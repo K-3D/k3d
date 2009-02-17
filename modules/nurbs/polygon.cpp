@@ -18,16 +18,20 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/node.h>
+#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/nurbs_curve.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -39,59 +43,69 @@ namespace nurbs
 // polygon
 
 class polygon :
-			public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	polygon(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document),
-			m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Sides")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-			m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
+		base(Factory, Document),
+		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Sides")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
-		m_material.changed_signal().connect(make_reset_mesh_slot());
-		m_u_segments.changed_signal().connect(make_reset_mesh_slot());
-		m_radius.changed_signal().connect(make_reset_mesh_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_radius.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_u_segments.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		k3d::legacy::nucurve_group* const nucurve_group = new k3d::legacy::nucurve_group();
-		k3d::legacy::nucurve* const nucurve = new k3d::legacy::nucurve();
+		Output = k3d::mesh();
 
-		Mesh.nucurve_groups.push_back(nucurve_group);
-		nucurve_group->curves.push_back(nucurve);
-		nucurve_group->material = m_material.pipeline_value();
+		k3d::imaterial* const material = m_material.pipeline_value();
+		const k3d::double_t radius = m_radius.pipeline_value();
+		const k3d::int32_t u_segments = m_u_segments.pipeline_value();
 
-		// Create a NURBS polygon ...
-		nucurve->order = 2;
+		// Create curve ...
+		k3d::mesh::points_t& points = Output.points.create();
+		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
 
-		// Get side number ...
-		const unsigned long u_segments = m_u_segments.pipeline_value();
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> primitive(k3d::nurbs_curve::create(Output));
 
-		// Build knot vector ...
-		nucurve->knots.push_back(0);
-		for (unsigned long n = 0; n <= u_segments; ++n)
-			nucurve->knots.push_back(n);
-		nucurve->knots.push_back(u_segments);
+		primitive->first_curves.push_back(primitive->curve_first_points.size());
+		primitive->curve_counts.push_back(1);
+		primitive->materials.push_back(material);
 
-		// Build control vertices ...
-		const double radius = m_radius.pipeline_value();
+		primitive->curve_first_points.push_back(primitive->curve_points.size());
+		primitive->curve_point_counts.push_back(u_segments + 1);
+		primitive->curve_orders.push_back(2);
+		primitive->curve_first_knots.push_back(primitive->curve_knots.size());
+		primitive->curve_selections.push_back(0.0);
 
-		for (unsigned long n = 0; n != u_segments; ++n)
+		for(k3d::int32_t i = 0; i != u_segments; ++i)
 		{
-			const double angle = k3d::pi_over_2() + k3d::pi_times_2() / static_cast<double>(u_segments) * static_cast<double>(n);
+			const k3d::double_t angle = k3d::pi_over_2() + k3d::pi_times_2() / static_cast<k3d::double_t>(u_segments) * static_cast<k3d::double_t>(i);
 
-			k3d::legacy::point* const new_point = new k3d::legacy::point(radius * cos(angle), radius * sin(angle), 0.0);
-			Mesh.points.push_back(new_point);
-			nucurve->control_points.push_back(k3d::legacy::nucurve::control_point(new_point));
+			points.push_back(radius * k3d::point3(cos(angle), sin(angle), 0));
+			point_selection.push_back(0);
+
+			primitive->curve_points.push_back(i);
+			primitive->curve_point_weights.push_back(1);
 		}
-		nucurve->control_points.push_back(k3d::legacy::nucurve::control_point(Mesh.points.front()));
+		primitive->curve_points.push_back(0);
+		primitive->curve_point_weights.push_back(1);
 
-		assert_warning(k3d::legacy::is_valid(*nucurve));
+		primitive->curve_knots.push_back(0);
+		for(k3d::int32_t i = 0; i <= u_segments; ++i)
+			primitive->curve_knots.push_back(i);
+		primitive->curve_knots.push_back(u_segments);
+
 	}
 
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
@@ -108,8 +122,8 @@ public:
 	}
 
 private:
-	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_segments;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_segments;
 };
 
 /////////////////////////////////////////////////////////////////////////////

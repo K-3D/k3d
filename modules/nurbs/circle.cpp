@@ -18,17 +18,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -40,51 +44,71 @@ namespace nurbs
 // circle
 
 class circle :
-			public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	circle(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document),
-			m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-			m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("thetamax")) + init_description(_("End angle")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
-			m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+		base(Factory, Document),
+		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("thetamax")) + init_description(_("End angle")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
+		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
-		m_material.changed_signal().connect(make_reset_mesh_slot());
-		m_radius.changed_signal().connect(make_reset_mesh_slot());
-		m_thetamax.changed_signal().connect(make_reset_mesh_slot());
-		m_u_segments.changed_signal().connect(make_reset_mesh_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_radius.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_thetamax.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_u_segments.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		const double radius = m_radius.pipeline_value();
-		const double thetamax = m_thetamax.pipeline_value();
-		const unsigned long u_segments = m_u_segments.pipeline_value();
+		Output = k3d::mesh();
 
-		k3d::legacy::nucurve_group* const nucurve_group = new k3d::legacy::nucurve_group();
-		k3d::legacy::nucurve* const nucurve = new k3d::legacy::nucurve();
-		Mesh.nucurve_groups.push_back(nucurve_group);
-		nucurve_group->curves.push_back(nucurve);
-		nucurve_group->material = m_material.pipeline_value();
-		nucurve->order = 3;
+		k3d::imaterial* const material = m_material.pipeline_value();
+		const k3d::double_t radius = m_radius.pipeline_value();
+		const k3d::double_t thetamax = m_thetamax.pipeline_value();
+		const k3d::int32_t u_segments = m_u_segments.pipeline_value();
 
-		std::vector<double> weights;
+		// Compute NURBS control points ...
+		std::vector<k3d::double_t> knots;
+		std::vector<k3d::double_t> weights;
 		std::vector<k3d::point3> control_points;
-		k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, u_segments, nucurve->knots, weights, control_points);
-		return_if_fail(weights.size() == control_points.size());
+		k3d::nurbs::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, thetamax, u_segments, knots, weights, control_points);
 
-		for (unsigned long i = 0; i != control_points.size(); ++i)
+		// Create points ...
+		k3d::mesh::points_t& points = Output.points.create(new k3d::mesh::points_t(control_points.size()));
+		k3d::mesh::selection_t& point_selection = Output.point_selection.create(new k3d::mesh::selection_t(control_points.size(), 0.0));
+		for(k3d::uint_t i = 0; i != control_points.size(); ++i)
+			points[i] = radius * control_points[i];
+		
+		// Create curve ...
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> primitive(k3d::nurbs_curve::create(Output));
+
+		primitive->first_curves.push_back(primitive->curve_first_points.size());
+		primitive->curve_counts.push_back(1);
+		primitive->materials.push_back(material);
+
+		primitive->curve_first_points.push_back(primitive->curve_points.size());
+		primitive->curve_point_counts.push_back(control_points.size());
+		primitive->curve_orders.push_back(3);
+		primitive->curve_first_knots.push_back(primitive->curve_knots.size());
+		primitive->curve_selections.push_back(0.0);
+
+		for(k3d::uint_t i = 0; i != control_points.size(); ++i)
 		{
-			Mesh.points.push_back(new k3d::legacy::point(radius * control_points[i]));
-			nucurve->control_points.push_back(k3d::legacy::nucurve::control_point(Mesh.points.back(), weights[i]));
+			primitive->curve_points.push_back(i);
+			primitive->curve_point_weights.push_back(weights[i]);
 		}
 
-		assert_warning(k3d::legacy::is_valid(*nucurve));
+		primitive->curve_knots.assign(knots.begin(), knots.end());
 	}
 
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
