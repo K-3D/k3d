@@ -4,7 +4,7 @@ import k3d
 
 doc = k3d.new_document()
 
-node_selection = k3d.dynamic_cast(doc.new_node("NodeSelection"), "inode_selection")
+node_selection = doc.new_node("NodeSelection")
 
 node1 = doc.new_node("FrozenMesh")
 node2 = doc.new_node("FrozenMesh")

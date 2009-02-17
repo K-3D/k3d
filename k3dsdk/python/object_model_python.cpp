@@ -284,7 +284,7 @@ void module_close_document(idocument_wrapper& Document)
 
 object module_get_command_node(const string_t& Path)
 {
-	return wrap(k3d::command_node::lookup(Path));
+	return wrap_unknown(k3d::command_node::lookup(Path));
 }
 
 object module_open_document(const string_t& Path)
