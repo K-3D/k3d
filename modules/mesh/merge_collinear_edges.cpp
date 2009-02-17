@@ -91,7 +91,23 @@ public:
 		k3d::mesh::indices_t redundant_edges;
 		k3d::polyhedron::mark_collinear_edges(redundant_edges, input_edge_selection, points, edge_points, clockwise_edges, vertex_valences, boundary_edges, companions, m_threshold.pipeline_value());
 		
-		k3d::euler::kill_edge_and_vertex(Output.polyhedra.writable(), redundant_edges, boundary_edges, companions, points.size());
+		k3d::mesh::polyhedra_t& output_polyhedra = Output.polyhedra.writable();
+		k3d::polyhedron::primitive output_primitive(output_polyhedra.first_faces.writable(),
+				output_polyhedra.face_counts.writable(),
+				output_polyhedra.types.writable(),
+				output_polyhedra.face_first_loops.writable(),
+				output_polyhedra.face_loop_counts.writable(),
+				output_polyhedra.face_selection.writable(),
+				output_polyhedra.face_materials.writable(),
+				output_polyhedra.loop_first_edges.writable(),
+				output_polyhedra.edge_points.writable(),
+				output_polyhedra.clockwise_edges.writable(),
+				output_polyhedra.edge_selection.writable(),
+				output_polyhedra.constant_data,
+				output_polyhedra.uniform_data,
+				output_polyhedra.face_varying_data);
+		
+		k3d::euler::kill_edge_and_vertex(output_primitive, redundant_edges, boundary_edges, companions, points.size());
 		
 		k3d::mesh::delete_unused_points(Output);
 	}

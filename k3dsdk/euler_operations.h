@@ -21,6 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "mesh.h"
+#include "polyhedron.h"
 
 namespace k3d
 {
@@ -66,7 +67,7 @@ const uint_t number(const mesh& Mesh, const uint_t Polyhedron);
  * \param Points The coordinates of the points for the mesh
  * \param FaceNormals The normal for each face
  */
-void kill_edge_make_loop(mesh::polyhedra_t& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const mesh::points_t& Points, const mesh::normals_t& FaceNormals);
+void kill_edge_make_loop(polyhedron::primitive& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const mesh::points_t& Points, const mesh::normals_t& FaceNormals);
 
 /// Apply the Kill Edge and Vertex (KEV) Euler operation to all selected edges
 /**
@@ -78,7 +79,7 @@ void kill_edge_make_loop(mesh::polyhedra_t& Output, const mesh::indices_t& EdgeL
  * \param AdjacentEdges The index of the adjacent edge (companion) for each edge
  * \param PointCount The number of points in the mesh
  */
-void kill_edge_and_vertex(mesh::polyhedra_t& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const uint_t PointCount);
+void kill_edge_and_vertex(polyhedron::primitive& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const uint_t PointCount);
 
 } // namespace euler
 

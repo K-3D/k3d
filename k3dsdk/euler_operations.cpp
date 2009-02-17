@@ -19,7 +19,6 @@
 
 #include "euler_operations.h"
 #include "mesh_operations.h"
-#include "polyhedron.h"
 
 #include <set>
 
@@ -116,7 +115,7 @@ void delete_loop_if_degenerate(const uint_t Loop, const mesh::indices_t& LoopFac
 }
 
 /// Update output arrays based on geometry that is marked for deletion
-void remove_deleted_geometry(mesh::polyhedra_t& Output,
+void remove_deleted_geometry(polyhedron::primitive& Output,
 		const mesh::indices_t& FaceFirstLoops,
 		const mesh::counts_t& FaceLoopCounts,
 		const mesh::indices_t& LoopFirstEdges,
@@ -133,10 +132,14 @@ void remove_deleted_geometry(mesh::polyhedra_t& Output,
 	mesh::counts_t edges_to_delete_sum(edge_count);
 	detail::cumulative_sum(EdgesToDelete, edges_to_delete_sum);
 	mesh::indices_t loop_map(LoopFirstEdges.size()); // mapping between old and new loop numbers
-	mesh::indices_t& output_loop_first_edges = Output.loop_first_edges.create();
-	mesh::indices_t& output_face_first_loops = Output.face_first_loops.create();
-	mesh::indices_t& output_face_loop_counts = Output.face_loop_counts.create();
-	mesh::selection_t& output_face_selection = Output.face_selection.create();
+	mesh::indices_t& output_loop_first_edges = Output.loop_first_edges;
+	output_loop_first_edges.clear();
+	mesh::indices_t& output_face_first_loops = Output.face_first_loops;
+	output_face_first_loops.clear();
+	mesh::indices_t& output_face_loop_counts = Output.face_loop_counts;
+	output_face_loop_counts.clear();
+	mesh::selection_t& output_face_selection = Output.face_selections;
+	output_face_selection.clear();
 	mesh::indices_t face_map(face_count);
 	for(uint_t loop = 0; loop != LoopFirstEdges.size(); ++loop)
 	{
@@ -170,8 +173,10 @@ void remove_deleted_geometry(mesh::polyhedra_t& Output,
 			}
 		}
 	}
-	mesh::indices_t& output_edge_points = Output.edge_points.create();
-	mesh::indices_t& output_clockwise_edges = Output.clockwise_edges.create();
+	mesh::indices_t& output_edge_points = Output.edge_points;
+	output_edge_points.clear();
+	mesh::indices_t& output_clockwise_edges = Output.clockwise_edges;
+	output_clockwise_edges.clear();
 	for(uint_t edge = 0; edge != edge_count; ++edge)
 	{
 		if(!EdgesToDelete[edge])
@@ -180,12 +185,15 @@ void remove_deleted_geometry(mesh::polyhedra_t& Output,
 			output_clockwise_edges.push_back(ClockwiseEdges[edge] - edges_to_delete_sum[ClockwiseEdges[edge]]);
 		}
 	}
-	const mesh::indices_t first_faces = *Output.first_faces;
-	const mesh::indices_t face_counts = *Output.face_counts;
-	const mesh::polyhedra_t::types_t types = *Output.types;
-	mesh::indices_t& output_first_faces = Output.first_faces.create();
-	mesh::indices_t& output_face_counts = Output.face_counts.create();
-	mesh::polyhedra_t::types_t& output_types = Output.types.create();
+	const mesh::indices_t first_faces = Output.first_faces;
+	const mesh::indices_t face_counts = Output.face_counts;
+	const mesh::polyhedra_t::types_t types = Output.polyhedron_types;
+	mesh::indices_t& output_first_faces = Output.first_faces;
+	output_first_faces.clear();
+	mesh::indices_t& output_face_counts = Output.face_counts;
+	output_face_counts.clear();
+	mesh::polyhedra_t::types_t& output_types = Output.polyhedron_types;
+	output_types.clear();
 	mesh::counts_t faces_to_delete_sum(FacesToDelete.size());
 	detail::cumulative_sum(FacesToDelete, faces_to_delete_sum);
 	uint_t new_first_face = 0;
@@ -286,14 +294,14 @@ const uint_t number(const mesh& Mesh, const uint_t Polyhedron)
 	return vertex_count - edge_count + face_count - (loop_count - face_count);
 }
 
-void kill_edge_make_loop(mesh::polyhedra_t& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const mesh::points_t& Points, const mesh::normals_t& FaceNormals)
+void kill_edge_make_loop(polyhedron::primitive& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const mesh::points_t& Points, const mesh::normals_t& FaceNormals)
 {
 	// Copies, so we can use them as temp storage between the individiual KEML operations
-	const mesh::indices_t face_first_loops = *Output.face_first_loops;
-	mesh::counts_t face_loop_counts = *Output.face_loop_counts;
-	mesh::indices_t loop_first_edges = *Output.loop_first_edges;
-	mesh::indices_t clockwise_edges = *Output.clockwise_edges;
-	const mesh::indices_t edge_points = *Output.edge_points;
+	const mesh::indices_t face_first_loops = Output.face_first_loops;
+	mesh::counts_t face_loop_counts = Output.face_loop_counts;
+	mesh::indices_t loop_first_edges = Output.loop_first_edges;
+	mesh::indices_t clockwise_edges = Output.clockwise_edges;
+	const mesh::indices_t edge_points = Output.edge_points;
 	
 	const double_t threshold = 1e-1; // Threshold for normal comparison
 	
@@ -445,17 +453,17 @@ void kill_edge_make_loop(mesh::polyhedra_t& Output, const mesh::indices_t& EdgeL
 	detail::cumulative_sum(edges_to_delete, edges_to_delete_sum);
 	// Update the output arrays
 	detail::remove_deleted_geometry(Output, face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, faces_to_delete, loops_to_delete, edges_to_delete, loop_faces, face_selection);
-	Output.face_materials.create(new mesh::materials_t(Output.face_first_loops->size(), static_cast<imaterial*>(0)));
-	mesh::selection_t& edge_selection = Output.edge_selection.create(new mesh::selection_t(Output.edge_points->size(), 0.0));
+	Output.face_materials.assign(Output.face_first_loops.size(), static_cast<imaterial*>(0));
+	Output.edge_selections.assign(Output.edge_points.size(), 0.0);
 }
 
-void kill_edge_and_vertex(mesh::polyhedra_t& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const uint_t PointCount)
+void kill_edge_and_vertex(polyhedron::primitive& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const uint_t PointCount)
 {
-	const mesh::indices_t face_first_loops = *Output.face_first_loops;
-	mesh::counts_t face_loop_counts = *Output.face_loop_counts;
-	mesh::indices_t loop_first_edges = *Output.loop_first_edges;
-	mesh::indices_t clockwise_edges = *Output.clockwise_edges;
-	mesh::indices_t edge_points = *Output.edge_points;
+	const mesh::indices_t face_first_loops = Output.face_first_loops;
+	mesh::counts_t face_loop_counts = Output.face_loop_counts;
+	mesh::indices_t loop_first_edges = Output.loop_first_edges;
+	mesh::indices_t clockwise_edges = Output.clockwise_edges;
+	mesh::indices_t edge_points = Output.edge_points;
 	// Copy the companions array, since it will change
 	mesh::indices_t companions = AdjacentEdges;
 	
@@ -563,8 +571,8 @@ void kill_edge_and_vertex(mesh::polyhedra_t& Output, const mesh::indices_t& Edge
 	
 	// Update output arrays
 	detail::remove_deleted_geometry(Output,face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, faces_to_delete, loops_to_delete, edges_to_delete, loop_faces, face_selection);
-	Output.face_materials.create(new mesh::materials_t(Output.face_first_loops->size(), static_cast<imaterial*>(0)));
-	Output.edge_selection.create(new mesh::selection_t(Output.clockwise_edges->size()));
+	Output.face_materials.assign(Output.face_first_loops.size(), static_cast<imaterial*>(0));
+	Output.edge_selections.assign(Output.clockwise_edges.size(), 0.0);
 }
 
 } // namespace euler
