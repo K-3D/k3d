@@ -91,6 +91,8 @@ static object getattr(iunknown_wrapper& Self, const string_t& Name)
 
 		throw std::invalid_argument("unknown property: " + Name);
 	}
+
+	return object();
 }
 
 // This rightfully belongs with the rest of the iproperty_collection code, but for some reason __getattr__
