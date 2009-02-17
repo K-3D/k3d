@@ -116,13 +116,16 @@ public:
 		const k3d::uint_t point_end = point_begin + OutputPoints.size();
 		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			values[0] = InputPoints[point].n[0];
-			values[1] = InputPoints[point].n[1];
-			values[2] = InputPoints[point].n[2];
-			output_point.n[0] = parser_x_component.evaluate(&values[0]);
-			output_point.n[1] = parser_y_component.evaluate(&values[0]);
-			output_point.n[2] = parser_z_component.evaluate(&values[0]);
-			OutputPoints[point] = PointSelection[point] * output_point;
+			if(PointSelection[point])
+			{
+				values[0] = InputPoints[point].n[0];
+				values[1] = InputPoints[point].n[1];
+				values[2] = InputPoints[point].n[2];
+				output_point.n[0] = parser_x_component.evaluate(&values[0]);
+				output_point.n[1] = parser_y_component.evaluate(&values[0]);
+				output_point.n[2] = parser_z_component.evaluate(&values[0]);
+				OutputPoints[point] = output_point;
+			}
 		}
 	}
 
