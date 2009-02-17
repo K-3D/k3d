@@ -90,7 +90,7 @@ iproperty* property_lookup(iproperty* const Source)
 	return result;
 }
 
-void save_external_resource(xml::element& Element, const ipersistent::save_context& Context, const std::string& Name, const ipath_property::reference_t Reference, const filesystem::path& Value)
+xml::element& save_external_resource(xml::element& Element, const ipersistent::save_context& Context, const std::string& Name, const ipath_property::reference_t Reference, const filesystem::path& Value)
 {
 	xml::element& xml_storage = Element.append(
 	xml::element("property",
@@ -160,6 +160,8 @@ void save_external_resource(xml::element& Element, const ipersistent::save_conte
 			break;
 		}
 	}
+	
+	return xml_storage;
 }
 
 void load_external_resource(xml::element& Element, const ipersistent::load_context& Context, ipath_property::reference_t& Reference, filesystem::path& Value)

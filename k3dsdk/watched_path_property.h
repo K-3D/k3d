@@ -46,7 +46,7 @@ public:
 	void watch(const bool_t Watch)
 	{
 		m_watched = Watch;
-		on_path_changed(0);
+		base::changed_signal().emit(0);
 	}
 	
 	const bool_t is_watched() const
@@ -94,6 +94,34 @@ private:
 	
 	bool_t m_watched;
 	uint_t m_watch_id;	
+};
+	
+/// Serialization policy for filesystem path data that handles external filesystem resources
+template<typename value_t, class property_policy_t>
+class watched_path_serialization :
+	public path_serialization<value_t, property_policy_t>
+{
+	// This policy only works for data stored by-value
+	BOOST_STATIC_ASSERT((!boost::is_pointer<value_t>::value));
+
+	typedef path_serialization<value_t, property_policy_t> base;
+	
+public:
+	void save(xml::element& Element, const ipersistent::save_context& Context)
+	{
+		xml::element& xml_storage = save_external_resource(Element, Context, property_policy_t::name(), property_policy_t::property_path_reference(), property_policy_t::internal_value());
+		xml_storage.append(xml::attribute("watched", property_policy_t::is_watched()));
+	}
+
+	void load(xml::element& Element, const ipersistent::load_context& Context)
+	{
+		base::load(Element, Context);
+		property_policy_t::watch(xml::attribute_value<bool_t>(Element, "watched", false));
+	}
+
+protected:
+	template<typename init_t>
+	watched_path_serialization(const init_t& Init) : base(Init) {}
 };
 
 } // namespace k3d

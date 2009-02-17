@@ -30,7 +30,9 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/command_tree.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/istate_recorder.h>
+#include <k3dsdk/iwatched_path_property.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/share.h>
@@ -40,6 +42,7 @@
 #include <gtkmm/combobox.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/liststore.h>
+#include <gtkmm/togglebutton.h>
 #include <gtkmm/tooltips.h>
 
 namespace libk3dngui
@@ -60,7 +63,8 @@ public:
 		idata_proxy(StateRecorder, ChangeMessage),
 		m_readable_data(Data),
 		m_writable_data(dynamic_cast<k3d::iwritable_property*>(&Data)),
-		m_path_data(dynamic_cast<k3d::ipath_property*>(&Data))
+		m_path_data(dynamic_cast<k3d::ipath_property*>(&Data)),
+		m_watched_data(dynamic_cast<k3d::iwatched_path_property*>(&Data))
 	{
 	}
 
@@ -105,6 +109,24 @@ public:
 	{
 		return m_readable_data.property_changed_signal();
 	}
+	
+	/// True if the underlying path can be watched for changes
+	const k3d::bool_t is_watchable() const
+	{
+		return m_watched_data;
+	}
+	
+	/// True if the path is watchable and is actually being watched 
+	const k3d::bool_t is_watched() const
+	{
+		return m_watched_data ? m_watched_data->is_watched() : false;
+	}
+	
+	void watch(const k3d::bool_t Watched)
+	{
+		return_if_fail(m_watched_data);
+		m_watched_data->watch(Watched);
+	}
 
 private:
 	data_proxy(const data_proxy& RHS);
@@ -113,6 +135,7 @@ private:
 	data_t& m_readable_data;
 	k3d::iwritable_property* const m_writable_data;
 	k3d::ipath_property* const m_path_data;
+	k3d::iwatched_path_property* const m_watched_data;
 };
 
 std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
@@ -128,6 +151,7 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	m_entry(new hotkey_entry),
 	m_button(new Gtk::Button("...")),
 	m_combo(new Gtk::ComboBox()),
+	m_toggle_button(0),
 	m_data(Data),
 	m_disable_set_value(false)
 {
@@ -160,6 +184,15 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	pack_start(*manage(m_entry), Gtk::PACK_EXPAND_WIDGET);
 	pack_start(*manage(m_button), Gtk::PACK_SHRINK);
 	pack_start(*manage(m_combo), Gtk::PACK_SHRINK);
+	
+	if(m_data.get() && m_data->is_watchable())
+	{
+		m_toggle_button = new Gtk::ToggleButton(_("Watch"), true);
+		m_toggle_button->set_active(true);
+		m_toggle_button->signal_toggled().connect(sigc::mem_fun(*this, &control::on_watch_toggle));
+		tooltips().set_tip(*m_toggle_button, _("Watch/unwatch file for changes"));
+		pack_start(*manage(m_toggle_button), Gtk::PACK_SHRINK);
+	}
 
 	data_changed(0);
 
@@ -281,6 +314,16 @@ void control::on_pick_reference_type()
 	m_data->set_reference(m_combo->get_active()->get_value(m_columns.reference));
 }
 
+void control::on_watch_toggle()
+{
+	if(m_disable_set_value)
+		return;
+	k3d::log() << debug << "doing watch toggle" << std::endl;
+	return_if_fail(m_data.get());
+	m_data->watch(!m_data->is_watched());
+	k3d::log() << debug << "watch toggle finished" << std::endl;
+}
+
 void control::set_value()
 {
 	if(m_disable_set_value)
@@ -339,7 +382,7 @@ void control::set_value()
 	m_disable_set_value = false;
 }
 
-void control::data_changed(k3d::ihint*)
+void control::data_changed(k3d::ihint* Hint)
 {
 	return_if_fail(m_data.get());
 
@@ -347,6 +390,12 @@ void control::data_changed(k3d::ihint*)
 	tooltips().set_tip(*m_entry, m_data->value().native_utf8_string().raw());
 
 	m_combo->set_active(m_data->reference());
+	if(m_toggle_button)
+	{
+		m_disable_set_value = true;
+		m_toggle_button->set_active(m_data->is_watched());
+		m_disable_set_value = false;
+	}
 }
 
 void control::on_reference_type_changed()

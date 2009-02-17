@@ -70,6 +70,13 @@ public:
 	typedef sigc::signal<void, k3d::ihint*> changed_signal_t;
 	/// Signal emitted if the underlying data changes
 	virtual changed_signal_t& changed_signal() = 0;
+	
+	/// True if the underlying path can be watched for changes
+	virtual const k3d::bool_t is_watchable() const = 0;
+	/// True if the path is watchable and is actually being watched 
+	virtual const k3d::bool_t is_watched() const = 0;
+	/// Watch the path
+	virtual void watch(const k3d::bool_t Watched) = 0;
 
 	/// Stores an optional state recorder for recording undo/redo data
 	k3d::istate_recorder* const state_recorder;
@@ -118,6 +125,8 @@ private:
 	void data_changed(k3d::ihint*);
 	/// Called whenever the underlying data reference changes
 	void on_reference_type_changed();
+	/// Called whenever the watch change toggle button is toggled
+	void on_watch_toggle();
 
 	/// Stores an entry widget for displaying the current value
 	hotkey_entry* const m_entry;
@@ -125,9 +134,11 @@ private:
 	Gtk::Button* const m_button;
 	/// Stores a combo-box for picking absolute, relative, or inline path behavior
 	Gtk::ComboBox* const m_combo;
-	/// Storeas a reference to the underlying data object
+	/// Stores a toggle button to set if the file should be watched, if the path property is watchable
+	Gtk::ToggleButton* m_toggle_button;
+	/// Stores a reference to the underlying data object
 	std::auto_ptr<idata_proxy> m_data;
-	/// Prevent set_value() from being called recursively (a hack)
+	/// Prevent set_value() and on_watch_toggle from being called recursively (a hack)
 	bool m_disable_set_value;
 
 	class reference_columns :

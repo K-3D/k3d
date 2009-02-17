@@ -89,7 +89,7 @@ protected:
 	}
 
 	/// Stores the input file path.
-	k3d_data(filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, watched_path_property, path_serialization) m_file;
+	k3d_data(filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, watched_path_property, watched_path_serialization) m_file;
 	/// Center the output mesh on the origin.
 	k3d_data(bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_center;
 	/// Scale the output mesh to fit within a fixed-size bounding-box.
