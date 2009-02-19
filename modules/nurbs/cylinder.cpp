@@ -107,7 +107,7 @@ public:
 
 		for(k3d::int32_t i = 0; i <= v_segments; ++i)
 		{
-			const k3d::point3 offset = k3d::mix(zmin, zmax, static_cast<k3d::double_t>(i) / static_cast<k3d::double_t>(v_segments)) * k3d::point3(0, 0, 1);
+			const k3d::vector3 offset = k3d::mix(zmin, zmax, static_cast<k3d::double_t>(i) / static_cast<k3d::double_t>(v_segments)) * k3d::vector3(0, 0, 1);
 
 			for(k3d::uint_t j = 0; j != control_points.size(); ++j)
 			{
