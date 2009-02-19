@@ -32,6 +32,8 @@
 #include <k3dsdk/nurbs.h>
 #include <k3dsdk/nurbs_patch.h>
 
+#include <boost/scoped_ptr.hpp>
+
 namespace module
 {
 
