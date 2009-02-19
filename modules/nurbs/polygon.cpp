@@ -89,11 +89,11 @@ public:
 		{
 			const k3d::double_t angle = k3d::pi_over_2() + k3d::pi_times_2() / static_cast<k3d::double_t>(u_segments) * static_cast<k3d::double_t>(i);
 
+			primitive->curve_points.push_back(points.size());
+			primitive->curve_point_weights.push_back(1);
+
 			points.push_back(radius * k3d::point3(cos(angle), sin(angle), 0));
 			point_selection.push_back(0);
-
-			primitive->curve_points.push_back(i);
-			primitive->curve_point_weights.push_back(1);
 		}
 		primitive->curve_points.push_back(0);
 		primitive->curve_point_weights.push_back(1);
