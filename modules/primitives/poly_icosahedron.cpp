@@ -60,7 +60,7 @@ public:
 		Output = k3d::mesh();
 
 		k3d::imaterial* const material = m_material.pipeline_value();
-		const double radius = m_radius.pipeline_value();
+		const k3d::double_t radius = m_radius.pipeline_value();
 
 		// Create points ...
 		const k3d::uint_t point_count = 12;
@@ -123,16 +123,16 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
 
-	static double vdata[12][3];
-	static size_t tindices[20][3];
+	static k3d::double_t vdata[12][3];
+	static k3d::uint_t tindices[20][3];
 };
 
 #define X .525731112119133606
 #define Z .850650808352039932
 
-double poly_icosahedron::vdata[12][3] = {
+k3d::double_t poly_icosahedron::vdata[12][3] = {
 	{-X, 0, Z},
 	{X, 0, Z},
 	{-X, 0, -Z},
@@ -146,7 +146,7 @@ double poly_icosahedron::vdata[12][3] = {
 	{Z, -X, 0},
 	{-Z, -X, 0}};
 
-size_t poly_icosahedron::tindices[20][3] = {
+k3d::uint_t poly_icosahedron::tindices[20][3] = {
 	{1, 4, 0},
 	{4, 9, 0},
 	{4, 5, 9},
