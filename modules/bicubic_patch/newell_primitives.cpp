@@ -18,373 +18,29 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/bicubic_patch.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/teapot.h>
 
-namespace libk3dprimitives
+#include <boost/scoped_ptr.hpp>
+
+namespace module
 {
 
-const double TeapotPoints[306][3] =
+namespace bicubic_patch
 {
-	{1.4,0.0,2.4},
-	{1.4,-0.784,2.4},
-	{0.784,-1.4,2.4},
-	{0.0,-1.4,2.4},
-	{1.3375,0.0,2.53125},
-	{1.3375,-0.749,2.53125},
-	{0.749,-1.3375,2.53125},
-	{0.0,-1.3375,2.53125},
-	{1.4375,0.0,2.53125},
-	{1.4375,-0.805,2.53125},
-	{0.805,-1.4375,2.53125},
-	{0.0,-1.4375,2.53125},
-	{1.5,0.0,2.4},
-	{1.5,-0.84,2.4},
-	{0.84,-1.5,2.4},
-	{0.0,-1.5,2.4},
-	{-0.784,-1.4,2.4},
-	{-1.4,-0.784,2.4},
-	{-1.4,0.0,2.4},
-	{-0.749,-1.3375,2.53125},
-	{-1.3375,-0.749,2.53125},
-	{-1.3375,0.0,2.53125},
-	{-0.805,-1.4375,2.53125},
-	{-1.4375,-0.805,2.53125},
-	{-1.4375,0.0,2.53125},
-	{-0.84,-1.5,2.4},
-	{-1.5,-0.84,2.4},
-	{-1.5,0.0,2.4},
-	{-1.4,0.784,2.4},
-	{-0.784,1.4,2.4},
-	{0.0,1.4,2.4},
-	{-1.3375,0.749,2.53125},
-	{-0.749,1.3375,2.53125},
-	{0.0,1.3375,2.53125},
-	{-1.4375,0.805,2.53125},
-	{-0.805,1.4375,2.53125},
-	{0.0,1.4375,2.53125},
-	{-1.5,0.84,2.4},
-	{-0.84,1.5,2.4},
-	{0.0,1.5,2.4},
-	{0.784,1.4,2.4},
-	{1.4,0.784,2.4},
-	{0.749,1.3375,2.53125},
-	{1.3375,0.749,2.53125},
-	{0.805,1.4375,2.53125},
-	{1.4375,0.805,2.53125},
-	{0.84,1.5,2.4},
-	{1.5,0.84,2.4},
-	{1.75,0.0,1.875},
-	{1.75,-0.98,1.875},
-	{0.98,-1.75,1.875},
-	{0.0,-1.75,1.875},
-	{2.0,0.0,1.35},
-	{2.0,-1.12,1.35},
-	{1.12,-2.0,1.35},
-	{0.0,-2.0,1.35},
-	{2.0,0.0,0.9},
-	{2.0,-1.12,0.9},
-	{1.12,-2.0,0.9},
-	{0.0,-2.0,0.9},
-	{-0.98,-1.75,1.875},
-	{-1.75,-0.98,1.875},
-	{-1.75,0.0,1.875},
-	{-1.12,-2.0,1.35},
-	{-2.0,-1.12,1.35},
-	{-2.0,0.0,1.35},
-	{-1.12,-2.0,0.9},
-	{-2.0,-1.12,0.9},
-	{-2.0,0.0,0.9},
-	{-1.75,0.98,1.875},
-	{-0.98,1.75,1.875},
-	{0.0,1.75,1.875},
-	{-2.0,1.12,1.35},
-	{-1.12,2.0,1.35},
-	{0.0,2.0,1.35},
-	{-2.0,1.12,0.9},
-	{-1.12,2.0,0.9},
-	{0.0,2.0,0.9},
-	{0.98,1.75,1.875},
-	{1.75,0.98,1.875},
-	{1.12,2.0,1.35},
-	{2.0,1.12,1.35},
-	{1.12,2.0,0.9},
-	{2.0,1.12,0.9},
-	{2.0,0.0,0.45},
-	{2.0,-1.12,0.45},
-	{1.12,-2.0,0.45},
-	{0.0,-2.0,0.45},
-	{1.5,0.0,0.225},
-	{1.5,-0.84,0.225},
-	{0.84,-1.5,0.225},
-	{0.0,-1.5,0.225},
-	{1.5,0.0,0.15},
-	{1.5,-0.84,0.15},
-	{0.84,-1.5,0.15},
-	{0.0,-1.5,0.15},
-	{-1.12,-2.0,0.45},
-	{-2.0,-1.12,0.45},
-	{-2.0,0.0,0.45},
-	{-0.84,-1.5,0.225},
-	{-1.5,-0.84,0.225},
-	{-1.5,0.0,0.225},
-	{-0.84,-1.5,0.15},
-	{-1.5,-0.84,0.15},
-	{-1.5,0.0,0.15},
-	{-2.0,1.12,0.45},
-	{-1.12,2.0,0.45},
-	{0.0,2.0,0.45},
-	{-1.5,0.84,0.225},
-	{-0.84,1.5,0.225},
-	{0.0,1.5,0.225},
-	{-1.5,0.84,0.15},
-	{-0.84,1.5,0.15},
-	{0.0,1.5,0.15},
-	{1.12,2.0,0.45},
-	{2.0,1.12,0.45},
-	{0.84,1.5,0.225},
-	{1.5,0.84,0.225},
-	{0.84,1.5,0.15},
-	{1.5,0.84,0.15},
-	{-1.6,0.0,2.025},
-	{-1.6,-0.3,2.025},
-	{-1.5,-0.3,2.25},
-	{-1.5,0.0,2.25},
-	{-2.3,0.0,2.025},
-	{-2.3,-0.3,2.025},
-	{-2.5,-0.3,2.25},
-	{-2.5,0.0,2.25},
-	{-2.7,0.0,2.025},
-	{-2.7,-0.3,2.025},
-	{-3.0,-0.3,2.25},
-	{-3.0,0.0,2.25},
-	{-2.7,0.0,1.8},
-	{-2.7,-0.3,1.8},
-	{-3.0,-0.3,1.8},
-	{-3.0,0.0,1.8},
-	{-1.5,0.3,2.25},
-	{-1.6,0.3,2.025},
-	{-2.5,0.3,2.25},
-	{-2.3,0.3,2.025},
-	{-3.0,0.3,2.25},
-	{-2.7,0.3,2.025},
-	{-3.0,0.3,1.8},
-	{-2.7,0.3,1.8},
-	{-2.7,0.0,1.575},
-	{-2.7,-0.3,1.575},
-	{-3.0,-0.3,1.35},
-	{-3.0,0.0,1.35},
-	{-2.5,0.0,1.125},
-	{-2.5,-0.3,1.125},
-	{-2.65,-0.3,0.9375},
-	{-2.65,0.0,0.9375},
-	{-2.0,-0.3,0.9},
-	{-1.9,-0.3,0.6},
-	{-1.9,0.0,0.6},
-	{-3.0,0.3,1.35},
-	{-2.7,0.3,1.575},
-	{-2.65,0.3,0.9375},
-	{-2.5,0.3,1.125},
-	{-1.9,0.3,0.6},
-	{-2.0,0.3,0.9},
-	{1.7,0.0,1.425},
-	{1.7,-0.66,1.425},
-	{1.7,-0.66,0.6},
-	{1.7,0.0,0.6},
-	{2.6,0.0,1.425},
-	{2.6,-0.66,1.425},
-	{3.1,-0.66,0.825},
-	{3.1,0.0,0.825},
-	{2.3,0.0,2.1},
-	{2.3,-0.25,2.1},
-	{2.4,-0.25,2.025},
-	{2.4,0.0,2.025},
-	{2.7,0.0,2.4},
-	{2.7,-0.25,2.4},
-	{3.3,-0.25,2.4},
-	{3.3,0.0,2.4},
-	{1.7,0.66,0.6},
-	{1.7,0.66,1.425},
-	{3.1,0.66,0.825},
-	{2.6,0.66,1.425},
-	{2.4,0.25,2.025},
-	{2.3,0.25,2.1},
-	{3.3,0.25,2.4},
-	{2.7,0.25,2.4},
-	{2.8,0.0,2.475},
-	{2.8,-0.25,2.475},
-	{3.525,-0.25,2.49375},
-	{3.525,0.0,2.49375},
-	{2.9,0.0,2.475},
-	{2.9,-0.15,2.475},
-	{3.45,-0.15,2.5125},
-	{3.45,0.0,2.5125},
-	{2.8,0.0,2.4},
-	{2.8,-0.15,2.4},
-	{3.2,-0.15,2.4},
-	{3.2,0.0,2.4},
-	{3.525,0.25,2.49375},
-	{2.8,0.25,2.475},
-	{3.45,0.15,2.5125},
-	{2.9,0.15,2.475},
-	{3.2,0.15,2.4},
-	{2.8,0.15,2.4},
-	{0.0,0.0,3.15},
-	{0.0,-0.002,3.15},
-	{0.002,0.0,3.15},
-	{0.8,0.0,3.15},
-	{0.8,-0.45,3.15},
-	{0.45,-0.8,3.15},
-	{0.0,-0.8,3.15},
-	{0.0,0.0,2.85},
-	{0.2,0.0,2.7},
-	{0.2,-0.112,2.7},
-	{0.112,-0.2,2.7},
-	{0.0,-0.2,2.7},
-	{-0.002,0.0,3.15},
-	{-0.45,-0.8,3.15},
-	{-0.8,-0.45,3.15},
-	{-0.8,0.0,3.15},
-	{-0.112,-0.2,2.7},
-	{-0.2,-0.112,2.7},
-	{-0.2,0.0,2.7},
-	{0.0,0.002,3.15},
-	{-0.8,0.45,3.15},
-	{-0.45,0.8,3.15},
-	{0.0,0.8,3.15},
-	{-0.2,0.112,2.7},
-	{-0.112,0.2,2.7},
-	{0.0,0.2,2.7},
-	{0.45,0.8,3.15},
-	{0.8,0.45,3.15},
-	{0.112,0.2,2.7},
-	{0.2,0.112,2.7},
-	{0.4,0.0,2.55},
-	{0.4,-0.224,2.55},
-	{0.224,-0.4,2.55},
-	{0.0,-0.4,2.55},
-	{1.3,0.0,2.55},
-	{1.3,-0.728,2.55},
-	{0.728,-1.3,2.55},
-	{0.0,-1.3,2.55},
-	{1.3,0.0,2.4},
-	{1.3,-0.728,2.4},
-	{0.728,-1.3,2.4},
-	{0.0,-1.3,2.4},
-	{-0.224,-0.4,2.55},
-	{-0.4,-0.224,2.55},
-	{-0.4,0.0,2.55},
-	{-0.728,-1.3,2.55},
-	{-1.3,-0.728,2.55},
-	{-1.3,0.0,2.55},
-	{-0.728,-1.3,2.4},
-	{-1.3,-0.728,2.4},
-	{-1.3,0.0,2.4},
-	{-0.4,0.224,2.55},
-	{-0.224,0.4,2.55},
-	{0.0,0.4,2.55},
-	{-1.3,0.728,2.55},
-	{-0.728,1.3,2.55},
-	{0.0,1.3,2.55},
-	{-1.3,0.728,2.4},
-	{-0.728,1.3,2.4},
-	{0.0,1.3,2.4},
-	{0.224,0.4,2.55},
-	{0.4,0.224,2.55},
-	{0.728,1.3,2.55},
-	{1.3,0.728,2.55},
-	{0.728,1.3,2.4},
-	{1.3,0.728,2.4},
-	{0.0,0.0,0.0},
-	{1.5,0.0,0.15},
-	{1.5,0.84,0.15},
-	{0.84,1.5,0.15},
-	{0.0,1.5,0.15},
-	{1.5,0.0,0.075},
-	{1.5,0.84,0.075},
-	{0.84,1.5,0.075},
-	{0.0,1.5,0.075},
-	{1.425,0.0,0.0},
-	{1.425,0.798,0.0},
-	{0.798,1.425,0.0},
-	{0.0,1.425,0.0},
-	{-0.84,1.5,0.15},
-	{-1.5,0.84,0.15},
-	{-1.5,0.0,0.15},
-	{-0.84,1.5,0.075},
-	{-1.5,0.84,0.075},
-	{-1.5,0.0,0.075},
-	{-0.798,1.425,0.0},
-	{-1.425,0.798,0.0},
-	{-1.425,0.0,0.0},
-	{-1.5,-0.84,0.15},
-	{-0.84,-1.5,0.15},
-	{0.0,-1.5,0.15},
-	{-1.5,-0.84,0.075},
-	{-0.84,-1.5,0.075},
-	{0.0,-1.5,0.075},
-	{-1.425,-0.798,0.0},
-	{-0.798,-1.425,0.0},
-	{0.0,-1.425,0.0},
-	{0.84,-1.5,0.15},
-	{1.5,-0.84,0.15},
-	{0.84,-1.5,0.075},
-	{1.5,-0.84,0.075},
-	{0.798,-1.425,0.0},
-	{1.425,-0.798,0.0}
-};
 
-const unsigned long TeapotPatches[32][16] =
-{
-	// Rim
-	{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16},
-	{4,17,18,19,8,20,21,22,12,23,24,25,16,26,27,28},
-	{19,29,30,31,22,32,33,34,25,35,36,37,28,38,39,40},
-	{31,41,42,1,34,43,44,5,37,45,46,9,40,47,48,13},
-	// Body
-	{13,14,15,16,49,50,51,52,53,54,55,56,57,58,59,60},
-	{16,26,27,28,52,61,62,63,56,64,65,66,60,67,68,69},
-	{28,38,39,40,63,70,71,72,66,73,74,75,69,76,77,78},
-	{40,47,48,13,72,79,80,49,75,81,82,53,78,83,84,57},
-	{57,58,59,60,85,86,87,88,89,90,91,92,93,94,95,96},
-	{60,67,68,69,88,97,98,99,92,100,101,102,96,103,104,105},
-	{69,76,77,78,99,106,107,108,102,109,110,111,105,112,113,114},
-	{78,83,84,57,108,115,116,85,111,117,118,89,114,119,120,93},
-	// Handle
-	{121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136},
-	{124,137,138,121,128,139,140,125,132,141,142,129,136,143,144,133},
-	{133,134,135,136,145,146,147,148,149,150,151,152,69,153,154,155},
-	{136,143,144,133,148,156,157,145,152,158,159,149,155,160,161,69},
-	// Spout
-	{162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177},
-	{165,178,179,162,169,180,181,166,173,182,183,170,177,184,185,174},
-	{174,175,176,177,186,187,188,189,190,191,192,193,194,195,196,197},
-	{177,184,185,174,189,198,199,186,193,200,201,190,197,202,203,194},
-	// Lid
-	{204,204,204,204,207,208,209,210,211,211,211,211,212,213,214,215},
-	{204,204,204,204,210,217,218,219,211,211,211,211,215,220,221,222},
-	{204,204,204,204,219,224,225,226,211,211,211,211,222,227,228,229},
-	{204,204,204,204,226,230,231,207,211,211,211,211,229,232,233,212},
-	{212,213,214,215,234,235,236,237,238,239,240,241,242,243,244,245},
-	{215,220,221,222,237,246,247,248,241,249,250,251,245,252,253,254},
-	{222,227,228,229,248,255,256,257,251,258,259,260,254,261,262,263},
-	{229,232,233,212,257,264,265,234,260,266,267,238,263,268,269,242},
-	// Bottom (not on original teapot)
-	{270,270,270,270,279,280,281,282,275,276,277,278,271,272,273,274},
-	{270,270,270,270,282,289,290,291,278,286,287,288,274,283,284,285},
-	{270,270,270,270,291,298,299,300,288,295,296,297,285,292,293,294},
-	{270,270,270,270,300,305,306,279,297,303,304,275,294,301,302,271}
-};
-
-const double TeacupPoints[251][3] =
+static const double TeacupPoints[251][3] =
 {
 	{0.409091,0.772727,0.0},
 	{0.409091,0.772727,-0.229091},
@@ -639,7 +295,7 @@ const double TeacupPoints[251][3] =
 	{-0.409091,0.363636,0.0454545}
 };
 
-const unsigned long TeacupPatches[26][16] =
+static const unsigned long TeacupPatches[26][16] =
 {
 	{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16},
 	{4,17,18,19,8,20,21,22,12,23,24,25,16,26,27,28},
@@ -669,7 +325,7 @@ const unsigned long TeacupPatches[26][16] =
 	{150,155,156,129,180,187,188,157,183,189,190,161,186,191,192,165}
 };
 
-const double TeaspoonPoints[256][3] =
+static const double TeaspoonPoints[256][3] =
 {
 	{-0.000107143,0.205357,0.0},
 	{0.0,0.196429,-0.0178571},
@@ -929,7 +585,7 @@ const double TeaspoonPoints[256][3] =
 	{-0.000357143,-1,0.0178571}
 };
 
-const unsigned long TeaspoonPatches[16][16] =
+static const unsigned long TeaspoonPatches[16][16] =
 {
 	{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16},
 	{17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32},
@@ -950,141 +606,96 @@ const unsigned long TeaspoonPatches[16][16] =
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// newell_primitive_implementation
+// newell_primitive
 
-class newell_primitive_implementation :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+class newell_primitive :
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	newell_primitive_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	newell_primitive(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_type(init_owner(*this) + init_name("type") + init_label(_("Primitive")) + init_description(_("Primitive type (teapot, teacup or teaspoon")) + init_value(TEAPOT) + init_enumeration(type_values())),
 		m_size(init_owner(*this) + init_name("size") + init_label(_("Size")) + init_description(_("Primitive size (scale)")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar)))
 	{
-		m_material.changed_signal().connect(make_reset_mesh_slot());
-		m_type.changed_signal().connect(make_reset_mesh_slot());
-		m_size.changed_signal().connect(make_reset_mesh_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_type.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_size.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		const double size = m_size.pipeline_value();
-		k3d::imaterial* const material = m_material.pipeline_value();
+		Output = k3d::mesh();
 
-		// Creates Newell's primitives using his bezier patches ...
+		k3d::imaterial* const material = m_material.pipeline_value();
+		const k3d::double_t size = m_size.pipeline_value();
+
+		k3d::mesh::points_t& points = Output.points.create();
+		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
+		boost::scoped_ptr<k3d::bicubic_patch::primitive> primitive(k3d::bicubic_patch::create(Output));
+
 		switch(m_type.pipeline_value())
 		{
 			case TEAPOT:
 			{
-				// Min : -3.0, max : 3.525 -> 20/6.525 = 3.065
-				for(unsigned long i = 0; i < 306; i++)
-					Mesh.points.push_back(new k3d::legacy::point(size * k3d::point3(TeapotPoints[i][0], TeapotPoints[i][1], TeapotPoints[i][2])));
+				const k3d::teapot::points_array_t& teapot_points = k3d::teapot::points();
+				const k3d::teapot::patches_array_t& teapot_patches = k3d::teapot::patches();
 
-				// Rim
-				for(unsigned long i = 0; i < 4; i++)
+				for(k3d::uint_t i = 0; i != 306; ++i)
 				{
-					k3d::legacy::bicubic_patch* const patch = new k3d::legacy::bicubic_patch();
-					patch->material = material;
-
-					for(unsigned long j = 0; j < 16; j++)
-						patch->control_points[j] = Mesh.points[TeapotPatches[i][j]-1];
-
-					Mesh.bicubic_patches.push_back(patch);
+					points.push_back(size * k3d::point3(teapot_points[i][0], teapot_points[i][1], teapot_points[i][2]));
+					point_selection.push_back(0);
 				}
-				// Body
-				for(unsigned long i = 4; i < 12; i++)
+
+				for(k3d::uint_t i = 0; i < 32; i++)
 				{
-					k3d::legacy::bicubic_patch* const patch = new k3d::legacy::bicubic_patch();
-					patch->material = material;
+					primitive->patch_selections.push_back(0);
+					primitive->patch_materials.push_back(material);
 
-					for(unsigned long j = 0; j < 16; j++)
-						patch->control_points[j] = Mesh.points[TeapotPatches[i][j]-1];
-
-					Mesh.bicubic_patches.push_back(patch);
-				}
-				// Handle
-				for(unsigned long i = 12; i < 16; i++)
-				{
-					k3d::legacy::bicubic_patch* const patch = new k3d::legacy::bicubic_patch();
-					patch->material = material;
-
-					for(unsigned long j = 0; j < 16; j++)
-						patch->control_points[j] = Mesh.points[TeapotPatches[i][j]-1];
-
-					Mesh.bicubic_patches.push_back(patch);
-				}
-				// Spout
-				for(unsigned long i = 16; i < 20; i++)
-				{
-					k3d::legacy::bicubic_patch* const patch = new k3d::legacy::bicubic_patch();
-					patch->material = material;
-
-					for(unsigned long j = 0; j < 16; j++)
-						patch->control_points[j] = Mesh.points[TeapotPatches[i][j]-1];
-
-					Mesh.bicubic_patches.push_back(patch);
-				}
-				// Lid
-				for(unsigned long i = 20; i < 28; i++)
-				{
-					k3d::legacy::bicubic_patch* const patch = new k3d::legacy::bicubic_patch();
-					patch->material = material;
-
-					for(unsigned long j = 0; j < 16; j++)
-						patch->control_points[j] = Mesh.points[TeapotPatches[i][j]-1];
-
-					Mesh.bicubic_patches.push_back(patch);
-				}
-				// Bottom
-				for(unsigned long i = 28; i < 32; i++)
-				{
-					k3d::legacy::bicubic_patch* const patch = new k3d::legacy::bicubic_patch();
-					patch->material = material;
-
-					for(unsigned long j = 0; j < 16; j++)
-						patch->control_points[j] = Mesh.points[TeapotPatches[i][j]-1];
-
-					Mesh.bicubic_patches.push_back(patch);
+					for(k3d::uint_t j = 0; j != 16; ++j)
+						primitive->patch_points.push_back(teapot_patches[i][j]);
 				}
 
 				break;
 			}
 			case TEACUP :
 			{
-				// Min : -1.0, max : 1.0
-				for(unsigned long i = 0; i < 251; i++)
-					Mesh.points.push_back(new k3d::legacy::point(size * k3d::point3(TeacupPoints[i][0], TeacupPoints[i][2], TeacupPoints[i][1])));
-
-				for(unsigned long i = 0; i < 26; i++)
+				for(k3d::uint_t i = 0; i != 251; ++i)
 				{
-					k3d::legacy::bicubic_patch* const patch = new k3d::legacy::bicubic_patch();
-					patch->material = material;
+					points.push_back(size * k3d::point3(TeacupPoints[i][0], TeacupPoints[i][2], TeacupPoints[i][1]));
+					point_selection.push_back(0);
+				}
 
-					for(unsigned long j = 0; j < 16; j++)
-						patch->control_points[j] = Mesh.points[TeacupPatches[i][j]-1];
+				for(k3d::uint_t i = 0; i != 26; ++i)
+				{
+					primitive->patch_selections.push_back(0);
+					primitive->patch_materials.push_back(material);
 
-					Mesh.bicubic_patches.push_back(patch);
+					for(k3d::uint_t j = 0; j != 16; ++j)
+						primitive->patch_points.push_back(TeacupPatches[i][j]-1);
 				}
 
 				break;
 			}
 			case TEASPOON :
 			{
-				// Min : -1.0, max : 0.221 -> 20/1.221 = 16.38
-				for(unsigned long i = 0; i < 256; i++)
-					Mesh.points.push_back(new k3d::legacy::point(size * k3d::point3(TeaspoonPoints[i][1], TeaspoonPoints[i][0], TeaspoonPoints[i][2])));
-
-				for(unsigned long i = 0; i < 16; i++)
+				for(k3d::uint_t i = 0; i != 256; ++i)
 				{
-					k3d::legacy::bicubic_patch* const patch = new k3d::legacy::bicubic_patch();
-					patch->material = material;
+					points.push_back(size * k3d::point3(TeaspoonPoints[i][1], TeaspoonPoints[i][0], TeaspoonPoints[i][2]));
+					point_selection.push_back(0);
+				}
 
-					for(unsigned long j = 0; j < 16; j++)
-						patch->control_points[j] = Mesh.points[TeaspoonPatches[i][j]-1];
+				for(k3d::uint_t i = 0; i != 16; ++i)
+				{
+					primitive->patch_selections.push_back(0);
+					primitive->patch_materials.push_back(material);
 
-					Mesh.bicubic_patches.push_back(patch);
+					for(k3d::uint_t j = 0; j != 16; ++j)
+						primitive->patch_points.push_back(TeaspoonPatches[i][j]-1);
 				}
 
 				break;
@@ -1092,13 +703,13 @@ public:
 		}
 	}
 
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<newell_primitive_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<newell_primitive, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x274c0cae, 0x2efd5bbf, 0x986a500f, 0xff5e2de6),
 			"Newell",
 			_("Generates Newell primitives as Bezier patches"),
@@ -1168,7 +779,7 @@ private:
 	k3d_data(primitive_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_type;
 
 	/// Generic size control
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_size;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_size;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1176,8 +787,11 @@ private:
 
 k3d::iplugin_factory& newell_primitive_factory()
 {
-	return newell_primitive_implementation::get_factory();
+	return newell_primitive::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace bicubic_patch
+
+} // namespace module
+
 

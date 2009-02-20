@@ -27,7 +27,6 @@
 namespace libk3dprimitives
 {
 
-extern k3d::iplugin_factory& newell_primitive_factory();
 extern k3d::iplugin_factory& poly_cone_factory();
 extern k3d::iplugin_factory& poly_cube_factory();
 extern k3d::iplugin_factory& poly_cushion_factory();
@@ -45,7 +44,6 @@ extern k3d::iplugin_factory& sphere_eversion_factory();
 } // namespace libk3dprimitives
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dprimitives::newell_primitive_factory());
 	Registry.register_factory(libk3dprimitives::poly_cone_factory());
 	Registry.register_factory(libk3dprimitives::poly_cube_factory());
 	Registry.register_factory(libk3dprimitives::poly_cushion_factory());
