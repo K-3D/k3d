@@ -29,33 +29,6 @@ namespace k3d
 namespace euler
 {
 
-/// Returns the "Euler Number" for a polyhedron, which we define as:
-///
-/// V - E + F - (L - F)
-///
-/// with the following definitions:
-///
-/// V = number of vertices in the polyhedron.
-/// E = number of whole edges (i.e. number of split-edges / 2) in the polyhedron.
-/// F = number of faces in the polyhedron.
-/// L = number of loops in the polyhedron.
-///
-/// Note the relation between the above definition and the traditional
-/// Euler - Poincare formula:
-///
-/// V - E + F - (L - F) - 2(S - G) = 0
-///
-/// with the same definitions as above, plus:
-///
-/// S = number of shells (solid manifolds) in the polyhedron.
-/// G = genus (number of holes) in the polyhedron.
-///
-/// Thus, the result of euler::number() will equal the 2(S - G) term
-/// for a given polyhedron.  If you know the number of shells in the
-/// polyhedron (almost always 1), you can easily determine the number of holes.
-
-const uint_t number(const mesh& Mesh, const uint_t Polyhedron);
-
 /// Apply the Kill Edge Make Loop (KEML) Euler operation to all edges in EdgeList that are not boundary edges
 /**
  * This operations removes an edge and its companion, and makes one loop out of the loops that are on either side of the edge.

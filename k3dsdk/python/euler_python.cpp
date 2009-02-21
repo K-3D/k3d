@@ -35,18 +35,11 @@ namespace python
 class euler
 {
 public:
-	static k3d::uint_t number(k3d::python::mesh& Mesh, k3d::uint_t Polyhedron)
-	{
-		return k3d::euler::number(Mesh.wrapped(), Polyhedron);
-	}
 };
 
 void define_namespace_euler()
 {
-	scope outer = class_<euler>("euler", no_init)
-		.def("number", &euler::number,
-			"Computes the Euler number for a polyhedron.")
-		.staticmethod("number");
+	scope outer = class_<euler>("euler", no_init);
 }
 
 } // namespace python

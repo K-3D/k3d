@@ -26,65 +26,6 @@
 namespace k3d
 {
 
-const bool_t is_solid(const mesh& Mesh)
-{
-	const uint_t polyhedron_begin = 0;
-	const uint_t polyhedron_end = polyhedron_begin + polyhedron::count(Mesh);
-	for(uint_t polyhedron = polyhedron_begin; polyhedron != polyhedron_end; ++polyhedron)
-	{
-		if(!polyhedron::is_solid(Mesh, polyhedron))
-			return false;
-	}
-
-	return true;
-}
-
-const bool_t is_triangles(const mesh& Mesh)
-{
-	if(!validate_polyhedra(Mesh))
-		return true;
-
-	const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-	const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-
-	const uint_t face_begin = 0;
-	const uint_t face_end = face_begin + face_first_loops.size();
-	for(uint_t face = face_begin; face != face_end; ++face)
-	{
-		uint_t edge_count = 0;
-		const uint_t first_edge = loop_first_edges[face_first_loops[face]];
-		for(uint_t edge = first_edge; ; )
-		{
-			++edge_count;
-
-			edge = clockwise_edges[edge];
-			if(edge == first_edge)
-				break;
-		}
-
-		if(edge_count != 3)
-			return false;
-	}
-
-	return true;
-}
-
-const bool_t is_uninitialized(const mesh& Mesh)
-{
-	if (Mesh.points)
-		return false;
-	if (Mesh.nurbs_curve_groups)
-		return false;
-	if (Mesh.nurbs_patches)
-		return false;
-	if (Mesh.polyhedra)
-		return false;
-	if (Mesh.point_selection)
-		return false;
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // bounds
 

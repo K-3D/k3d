@@ -74,6 +74,24 @@ const_primitive::const_primitive(
 {
 }
 
+const_primitive::const_primitive(const primitive& Primitive) :
+	first_faces(Primitive.first_faces),
+	face_counts(Primitive.face_counts),
+	polyhedron_types(Primitive.polyhedron_types),
+	face_first_loops(Primitive.face_first_loops),
+	face_loop_counts(Primitive.face_loop_counts),
+	face_selections(Primitive.face_selections),
+	face_materials(Primitive.face_materials),
+	loop_first_edges(Primitive.loop_first_edges),
+	edge_points(Primitive.edge_points),
+	clockwise_edges(Primitive.clockwise_edges),
+	edge_selections(Primitive.edge_selections),
+	constant_data(Primitive.constant_data),
+	uniform_data(Primitive.uniform_data),
+	face_varying_data(Primitive.face_varying_data)
+{
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 // primitive
 
@@ -212,7 +230,7 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// create
+// create_grid
 
 primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material)
 {
@@ -290,7 +308,7 @@ primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imat
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// create
+// create_cylinder
 
 primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material)
 {
@@ -367,6 +385,9 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 	return 0;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// validate
+
 const_primitive* validate(const mesh& Mesh)
 {
 	if(!validate_polyhedra(Mesh))
@@ -388,6 +409,9 @@ const_primitive* validate(const mesh& Mesh)
 		Mesh.polyhedra->uniform_data,
 		Mesh.polyhedra->face_varying_data);
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// validate
 
 primitive* validate(mesh& Mesh)
 {
@@ -411,6 +435,49 @@ primitive* validate(mesh& Mesh)
 		polyhedron.constant_data,
 		polyhedron.uniform_data,
 		polyhedron.face_varying_data);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// is_triangles
+
+const bool_t is_triangles(const const_primitive& Polyhedron)
+{
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		uint_t edge_count = 0;
+		const uint_t first_edge = Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]];
+		for(uint_t edge = first_edge; ; )
+		{
+			++edge_count;
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
+		}
+
+		if(edge_count != 3)
+			return false;
+	}
+
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// is_solid
+
+const bool_t is_solid(const const_primitive& Polyhedron)
+{
+	// K-3D uses a split-edge data structure to represent polyhedra.
+	// We test for solidity by counting the number of edges that
+	// connect each pair of points in the polyhedron.  A polyhedron is 
+	// solid if-and-only-if each pair of points is used by two edges.
+
+	mesh::bools_t boundary_edges;
+	mesh::indices_t adjacent_edges;
+	create_edge_adjacency_lookup(Polyhedron.edge_points, Polyhedron.clockwise_edges, boundary_edges, adjacent_edges);
+	return std::find(boundary_edges.begin(), boundary_edges.end(), true) == boundary_edges.end();
 }
 
 namespace detail
@@ -645,53 +712,6 @@ void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const me
 			}
 		}
 	}
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// count
-
-const uint_t count(const mesh& Mesh)
-{
-	if(!validate_polyhedra(Mesh))
-		return 0;
-
-	return Mesh.polyhedra->first_faces->size();
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// is_solid
-
-const bool_t is_solid(const mesh& Mesh, const uint_t Polyhedron)
-{
-	// K-3D uses a split-edge data structure to represent polyhedra.
-	// We test for solidity by counting the number of edges that
-	// connect each pair of points in the polyhedron.  A polyhedron is 
-	// solid if-and-only-if each pair of points is used by two edges.
-
-	return_val_if_fail(Polyhedron < count(Mesh), false);
-
-	const mesh::indices_t& first_faces = *Mesh.polyhedra->first_faces;
-	const mesh::counts_t& face_counts = *Mesh.polyhedra->face_counts;
-	const mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-	const mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-	const mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-
-	mesh::bools_t boundary_edges;
-	mesh::indices_t adjacent_edges;
-	create_edge_adjacency_lookup(edge_points, clockwise_edges, boundary_edges, adjacent_edges);
-	
-	for(uint_t edge = 0; edge != boundary_edges.size(); ++edge)
-	{
-		if(boundary_edges[edge])
-		{
-			k3d::log() << debug << "k3d::polyhedron::is_solid: found boundary edge " << edge << std::endl;
-			return false;
-		}
-	}
-
-	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

@@ -246,54 +246,6 @@ void create_edge_loop_face_lookup(const mesh::indices_t& FaceFirstLoops,
 
 } // namespace detail
 
-const uint_t number(const mesh& Mesh, const uint_t Polyhedron)
-{
-	return_val_if_fail(Polyhedron < polyhedron::count(Mesh), 0);
-	return_val_if_fail(polyhedron::is_solid(Mesh, Polyhedron), 0);
-
-	const mesh::indices_t& first_faces = *Mesh.polyhedra->first_faces;
-	const mesh::counts_t& face_counts = *Mesh.polyhedra->face_counts;
-	const mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-	const mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-	const mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-
-	uint_t vertex_count = 0;
-	uint_t edge_count = 0;
-	uint_t face_count = face_counts[Polyhedron];
-	uint_t loop_count = 0;
-
-	std::set<uint_t> vertices;
-	const uint_t face_begin = first_faces[Polyhedron];
-	const uint_t face_end = face_begin + face_counts[Polyhedron];
-	for(uint_t face = face_begin; face != face_end; ++face)
-	{
-		loop_count += face_loop_counts[face];
-
-		const uint_t loop_begin = face_first_loops[face];
-		const uint_t loop_end = loop_begin + face_loop_counts[face];
-		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
-		{
-			const uint_t first_edge = loop_first_edges[loop];
-			for(uint_t edge = first_edge; ;)
-			{
-				vertices.insert(edge_points[edge]);
-
-				++edge_count;
-
-				edge = clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
-			}
-		}
-	}
-	vertex_count = vertices.size();
-	edge_count /= 2;
-
-	return vertex_count - edge_count + face_count - (loop_count - face_count);
-}
-
 void kill_edge_make_loop(polyhedron::primitive& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const mesh::points_t& Points, const mesh::normals_t& FaceNormals)
 {
 	// Copies, so we can use them as temp storage between the individiual KEML operations

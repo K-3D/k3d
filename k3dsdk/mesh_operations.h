@@ -31,13 +31,6 @@ namespace k3d
 
 class imaterial;
 
-/// Returns true iff every polyhedron in the given mesh is a solid volume.
-const bool_t is_solid(const mesh& Mesh);
-/// Returns true iff every face in the given mesh is a triangle.
-const bool_t is_triangles(const mesh& Mesh);
-/// Returns true iff every array and primitive shared pointer in the mesh is unitinialized.
-const bool_t is_uninitialized(const mesh& Mesh);
-
 /// Returns a bounding-box containing every point in the given mesh.
 const bounding_box3 bounds(const mesh& Mesh);
 /// Returns a bounding-box containing every point in the given collection.

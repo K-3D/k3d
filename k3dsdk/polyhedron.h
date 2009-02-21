@@ -40,6 +40,8 @@ enum polyhedron_type
 	CATMULL_CLARK = 1,
 };
 
+class primitive;
+
 /// Gathers the member arrays of a polyhedron primitive into a convenient package
 class const_primitive
 {
@@ -61,6 +63,9 @@ public:
 		const mesh::attribute_arrays_t& UniformData,
 		const mesh::attribute_arrays_t& FaceVaryingData
 		);
+
+	/// Implicit conversion
+	const_primitive(const primitive& Primitive);
 
 	const mesh::indices_t& first_faces;
 	const mesh::counts_t& face_counts;
@@ -146,6 +151,11 @@ const_primitive* validate(const mesh& Mesh);
 /** \deprecated This method exists for the sole purpose of easing the transition to generic primitives. */
 primitive* validate(mesh& Mesh);
 
+/// Returns true iff every face in the given polyhedron is a triangle.
+const bool_t is_triangles(const const_primitive& Polyhedron);
+/// Returns true iff the given polyhedron is a solid (i.e. it has no topological holes).
+const bool_t is_solid(const const_primitive& Polyhedron);
+
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
 void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
 
@@ -165,12 +175,6 @@ void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t
 
 /// Initialise boundary_faces array for constant time lookup of faces that are on the mesh boundary. BoundaryEdges and AdjacentEdges can be created using create_edge_adjacency_lookup
 void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, mesh::bools_t& BoundaryFaces);
-
-/// Returns the number of polyhedra (if any) in a mesh
-const uint_t count(const mesh& Mesh);
-
-/// Returns true iff a polyhedron is a solid volume.
-const bool_t is_solid(const mesh& Mesh, const uint_t Polyhedron);
 
 /// Adds edges that are collinear and with points of valence 1 for boundary edges or valence 2 otherwise to EdgeList
 void mark_collinear_edges(mesh::indices_t& RedundantEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold = 1e-8);

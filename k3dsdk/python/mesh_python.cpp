@@ -52,21 +52,6 @@ const bool validate(mesh& Mesh)
 	return k3d::validate(Mesh.wrapped());
 }
 
-const bool is_solid(const mesh& Mesh)
-{
-	return k3d::is_solid(Mesh.wrapped());
-}
-
-const bool is_triangles(const mesh& Mesh)
-{
-	return k3d::is_triangles(Mesh.wrapped());
-}
-
-const bool is_uninitialized(const mesh& Mesh)
-{
-	return k3d::is_uninitialized(Mesh.wrapped());
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_object
 
@@ -908,12 +893,6 @@ void define_class_mesh()
 
 	def("validate", detail::validate,
 		"Returns true if the given L{mesh} contains valid data.");
-	def("is_solid", detail::is_solid,
-		"Returns true if every L{polyhedra} in the given L{mesh} is solid.");
-	def("is_triangles", detail::is_triangles,
-		"Returns true if every face in the given L{mesh} is a triangle.");
-	def("is_uninitialized", detail::is_uninitialized,
-		"Returns true if all arrays and primitives are uninitialized (null).");
 
 	scope outer = class_<mesh>("mesh", 
 		"Stores a heterogeneous collection of geometric mesh primitives.", no_init)

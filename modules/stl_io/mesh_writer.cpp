@@ -83,7 +83,7 @@ public:
 		if(!polyhedron)
 			return;
 		
-		return_if_fail(k3d::is_triangles(*mesh));
+		return_if_fail(k3d::polyhedron::is_triangles(*polyhedron));
 
 		const k3d::mesh::points_t& points = *(mesh->points);
 		
