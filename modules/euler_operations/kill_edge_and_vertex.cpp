@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Bart Janssens (bart.janssens@lid.kviv.be)
+	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
 #include <k3dsdk/attribute_array_copier.h>
@@ -36,6 +36,8 @@
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -60,57 +62,30 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// If there are no valid polyhedra, we give up
-		if(!k3d::validate_polyhedra(Input))
-		{
+		Output = Input;
+
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+	
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output));	
+		if(!polyhedron)
 			return;
+
+		k3d::mesh::indices_t edge_list;
+		const k3d::uint_t edge_begin = 0;
+		const k3d::uint_t edge_end = edge_begin + polyhedron->edge_selections.size();
+		for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+		{
+			if(polyhedron->edge_selections[edge])
+				edge_list.push_back(edge);
 		}
 		
-		Output = Input; // shallow copy, so all non-polyhedra are untouched
-		
-		k3d::mesh::selection_t input_edge_selection = *Input.polyhedra->edge_selection;
-		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
-		k3d::mesh_selection::merge(mesh_selection.edges, input_edge_selection);
-		
-		const k3d::uint_t edge_count = input_edge_selection.size();
-		k3d::mesh::indices_t edge_list;
-		for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
-			if(input_edge_selection[edge])
-				edge_list.push_back(edge);
-		
-		
 		const k3d::mesh::points_t& points = *Input.points;
-		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
-		const k3d::mesh::indices_t& loop_first_edges = *Input.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& face_first_loops = *Input.polyhedra->face_first_loops;
-		const k3d::uint_t face_begin = 0;
-		const k3d::uint_t face_end = face_first_loops.size();
 		
 		k3d::mesh::bools_t boundary_edges;
 		k3d::mesh::indices_t companions;
-		k3d::polyhedron::create_edge_adjacency_lookup(edge_points, clockwise_edges, boundary_edges, companions);
+		k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, boundary_edges, companions);
 		
-		k3d::mesh::counts_t vertex_valences;
-		k3d::polyhedron::create_vertex_valence_lookup(points.size(), edge_points, vertex_valences);
-		
-		k3d::mesh::polyhedra_t& output_polyhedra = Output.polyhedra.writable();
-		k3d::polyhedron::primitive output_primitive(output_polyhedra.first_faces.writable(),
-				output_polyhedra.face_counts.writable(),
-				output_polyhedra.types.writable(),
-				output_polyhedra.face_first_loops.writable(),
-				output_polyhedra.face_loop_counts.writable(),
-				output_polyhedra.face_selection.writable(),
-				output_polyhedra.face_materials.writable(),
-				output_polyhedra.loop_first_edges.writable(),
-				output_polyhedra.edge_points.writable(),
-				output_polyhedra.clockwise_edges.writable(),
-				output_polyhedra.edge_selection.writable(),
-				output_polyhedra.constant_data,
-				output_polyhedra.uniform_data,
-				output_polyhedra.face_varying_data);
-		
-		k3d::euler::kill_edge_and_vertex(output_primitive, edge_list, boundary_edges, companions, points.size());
+		k3d::euler::kill_edge_and_vertex(*polyhedron, edge_list, boundary_edges, companions, points.size());
 		
 		k3d::mesh::delete_unused_points(Output);
 	}
