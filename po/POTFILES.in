@@ -87,6 +87,7 @@ modules/array/rotate_array_3d.cpp
 modules/array/translate_array_1d.cpp
 modules/array/translate_array_2d.cpp
 modules/array/translate_array_3d.cpp
+modules/bicubic_patch/newell_primitives.cpp
 modules/bicubic_patch/polygonize_bicubic_patches.cpp
 modules/bilinear_patch/make_bilinear_patches.cpp
 modules/bitmap/add.cpp
@@ -172,6 +173,8 @@ modules/deformation/tweak_points.cpp
 modules/deformation/twist_points.cpp
 modules/development/glsl_painter.cpp
 modules/development/tweak_points.cpp
+modules/euler_operations/kill_edge_and_vertex.cpp
+modules/euler_operations/kill_edge_make_loop.cpp
 modules/file_magic/mime_type_handler.cpp
 modules/freetype2/poly_text.cpp
 modules/glx/camera_to_bitmap.cpp
@@ -182,6 +185,7 @@ modules/gts_io/mesh_reader.cpp
 modules/gts/mesh_area.cpp
 modules/gts/mesh_volume.cpp
 modules/imagemagick_io/bitmap_importer.cpp
+modules/inotify/file_change_notifier.cpp
 modules/jpeg_io/bitmap_importer.cpp
 modules/jpeg_io/bitmap_reader.cpp
 modules/jpeg_io/bitmap_writer.cpp
@@ -210,6 +214,8 @@ modules/mesh_instance/frozen_mesh.cpp
 modules/mesh_instance/mesh_instance.cpp
 modules/mesh/legacy_triangulate_faces.cpp
 modules/mesh/make_sds.cpp
+modules/mesh/merge_collinear_edges.cpp
+modules/mesh/merge_coplanar_faces.cpp
 modules/mesh/merge_mesh.cpp
 modules/mesh/mesh_stats.cpp
 modules/mesh/move_first_edge.cpp
@@ -293,6 +299,7 @@ modules/opencascade/opencascade_mesh_reader.cpp
 modules/openexr_io/bitmap_importer.cpp
 modules/opengl_framebuffer/camera_to_bitmap.cpp
 modules/opengl/material.cpp
+modules/opengl_painters/bezier_triangle_patch_painter.cpp
 modules/opengl_painters/bicubic_patch_painter.cpp
 modules/opengl_painters/bilinear_patch_painter.cpp
 modules/opengl_painters/blobby_point_painter.cpp
@@ -311,6 +318,7 @@ modules/opengl_painters/face_numbering_painter.cpp
 modules/opengl_painters/face_orientation_painter.cpp
 modules/opengl_painters/face_painter.cpp
 modules/opengl_painters/face_varying_painter.cpp
+modules/opengl_painters/half_edge_painter.cpp
 modules/opengl_painters/hidden_line_painter.cpp
 modules/opengl_painters/hyperboloid_painter.cpp
 modules/opengl_painters/linear_curve_painter.cpp
@@ -357,7 +365,6 @@ modules/png_io/bitmap_writer.cpp
 modules/point_group/make_point_group.cpp
 modules/polyhedra/bevel_points.cpp
 modules/polyhedra/extrude_faces.cpp
-modules/primitives/newell_primitives.cpp
 modules/primitives/poly_cone.cpp
 modules/primitives/poly_cube.cpp
 modules/primitives/poly_cushion.cpp
@@ -481,6 +488,8 @@ modules/selection/select_n_sided.cpp
 modules/selection/select_nurbs_curve_by_number.cpp
 modules/selection/select_nurbs_patch_by_number.cpp
 modules/selection/select_point_by_number.cpp
+modules/stl_io/mesh_reader.cpp
+modules/stl_io/mesh_writer.cpp
 modules/svg_io/mesh_reader.cpp
 modules/test/legacy_mesh_conversion.cpp
 modules/test/memory_pools.cpp
