@@ -45,6 +45,8 @@
 #include <k3dsdk/triangulator.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
+#include <boost/scoped_ptr.hpp>
+
 namespace module
 {
 
@@ -427,8 +429,8 @@ private:
 			{
 				const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(*Property));
 				return_if_fail(mesh);
-				return_if_fail(k3d::validate_polyhedra(*mesh));
-				return_if_fail(k3d::is_solid(*mesh));
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh));
+				return_if_fail(k3d::polyhedron::is_solid(*polyhedron));
 				
 				// First triangulate inputs
 				k3d::mesh triangulated_mesh;
