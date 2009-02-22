@@ -38,6 +38,8 @@
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
 
+#include <boost/scoped_ptr.hpp>
+
 namespace module
 {
 
@@ -101,22 +103,8 @@ public:
 		k3d::polyhedron::mark_coplanar_edges(companions, boundary_edges, face_normals, edge_faces, input_face_selection, redundant_edges, m_threshold.pipeline_value());
 	
 		k3d::mesh::polyhedra_t& output_polyhedra = Output.polyhedra.writable();
-		k3d::polyhedron::primitive output_primitive(output_polyhedra.first_faces.writable(),
-				output_polyhedra.face_counts.writable(),
-				output_polyhedra.types.writable(),
-				output_polyhedra.face_first_loops.writable(),
-				output_polyhedra.face_loop_counts.writable(),
-				output_polyhedra.face_selection.writable(),
-				output_polyhedra.face_materials.writable(),
-				output_polyhedra.loop_first_edges.writable(),
-				output_polyhedra.edge_points.writable(),
-				output_polyhedra.clockwise_edges.writable(),
-				output_polyhedra.edge_selection.writable(),
-				output_polyhedra.constant_data,
-				output_polyhedra.uniform_data,
-				output_polyhedra.face_varying_data);
-				
-		k3d::euler::kill_edge_make_loop(output_primitive, redundant_edges, boundary_edges, companions, points, face_normals);
+		boost::scoped_ptr<k3d::polyhedron::primitive> output_primitive(k3d::polyhedron::validate(Output));
+		k3d::euler::kill_edge_make_loop(*output_primitive, redundant_edges, boundary_edges, companions, points, face_normals);
 		
 		k3d::mesh::delete_unused_points(Output);
 	}
