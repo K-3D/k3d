@@ -48,8 +48,8 @@ public:
 	
 protected:
 	iwatched_path_property() {}
-	iwatched_path_property(const ipath_property&) {}
-	iwatched_path_property& operator=(const ipath_property&) { return *this; }
+	iwatched_path_property(const iwatched_path_property&) {}
+	iwatched_path_property& operator=(const iwatched_path_property&) { return *this; }
 	virtual ~iwatched_path_property() {}
 };
 
