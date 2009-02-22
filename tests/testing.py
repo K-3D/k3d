@@ -359,9 +359,12 @@ def assert_valid_mesh(mesh):
 	if not k3d.validate(mesh):
 		raise Exception("output mesh is not valid")
 
-def assert_solid_mesh(mesh):
-	if not k3d.is_solid(mesh):
-		raise Exception("output mesh is not solid")
+def assert_contains_solid_polyhedron(mesh):
+	polyhedron = k3d.polyhedron.validate(mesh)
+	if not polyhedron:
+		raise Exception("mesh does not contain a polyhedron")
+	if not k3d.polyhedron.is_solid(polyhedron):
+		raise Exception("polyhedron is not solid")
 
 def bitmap_perceptual_difference(document, input_image1, input_image2, threshold=1e-8):
 	difference = document.new_node("BitmapPerceptualDifference")

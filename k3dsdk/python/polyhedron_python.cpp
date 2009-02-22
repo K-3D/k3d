@@ -102,17 +102,20 @@ public:
 		return wrap_owned(k3d::polyhedron::create(Mesh.wrapped(), vertices, vertex_counts, vertex_indices, material));
 	}
 
-/*
-	static object validate(mesh_primitive_wrapper& Primitive)
+	static object validate(mesh& Mesh)
 	{
-		return wrap_owned(k3d::polyhedron::validate(Primitive.wrapped()));
+		return wrap_owned(k3d::polyhedron::validate(Mesh.wrapped()));
 	}
 
-	static object validate_const(const_mesh_primitive_wrapper& Primitive)
+	static bool_t is_solid(polyhedron::const_primitive::wrapper& Polyhedron)
 	{
-		return wrap_owned(k3d::polyhedron::validate(Primitive.wrapped()));
+		return k3d::polyhedron::is_solid(Polyhedron.wrapped());
 	}
-*/
+
+	static bool_t is_solid2(polyhedron::primitive::wrapper& Polyhedron)
+	{
+		return k3d::polyhedron::is_solid(Polyhedron.wrapped());
+	}
 };
 
 void define_namespace_polyhedron()
@@ -124,11 +127,11 @@ void define_namespace_polyhedron()
 		.def("create", &polyhedron::create2,
 			"Creates a polyhedron, populating it from a list of vertices, a list of per-face vertex counts, a list of per-face vertices, and an optional material node.")
 		.staticmethod("create")
-/*
 		.def("validate", &polyhedron::validate)
-		.def("validate", &polyhedron::validate_const)
 		.staticmethod("validate")
-*/
+		.def("is_solid", &polyhedron::is_solid)
+		.def("is_solid", &polyhedron::is_solid2)
+		.staticmethod("is_solid")
 		;
 
 	enum_<k3d::polyhedron::polyhedron_type>("polyhedron_type")
