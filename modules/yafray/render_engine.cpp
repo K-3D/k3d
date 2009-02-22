@@ -56,7 +56,6 @@
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/resolutions.h>
-#include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/triangulator.h>

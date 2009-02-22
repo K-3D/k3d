@@ -33,7 +33,6 @@
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
-#include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
 #include <k3dsdk/utility_gl.h>
 
 #include "colored_selection_painter_gl.h"
@@ -81,7 +80,7 @@ public:
 		k3d::gl::store_attributes attributes;
 		
 		enable_blending();
-		draw(Mesh, get_data<sds_cache>(&Mesh, this).cache(), get_data<selection_t>(&Mesh, this), RenderState);
+		draw(Mesh, get_data<sds_cache>(&Mesh, this), get_data<selection_t>(&Mesh, this), RenderState);
 		disable_blending();
 	}
 	
@@ -94,7 +93,7 @@ public:
 			return;
 		
 		k3d::gl::store_attributes attributes;
-		select(Mesh, get_data<sds_cache>(&Mesh, this).cache(), SelectionState);
+		select(Mesh, get_data<sds_cache>(&Mesh, this), SelectionState);
 	}
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
@@ -110,10 +109,10 @@ protected:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
 	
 	// override to choose drawing mode
-	virtual void draw(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState) = 0;
+	virtual void draw(const k3d::mesh& Mesh, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState) = 0;
 	
 	// override to choose selection mode
-	virtual void select(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState) = 0;
+	virtual void select(const k3d::mesh& Mesh, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState) = 0;
 };
 
 ////////////////////////////////:
@@ -141,7 +140,7 @@ public:
 		return factory;
 	}
 protected:
-	virtual void draw(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
+	virtual void draw(const k3d::mesh& Mesh, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
 	{
 		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
 		glEnable(GL_CULL_FACE);
@@ -164,7 +163,7 @@ protected:
 		}
 		
 		face_visitor visitor;
-		Cache.visit_faces(visitor, m_levels.pipeline_value(), false);
+		Cache.visit_surface(m_levels.pipeline_value(), visitor);
 		
 		k3d::uint_t face_count = visitor.face_starts.size();
 		const selection_records_t& face_selection_records = Selection.records();
@@ -219,7 +218,7 @@ protected:
 		}
 		glEnd();
 	}
-	virtual void select(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
+	virtual void select(const k3d::mesh& Mesh, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if (!SelectionState.select_faces)
 			return;
@@ -235,7 +234,7 @@ protected:
 		glPolygonOffset(1.0, 1.0);
 		
 		face_visitor visitor;
-		Cache.visit_faces(visitor, m_levels.pipeline_value(), false);
+		Cache.visit_surface(m_levels.pipeline_value(), visitor);
 		
 		for (k3d::uint_t face = 0; face != visitor.face_starts.size(); ++face)
 		{
@@ -290,75 +289,78 @@ public:
 	}
 	
 private:
-	virtual void draw(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
+	virtual void draw(const k3d::mesh& Mesh, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
 	{
+		assert_not_implemented();
 		glDisable(GL_LIGHTING);
-		edge_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops);
-		Cache.visit_borders(visitor, m_levels.pipeline_value(), false);
-		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &visitor.points_array[0]);
-		
-		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-		
-		k3d::uint_t edge_count = visitor.edge_starts.size();
-		
-		glBegin(GL_LINES);
-		const selection_records_t& edge_selection_records = Selection.records();
-		if (!edge_selection_records.empty())
-		{
-			for (selection_records_t::const_iterator record = edge_selection_records.begin(); record != edge_selection_records.end() && record->begin < edge_count; ++record)
-			{ // color by selection
-				color4d(record->weight ? selected_color : color);
-				k3d::uint_t start = record->begin;
-				k3d::uint_t end = record->end;
-				end = end > edge_count ? edge_count : end;
-				k3d::uint_t start_index = visitor.edge_starts[start];
-				k3d::uint_t end_index = end == edge_count ? visitor.points_array.size() : visitor.edge_starts[end];
-				for (k3d::uint_t i = start_index; i < end_index; ++i)
-				{
-					k3d::gl::vertex3d(visitor.points_array[i]);
-				}
-			}
-		}
-		else
-		{ // empty selection, everything has the same color
-			color4d(color);
-			for (k3d::uint_t i = 0; i != edge_count; ++i)
-			{
-				k3d::gl::vertex3d(visitor.points_array[i]);
-			}
-		}
-		glEnd();
+//		edge_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops);
+//		Cache.visit_borders(visitor, m_levels.pipeline_value(), false);
+//		
+//		glEnableClientState(GL_VERTEX_ARRAY);
+//		glVertexPointer(3, GL_DOUBLE, 0, &visitor.points_array[0]);
+//		
+//		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+//		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+//		
+//		k3d::uint_t edge_count = visitor.edge_starts.size();
+//		
+//		glBegin(GL_LINES);
+//		const selection_records_t& edge_selection_records = Selection.records();
+//		if (!edge_selection_records.empty())
+//		{
+//			for (selection_records_t::const_iterator record = edge_selection_records.begin(); record != edge_selection_records.end() && record->begin < edge_count; ++record)
+//			{ // color by selection
+//				color4d(record->weight ? selected_color : color);
+//				k3d::uint_t start = record->begin;
+//				k3d::uint_t end = record->end;
+//				end = end > edge_count ? edge_count : end;
+//				k3d::uint_t start_index = visitor.edge_starts[start];
+//				k3d::uint_t end_index = end == edge_count ? visitor.points_array.size() : visitor.edge_starts[end];
+//				for (k3d::uint_t i = start_index; i < end_index; ++i)
+//				{
+//					k3d::gl::vertex3d(visitor.points_array[i]);
+//				}
+//			}
+//		}
+//		else
+//		{ // empty selection, everything has the same color
+//			color4d(color);
+//			for (k3d::uint_t i = 0; i != edge_count; ++i)
+//			{
+//				k3d::gl::vertex3d(visitor.points_array[i]);
+//			}
+//		}
+//		glEnd();
 	}
 	
-	virtual void select(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
+	virtual void select(const k3d::mesh& Mesh, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if (!SelectionState.select_split_edges)
 			return;
 
-		glDisable(GL_LIGHTING);
-		edge_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops);
-		Cache.visit_borders(visitor, m_levels.pipeline_value(), false);
-		
-		k3d::uint_t edge_count = visitor.edge_starts.size();
-		
-		for (k3d::uint_t edge = 0; edge != visitor.edge_starts.size(); ++edge)
-		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
-			
-			k3d::uint_t start_index = visitor.edge_starts[edge];
-			k3d::uint_t end_index = edge == (edge_count-1) ? visitor.points_array.size() : visitor.edge_starts[edge+1];
-			glBegin(GL_LINES);
-			for (k3d::uint_t i = start_index; i < end_index; ++i)
-			{
-				k3d::gl::vertex3d(visitor.points_array[i]);
-			}
-			glEnd();
-			
-			k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
-		}
+		assert_not_implemented();
+//		
+//		glDisable(GL_LIGHTING);
+//		edge_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops);
+//		Cache.visit_borders(visitor, m_levels.pipeline_value(), false);
+//		
+//		k3d::uint_t edge_count = visitor.edge_starts.size();
+//		
+//		for (k3d::uint_t edge = 0; edge != visitor.edge_starts.size(); ++edge)
+//		{
+//			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
+//			
+//			k3d::uint_t start_index = visitor.edge_starts[edge];
+//			k3d::uint_t end_index = edge == (edge_count-1) ? visitor.points_array.size() : visitor.edge_starts[edge+1];
+//			glBegin(GL_LINES);
+//			for (k3d::uint_t i = start_index; i < end_index; ++i)
+//			{
+//				k3d::gl::vertex3d(visitor.points_array[i]);
+//			}
+//			glEnd();
+//			
+//			k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
+//		}
 	}
 };
 
@@ -401,65 +403,67 @@ public:
 	}
 	
 private:
-	virtual void draw(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
+	virtual void draw(const k3d::mesh& Mesh, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
 	{
-		glDisable(GL_LIGHTING);
-		point_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->edge_points, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops, Mesh.points->size());
-		Cache.visit_corners(visitor, m_levels.pipeline_value(), false);
-		
-		k3d::uint_t point_count = Mesh.points->size();
-		
-		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-		
-		glBegin(GL_POINTS);
-		const selection_records_t& point_selection_records = Selection.records();
-		if (!point_selection_records.empty())
-		{
-			for (selection_records_t::const_iterator record = point_selection_records.begin(); record != point_selection_records.end() && record->begin < point_count; ++record)
-			{ // color by selection
-				color4d(record->weight ? selected_color : color);
-				k3d::uint_t start = record->begin;
-				k3d::uint_t end = record->end;
-				end = end > point_count ? point_count : end;
-				for (k3d::uint_t i = start; i != end; ++i)
-				{
-					k3d::gl::vertex3d(visitor.points_array[i]);
-				}
-			}
-		}
-		else
-		{ // empty selection, everything has the same color
-			color4d(color);
-			for (k3d::uint_t i = 0; i != point_count; ++i)
-			{
-				k3d::gl::vertex3d(visitor.points_array[i]);
-			}
-		}
-		glEnd();
+		assert_not_implemented();
+//		glDisable(GL_LIGHTING);
+//		point_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->edge_points, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops, Mesh.points->size());
+//		Cache.visit_corners(visitor, m_levels.pipeline_value(), false);
+//		
+//		k3d::uint_t point_count = Mesh.points->size();
+//		
+//		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+//		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+//		
+//		glBegin(GL_POINTS);
+//		const selection_records_t& point_selection_records = Selection.records();
+//		if (!point_selection_records.empty())
+//		{
+//			for (selection_records_t::const_iterator record = point_selection_records.begin(); record != point_selection_records.end() && record->begin < point_count; ++record)
+//			{ // color by selection
+//				color4d(record->weight ? selected_color : color);
+//				k3d::uint_t start = record->begin;
+//				k3d::uint_t end = record->end;
+//				end = end > point_count ? point_count : end;
+//				for (k3d::uint_t i = start; i != end; ++i)
+//				{
+//					k3d::gl::vertex3d(visitor.points_array[i]);
+//				}
+//			}
+//		}
+//		else
+//		{ // empty selection, everything has the same color
+//			color4d(color);
+//			for (k3d::uint_t i = 0; i != point_count; ++i)
+//			{
+//				k3d::gl::vertex3d(visitor.points_array[i]);
+//			}
+//		}
+//		glEnd();
 	}
 	
-	virtual void select(const k3d::mesh& Mesh, k3d::sds::k3d_sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
+	virtual void select(const k3d::mesh& Mesh, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if (!SelectionState.select_points)
-			return;
-		glDisable(GL_LIGHTING);
-		point_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->edge_points, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops, Mesh.points->size());
-		Cache.visit_corners(visitor, m_levels.pipeline_value(), false);
-		
-		k3d::uint_t point_count = Mesh.points->size();
-		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_DOUBLE, 0, &visitor.points_array[0]);
-		
-		for (k3d::uint_t point = 0; point != point_count; ++point)
-		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
-			glBegin(GL_POINTS);
-			k3d::gl::vertex3d(visitor.points_array[point]);
-			glEnd();
-			k3d::gl::pop_selection_token();
-		}
+		assert_not_implemented();
+//		if (!SelectionState.select_points)
+//			return;
+//		glDisable(GL_LIGHTING);
+//		point_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->edge_points, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops, Mesh.points->size());
+//		Cache.visit_corners(visitor, m_levels.pipeline_value(), false);
+//		
+//		k3d::uint_t point_count = Mesh.points->size();
+//		
+//		glEnableClientState(GL_VERTEX_ARRAY);
+//		glVertexPointer(3, GL_DOUBLE, 0, &visitor.points_array[0]);
+//		
+//		for (k3d::uint_t point = 0; point != point_count; ++point)
+//		{
+//			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
+//			glBegin(GL_POINTS);
+//			k3d::gl::vertex3d(visitor.points_array[point]);
+//			glEnd();
+//			k3d::gl::pop_selection_token();
+//		}
 	}
 };
 

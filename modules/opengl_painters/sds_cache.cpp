@@ -18,6 +18,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "sds_cache.h"
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -44,6 +47,12 @@ sds_cache::~sds_cache()
 	delete m_cache;
 }
 
+void sds_cache::visit_surface(const k3d::uint_t Level, k3d::sds::ipatch_surface_visitor& Visitor)
+{
+	return_if_fail(m_cache);
+	m_cache->visit_surface(Level, Visitor);
+}
+
 void sds_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
 	if (m_cache && m_selection_changed)
@@ -51,15 +60,23 @@ void sds_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 		m_selection_changed = false;
 		return;
 	}
+	k3d::mesh::bools_t point_selection(Mesh.points->size(), false);
+	for(k3d::uint_t i = 0; i != m_indices.size(); ++i)
+	{
+		point_selection[m_indices[i]] = true;
+	}
+	const boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+	return_if_fail(polyhedron);
+	
+	k3d::mesh::selection_t face_selections(polyhedron->face_selections.size(), 1.0);
+	
 	if (!m_cache)
 	{
 		k3d::log() << debug << "SDS: Creating new SDS cache with " << m_levels << " levels" << std::endl;
-		m_cache = new k3d::sds::k3d_sds_cache();
-		m_cache->set_input(&Mesh);
-		m_cache->set_levels(m_levels);
+		m_cache = new k3d::sds::catmull_clark_subdivider(m_levels);
+		m_cache->create_mesh(Mesh, face_selections, m_mesh, Painter);
 	}
-	m_cache->set_new_addresses(Mesh);
-	m_cache->update(m_indices);
+	m_cache->update_mesh(Mesh, face_selections, m_mesh, Painter);
 }
 
 void sds_cache::on_schedule(k3d::inode* Painter) 
@@ -77,10 +94,6 @@ void sds_cache::on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* 
 void sds_cache::on_schedule(k3d::hint::selection_changed* Hint, k3d::inode* Painter)
 {
 	register_painter(Painter);
-	if (m_cache)
-	{
-		m_cache->clear_modified_faces();
-	}
 	m_indices.clear();
 	m_selection_changed = true;
 }
@@ -88,19 +101,22 @@ void sds_cache::on_schedule(k3d::hint::selection_changed* Hint, k3d::inode* Pain
 void sds_cache::level_changed(k3d::ihint* Hint)
 {
 	// search the highest level requested by the clients
-	m_levels = 0;
+	k3d::uint_t levels = 0;
 	k3d::iproperty* highest = 0;
 	for (sds_cache::levels_t::iterator level_it = m_level_properties.begin(); level_it != m_level_properties.end(); ++level_it)
 	{
 		const k3d::int32_t new_level = boost::any_cast<const k3d::int32_t>((*level_it)->property_internal_value());
-		if (new_level > m_levels)
+		if (new_level > levels)
 		{
-			m_levels = new_level;
+			levels = new_level;
 			highest = *level_it;
 		}
 	}
-	if (!m_cache || m_cache->levels() != m_levels)
+	if (!m_cache || m_levels != levels)
+	{
+		m_levels = levels;
 		schedule(highest->property_node());
+	}
 }
 
 void sds_cache::register_painter(k3d::inode* Painter)

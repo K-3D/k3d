@@ -34,7 +34,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/properties.h>
-#include <k3dsdk/subdivision_surface/k3d_sds_binding.h>
+#include <k3dsdk/subdivision_surface/catmull_clark.h>
 
 #include "cached_triangulation.h"
 #include "painter_cache.h"
@@ -174,7 +174,7 @@ public:
 	{
 		std::pair<typename caches_t::iterator, bool> result = m_caches.insert(std::make_pair(Level, component_t()));
 		if (result.second)
-			result.first->second.update(*m_mesh, Level, get_data<sds_cache>(m_mesh, Painter).cache());
+			result.first->second.update(*m_mesh, Level, get_data<sds_cache>(m_mesh, Painter));
 		return m_caches[Level];
 	}
 	
@@ -184,7 +184,7 @@ protected:
 	{
 		return_if_fail(Painter);
 		k3d::int32_t level = k3d::property::pipeline_value<k3d::int32_t>(*Painter, "levels");
-		m_caches.insert(std::make_pair(level, component_t())).first->second.update(Mesh, level, get_data<sds_cache>(&Mesh, Painter).cache());
+		m_caches.insert(std::make_pair(level, component_t())).first->second.update(Mesh, level, get_data<sds_cache>(&Mesh, Painter));
 	}
 	
 	void on_schedule(k3d::inode* Painter) 
@@ -256,7 +256,7 @@ public:
 	}
 	
 	/// Update the cache using the supplied sds cache
-	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache);
+	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache);
 	
 	/// Bind the VBOs
 	void bind();
@@ -289,7 +289,7 @@ public:
 	}
 	
 	/// Update the cache using the supplied sds cache
-	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache);
+	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache);
 	
 	/// Bind the VBOs
 	void bind();
@@ -315,7 +315,7 @@ public:
 	}
 	
 	/// Update the cache using the supplied sds cache
-	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::k3d_sds_cache& Cache);
+	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache);
 	
 	/// Bind the VBOs
 	void bind();

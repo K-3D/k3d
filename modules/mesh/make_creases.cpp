@@ -27,7 +27,6 @@
 #include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/subdivision_surface/sds_crease.h>
 
 #include <iterator>
 
@@ -60,9 +59,8 @@ public:
 
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
-			k3d::sds::crease(Mesh, **polyhedron);
+//TODO: reimplement this
+		assert_not_implemented();
 	}
 
 	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
