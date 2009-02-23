@@ -1,6 +1,7 @@
 #python
 
 import k3d
+import difflib
 import os
 import sys
 import time
@@ -337,9 +338,7 @@ def get_mesh_difference(document, input_mesh, reference_mesh, threshold):
 """
 def output_mesh_difference(input_mesh, reference_mesh, threshold, name = "Mesh Difference"):
 	print """<DartMeasurement name="Mesh Difference" type="text/html"><![CDATA[\n"""
-	print """<pre>"""
-	print k3d.print_diff(input_mesh, reference_mesh, threshold)
-	print """</pre>"""
+	print difflib.HtmlDiff().make_file(repr(input_mesh).splitlines(1), repr(reference_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
 	print """]]></DartMeasurement>\n"""
 	sys.stdout.flush()
 

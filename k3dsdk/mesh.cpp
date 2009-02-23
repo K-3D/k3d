@@ -47,6 +47,53 @@ std::ostream& indentation(std::ostream& Stream)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
+// block_output
+
+template<typename output_type, typename iterator_type>
+void block_output(iterator_type Begin, iterator_type End, std::ostream& Stream, const string_t& Delimiter, const uint_t BlockSize = 8)
+{
+	if(Begin == End)
+		return;
+
+	uint_t count = 0;
+	for(; Begin != End; ++count, ++Begin)
+	{
+		if(0 == count % BlockSize)
+			Stream << indentation;
+
+		Stream << static_cast<output_type>(*Begin) << Delimiter;
+
+		if(BlockSize - 1 == count % BlockSize)
+			Stream << "\n";
+	}
+
+	if(count % BlockSize)
+		Stream << "\n";
+};
+
+template<typename iterator_type>
+void string_block_output(iterator_type Begin, iterator_type End, std::ostream& Stream, const string_t& Delimiter, const uint_t BlockSize = 8)
+{
+	if(Begin == End)
+		return;
+
+	uint_t count = 0;
+	for(; Begin != End; ++count, ++Begin)
+	{
+		if(0 == count % BlockSize)
+			Stream << indentation;
+
+		Stream << "\"" << *Begin << "\"" << Delimiter;
+
+		if(BlockSize - 1 == count % BlockSize)
+			Stream << "\n";
+	}
+
+	if(count % BlockSize)
+		Stream << "\n";
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
 // print
 
 template<typename pointer_type>
@@ -60,9 +107,12 @@ void print(std::ostream& Stream, const string_t& Label, const pointer_type& Poin
 		Stream << indentation << Label;
 		if(type_registered<value_type>())
 			Stream << " [" << type_string<value_type>() <<  "]";
-		Stream << " (" << Pointer->size() <<  "): ";
-		std::copy(Pointer->begin(), Pointer->end(), std::ostream_iterator<typename pointer_type::element_type::value_type>(Stream, " "));
-		Stream << "\n";
+		Stream << " (" << Pointer->size() <<  "):\n";
+		Stream << push_indent;
+
+		block_output<typename pointer_type::element_type::value_type>(Pointer->begin(), Pointer->end(), Stream, " ");
+
+		Stream << pop_indent;
 	}
 }
 
@@ -82,11 +132,13 @@ public:
 		if(const uint_t_array* const array = dynamic_cast<const uint_t_array*>(&m_array))
 		{
 			m_printed = true;
-			m_stream << indentation << "array \"" << m_array_name << "\" [k3d::uint_t] (" << m_array.size() << "): ";
-			std::copy(array->begin(), array->end(), std::ostream_iterator<uint_t>(m_stream, " "));
-			m_stream << "\n";
-
+			m_stream << indentation << "array \"" << m_array_name << "\" [k3d::uint_t] (" << m_array.size() << "):\n";
+			m_stream << push_indent;
+			
+			block_output<uint_t>(array->begin(), array->end(), m_stream, " ");
 			print_metadata();
+
+			m_stream << pop_indent;
 		}
 	}
 
@@ -99,11 +151,13 @@ public:
 		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
 		{
 			m_printed = true;
-			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
-			std::copy(array->begin(), array->end(), std::ostream_iterator<T>(m_stream, " "));
-			m_stream << "\n";
+			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
+			m_stream << push_indent;
 
+			block_output<T>(array->begin(), array->end(), m_stream, " ");
 			print_metadata();
+
+			m_stream << pop_indent;
 		}
 	}
 
@@ -118,11 +172,13 @@ public:
 		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
 		{
 			m_printed = true;
-			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
-			std::copy(array->begin(), array->end(), std::ostream_iterator<int16_t>(m_stream, " "));
-			m_stream << "\n";
+			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
+			m_stream << push_indent;
 
+			block_output<int16_t>(array->begin(), array->end(), m_stream, " ");
 			print_metadata();
+
+			m_stream << pop_indent;
 		}
 	}
 
@@ -137,11 +193,13 @@ public:
 		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
 		{
 			m_printed = true;
-			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
-			std::copy(array->begin(), array->end(), std::ostream_iterator<uint16_t>(m_stream, " "));
-			m_stream << "\n";
+			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
+			m_stream << push_indent;
 
+			block_output<uint16_t>(array->begin(), array->end(), m_stream, " ");
 			print_metadata();
+
+			m_stream << pop_indent;
 		}
 	}
 
@@ -156,12 +214,13 @@ public:
 		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
 		{
 			m_printed = true;
-			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "): ";
-			for(typed_array<T>::const_iterator i = array->begin(); i != array->end(); ++i)
-				m_stream << "\"" << *i << "\" ";
-			m_stream << "\n";
+			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
+			m_stream << push_indent;
 
+			string_block_output(array->begin(), array->end(), m_stream, " ");
 			print_metadata();
+
+			m_stream << pop_indent;
 		}
 	}
 
@@ -170,7 +229,7 @@ private:
 	{
 		const array::metadata_t metadata = m_array.get_metadata();
 		for(array::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
-			m_stream << push_indent << indentation << "metadata: " << pair->first << " = " << pair->second << "\n" << pop_indent;
+			m_stream << indentation << "metadata: " << pair->first << " = " << pair->second << "\n";
 	}
 
 	std::ostream& m_stream;

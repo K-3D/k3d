@@ -94,7 +94,6 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/iuser_interface.h>
-#include <k3dsdk/mesh_diff.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/render_state_ri.h> // MinGW needs typeinfo
 #include <k3dsdk/scripting.h>
@@ -310,21 +309,6 @@ const bool_t module_almost_equal_mesh(const mesh& A, const mesh& B, const uint64
 	return k3d::almost_equal<k3d::mesh>(Threshold)(A.wrapped(), B.wrapped());
 }
 
-const string_t module_print_diff(const object& A, const object& B, const object& Threshold)
-{
-	extract<mesh> a(A);
-	extract<mesh> b(B);
-	extract<boost::uint64_t> threshold(Threshold);
-	if(a.check() && b.check() && threshold.check())
-	{
-		std::ostringstream buffer;
-		k3d::print_diff(buffer, a().wrapped(), b().wrapped(), threshold());
-		return buffer.str();
-	}
-
-	throw std::invalid_argument("cannot diff given objects");
-}
-
 const k3d::vector3 module_to_vector3(const k3d::point3& v)
 {
 	return k3d::to_vector(v);
@@ -408,8 +392,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
 	def("documents", module_documents,
 		"Returns a list containing all open documents.");
-	def("print_diff", module_print_diff,
-		"Returns the difference of two L{mesh} objects as a string.");
 	def("execute_script", module_execute_script,
 		"Executes a script (which does not have to be written in Python).");
 	def("execute_script", module_execute_script_context,
