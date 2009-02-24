@@ -90,9 +90,6 @@ public:
 		}
 
 		mod.polygonize_patch(my_patch, m_segments.pipeline_value(), m_delete_orig.pipeline_value(), m_flip.pipeline_value());
-
-		assert_warning(k3d::validate_nurbs_patches(Output));
-		assert_warning(k3d::validate_polyhedra(Output));
 	}
 
 	static k3d::iplugin_factory& get_factory()
