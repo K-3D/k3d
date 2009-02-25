@@ -332,9 +332,7 @@ void triangle_vbo::draw_range(k3d::uint_t Start, k3d::uint_t End, k3d::inode* Pa
 class update_face_vbo_visitor : public k3d::sds::ipatch_surface_visitor
 {
 public:
-	update_face_vbo_visitor(const k3d::mesh::indices_t& FaceStarts, const GLuint* Indices, k3d::point3* Points) :
-		m_face_starts(FaceStarts),
-		m_indices(Indices),
+	update_face_vbo_visitor(k3d::point3* Points) :
 		m_points(Points),
 		m_index(0) 
 	{}
@@ -345,15 +343,10 @@ public:
 		normals.push_back(Normal); // Unfortunately, we need temp storage for the normals, since we can't map two buffers at once
 	}
 	void on_edge(const k3d::uint_t PointIndex) {}
-	void on_patch(k3d::uint_t Face)
-	{
-		m_index = m_indices[m_face_starts[Face]];
-	}
+	void on_patch(k3d::uint_t Face) {}
 	k3d::mesh::indices_t modified_indices;
 	k3d::mesh::normals_t normals;
 private:
-	const k3d::mesh::indices_t& m_face_starts;
-	const GLuint* m_indices;
 	k3d::point3* m_points;
 	k3d::uint_t m_index;
 };
@@ -484,33 +477,18 @@ void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_ca
 		k3d::point3* points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_index_vbo);
 		GLuint* indices = static_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY));
+	
+		update_face_vbo_visitor visitor(points);
+		Cache.visit_surface(Level, visitor);
 		
-		if(Mesh.polyhedra->constant_data.lookup<tags_t>("interpolateboundary"))
-		{
-			update_face_vbo_visitor visitor(face_starts, indices, points);
-			Cache.visit_surface(Level, visitor);
-			
-			glUnmapBuffer(GL_ARRAY_BUFFER);
-			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-			
-			glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
-			k3d::normal3* normals = static_cast<k3d::normal3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-			for(k3d::uint_t i = 0; i != visitor.modified_indices.size(); ++i)
-				normals[visitor.modified_indices[i]] = visitor.normals[i];
-		}
-		else // interpolateboundary not set
-		{
-			update_face_vbo_visitor_no_boundary visitor(face_starts, indices, points, boundary_faces);
-			Cache.visit_surface(Level, visitor);
-			
-			glUnmapBuffer(GL_ARRAY_BUFFER);
-			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-			
-			glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
-			k3d::normal3* normals = static_cast<k3d::normal3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-			for (k3d::uint_t i = 0; i != visitor.modified_indices.size(); ++i)
-				normals[visitor.modified_indices[i]] = visitor.normals[i];
-		}
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+		
+		glBindBuffer(GL_ARRAY_BUFFER, *m_normal_vbo);
+		k3d::normal3* normals = static_cast<k3d::normal3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+		for(k3d::uint_t i = 0; i != visitor.modified_indices.size(); ++i)
+			normals[visitor.modified_indices[i]] = visitor.normals[i];
+		
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 	}
 }
@@ -542,18 +520,12 @@ class update_edge_vbo_visitor : public k3d::sds::ipatch_boundary_visitor
 {
 public:
 	update_edge_vbo_visitor(const k3d::mesh::indices_t& EdgeStarts,
-			k3d::point3* Points,
-			const k3d::mesh::indices_t& ClockwiseEdges,
-			const k3d::mesh::indices_t& LoopFirstEdges,
-			const k3d::mesh::indices_t& FaceFirstLoops) :
+			k3d::point3* Points) :
 		m_edge_starts(EdgeStarts),
 		m_points(Points),
-		m_index(0),
-		m_clockwise_edges(ClockwiseEdges),
-		m_loop_first_edges(LoopFirstEdges),
-		m_face_first_loops(FaceFirstLoops)
+		m_index(0)
 	{}
-	void on_vertex(const k3d::point3& Point)
+	void on_point(const k3d::point3& Point)
 	{
 		m_points[m_index++] = Point;
 	}
@@ -565,37 +537,33 @@ private:
 	const k3d::mesh::indices_t& m_edge_starts;
 	k3d::point3* m_points;
 	k3d::uint_t m_index;
-	const k3d::mesh::indices_t& m_clockwise_edges;
-	const k3d::mesh::indices_t& m_loop_first_edges;
-	const k3d::mesh::indices_t& m_face_first_loops;
 	k3d::uint_t m_edge;
 };
 
 void sds_edge_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache)
 {
-	assert_not_implemented();
-//	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
-//	{
-//		edge_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops);
-//		Cache.visit_boundary(Level, visitor);
-//		
-//		m_point_vbo = new vbo();
-//		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
-//		glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.points_array[0]) * visitor.points_array.size(), &visitor.points_array[0], GL_STATIC_DRAW);
-//		
-//		edge_starts = visitor.edge_starts;
-//		index_size = visitor.points_array.size();
-//	}
-//	else // Only update the point VBO with new positions
-//	{
-//		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
-//		k3d::point3* points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-//		
-//		update_edge_vbo_visitor visitor(edge_starts, points, *Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops);
-//		Cache.visit_boundary(Level, visitor);
-//		
-//		glUnmapBuffer(GL_ARRAY_BUFFER);
-//	}
+	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
+	{
+		edge_visitor visitor(Mesh.polyhedra->edge_points->size());
+		Cache.visit_boundary(Mesh, Level, visitor);
+		
+		m_point_vbo = new vbo();
+		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.points_array[0]) * visitor.points_array.size(), &visitor.points_array[0], GL_STATIC_DRAW);
+		
+		edge_starts = visitor.edge_starts;
+		index_size = visitor.points_array.size();
+	}
+	else // Only update the point VBO with new positions
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+		k3d::point3* points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+		
+		update_edge_vbo_visitor visitor(edge_starts, points);
+		Cache.visit_boundary(Mesh, Level, visitor);
+		
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+	}
 }
 
 void sds_edge_vbo::bind()
@@ -615,54 +583,42 @@ void sds_edge_vbo::bind()
 class update_point_vbo_visitor : public k3d::sds::ipatch_corner_visitor
 {
 public:
-	update_point_vbo_visitor(k3d::point3* Points,
-			const k3d::mesh::indices_t& ClockwiseEdges,
-			const k3d::mesh::indices_t& LoopFirstEdges,
-			const k3d::mesh::indices_t& FaceFirstLoops,
-			const k3d::mesh::indices_t& EdgePoints) :
+	update_point_vbo_visitor(k3d::point3* Points) :
 		m_points(Points),
-		m_clockwise_edges(ClockwiseEdges),
-		m_loop_first_edges(LoopFirstEdges),
-		m_face_first_loops(FaceFirstLoops),
-		m_edge_points(EdgePoints)
+		m_index(0)
 	{}
 	void on_corner(const k3d::point3& Point)
 	{
-		//m_points[m_edge_points[m_edge]] = Point;
+		m_points[m_index++] = Point;
 	}
 private:
 	k3d::point3* m_points;
-	const k3d::mesh::indices_t& m_clockwise_edges;
-	const k3d::mesh::indices_t& m_loop_first_edges;
-	const k3d::mesh::indices_t& m_face_first_loops;
-	const k3d::mesh::indices_t& m_edge_points;
-	k3d::uint_t m_edge;
+	k3d::uint_t m_index;
 };
 
 void sds_point_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache)
 {
-	assert_not_implemented();
-//	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
-//	{
-//		point_visitor visitor(*Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->edge_points, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops, Mesh.points->size());
-//		Cache.visit_corners(visitor, Level, false);
-//		
-//		m_point_vbo = new vbo();
-//		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
-//		glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.points_array[0]) * visitor.points_array.size(), &visitor.points_array[0], GL_STATIC_DRAW);
-//		
-//		index_size = visitor.points_array.size();
-//	}
-//	else // Only update the point VBO with new positions
-//	{
-//		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
-//		k3d::point3* points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-//		
-//		update_point_vbo_visitor visitor(points, *Mesh.polyhedra->clockwise_edges, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->edge_points);
-//		Cache.visit_corners(visitor, Level, true);
-//		
-//		glUnmapBuffer(GL_ARRAY_BUFFER);
-//	}
+	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
+	{
+		point_visitor visitor;
+		Cache.visit_corners(Level, visitor);
+		
+		m_point_vbo = new vbo();
+		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(visitor.points_array[0]) * visitor.points_array.size(), &visitor.points_array[0], GL_STATIC_DRAW);
+		
+		index_size = visitor.points_array.size();
+	}
+	else // Only update the point VBO with new positions
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
+		k3d::point3* points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+		
+		update_point_vbo_visitor visitor(points);
+		Cache.visit_corners(Level, visitor);
+		
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+	}
 }
 
 void sds_point_vbo::bind()

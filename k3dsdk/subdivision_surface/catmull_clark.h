@@ -65,11 +65,8 @@ public:
 	/// Called at the start of each boundary, corresponding to an edge on the original mesh
 	virtual void on_boundary(const k3d::uint_t Edge) = 0;
 	
-	/// Called for each edge of each boundary
-	virtual void on_edge(const k3d::uint_t PointIndex) = 0;
-	
-	/// Called for each vertex on the patch boundaries
-	virtual void on_vertex(const k3d::point3& Point) = 0;
+	/// Called for each point on the patch boundaries
+	virtual void on_point(const k3d::point3& Point) = 0;
 	
 protected:
 	ipatch_boundary_visitor() {}
@@ -117,8 +114,8 @@ public:
 	/// Visit the data representing the SDS patch surface
 	void visit_surface(const k3d::uint_t Level, ipatch_surface_visitor& Visitor);
 	
-	/// Visit the data representing the SDS patch boundaries
-	void visit_boundary(const k3d::uint_t Level, ipatch_boundary_visitor& Visitor);
+	/// Visit the data representing the SDS patch boundaries, using the given source mesh (needed for topology info)
+	void visit_boundary(const k3d::mesh& Mesh, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor);
 	
 	/// Visit the data representing the patch corners
 	void visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor);

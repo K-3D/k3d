@@ -1208,6 +1208,68 @@ public:
 		}
 	}
 	
+	void visit_boundary(const k3d::mesh& Mesh, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor)
+	{
+		const k3d::uint_t edge_count = m_topology_data[0].edge_midpoints.size();
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> input(k3d::polyhedron::validate(Mesh));
+		for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
+		{
+			Visitor.on_boundary(edge);
+			k3d::uint_t c0 = input->edge_points[edge];
+			k3d::uint_t c1 = input->edge_points[input->clockwise_edges[edge]];
+			k3d::uint_t first_edge = edge;
+			for(k3d::uint_t level = 0; level != Level - 1; ++level)
+			{
+				c0 = m_topology_data[level].corner_points[c0];
+				c1 = m_topology_data[level].corner_points[c1];
+				const k3d::uint_t midpoint = m_topology_data[level].edge_midpoints[first_edge];
+				const k3d::uint_t point_edge_begin = m_topology_data[level+1].point_first_edges[c0];
+				const k3d::uint_t point_edge_end = point_edge_begin + m_topology_data[level+1].vertex_valences[c0];
+				const k3d::mesh& mesh = m_intermediate_meshes[level];
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(mesh));
+				for(k3d::uint_t point_edge_index = point_edge_begin; point_edge_index != point_edge_end; ++point_edge_index)
+				{
+					const k3d::uint_t point_edge = m_topology_data[level+1].point_edges[point_edge_index];
+					if(polyhedron->edge_points[polyhedron->clockwise_edges[point_edge]] == midpoint)
+					{
+						first_edge = point_edge;
+						break;
+					}
+				}
+			}
+			const k3d::mesh& mesh = m_intermediate_meshes[Level-2];
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(mesh));
+			const k3d::mesh::indices_t& corner_points = m_topology_data[Level-1].corner_points;
+			const k3d::mesh::indices_t& edge_midpoints = m_topology_data[Level-1].edge_midpoints;
+			const k3d::mesh::indices_t& companions = m_topology_data[Level-1].companions;
+			const k3d::mesh::points_t& points = *m_intermediate_meshes[Level-1].points;
+			return_if_fail(polyhedron->edge_points[first_edge] == c0);
+			for(k3d::uint_t subedge = first_edge; ;)
+			{ 
+				Visitor.on_point(points[corner_points[polyhedron->edge_points[subedge]]]);
+				Visitor.on_point(points[edge_midpoints[subedge]]);
+				
+				if(polyhedron->edge_points[polyhedron->clockwise_edges[subedge]] == c1)
+					break;
+				subedge = polyhedron->clockwise_edges[companions[polyhedron->clockwise_edges[subedge]]];
+			}
+		}
+	}
+	
+	void visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor)
+	{
+		const k3d::uint_t point_count = m_topology_data[0].corner_points.size();
+		for(k3d::uint_t point = 0; point != point_count; ++point)
+		{
+			k3d::uint_t corner = point;
+			for(k3d::uint_t level = 0; level != Level; ++level)
+			{
+				corner = m_topology_data[level].corner_points[corner];
+			}
+			Visitor.on_corner(m_intermediate_meshes[Level-1].points->at(corner));
+		}
+	}
+	
 private:
 	/// Used to recurse through levels to associate an original face with its subfaces
 	void visit_subfacets(const k3d::uint_t MaxLevel, const k3d::uint_t Level, const k3d::uint_t Face, ipatch_surface_visitor& Visitor)
@@ -1283,14 +1345,14 @@ void catmull_clark_subdivider::visit_surface(const k3d::uint_t Level, ipatch_sur
 	m_implementation->visit_surface(Level, Visitor);
 }
 
-void catmull_clark_subdivider::visit_boundary(const k3d::uint_t Level, ipatch_boundary_visitor& Visitor)
+void catmull_clark_subdivider::visit_boundary(const k3d::mesh& Mesh, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor)
 {
-	
+	m_implementation->visit_boundary(Mesh, Level, Visitor);
 }
 
 void catmull_clark_subdivider::visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor)
 {
-	
+	m_implementation->visit_corners(Level, Visitor);
 }
 
 } // namespace sds

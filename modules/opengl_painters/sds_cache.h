@@ -56,10 +56,10 @@ public:
 	void visit_surface(const k3d::uint_t Level, k3d::sds::ipatch_surface_visitor& Visitor);
 	
 	/// Visit the data representing the SDS patch boundaries
-	void visit_boundary(const k3d::uint_t Level, k3d::sds::ipatch_boundary_visitor& Visitor) {}
+	void visit_boundary(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::ipatch_boundary_visitor& Visitor);
 	
 	/// Visit the data representing the patch corners
-	void visit_corners(const k3d::uint_t Level, k3d::sds::ipatch_corner_visitor& Visitor) {}
+	void visit_corners(const k3d::uint_t Level, k3d::sds::ipatch_corner_visitor& Visitor);
 	
 protected:
 	/// Scheduler implementation
@@ -117,77 +117,37 @@ public:
 	k3d::mesh::indices_t face_starts;
 };
 
-///// Stores SDS patch border data in OpenGL-compatible arrays
-//class edge_visitor : public k3d::sds::sds_visitor
-//{
-//public:
-//	edge_visitor(const k3d::mesh::indices_t& ClockwiseEdges,
-//			const k3d::mesh::indices_t& LoopFirstEdges,
-//			const k3d::mesh::indices_t& FaceFirstLoops) :
-//		edge_starts(ClockwiseEdges.size()),
-//		m_clockwise_edges(ClockwiseEdges),
-//		m_loop_first_edges(LoopFirstEdges),
-//		m_face_first_loops(FaceFirstLoops)
-//	{}
-//	virtual void on_point(const k3d::sds::position_t& Point, const k3d::sds::position_t& Normal = k3d::sds::position_t(0,0,1))
-//	{
-//		points_array.push_back(Point);
-//	}
-//	virtual void on_face(k3d::uint_t Face)
-//	{
-//		m_edge = m_loop_first_edges[m_face_first_loops[Face]];
-//	}
-//	virtual void on_edge()
-//	{
-//		edge_starts[m_edge] = points_array.size();
-//		m_edge = m_clockwise_edges[m_edge];
-//	}
-//	
-//	std::vector<k3d::sds::position_t> points_array;
-//	k3d::mesh::indices_t edge_starts;
-//private:
-//	const k3d::mesh::indices_t& m_clockwise_edges;
-//	const k3d::mesh::indices_t& m_loop_first_edges;
-//	const k3d::mesh::indices_t& m_face_first_loops;
-//	k3d::uint_t m_edge;
-//};
-//
-///// Stores SDS patch corner data in OpenGL-compatible arrays
-//class point_visitor : public k3d::sds::sds_visitor
-//{
-//public:
-//	point_visitor(const k3d::mesh::indices_t& ClockwiseEdges,
-//			const k3d::mesh::indices_t& EdgePoints,
-//			const k3d::mesh::indices_t& LoopFirstEdges,
-//			const k3d::mesh::indices_t& FaceFirstLoops,
-//			const k3d::uint_t PointCount) :
-//		m_clockwise_edges(ClockwiseEdges),
-//		m_edge_points(EdgePoints),
-//		m_loop_first_edges(LoopFirstEdges),
-//		m_face_first_loops(FaceFirstLoops),
-//		points_array(PointCount)
-//	{}
-//	virtual void on_point(const k3d::sds::position_t& Point, const k3d::sds::position_t& Normal = k3d::sds::position_t(0,0,1))
-//	{
-//		points_array[m_edge_points[m_edge]] = Point;
-//	}
-//	virtual void on_face(k3d::uint_t Face)
-//	{
-//		m_edge = m_loop_first_edges[m_face_first_loops[Face]];
-//	}
-//	virtual void on_edge()
-//	{
-//		m_edge = m_clockwise_edges[m_edge];
-//	}
-//	
-//	std::vector<k3d::sds::position_t> points_array;
-//private:
-//	const k3d::mesh::indices_t& m_clockwise_edges;
-//	const k3d::mesh::indices_t& m_edge_points;
-//	const k3d::mesh::indices_t& m_loop_first_edges;
-//	const k3d::mesh::indices_t& m_face_first_loops;
-//	k3d::uint_t m_edge;
-//};
+/// Stores SDS patch border data in OpenGL-compatible arrays
+class edge_visitor : public k3d::sds::ipatch_boundary_visitor
+{
+public:
+	edge_visitor(const k3d::uint_t EdgeCount) : edge_starts(EdgeCount) {}
+
+	void on_point(const k3d::point3& Point)
+	{
+		points_array.push_back(Point);
+	}
+	void on_boundary(const k3d::uint_t Edge)
+	{
+		edge_starts[Edge] = points_array.size();
+	}
+	
+	k3d::mesh::points_t points_array;
+	k3d::mesh::indices_t edge_starts;
+};
+
+/// Stores SDS patch corner data in OpenGL-compatible arrays
+class point_visitor : public k3d::sds::ipatch_corner_visitor
+{
+public:
+	
+	void on_corner(const k3d::point3& Point)
+	{
+		points_array.push_back(Point);
+	}
+	
+	k3d::mesh::points_t points_array;
+};
 
 } // namespace opengl
 

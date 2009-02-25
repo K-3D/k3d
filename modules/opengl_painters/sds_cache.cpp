@@ -53,6 +53,18 @@ void sds_cache::visit_surface(const k3d::uint_t Level, k3d::sds::ipatch_surface_
 	m_cache->visit_surface(Level, Visitor);
 }
 
+void sds_cache::visit_boundary(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::ipatch_boundary_visitor& Visitor)
+{
+	return_if_fail(m_cache);
+	m_cache->visit_boundary(Mesh, Level, Visitor);
+}
+
+void sds_cache::visit_corners(const k3d::uint_t Level, k3d::sds::ipatch_corner_visitor& Visitor)
+{
+	return_if_fail(m_cache);
+	m_cache->visit_corners(Level, Visitor);
+}
+
 void sds_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
 	if (m_cache && m_selection_changed)
