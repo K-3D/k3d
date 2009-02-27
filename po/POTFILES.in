@@ -352,9 +352,6 @@ modules/opengl_painters/vertex_data_painter.cpp
 modules/opengl/render_engine.cpp
 modules/osx/uri_handler.cpp
 modules/pdiff/perceptual_difference.cpp
-modules/pgp_remesh/pgp_face_painter.cpp
-modules/pgp_remesh/point_mean_curv_painter.cpp
-modules/pgp_remesh/remesh.cpp
 modules/pixie/raytrace_map.cpp
 modules/plot/least_squares_plot.cpp
 modules/plot/surface_plot.cpp
@@ -396,7 +393,6 @@ modules/quadrics/paraboloid.cpp
 modules/quadrics/sphere.cpp
 modules/quadrics/teapot.cpp
 modules/quadrics/torus.cpp
-modules/quadrilateral_remeshing/quadrilateral_remeshing.cpp
 modules/renderman/area_light.cpp
 modules/renderman/array_1d.cpp
 modules/renderman/array_2d.cpp
@@ -533,3 +529,5 @@ share/scripts/scripted_plugins/ogre_exporter.py
 uimodules/ngui/splash_box.cpp
 uimodules/ngui/user_interface.cpp
 uimodules/qtui/user_interface.cpp
+k3dsdk/mesh_writer.h
+modules/ply_io/mesh_writer.cpp
