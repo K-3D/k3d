@@ -103,7 +103,7 @@ private:
 		k3d::mesh::indices_t& vertices;
 	};
 
-	void on_write_mesh(const k3d::mesh& Input, std::ostream& Output)
+	void on_write_mesh(const k3d::mesh& Input, const k3d::filesystem::path& OutputPath, std::ostream& Output)
 	{
 		// Convert input polyhedra to triangles ...
 		k3d::mesh::points_t points;

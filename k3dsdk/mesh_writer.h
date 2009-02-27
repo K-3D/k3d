@@ -85,13 +85,14 @@ private:
 		}
 
 		base_t::document().pipeline_profiler().start_execution(*this, "Write Mesh");
-		on_write_mesh(*mesh, stream);
+		on_write_mesh(*mesh, path, stream);
 		base_t::document().pipeline_profiler().finish_execution(*this, "Write Mesh");
 	}
 
 
-	/// Implement this in derived classes to write the given mesh to an output stream.
-	virtual void on_write_mesh(const mesh& Input, std::ostream& Output) = 0;
+	/// Implement this in derived classes to write the given mesh to an output stream.  Note that the output
+	/// path is provided for reference only, all data must be written to the provided stream.
+	virtual void on_write_mesh(const mesh& Input, const filesystem::path& OutputPath, std::ostream& Output) = 0;
 };
 
 } // namespace k3d

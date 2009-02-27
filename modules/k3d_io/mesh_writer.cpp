@@ -27,7 +27,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/file_helpers.h>
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/mesh_sink.h>
+#include <k3dsdk/mesh_writer.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/serialization_xml.h>
@@ -42,46 +42,14 @@ namespace k3d_io
 // mesh_writer
 
 class mesh_writer :
-	public k3d::mesh_sink<k3d::node >
+	public k3d::mesh_writer<k3d::node >
 {
-	typedef k3d::mesh_sink<k3d::node > base;
+	typedef k3d::mesh_writer<k3d::node > base;
 
 public:
 	mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Output file")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::WRITE) + init_path_type("k3d_files"))
+		base(Factory, Document)
 	{
-		m_file.changed_signal().connect(sigc::mem_fun(*this, &mesh_writer::on_write_file));
-		m_input_mesh.changed_signal().connect(sigc::mem_fun(*this, &mesh_writer::on_write_file));
-	}
-
-	void on_write_file(k3d::iunknown*)
-	{
-		const k3d::filesystem::path path = m_file.pipeline_value();
-		k3d::mesh* const mesh = m_input_mesh.pipeline_value();
-
-		if(!mesh || path.empty())
-			return;
-
-		k3d::log() << info << "Writing " << path.native_console_string() << " using " << get_factory().name() << std::endl;
-
-		k3d::filesystem::ofstream file(path);
-		if(!file)
-		{
-			k3d::log() << error << k3d_file_reference << ": error opening [" << path.native_console_string() << "]" << std::endl;
-			return;
-		}
-
-		const k3d::filesystem::path root_path(path.branch_path());
-		k3d::dependencies dependencies;
-		k3d::persistent_lookup lookup;
-		k3d::ipersistent::save_context context(root_path, dependencies, lookup);
-
-		k3d::xml::element xml("k3dml");
-		k3d::xml::element& xml_mesh = xml.append(k3d::xml::element("mesh_arrays"));
-		k3d::xml::save(*mesh, xml_mesh, context);
-
-		file << k3d::xml::declaration() <<  xml;
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -97,7 +65,19 @@ public:
 	}
 
 private:
-	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file;
+	void on_write_mesh(const k3d::mesh& Input, const k3d::filesystem::path& OutputPath, std::ostream& Output)
+	{
+		const k3d::filesystem::path root_path(OutputPath.branch_path());
+		k3d::dependencies dependencies;
+		k3d::persistent_lookup lookup;
+		k3d::ipersistent::save_context context(root_path, dependencies, lookup);
+
+		k3d::xml::element xml("k3dml");
+		k3d::xml::element& xml_mesh = xml.append(k3d::xml::element("mesh_arrays"));
+		k3d::xml::save(Input, xml_mesh, context);
+
+		Output << k3d::xml::declaration() << xml;
+	}
 };
 
 k3d::iplugin_factory& mesh_writer_factory()
