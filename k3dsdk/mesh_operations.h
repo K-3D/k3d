@@ -52,8 +52,8 @@ const bool_t validate_points(const mesh& Mesh);
 const bool_t validate_nurbs_curve_groups(const mesh& Mesh);
 /// Returns true iff the given mesh contains valid nurbs patch data (i.e. every array is defined).
 const bool_t validate_nurbs_patches(const mesh& Mesh);
-/// Returns true iff the given mesh contains valid polyhedron data (i.e. every array is defined).
-const bool_t validate_polyhedra(const mesh& Mesh);
+/** \deprecated */
+const bool_t legacy_validate_polyhedra(const mesh& Mesh);
 
 /// Returns true iff the given mesh should be rendered as SDS.
 const bool_t is_sds(const mesh& Mesh);
@@ -62,7 +62,7 @@ const bool_t is_sds(const mesh& Mesh);
 template<typename visitor_t>
 void traverse_polyhedra(const mesh& Mesh, visitor_t& Visitor)
 {
-	return_if_fail(validate_polyhedra(Mesh));
+	return_if_fail(legacy_validate_polyhedra(Mesh));
 	const mesh::points_t& points = *Mesh.points;
 	const mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
 	const mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
@@ -112,7 +112,7 @@ void traverse_selected_points(const mesh& Mesh, visitor_t& Visitor)
 template<typename visitor_t>
 void traverse_selected_edge_points(const mesh& Mesh, visitor_t& Visitor)
 {
-	return_if_fail(validate_polyhedra(Mesh));
+	return_if_fail(legacy_validate_polyhedra(Mesh));
 	const mesh::points_t& points = *Mesh.points;
 	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
 	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
@@ -131,7 +131,7 @@ void traverse_selected_edge_points(const mesh& Mesh, visitor_t& Visitor)
 template<typename visitor_t>
 void traverse_selected_face_points(const mesh& Mesh, visitor_t& Visitor)
 {
-	return_if_fail(validate_polyhedra(Mesh));
+	return_if_fail(legacy_validate_polyhedra(Mesh));
 	const mesh::points_t& points = *Mesh.points;
 	const mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
 	const mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;

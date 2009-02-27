@@ -28,11 +28,12 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/texture3.h>
 #include <k3dsdk/transformable.h>
 #include <k3dsdk/utility_gl.h>
 
-#include <iterator>
+#include <boost/scoped_ptr.hpp>
 
 namespace libk3dtexture
 {
@@ -69,7 +70,6 @@ class planar_map :
 	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::transformable< k3d::node > > > 
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::transformable< k3d::node > > >  base_t;
-	typedef k3d::typed_array<k3d::texture3> texcoord_array_t;
 
 public:
 	planar_map(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -84,29 +84,30 @@ public:
 	{
 		Output = Input;
 
-		if(!k3d::validate_polyhedra(Output))
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output));
+		if(!polyhedron)
 			return;
 
-		k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.writable();
-		polyhedra.face_varying_data.create(m_texcoord_set_name.pipeline_value(), new texcoord_array_t(polyhedra.edge_points->size()));
+		polyhedron->face_varying_data.create(m_texcoord_set_name.pipeline_value(), new k3d::mesh::texture_coordinates_t(polyhedron->edge_points.size()));
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if(!k3d::validate_polyhedra(Output))
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output));
+		if(!polyhedron)
 			return;
 
 		const k3d::matrix4 inv_matrix = inverse(m_input_matrix.pipeline_value());
 
 		const k3d::mesh::points_t& points = *Output.points;
-		const k3d::mesh::indices_t& edge_points = *Output.polyhedra->edge_points;
-		texcoord_array_t& texcoords = *Output.polyhedra.writable().face_varying_data.writable<texcoord_array_t>(m_texcoord_set_name.pipeline_value());
+		k3d::mesh::texture_coordinates_t& texcoords =
+			*polyhedron->face_varying_data.writable<k3d::mesh::texture_coordinates_t>(m_texcoord_set_name.pipeline_value());
 
 		const k3d::uint_t edge_begin = 0;
-		const k3d::uint_t edge_end = edge_points.size();
+		const k3d::uint_t edge_end = polyhedron->edge_points.size();
 		for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 		{
-			const k3d::point3 point = inv_matrix * points[edge_points[edge]];
+			const k3d::point3 point = inv_matrix * points[polyhedron->edge_points[edge]];
 			texcoords[edge].n[0] = point.n[0];
 			texcoords[edge].n[1] = point.n[1];
 			texcoords[edge].n[2] = point.n[2];

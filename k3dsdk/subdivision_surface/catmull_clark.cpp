@@ -875,14 +875,10 @@ public:
 	void create_mesh(const k3d::mesh& Input, const k3d::mesh::selection_t& InputFaceSelection, k3d::mesh& Output, k3d::inode* Node)
 	{
 		// If there are no valid polyhedra, we give up
-		if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Validate input");
-		if(!k3d::validate_polyhedra(Input))
-		{
-			if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Validate input");
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
+		if(!polyhedron)
 			return;
-		}
-		if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Validate input");
-		
+
 		for(k3d::uint_t level = 0; level != m_levels; ++level)
 		{
 			topology_data_t& topology_data = m_topology_data[level];
@@ -1045,17 +1041,11 @@ public:
 	
 	void update_mesh(const k3d::mesh& Input, const k3d::mesh::selection_t& InputFaceSelection, k3d::mesh& Output, k3d::inode* Node)
 	{
-		// If there are no valid polyhedra, we give up
-		if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Validate input");
-		if(!k3d::validate_polyhedra(Input))
-		{
-			if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Validate input");
-			return;
-		}
-		if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Validate input");
-		
 		k3d::mesh input_with_normals = Input;
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(input_with_normals));
+		if(!polyhedron)
+			return;
+
 		const k3d::mesh::points_t& points = *input_with_normals.points;
 		
 		// Calculate the normals on the input

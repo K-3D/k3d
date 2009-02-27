@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -27,7 +27,10 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/painter_render_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace k3d
 {
@@ -161,27 +164,22 @@ public:
 		{
 			case k3d::STORAGE_CLASS_UNIFORM:
 			{
-				if(k3d::validate_polyhedra(Mesh))
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+				if(polyhedron)
 				{
-					if(const k3d::mesh::normals_t* const array = Mesh.polyhedra->uniform_data.lookup<k3d::mesh::normals_t>(array_name))
+					if(const k3d::mesh::normals_t* const array = polyhedron->uniform_data.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);
 						k3d::gl::color3d(color);
 
-						const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-						const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
-						const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-						const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-						const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 						const k3d::mesh::points_t& points = *Mesh.points;
-
 
 						glBegin(GL_LINES);
 						const k3d::uint_t face_begin = 0;
-						const k3d::uint_t face_end = face_begin + face_first_loops.size();
+						const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
 						for(k3d::uint_t face = face_begin; face != face_end; ++face)
-							draw_line(k3d::center(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]), (*array)[face], normalize, scale);
+							draw_line(k3d::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]), (*array)[face], normalize, scale);
 						glEnd();
 					}
 				}
@@ -190,39 +188,32 @@ public:
 
 			case k3d::STORAGE_CLASS_FACEVARYING:
 			{
-				if(k3d::validate_polyhedra(Mesh))
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+				if(polyhedron)
 				{
-					if(const k3d::mesh::normals_t* const array = Mesh.polyhedra->face_varying_data.lookup<k3d::mesh::normals_t>(array_name))
+					if(const k3d::mesh::normals_t* const array = polyhedron->face_varying_data.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);
 						k3d::gl::color3d(color);
 
-						const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-						const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-						const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
-						const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-						const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-						const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 						const k3d::mesh::points_t& points = *Mesh.points;
-
-						const k3d::uint_t face_count = face_first_loops.size();
 
 						glBegin(GL_LINES);
 						const k3d::uint_t face_begin = 0;
-						const k3d::uint_t face_end = face_begin + face_first_loops.size();
+						const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
 						for(k3d::uint_t face = face_begin; face != face_end; ++face)
 						{
-							const k3d::uint_t loop_begin = face_first_loops[face];
-							const k3d::uint_t loop_end = loop_begin + face_loop_counts[face];
+							const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+							const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
 							for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
 							{
-								const k3d::uint_t first_edge = loop_first_edges[loop];
+								const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
 								for(k3d::uint_t edge = first_edge; ;)
 								{
-									draw_line(points[edge_points[edge]], (*array)[edge], normalize, scale);
+									draw_line(points[polyhedron->edge_points[edge]], (*array)[edge], normalize, scale);
 
-									edge = clockwise_edges[edge];
+									edge = polyhedron->clockwise_edges[edge];
 									if(edge == first_edge)
 										break;
 								}
@@ -236,7 +227,8 @@ public:
 
 			case k3d::STORAGE_CLASS_VERTEX:
 			{
-				if(k3d::validate_polyhedra(Mesh))
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+				if(polyhedron)
 				{
 					if(const k3d::mesh::normals_t* const array = Mesh.vertex_data.lookup<k3d::mesh::normals_t>(array_name))
 					{

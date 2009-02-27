@@ -30,6 +30,7 @@
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/painter_render_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/share.h>
 
@@ -87,9 +88,9 @@ public:
 	{
 		k3d::gl::color3d(Color);
 
-		const size_t face_begin = 0;
-		const size_t face_end = face_begin + Centers.size();
-		for(size_t face = face_begin; face != face_end; ++face)
+		const k3d::uint_t face_begin = 0;
+		const k3d::uint_t face_end = face_begin + Centers.size();
+		for(k3d::uint_t face = face_begin; face != face_end; ++face)
 		{
 			if(FaceTest(face))
 			{
@@ -102,12 +103,13 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		const bool draw_selected = m_draw_selected.pipeline_value();
-		const bool draw_unselected = m_draw_unselected.pipeline_value();
+		const k3d::bool_t draw_selected = m_draw_selected.pipeline_value();
+		const k3d::bool_t draw_unselected = m_draw_unselected.pipeline_value();
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 
 		if(!m_font)
@@ -126,23 +128,19 @@ public:
 			}
 		}
 
-		const double offset = m_offset.pipeline_value();
+		const k3d::double_t offset = m_offset.pipeline_value();
 
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 		const k3d::mesh::points_t& points = *Mesh.points;
 
-		const size_t face_count = face_first_loops.size();
+		const k3d::uint_t face_count = polyhedron->face_first_loops.size();
 
 		// Calculate face centers and normals ...
 		k3d::typed_array<k3d::point3> centers(face_count);
 		k3d::typed_array<k3d::normal3> normals(face_count);
-		for(size_t face = 0; face != face_count; ++face)
+		for(k3d::uint_t face = 0; face != face_count; ++face)
 		{
-			centers[face] = k3d::center(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
-			normals[face] = k3d::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
+			centers[face] = k3d::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+			normals[face] = k3d::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 		}
 
 		k3d::gl::store_attributes attributes;
@@ -171,8 +169,8 @@ private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_font_path;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_font_size;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_antialias;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_selected;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_unselected;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_selected;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_unselected;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_selected_color;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_unselected_color;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_offset;

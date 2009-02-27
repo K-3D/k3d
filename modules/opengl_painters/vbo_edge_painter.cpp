@@ -20,22 +20,25 @@
 /** \file Paint edges using a VBO
  */
 
+#include "colored_selection_painter_gl.h"
+#include "normal_cache.h"
+#include "vbo.h"
+
+#include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/hints.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
-#include "colored_selection_painter_gl.h"
-#include "normal_cache.h"
-#include "vbo.h"
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -63,7 +66,8 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 		
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
@@ -110,7 +114,8 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if (!SelectionState.select_split_edges)
@@ -154,7 +159,8 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 		
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 		
 		schedule_data<point_vbo>(&Mesh, Hint, this);

@@ -21,8 +21,11 @@
 #include "legacy_mesh.h"
 #include "mesh.h"
 #include "mesh_operations.h"
+#include "polyhedron.h"
 #include "result.h"
 #include "utility.h"
+
+#include <boost/scoped_ptr.hpp>
 
 #include <algorithm>
 
@@ -677,28 +680,17 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		}
 	}
 
-	if(validate_polyhedra(Mesh))
+	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+	if(polyhedron)
 	{
-		const k3d::mesh::indices_t& first_faces = *Mesh.polyhedra->first_faces;
-		const k3d::mesh::counts_t& face_counts = *Mesh.polyhedra->face_counts;
-		const k3d::mesh::polyhedra_t::types_t& types = *Mesh.polyhedra->types;
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection.get();
-		const k3d::mesh::materials_t& face_materials = *Mesh.polyhedra->face_materials.get();
-		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::mesh::selection_t& edge_selection = *Mesh.polyhedra->edge_selection.get();
-
-		const uint_t polyhedron_begin = 0;
-		const uint_t polyhedron_end = polyhedron_begin + first_faces.size();
-		for(uint_t polyhedron = polyhedron_begin; polyhedron != polyhedron_end; ++polyhedron)
+		const uint_t shell_begin = 0;
+		const uint_t shell_end = shell_begin + polyhedron->first_faces.size();
+		for(uint_t shell = shell_begin; shell != shell_end; ++shell)
 		{
 			legacy::polyhedron* const legacy_polyhedron = new legacy::polyhedron();
 			polyhedra.push_back(legacy_polyhedron);
 
-			switch(types[polyhedron])
+			switch(polyhedron->polyhedron_types[shell])
 			{
 				case k3d::mesh::polyhedra_t::POLYGONS:
 					legacy_polyhedron->type = legacy::polyhedron::POLYGONS;
@@ -708,23 +700,23 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 					break;
 			}
 
-			const uint_t face_begin = first_faces[polyhedron];
-			const uint_t face_end = face_begin + face_counts[polyhedron];
+			const uint_t face_begin = polyhedron->first_faces[shell];
+			const uint_t face_end = face_begin + polyhedron->face_counts[shell];
 			for(uint_t face = face_begin; face != face_end; ++face)
 			{
-				const uint_t loop_begin = face_first_loops[face];
-				const uint_t loop_end = loop_begin + face_loop_counts[face];
+				const uint_t loop_begin = polyhedron->face_first_loops[face];
+				const uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
 				for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 				{
-					const uint_t first_edge = loop_first_edges[loop];
+					const uint_t first_edge = polyhedron->loop_first_edges[loop];
 					std::vector<legacy::split_edge*> legacy_loop;
 					for(uint_t edge = first_edge; ; )
 					{
-						legacy::split_edge* const legacy_edge = new legacy::split_edge(points[edge_points[edge]]);
-						legacy_edge->selection_weight = edge_selection[edge];
+						legacy::split_edge* const legacy_edge = new legacy::split_edge(points[polyhedron->edge_points[edge]]);
+						legacy_edge->selection_weight = polyhedron->edge_selections[edge];
 						legacy_loop.push_back(legacy_edge);
 
-						edge = clockwise_edges[edge];
+						edge = polyhedron->clockwise_edges[edge];
 						if(edge == first_edge)
 							break;
 					}
@@ -737,8 +729,8 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 
 						legacy_polyhedron->faces.push_back(legacy_face);
 
-						legacy_face->material = face_materials[face];
-						legacy_face->selection_weight = face_selection[face];
+						legacy_face->material = polyhedron->face_materials[face];
+						legacy_face->selection_weight = polyhedron->face_selections[face];
 					}
 
 					/** \todo Support faces with holes */

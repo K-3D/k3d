@@ -32,6 +32,7 @@
 #include <k3dsdk/named_arrays.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/painter_render_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/share.h>
 
@@ -140,7 +141,8 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 
 		if(!m_font)

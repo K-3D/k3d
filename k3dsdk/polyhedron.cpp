@@ -390,7 +390,7 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 
 const_primitive* validate(const mesh& Mesh)
 {
-	if(!validate_polyhedra(Mesh))
+	if(!legacy_validate_polyhedra(Mesh))
 		return 0;
 
 	return new const_primitive(
@@ -415,7 +415,7 @@ const_primitive* validate(const mesh& Mesh)
 
 primitive* validate(mesh& Mesh)
 {
-	if(!validate_polyhedra(Mesh))
+	if(!legacy_validate_polyhedra(Mesh))
 		return 0;
 
 	mesh::polyhedra_t& polyhedron = Mesh.polyhedra.writable();

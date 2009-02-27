@@ -24,6 +24,8 @@
  * 	\author Bart Janssens (bart.janssens@lid.kviv.be)
  */
 
+#include <k3dsdk/mesh_selection.h>
+
 namespace module
 {
 

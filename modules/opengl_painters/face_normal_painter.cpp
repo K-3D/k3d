@@ -18,17 +18,20 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
+#include "normal_cache.h"
+
 #include <k3d-i18n-config.h>
-#include <k3dsdk/mesh_painter_gl.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/painter_render_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 
-#include "normal_cache.h"
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -63,23 +66,19 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		const bool draw_selected = m_draw_selected.pipeline_value() && RenderState.show_component_selection;
-		const bool draw_unselected = m_draw_unselected.pipeline_value();
+		const k3d::bool_t draw_selected = m_draw_selected.pipeline_value() && RenderState.show_component_selection;
+		const k3d::bool_t draw_unselected = m_draw_unselected.pipeline_value();
 
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
-		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 		const k3d::mesh::points_t& points = *Mesh.points;
 
-		const k3d::uint_t face_count = face_first_loops.size();
+		const k3d::uint_t face_count = polyhedron->face_first_loops.size();
 		
 		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
 
@@ -93,9 +92,9 @@ public:
 			glBegin(GL_LINES);
 			for(k3d::uint_t face = 0; face != face_count; ++face)
 			{
-				if(face_selection[face])
+				if(polyhedron->face_selections[face])
 				{
-					k3d::point3 center = k3d::center(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
+					k3d::point3 center = k3d::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 					k3d::gl::vertex3d(center);
 					k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face)));
 				}
@@ -110,9 +109,9 @@ public:
 			glBegin(GL_LINES);
 			for(k3d::uint_t face = 0; face != face_count; ++face)
 			{
-				if(!face_selection[face])
+				if(!polyhedron->face_selections[face])
 				{
-					k3d::point3 center = k3d::center(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
+					k3d::point3 center = k3d::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 					k3d::gl::vertex3d(center);
 					k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face)));
 				}
@@ -123,7 +122,8 @@ public:
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 		
 		schedule_data<normal_cache>(&Mesh, Hint, this);
@@ -144,8 +144,8 @@ public:
 	
 
 private:
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_selected;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_unselected;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_selected;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_unselected;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_selected_color;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_unselected_color;
 };

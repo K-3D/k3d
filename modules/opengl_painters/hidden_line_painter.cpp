@@ -35,8 +35,11 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -65,7 +68,8 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if(k3d::is_sds(Mesh))
@@ -82,12 +86,6 @@ public:
 		glPolygonOffset(2.0, 1.0);
 		glDisable(GL_CULL_FACE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::mesh::selection_t& edge_selection = *Mesh.polyhedra->edge_selection;
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::points_t& mesh_points = *Mesh.points;
 
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
@@ -123,27 +121,28 @@ public:
 		glLineWidth(m_line_width.pipeline_value());
 
 		glBegin(GL_LINES);
-		const size_t edge_count = edge_points.size();
-		for(size_t edge = 0; edge != edge_count; ++edge)
+		const k3d::uint_t edge_count = polyhedron->edge_points.size();
+		for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 		{
-			color4d(edge_selection[edge] ? selected_color : color);
-			k3d::gl::vertex3d(mesh_points[edge_points[edge]]);
-			k3d::gl::vertex3d(mesh_points[edge_points[clockwise_edges[edge]]]);
+			color4d(polyhedron->edge_selections[edge] ? selected_color : color);
+			k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
+			k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
 		}
 		glEnd();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!validate_polyhedra(Mesh))
+		if (!SelectionState.select_faces)
+			return;
+
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if (k3d::is_sds(Mesh))
 			return;
 			
-		if (!SelectionState.select_faces)
-			return;
-
 		k3d::gl::store_attributes attributes;
 		
 		glDisable(GL_LIGHTING);
@@ -160,8 +159,8 @@ public:
 		const k3d::mesh::points_t& points = triangles.points();
 		const cached_triangulation::indices_t& indices = triangles.indices();
 		
-		size_t face_count = Mesh.polyhedra->face_first_loops->size();
-		for(size_t face = 0; face != face_count; ++face)
+		k3d::uint_t face_count = polyhedron->face_first_loops.size();
+		for(k3d::uint_t face = 0; face != face_count; ++face)
 		{
 			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
 
@@ -178,7 +177,8 @@ public:
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if (k3d::is_sds(Mesh))

@@ -32,6 +32,8 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
 
+#include <boost/scoped_ptr.hpp>
+
 namespace module
 {
 
@@ -79,7 +81,8 @@ public:
 private:
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if (!k3d::validate_polyhedra(Input))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
+		if(!input_polyhedron)
 			return;
 		
 		m_companions.clear();
@@ -88,16 +91,14 @@ private:
 
 		if (m_companions.empty() || m_valences.empty() || m_boundary_edges.empty())
 		{
-			k3d::polyhedron::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, m_boundary_edges, m_companions);
-			k3d::polyhedron::create_vertex_valence_lookup(Input.points->size(), *Input.polyhedra->edge_points, m_valences);
+			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, m_boundary_edges, m_companions);
+			k3d::polyhedron::create_vertex_valence_lookup(Input.points->size(), input_polyhedron->edge_points, m_valences);
 		}
 		
 		// Make sure the Output selection arrays contain the correct selection
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 		
-		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
 		const k3d::mesh::selection_t edge_selection = *Output.polyhedra->edge_selection;
-		const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
 		const k3d::uint_t edge_count = edge_selection.size();
 		k3d::mesh::polyhedra_t& target_polyhedra = Output.polyhedra.writable();
 		k3d::mesh::selection_t& target_selection = target_polyhedra.edge_selection.writable();
@@ -116,13 +117,13 @@ private:
 					{
 						target_selection[loopedge] = selection_weight;
 						
-						if (m_valences[edge_points[clockwise_edges[loopedge]]] != 4) // Next edge in loop is ambiguous
+						if (m_valences[input_polyhedron->edge_points[input_polyhedron->clockwise_edges[loopedge]]] != 4) // Next edge in loop is ambiguous
 							break;
 						
-						if (m_boundary_edges[clockwise_edges[loopedge]]) // No companion
+						if (m_boundary_edges[input_polyhedron->clockwise_edges[loopedge]]) // No companion
 							break;
 						
-						loopedge = clockwise_edges[m_companions[clockwise_edges[loopedge]]];
+						loopedge = input_polyhedron->clockwise_edges[m_companions[input_polyhedron->clockwise_edges[loopedge]]];
 						if (loopedge == edge) // loop complete
 							break;
 					}
@@ -133,15 +134,15 @@ private:
 		{
 			for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
-				double selection_weight = edge_selection[edge];
+				double selection_weight = input_polyhedron->edge_selections[edge];
 				if (selection_weight)
 				{
-					if (!m_boundary_edges[edge] && edge_selection[m_companions[edge]] && m_companions[edge] > edge)
+					if (!m_boundary_edges[edge] && input_polyhedron->edge_selections[m_companions[edge]] && m_companions[edge] > edge)
 						continue; // we'll catch this one when we reach its companion
 					if (a_side)
-						select_with_edgering(selection_weight, clockwise_edges[edge], clockwise_edges, target_selection);
+						select_with_edgering(selection_weight, input_polyhedron->clockwise_edges[edge], input_polyhedron->clockwise_edges, target_selection);
 					if (b_side && !m_boundary_edges[edge])
-						select_with_edgering(selection_weight, clockwise_edges[m_companions[edge]], clockwise_edges, target_selection);
+						select_with_edgering(selection_weight, input_polyhedron->clockwise_edges[m_companions[edge]], input_polyhedron->clockwise_edges, target_selection);
 				}
 			}
 		}

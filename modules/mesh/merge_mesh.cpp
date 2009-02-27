@@ -37,8 +37,11 @@
 #include <k3dsdk/parallel/blocked_range.h>
 #include <k3dsdk/parallel/parallel_for.h>
 #include <k3dsdk/parallel/threads.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/user_property_changed_signal.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -96,7 +99,7 @@ typename DataT::value_type& create_if_not_exists(DataT& Data)
 /// Appends the polyhedra of mesh Input to those of mesh Output, putting everything in one single polyhedron if SinglePolyhedron is true.
 void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyhedron = true)
 {
-	if(!k3d::validate_polyhedra(Input))
+	if(!k3d::legacy_validate_polyhedra(Input))
 		return;
 	k3d::mesh::polyhedra_t& output_polyhedra = create_if_not_exists(Output.polyhedra);
 	k3d::mesh::indices_t& output_first_faces = create_if_not_exists(output_polyhedra.first_faces);

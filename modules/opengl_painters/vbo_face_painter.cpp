@@ -21,24 +21,27 @@
  * 	\author Bart Janssens (bart.janssens@lid.kviv.be)
  */
 
+#include "cached_triangulation.h"
+#include "colored_selection_painter_gl.h"
+#include "vbo.h"
+
+#include <k3d-i18n-config.h>
 #include <k3dsdk/array.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/hints.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
-#include "cached_triangulation.h"
-#include "colored_selection_painter_gl.h"
-#include "vbo.h"
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -67,7 +70,8 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		if(!validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if (k3d::is_sds(Mesh))
@@ -127,7 +131,8 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		if(!validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if (k3d::is_sds(Mesh))
@@ -170,7 +175,8 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 		
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 		
 		if (k3d::is_sds(Mesh))

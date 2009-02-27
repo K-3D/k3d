@@ -29,6 +29,7 @@
 #include <k3dsdk/utility_gl.h>
 
 #include <boost/any.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <map>
 
@@ -150,7 +151,8 @@ void edge_vbo::on_schedule(k3d::inode* Painter)
 
 void edge_vbo::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
-	return_if_fail(k3d::validate_polyhedra(Mesh));
+	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+	return_if_fail(polyhedron);
 	if (m_vbo)
 		return;
 	

@@ -18,17 +18,20 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
+#include "normal_cache.h"
+
 #include <k3d-i18n-config.h>
-#include <k3dsdk/mesh_painter_gl.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/painter_render_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 
-#include "normal_cache.h"
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -63,13 +66,14 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		const bool draw_selected = m_draw_selected.pipeline_value() && RenderState.show_component_selection;
-		const bool draw_unselected = m_draw_unselected.pipeline_value();
+		const k3d::bool_t draw_selected = m_draw_selected.pipeline_value() && RenderState.show_component_selection;
+		const k3d::bool_t draw_unselected = m_draw_unselected.pipeline_value();
 
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 
 		const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
@@ -117,7 +121,8 @@ public:
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 		
 		schedule_data<normal_cache>(&Mesh, Hint, this);
@@ -138,8 +143,8 @@ public:
 	
 
 private:
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_selected;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_unselected;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_selected;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_draw_unselected;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_selected_color;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_unselected_color;
 };

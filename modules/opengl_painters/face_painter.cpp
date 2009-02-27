@@ -21,6 +21,10 @@
  * 	\author Bart Janssens (bart.janssens@lid.kviv.be)
  */
 
+#include "cached_triangulation.h"
+#include "colored_selection_painter_gl.h"
+#include "normal_cache.h"
+
 #include <k3d-i18n-config.h>
 #include <k3dsdk/array.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -33,12 +37,11 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
-#include "cached_triangulation.h"
-#include "colored_selection_painter_gl.h"
-#include "normal_cache.h"
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -65,7 +68,8 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if(k3d::is_sds(Mesh))
@@ -95,13 +99,13 @@ public:
 		glEnable(GL_LIGHTING);
 		enable_blending();
 		
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+		const k3d::mesh::indices_t& edge_points = polyhedron->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = polyhedron->clockwise_edges;
+		const k3d::mesh::indices_t& loop_first_edges = polyhedron->loop_first_edges;
+		const k3d::mesh::indices_t& face_first_loops = polyhedron->face_first_loops;
+		const k3d::mesh::indices_t& face_loop_counts = polyhedron->face_loop_counts;
 		const k3d::mesh::points_t& mesh_points = *Mesh.points;
-		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
+		const k3d::mesh::selection_t& face_selection = polyhedron->face_selections;
 		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
 
 		glBegin(GL_TRIANGLES);
@@ -122,7 +126,8 @@ public:
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if (k3d::is_sds(Mesh))
@@ -150,8 +155,8 @@ public:
 		const k3d::mesh::points_t& points = triangles.points();
 		const cached_triangulation::indices_t& indices = triangles.indices();
 		
-		size_t face_count = Mesh.polyhedra->face_first_loops->size();
-		for(size_t face = 0; face != face_count; ++face)
+		k3d::uint_t face_count = polyhedron->face_first_loops.size();
+		for(k3d::uint_t face = 0; face != face_count; ++face)
 		{
 			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
 
@@ -168,7 +173,8 @@ public:
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if (k3d::is_sds(Mesh))

@@ -30,6 +30,7 @@
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/painter_render_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/share.h>
 
@@ -85,25 +86,25 @@ public:
 	}
 
 	template<typename FunctorT>
-	void draw(const k3d::mesh::indices_t& FaceFirstLoops, const k3d::mesh::counts_t& FaceLoopCounts, const k3d::mesh::indices_t& LoopFirstEdges, const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::points_t& Points, const k3d::mesh::normals_t& FaceNormals, const k3d::color& Color, const k3d::double_t EdgeOffset, const k3d::double_t FaceOffset, const FunctorT& EdgeTest, FTFont& Font)
+	void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::mesh::points_t& Points, const k3d::mesh::normals_t& FaceNormals, const k3d::color& Color, const k3d::double_t EdgeOffset, const k3d::double_t FaceOffset, const FunctorT& EdgeTest, FTFont& Font)
 	{
 		k3d::gl::color3d(Color);
 
-		const size_t face_begin = 0;
-		const size_t face_end = face_begin + FaceFirstLoops.size();
-		for(size_t face = face_begin; face != face_end; ++face)
+		const k3d::uint_t face_begin = 0;
+		const k3d::uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
+		for(k3d::uint_t face = face_begin; face != face_end; ++face)
 		{
-			const size_t loop_begin = FaceFirstLoops[face];
-			const size_t loop_end = loop_begin + FaceLoopCounts[face];
-			for(size_t loop = loop_begin; loop != loop_end; ++loop)
+			const k3d::uint_t loop_begin = Polyhedron.face_first_loops[face];
+			const k3d::uint_t loop_end = loop_begin + Polyhedron.face_loop_counts[face];
+			for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
 			{
-				const size_t first_edge = LoopFirstEdges[loop];
-				for(size_t edge = first_edge; ; )
+				const k3d::uint_t first_edge = Polyhedron.loop_first_edges[loop];
+				for(k3d::uint_t edge = first_edge; ; )
 				{
 					if(EdgeTest(edge))
 					{
-						const k3d::point3 vertex1 = Points[EdgePoints[edge]];
-						const k3d::point3 vertex2 = Points[EdgePoints[ClockwiseEdges[edge]]];
+						const k3d::point3 vertex1 = Points[Polyhedron.edge_points[edge]];
+						const k3d::point3 vertex2 = Points[Polyhedron.edge_points[Polyhedron.clockwise_edges[edge]]];
 						const k3d::vector3 edge_vector = vertex2 - vertex1;
 
 						const k3d::point3 position = vertex1 + (0.5 * edge_vector) + (EdgeOffset * k3d::normalize(FaceNormals[face] ^ edge_vector)) + (FaceOffset * k3d::to_vector(k3d::normalize(FaceNormals[face])));
@@ -112,7 +113,7 @@ public:
 						Font.Render(k3d::string_cast(edge).c_str());
 					}
 
-					edge = ClockwiseEdges[edge];
+					edge = Polyhedron.clockwise_edges[edge];
 					if(edge == first_edge)
 						break;
 				}
@@ -127,7 +128,8 @@ public:
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 
 		if(!m_font)
@@ -149,28 +151,23 @@ public:
 		const k3d::double_t edge_offset = m_edge_offset.pipeline_value();
 		const k3d::double_t face_offset = m_face_offset.pipeline_value();
 
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 		const k3d::mesh::points_t& points = *Mesh.points;
 
-		const size_t face_count = face_first_loops.size();
+		const k3d::uint_t face_count = polyhedron->face_first_loops.size();
 
 		// Calculate face normals ...
 		k3d::typed_array<k3d::normal3> normals(face_count);
-		for(size_t face = 0; face != face_count; ++face)
-			normals[face] = k3d::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
+		for(k3d::uint_t face = 0; face != face_count; ++face)
+			normals[face] = k3d::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
 		if(draw_selected)
-			draw(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, normals, m_selected_color.pipeline_value(), edge_offset, face_offset, selected_edges(Mesh), *m_font);
+			draw(*polyhedron, points, normals, m_selected_color.pipeline_value(), edge_offset, face_offset, selected_edges(Mesh), *m_font);
 
 		if(draw_unselected)
-			draw(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, normals, m_unselected_color.pipeline_value(), edge_offset, face_offset, unselected_edges(Mesh), *m_font);
+			draw(*polyhedron, points, normals, m_unselected_color.pipeline_value(), edge_offset, face_offset, unselected_edges(Mesh), *m_font);
 	}
 	
 	static k3d::iplugin_factory& get_factory()

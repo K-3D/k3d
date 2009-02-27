@@ -130,7 +130,7 @@ const bool_t validate(mesh& Mesh)
 	if(Mesh.nurbs_patches && !validate_nurbs_patches(Mesh))
 		result = false;
 
-	if(Mesh.polyhedra && !validate_polyhedra(Mesh))
+	if(Mesh.polyhedra && !legacy_validate_polyhedra(Mesh))
 		result = false;
 
 	return result;
@@ -194,7 +194,7 @@ const bool_t validate_nurbs_patches(const mesh& Mesh)
 	return true;
 }
 
-const bool_t validate_polyhedra(const mesh& Mesh)
+const bool_t legacy_validate_polyhedra(const mesh& Mesh)
 {
 	if(!Mesh.polyhedra)
 		return false;
@@ -259,7 +259,7 @@ const bool_t validate_polyhedra(const mesh& Mesh)
 
 const bool_t is_sds(const mesh& Mesh)
 {
-	if(!validate_polyhedra(Mesh))
+	if(!legacy_validate_polyhedra(Mesh))
 		return false;
 
 	const mesh::polyhedra_t::types_t& types = *Mesh.polyhedra->types;

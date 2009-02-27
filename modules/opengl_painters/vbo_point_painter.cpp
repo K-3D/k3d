@@ -20,22 +20,25 @@
 /** \file Paint points using a VBO
  */
 
+#include "colored_selection_painter_gl.h"
+#include "normal_cache.h"
+#include "vbo.h"
+
+#include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/hints.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility_gl.h>
 
-#include "colored_selection_painter_gl.h"
-#include "normal_cache.h"
-#include "vbo.h"
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -115,7 +118,8 @@ public:
 		if (!SelectionState.select_points)
 			return;
 		
-		bool valid_polyhedra = k3d::validate_polyhedra(Mesh) && !Mesh.polyhedra->face_first_loops->empty();
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		bool valid_polyhedra = polyhedron && !Mesh.polyhedra->face_first_loops->empty();
 		
 		clean_vbo_state();
 

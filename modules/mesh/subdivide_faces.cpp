@@ -855,7 +855,7 @@ public:
 	{
 		// If there are no valid polyhedra, we give up
 		document().pipeline_profiler().start_execution(*this, "Validate input");
-		if(!k3d::validate_polyhedra(Input))
+		if(!k3d::legacy_validate_polyhedra(Input))
 		{
 			document().pipeline_profiler().finish_execution(*this, "Validate input");
 			return;
@@ -1111,7 +1111,7 @@ public:
 	{
 		// If there are no valid polyhedra, we give up
 		document().pipeline_profiler().start_execution(*this, "Validate input");
-		if(!k3d::validate_polyhedra(Input))
+		if(!k3d::legacy_validate_polyhedra(Input))
 		{
 			document().pipeline_profiler().finish_execution(*this, "Validate input");
 			return;

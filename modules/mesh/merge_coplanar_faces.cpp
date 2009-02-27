@@ -65,47 +65,41 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// If there are no valid polyhedra, we give up
-		if(!k3d::validate_polyhedra(Input))
-		{
+		Output = Input;
+
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
+		if(!input_polyhedron)
 			return;
-		}
+
+		boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::validate(Output));
 		
-		Output = Input; // shallow copy, so all non-polyhedra are untouched
-		
-		k3d::mesh::selection_t input_face_selection = *Input.polyhedra->face_selection;
+		k3d::mesh::selection_t input_face_selection = input_polyhedron->face_selections;
 		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
 		k3d::mesh_selection::merge(mesh_selection.faces, input_face_selection);
 		k3d::mesh_selection::merge(mesh_selection, Output);
 		
 		const k3d::mesh::points_t& points = *Input.points;
-		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
-		const k3d::mesh::indices_t& loop_first_edges = *Input.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& face_first_loops = *Input.polyhedra->face_first_loops;
+		
 		const k3d::uint_t face_begin = 0;
-		const k3d::uint_t face_end = face_first_loops.size();
+		const k3d::uint_t face_end = face_begin + input_polyhedron->face_first_loops.size();
 		
 		k3d::mesh::bools_t boundary_edges;
 		k3d::mesh::indices_t companions;
-		k3d::polyhedron::create_edge_adjacency_lookup(edge_points, clockwise_edges, boundary_edges, companions);
+		k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, boundary_edges, companions);
 		
 		// Calculate the face normals
-		k3d::mesh::normals_t face_normals(face_first_loops.size());
+		k3d::mesh::normals_t face_normals(input_polyhedron->face_first_loops.size());
 		for(k3d::uint_t face = face_begin; face != face_end; ++face)
 		{
-			face_normals[face] = k3d::normalize(k3d::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]));
+			face_normals[face] = k3d::normalize(k3d::normal(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, points, input_polyhedron->loop_first_edges[input_polyhedron->face_first_loops[face]]));
 		}
 		
 		k3d::mesh::indices_t edge_faces;
-		k3d::polyhedron::create_edge_face_lookup(face_first_loops, *Input.polyhedra->face_loop_counts, loop_first_edges, clockwise_edges, edge_faces);
+		k3d::polyhedron::create_edge_face_lookup(input_polyhedron->face_first_loops, input_polyhedron->face_loop_counts, input_polyhedron->loop_first_edges, input_polyhedron->clockwise_edges, edge_faces);
 		k3d::mesh::indices_t redundant_edges;
 		k3d::polyhedron::mark_coplanar_edges(companions, boundary_edges, face_normals, edge_faces, input_face_selection, redundant_edges, m_threshold.pipeline_value());
 	
-		k3d::mesh::polyhedra_t& output_polyhedra = Output.polyhedra.writable();
-		boost::scoped_ptr<k3d::polyhedron::primitive> output_primitive(k3d::polyhedron::validate(Output));
-		k3d::euler::kill_edge_make_loop(*output_primitive, redundant_edges, boundary_edges, companions, points, face_normals);
-		
+		k3d::euler::kill_edge_make_loop(*output_polyhedron, redundant_edges, boundary_edges, companions, points, face_normals);
 		k3d::mesh::delete_unused_points(Output);
 	}
 

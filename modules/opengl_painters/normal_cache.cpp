@@ -17,16 +17,18 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "normal_cache.h"
 
 #include <k3dsdk/hints.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>
 
-#include "normal_cache.h"
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -93,14 +95,15 @@ protected:
 	
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 	{
-		if (!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
-		if (Mesh.polyhedra->face_first_loops->empty())
+		if(polyhedron->face_first_loops.empty())
 			return;
 		// Resize arrays and initialize normals if the topology changed
 		if (f_normals.empty())
 		{
-			f_normals.resize(Mesh.polyhedra->face_first_loops->size());
+			f_normals.resize(polyhedron->face_first_loops.size());
 			point_to_faces.resize(Mesh.points->size());
 			k3d::traverse_polyhedra(Mesh, *this);
 		}
@@ -145,8 +148,9 @@ protected:
 	
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 	{
-		return_if_fail(validate_polyhedra(Mesh));
-		if (Mesh.polyhedra->face_first_loops->empty())
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		return_if_fail(polyhedron);
+		if (polyhedron->face_first_loops.empty())
 			return;
 		face_normals& f_normals = get_data<face_normals>(&Mesh, Painter);
 		// Resize arrays and initialize normals if the topology changed
@@ -164,11 +168,6 @@ protected:
 		}
 		
 		const k3d::mesh::points_t& points = *Mesh.points;
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 		
 		// not only the moved points, but all points belonging to deformed faces need to be updated
 		std::set<k3d::uint_t> affected_points;
@@ -178,15 +177,15 @@ protected:
 			for (k3d::uint_t j = 0; j != faces.size(); ++j)
 			{
 				k3d::uint_t face = faces[j];
-				const k3d::uint_t loop_begin = face_first_loops[face];
-				const k3d::uint_t loop_end = loop_begin + face_loop_counts[face];
+				const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+				const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
 				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
 				{
-					const k3d::uint_t first_edge = loop_first_edges[loop];
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
 					for(k3d::uint_t edge = first_edge; ; )
 					{
-						affected_points.insert(edge_points[edge]);
-						edge = clockwise_edges[edge];
+						affected_points.insert(polyhedron->edge_points[edge]);
+						edge = polyhedron->clockwise_edges[edge];
 						if(edge == first_edge)
 							break;
 					}

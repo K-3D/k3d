@@ -21,6 +21,10 @@
  * 	\author Bart Janssens (bart.janssens@lid.kviv.be)
  */
 
+#include "cached_triangulation.h"
+#include "colored_selection_painter_gl.h"
+#include "normal_cache.h"
+
 #include <k3d-i18n-config.h>
 #include <k3dsdk/array.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -32,13 +36,12 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/texture3.h>
 #include <k3dsdk/utility_gl.h>
 
-#include "cached_triangulation.h"
-#include "colored_selection_painter_gl.h"
-#include "normal_cache.h"
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -90,7 +93,8 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if(k3d::is_sds(Mesh))
@@ -189,7 +193,8 @@ public:
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if (k3d::is_sds(Mesh))
@@ -235,7 +240,8 @@ public:
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		if(!k3d::validate_polyhedra(Mesh))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+		if(!polyhedron)
 			return;
 			
 		if (k3d::is_sds(Mesh))

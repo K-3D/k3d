@@ -33,6 +33,8 @@
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/utility.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include <iomanip>
 #include <iterator>
 #include <set>
@@ -64,37 +66,38 @@ public:
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-		
-		if(!k3d::validate_polyhedra(Input))
+
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
+		if(!input_polyhedron)
 			return;
 		
 		k3d::mesh::bools_t boundary_edges;
-		k3d::polyhedron::create_edge_adjacency_lookup(*Input.polyhedra->edge_points, *Input.polyhedra->clockwise_edges, boundary_edges, m_companions);
+		k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, boundary_edges, m_companions);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if(!k3d::validate_polyhedra(Output))
+		boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::validate(Output));
+		if(!output_polyhedron)
 			return;
 		
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
-		k3d::mesh::selection_t& edge_selection = Output.polyhedra.writable().edge_selection.writable();
 		
-		return_if_fail(edge_selection.size() == m_companions.size());
+		return_if_fail(output_polyhedron->edge_selections.size() == m_companions.size());
 		
 		const k3d::bool_t keep_selection = m_keep_original_selection.pipeline_value();
 		
-		for(k3d::uint_t edge = 0; edge != edge_selection.size(); ++edge)
+		for(k3d::uint_t edge = 0; edge != output_polyhedron->edge_selections.size(); ++edge)
 		{
 			// select the companions
-			if(edge_selection[edge])
+			if(output_polyhedron->edge_selections[edge])
 			{
-				edge_selection[m_companions[edge]] = edge_selection[edge];
+				output_polyhedron->edge_selections[m_companions[edge]] = output_polyhedron->edge_selections[edge];
 			}
 			
 			// deselect original, if requested
 			if(!keep_selection && edge != m_companions[edge])
-				edge_selection[edge] = 0.0;
+				output_polyhedron->edge_selections[edge] = 0.0;
 		}
 	}
 

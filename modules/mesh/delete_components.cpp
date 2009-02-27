@@ -357,10 +357,12 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if(!k3d::validate_polyhedra(Input))
-			return;
-		
 		Output = Input;
+
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
+		if(!input_polyhedron)
+			return;
+
 		const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
 		k3d::mesh::selection_t point_selection = *Input.point_selection;
 		k3d::mesh_selection::merge(mesh_selection.points, point_selection);

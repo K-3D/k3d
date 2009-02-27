@@ -30,6 +30,7 @@
 #include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -63,7 +64,8 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if(!k3d::validate_polyhedra(Input))
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
+		if(!polyhedron)
 			return;
 
 		const k3d::double_t radius = m_radius.pipeline_value();
@@ -72,19 +74,17 @@ public:
 
 		// Build a list of edges, eliminating duplicates (neighbors) as we go ...
 		const k3d::mesh::points_t& points = *Input.points;
-		const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
 
 		typedef std::set<std::pair<k3d::uint_t, k3d::uint_t> > edges_t;
 		edges_t edges;
 
 		const k3d::uint_t edge_begin = 0;
-		const k3d::uint_t edge_end = edge_begin + edge_points.size();
+		const k3d::uint_t edge_end = edge_begin + polyhedron->edge_points.size();
 		for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 		{
 			edges.insert(std::make_pair(
-				std::min(edge_points[edge], edge_points[clockwise_edges[edge]]),
-				std::max(edge_points[edge], edge_points[clockwise_edges[edge]])));
+				std::min(polyhedron->edge_points[edge], polyhedron->edge_points[polyhedron->clockwise_edges[edge]]),
+				std::max(polyhedron->edge_points[edge], polyhedron->edge_points[polyhedron->clockwise_edges[edge]])));
 		}
 
 		// Setup arrays to build a new blobby ...
