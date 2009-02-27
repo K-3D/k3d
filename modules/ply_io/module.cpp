@@ -33,6 +33,7 @@ namespace io
 {
 
 extern k3d::iplugin_factory& mesh_reader_factory();
+extern k3d::iplugin_factory& mesh_writer_factory();
 
 } // namespace io
 
@@ -42,5 +43,6 @@ extern k3d::iplugin_factory& mesh_reader_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::ply::io::mesh_reader_factory());
+	Registry.register_factory(module::ply::io::mesh_writer_factory());
 K3D_MODULE_END
 
