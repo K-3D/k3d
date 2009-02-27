@@ -47,7 +47,7 @@ namespace detail
 /// Extracts the STL topology information, merging points that are less than threshold apart
 void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::mesh::counts_t& VertexCounts, k3d::mesh::indices_t& VertexIndices, const k3d::double_t Threshold = 1e-12)
 {
-	const double_t threshold = Threshold*Threshold;
+	const k3d::double_t threshold = Threshold*Threshold;
 	
 	k3d::string_t line_buffer;
 	k3d::uint_t line_number = 0;
