@@ -69,7 +69,7 @@ public:
 
 	void process(const k3d::mesh& Input, const k3d::mesh_selection& Selection, k3d::mesh& Output)
 	{
-		if(!k3d::validate_polyhedra(Input))
+		if(!k3d::polyhedron::validate(Input))
 			return;
 
 		m_input = &Input;
@@ -374,7 +374,7 @@ public:
 		try
 		{
 			do_boolean<exact_nef>(Output, *this);
-			if(Output.points && k3d::validate_polyhedra(Output))
+			if(Output.points && k3d::polyhedron::validate(Output))
 			{
 				document().pipeline_profiler().start_execution(*this, "Simplify output");
 				detail::merge_coplanar_faces(Output, m_threshold.pipeline_value());
