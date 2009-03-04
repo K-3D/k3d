@@ -55,9 +55,6 @@ const bool_t validate_nurbs_patches(const mesh& Mesh);
 /** \deprecated */
 const bool_t legacy_validate_polyhedra(const mesh& Mesh);
 
-/// Returns true iff the given mesh should be rendered as SDS.
-const bool_t is_sds(const mesh& Mesh);
-
 /// Traverse polygonal mesh, visiting faces, loops, and points.
 template<typename visitor_t>
 void traverse_polyhedra(const mesh& Mesh, visitor_t& Visitor)

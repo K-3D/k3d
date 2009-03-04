@@ -155,6 +155,10 @@ primitive* validate(mesh& Mesh);
 const bool_t is_triangles(const const_primitive& Polyhedron);
 /// Returns true iff the given polyhedron is a solid (i.e. it has no topological holes).
 const bool_t is_solid(const const_primitive& Polyhedron);
+/// Returns true iff the given polyhedron should be rendered as a Subdivision surface
+/** \note The implementation looks at the flags set on the first (outer) shell.  We
+should consider whether SDS should be set on a per-shell basis? */
+const bool_t is_sds(const const_primitive& Polyhedron);
 
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
 void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);

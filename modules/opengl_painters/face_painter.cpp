@@ -72,7 +72,7 @@ public:
 		if(!polyhedron)
 			return;
 			
-		if(k3d::is_sds(Mesh))
+		if(k3d::polyhedron::is_sds(*polyhedron))
 			return;
 		
 		k3d::gl::store_attributes attributes;
@@ -130,7 +130,7 @@ public:
 		if(!polyhedron)
 			return;
 			
-		if (k3d::is_sds(Mesh))
+		if (k3d::polyhedron::is_sds(*polyhedron))
 			return;
 			
 		if (!SelectionState.select_faces)
@@ -177,7 +177,7 @@ public:
 		if(!polyhedron)
 			return;
 			
-		if (k3d::is_sds(Mesh))
+		if (k3d::polyhedron::is_sds(*polyhedron))
 			return;
 		
 		schedule_data<cached_triangulation>(&Mesh, Hint, this);

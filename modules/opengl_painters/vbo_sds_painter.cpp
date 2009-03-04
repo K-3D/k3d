@@ -79,7 +79,7 @@ public:
 		if(!polyhedron)
 			return;
 
-		if (!k3d::is_sds(Mesh))
+		if (!k3d::polyhedron::is_sds(*polyhedron))
 			return;
 		
 		sds_vbo<vbo_t>& vbo_cache = get_data<sds_vbo<vbo_t> >(&Mesh, this);
@@ -101,7 +101,7 @@ public:
 		if(!polyhedron)
 			return;
 			
-		if (!k3d::is_sds(Mesh))
+		if(!k3d::polyhedron::is_sds(*polyhedron))
 			return;
 		
 		sds_vbo<vbo_t>& cache = get_data<sds_vbo<vbo_t> >(&Mesh, this);

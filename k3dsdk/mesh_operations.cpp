@@ -257,19 +257,5 @@ const bool_t legacy_validate_polyhedra(const mesh& Mesh)
 	return true;
 }
 
-const bool_t is_sds(const mesh& Mesh)
-{
-	if(!legacy_validate_polyhedra(Mesh))
-		return false;
-
-	const mesh::polyhedra_t::types_t& types = *Mesh.polyhedra->types;
-	for(uint_t type = 0; type != types.size(); ++type)
-	{
-		if(types[type] == mesh::polyhedra_t::CATMULL_CLARK)
-			return true;
-	}
-	return false;
-}
-
 } // namespace k3d
 

@@ -65,7 +65,7 @@ public:
 		if(!polyhedron)
 			return;
 			
-		if (k3d::is_sds(Mesh))
+		if(k3d::polyhedron::is_sds(*polyhedron))
 			return;
 
 		const k3d::mesh::points_t& points = *Mesh.points;
@@ -126,7 +126,7 @@ public:
 		if(!polyhedron)
 			return;
 		
-		if(k3d::is_sds(Mesh))
+		if(k3d::polyhedron::is_sds(*polyhedron))
 			return;
 
 		const k3d::mesh::points_t& points = *Mesh.points;

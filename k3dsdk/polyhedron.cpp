@@ -480,6 +480,14 @@ const bool_t is_solid(const const_primitive& Polyhedron)
 	return std::find(boundary_edges.begin(), boundary_edges.end(), true) == boundary_edges.end();
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// is_sds
+
+const bool_t is_sds(const const_primitive& Polyhedron)
+{
+	return Polyhedron.polyhedron_types.size() && (Polyhedron.polyhedron_types[0] == mesh::polyhedra_t::CATMULL_CLARK);
+}
+
 namespace detail
 {
 
