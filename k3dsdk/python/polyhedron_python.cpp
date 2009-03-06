@@ -107,6 +107,16 @@ public:
 		return wrap_owned(k3d::polyhedron::validate(Mesh.wrapped()));
 	}
 
+	static bool_t is_triangles(polyhedron::const_primitive::wrapper& Polyhedron)
+	{
+		return k3d::polyhedron::is_triangles(Polyhedron.wrapped());
+	}
+
+	static bool_t is_triangles2(polyhedron::primitive::wrapper& Polyhedron)
+	{
+		return k3d::polyhedron::is_triangles(Polyhedron.wrapped());
+	}
+
 	static bool_t is_solid(polyhedron::const_primitive::wrapper& Polyhedron)
 	{
 		return k3d::polyhedron::is_solid(Polyhedron.wrapped());
@@ -129,6 +139,9 @@ void define_namespace_polyhedron()
 		.staticmethod("create")
 		.def("validate", &polyhedron::validate)
 		.staticmethod("validate")
+		.def("is_triangles", &polyhedron::is_triangles)
+		.def("is_triangles", &polyhedron::is_triangles2)
+		.staticmethod("is_triangles")
 		.def("is_solid", &polyhedron::is_solid)
 		.def("is_solid", &polyhedron::is_solid2)
 		.staticmethod("is_solid")
