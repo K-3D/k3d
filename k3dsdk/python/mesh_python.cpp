@@ -47,11 +47,6 @@ namespace python
 namespace detail
 {
 
-const bool validate(mesh& Mesh)
-{
-	return k3d::validate(Mesh.wrapped());
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////
 // wrap_const_object
 
@@ -890,9 +885,6 @@ void define_class_mesh()
 		.value("polygons", k3d::mesh::polyhedra_t::POLYGONS)
 		.value("catmull_clark", k3d::mesh::polyhedra_t::CATMULL_CLARK)
 		.attr("__module__") = "k3d";
-
-	def("validate", detail::validate,
-		"Returns true if the given L{mesh} contains valid data.");
 
 	scope outer = class_<mesh>("mesh", 
 		"Stores a heterogeneous collection of geometric mesh primitives.", no_init)

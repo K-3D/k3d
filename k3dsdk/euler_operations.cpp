@@ -351,7 +351,7 @@ void kill_edge_make_loop(polyhedron::primitive& Output, const mesh::indices_t& E
 				continue;
 			}
 			if(!detail::is_polyline(clockwise_edges[companion], clockwise_edges, edge_loops, AdjacentEdges)
-				&& std::abs(normalize(normal(edge_points, clockwise_edges, Points, clockwise_edges[companion])) * FaceNormals[face] - 1) < threshold)
+				&& std::abs(normalize(polyhedron::normal(edge_points, clockwise_edges, Points, clockwise_edges[companion])) * FaceNormals[face] - 1) < threshold)
 			{
 				loop_first_edges[loop] = clockwise_edges[companion];
 				const uint_t new_loop = loop_first_edges.size();
@@ -364,7 +364,7 @@ void kill_edge_make_loop(polyhedron::primitive& Output, const mesh::indices_t& E
 				if(loop == face_first_loops[face]) // first loops should not degenerate to a polyline
 				{
 					return_if_fail(!detail::is_polyline(clockwise_edges[edge], clockwise_edges, edge_loops, AdjacentEdges));
-					return_if_fail(std::abs(normalize(normal(edge_points, clockwise_edges, Points, clockwise_edges[edge])) * FaceNormals[face] - 1) < threshold);
+					return_if_fail(std::abs(normalize(polyhedron::normal(edge_points, clockwise_edges, Points, clockwise_edges[edge])) * FaceNormals[face] - 1) < threshold);
 				}
 				loop_first_edges[loop] = clockwise_edges[edge];
 				const uint_t new_loop = loop_first_edges.size();

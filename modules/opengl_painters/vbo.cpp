@@ -97,7 +97,7 @@ void point_vbo::on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* 
 
 void point_vbo::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
-	return_if_fail(k3d::validate_points(Mesh));
+	return_if_fail(Mesh.points);
 	const k3d::mesh::points_t& points = *(Mesh.points);
 	bool new_vbo = false;
 	

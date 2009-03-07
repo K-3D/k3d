@@ -121,7 +121,7 @@ k3d::inode* duplicate_mesh(k3d::idocument& Document, k3d::inode& Node)
 		if(k3d::imesh_storage* const frozen_mesh_storage = dynamic_cast<k3d::imesh_storage*>(frozen_mesh))
 		{
 			k3d::mesh* const new_mesh = new k3d::mesh();
-			k3d::deep_copy(*upstream_mesh, *new_mesh);
+			k3d::mesh::deep_copy(*upstream_mesh, *new_mesh);
 			frozen_mesh_storage->reset_mesh(new_mesh);
 		}
 	}

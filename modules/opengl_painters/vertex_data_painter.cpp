@@ -116,7 +116,7 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		if(!k3d::validate_points(Mesh))
+		if(!Mesh.points)
 			return;
 
 		if(!m_font)

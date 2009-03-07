@@ -179,7 +179,7 @@ public:
 						const k3d::uint_t face_begin = 0;
 						const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
 						for(k3d::uint_t face = face_begin; face != face_end; ++face)
-							draw_line(k3d::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]), (*array)[face], normalize, scale);
+							draw_line(k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]), (*array)[face], normalize, scale);
 						glEnd();
 					}
 				}

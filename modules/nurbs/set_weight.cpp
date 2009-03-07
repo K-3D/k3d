@@ -110,9 +110,6 @@ public:
 
 			assert_warning(k3d::validate_nurbs_patches(Output));
 		}
-
-
-		assert_warning(k3d::validate(Output));
 	}
 
 	static k3d::iplugin_factory& get_factory()

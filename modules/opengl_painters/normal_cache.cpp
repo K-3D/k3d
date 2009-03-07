@@ -112,7 +112,7 @@ protected:
 			const k3d::mesh::indices_t& faces = point_to_faces[indices[i]];
 			for (k3d::uint_t j = 0; j != faces.size(); ++j)
 			{
-				f_normals[faces[j]] = k3d::normal(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, *Mesh.points, Mesh.polyhedra->loop_first_edges->at(Mesh.polyhedra->face_first_loops->at(faces[j])));
+				f_normals[faces[j]] = k3d::polyhedron::normal(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, *Mesh.points, Mesh.polyhedra->loop_first_edges->at(Mesh.polyhedra->face_first_loops->at(faces[j])));
 			}
 		}
 		indices.clear();

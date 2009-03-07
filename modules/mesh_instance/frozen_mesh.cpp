@@ -65,7 +65,7 @@ public:
 	void execute(const std::vector<k3d::ihint*>& Hints, k3d::mesh& Output)
 	{
 		if(const k3d::mesh* const input = m_input_mesh.pipeline_value())
-			k3d::deep_copy(*input, Output);
+			k3d::mesh::deep_copy(*input, Output);
 	}
 
 	k3d::iproperty& mesh_source_output()

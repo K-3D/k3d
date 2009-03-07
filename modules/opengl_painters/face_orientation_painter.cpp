@@ -111,7 +111,7 @@ public:
 		// Calculate face centers ...
 		k3d::typed_array<k3d::point3> centers(face_count);
 		for(k3d::uint_t face = 0; face != face_count; ++face)
-			centers[face] = k3d::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+			centers[face] = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);

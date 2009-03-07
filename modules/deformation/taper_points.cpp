@@ -121,7 +121,7 @@ public:
 		const bool displace_y = m_displace_y.pipeline_value();
 		const bool displace_z = m_displace_z.pipeline_value();
 
-		const k3d::bounding_box3 bounds = k3d::bounds(InputPoints);
+		const k3d::bounding_box3 bounds = k3d::mesh::bounds(InputPoints);
 		double size = 0.0;
 		switch(axis)
 		{

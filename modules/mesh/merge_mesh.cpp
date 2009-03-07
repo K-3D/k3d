@@ -355,7 +355,7 @@ void merge_nurbs_patches(k3d::mesh& Output, const k3d::mesh& Input)
 
 const k3d::uint_t merge_points(k3d::mesh& Output, const k3d::mesh& Input)
 {
-	if(!k3d::validate_points(Input))
+	if(!Input.points)
 		return 0;
 
 	k3d::mesh::points_t& output_points = create_if_not_exists(Output.points);

@@ -32,7 +32,6 @@
 #include "imesh_storage.h"
 #include "measurement.h"
 #include "mesh.h"
-#include "mesh_operations.h"
 #include "node.h"
 #include "pointer_demand_storage.h"
 #include "user_interface.h"
@@ -135,7 +134,7 @@ private:
 
 			mesh::points_t& output_points = Mesh.points.writable();
 			if(center || scale_to_size)
-				bounding_box = bounds(output_points);
+				bounding_box = mesh::bounds(output_points);
 
 			if(center)
 			{

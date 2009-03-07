@@ -85,7 +85,7 @@ public:
 				const k3d::point3 first_point = Points[Polyhedron.edge_points[edge]];
 				const k3d::point3 second_point = Points[Polyhedron.edge_points[Polyhedron.clockwise_edges[edge]]];
 				k3d::vector3 edge_vector = k3d::normalize(second_point - first_point);
-				k3d::normal3 normal_vector = k3d::normalize(k3d::normal(Polyhedron.edge_points, Polyhedron.clockwise_edges, Points, edge));
+				k3d::normal3 normal_vector = k3d::normalize(k3d::polyhedron::normal(Polyhedron.edge_points, Polyhedron.clockwise_edges, Points, edge));
 				k3d::vector3 offset_vector = normal_vector ^ edge_vector;
 
 				const k3d::point3 glyph_point1 = first_point + (offset_vector + edge_vector) * m_offset.pipeline_value();

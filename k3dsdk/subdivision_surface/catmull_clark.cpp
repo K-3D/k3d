@@ -1054,7 +1054,7 @@ public:
 		const k3d::uint_t face_end = polyhedron->face_first_loops.size();
 		k3d::mesh::normals_t uniform_normals(polyhedron->face_first_loops.size());
 		for(k3d::uint_t face = face_begin; face != face_end; ++face)
-			uniform_normals[face] = k3d::normalize(k3d::normal(polyhedron->edge_points, polyhedron->clockwise_edges, *input_with_normals.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
+			uniform_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, *input_with_normals.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
 		k3d::mesh::normals_t& vertex_normals = input_with_normals.vertex_data.create("sds_normals", new k3d::mesh::normals_t(points.size()));
 		for(k3d::uint_t face = face_begin; face != face_end; ++face)
 		{

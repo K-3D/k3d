@@ -105,7 +105,7 @@ public:
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		if(!k3d::validate_points(Mesh))
+		if(!Mesh.points)
 			return;
 
 		if(!m_font)

@@ -59,7 +59,7 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if(!k3d::validate_points(Input))
+		if(!Input.points)
 			return;
 
 		const k3d::uint_t point_count = Input.points->size();

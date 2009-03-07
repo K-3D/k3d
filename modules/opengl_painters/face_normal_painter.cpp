@@ -94,7 +94,7 @@ public:
 			{
 				if(polyhedron->face_selections[face])
 				{
-					k3d::point3 center = k3d::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+					k3d::point3 center = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 					k3d::gl::vertex3d(center);
 					k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face)));
 				}
@@ -111,7 +111,7 @@ public:
 			{
 				if(!polyhedron->face_selections[face])
 				{
-					k3d::point3 center = k3d::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+					k3d::point3 center = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 					k3d::gl::vertex3d(center);
 					k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face)));
 				}

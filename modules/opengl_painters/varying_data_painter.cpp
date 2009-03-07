@@ -176,7 +176,7 @@ public:
 		// Calculate face normals ...
 		k3d::typed_array<k3d::normal3> normals(face_count);
 		for(size_t face = 0; face != face_count; ++face)
-			normals[face] = k3d::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
+			normals[face] = k3d::polyhedron::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);

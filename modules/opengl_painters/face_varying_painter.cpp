@@ -53,7 +53,7 @@ const k3d::point3 get_offset_point(const k3d::mesh::indices_t& EdgePoints, const
 {
 	k3d::point3 corner = Points[EdgePoints[EdgeIndex]];
 	k3d::point3 next_corner = Points[EdgePoints[ClockwiseEdges[EdgeIndex]]];
-	k3d::normal3 normal = k3d::normalize(k3d::normal(EdgePoints, ClockwiseEdges, Points, EdgeIndex));
+	k3d::normal3 normal = k3d::normalize(k3d::polyhedron::normal(EdgePoints, ClockwiseEdges, Points, EdgeIndex));
 	k3d::vector3 edge_vector = next_corner - corner;
 	k3d::vector3 inward_vector = normal ^ edge_vector;
 	return corner + Offset*inward_vector + Offset*edge_vector;

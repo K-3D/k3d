@@ -95,7 +95,7 @@ public:
 		// Compute uniform (per-face) normals (used for all subsequent calculations) ...
 		k3d::mesh::normals_t uniform_normals(polyhedron->face_first_loops.size());
 		for(k3d::uint_t face = face_begin; face != face_end; ++face)
-			uniform_normals[face] = k3d::normalize(k3d::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
+			uniform_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
 
 		// Optionally store the uniform normals ...
 		if(m_uniform.pipeline_value())

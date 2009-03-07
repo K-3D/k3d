@@ -743,6 +743,29 @@ struct mark_used_primitive_points
 
 } // namespace detail
 
+const bounding_box3 mesh::bounds(const mesh& Mesh)
+{
+	return Mesh.points ? bounds(*Mesh.points) : bounding_box3();
+}
+
+const bounding_box3 mesh::bounds(const points_t& Points)
+{
+	bounding_box3 results;
+
+	const uint_t point_begin = 0;
+	const uint_t point_end = point_begin + Points.size();
+	for(uint_t point = point_begin; point != point_end; ++point)
+		results.insert(Points[point]);
+
+	return results;
+}
+
+void mesh::deep_copy(const mesh& From, mesh& To)
+{
+	To = From;
+	assert_not_implemented(); // Need to ensure that all storage is unique
+}
+
 void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 {
 	UnusedPoints.assign(Mesh.points ? Mesh.points->size() : 0, true);

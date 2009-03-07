@@ -61,7 +61,7 @@ public:
 
 	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
-		if(!k3d::validate_points(Mesh))
+		if(!Mesh.points)
 			return;
 
 		const k3d::mesh::points_t& points = *Mesh.points;

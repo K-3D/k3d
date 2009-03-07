@@ -26,136 +26,11 @@
 namespace k3d
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// bounds
-
-const bounding_box3 bounds(const k3d::mesh& Mesh)
-{
-	bounding_box3 results;
-
-	if(Mesh.points)
-        return bounds(*Mesh.points);
-
-	return results;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// bounds
-
-const bounding_box3 bounds(const k3d::mesh::points_t& Points)
-{
-	bounding_box3 results;
-
-    const uint_t point_begin = 0;
-    const uint_t point_end = point_begin + Points.size();
-    for(uint_t point = point_begin; point != point_end; ++point)
-        results.insert(Points[point]);
-
-	return results;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// center
-
-const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
-{
-	point3 result(0, 0, 0);
-
-	uint_t count = 0;
-	for(uint_t edge = EdgeIndex; ; )
-	{
-		result += to_vector(Points[EdgePoints[edge]]);
-		++count;
-
-		edge = ClockwiseEdges[edge];
-		if(edge == EdgeIndex)
-			break;
-	}
-
-	if(count)
-		result /= static_cast<double>(count);
-
-	return result;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// normal
-
-const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
-{
-	// Calculates the normal for an edge loop using the summation method, which is more robust than the three-point methods (handles zero-length edges)
-	normal3 result(0, 0, 0);
-
-	for(uint_t edge = EdgeIndex; ; )
-	{
-		const point3& i = Points[EdgePoints[edge]];
-		const point3& j = Points[EdgePoints[ClockwiseEdges[edge]]];
-
-		result[0] += (i[1] + j[1]) * (j[2] - i[2]);
-		result[1] += (i[2] + j[2]) * (j[0] - i[0]);
-		result[2] += (i[0] + j[0]) * (j[1] - i[1]);
-
-		edge = ClockwiseEdges[edge];
-		if(edge == EdgeIndex)
-			break;
-	}
-
-	return 0.5 * result;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// deep_copy
-
-void deep_copy(const mesh& From, mesh& To)
-{
-	To = From;
-	assert_not_implemented(); // Need to ensure that all storage is unique
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// validate
-
-/** \todo Handle all gprim types */
-const bool_t validate(mesh& Mesh)
-{
-	bool_t result = true;
-
-	if(Mesh.points && !validate_points(Mesh))
-		result = false;
-
-	if(Mesh.nurbs_curve_groups && !validate_nurbs_curve_groups(Mesh))
-		result = false;
-
-	if(Mesh.nurbs_patches && !validate_nurbs_patches(Mesh))
-		result = false;
-
-	if(Mesh.polyhedra && !legacy_validate_polyhedra(Mesh))
-		result = false;
-
-	return result;
-}
-
-const bool_t validate_points(const mesh& Mesh)
-{
-	if(!Mesh.points)
-		return false;
-
-	// If the mesh has points, it must have storage for point selections
-	return_val_if_fail(Mesh.point_selection, false);
-
-	// The point and point selection arrays must be the same length
-	return_val_if_fail(Mesh.points->size() == Mesh.point_selection->size(), false);
-
-	return true;
-}
-
 const bool_t validate_nurbs_curve_groups(const mesh& Mesh)
 {
 	if(!Mesh.nurbs_curve_groups)
 		return false;
 
-	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.nurbs_curve_groups->first_curves, false);
 	return_val_if_fail(Mesh.nurbs_curve_groups->curve_counts, false);
 	return_val_if_fail(Mesh.nurbs_curve_groups->curve_first_points, false);
@@ -176,7 +51,6 @@ const bool_t validate_nurbs_patches(const mesh& Mesh)
 	if(!Mesh.nurbs_patches)
 		return false;
 
-	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.nurbs_patches->patch_first_points, false);
 	return_val_if_fail(Mesh.nurbs_patches->patch_u_point_counts, false);
 	return_val_if_fail(Mesh.nurbs_patches->patch_v_point_counts, false);
@@ -199,7 +73,6 @@ const bool_t legacy_validate_polyhedra(const mesh& Mesh)
 	if(!Mesh.polyhedra)
 		return false;
 
-	return_val_if_fail(validate_points(Mesh), false);
 	return_val_if_fail(Mesh.polyhedra->first_faces, false);
 	return_val_if_fail(Mesh.polyhedra->face_counts, false);
 	return_val_if_fail(Mesh.polyhedra->types, false);

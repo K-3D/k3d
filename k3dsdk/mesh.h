@@ -21,6 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "attribute_arrays.h"
+#include "bounding_box3.h"
 #include "named_attribute_arrays.h"
 #include "named_arrays.h"
 #include "named_array_types.h"
@@ -277,10 +278,16 @@ public:
 	/// Conversion from a legacy mesh to a new mesh
 	mesh& operator=(const k3d::legacy::mesh& RHS);
 
+	/// Returns a bounding-box containing every point in the given mesh.
+	static const bounding_box3 bounds(const mesh& Mesh);
+	/// Returns a bounding-box containing every point in the given array.
+	static const bounding_box3 bounds(const points_t& Points);
 	/// Initialize an array to mark unused mesh points (points not used by any primitive).
 	static void lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints);
 	/// Remove unused points from a mesh, adjusting point indices in all remaining primitives.
 	static void delete_unused_points(mesh& Mesh);
+	/// Performs a deep-copy from one mesh to another (the new mesh doesn't share any memory with the old).
+	static void deep_copy(const mesh& From, mesh& To);
 
 	/// Iterates over every array in a generic mesh primitive, passing the array name and array to a functor.
 	template<typename FunctorT>

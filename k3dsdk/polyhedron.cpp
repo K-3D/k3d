@@ -488,6 +488,55 @@ const bool_t is_sds(const const_primitive& Polyhedron)
 	return Polyhedron.polyhedron_types.size() && (Polyhedron.polyhedron_types[0] == mesh::polyhedra_t::CATMULL_CLARK);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// center
+
+const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
+{
+	point3 result(0, 0, 0);
+
+	uint_t count = 0;
+	for(uint_t edge = EdgeIndex; ; )
+	{
+		result += to_vector(Points[EdgePoints[edge]]);
+		++count;
+
+		edge = ClockwiseEdges[edge];
+		if(edge == EdgeIndex)
+			break;
+	}
+
+	if(count)
+		result /= static_cast<double>(count);
+
+	return result;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// normal
+
+const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
+{
+	// Calculates the normal for an edge loop using the summation method, which is more robust than the three-point methods (handles zero-length edges)
+	normal3 result(0, 0, 0);
+
+	for(uint_t edge = EdgeIndex; ; )
+	{
+		const point3& i = Points[EdgePoints[edge]];
+		const point3& j = Points[EdgePoints[ClockwiseEdges[edge]]];
+
+		result[0] += (i[1] + j[1]) * (j[2] - i[2]);
+		result[1] += (i[2] + j[2]) * (j[0] - i[0]);
+		result[2] += (i[0] + j[0]) * (j[1] - i[1]);
+
+		edge = ClockwiseEdges[edge];
+		if(edge == EdgeIndex)
+			break;
+	}
+
+	return 0.5 * result;
+}
+
 namespace detail
 {
 

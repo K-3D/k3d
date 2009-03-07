@@ -75,7 +75,7 @@ public:
 		// Calculate face normals ...
 		k3d::typed_array<k3d::normal3> normals(face_count, k3d::normal3(0, 0, 1));
 		for(k3d::uint_t face = 0; face != face_count; ++face)
-			normals[face] = k3d::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+			normals[face] = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 
 		// Define a default face color array (in case the user's choice of color array doesn't exist) ...
 		k3d::typed_array<k3d::color> default_color_array;

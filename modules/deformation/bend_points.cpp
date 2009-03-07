@@ -221,7 +221,7 @@ public:
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const k3d::bounding_box3 bounds = k3d::bounds(InputPoints);
+		const k3d::bounding_box3 bounds = k3d::mesh::bounds(InputPoints);
 
 		const double angle = m_angle.pipeline_value();
 		const double tightness = m_tightness.pipeline_value();

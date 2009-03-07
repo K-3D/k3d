@@ -63,8 +63,6 @@ public:
 		context["Output"] = &Output;
 
 		execute_script(context);
-
-		k3d::validate(Output);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
