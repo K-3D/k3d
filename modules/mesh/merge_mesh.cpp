@@ -99,7 +99,8 @@ typename DataT::value_type& create_if_not_exists(DataT& Data)
 /// Appends the polyhedra of mesh Input to those of mesh Output, putting everything in one single polyhedron if SinglePolyhedron is true.
 void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyhedron = true)
 {
-	if(!k3d::legacy_validate_polyhedra(Input))
+	boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
+	if(!input_polyhedron)
 		return;
 	k3d::mesh::polyhedra_t& output_polyhedra = create_if_not_exists(Output.polyhedra);
 	k3d::mesh::indices_t& output_first_faces = create_if_not_exists(output_polyhedra.first_faces);

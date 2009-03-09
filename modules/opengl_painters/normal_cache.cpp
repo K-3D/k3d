@@ -42,6 +42,44 @@ namespace painters
 namespace detail
 {
 
+/// Traverse polygonal mesh, visiting faces, loops, and points.
+template<typename FunctorT>
+void traverse_polyhedra(const k3d::mesh& Mesh, FunctorT Functor)
+{
+	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+	return_if_fail(polyhedron);
+
+	const k3d::mesh::points_t& points = *Mesh.points;
+	const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+	const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+	const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+	
+	const k3d::uint_t face_count = face_first_loops.size();
+	for(k3d::uint_t face = 0; face != face_count; ++face)
+	{
+		Functor.on_face_start(face);
+		const k3d::uint_t loop_begin = face_first_loops[face];
+		const k3d::uint_t loop_end = loop_begin + face_loop_counts[face];
+
+		for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			Functor.on_loop(loop);
+			const k3d::uint_t first_edge = loop_first_edges[loop];
+
+			for(k3d::uint_t edge = first_edge; ; )
+			{
+				Functor.on_edge(edge, edge_points[edge], edge_points[clockwise_edges[edge]], points[edge_points[edge]], points[edge_points[clockwise_edges[edge]]]);
+				edge = clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+		}
+		Functor.on_face_end(face);
+	}
+}
+
 class face_normals : public scheduler 
 {
 public:
@@ -105,7 +143,7 @@ protected:
 		{
 			f_normals.resize(polyhedron->face_first_loops.size());
 			point_to_faces.resize(Mesh.points->size());
-			k3d::traverse_polyhedra(Mesh, *this);
+			detail::traverse_polyhedra(Mesh, *this);
 		}
 		for (k3d::uint_t i = 0; i != indices.size(); ++i)
 		{

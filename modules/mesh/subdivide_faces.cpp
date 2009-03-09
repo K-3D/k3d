@@ -38,6 +38,8 @@
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
 
+#include <boost/scoped_ptr.hpp>
+
 namespace module
 {
 
@@ -853,14 +855,9 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// If there are no valid polyhedra, we give up
-		document().pipeline_profiler().start_execution(*this, "Validate input");
-		if(!k3d::legacy_validate_polyhedra(Input))
-		{
-			document().pipeline_profiler().finish_execution(*this, "Validate input");
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
+		if(!input_polyhedron)
 			return;
-		}
-		document().pipeline_profiler().finish_execution(*this, "Validate input");
 
 		subdivision_t subdivision_type = m_subdivision_type.pipeline_value();
 		// Shallow copy of the input (no data is copied, only shared pointers are)
@@ -1109,14 +1106,9 @@ public:
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// If there are no valid polyhedra, we give up
-		document().pipeline_profiler().start_execution(*this, "Validate input");
-		if(!k3d::legacy_validate_polyhedra(Input))
-		{
-			document().pipeline_profiler().finish_execution(*this, "Validate input");
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
+		if(!input_polyhedron)
 			return;
-		}
-		document().pipeline_profiler().finish_execution(*this, "Validate input");
 
 		subdivision_t subdivision_type = m_subdivision_type.pipeline_value();
 

@@ -37,6 +37,8 @@
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
 
+#include <boost/scoped_ptr.hpp>
+
 namespace module
 {
 
@@ -311,14 +313,9 @@ public:
 	{
 		m_edge_list.clear();
 
-		// If there are no valid polyhedra, we give up
-		document().pipeline_profiler().start_execution(*this, "Validate input");
-		if(!k3d::legacy_validate_polyhedra(Input))
-		{
-			document().pipeline_profiler().finish_execution(*this, "Validate input");
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
+		if(!input_polyhedron)
 			return;
-		}
-		document().pipeline_profiler().finish_execution(*this, "Validate input");
 
 		// Shallow copy of the input (no data is copied, only shared pointers are)
 		document().pipeline_profiler().start_execution(*this, "Merge selection");
@@ -397,13 +394,9 @@ public:
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		document().pipeline_profiler().start_execution(*this, "Validate input");
-		if(!k3d::legacy_validate_polyhedra(Input))
-		{
-			document().pipeline_profiler().finish_execution(*this, "Validate input");
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
+		if(!input_polyhedron)
 			return;
-		}
-		document().pipeline_profiler().finish_execution(*this, "Validate input");
 
 		k3d::mesh::points_t& output_points = Output.points.writable();
 

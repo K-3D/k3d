@@ -36,8 +36,11 @@
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <set>
 
@@ -67,6 +70,74 @@ private:
 	const k3d::matrix4& m_matrix;
 	std::set<k3d::uint_t> m_inserted_points;
 };
+
+/// Traverse selected mesh points
+template<typename visitor_t>
+void traverse_selected_points(const k3d::mesh& Mesh, visitor_t& Visitor)
+{
+	for (k3d::uint_t point = 0; point != Mesh.points->size(); ++point)
+	{
+		if (Mesh.point_selection->at(point))
+		{
+			Visitor(point, Mesh.points->at(point));
+		}
+	}
+}
+
+/// For each selected edge, visit the start and end point (multiple visits per point possible!)
+template<typename visitor_t>
+void traverse_selected_edge_points(const k3d::mesh& Mesh, visitor_t& Visitor)
+{
+	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+	return_if_fail(polyhedron);
+	const k3d::mesh::points_t& points = *Mesh.points;
+	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+	const k3d::mesh::selection_t& edge_selection = *Mesh.polyhedra->edge_selection;
+	for (k3d::uint_t edge = 0; edge != edge_points.size(); ++edge)
+	{
+		if (edge_selection[edge])
+		{
+			Visitor(edge_points[edge], points[edge_points[edge]]);
+			Visitor(edge_points[clockwise_edges[edge]], points[edge_points[clockwise_edges[edge]]]);
+		}
+	}
+}
+
+// For each selected face, visit all of its points (multiple visits per point possible!)
+template<typename visitor_t>
+void traverse_selected_face_points(const k3d::mesh& Mesh, visitor_t& Visitor)
+{
+	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
+	return_if_fail(polyhedron);
+	const k3d::mesh::points_t& points = *Mesh.points;
+	const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
+	const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
+	const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
+	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
+	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
+	const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
+	for(k3d::uint_t face = 0; face != face_first_loops.size(); ++face)
+	{
+		if (!face_selection[face])
+			continue;
+		
+		const k3d::uint_t loop_begin = face_first_loops[face];
+		const k3d::uint_t loop_end = loop_begin + face_loop_counts[face];
+		for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			const k3d::uint_t first_edge = loop_first_edges[loop];
+			for(k3d::uint_t edge = first_edge; ; )
+			{
+				Visitor(edge_points[edge], points[edge_points[edge]]);
+
+				edge = clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+		}
+	}
+}
 
 /// Computes the average position of selected nodes, returns false when no selected node was found.
 bool selection_position(const selection_mode_t& SelectionMode, const k3d::nodes_t& Selection, k3d::bounding_box3& BoundingBox, k3d::mesh::points_t& Points)
@@ -109,15 +180,15 @@ bool selection_position(const selection_mode_t& SelectionMode, const k3d::nodes_
 		}
 		if(SelectionMode == SELECT_POINTS)
 		{
-			k3d::traverse_selected_points(*mesh, visitor);
+			traverse_selected_points(*mesh, visitor);
 		}
 		if(SelectionMode == SELECT_SPLIT_EDGES)
 		{
-			k3d::traverse_selected_edge_points(*mesh, visitor);
+			traverse_selected_edge_points(*mesh, visitor);
 		}
 		if(SelectionMode == SELECT_UNIFORM)
 		{
-			k3d::traverse_selected_face_points(*mesh, visitor);
+			traverse_selected_face_points(*mesh, visitor);
 		}
 	}
 	
