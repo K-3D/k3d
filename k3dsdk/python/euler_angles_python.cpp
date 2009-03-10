@@ -24,6 +24,8 @@
 #include "euler_angles_python.h"
 #include "utility_python.h"
 
+#include <k3dsdk/algebra.h>
+
 #include <boost/python.hpp>
 using namespace boost::python;
 
@@ -35,6 +37,7 @@ namespace k3d
 namespace python
 {
 
+/*
 euler_angles::euler_angles(const k3d::euler_angles& EulerAngles) :
 	base(EulerAngles)
 {
@@ -166,48 +169,51 @@ const euler_angles operator*(const double LHS, const euler_angles& RHS)
 {
 	return RHS * LHS;
 }
+*/
 
-void euler_angles::define_class()
+void define_class_euler_angles()
 {
-	class_<euler_angles>("euler_angles",
+	scope outer = class_<k3d::euler_angles>("euler_angles",
 		"Encodes a change in orientation as three rotations around mutally-perpendicular axes.", no_init)
-		.def(init<euler_angles::AngleOrder, double, double, double>())
-		.def_readwrite("order", &euler_angles::order)
-		.def("__len__", &utility::constant_len_len<euler_angles, 3>)
-		.def("__getitem__", &euler_angles::getitem)
-		.def("__setitem__", &euler_angles::setitem)
-		.def("__str__", &euler_angles::str)
-		.def(self + self)
-		.def(self * double())
-		.def(double() * self);
+		.def(init<k3d::double_t, k3d::double_t, k3d::double_t, k3d::euler_angles::AngleOrder>())
+		.def_readwrite("order", &k3d::euler_angles::order)
+		.def("__len__", &utility::constant_len_len<k3d::euler_angles, 3>)
+		.def("__getitem__", &utility::constant_len_get_item<k3d::euler_angles, 3, k3d::double_t>)
+		.def("__setitem__", &utility::constant_len_set_item<k3d::euler_angles, 3, k3d::double_t>)
+//		.def(self + self)
+//		.def(self * double())
+//		.def(double() * self)
+		.def(self_ns::str(self))
+		;
 
-	enum_<euler_angles::AngleOrder>("angle_order")
-		.value("xyz", euler_angles::XYZstatic)
-		.value("xyz", euler_angles::XYZstatic)
-		.value("xyx", euler_angles::XYXstatic)
-		.value("xzy", euler_angles::XZYstatic)
-		.value("xzx", euler_angles::XZXstatic)
-		.value("yzx", euler_angles::YZXstatic)
-		.value("yzy", euler_angles::YZYstatic)
-		.value("yxz", euler_angles::YXZstatic)
-		.value("yxy", euler_angles::YXYstatic)
-		.value("zxy", euler_angles::ZXYstatic)
-		.value("zxz", euler_angles::ZXZstatic)
-		.value("zyx", euler_angles::ZYXstatic)
-		.value("zyz", euler_angles::ZYZstatic)
-		.value("zyx_rotating", euler_angles::ZYXrotating)
-		.value("xyx_rotating", euler_angles::XYXrotating)
-		.value("yzx_rotating", euler_angles::YZXrotating)
-		.value("xzx_rotating", euler_angles::XZXrotating)
-		.value("xzy_rotating", euler_angles::XZYrotating)
-		.value("yzy_rotating", euler_angles::YZYrotating)
-		.value("zxy_rotating", euler_angles::ZXYrotating)
-		.value("yxy_rotating", euler_angles::YXYrotating)
-		.value("yxz_rotating", euler_angles::YXZrotating)
-		.value("zxz_rotating", euler_angles::ZXZrotating)
-		.value("xyz_rotating", euler_angles::XYZrotating)
-		.value("zyz_rotating", euler_angles::ZYZrotating)
-		.attr("__module__") = "k3d";
+	enum_<k3d::euler_angles::AngleOrder>("angle_order")
+		.value("xyz", k3d::euler_angles::XYZstatic)
+		.value("xyz", k3d::euler_angles::XYZstatic)
+		.value("xyx", k3d::euler_angles::XYXstatic)
+		.value("xzy", k3d::euler_angles::XZYstatic)
+		.value("xzx", k3d::euler_angles::XZXstatic)
+		.value("yzx", k3d::euler_angles::YZXstatic)
+		.value("yzy", k3d::euler_angles::YZYstatic)
+		.value("yxz", k3d::euler_angles::YXZstatic)
+		.value("yxy", k3d::euler_angles::YXYstatic)
+		.value("zxy", k3d::euler_angles::ZXYstatic)
+		.value("zxz", k3d::euler_angles::ZXZstatic)
+		.value("zyx", k3d::euler_angles::ZYXstatic)
+		.value("zyz", k3d::euler_angles::ZYZstatic)
+		.value("zyx_rotating", k3d::euler_angles::ZYXrotating)
+		.value("xyx_rotating", k3d::euler_angles::XYXrotating)
+		.value("yzx_rotating", k3d::euler_angles::YZXrotating)
+		.value("xzx_rotating", k3d::euler_angles::XZXrotating)
+		.value("xzy_rotating", k3d::euler_angles::XZYrotating)
+		.value("yzy_rotating", k3d::euler_angles::YZYrotating)
+		.value("zxy_rotating", k3d::euler_angles::ZXYrotating)
+		.value("yxy_rotating", k3d::euler_angles::YXYrotating)
+		.value("yxz_rotating", k3d::euler_angles::YXZrotating)
+		.value("zxz_rotating", k3d::euler_angles::ZXZrotating)
+		.value("xyz_rotating", k3d::euler_angles::XYZrotating)
+		.value("zyz_rotating", k3d::euler_angles::ZYZrotating)
+		.attr("__module__") = "k3d"
+		;
 }
 
 } // namespace python

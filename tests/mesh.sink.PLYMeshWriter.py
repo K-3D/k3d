@@ -6,7 +6,7 @@ import testing
 doc = k3d.new_document()
 
 # We will be writing a temporary file ...
-file = k3d.generic_path(testing.binary_path() + "/mesh.sink.PLYMeshWriter.ply")
+file = k3d.filesystem.generic_path(testing.binary_path() + "/mesh.sink.PLYMeshWriter.ply")
 
 # Create a simple polyhedron source ...
 source = doc.new_node("PolyCube")

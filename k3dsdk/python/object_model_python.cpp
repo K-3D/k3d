@@ -42,6 +42,7 @@
 #include "disk_python.h"
 #include "euler_angles_python.h"
 #include "euler_python.h"
+#include "filesystem_python.h"
 #include "hyperboloid_python.h"
 #include "idocument_python.h"
 #include "ifile_change_notifier_python.h"
@@ -60,7 +61,6 @@
 #include "object_model_python.h"
 #include "paraboloid_python.h"
 #include "parallel_python.h"
-#include "path_python.h"
 #include "plugin_python.h"
 #include "point2_python.h"
 #include "point3_python.h"
@@ -220,12 +220,12 @@ const list module_plugins()
 	throw std::runtime_error("k3d.plugins() has been removed, use k3d.plugin.factory.lookup() instead.");
 }
 
-static const k3d::matrix4 rotate3_a(const k3d::python::angle_axis& Value)
+static const k3d::matrix4 rotate3_a(const k3d::angle_axis& Value)
 {
 	return k3d::rotate3(Value);
 }
 
-static const k3d::matrix4 rotate3_b(const k3d::python::euler_angles& Value)
+static const k3d::matrix4 rotate3_b(const k3d::euler_angles& Value)
 {
 	return k3d::rotate3(k3d::quaternion(Value));
 }
@@ -322,7 +322,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_typed_array_classes();
 	define_const_typed_array_classes();
 
-	angle_axis::define_class();
+	define_class_angle_axis();
 	define_class_attribute_arrays();
 	define_class_bitmap();
 	define_class_bounding_box3();
@@ -331,6 +331,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_const_bitmap();
 	define_class_const_named_arrays();
 	define_class_const_named_attribute_arrays();
+	define_class_euler_angles();
 	define_class_file_change_receiver();
 	define_class_idocument();
 	define_class_iunknown();
@@ -340,7 +341,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_named_arrays();
 	define_class_named_attribute_arrays();
 	define_class_normal3();
-	define_class_path();
 	define_class_point2();
 	define_class_point3();
 	define_class_point4();
@@ -358,6 +358,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_cylinder();
 	define_namespace_disk();
 	define_namespace_euler();
+	define_namespace_filesystem();
 	define_namespace_hyperboloid();
 	define_namespace_linear_curve();
 	define_namespace_log();
@@ -375,7 +376,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_sphere();
 	define_namespace_teapot();
 	define_namespace_torus();
-	euler_angles::define_class();
 
 	def("almost_equal", module_almost_equal_mesh,
 		"Tests two meshes for equality using fuzzy-comparisons for floating-point types.");

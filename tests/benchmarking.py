@@ -188,9 +188,9 @@ class k3dProfilingProcessor(object):
         if (appendToFile or firstInFile):
             if firstInFile:
                 appendToFile = False
-            CSV_output_file = k3d.generic_path(benchmark_path() + '/' + nodeName + '.benchmark.txt')
+            CSV_output_file = k3d.filesystem.generic_path(benchmark_path() + '/' + nodeName + '.benchmark.txt')
         else:
-            CSV_output_file = k3d.generic_path(benchmark_path() + '/' + nodeName + description + '.benchmark.txt')
+            CSV_output_file = k3d.filesystem.generic_path(benchmark_path() + '/' + nodeName + description + '.benchmark.txt')
         
         self.output_as_CSV_file(str(CSV_output_file), description, appendToFile)
 

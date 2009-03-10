@@ -31,7 +31,7 @@ print repr(mesh)
 sys.stdout.flush()
 
 mesh_writer = document.new_node("K3DMeshWriter")
-mesh_writer.file = k3d.generic_path(testing.binary_path() + "/mesh.serialization.output.k3d")
+mesh_writer.file = k3d.filesystem.generic_path(testing.binary_path() + "/mesh.serialization.output.k3d")
 document.set_dependency(mesh_writer.get_property("input_mesh"), source.get_property("output_mesh"))
 
 mesh_reader = document.new_node("K3DMeshReader")

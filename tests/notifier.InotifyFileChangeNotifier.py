@@ -6,7 +6,7 @@ import testing
 receiver = k3d.file_change_receiver()
 notifier = k3d.plugin.create("InotifyFileChangeNotifier")
 
-path = k3d.generic_path(testing.binary_path() + "/" + "notifier.InotifyFileChangeNotifier.test")
+path = k3d.filesystem.generic_path(testing.binary_path() + "/" + "notifier.InotifyFileChangeNotifier.test")
 
 f = file(str(path), "w")
 f.write("Howdy, ")

@@ -23,6 +23,8 @@
 
 #include "angle_axis_python.h"
 
+#include <k3dsdk/algebra.h>
+
 #include <boost/python.hpp>
 using namespace boost::python;
 
@@ -34,56 +36,21 @@ namespace k3d
 namespace python
 {
 
-////////////////////////////////////////////////////////////////////////////////////
-// angle_axis
-
-angle_axis::angle_axis(double Angle, const vector3& Axis) :
-	base(k3d::radians(Angle), Axis)
+void define_class_angle_axis()
 {
-}
-
-angle_axis::angle_axis(const k3d::angle_axis& Value) :
-	base(Value)
-{
-}
-
-const double angle_axis::get_angle_radians() const
-{
-	return angle;
-}
-
-const double angle_axis::get_angle() const
-{
-	return k3d::degrees(angle);
-}
-
-void angle_axis::set_angle(const double value)
-{
-	angle = k3d::radians(value);
-}
-
-const std::string angle_axis::str() const
-{
-	std::stringstream buffer;
-	buffer << "(" << k3d::degrees(angle) << ", (" << axis[0] << ", " << axis[1] << ", " << axis[2] << "))";
-	return buffer.str();
-}
-
-void angle_axis::define_class()
-{
-	class_<angle_axis>("angle_axis",
+	class_<k3d::angle_axis>("angle_axis",
 		"Encodes a change in orientation as a rotation around an arbitrary axis.\n"
 		"@note: This is the preferred datatype for storing orientation "
 		"in K-3D because it does not suffer from gimbal-lock.", no_init)
 		.def(init<double, const k3d::vector3&>())
-		.add_property("angle_radians", &angle_axis::get_angle_radians)
-		.add_property("angle", &angle_axis::get_angle, &angle_axis::set_angle,
-			"Stores the rotation angle in degrees.")
-		.def_readwrite("axis", &angle_axis::axis,
+		.def(init<double, double, double, double>())
+		.def_readwrite("angle", &k3d::angle_axis::angle,
+			"Stores the rotation angle in radians.")
+		.def_readwrite("axis", &k3d::angle_axis::axis,
 			"Stores the axis of rotation as a L{vector3}.")
 		.def(self == self)
 		.def(self != self)
-		.def("__str__", &angle_axis::str);
+		.def(self_ns::str(self));
 }
 
 } // namespace python

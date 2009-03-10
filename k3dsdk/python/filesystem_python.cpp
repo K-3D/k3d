@@ -17,7 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "path_python.h"
+#include "filesystem_python.h"
 
 #include <k3dsdk/path.h>
 #include <k3dsdk/types.h>
@@ -32,38 +32,49 @@ namespace k3d
 namespace python
 {
 
-const k3d::string_t root_name(const k3d::filesystem::path& Path)
+const k3d::string_t root_name(const k3d::filesystem::path& Self)
 {
-	return Path.root_name().raw();
+	return Self.root_name().raw();
 }
 
-const k3d::string_t root_directory(const k3d::filesystem::path& Path)
+const k3d::string_t root_directory(const k3d::filesystem::path& Self)
 {
-	return Path.root_directory().raw();
+	return Self.root_directory().raw();
 }
 
-const k3d::string_t leaf(const k3d::filesystem::path& Path)
+const k3d::string_t leaf(const k3d::filesystem::path& Self)
 {
-	return Path.leaf().raw();
+	return Self.leaf().raw();
 }
 
-const k3d::filesystem::path generic_path(const k3d::string_t& GenericPath)
+const k3d::string_t path_string(const k3d::filesystem::path& Self)
 {
-	return k3d::filesystem::generic_path(GenericPath);
+	return Self.native_filesystem_string();
 }
 
-const k3d::filesystem::path native_path(const k3d::string_t& NativePath)
+class filesystem
 {
-	return k3d::filesystem::native_path(k3d::ustring::from_utf8(NativePath));
-}
+public:
+	static const k3d::filesystem::path generic_path(const k3d::string_t& GenericPath)
+	{
+		return k3d::filesystem::generic_path(GenericPath);
+	}
 
-const k3d::string_t path_string(const k3d::filesystem::path& Path)
-{
-	return Path.native_filesystem_string();
-}
+	static const k3d::filesystem::path native_path(const k3d::string_t& NativePath)
+	{
+		return k3d::filesystem::native_path(k3d::ustring::from_utf8(NativePath));
+	}
+};
 
-void define_class_path()
+void define_namespace_filesystem()
 {
+	scope outer = class_<filesystem>("filesystem", no_init)
+		.def("generic_path", filesystem::generic_path)
+		.staticmethod("generic_path")
+		.def("native_path", filesystem::native_path)
+		.staticmethod("native_path")
+		;
+
 	class_<k3d::filesystem::path>("path",
 		"Stores a filesystem path")
 		.def(self == self)
@@ -76,10 +87,9 @@ void define_class_path()
 		.def("branch_path", &k3d::filesystem::path::branch_path)
 		.def("empty", &k3d::filesystem::path::empty)
 		.def("is_complete", &k3d::filesystem::path::is_complete)
-		.def("__str__", path_string);
+		.def("__str__", path_string)
+		;
 
-	def("generic_path", generic_path);
-	def("native_path", native_path);
 }
 
 } // namespace python

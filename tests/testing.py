@@ -101,7 +101,7 @@ def create_default_painter(document):
 def setup_bitmap_reader_test(reader_name, source_file):
 	doc = k3d.new_document()
 	reader = doc.new_node(reader_name)
-	reader.file = k3d.generic_path(source_path() + "/bitmaps/" + source_file)
+	reader.file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + source_file)
 
 	class result_object:
 		pass
@@ -115,7 +115,7 @@ def setup_bitmap_reader_test(reader_name, source_file):
 def setup_mesh_reader_test(reader_name, source_file):
 	doc = k3d.new_document()
 	reader = doc.new_node(reader_name)
-	reader.file = k3d.generic_path(source_path() + "/meshes/" + source_file)
+	reader.file = k3d.filesystem.generic_path(source_path() + "/meshes/" + source_file)
 	reader.center = False
 	reader.scale_to_size = False
 
@@ -287,7 +287,7 @@ def bitmap_size_comparison(bitmap, width, height):
 def mesh_comparison_to_reference(document, input_mesh, reference_mesh_name, threshold):
 
 	mesh_writer = document.new_node("K3DMeshWriter")
-	mesh_writer.file = k3d.generic_path(binary_path() + "/" + reference_mesh_name + ".output.k3d")
+	mesh_writer.file = k3d.filesystem.generic_path(binary_path() + "/" + reference_mesh_name + ".output.k3d")
 	document.set_dependency(mesh_writer.get_property("input_mesh"), input_mesh)
 
 	reference = document.new_node("K3DMeshReader")
@@ -297,7 +297,7 @@ def mesh_comparison_to_reference(document, input_mesh, reference_mesh_name, thre
 	difference = get_mesh_difference(document, input_mesh, reference.get_property("output_mesh"), threshold)
 
 	for index in range(1, 100):
-		reference_file = k3d.generic_path(source_path() + "/meshes/" + reference_mesh_name + ".reference." + str(index) + ".k3d")
+		reference_file = k3d.filesystem.generic_path(source_path() + "/meshes/" + reference_mesh_name + ".reference." + str(index) + ".k3d")
 
 		if not os.path.exists(str(reference_file)):
 			if index == 1:
@@ -407,9 +407,9 @@ def bitmap_compare_plugin_outputs(referenceName, pluginToTest, pluginPropertyVal
 
 def image_comparison(document, image_property, image_name, threshold):
 
-	output_file = k3d.generic_path(binary_path() + "/" + image_name + ".output.png")
-	reference_file = k3d.generic_path(source_path() + "/bitmaps/" + image_name + ".reference.png")
-	difference_file = k3d.generic_path(binary_path() + "/" + image_name + ".difference.png")
+	output_file = k3d.filesystem.generic_path(binary_path() + "/" + image_name + ".output.png")
+	reference_file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + image_name + ".reference.png")
+	difference_file = k3d.filesystem.generic_path(binary_path() + "/" + image_name + ".difference.png")
 
 	reference = document.new_node("PNGBitmapReader")
 	reference.file = reference_file

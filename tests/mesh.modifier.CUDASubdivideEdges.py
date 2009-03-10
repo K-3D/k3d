@@ -7,7 +7,7 @@ document = k3d.new_document()
 
 reader = document.new_node("K3DMeshReader")
 
-reader.file = k3d.generic_path(testing.source_path() + "/meshes/testmesh.polyhedra.k3d")
+reader.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/testmesh.polyhedra.k3d")
 
 
 modifier = document.new_node("CUDASubdivideEdges")

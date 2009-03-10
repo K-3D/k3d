@@ -1,5 +1,5 @@
-#ifndef K3DSDK_PYTHON_PATH_PYTHON_H
-#define K3DSDK_PYTHON_PATH_PYTHON_H
+#ifndef K3DSDK_PYTHON_FILESYSTEM_PYTHON_H
+#define K3DSDK_PYTHON_FILESYSTEM_PYTHON_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -30,11 +30,11 @@ namespace k3d
 namespace python
 {
 
-void define_class_path();
+void define_namespace_filesystem();
 
 } // namespace python
 
 } // namespace k3d
 
-#endif // !K3DSDK_PYTHON_PATH_PYTHON_H
+#endif // !K3DSDK_PYTHON_FILESYSTEM_PYTHON_H
 

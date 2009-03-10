@@ -21,7 +21,7 @@ def run_compare_test():
 
     filename = benchmarking.compare_and_output_image("TransformPointsComparison", [("TransformPoints", "Total"),("CUDATransformPoints", "Total"),("CUDATransformPointsAsynchronous", "Total")], ('Number of Points', 'Time [s]'))
     if filename != 0:
-        out_filename = benchmarking.k3d.generic_path(filename)
+        out_filename = benchmarking.k3d.filesystem.generic_path(filename)
         print """<DartMeasurementFile name="Benchmark Comparison" type="image/png">""" + str(out_filename) + """</DartMeasurementFile>"""
     
     selected = []
@@ -39,13 +39,13 @@ def run_compare_test():
 
     filename = benchmarking.compare_and_output_image("CUDATransformPointsBreakdown", selected, ('Number of Pixels', 'Time [s]'))
     if filename != 0:
-        out_filename = benchmarking.k3d.generic_path(filename)
+        out_filename = benchmarking.k3d.filesystem.generic_path(filename)
         print """<DartMeasurementFile name="Benchmark Comparison" type="image/png">""" + str(out_filename) + """</DartMeasurementFile>"""
     
     selected = [("CUDASubdivideEdges", "64to32: Host"), ("CUDASubdivideEdges", "64to32: Device")]
     filename = benchmarking.compare_and_output_image("CUDASubdivideConversion", selected, ('Mesh Size', 'Time [s]'))
     if filename != 0:
-        out_filename = benchmarking.k3d.generic_path(filename)
+        out_filename = benchmarking.k3d.filesystem.generic_path(filename)
         print """<DartMeasurementFile name="Benchmark Comparison" type="image/png">""" + str(out_filename) + """</DartMeasurementFile>"""
     
 run_compare_test()

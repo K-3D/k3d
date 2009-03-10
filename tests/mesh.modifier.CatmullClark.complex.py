@@ -7,7 +7,7 @@ document = k3d.new_document()
 
 reader = document.new_node("K3DMeshReader")
 # load a mesh that has multiple polyhedra, triangles, quads, n-sided polygons and holes. (i.e. a mesh from hell)
-reader.file = k3d.generic_path(testing.source_path() + "/meshes/testmesh.polyhedra.hole.k3d")
+reader.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/testmesh.polyhedra.hole.k3d")
 reader.center = False
 reader.scale_to_size = False
 

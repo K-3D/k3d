@@ -42,12 +42,12 @@ ADD_LIBRARY(k3dsdk-python-values SHARED
 	const_bitmap_python.h
 	euler_angles_python.cpp
 	euler_angles_python.h
+	filesystem_python.cpp
+	filesystem_python.h
 	matrix4_python.cpp
 	matrix4_python.h
 	normal3_python.cpp
 	normal3_python.h
-	path_python.cpp
-	path_python.h
 	point2_python.cpp
 	point2_python.h
 	point3_python.cpp

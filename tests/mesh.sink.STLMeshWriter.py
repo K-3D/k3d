@@ -6,7 +6,7 @@ import testing
 doc = k3d.new_document()
 
 # We will be writing a temporary file ...
-file = k3d.generic_path(testing.binary_path() + "/mesh.sink.STLMeshWriter.stl")
+file = k3d.filesystem.generic_path(testing.binary_path() + "/mesh.sink.STLMeshWriter.stl")
 
 # Create a simple polyhedron source ...
 cube = doc.new_node("PolyCube")
@@ -28,7 +28,7 @@ reader.scale_to_size = False
 
 #read in the reference date. This differs from the source data, since the STL file format is incapable of preserving vertex order
 reference = doc.new_node("K3DMeshReader")
-reference.file = k3d.generic_path(testing.source_path() + "/meshes/mesh.source.STLMeshReader.reference.1.k3d")
+reference.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/mesh.source.STLMeshReader.reference.1.k3d")
 reference.center = False
 reference.scale_to_size = False
 

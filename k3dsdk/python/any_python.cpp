@@ -21,7 +21,6 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "angle_axis_python.h"
 #include "any_python.h"
 #include "bitmap_python.h"
 #include "const_bitmap_python.h"
@@ -95,6 +94,9 @@ const object any_to_python(const boost::any& Value)
 	if(type == typeid(filesystem::path))
 		return object(boost::any_cast<filesystem::path>(Value));
 
+	if(type == typeid(k3d::angle_axis))
+		return object(boost::any_cast<k3d::angle_axis>(Value));
+
 	if(type == typeid(k3d::color))
 		return object(boost::any_cast<k3d::color>(Value));
 
@@ -118,9 +120,6 @@ const object any_to_python(const boost::any& Value)
 
 	if(type == typeid(k3d::matrix4))
 		return object(boost::any_cast<k3d::matrix4>(Value));
-
-	if(type == typeid(angle_axis))
-		return object(angle_axis(boost::any_cast<k3d::angle_axis>(Value)));
 
 	if(type == typeid(k3d::euler_angles))
 		return object(boost::any_cast<k3d::euler_angles>(Value));
@@ -283,6 +282,9 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 	if(TargetType == typeid(filesystem::path))
 		return boost::any(extract<k3d::filesystem::path>(Value)());
 
+	if(TargetType == typeid(k3d::angle_axis))
+		return boost::any(extract<k3d::angle_axis>(Value)());
+
 	if(TargetType == typeid(k3d::color))
 		return boost::any(extract<k3d::color>(Value)());
 
@@ -303,9 +305,6 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 
 	if(TargetType == typeid(k3d::matrix4))
 		return boost::any(extract<k3d::matrix4>(Value)());
-
-	if(TargetType == typeid(k3d::angle_axis))
-		return boost::any(extract<angle_axis>(Value)());
 
 	if(TargetType == typeid(k3d::mesh_selection))
 		return boost::any(extract<k3d::mesh_selection>(Value)());

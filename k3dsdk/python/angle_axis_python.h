@@ -24,30 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/algebra.h>
-
 namespace k3d
 {
 
 namespace python
 {
 
-class angle_axis :
-	public k3d::angle_axis
-{
-	typedef k3d::angle_axis base;
-
-public:
-	angle_axis(double Angle, const vector3& Axis);
-	angle_axis(const k3d::angle_axis& Value);
-
-	const double get_angle_radians() const;
-	const double get_angle() const;
-	void set_angle(const double Value);
-	const std::string str() const;
-
-	static void define_class();
-};
+void define_class_angle_axis();
 
 } // namespace python
 
