@@ -58,6 +58,8 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/textview.h>
 
+#include <boost/assign/list_of.hpp>
+
 #include <sstream>
 
 using namespace libk3dngui;
@@ -323,7 +325,8 @@ public:
 			"NGUITextEditorDialog",
 			_("Provides a general-purpose dialog for editing text, scripts, and shaders."),
 			"NGUI Dialog",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::EXPERIMENTAL
+			);
 
 		return factory;
 	}

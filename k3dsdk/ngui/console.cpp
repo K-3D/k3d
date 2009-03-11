@@ -28,7 +28,10 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/textview.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace console
@@ -45,7 +48,7 @@ public:
 	{
 	}
 
-	void print_string(const std::string& String)
+	void print_string(const string_t& String)
 	{
 		if(current_format)
 		{
@@ -71,7 +74,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name) :
+control::control(k3d::icommand_node& Parent, const string_t& Name) :
 	base(),
 	m_implementation(new implementation())
 {
@@ -104,12 +107,14 @@ void control::set_current_format(Glib::RefPtr<Gtk::TextTag>& Tag)
 	m_implementation->current_format = Tag;
 }
 
-void control::print_string(const std::string& String)
+void control::print_string(const string_t& String)
 {
 	m_implementation->print_string(String);
 }
 
 } // namespace console
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

@@ -30,7 +30,10 @@
 
 namespace Gtk { class TextTag; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace console
@@ -46,7 +49,7 @@ class control :
 	typedef Gtk::Frame base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name);
+	control(k3d::icommand_node& Parent, const string_t& Name);
 	~control();
 
 	/// Clears the contents of the console
@@ -54,7 +57,7 @@ public:
 	/// Sets the text formatting tag that will be applied to text passed to print_string()
 	void set_current_format(Glib::RefPtr<Gtk::TextTag>& Tag);
 	/// Writes the supplied text to the console
-	void print_string(const std::string& String);
+	void print_string(const string_t& String);
 
 private:
 	class implementation;
@@ -63,7 +66,9 @@ private:
 
 } // namespace console
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_CONSOLE_H
 

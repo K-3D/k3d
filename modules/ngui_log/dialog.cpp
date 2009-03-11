@@ -31,9 +31,9 @@
 
 #include <gtkmm/texttag.h>
 
-#include <sstream>
+#include <boost/assign/list_of.hpp>
 
-using namespace libk3dngui;
+#include <sstream>
 
 namespace module
 {
@@ -49,13 +49,13 @@ namespace log
 
 /// Provides a window for viewing the contents of the K-3D log
 class dialog :
-	public application_window
+	public libk3dngui::application_window
 {
-	typedef application_window base;
+	typedef libk3dngui::application_window base;
 
 public:
 	dialog() :
-		console(Gtk::manage(new console::control(*this, "console")))
+		console(Gtk::manage(new k3d::ngui::console::control(*this, "console")))
 	{
 		k3d::command_tree().add(*this, "log_window");
 
@@ -137,7 +137,7 @@ public:
 		console->print_string(Message);
 	}
 
-	console::control* const console;
+	k3d::ngui::console::control* const console;
 	Glib::RefPtr<Gtk::TextTag> critical_tag;
 	Glib::RefPtr<Gtk::TextTag> error_tag;
 	Glib::RefPtr<Gtk::TextTag> warning_tag;
@@ -151,7 +151,8 @@ public:
 			"NGUILogDialog",
 			_("Displays the contents of the K-3D log"),
 			"NGUI Dialog",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE,
+			boost::assign::map_list_of("ngui:component-type", "dialog"));
 
 		return factory;
 	}

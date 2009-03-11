@@ -504,7 +504,8 @@ public:
 			"NGUIAboutDialog",
 			_("Displays the current K-3D version and credits contributors"),
 			"NGUI Dialog",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE,
+			boost::assign::map_list_of("ngui:component-type", "dialog"));
 
 		return factory;
 	}

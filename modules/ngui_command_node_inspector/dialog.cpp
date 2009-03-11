@@ -43,6 +43,8 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
+#include <boost/assign/list_of.hpp>
+
 using namespace libk3dngui;
 
 namespace module
@@ -186,7 +188,8 @@ public:
 			"NGUICommandNodeInspectorDialog",
 			_("Provides a graphical view of the command-node hierarchy"),
 			"NGUI Dialog",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE,
+			boost::assign::map_list_of("ngui:component-type", "dialog"));
 
 		return factory;
 	}

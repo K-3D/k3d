@@ -37,6 +37,7 @@
 #include <k3dsdk/string_cast.h>
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <gtkmm/label.h>
 #include <gtk/gtk.h>
@@ -110,7 +111,8 @@ public:
 				"NGUITestCaseRecorderDialog",
 				_("Provides a user interface for recording test cases, including situations where the application crashes."),
 				"NGUI Dialog",
-				k3d::iplugin_factory::EXPERIMENTAL)
+				k3d::iplugin_factory::STABLE,
+				boost::assign::map_list_of("ngui:component-type", "dialog"))
 		{
 		}
 

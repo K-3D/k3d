@@ -50,6 +50,7 @@
 #include <gtkmm/treeview.h>
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/assign/list_of.hpp>
 
 using namespace libk3dngui;
 
@@ -350,7 +351,8 @@ public:
 			"NGUILearningDialog",
 			_("Displays a menu containing interactive tutorials and sample documents"),
 			"NGUI Dialog",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE,
+			boost::assign::map_list_of("ngui:component-type", "dialog"));
 
 		return factory;
 	}

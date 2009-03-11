@@ -427,6 +427,7 @@ public:
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("Modify"), *manage(create_modifier_menu(*menubar))));
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Render"), *manage(create_render_menu(*menubar))));
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("S_cripting"), *manage(create_scripting_menu(*menubar))));
+		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Advanced"), *manage(create_advanced_menu(*menubar))));
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Help"), *manage(create_help_menu(*menubar))));
 		menubar->show_all();
 
@@ -1280,6 +1281,32 @@ private:
 				create_menu_item(Parent, "scripting_action_", **factory)
 				<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_scripting_action), *factory))
 				<< set_accelerator_path("<k3d-document>/actions/scripting/action/" + (**factory).name(), get_accel_group())));
+		}
+
+		return menu;
+	}
+
+	Gtk::Menu* create_advanced_menu(k3d::icommand_node& Parent)
+	{
+		Gtk::Menu* const menu = new Gtk::Menu();
+		menu->set_accel_group(get_accel_group());
+
+		const k3d::plugin::factory::collection_t dialogs = k3d::plugin::factory::lookup("ngui:component-type", "dialog");
+		if(!dialogs.empty())
+		{
+			std::vector<k3d::iplugin_factory*> sorted_dialogs(dialogs.begin(), dialogs.end());
+			std::sort(sorted_dialogs.begin(), sorted_dialogs.end(), detail::sort_by_name());
+
+			Gtk::Menu* const dialogs_menu = new Gtk::Menu();
+			menu->items().push_back(Gtk::Menu_Helpers::MenuElem(_("Dialogs"), *manage(dialogs_menu)));
+
+			for(std::vector<k3d::iplugin_factory*>::iterator dialog = sorted_dialogs.begin(); dialog != sorted_dialogs.end(); ++dialog)
+			{
+				dialogs_menu->items().push_back(*Gtk::manage(
+					create_menu_item(Parent, "create_dialog_", **dialog)
+					<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_advanced_create_dialog), *dialog))
+					<< set_accelerator_path("<k3d-document>/actions/advanced/create_dialog/" + (**dialog).name(), get_accel_group())));
+			}
 		}
 
 		return menu;
@@ -2471,6 +2498,14 @@ private:
 			fullscreen();
 		else
 			unfullscreen();
+	}
+
+	void on_advanced_create_dialog(k3d::iplugin_factory* Factory)
+	{
+		Gtk::Window* const window = k3d::plugin::create<Gtk::Window>(*Factory);
+		return_if_fail(window);
+
+		window->set_transient_for(*this);
 	}
 
 	void on_help_learning_menu()
