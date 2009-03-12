@@ -52,12 +52,17 @@ public:
 	control(k3d::icommand_node& Parent, const string_t& Name);
 	~control();
 
-	/// Clears the contents of the console
+	/// Clears the contents of the console.
 	void clear();
-	/// Sets the text formatting tag that will be applied to text passed to print_string()
+	/// Sets the text formatting tag that will be applied to text passed to print_string() and prompt_string().
 	void set_current_format(Glib::RefPtr<Gtk::TextTag>& Tag);
-	/// Writes the supplied text to the console
+	/// Writes the supplied text to the console.
 	void print_string(const string_t& String);
+	/// Writes the supplied user prompt text to the console.
+	void prompt_string(const string_t& String);
+
+	/// Connects a slot to a signal that will be emitted whenever the user enters a command.
+	sigc::connection connect_command_signal(const sigc::slot<void, const string_t&>& Slot);
 
 private:
 	class implementation;

@@ -196,6 +196,8 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-primitives k3dsdk-python-b)
 
 ADD_LIBRARY(k3dsdk-python SHARED
 	instance_wrapper_python.h
+	file_signal_python.cpp
+	file_signal_python.h
 	object_model_python.cpp
 	object_model_python.h
 	)

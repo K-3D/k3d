@@ -44,12 +44,23 @@ class control::implementation
 {
 public:
 	implementation() :
-		buffer(Gtk::TextBuffer::create())
+		buffer(Gtk::TextBuffer::create()),
+		ignore_change(false)
 	{
+		read_only = Gtk::TextTag::create("read-only");
+		read_only->property_editable() = false;
+
+		begin_input = Gtk::TextMark::create("begin-input");
+
+		buffer->get_tag_table()->add(read_only);
+		buffer->add_mark(begin_input, buffer->end());
+		buffer->signal_changed().connect(sigc::mem_fun(*this, &implementation::on_changed));
 	}
 
 	void print_string(const string_t& String)
 	{
+		ignore_change = true;
+
 		if(current_format)
 		{
 			if(!buffer->get_tag_table()->lookup(current_format->property_name().get_value()))
@@ -62,13 +73,35 @@ public:
 			buffer->insert(buffer->end(), String);
 		}
 
+		buffer->apply_tag(read_only, buffer->begin(), buffer->end());
+
 		view.scroll_to(buffer->get_insert());
+
+		ignore_change = false;
+	}
+
+	void on_changed()
+	{
+		if(ignore_change)
+			return;
+
+		Glib::ustring input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end());
+		if(input.find('\n') != Glib::ustring::npos)
+		{
+			buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
+			buffer->move_mark(begin_input, buffer->end());
+			command_signal.emit(input.raw());
+		}
 	}
 
 	Glib::RefPtr<Gtk::TextBuffer> buffer;
 	Glib::RefPtr<Gtk::TextTag> current_format;
+	Glib::RefPtr<Gtk::TextTag> read_only;
+	Glib::RefPtr<Gtk::TextMark> begin_input;
 	Gtk::TextView view;
 	Gtk::ScrolledWindow scrolled_window;
+	sigc::signal<void, const string_t&> command_signal;
+	bool_t ignore_change;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -110,6 +143,21 @@ void control::set_current_format(Glib::RefPtr<Gtk::TextTag>& Tag)
 void control::print_string(const string_t& String)
 {
 	m_implementation->print_string(String);
+	m_implementation->view.set_editable(false);
+	m_implementation->view.set_cursor_visible(false);
+}
+
+void control::prompt_string(const string_t& String)
+{
+	m_implementation->print_string(String);
+	m_implementation->buffer->move_mark(m_implementation->begin_input, m_implementation->buffer->end());
+	m_implementation->view.set_editable(true);
+	m_implementation->view.set_cursor_visible(true);
+}
+
+sigc::connection control::connect_command_signal(const sigc::slot<void, const string_t&>& Slot)
+{
+	return m_implementation->command_signal.connect(Slot);
 }
 
 } // namespace console

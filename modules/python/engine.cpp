@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,11 +18,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements Python engine, an implementation of k3d::iscript_engine that supports the Python language
-		\author Anders Dahnielson (anders@dahnielson.com)
-		\author Romain Behar (romainbehar@yahoo.com)
-		\author Adam Hupp (hupp@cs.wisc.edu)
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\brief Implements Python engine, an implementation of k3d::iscript_engine that supports the Python language
+	\author Anders Dahnielson (anders@dahnielson.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Adam Hupp (hupp@cs.wisc.edu)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -33,12 +33,14 @@
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/module.h>
+#include <k3dsdk/python/file_signal_python.h>
 #include <k3dsdk/python/object_model_python.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_modifiers.h>
 
 #include <boost/assign/list_of.hpp>
 #include <boost/python/dict.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -47,7 +49,7 @@ namespace python
 {
 
 /// Magic token used to identify Python scripts
-const std::string magic_token("#python");
+const k3d::string_t magic_token("#python");
 
 /// Ensures that Py_Initialize() is called before any other Python API functions
 class initialize_python
@@ -97,19 +99,38 @@ public:
 		return factory;
 	}
 
-	const std::string language()
+	const k3d::string_t language()
 	{
 		return "Python";
 	}
 
-	bool execute(const std::string& ScriptName, const std::string& Script, context_t& Context)
+	k3d::bool_t execute(const k3d::string_t& ScriptName, const k3d::string_t& Script, context_t& Context, output_t* Stdout, output_t* Stderr)
 	{
+		k3d::bool_t succeeded = true;
+
 		try
 		{
+			boost::scoped_ptr<k3d::python::file_signal> stdout_signal;
+			boost::scoped_ptr<k3d::python::file_signal> stderr_signal;
+
+			if(Stdout)
+			{
+				stdout_signal.reset(new k3d::python::file_signal());
+				stdout_signal->connect_output_signal(*Stdout);
+				PySys_SetObject(const_cast<char*>("stdout"), boost::python::object(*stdout_signal).ptr());
+			}
+
+			if(Stderr)
+			{
+				stderr_signal.reset(new k3d::python::file_signal());
+				stderr_signal->connect_output_signal(*Stderr);
+				PySys_SetObject(const_cast<char*>("stderr"), boost::python::object(*stderr_signal).ptr());
+			}
+
 			k3d::python::set_context(Context, m_local_dict);
 
 			// The embedded python interpreter cannot handle DOS line-endings, see http://sourceforge.net/tracker/?group_id=5470&atid=105470&func=detail&aid=1167922
-			std::string script = Script;
+			k3d::string_t script = Script;
 			script.erase(std::remove(script.begin(), script.end(), '\r'), script.end());
 
 			PyDict_Update(m_local_dict.ptr(), PyObject_GetAttrString(PyImport_AddModule("__main__"), "__dict__"));
@@ -128,21 +149,29 @@ public:
 
 			k3d::python::get_context(m_local_dict, Context);
 			
-			return result ? true : false;
+			succeeded = result ? true : false;
 		}
 		catch(std::exception& e)
 		{
 			k3d::log() << error << k3d_file_reference << ": " << e.what() << std::endl;
-			return false;
+			succeeded = false;
 		}
 		catch(...)
 		{
 			k3d::log() << error << k3d_file_reference << ": " << "Unknown exception" << std::endl;
-			return false;
+			succeeded = false;
 		}
+
+		if(Stdout)
+		      PySys_SetObject(const_cast<char*>("stdout"), PySys_GetObject(const_cast<char*>("__stdout__")));
+
+		if(Stderr)
+		      PySys_SetObject(const_cast<char*>("stderr"), PySys_GetObject(const_cast<char*>("__stderr__")));
+
+		return succeeded;
 	}
 
-	bool halt()
+	k3d::bool_t halt()
 	{
 		return false;
 	}
@@ -153,17 +182,17 @@ public:
 		Script << "import k3d\n\n";
 	}
 
-	void append_comment(std::ostream& Script, const std::string& Comment)
+	void append_comment(std::ostream& Script, const k3d::string_t& Comment)
 	{
 		// Ensure that the comment doesn't contain any newlines ...
-		std::string comment(Comment);
+		k3d::string_t comment(Comment);
 		std::replace(comment.begin(), comment.end(), '\r', ' ');
 		std::replace(comment.begin(), comment.end(), '\n', ' ');
 
 		Script << "# " << comment << "\n";
 	};
 
-	void append_command(std::ostream& Script, k3d::icommand_node& CommandNode, const std::string& Command, const std::string& Arguments)
+	void append_command(std::ostream& Script, k3d::icommand_node& CommandNode, const k3d::string_t& Command, const k3d::string_t& Arguments)
 	{
 		Script << "k3d.get_command_node(\"";
 		Script << k3d::command_node::path(CommandNode);

@@ -43,6 +43,7 @@
 #include "euler_angles_python.h"
 #include "euler_python.h"
 #include "filesystem_python.h"
+#include "file_signal_python.h"
 #include "hyperboloid_python.h"
 #include "idocument_python.h"
 #include "ifile_change_notifier_python.h"
@@ -333,6 +334,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_const_named_attribute_arrays();
 	define_class_euler_angles();
 	define_class_file_change_receiver();
+	define_class_file_signal();
 	define_class_idocument();
 	define_class_iunknown();
 	define_class_matrix4();

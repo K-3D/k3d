@@ -42,7 +42,7 @@ namespace k3dscript
 {
 
 /// Defines a "magic token" for automatic identification of scripts
-const std::string magic_token("#k3dscript");
+const k3d::string_t magic_token("#k3dscript");
 
 /// Provides an implementation of k3d::iscript_engine primarily designed for recording and playback of tutorials
 class engine :
@@ -76,19 +76,19 @@ public:
 		return factory;
 	}
 
-	const std::string language()
+	const k3d::string_t language()
 	{
 		return "K3DScript";
 	}
 
-	bool execute(const std::string& ScriptName, const std::string& Script, context_t& Context)
+	k3d::bool_t execute(const k3d::string_t& ScriptName, const k3d::string_t& Script, context_t& Context, output_t* Stdout, output_t* Stderr)
 	{
 		return_val_if_fail(ScriptName.size(), false);
 
 		m_halt_request = false;
 
 		std::stringstream script(Script);
-		std::string line;
+		k3d::string_t line;
 		for(k3d::getline(script, line); !script.eof(); k3d::getline(script, line))
 		{
 			if(m_halt_request)
@@ -115,13 +115,13 @@ public:
 
 			return_val_if_fail(command.name == "command", false);
 
-			const std::string node_text = k3d::xml::attribute_text(command, "node");
+			const k3d::string_t node_text = k3d::xml::attribute_text(command, "node");
 			return_val_if_fail(!node_text.empty(), false);
 			
-			const std::string command_text = k3d::xml::attribute_text(command, "command");
+			const k3d::string_t command_text = k3d::xml::attribute_text(command, "command");
 			return_val_if_fail(!command_text.empty(), false);
 
-			const std::string arguments_text = k3d::xml::attribute_text(command, "arguments");
+			const k3d::string_t arguments_text = k3d::xml::attribute_text(command, "arguments");
 
 			k3d::icommand_node* const node = k3d::command_node::lookup(node_text);
 			if(!node)
@@ -145,7 +145,7 @@ public:
 		return true;
 	}
 
-	bool halt()
+	k3d::bool_t halt()
 	{
 		m_halt_request = true;
 		return true;
@@ -156,12 +156,12 @@ public:
 		Script << magic_token << "\n\n";
 	}
 
-	void append_comment(std::ostream& Script, const std::string& Comment)
+	void append_comment(std::ostream& Script, const k3d::string_t& Comment)
 	{
 		std::stringstream buffer(Comment);
 		while(true)
 		{
-			std::string line;
+			k3d::string_t line;
 			k3d::getline(buffer, line);
 			Script << "# " << line << "\n";
 
@@ -170,7 +170,7 @@ public:
 		}
 	}
 
-	void append_command(std::ostream& Script, k3d::icommand_node& Node, const std::string& Command, const std::string& Arguments)
+	void append_command(std::ostream& Script, k3d::icommand_node& Node, const k3d::string_t& Command, const k3d::string_t& Arguments)
 	{
 		k3d::xml::element command(
 			"command",
@@ -183,7 +183,7 @@ public:
 
 private:
 	/// Stores a request to halt execution of a running script
-	bool m_halt_request;
+	k3d::bool_t m_halt_request;
 };
 
 } // namespace k3dscript

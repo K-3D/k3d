@@ -25,6 +25,8 @@
 */
 
 #include "iunknown.h"
+#include "signal_system.h"
+#include "types.h"
 
 #include <boost/any.hpp>
 #include <iosfwd>
@@ -58,24 +60,28 @@ public:
 	virtual iplugin_factory& factory() = 0;
 	/**	\brief Returns the human-readable name of the scripting language this engine implements
 	*/
-	virtual const std::string language() = 0;
+	virtual const string_t language() = 0;
 
 	/// Defines a collection of named objects to pass to a script that define its context (its execution environment) - how they are used is implementation-dependent (note that the names are merely suggestions, and may be changed or ignored at the whim of the implementation)
-	typedef std::map<std::string, boost::any> context_t;
+	typedef std::map<string_t, boost::any> context_t;
+	/// Defines a slot that can be called to redirect script output.
+	typedef sigc::slot<void, const string_t&> output_t;
 
 	/**	\brief Executes a script
 		\param ScriptName A human readable identifier for the script, which should be used in error messages, etc.
 		\param Script The complete source code of the script to be executed
-		\param Context Optional collection of objects that define the context/execution environment of the script -  how they are used is implementation-dependent.  Note that the script engine may alter context objects before returning.
+		\param Context Collection of objects that define the context/execution environment of the script -  how they are used is implementation-dependent.  Note that the script engine may alter context objects before returning.
+		\param Stdout Optional slot that will be called with script output.
+		\param Stderr Optional slot that will be called with script output.
 		\return true, iff the script was successfully executed without errors (either syntax or runtime)
 	*/
-	virtual bool execute(const std::string& ScriptName, const std::string& Script, context_t& Context) = 0;
+	virtual bool_t execute(const string_t& ScriptName, const string_t& Script, context_t& Context, output_t* Stdout = 0, output_t* Stderr = 0) = 0;
 
 	/**	\brief Requests a cancellation of all running scripts.
 		\return true, iff script cancellation is supported by this engine.
 		\note Cancellation may be asynchronous, i.e. scripts may still be running when the call returns, and may continue to run for an indefinite period before shutting down, if at all.
 	*/
-	virtual bool halt() = 0;
+	virtual bool_t halt() = 0;
 
 	/**	\brief Writes a token to a script stream so that it can be recognized by this engine
 	*/
@@ -85,7 +91,7 @@ public:
 		\param Comment A string to be appended to the script as a comment
 		\note The comment may be single- or multi-line, and can contain any text.  The engine is responsible for ensuring that the comment text does not introduce syntactically-incorrect code.
 	*/
-	virtual void append_comment(std::ostream& Script, const std::string& Comment) = 0;
+	virtual void append_comment(std::ostream& Script, const string_t& Comment) = 0;
 
 	/** Converts a command-node command into source code appropriate to this language and adds it to the given script
 		\param CommandNode The command node executing the command to be appended
@@ -93,7 +99,7 @@ public:
 		\param Arguments The command arguments to be appended
 		\note The engine is responsible for ensuring that the appended command does not introduce syntactically-incorrect code, e.g. quoting issues or escaped characters with special meanings.
 	*/
-	virtual void append_command(std::ostream& Script, icommand_node& CommandNode, const std::string& Command, const std::string& Arguments) = 0;
+	virtual void append_command(std::ostream& Script, icommand_node& CommandNode, const string_t& Command, const string_t& Arguments) = 0;
 
 protected:
 	iscript_engine() {}
