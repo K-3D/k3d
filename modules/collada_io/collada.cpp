@@ -1,5 +1,9 @@
 #include "collada.h"
 
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
+
 namespace module
 {
 namespace collada
@@ -83,7 +87,8 @@ namespace io
 		// Store polyhedra ...
 		std::vector<domUint> ind;
 		std::vector<domUint> vcou;
-		if(k3d::validate_polyhedra(*mesh))
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*mesh));
+		if(polyhedron)
 		{
 			const k3d::mesh::indices_t& first_faces = *mesh->polyhedra->first_faces;
 			const k3d::mesh::counts_t& face_counts = *mesh->polyhedra->face_counts;
