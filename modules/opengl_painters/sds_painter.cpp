@@ -167,7 +167,7 @@ protected:
 			k3d::polyhedron::create_boundary_face_lookup(*Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->face_loop_counts, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->clockwise_edges, boundary_edges, companions, boundary_faces);
 		}
 		
-		face_visitor visitor;
+		face_visitor visitor(Cache.point_count(), Cache.edge_count(), Mesh.polyhedra->face_first_loops->size());
 		Cache.visit_surface(m_levels.pipeline_value(), visitor);
 		
 		k3d::uint_t face_count = visitor.face_starts.size();
@@ -238,7 +238,7 @@ protected:
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		
-		face_visitor visitor;
+		face_visitor visitor(Cache.point_count(), Cache.edge_count(), Mesh.polyhedra->face_first_loops->size());
 		Cache.visit_surface(m_levels.pipeline_value(), visitor);
 		
 		for (k3d::uint_t face = 0; face != visitor.face_starts.size(); ++face)

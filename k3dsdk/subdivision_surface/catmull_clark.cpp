@@ -26,6 +26,7 @@
 
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/basic_math.h>
+#include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/ipipeline_profiler.h>
@@ -519,10 +520,16 @@ public:
 		m_output_points(OutputPoints),
 		m_uniform_copier(UniformCopier),
 		m_face_varying_copier(FaceVaryingCopier),
-		m_vertex_copier(VertexCopier)
+		m_vertex_copier(VertexCopier),
+		position_update_time(0.0),
+		varying_and_uniform_data_time(0.0),
+		vertex_data_time(0.0)
 	{}
 
-
+	k3d::double_t position_update_time;
+	k3d::double_t varying_and_uniform_data_time;
+	k3d::double_t vertex_data_time;
+			
 	void operator()(const k3d::uint_t Face)
 	{
 		const k3d::uint_t first_new_face = Face == 0 ? 0 : m_face_subface_counts[Face - 1];
@@ -555,24 +562,36 @@ public:
 			k3d::point3& center = m_output_points[m_face_centers[Face]];
 			center = k3d::point3(0,0,0);
 			k3d::uint_t count = 0;
-			//indices for target of the varying data copy
-			k3d::mesh::indices_t edges;
-			k3d::mesh::indices_t points;
+			
+			k3d::timer t;
 			for(k3d::uint_t edge = first_edge; ; )
 			{
 				center += k3d::to_vector(m_input_points[m_input_edge_points[edge]]);
 				++count;
-				edges.push_back(edge);
-				points.push_back(m_input_edge_points[edge]);
 	
 				edge = m_mesh_arrays.clockwise_edges[edge];
 				if(edge == first_edge)
 					break;
 			}
-	
 			center /= count;
+			position_update_time += t.elapsed();
+			
+			//indices for target of the varying data copy
+			t.restart();
+			k3d::mesh::indices_t edges(count);
+			k3d::mesh::indices_t points(count);
 			k3d::mesh::weights_t weights(count, 1.0/static_cast<double>(count));
+			k3d::uint_t i = 0;
+			for(k3d::uint_t edge = first_edge; ; )
+			{
+				edges[i] = edge;
+				points[i] = m_input_edge_points[edge];
+				++i;
 	
+				edge = m_mesh_arrays.clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
 			k3d::uint_t output_face = first_new_face;
 			for(k3d::uint_t edge = first_edge; ; )
 			{
@@ -586,10 +605,13 @@ public:
 				if(edge == first_edge)
 					break;
 			}
+			varying_and_uniform_data_time += t.elapsed();
+			t.restart();
 			m_vertex_copier.copy(count, &points[0], &weights[0], m_face_centers[Face]);
+			vertex_data_time += t.elapsed();
 		}
 	}
-
+	
 private:
 	const mesh_arrays& m_mesh_arrays;
 	const k3d::mesh::indices_t& m_input_edge_points;
@@ -651,10 +673,8 @@ public:
 		const k3d::uint_t first_edge = m_mesh_arrays.loop_first_edges[m_mesh_arrays.face_first_loops[Face]];
 		
 		// Get the edge indices of the own face, for named array copying
-		k3d::mesh::indices_t face_edges;
 		for(k3d::uint_t edge = first_edge; ; )
 		{
-			face_edges.push_back(edge);
 			edge = m_mesh_arrays.clockwise_edges[edge];
 			if(edge == first_edge)
 				break;
@@ -785,8 +805,8 @@ public:
 			const k3d::double_t neighbour_weight = 1.0 / static_cast<double>(valence * valence); // Weight attributed to surrounding corners and face vertices
 			output_position *=  own_weight; // adjust initial position
 			k3d::vector3 sum(0, 0, 0);
-			k3d::mesh::indices_t corner_indices; // indices of neighbor corners, for vertex attribute data
-			k3d::mesh::indices_t face_indices; // indices of neighbor faces face vertices, for vertex attribute data
+			k3d::mesh::indices_t corner_indices(valence + 1); // indices of neighbor corners, for vertex attribute data
+			k3d::mesh::indices_t face_indices(valence + 1); // indices of neighbor faces face vertices, for vertex attribute data
 			for(k3d::uint_t index = start_index; index != end_index; ++index)
 			{
 				const k3d::uint_t edge = m_point_edges[index];
@@ -794,19 +814,19 @@ public:
 				const k3d::uint_t face = m_mesh_arrays.edge_faces[edge];
 				const k3d::vector3 next_corner = k3d::to_vector(m_input_points[m_input_edge_points[clockwise]]);
 				const k3d::vector3 face_vertex = k3d::to_vector(m_output_points[m_face_centers[face]]);
-				corner_indices.push_back(m_input_edge_points[clockwise]);
-				face_indices.push_back(m_face_centers[face]);
+				corner_indices[index - start_index] = m_input_edge_points[clockwise];
+				face_indices[index - start_index] = m_face_centers[face];
 				sum += next_corner + face_vertex;
 			}
 			sum *= neighbour_weight;
 			output_position += sum;
-			k3d::mesh::weights_t corner_weights(corner_indices.size(), neighbour_weight);
-			corner_indices.push_back(Point); // Append the current point and its weight
-			corner_weights.push_back(own_weight);
+			k3d::mesh::weights_t corner_weights(corner_indices.size()+1, neighbour_weight);
+			corner_indices.back() = Point; // Append the current point and its weight
+			corner_weights.back() = own_weight;
 			m_vertex_copier.copy(corner_indices.size(), &corner_indices[0], &corner_weights[0], m_corner_points[Point]); // Contribution of Point and its neighbor corners
-			k3d::mesh::weights_t face_weights(face_indices.size(), neighbour_weight);
-			face_indices.push_back(m_corner_points[Point]);
-			face_weights.push_back(1.0);
+			k3d::mesh::weights_t face_weights(face_indices.size()+1, neighbour_weight);
+			face_indices.back() = m_corner_points[Point];
+			face_weights.back() = 1.0;
 			m_vertex_mixer.copy(face_indices.size(), &face_indices[0], &face_weights[0], m_corner_points[Point]); // Contribution of the face vertices
 		}
 		else if(affected_edge_count != 0) // Boundary of the subdivided surface
@@ -874,11 +894,21 @@ public:
 	
 	void create_mesh(const k3d::mesh& Input, const k3d::mesh::selection_t& InputFaceSelection, k3d::mesh& Output, k3d::inode* Node)
 	{
+		k3d::timer total_timer;
 		// If there are no valid polyhedra, we give up
 		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
 		if(!polyhedron)
 			return;
 
+		// Manually sum timings over different levels
+		k3d::timer timer;
+		k3d::double_t copy_input_time = 0;
+		k3d::double_t calculate_companions_time = 0;
+		k3d::double_t calculate_indices_time = 0;
+		k3d::double_t allocate_memory_time = 0;
+		k3d::double_t subdivide_topology_time = 0;
+		k3d::double_t vertex_valences_time = 0;
+				
 		for(k3d::uint_t level = 0; level != m_levels; ++level)
 		{
 			topology_data_t& topology_data = m_topology_data[level];
@@ -890,7 +920,7 @@ public:
 			output = input;
 
 			// Make writeable copies of the arrays we intend to modify
-			if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Copy input");
+			timer.restart();
 			k3d::mesh::polyhedra_t& output_polyhedra = output.polyhedra.writable();
 			k3d::mesh::polyhedra_t::types_t& output_types = output_polyhedra.types.writable();
 			k3d::mesh::indices_t& output_loop_first_edges = output_polyhedra.loop_first_edges.writable();
@@ -929,17 +959,16 @@ public:
 					input_clockwise_edges,
 					topology_data.edge_faces,
 					topology_data.companions);
-			
-			if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Copy input");
+			copy_input_time += timer.elapsed();
 
 
 			// Get the "companion" edge for each edge
-			if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Calculate companions");
+			timer.restart();
 			k3d::mesh::bools_t boundary_edges;
 			k3d::polyhedron::create_edge_adjacency_lookup(output_edge_points, output_clockwise_edges, boundary_edges, topology_data.companions);
-			if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Calculate companions");
+			calculate_companions_time += timer.elapsed();
 
-			if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Calculate indices");
+			timer.restart();
 			// For each edge, get the face it belongs to
 			topology_data.edge_faces.resize(input_edge_count);
 			k3d::polyhedron::create_edge_face_lookup(input_face_first_loops, input_face_loop_counts, input_loop_first_edges, input_clockwise_edges, topology_data.edge_faces);
@@ -972,9 +1001,10 @@ public:
 					topology_data.edge_midpoints,
 					topology_data.face_centers);
 			for(k3d::uint_t face = 0; face != input_face_count; ++face) point_index_calculator(face);
+			calculate_indices_time += timer.elapsed();
 					
 			// Allocate required memory
-			if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Allocate memory");
+			timer.restart();
 			k3d::mesh::points_t& output_points = output.points.create(new k3d::mesh::points_t(face_point_counts.back()));
 			k3d::mesh::selection_t& output_point_selection = output.point_selection.create(new k3d::mesh::selection_t(output_points.size(), 0.0));
 			output_edge_points.resize(face_edge_counts.back(), 0);
@@ -986,9 +1016,9 @@ public:
 			output_face_materials.resize(topology_data.face_subface_counts.back());
 			output_polyhedra.face_varying_data.resize(face_edge_counts.back());
 			output_polyhedra.uniform_data.resize(topology_data.face_subface_counts.back());
-			if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Allocate memory");
+			allocate_memory_time += timer.elapsed();
 			
-			if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Subdivide topology");
+			timer.restart();
 			detail::topology_subdivider topology_subdivider(mesh_arrays,
 					*input.polyhedra->edge_points,
 					input_face_materials,
@@ -1024,29 +1054,56 @@ public:
 				output_first_faces.push_back(topology_data.face_subface_counts[input_first_faces[polyhedron] - 1]);
 			}
 			output_face_counts.push_back(topology_data.face_subface_counts.back() - output_first_faces.back());
-			if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Subdivide topology");
+			subdivide_topology_time += timer.elapsed();
 			
 			// Update selection arrays
 			output_edge_selection.assign(output_edge_points.size(), 0.0);
 			
 			// Calculate vertex valences, needed for corner point updates.
-			if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Vertex valence calculation");
+			timer.restart();
 			k3d::polyhedron::create_vertex_valence_lookup(input.points->size(), input_edge_points, topology_data.vertex_valences);
 			detail::create_vertex_edge_lookup(input_edge_points, topology_data.vertex_valences, topology_data.point_first_edges, topology_data.point_edges);
-			if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Vertex valence calculation");
+			vertex_valences_time += timer.elapsed();
 		}
+		if(Node)
+		{
+			Node->document().pipeline_profiler().add_timing_entry(*Node, "Copy input", copy_input_time);
+			Node->document().pipeline_profiler().add_timing_entry(*Node, "Calculate companions", calculate_companions_time);
+			Node->document().pipeline_profiler().add_timing_entry(*Node, "Calculate indices", calculate_indices_time);
+			Node->document().pipeline_profiler().add_timing_entry(*Node, "Allocate memory", allocate_memory_time);
+			Node->document().pipeline_profiler().add_timing_entry(*Node, "Subdivide topology", subdivide_topology_time);
+			Node->document().pipeline_profiler().add_timing_entry(*Node, "Vertex valences", vertex_valences_time);
+		}
+		const k3d::double_t total = total_timer.elapsed();
+		k3d::log() << debug << "SDS create timings: Total: " << total 
+			<< ", copy input: " << copy_input_time << " (" << copy_input_time/total*100 << "%), calculate companions: "
+			<< calculate_companions_time << " (" << calculate_companions_time/total*100 << "%), calculate indices: "
+			<< calculate_indices_time << " (" << calculate_indices_time/total*100 << "%), allocate memory: "
+			<< allocate_memory_time << " (" << allocate_memory_time/total*100 << "%), subdivide topology: "
+			<< subdivide_topology_time << " (" << subdivide_topology_time/total*100 << "%), vertex valences: "
+			<< vertex_valences_time << " (" << vertex_valences_time/total*100 << "%)" << std::endl;
 		
 		Output = m_intermediate_meshes[m_levels - 1];
 	}
 	
 	void update_mesh(const k3d::mesh& Input, const k3d::mesh::selection_t& InputFaceSelection, k3d::mesh& Output, k3d::inode* Node)
 	{
+		k3d::timer total_timer;
 		k3d::mesh input_with_normals = Input;
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(input_with_normals));
 		if(!polyhedron)
 			return;
 
 		const k3d::mesh::points_t& points = *input_with_normals.points;
+		
+		// Manually keep track of some timing data, in order to get the total time over the loops
+		k3d::double_t face_center_time = 0;
+		k3d::double_t edge_midpoint_time = 0;
+		k3d::double_t point_position_time = 0;
+		k3d::double_t face_position_time = 0;
+		k3d::double_t face_varying_data_time = 0;
+		k3d::double_t face_vertex_data_time = 0;
+		k3d::timer timer;
 		
 		// Calculate the normals on the input
 		if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Calculate Normals");
@@ -1117,7 +1174,7 @@ public:
 			output_points.assign(output_points.size(), k3d::point3(0,0,0));
 	
 			// Calculate face centers
-			if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Face centers");
+			timer.restart();
 			detail::face_center_calculator face_center_calculator(
 					mesh_arrays,
 					input_edge_points,
@@ -1132,10 +1189,13 @@ public:
 					face_varying_data_copier,
 					vertex_data_copier);
 			for(k3d::uint_t face = 0; face != face_count; ++face) face_center_calculator(face);
-			if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Face centers");
+			face_center_time += timer.elapsed();
+			face_position_time += face_center_calculator.position_update_time;
+			face_varying_data_time += face_center_calculator.varying_and_uniform_data_time;
+			face_vertex_data_time += face_center_calculator.vertex_data_time;
 	
 			// Calculate edge midpoints
-			if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Edge midpoints");
+			timer.restart();
 			detail::edge_midpoint_calculator edge_midpoint_calculator(
 					mesh_arrays,
 					input_edge_points,
@@ -1151,10 +1211,10 @@ public:
 					vertex_data_copier,
 					vertex_data_mixer);
 			for(k3d::uint_t face = 0; face != face_count; ++face) edge_midpoint_calculator(face);
-			if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Edge midpoints");
+			edge_midpoint_time += timer.elapsed();
 			
 			// Calculate new point positions
-			if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Point positions");
+			timer.restart();
 			detail::corner_point_calculator corner_point_calculator(
 					mesh_arrays,
 					input_edge_points,
@@ -1169,14 +1229,24 @@ public:
 					vertex_data_copier,
 					vertex_data_mixer);
 			for(k3d::uint_t point = 0; point != input_points.size(); ++point) corner_point_calculator(point);
-			if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Point positions");
+			point_position_time += timer.elapsed();
 		}
+		if(Node)
+		{
+			Node->document().pipeline_profiler().add_timing_entry(*Node, "Face centers", face_center_time);
+			Node->document().pipeline_profiler().add_timing_entry(*Node, "Edge midpoints", edge_midpoint_time);
+			Node->document().pipeline_profiler().add_timing_entry(*Node, "Point positions", point_position_time);
+		}
+		const k3d::double_t total = total_timer.elapsed();
+		k3d::log() << debug << "SDS update timings: Total: " << total << ", face centers: " << face_center_time << " (" << face_center_time/total*100 << "%), edge midpoints: " << edge_midpoint_time << " (" << edge_midpoint_time/total*100 << "%), point positions: " << point_position_time << " (" << point_position_time/total*100 << "%)" << std::endl;
+		k3d::log() << debug << "SDS face center time: " << face_center_time << ", positions: " << face_position_time << " (" << face_position_time/face_center_time*100 << "%), varying and uniform: " << face_varying_data_time << " (" << face_varying_data_time/face_center_time*100 << "%), vertex data: " << face_vertex_data_time << " (" << face_vertex_data_time/face_center_time*100 << "%)" << std::endl;
 		
 		Output = m_intermediate_meshes[m_levels - 1];
 	}
 	
 	void visit_surface(const k3d::uint_t Level, ipatch_surface_visitor& Visitor)
 	{
+		k3d::timer t;
 		k3d::uint_t last_count = 0;
 		for(k3d::uint_t face = 0; face != m_topology_data[0].face_subface_counts.size(); ++face)
 		{
@@ -1188,7 +1258,9 @@ public:
 			}
 			last_count = face_count;
 		}
+		k3d::log() << debug << "SDS facet visit took " << t.elapsed() << "s" << std::endl;
 		
+		t.restart();
 		const k3d::mesh& mesh = m_intermediate_meshes[Level - 1];
 		const k3d::mesh::points_t points = *mesh.points;
 		const k3d::mesh::normals_t* normals = mesh.vertex_data.lookup<k3d::mesh::normals_t>("sds_normals");
@@ -1196,17 +1268,20 @@ public:
 		{
 			Visitor.on_vertex(points[point], normals ? normals->at(point) : k3d::normal3(0,0,1));
 		}
+		k3d::log() << debug << "SDS facet points visit took " << t.elapsed() << "s" << std::endl;
 	}
 	
 	void visit_boundary(const k3d::mesh& Mesh, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor)
 	{
+		k3d::timer t;
 		const k3d::uint_t edge_count = m_topology_data[0].edge_midpoints.size();
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> input(k3d::polyhedron::validate(Mesh));
+		const k3d::mesh::indices_t& input_edge_points = *Mesh.polyhedra->edge_points;
+		const k3d::mesh::indices_t& input_clockwise_edges = *Mesh.polyhedra->clockwise_edges;
 		for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 		{
 			Visitor.on_boundary(edge);
-			k3d::uint_t c0 = input->edge_points[edge];
-			k3d::uint_t c1 = input->edge_points[input->clockwise_edges[edge]];
+			k3d::uint_t c0 = input_edge_points[edge];
+			k3d::uint_t c1 = input_edge_points[input_clockwise_edges[edge]];
 			k3d::uint_t first_edge = edge;
 			for(k3d::uint_t level = 0; level != Level - 1; ++level)
 			{
@@ -1216,11 +1291,12 @@ public:
 				const k3d::uint_t point_edge_begin = m_topology_data[level+1].point_first_edges[c0];
 				const k3d::uint_t point_edge_end = point_edge_begin + m_topology_data[level+1].vertex_valences[c0];
 				const k3d::mesh& mesh = m_intermediate_meshes[level];
-				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(mesh));
+				const k3d::mesh::indices_t& edge_points = *mesh.polyhedra->edge_points;
+				const k3d::mesh::indices_t& clockwise_edges = *mesh.polyhedra->clockwise_edges;
 				for(k3d::uint_t point_edge_index = point_edge_begin; point_edge_index != point_edge_end; ++point_edge_index)
 				{
 					const k3d::uint_t point_edge = m_topology_data[level+1].point_edges[point_edge_index];
-					if(polyhedron->edge_points[polyhedron->clockwise_edges[point_edge]] == midpoint)
+					if(edge_points[clockwise_edges[point_edge]] == midpoint)
 					{
 						first_edge = point_edge;
 						break;
@@ -1228,22 +1304,24 @@ public:
 				}
 			}
 			const k3d::mesh& mesh = m_intermediate_meshes[Level-2];
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(mesh));
+			const k3d::mesh::indices_t& edge_points = *mesh.polyhedra->edge_points;
+			const k3d::mesh::indices_t& clockwise_edges = *mesh.polyhedra->clockwise_edges;
 			const k3d::mesh::indices_t& corner_points = m_topology_data[Level-1].corner_points;
 			const k3d::mesh::indices_t& edge_midpoints = m_topology_data[Level-1].edge_midpoints;
 			const k3d::mesh::indices_t& companions = m_topology_data[Level-1].companions;
 			const k3d::mesh::points_t& points = *m_intermediate_meshes[Level-1].points;
-			return_if_fail(polyhedron->edge_points[first_edge] == c0);
+			return_if_fail(edge_points[first_edge] == c0);
 			for(k3d::uint_t subedge = first_edge; ;)
 			{ 
-				Visitor.on_point(points[corner_points[polyhedron->edge_points[subedge]]]);
+				Visitor.on_point(points[corner_points[edge_points[subedge]]]);
 				Visitor.on_point(points[edge_midpoints[subedge]]);
 				
-				if(polyhedron->edge_points[polyhedron->clockwise_edges[subedge]] == c1)
+				if(edge_points[clockwise_edges[subedge]] == c1)
 					break;
-				subedge = polyhedron->clockwise_edges[companions[polyhedron->clockwise_edges[subedge]]];
+				subedge = clockwise_edges[companions[clockwise_edges[subedge]]];
 			}
 		}
+		k3d::log() << debug << "SDS boundary visit took " << t.elapsed() << "s" << std::endl;
 	}
 	
 	void visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor)
@@ -1274,16 +1352,18 @@ private:
 		else
 		{
 			const k3d::mesh& mesh = m_intermediate_meshes[Level];
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(mesh));
-			return_if_fail(polyhedron);
+			const k3d::mesh::indices_t& loop_first_edges = *mesh.polyhedra->loop_first_edges;
+			const k3d::mesh::indices_t& face_first_loops = *mesh.polyhedra->face_first_loops;
+			const k3d::mesh::indices_t& edge_points = *mesh.polyhedra->edge_points;
+			const k3d::mesh::indices_t& clockwise_edges = *mesh.polyhedra->clockwise_edges;
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
+				const k3d::uint_t first_edge = loop_first_edges[face_first_loops[face]];
 				for(k3d::uint_t edge = first_edge; ;)
 				{
-					Visitor.on_edge(polyhedron->edge_points[edge]);
+					Visitor.on_edge(edge_points[edge]);
 					
-					edge = polyhedron->clockwise_edges[edge];
+					edge = clockwise_edges[edge];
 					if(edge == first_edge)
 						break;
 				}

@@ -61,6 +61,19 @@ public:
 	/// Visit the data representing the patch corners
 	void visit_corners(const k3d::uint_t Level, k3d::sds::ipatch_corner_visitor& Visitor);
 	
+	const k3d::uint_t point_count() const
+	{
+		return m_mesh.points->size();
+	}
+	const k3d::uint_t edge_count() const
+	{
+		return m_mesh.polyhedra->edge_points->size();
+	}
+	const k3d::uint_t face_count() const
+	{
+		return m_mesh.polyhedra->face_first_loops->size();
+	}
+	
 protected:
 	/// Scheduler implementation
 	void on_schedule(k3d::inode* Painter);
@@ -98,23 +111,42 @@ private:
 class face_visitor : public k3d::sds::ipatch_surface_visitor
 {
 public:
+	face_visitor(const k3d::uint_t PointCount, const k3d::uint_t EdgeCount, const k3d::uint_t FaceCount) :
+		points_array(PointCount),
+		normals_array(PointCount),
+		indices(EdgeCount),
+		face_starts(FaceCount),
+		m_point(0),
+		m_edge(0),
+		m_face(0)
+	{
+		k3d::log() << debug << "created SDS face visitor with " << PointCount << " points, " << EdgeCount << " edges and " << FaceCount << " faces" << std::endl; 
+	}
+	~face_visitor()
+	{
+		k3d::log() << debug << "SDS face visitor visited " << m_point << " points, " << m_edge << " edges and " << m_face << " faces" << std::endl;
+	}
 	void on_vertex(const k3d::point3& Point, const k3d::normal3& Normal)
 	{
-		points_array.push_back(Point);
-		normals_array.push_back(Normal);
+		points_array[m_point]= Point;
+		normals_array[m_point++] = Normal;
 	}
 	void on_edge(const k3d::uint_t PointIndex)
 	{
-		indices.push_back(PointIndex);
+		indices[m_edge++] = PointIndex;
 	}
 	void on_patch(k3d::uint_t Face)
 	{
-		face_starts.push_back(indices.size());
+		face_starts[m_face++] = m_edge;
 	}
 	k3d::mesh::points_t points_array;
 	k3d::mesh::normals_t normals_array;
 	std::vector<GLuint> indices;
 	k3d::mesh::indices_t face_starts;
+private:
+	k3d::uint_t m_point;
+	k3d::uint_t m_edge;
+	k3d::uint_t m_face;
 };
 
 /// Stores SDS patch border data in OpenGL-compatible arrays

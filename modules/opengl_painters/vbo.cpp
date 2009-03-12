@@ -431,7 +431,7 @@ void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_ca
 	{
 		if(Mesh.polyhedra->constant_data.lookup<tags_t>("interpolateboundary"))
 		{
-			face_visitor visitor;
+			face_visitor visitor(Cache.point_count(), Cache.edge_count(), Mesh.polyhedra->face_first_loops->size());
 			Cache.visit_surface(Level, visitor);
 			
 			m_point_vbo = new vbo();
