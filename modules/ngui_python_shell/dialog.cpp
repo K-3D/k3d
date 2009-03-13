@@ -102,17 +102,26 @@ public:
 
 			k3d::iscript_engine::context_t context;
 			engine->execute(get_factory().name(), "import code\n", context);
-			engine->execute(get_factory().name(), "console = code.InteractiveConsole()\n", context);
+			engine->execute(get_factory().name(), "__console = code.InteractiveConsole(locals())\n", context);
+
+			engine->execute(get_factory().name(), "def quit():\n  print \"Use k3d.exit() if you want to exit K-3D.\"", context);
+			engine->execute(get_factory().name(), "def exit():\n  print \"Use k3d.exit() if you want to exit K-3D.\"", context);
 		}
 
-		std::ostringstream command;
-		command << "incomplete = console.push(\"\"\"" << boost::replace_all_copy(boost::erase_last_copy(Command, "\n"), "\"", "\\\"") << "\"\"\")";
+		k3d::string_t command(Command);
+		boost::replace_all(command, "\\", "\\\\");
+		boost::replace_all(command, "\"", "\\\"");
+
+		std::ostringstream console_command;
+		console_command << "__incomplete = __console.push(\"\"\"" << command << "\"\"\")";
+
+//		k3d::log() << debug << console_command.str() << std::endl;
 
 		k3d::iscript_engine::context_t context;
-		context["incomplete"] = false;
-		engine->execute(get_factory().name(), command.str(), context, &stdout_slot, &stderr_slot);
+		context["__incomplete"] = false;
+		engine->execute(get_factory().name(), console_command.str(), context, &stdout_slot, &stderr_slot);
 
-		print_prompt(boost::any_cast<k3d::bool_t>(context["incomplete"]) ? "... " : ">>> ");
+		print_prompt(boost::any_cast<k3d::bool_t>(context["__incomplete"]) ? "... " : ">>> ");
 	}
 
 	void print_prompt(const k3d::string_t& Output)

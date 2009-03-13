@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "console.h"
@@ -27,6 +27,8 @@
 
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/textview.h>
+
+#include <boost/algorithm/string.hpp>
 
 namespace k3d
 {
@@ -85,12 +87,15 @@ public:
 		if(ignore_change)
 			return;
 
-		Glib::ustring input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end());
-		if(input.find('\n') != Glib::ustring::npos)
+		k3d::string_t input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
+		if(input.find('\n') != k3d::string_t::npos)
 		{
+			if(boost::ends_with(input, "\n"))
+				boost::erase_last(input, "\n");
+
 			buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
 			buffer->move_mark(begin_input, buffer->end());
-			command_signal.emit(input.raw());
+			command_signal.emit(input);
 		}
 	}
 
