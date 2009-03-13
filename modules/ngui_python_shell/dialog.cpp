@@ -34,6 +34,8 @@
 
 #include <gtkmm/texttag.h>
 
+#include <boost/algorithm/string/erase.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/python.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -60,14 +62,15 @@ class dialog :
 
 public:
 	dialog() :
-		stdout_slot(sigc::mem_fun(*this, &dialog::on_stdout)),
-		stderr_slot(sigc::mem_fun(*this, &dialog::on_stderr)),
+		stdout_slot(sigc::mem_fun(*this, &dialog::print_stdout)),
+		stderr_slot(sigc::mem_fun(*this, &dialog::print_stderr)),
 		console(Gtk::manage(new k3d::ngui::console::control(*this, "console")))
 	{
 		k3d::command_tree().add(*this, "python_shell_window");
 
 		prompt_tag = Gtk::TextTag::create("prompt");
 		prompt_tag->property_foreground() = "#888888";
+		prompt_tag->property_family() = "monospace";
 
 		stdout_tag = Gtk::TextTag::create("stdout");
 		stdout_tag->property_foreground() = "#0000ff";
@@ -84,16 +87,10 @@ public:
 		add(*console);
 		console->connect_command_signal(sigc::mem_fun(*this, &dialog::on_command));
 
-		on_stdout(k3d::string_cast(boost::format(_("Python %1% on %2%\n")) % Py_GetVersion() % Py_GetPlatform()));
-		show_prompt();
+		print_stdout(k3d::string_cast(boost::format(_("Python %1% on %2%\n")) % Py_GetVersion() % Py_GetPlatform()));
+		print_prompt(">>> ");
 
 		show_all();
-	}
-
-	void show_prompt()
-	{
-		console->set_current_format(prompt_tag);
-		console->prompt_string(">>> ");
 	}
 
 	void on_command(const k3d::string_t& Command)
@@ -102,22 +99,35 @@ public:
 		{
 			engine.reset(k3d::plugin::create<k3d::iscript_engine>("Python"));
 			return_if_fail(engine);
+
+			k3d::iscript_engine::context_t context;
+			engine->execute(get_factory().name(), "import code\n", context);
+			engine->execute(get_factory().name(), "console = code.InteractiveConsole()\n", context);
 		}
 
-		k3d::iscript_engine::context_t context;
-		if(!engine->execute("interactive-script", Command, context, &stdout_slot, &stderr_slot))
-			k3d::log() << error << "error executing command: " << Command << std::endl;
+		std::ostringstream command;
+		command << "incomplete = console.push(\"\"\"" << boost::replace_all_copy(boost::erase_last_copy(Command, "\n"), "\"", "\\\"") << "\"\"\")";
 
-		show_prompt();
+		k3d::iscript_engine::context_t context;
+		context["incomplete"] = false;
+		engine->execute(get_factory().name(), command.str(), context, &stdout_slot, &stderr_slot);
+
+		print_prompt(boost::any_cast<k3d::bool_t>(context["incomplete"]) ? "... " : ">>> ");
 	}
 
-	void on_stdout(const k3d::string_t& Output)
+	void print_prompt(const k3d::string_t& Output)
+	{
+		console->set_current_format(prompt_tag);
+		console->prompt_string(Output);
+	}
+
+	void print_stdout(const k3d::string_t& Output)
 	{
 		console->set_current_format(stdout_tag);
 		console->print_string(Output);
 	}
 
-	void on_stderr(const k3d::string_t& Output)
+	void print_stderr(const k3d::string_t& Output)
 	{
 		console->set_current_format(stderr_tag);
 		console->print_string(Output);
