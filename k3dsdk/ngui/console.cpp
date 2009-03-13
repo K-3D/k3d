@@ -46,8 +46,7 @@ class control::implementation
 {
 public:
 	implementation() :
-		buffer(Gtk::TextBuffer::create()),
-		ignore_change(false)
+		buffer(Gtk::TextBuffer::create())
 	{
 		read_only = Gtk::TextTag::create("read-only");
 		read_only->property_editable() = false;
@@ -56,13 +55,12 @@ public:
 
 		buffer->get_tag_table()->add(read_only);
 		buffer->add_mark(begin_input, buffer->end());
-		buffer->signal_changed().connect(sigc::mem_fun(*this, &implementation::on_changed));
+
+		view.signal_key_press_event().connect(sigc::mem_fun(*this, &implementation::on_key_press_event), false);
 	}
 
 	void print_string(const string_t& String)
 	{
-		ignore_change = true;
-
 		if(current_format)
 		{
 			if(!buffer->get_tag_table()->lookup(current_format->property_name().get_value()))
@@ -76,27 +74,68 @@ public:
 		}
 
 		buffer->apply_tag(read_only, buffer->begin(), buffer->end());
-
 		view.scroll_to(buffer->get_insert());
-
-		ignore_change = false;
 	}
 
-	void on_changed()
+	bool on_key_press_event(GdkEventKey* event)
 	{
-		if(ignore_change)
-			return;
-
-		k3d::string_t input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
-		if(input.find('\n') != k3d::string_t::npos)
+		switch(event->keyval)
 		{
-			if(boost::ends_with(input, "\n"))
-				boost::erase_last(input, "\n");
+			case GDK_Return:
+			{
+				const k3d::string_t input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
 
-			buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
-			buffer->move_mark(begin_input, buffer->end());
-			command_signal.emit(input);
+				buffer->insert(buffer->end(), "\n");
+				buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
+				buffer->move_mark(begin_input, buffer->end());
+
+				command_signal.emit(input);
+
+				return true;
+			}
+			case GDK_Left:
+			{
+				return buffer->get_iter_at_mark(buffer->get_insert()) <= buffer->get_iter_at_mark(begin_input);
+			}
+			case GDK_Up:
+			{
+//				k3d::log() << debug << "history back" << std::endl;
+				return true;
+			}
+			case GDK_Down:
+			{
+//				k3d::log() << debug << "history forward" << std::endl;
+				return true;
+			}
+			case GDK_v:
+			{
+				if(event->state & GDK_CONTROL_MASK)
+				{
+					const k3d::string_t input = Gtk::Clipboard::get()->wait_for_text();
+					
+					std::vector<k3d::string_t> lines;
+					boost::split(lines, input, boost::is_any_of("\n"));
+
+					for(k3d::uint_t i = 0; i != lines.size(); ++i)
+					{
+						buffer->insert(buffer->end(), lines[i]);
+						
+						if(i+1 < lines.size())
+						{
+							buffer->insert(buffer->end(), "\n");
+							buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
+							buffer->move_mark(begin_input, buffer->end());
+
+							command_signal.emit(lines[i]);
+						}
+					}
+
+					return true;
+				}
+			}
 		}
+
+		return false;
 	}
 
 	Glib::RefPtr<Gtk::TextBuffer> buffer;
@@ -106,7 +145,6 @@ public:
 	Gtk::TextView view;
 	Gtk::ScrolledWindow scrolled_window;
 	sigc::signal<void, const string_t&> command_signal;
-	bool_t ignore_change;
 };
 
 /////////////////////////////////////////////////////////////////////////////
