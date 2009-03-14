@@ -67,7 +67,7 @@ protected:
 private:
 	/// Called whenever our inputs have changed and it's time to write to disk.
 	/// Note that execution is unaffected by the types of hints we've received.
-	void write_file(iunknown*)
+	void write_file(ihint*)
 	{
 		const k3d::filesystem::path path = m_file.pipeline_value();
 		const k3d::mesh* const mesh = m_input_mesh.pipeline_value();
