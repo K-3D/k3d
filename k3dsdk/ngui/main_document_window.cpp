@@ -1236,10 +1236,21 @@ private:
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_play))
 			<< set_accelerator_path("<k3d-document>/actions/scripting/play_script", get_accel_group())));
 
-		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(Parent, "scripting_script_editor", _("_Editor ..."), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_script_editor))
-			<< set_accelerator_path("<k3d-document>/actions/scripting/script_editor", get_accel_group())));
+		if(k3d::plugin::factory::lookup("NGUITextEditorDialog"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "scripting_script_editor", _("_Editor ..."), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_script_editor))
+				<< set_accelerator_path("<k3d-document>/actions/scripting/script_editor", get_accel_group())));
+		}
+
+		if(k3d::plugin::factory::lookup("NGUIPythonShellDialog"))
+		{
+			menu->items().push_back(*Gtk::manage(
+				new menu_item::control(Parent, "scripting_python_shell", _("Python _Shell ..."), true)
+				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_python_shell))
+				<< set_accelerator_path("<k3d-document>/actions/scripting/python_shell", get_accel_group())));
+		}
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
@@ -2457,6 +2468,12 @@ private:
 
 			window->set_transient_for(*this);
 		}
+	}
+
+	void on_scripting_python_shell()
+	{
+		if(Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUIPythonShellDialog"))
+			window->set_transient_for(*this);
 	}
 
 	void on_scripting_tutorial_recorder()
