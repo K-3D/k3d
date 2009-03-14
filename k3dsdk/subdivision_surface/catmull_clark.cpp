@@ -30,7 +30,6 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/ipipeline_profiler.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility.h>

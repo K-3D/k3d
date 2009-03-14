@@ -18,9 +18,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Carsten Haubold (CarstenHaubold@web.de)
+	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
+#include "nurbs_curve_modifier.h"
+
+#include <k3dsdk/axis.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
@@ -28,8 +31,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/data.h>
@@ -37,10 +39,10 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include <iostream>
 #include <vector>
-
-#include "nurbs_patch_modifier.h"
 
 namespace module
 {
@@ -48,17 +50,17 @@ namespace module
 namespace nurbs
 {
 class revolve_curve :
-			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 public:
 	revolve_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document),
-			m_angle(init_owner(*this) + init_name("angle") + init_label(_("angle")) + init_description(_("The curve will be rotated to this angle, specify 360 for a closed shape")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
-			m_segments(init_owner(*this) + init_name("segments") + init_label(_("segments")) + init_description(_("Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-			m_around(init_owner(*this) + init_name("around") + init_label(_("Around")) + init_description(_("Axis to revolve around")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
-			m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the original curve")) + init_value(true)),
-			m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false))
+		base(Factory, Document),
+		m_angle(init_owner(*this) + init_name("angle") + init_label(_("angle")) + init_description(_("The curve will be rotated to this angle, specify 360 for a closed shape")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
+		m_segments(init_owner(*this) + init_name("segments") + init_label(_("segments")) + init_description(_("Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_around(init_owner(*this) + init_name("around") + init_label(_("Around")) + init_description(_("Axis to revolve around")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
+		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the original curve")) + init_value(true)),
+		m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_angle.changed_signal().connect(make_update_mesh_slot());
@@ -77,7 +79,8 @@ public:
 	{
 		Output = Input;
 
-		if (!k3d::validate_nurbs_curve_groups(Output))
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
+		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
@@ -97,9 +100,6 @@ public:
 		{
 			mod.delete_curve(my_curve);
 		}
-
-		assert_warning(k3d::validate_nurbs_curve_groups(Output));
-		assert_warning(k3d::validate_nurbs_patches(Output));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -128,5 +128,7 @@ k3d::iplugin_factory& revolve_curve_factory()
 	return revolve_curve::get_factory();
 }
 
-}//namespace nurbs
-} //namespace module
+} // namespace nurbs
+
+} // namespace module
+

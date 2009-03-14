@@ -23,7 +23,6 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/itransform_source.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>

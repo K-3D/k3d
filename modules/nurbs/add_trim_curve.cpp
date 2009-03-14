@@ -18,29 +18,31 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Carsten Haubold (CarstenHaubold@web.de)
+	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
+#include "nurbs_patch_modifier.h"
+
+#include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/module.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/nurbs.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/selection.h>
-#include <k3dsdk/data.h>
-#include <k3dsdk/point3.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_patch.h>
+#include <k3dsdk/point3.h>
+#include <k3dsdk/selection.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <iostream>
 #include <vector>
-
-#include "nurbs_patch_modifier.h"
 
 namespace module
 {
@@ -53,14 +55,14 @@ class add_trim_curve :
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 public:
 	add_trim_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document),
-			m_flip(init_owner(*this) + init_name(_("flip")) + init_label(_("FlipTrimmingCurve")) + init_description(_("A trimming curve erases everything that lies left of it when traversing from start to end, if you want it to cut the other side then enable this")) + init_value(false)),
-			m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the curve which was used to create the trimming curve")) + init_value(false)),
-			m_patch(init_owner(*this) + init_name("patch") + init_label(_("Patch Number")) + init_description(_("The patch which will be trimmed")) + init_value(0) + init_constraint(constraint::minimum(0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-			m_curve(init_owner(*this) + init_name("curve") + init_label(_("Curve Number")) + init_description(_("The trimming curve")) + init_value(0) + init_constraint(constraint::minimum(0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-			m_scale(init_owner(*this) + init_name(_("scale")) + init_label(_("Scale the TrimCurve")) + init_description(_("The coordinates of the trim curve need to be in the interval [0,1]. When being created these are scaled to fit in, but you can adjust the scaling here")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0)) + init_value(1.0)),
-			m_offset_u(init_owner(*this) + init_name(_("offset_u")) + init_label(_("TrimCurve offset in u direction")) + init_description(_("If you scaled down your trim curve you might need to position it on the surface")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(-1.0 , constraint::maximum(1.0))) + init_value(0.0)),
-			m_offset_v(init_owner(*this) + init_name(_("offset_v")) + init_label(_("TrimCurve offset in v direction")) + init_description(_("If you scaled down your trim curve you might need to position it on the surface")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(-1.0 , constraint::maximum(1.0))) + init_value(0.0))
+		base(Factory, Document),
+		m_flip(init_owner(*this) + init_name(_("flip")) + init_label(_("FlipTrimmingCurve")) + init_description(_("A trimming curve erases everything that lies left of it when traversing from start to end, if you want it to cut the other side then enable this")) + init_value(false)),
+		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the curve which was used to create the trimming curve")) + init_value(false)),
+		m_patch(init_owner(*this) + init_name("patch") + init_label(_("Patch Number")) + init_description(_("The patch which will be trimmed")) + init_value(0) + init_constraint(constraint::minimum(0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_curve(init_owner(*this) + init_name("curve") + init_label(_("Curve Number")) + init_description(_("The trimming curve")) + init_value(0) + init_constraint(constraint::minimum(0)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_scale(init_owner(*this) + init_name(_("scale")) + init_label(_("Scale the TrimCurve")) + init_description(_("The coordinates of the trim curve need to be in the interval [0,1]. When being created these are scaled to fit in, but you can adjust the scaling here")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0)) + init_value(1.0)),
+		m_offset_u(init_owner(*this) + init_name(_("offset_u")) + init_label(_("TrimCurve offset in u direction")) + init_description(_("If you scaled down your trim curve you might need to position it on the surface")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(-1.0 , constraint::maximum(1.0))) + init_value(0.0)),
+		m_offset_v(init_owner(*this) + init_name(_("offset_v")) + init_label(_("TrimCurve offset in v direction")) + init_description(_("If you scaled down your trim curve you might need to position it on the surface")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(-1.0 , constraint::maximum(1.0))) + init_value(0.0))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_flip.changed_signal().connect(make_update_mesh_slot());
@@ -81,7 +83,8 @@ public:
 	{
 		Output = Input;
 
-		if (!k3d::validate_nurbs_patches(Output))
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(k3d::nurbs_patch::validate(Output));
+		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
@@ -117,9 +120,6 @@ public:
 		{
 			mod2.delete_curve(my_curve);
 		}
-
-		assert_warning(k3d::validate_nurbs_curve_groups(Output));
-		assert_warning(k3d::validate_nurbs_patches(Output));
 	}
 
 	static k3d::iplugin_factory& get_factory()

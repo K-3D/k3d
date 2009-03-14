@@ -22,7 +22,6 @@
 */
 
 #include "mesh_deformation_modifier.h"
-#include "mesh_operations.h"
 
 namespace k3d
 {

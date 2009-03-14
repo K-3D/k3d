@@ -28,7 +28,6 @@
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/pointer_demand_storage.h>

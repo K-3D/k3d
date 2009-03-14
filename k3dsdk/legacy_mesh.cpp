@@ -20,7 +20,8 @@
 #include "gl.h"
 #include "legacy_mesh.h"
 #include "mesh.h"
-#include "mesh_operations.h"
+#include "nurbs_curve.h"
+#include "nurbs_patch.h"
 #include "polyhedron.h"
 #include "result.h"
 #include "utility.h"
@@ -589,92 +590,68 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		}
 	}
 
-	if(validate_nurbs_curve_groups(Mesh))
+	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(Mesh));
+	if(nurbs_curve)
 	{
-		const k3d::mesh::indices_t& first_curves = *Mesh.nurbs_curve_groups->first_curves;
-		const k3d::mesh::counts_t& curve_counts = *Mesh.nurbs_curve_groups->curve_counts;
-		const k3d::mesh::materials_t& materials = *Mesh.nurbs_curve_groups->materials;
-		const k3d::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
-		const k3d::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
-		const k3d::mesh::orders_t& curve_orders = *Mesh.nurbs_curve_groups->curve_orders;
-		const k3d::mesh::indices_t& curve_first_knots = *Mesh.nurbs_curve_groups->curve_first_knots;
-		const k3d::mesh::selection_t& curve_selection = *Mesh.nurbs_curve_groups->curve_selection;
-		const k3d::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
-		const k3d::mesh::weights_t& curve_point_weights = *Mesh.nurbs_curve_groups->curve_point_weights;
-		const k3d::mesh::knots_t& curve_knots = *Mesh.nurbs_curve_groups->curve_knots;
-
 		const uint_t group_begin = 0;
-		const uint_t group_end = group_begin + first_curves.size();
+		const uint_t group_end = group_begin + nurbs_curve->first_curves.size();
 		for(uint_t group = group_begin; group != group_end; ++group)
 		{
 			legacy::nucurve_group* const legacy_group = new legacy::nucurve_group();
 			nucurve_groups.push_back(legacy_group);
 
-			legacy_group->material = materials[group];
+			legacy_group->material = nurbs_curve->materials[group];
 
-			const uint_t curve_begin = first_curves[group];
-			const uint_t curve_end = curve_begin + curve_counts[group];
+			const uint_t curve_begin = nurbs_curve->first_curves[group];
+			const uint_t curve_end = curve_begin + nurbs_curve->curve_counts[group];
 			for(uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
 				legacy::nucurve* const legacy_curve = new legacy::nucurve();
 				legacy_group->curves.push_back(legacy_curve);
 
-				legacy_curve->order = curve_orders[curve];
+				legacy_curve->order = nurbs_curve->curve_orders[curve];
 				legacy_curve->knots.assign(
-					curve_knots.begin() + curve_first_knots[curve],
-					curve_knots.begin() + curve_first_knots[curve] + curve_orders[curve] + curve_point_counts[curve]);
+					nurbs_curve->curve_knots.begin() + nurbs_curve->curve_first_knots[curve],
+					nurbs_curve->curve_knots.begin() + nurbs_curve->curve_first_knots[curve] + nurbs_curve->curve_orders[curve] + nurbs_curve->curve_point_counts[curve]);
 					
-				legacy_curve->selection_weight = curve_selection[curve];
+				legacy_curve->selection_weight = nurbs_curve->curve_selections[curve];
 
-				const uint_t point_begin = curve_first_points[curve];
-				const uint_t point_end = point_begin + curve_point_counts[curve];
+				const uint_t point_begin = nurbs_curve->curve_first_points[curve];
+				const uint_t point_end = point_begin + nurbs_curve->curve_point_counts[curve];
 				for(uint_t point = point_begin; point != point_end; ++point)
-					legacy_curve->control_points.push_back(legacy::nucurve::control_point(points[curve_points[point]], curve_point_weights[point]));
+					legacy_curve->control_points.push_back(legacy::nucurve::control_point(points[nurbs_curve->curve_points[point]], nurbs_curve->curve_point_weights[point]));
 			}
 		}
 	}
 
-	if(validate_nurbs_patches(Mesh))
+	boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs_patch(k3d::nurbs_patch::validate(Mesh));
+	if(nurbs_patch)
 	{
-		const k3d::mesh::indices_t& patch_first_points = *Mesh.nurbs_patches->patch_first_points;
-		const k3d::mesh::counts_t& patch_u_point_counts = *Mesh.nurbs_patches->patch_u_point_counts;
-		const k3d::mesh::counts_t& patch_v_point_counts = *Mesh.nurbs_patches->patch_v_point_counts;
-		const k3d::mesh::orders_t& patch_u_orders = *Mesh.nurbs_patches->patch_u_orders;
-		const k3d::mesh::orders_t& patch_v_orders = *Mesh.nurbs_patches->patch_v_orders;
-		const k3d::mesh::indices_t& patch_u_first_knots = *Mesh.nurbs_patches->patch_u_first_knots;
-		const k3d::mesh::indices_t& patch_v_first_knots = *Mesh.nurbs_patches->patch_v_first_knots;
-		const k3d::mesh::selection_t& patch_selection = *Mesh.nurbs_patches->patch_selection;
-		const k3d::mesh::materials_t& patch_materials = *Mesh.nurbs_patches->patch_materials;
-		const k3d::mesh::indices_t& patch_points = *Mesh.nurbs_patches->patch_points;
-		const k3d::mesh::weights_t& patch_point_weights = *Mesh.nurbs_patches->patch_point_weights;
-		const k3d::mesh::knots_t& patch_u_knots = *Mesh.nurbs_patches->patch_u_knots;
-		const k3d::mesh::knots_t& patch_v_knots = *Mesh.nurbs_patches->patch_v_knots;
-
 		const uint_t patch_begin = 0;
-		const uint_t patch_end = patch_begin + patch_first_points.size();
+		const uint_t patch_end = patch_begin + nurbs_patch->patch_first_points.size();
 		for(uint_t patch = patch_begin; patch != patch_end; ++patch)
 		{
 			legacy::nupatch* const legacy_patch = new legacy::nupatch();
 			nupatches.push_back(legacy_patch);
 
-			legacy_patch->u_order = patch_u_orders[patch];
-			legacy_patch->v_order = patch_v_orders[patch];
+			legacy_patch->u_order = nurbs_patch->patch_u_orders[patch];
+			legacy_patch->v_order = nurbs_patch->patch_v_orders[patch];
 			legacy_patch->u_knots.assign(
-				patch_u_knots.begin() + patch_u_first_knots[patch],
-				patch_u_knots.begin() + patch_u_first_knots[patch] + patch_u_point_counts[patch] + patch_u_orders[patch]); 
+				nurbs_patch->patch_u_knots.begin() + nurbs_patch->patch_u_first_knots[patch],
+				nurbs_patch->patch_u_knots.begin() + nurbs_patch->patch_u_first_knots[patch] + nurbs_patch->patch_u_point_counts[patch] + nurbs_patch->patch_u_orders[patch]); 
 			legacy_patch->v_knots.assign(
-				patch_v_knots.begin() + patch_v_first_knots[patch],
-				patch_v_knots.begin() + patch_v_first_knots[patch] + patch_v_point_counts[patch] + patch_v_orders[patch]); 
-			legacy_patch->selection_weight = patch_selection[patch];
-			legacy_patch->material = patch_materials[patch];
+				nurbs_patch->patch_v_knots.begin() + nurbs_patch->patch_v_first_knots[patch],
+				nurbs_patch->patch_v_knots.begin() + nurbs_patch->patch_v_first_knots[patch] + nurbs_patch->patch_v_point_counts[patch] + nurbs_patch->patch_v_orders[patch]); 
+			legacy_patch->selection_weight = nurbs_patch->patch_selections[patch];
+			legacy_patch->material = nurbs_patch->patch_materials[patch];
 
-			const uint_t point_begin = patch_first_points[patch];
-			const uint_t point_end = point_begin + (patch_u_point_counts[patch] * patch_v_point_counts[patch]);
+			const uint_t point_begin = nurbs_patch->patch_first_points[patch];
+			const uint_t point_end = point_begin + (nurbs_patch->patch_u_point_counts[patch] * nurbs_patch->patch_v_point_counts[patch]);
 			for(uint_t point = point_begin; point != point_end; ++point)
 			{
 				legacy::nupatch::control_point const legacy_point(
-					points[patch_points[point]],
-					patch_point_weights[point]);
+					points[nurbs_patch->patch_points[point]],
+					nurbs_patch->patch_point_weights[point]);
 				legacy_patch->control_points.push_back(legacy_point);
 			}
 		}

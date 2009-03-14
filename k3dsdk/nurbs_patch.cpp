@@ -17,7 +17,6 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh_operations.h"
 #include "metadata.h"
 #include "nurbs_patch.h"
 #include "primitive_detail.h"
@@ -214,9 +213,50 @@ primitive* create(mesh& Mesh)
 	return result;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// validate
+
+const bool_t legacy_validate_nurbs_patches(const mesh& Mesh)
+{
+	if(!Mesh.nurbs_patches)
+		return false;
+
+	return_val_if_fail(Mesh.nurbs_patches->patch_first_points, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_u_point_counts, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_v_point_counts, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_u_orders, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_v_orders, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_u_first_knots, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_v_first_knots, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_selection, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_materials, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_points, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_point_weights, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_u_knots, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_v_knots, false);
+
+	return_val_if_fail(Mesh.nurbs_patches->patch_trim_curve_loop_counts, false);
+	return_val_if_fail(Mesh.nurbs_patches->patch_first_trim_curve_loops, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_points, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_point_selection, false);
+	return_val_if_fail(Mesh.nurbs_patches->first_trim_curves, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_curve_counts, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_curve_loop_selection, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_curve_first_points, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_curve_point_counts, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_curve_orders, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_curve_first_knots, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_curve_selection, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_curve_points, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_curve_point_weights, false);
+	return_val_if_fail(Mesh.nurbs_patches->trim_curve_knots, false);
+
+	return true;
+}
+
 const_primitive* validate(const mesh& Mesh)
 {
-	if(!validate_nurbs_patches(Mesh))
+	if(!legacy_validate_nurbs_patches(Mesh))
 		return 0;
 
 	return new const_primitive(
@@ -255,7 +295,7 @@ const_primitive* validate(const mesh& Mesh)
 
 primitive* validate(mesh& Mesh)
 {
-	if(!validate_nurbs_patches(Mesh))
+	if(!legacy_validate_nurbs_patches(Mesh))
 		return 0;
 
 	mesh::nurbs_patches_t& nurbs = Mesh.nurbs_patches.writable();

@@ -26,7 +26,6 @@
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_modifier.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>

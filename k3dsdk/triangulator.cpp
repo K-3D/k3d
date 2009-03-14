@@ -18,7 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "gl.h"
-#include "mesh_operations.h"
 #include "polyhedron.h"
 #include "sgi_tesselator.h"
 #include "triangulator.h"

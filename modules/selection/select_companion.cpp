@@ -28,7 +28,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_modifier.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/utility.h>

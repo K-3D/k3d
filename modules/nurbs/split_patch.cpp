@@ -18,8 +18,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Carsten Haubold (CarstenHaubold@web.de)
+	\author Carsten Haubold (CarstenHaubold@web.de)
 */
+
+#include "nurbs_patch_modifier.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -28,34 +30,34 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_modifier.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/point3.h>
 #include <k3dsdk/selection.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include <iostream>
 #include <vector>
-
-#include "nurbs_patch_modifier.h"
 
 namespace module
 {
 
 namespace nurbs
 {
+
 class split_patch :
-			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 public:
 	split_patch(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document),
-			m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("u/v value of new knot")) + init_description(_("Insert knot at [0,1]")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5)),
-			m_insert_to_v(init_owner(*this) + init_name(_("insert_to_v")) + init_label(_("Insert knot in v? Otherwise u")) + init_description(_("By default the knot gets inserted into the patch in u direction, by checking this box you choose to insert it to v")) + init_value(false))
+		base(Factory, Document),
+		m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("u/v value of new knot")) + init_description(_("Insert knot at [0,1]")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5)),
+		m_insert_to_v(init_owner(*this) + init_name(_("insert_to_v")) + init_label(_("Insert knot in v? Otherwise u")) + init_description(_("By default the knot gets inserted into the patch in u direction, by checking this box you choose to insert it to v")) + init_value(false))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_u_value.changed_signal().connect(make_update_mesh_slot());
@@ -71,7 +73,8 @@ public:
 	{
 		Output = Input;
 
-		if (!k3d::validate_nurbs_patches(Output))
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(k3d::nurbs_patch::validate(Output));
+		if(!nurbs)
 			return;
 
  		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
@@ -94,8 +97,6 @@ public:
 			mod.split_patch_v(my_patch, u);
 
 		k3d::mesh::delete_unused_points(Output);
-
-		assert_warning(k3d::validate_nurbs_patches(Output));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -114,12 +115,12 @@ private:
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_insert_to_v;
 };
 
-//Create connect_curve factory
 k3d::iplugin_factory& split_patch_factory()
 {
 	return split_patch::get_factory();
 }
 
-}//namespace nurbs
-}//namespace module
+} //namespace nurbs
+
+} //namespace module
 

@@ -18,8 +18,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Carsten Haubold (CarstenHaubold@web.de)
+	\author Carsten Haubold (CarstenHaubold@web.de)
 */
+
+#include "nurbs_curve_modifier.h"
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
@@ -28,8 +30,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/data.h>
@@ -37,10 +38,10 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include <iostream>
 #include <vector>
-
-#include "nurbs_curve_modifier.h"
 
 namespace module
 {
@@ -48,13 +49,14 @@ namespace module
 namespace nurbs
 {
 void connect_at_points(k3d::mesh& Mesh, k3d::uint_t curve1, k3d::uint_t curve2, k3d::uint_t point1, k3d::uint_t point2);
+
 class connect_curves :
-			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 public:
 	connect_curves(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document)
+		base(Factory, Document)
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 	}
@@ -68,7 +70,8 @@ public:
 	{
 		Output = Input;
 
-		if (!k3d::validate_nurbs_curve_groups(Output))
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
+		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
@@ -111,8 +114,6 @@ public:
 			nurbs_curve_modifier mod(Output);
 			mod.join_curves(points[0], curves[0], points[1], curves[1]);
 		}
-
-		assert_warning(k3d::validate_nurbs_curve_groups(Output));
 	}
 
 	static k3d::iplugin_factory& get_factory()

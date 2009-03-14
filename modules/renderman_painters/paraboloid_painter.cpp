@@ -27,7 +27,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_painter_ri.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>

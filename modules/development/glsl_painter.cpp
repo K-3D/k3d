@@ -25,7 +25,6 @@
 #include <k3dsdk/gl.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/imesh_painter_gl.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/properties.h>
 

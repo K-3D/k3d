@@ -18,8 +18,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Carsten Haubold (CarstenHaubold@web.de)
+	\author Carsten Haubold (CarstenHaubold@web.de)
 */
+
+#include "nurbs_curve_modifier.h"
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/ireset_properties.h>
@@ -29,9 +31,8 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/metadata_keys.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/data.h>
@@ -39,21 +40,23 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include <iostream>
 #include <vector>
 #include <sstream>
 
-#include "nurbs_curve_modifier.h"
-
 namespace k3d
 {
+
 namespace data
 {
+
 /// Serialization policy for data containers that can be serialized as XML
 template<typename value_t, class property_policy_t>
 class array_serialization :
-			public property_policy_t,
-			public ipersistent
+	public property_policy_t,
+	public ipersistent
 {
 	// This policy only works for arrays
 	BOOST_STATIC_ASSERT((boost::is_base_and_derived<array, typename boost::remove_pointer<value_t>::type>::value));
@@ -113,14 +116,14 @@ namespace nurbs
 {
 
 class edit_knot_vector :
-			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >,
-			public k3d::ireset_properties
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >,
+	public k3d::ireset_properties
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 public:
 	edit_knot_vector(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document),
-			m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("Knot Vector")) + init_description(_("Enter a new knot vector containing knot values separated with spaces.")) + init_value(k3d::mesh::knots_t()))
+		base(Factory, Document),
+		m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("Knot Vector")) + init_description(_("Enter a new knot vector containing knot values separated with spaces.")) + init_value(k3d::mesh::knots_t()))
 	{
 		m_knot_vector.set_metadata_value(k3d::metadata::key::domain(), k3d::metadata::value::nurbs_knot_vector_domain());
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
@@ -138,7 +141,8 @@ public:
 		MY_DEBUG << "Create Called" << std::endl;
 		Output = Input;
 
-		if (!k3d::validate_nurbs_curve_groups(Output))
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
+		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
@@ -167,7 +171,8 @@ public:
 		MY_DEBUG << "Update Called" << std::endl;
 		Output = Input;
 
-		if (!k3d::validate_nurbs_curve_groups(Output))
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
+		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
@@ -235,8 +240,6 @@ private:
 
 		return true;
 	}
-
-
 };
 
 k3d::iplugin_factory& edit_knot_vector_factory()
@@ -247,3 +250,4 @@ k3d::iplugin_factory& edit_knot_vector_factory()
 } //namespace nurbs
 
 } //namespace module
+

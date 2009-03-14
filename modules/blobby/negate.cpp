@@ -31,7 +31,6 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/properties.h>

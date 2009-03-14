@@ -18,30 +18,31 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Carsten Haubold (CarstenHaubold@web.de)
+	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
+#include "nurbs_curve_modifier.h"
+
+#include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/module.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/nurbs.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/selection.h>
-#include <k3dsdk/data.h>
-#include <k3dsdk/point3.h>
-#include <k3dsdk/point4.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/nurbs_curve.h>
+#include <k3dsdk/point3.h>
+#include <k3dsdk/point4.h>
+#include <k3dsdk/selection.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <iostream>
 #include <vector>
-
-#include "nurbs_curve_modifier.h"
 
 namespace module
 {
@@ -49,14 +50,14 @@ namespace module
 namespace nurbs
 {
 class split_curve :
-			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 public:
 	split_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document),
-			m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("U value (in [0,1])")) + init_description(_("Split Curve at u in ]0,1[")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5)),
-			m_normalize_all(init_owner(*this) + init_name(_("normalize_all")) + init_label(_("Share Degree and KnotVector?")) + init_description(_("Make all selected curves have same Degree and KnotVector?")) + init_value(false))
+		base(Factory, Document),
+		m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("U value (in [0,1])")) + init_description(_("Split Curve at u in ]0,1[")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5)),
+		m_normalize_all(init_owner(*this) + init_name(_("normalize_all")) + init_label(_("Share Degree and KnotVector?")) + init_description(_("Make all selected curves have same Degree and KnotVector?")) + init_value(false))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_u_value.changed_signal().connect(make_update_mesh_slot());
@@ -72,7 +73,8 @@ public:
 	{
 		Output = Input;
 
-		if (!k3d::validate_nurbs_curve_groups(Output))
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
+		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
@@ -114,8 +116,6 @@ public:
 				mod.split_curve_at(my_curves.at(i) + i, u, mod.is_closed(my_curves.at(i) + i));
 			}
 		}
-
-		assert_warning(k3d::validate_nurbs_curve_groups(Output));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -135,11 +135,12 @@ private:
 
 };
 
-//Create connect_curve factory
 k3d::iplugin_factory& split_curve_factory()
 {
 	return split_curve::get_factory();
 }
 
-}//namespace nurbs
-} //namespace module
+} // namespace nurbs
+
+} // namespace module
+

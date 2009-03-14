@@ -24,7 +24,6 @@
 
 #include "helpers.h"
 
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/triangulator.h>
 

@@ -45,7 +45,6 @@
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/transformable.h>
 
 #include <string>

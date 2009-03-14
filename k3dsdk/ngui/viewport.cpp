@@ -45,7 +45,7 @@
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_operations.h>
+#include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/selection_state_gl.h>
@@ -55,6 +55,8 @@
 
 #include <gtk/gtkgl.h>
 #include <gtk/gtkmain.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <cassert>
 #include <iomanip>
@@ -1062,16 +1064,17 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 */
 	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_PATCH))
 	{
-		if(k3d::validate_nurbs_patches(*mesh))
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs_patch(k3d::nurbs_patch::validate(*mesh));
+		if(nurbs_patch)
 		{
 			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_NURBS_PATCH];
-			k3d::uint_t patch_begin = mesh->nurbs_patches->patch_first_points->at(patch);
-			k3d::uint_t patch_end = patch_begin + (mesh->nurbs_patches->patch_u_point_counts->at(patch) * mesh->nurbs_patches->patch_v_point_counts->at(patch));
+			k3d::uint_t patch_begin = nurbs_patch->patch_first_points.at(patch);
+			k3d::uint_t patch_end = patch_begin + (nurbs_patch->patch_u_point_counts.at(patch) * nurbs_patch->patch_v_point_counts.at(patch));
 			for(k3d::uint_t patch_point = patch_begin; patch_point != patch_end; ++patch_point)
 			{
 				detail::select_nearest_point(
 					*mesh->points,
-					(*mesh->nurbs_patches->patch_points)[patch_point],
+					nurbs_patch->patch_points[patch_point],
 					Coordinates,
 					get_height(),
 					model_view_matrix,

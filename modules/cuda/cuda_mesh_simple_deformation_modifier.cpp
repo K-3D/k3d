@@ -22,7 +22,6 @@
 	\author Evan Lezar (evanlezar@gmail.com)
  */
 
-#include <k3dsdk/mesh_operations.h>
 
 #include "cuda_mesh_simple_deformation_modifier.h"
 

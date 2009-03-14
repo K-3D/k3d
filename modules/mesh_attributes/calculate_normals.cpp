@@ -27,7 +27,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>

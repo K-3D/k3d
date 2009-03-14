@@ -18,23 +18,25 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Carsten Haubold (CarstenHaubold@web.de)
+	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
 #include <k3dsdk/basic_math.h>
+#include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/module.h>
-#include <k3dsdk/node.h>
+#include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_modifier.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/nurbs.h>
-#include <k3dsdk/measurement.h>
-#include <k3dsdk/selection.h>
-#include <k3dsdk/data.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/nurbs_curve.h>
+#include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/point3.h>
+#include <k3dsdk/selection.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <iostream>
 
@@ -45,13 +47,13 @@ namespace nurbs
 {
 
 class set_weight :
-			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 public:
 	set_weight(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document),
-			m_weight(init_owner(*this) + init_name("weight") + init_label(_("Weight")) + init_description(_("The new weight for the selected points")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar)))
+		base(Factory, Document),
+		m_weight(init_owner(*this) + init_name("weight") + init_label(_("Weight")) + init_description(_("The new weight for the selected points")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_weight.changed_signal().connect(make_update_mesh_slot());
@@ -70,7 +72,8 @@ public:
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		// There's no guarantee that the mesh contains NURBS!
-		if (k3d::validate_nurbs_curve_groups(Output))
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs_curve(k3d::nurbs_curve::validate(Output));
+		if(nurbs_curve)
 		{
 			// We need a mutable NURBS curve groups object since we're going to modify one of its arrays ...
 			k3d::mesh::nurbs_curve_groups_t& groups = Output.nurbs_curve_groups.writable();
@@ -95,10 +98,10 @@ public:
 						output_weights[curve_point] = k3d::mix(input_weights[curve_point], weight, (*Output.point_selection)[(*groups.curve_points)[curve_point]]);
 				}
 			}
-
-			assert_warning(k3d::validate_nurbs_curve_groups(Output));
 		}
-		if (k3d::validate_nurbs_patches(Output))
+
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs_patch(k3d::nurbs_patch::validate(Output));
+		if(nurbs_patch)
 		{
 			k3d::mesh::nurbs_patches_t& nurbs_patches = Output.nurbs_patches.writable();
 			k3d::mesh::weights_t& patch_point_weights = nurbs_patches.patch_point_weights.writable();
@@ -107,8 +110,6 @@ public:
 			{
 				patch_point_weights[i] = k3d::mix(patch_point_weights[i], weight, (*Output.point_selection)[(*nurbs_patches.patch_points)[i]]);
 			}
-
-			assert_warning(k3d::validate_nurbs_patches(Output));
 		}
 	}
 
@@ -128,7 +129,6 @@ private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, no_serialization) m_weight;
 };
 
-//Create connect_curve factory
 k3d::iplugin_factory& set_weight_factory()
 {
 	return set_weight::get_factory();
@@ -137,3 +137,4 @@ k3d::iplugin_factory& set_weight_factory()
 } //namespace nurbs
 
 } //namespace module
+

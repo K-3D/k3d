@@ -31,7 +31,6 @@
 
 #include <k3dsdk/color.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/type_registry.h>
 
 #include <boost/python.hpp>

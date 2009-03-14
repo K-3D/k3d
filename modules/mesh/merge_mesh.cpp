@@ -30,10 +30,11 @@
 #include <k3dsdk/imulti_mesh_sink.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/nurbs_curve.h>
+#include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/parallel/blocked_range.h>
 #include <k3dsdk/parallel/parallel_for.h>
 #include <k3dsdk/parallel/threads.h>
@@ -176,7 +177,8 @@ void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyh
 
 void merge_nurbs_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 {
-	if(!k3d::validate_nurbs_curve_groups(Input))
+	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(Input));
+	if(!nurbs_curve)
 		return;
 	
 	k3d::mesh::nurbs_curve_groups_t& output_nurbs_curve_groups = create_if_not_exists(Output.nurbs_curve_groups);
@@ -238,7 +240,8 @@ void merge_nurbs_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
 
 void merge_nurbs_patches(k3d::mesh& Output, const k3d::mesh& Input)
 {
-	if (!k3d::validate_nurbs_patches(Input))
+	boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs_patch(k3d::nurbs_patch::validate(Input));
+	if(!nurbs_patch)
 		return;
 	
 	k3d::mesh::nurbs_patches_t& output_nurbs_patches = create_if_not_exists(Output.nurbs_patches);

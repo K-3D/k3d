@@ -28,7 +28,6 @@
 #include <k3dsdk/axis.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
 
 namespace module

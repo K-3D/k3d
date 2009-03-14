@@ -21,7 +21,6 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "mesh_operations.h"
 #include "parallel/blocked_range.h"
 #include "parallel/parallel_for.h"
 #include "parallel/threads.h"
@@ -30,6 +29,8 @@
 #include <functional>
 #include <iterator>
 #include <numeric>
+#include <sstream>
+#include <stdexcept>
 
 namespace k3d
 {

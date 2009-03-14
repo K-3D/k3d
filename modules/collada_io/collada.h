@@ -27,7 +27,6 @@
 // Main integration file
 
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/imesh_source.h>

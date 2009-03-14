@@ -26,7 +26,6 @@
 #include <k3d-version-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_writer.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>

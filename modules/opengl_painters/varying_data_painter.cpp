@@ -27,7 +27,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/named_arrays.h>
 #include <k3dsdk/options.h>

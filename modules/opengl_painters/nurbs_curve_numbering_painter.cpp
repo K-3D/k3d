@@ -26,8 +26,8 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_painter_gl.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/selection.h>
@@ -93,8 +93,11 @@ public:
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		if(!k3d::validate_nurbs_curve_groups(Mesh))
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs(k3d::nurbs_curve::validate(Mesh));
+		if(!nurbs)
 			return;
+
+		const k3d::mesh::points_t& points = *Mesh.points;
 
 		if(!m_font)
 		{
@@ -116,51 +119,37 @@ public:
 		const k3d::double_t y_offset = m_y_offset.pipeline_value();
 		const k3d::double_t z_offset = m_z_offset.pipeline_value();
 
-		const k3d::mesh::indices_t& first_curves = *Mesh.nurbs_curve_groups->first_curves;
-		const k3d::mesh::counts_t& curve_counts = *Mesh.nurbs_curve_groups->curve_counts;
-		const k3d::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
-		const k3d::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
-		const k3d::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
-		const k3d::mesh::selection_t& curve_selection = *Mesh.nurbs_curve_groups->curve_selection;
-		const k3d::mesh::points_t& points = *Mesh.points;
+		const k3d::color selected_color = m_selected_color.pipeline_value();
+		const k3d::color unselected_color = m_unselected_color.pipeline_value();
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
-		const size_t group_begin = 0;
-		const size_t group_end = group_begin + first_curves.size();
+		const k3d::uint_t group_begin = 0;
+		const k3d::uint_t group_end = group_begin + nurbs->first_curves.size();
 
-		for (size_t group = group_begin; group < group_end; ++group)
+		for(k3d::uint_t group = group_begin; group < group_end; ++group)
 		{
-		    const size_t curves_begin = first_curves[group];
-		    const size_t curves_end = curves_begin + curve_counts[group];
-			for(size_t curve = curves_begin; curve < curves_end; curve++)
+			const k3d::uint_t curves_begin = nurbs->first_curves[group];
+			const k3d::uint_t curves_end = curves_begin + nurbs->curve_counts[group];
+			for(k3d::uint_t curve = curves_begin; curve < curves_end; curve++)
 			{
-			    if(curve_selection[curve] > 0)
-			    {
-                    k3d::gl::color3d(m_selected_color.pipeline_value());
-			    }
-			    else
-			    {
-			        k3d::gl::color3d(m_unselected_color.pipeline_value());
-			    }
+				k3d::gl::color3d(nurbs->curve_selections[curve] ? selected_color : unselected_color);
 
-			    //calculate center
-			    k3d::point3 center;
-			    const size_t points_begin = curve_first_points[curve];
-			    const size_t points_end = points_begin + curve_point_counts[curve];
+				//calculate center
+				k3d::point3 center;
+				const k3d::uint_t points_begin = nurbs->curve_first_points[curve];
+				const k3d::uint_t points_end = points_begin + nurbs->curve_point_counts[curve];
 
-			    for(size_t point = points_begin; point < points_end; point++)
-			    {
-			        center = center + points[curve_points[point]];
-			    }
+				for(k3d::uint_t point = points_begin; point < points_end; point++)
+					center = center + points[nurbs->curve_points[point]];
 
-			    center = center / curve_point_counts[curve];
+				center = center / nurbs->curve_point_counts[curve];
 
-                //draw the number
-			    const k3d::point3 position = center + k3d::point3(x_offset,y_offset,z_offset);
+				//draw the number
+				const k3d::point3 position = center + k3d::point3(x_offset, y_offset, z_offset);
 
-                glRasterPos3d(position[0], position[1], position[2]);
+				glRasterPos3d(position[0], position[1], position[2]);
 				m_font->Render(k3d::string_cast(curve).c_str());
 			}
 		}

@@ -22,6 +22,8 @@
 		\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
+#include "nurbs_curve_modifier.h"
+
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
@@ -29,8 +31,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/data.h>
@@ -38,10 +39,10 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include <iostream>
 #include <vector>
-
-#include "nurbs_curve_modifier.h"
 
 namespace module
 {
@@ -49,13 +50,13 @@ namespace module
 namespace nurbs
 {
 class curve_degree_elevation :
-			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 public:
 	curve_degree_elevation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document),
-			m_degree(init_owner(*this) + init_name("degree") + init_label(_("The degree which will be added to the curve")) + init_description(_("The curve degree gets elevated to the amount you specify here")) + init_value(1) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+		base(Factory, Document),
+		m_degree(init_owner(*this) + init_name("degree") + init_label(_("The degree which will be added to the curve")) + init_description(_("The curve degree gets elevated to the amount you specify here")) + init_value(1) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_degree.changed_signal().connect(make_update_mesh_slot());
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
@@ -70,7 +71,8 @@ public:
 	{
 		Output = Input;
 
-		if (!k3d::validate_nurbs_curve_groups(Output))
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
+		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
@@ -89,8 +91,6 @@ public:
 		int t = m_degree.pipeline_value();
 		for (int i = 0; i < t; i++)
 			mod.curve_degree_elevate(my_curve);
-
-		assert_warning(k3d::validate_nurbs_curve_groups(Output));
 	}
 
 	static k3d::iplugin_factory& get_factory()

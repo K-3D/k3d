@@ -50,7 +50,6 @@
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>

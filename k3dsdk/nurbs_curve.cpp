@@ -17,7 +17,6 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh_operations.h"
 #include "metadata.h"
 #include "nurbs_curve.h"
 #include "primitive_detail.h"
@@ -140,9 +139,32 @@ primitive* create(mesh& Mesh)
 	return result;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// validate
+
+const bool_t legacy_validate_nurbs_curve_groups(const mesh& Mesh)
+{
+	if(!Mesh.nurbs_curve_groups)
+		return false;
+
+	return_val_if_fail(Mesh.nurbs_curve_groups->first_curves, false);
+	return_val_if_fail(Mesh.nurbs_curve_groups->curve_counts, false);
+	return_val_if_fail(Mesh.nurbs_curve_groups->curve_first_points, false);
+	return_val_if_fail(Mesh.nurbs_curve_groups->curve_point_counts, false);
+	return_val_if_fail(Mesh.nurbs_curve_groups->curve_orders, false);
+	return_val_if_fail(Mesh.nurbs_curve_groups->curve_first_knots, false);
+	return_val_if_fail(Mesh.nurbs_curve_groups->curve_points, false);
+	return_val_if_fail(Mesh.nurbs_curve_groups->curve_point_weights, false);
+	return_val_if_fail(Mesh.nurbs_curve_groups->curve_knots, false);
+	return_val_if_fail(Mesh.nurbs_curve_groups->curve_selection, false);
+	return_val_if_fail(Mesh.nurbs_curve_groups->materials, false);
+
+	return true;
+}
+
 const_primitive* validate(const mesh& Mesh)
 {
-	if(!validate_nurbs_curve_groups(Mesh))
+	if(!legacy_validate_nurbs_curve_groups(Mesh))
 		return 0;
 
 	return new const_primitive(
@@ -164,7 +186,7 @@ const_primitive* validate(const mesh& Mesh)
 
 primitive* validate(mesh& Mesh)
 {
-	if(!validate_nurbs_curve_groups(Mesh))
+	if(!legacy_validate_nurbs_curve_groups(Mesh))
 		return 0;
 
 	mesh::nurbs_curve_groups_t& nurbs = Mesh.nurbs_curve_groups.writable();

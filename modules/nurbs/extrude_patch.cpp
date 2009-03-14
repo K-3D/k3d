@@ -18,8 +18,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Carsten Haubold (CarstenHaubold@web.de)
+	\author Carsten Haubold (CarstenHaubold@web.de)
 */
+
+#include "nurbs_patch_modifier.h"
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
@@ -28,8 +30,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/data.h>
@@ -37,10 +38,10 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include <iostream>
 #include <vector>
-
-#include "nurbs_patch_modifier.h"
 
 namespace module
 {
@@ -48,15 +49,15 @@ namespace module
 namespace nurbs
 {
 class extrude_patch :
-			public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 public:
 	extrude_patch(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-			base(Factory, Document),
-			m_distance(init_owner(*this) + init_name(_("distance")) + init_label(_("Distance")) + init_description(_("How far to extrude the patch")) + init_step_increment(0.5) + init_units(typeid(k3d::measurement::scalar)) + init_value(1.0)),
-			m_along(init_owner(*this) + init_name("along") + init_label(_("Extrude along")) + init_description(_("Axis along which the patch gets extruded")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
-			m_cap(init_owner(*this) + init_name(_("cap")) + init_label(_("Create Cap?")) + init_description(_("Extrusion can either create a cap or not")) + init_value(true))
+		base(Factory, Document),
+		m_distance(init_owner(*this) + init_name(_("distance")) + init_label(_("Distance")) + init_description(_("How far to extrude the patch")) + init_step_increment(0.5) + init_units(typeid(k3d::measurement::scalar)) + init_value(1.0)),
+		m_along(init_owner(*this) + init_name("along") + init_label(_("Extrude along")) + init_description(_("Axis along which the patch gets extruded")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
+		m_cap(init_owner(*this) + init_name(_("cap")) + init_label(_("Create Cap?")) + init_description(_("Extrusion can either create a cap or not")) + init_value(true))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_distance.changed_signal().connect(make_update_mesh_slot());
@@ -73,11 +74,11 @@ public:
 	{
 		Output = Input;
 
-		if (!k3d::validate_nurbs_patches(Output))
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(k3d::nurbs_patch::validate(Output));
+		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
-
 
 		nurbs_patch_modifier mod(Output);
 		int my_patch = mod.get_selected_patch();
@@ -89,8 +90,6 @@ public:
 		}
 
 		mod.extrude_patch(my_patch, m_along.pipeline_value(), m_distance.pipeline_value(), m_cap.pipeline_value());
-
-		assert_warning(k3d::validate_nurbs_patches(Output));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -117,6 +116,7 @@ k3d::iplugin_factory& extrude_patch_factory()
 	return extrude_patch::get_factory();
 }
 
-}//namespace nurbs
+} //namespace nurbs
+
 } //namespace module
 

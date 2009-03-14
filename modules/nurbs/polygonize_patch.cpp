@@ -18,29 +18,30 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Carsten Haubold (CarstenHaubold@web.de)
+	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
+#include "nurbs_patch_modifier.h"
+
+#include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/module.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/mesh_operations.h>
-#include <k3dsdk/nurbs.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/selection.h>
-#include <k3dsdk/data.h>
-#include <k3dsdk/point3.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/nurbs_patch.h>
+#include <k3dsdk/point3.h>
+#include <k3dsdk/selection.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <iostream>
 #include <vector>
-
-#include "nurbs_patch_modifier.h"
 
 namespace module
 {
@@ -74,11 +75,11 @@ public:
 		MY_DEBUG << "polygonize_patch::on_update_mesh" << std::endl;
 		Output = Input;
 
-		if (!k3d::validate_nurbs_patches(Output))
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(k3d::nurbs_patch::validate(Output));
+		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
-
 
 		nurbs_patch_modifier mod(Output);
 		int my_patch = mod.get_selected_patch();
@@ -110,12 +111,12 @@ private:
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_flip;
 };
 
-//Create connect_curve factory
 k3d::iplugin_factory& polygonize_patch_factory()
 {
 	return polygonize_patch::get_factory();
 }
 
-}//namespace nurbs
+} //namespace nurbs
+
 } //namespace module
 

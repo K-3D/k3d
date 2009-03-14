@@ -25,7 +25,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_painter_gl.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>

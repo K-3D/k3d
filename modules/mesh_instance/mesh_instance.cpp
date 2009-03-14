@@ -32,7 +32,6 @@
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/ipipeline_profiler.h>
-#include <k3dsdk/mesh_operations.h>
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
