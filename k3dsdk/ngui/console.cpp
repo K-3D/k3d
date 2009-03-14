@@ -46,17 +46,111 @@ class control::implementation
 {
 public:
 	implementation() :
-		buffer(Gtk::TextBuffer::create())
+		command_index(0)
 	{
+		buffer = Gtk::TextBuffer::create();
+
 		read_only = Gtk::TextTag::create("read-only");
 		read_only->property_editable() = false;
+		buffer->get_tag_table()->add(read_only);
 
 		begin_input = Gtk::TextMark::create("begin-input");
-
-		buffer->get_tag_table()->add(read_only);
 		buffer->add_mark(begin_input, buffer->end());
 
+		view.set_buffer(buffer);
+		view.set_editable(false);
+		view.set_cursor_visible(false);
+		view.set_wrap_mode(Gtk::WRAP_CHAR);
 		view.signal_key_press_event().connect(sigc::mem_fun(*this, &implementation::on_key_press_event), false);
+
+		scrolled_window.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+		scrolled_window.add(view);
+	}
+
+	bool on_key_press_event(GdkEventKey* event)
+	{
+		if(event->keyval == GDK_Return)
+		{
+			const k3d::string_t input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
+
+			buffer->insert(buffer->end(), "\n");
+			buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
+			buffer->move_mark(begin_input, buffer->end());
+
+			if(command_history.empty() || input != command_history.back())
+				command_history.push_back(input);
+			command_index = command_history.size();
+			command_signal.emit(input);
+
+			return true;
+		}
+		else if(event->keyval == GDK_Left)
+		{
+			return buffer->get_iter_at_mark(buffer->get_insert()) <= buffer->get_iter_at_mark(begin_input);
+		}
+		else if(event->keyval == GDK_Up)
+		{
+			if(command_index)
+			{
+				if(command_index == command_history.size())
+					command_buffer = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
+
+				command_index -= 1;
+				buffer->erase(buffer->get_iter_at_mark(begin_input), buffer->end());
+				buffer->insert(buffer->end(), command_history[command_index]);
+			}
+
+			buffer->place_cursor(buffer->end());
+			return true;
+		}
+		else if(event->keyval == GDK_Down)
+		{
+			if(command_index < command_history.size())
+			{
+				command_index += 1;
+				buffer->erase(buffer->get_iter_at_mark(begin_input), buffer->end());
+				buffer->insert(buffer->end(),
+					command_index < command_history.size()
+					? command_history[command_index]
+					: command_buffer);
+			}
+
+			buffer->place_cursor(buffer->end());
+			return true;
+		}
+		else if(event->keyval == GDK_v && (event->state & GDK_CONTROL_MASK))
+		{
+			const k3d::string_t input = Gtk::Clipboard::get()->wait_for_text();
+			
+			std::vector<k3d::string_t> lines;
+			boost::split(lines, input, boost::is_any_of("\n"));
+
+			for(k3d::uint_t i = 0; i != lines.size(); ++i)
+			{
+				buffer->insert(buffer->end(), lines[i]);
+				
+				if(i+1 < lines.size())
+				{
+					buffer->insert(buffer->end(), "\n");
+					buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
+					buffer->move_mark(begin_input, buffer->end());
+
+					if(command_history.empty() || lines[i] != command_history.back())
+						command_history.push_back(lines[i]);
+					command_index = command_history.size();
+					command_signal.emit(lines[i]);
+				}
+			}
+
+			return true;
+		}
+		else if(event->keyval != GDK_Control_L && event->keyval != GDK_Control_R)
+		{
+			buffer->place_cursor(buffer->end());
+			return false;
+		}
+
+		return false;
 	}
 
 	void print_string(const string_t& String)
@@ -77,74 +171,18 @@ public:
 		view.scroll_to(buffer->get_insert());
 	}
 
-	bool on_key_press_event(GdkEventKey* event)
-	{
-		switch(event->keyval)
-		{
-			case GDK_Return:
-			{
-				const k3d::string_t input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
-
-				buffer->insert(buffer->end(), "\n");
-				buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
-				buffer->move_mark(begin_input, buffer->end());
-
-				command_signal.emit(input);
-
-				return true;
-			}
-			case GDK_Left:
-			{
-				return buffer->get_iter_at_mark(buffer->get_insert()) <= buffer->get_iter_at_mark(begin_input);
-			}
-			case GDK_Up:
-			{
-//				k3d::log() << debug << "history back" << std::endl;
-				return true;
-			}
-			case GDK_Down:
-			{
-//				k3d::log() << debug << "history forward" << std::endl;
-				return true;
-			}
-			case GDK_v:
-			{
-				if(event->state & GDK_CONTROL_MASK)
-				{
-					const k3d::string_t input = Gtk::Clipboard::get()->wait_for_text();
-					
-					std::vector<k3d::string_t> lines;
-					boost::split(lines, input, boost::is_any_of("\n"));
-
-					for(k3d::uint_t i = 0; i != lines.size(); ++i)
-					{
-						buffer->insert(buffer->end(), lines[i]);
-						
-						if(i+1 < lines.size())
-						{
-							buffer->insert(buffer->end(), "\n");
-							buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
-							buffer->move_mark(begin_input, buffer->end());
-
-							command_signal.emit(lines[i]);
-						}
-					}
-
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
+	std::vector<string_t> command_history;
+	std::vector<string_t>::size_type command_index;
+	string_t command_buffer;
+	sigc::signal<void, const string_t&> command_signal;
 
 	Glib::RefPtr<Gtk::TextBuffer> buffer;
 	Glib::RefPtr<Gtk::TextTag> current_format;
 	Glib::RefPtr<Gtk::TextTag> read_only;
 	Glib::RefPtr<Gtk::TextMark> begin_input;
+
 	Gtk::TextView view;
 	Gtk::ScrolledWindow scrolled_window;
-	sigc::signal<void, const string_t&> command_signal;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -156,15 +194,6 @@ control::control(k3d::icommand_node& Parent, const string_t& Name) :
 {
 	set_name("k3d-console");
 	set_shadow_type(Gtk::SHADOW_NONE);
-
-	m_implementation->view.set_buffer(m_implementation->buffer);
-	m_implementation->view.set_editable(false);
-	m_implementation->view.set_cursor_visible(false);
-	m_implementation->view.set_wrap_mode(Gtk::WRAP_CHAR);
-
-	m_implementation->scrolled_window.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
-	m_implementation->scrolled_window.add(m_implementation->view);
-
 	add(m_implementation->scrolled_window);
 }
 
@@ -194,6 +223,7 @@ void control::prompt_string(const string_t& String)
 {
 	m_implementation->print_string(String);
 	m_implementation->buffer->move_mark(m_implementation->begin_input, m_implementation->buffer->end());
+	m_implementation->buffer->place_cursor(m_implementation->buffer->end());
 	m_implementation->view.set_editable(true);
 	m_implementation->view.set_cursor_visible(true);
 }

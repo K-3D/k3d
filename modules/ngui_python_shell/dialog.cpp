@@ -37,7 +37,6 @@
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/assign/list_of.hpp>
-#include <boost/python.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <sstream>
@@ -62,6 +61,7 @@ class dialog :
 
 public:
 	dialog() :
+		engine(k3d::plugin::create<k3d::iscript_engine>("Python")),
 		stdout_slot(sigc::mem_fun(*this, &dialog::print_stdout)),
 		stderr_slot(sigc::mem_fun(*this, &dialog::print_stderr)),
 		console(Gtk::manage(new k3d::ngui::console::control(*this, "console")))
@@ -87,26 +87,26 @@ public:
 		add(*console);
 		console->connect_command_signal(sigc::mem_fun(*this, &dialog::on_command));
 
-		print_stdout(k3d::string_cast(boost::format(_("Python %1% on %2%\n")) % Py_GetVersion() % Py_GetPlatform()));
-		print_prompt(">>> ");
-
 		show_all();
+
+		return_if_fail(engine);
+
+		k3d::iscript_engine::context_t context;
+		engine->execute(get_factory().name(), "import code\n", context);
+		engine->execute(get_factory().name(), "__console = code.InteractiveConsole(locals())\n", context);
+
+		engine->execute(get_factory().name(), "def quit():\n  print \"Use k3d.exit() if you want to exit K-3D.\"", context);
+		engine->execute(get_factory().name(), "def exit():\n  print \"Use k3d.exit() if you want to exit K-3D.\"", context);
+
+		engine->execute(get_factory().name(), "import sys\n", context);
+		engine->execute(get_factory().name(), "print \"Python \" + sys.version + \" on \" + sys.platform", context, &stdout_slot, &stderr_slot);
+
+		print_prompt(">>> ");
 	}
 
 	void on_command(const k3d::string_t& Command)
 	{
-		if(!engine)
-		{
-			engine.reset(k3d::plugin::create<k3d::iscript_engine>("Python"));
-			return_if_fail(engine);
-
-			k3d::iscript_engine::context_t context;
-			engine->execute(get_factory().name(), "import code\n", context);
-			engine->execute(get_factory().name(), "__console = code.InteractiveConsole(locals())\n", context);
-
-			engine->execute(get_factory().name(), "def quit():\n  print \"Use k3d.exit() if you want to exit K-3D.\"", context);
-			engine->execute(get_factory().name(), "def exit():\n  print \"Use k3d.exit() if you want to exit K-3D.\"", context);
-		}
+		return_if_fail(engine);
 
 		k3d::string_t command(Command);
 		boost::replace_all(command, "\\", "\\\\");
