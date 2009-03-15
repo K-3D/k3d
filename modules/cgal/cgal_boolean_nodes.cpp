@@ -37,6 +37,7 @@
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
@@ -280,7 +281,7 @@ void merge_coplanar_faces(k3d::mesh& Mesh, const k3d::double_t Threshold)
 	k3d::mesh::normals_t face_normals(face_first_loops.size());
 	for(k3d::uint_t face = face_begin; face != face_end; ++face)
 	{
-		face_normals[face] = k3d::normalize(k3d::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]));
+		face_normals[face] = k3d::normalize(k3d::polyhedron::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]));
 	}
 	
 	k3d::mesh::indices_t edge_faces;
