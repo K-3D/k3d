@@ -208,43 +208,45 @@ primitive* validate(mesh& Mesh)
 		nurbs.varying_data);
 }
 
-void add_curve(const uint_t Order, const mesh::points_t& ControlPoints, mesh& Mesh, primitive& Primitive)
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const uint_t RepeatPoints)
 {
-	add_curve(Order, ControlPoints, mesh::weights_t(ControlPoints.size(), 1), Mesh, Primitive);
+	add_curve(Mesh, Primitive, Order, ControlPoints, mesh::weights_t(ControlPoints.size(), 1), RepeatPoints);
 }
 
-void add_curve(const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, mesh& Mesh, primitive& Primitive)
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const uint_t RepeatPoints)
 {
-	return_if_fail(Order >= 2);
-	return_if_fail(ControlPoints.size() >= Order);
+	return_if_fail(ControlPoints.size() + RepeatPoints >= Order);
 
 	mesh::knots_t knots;
         knots.insert(knots.end(), Order, 0);
-	for(k3d::uint_t i = 1; i <= ControlPoints.size() - Order; ++i)
+	for(uint_t i = 1; i <= ControlPoints.size() + RepeatPoints - Order; ++i)
 		knots.insert(knots.end(), 1, i);
-	knots.insert(knots.end(), Order, ControlPoints.size() - Order + 1);
+	knots.insert(knots.end(), Order, ControlPoints.size() + RepeatPoints - Order + 1);
 
-	add_curve(Order, ControlPoints, Weights, knots, Mesh, Primitive);
+	add_curve(Mesh, Primitive, Order, ControlPoints, Weights, knots, RepeatPoints);
 }
 
-void add_curve(const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, mesh& Mesh, primitive& Primitive)
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, const uint_t RepeatPoints)
 {
-	return_if_fail(Order >= 2);
-	return_if_fail(ControlPoints.size() >= Order);
-	return_if_fail(ControlPoints.size() == Weights.size());
 	return_if_fail(Mesh.points);
 	return_if_fail(Mesh.point_selection);
+
+	return_if_fail(Order >= 2);
+	return_if_fail(ControlPoints.size() + RepeatPoints >= Order);
+	return_if_fail(ControlPoints.size() == Weights.size());
+	return_if_fail(Knots.size() == ControlPoints.size() + RepeatPoints + Order);
 
 	mesh::points_t& points = Mesh.points.writable();
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
 
         Primitive.curve_first_points.push_back(Primitive.curve_points.size());
-        Primitive.curve_point_counts.push_back(ControlPoints.size());
+        Primitive.curve_point_counts.push_back(ControlPoints.size() + RepeatPoints);
         Primitive.curve_orders.push_back(Order);
         Primitive.curve_first_knots.push_back(Primitive.curve_knots.size());
         Primitive.curve_selections.push_back(0);
 
-        for(k3d::uint_t i = 0; i != ControlPoints.size(); ++i)
+	const uint_t start_index = Primitive.curve_points.size();
+        for(uint_t i = 0; i != ControlPoints.size(); ++i)
         {
                 Primitive.curve_points.push_back(points.size());
                 Primitive.curve_point_weights.push_back(Weights[i]);
@@ -252,10 +254,17 @@ void add_curve(const uint_t Order, const mesh::points_t& ControlPoints, const me
                 point_selection.push_back(0);
         }
 
+	for(uint_t i = 0; i != RepeatPoints; ++i)
+	{
+		const uint_t repeat_index = start_index + (i % ControlPoints.size());
+		Primitive.curve_points.push_back(Primitive.curve_points[repeat_index]);
+		Primitive.curve_point_weights.push_back(Primitive.curve_point_weights[repeat_index]);
+	}
+
         Primitive.curve_knots.insert(Primitive.curve_knots.end(), Knots.begin(), Knots.end());
 }
 
-} // inamespace nurbs_curve
+} // namespace nurbs_curve
 
 } // namespace k3d
 

@@ -123,12 +123,12 @@ primitive* validate(mesh::primitive& GenericPrimitive);
 
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points.
 /// Control points will be assigned unity weights and an open uniform knot vector is automatically supplied.
-void add_curve(const uint_t Order, const mesh::points_t& ControlPoints, mesh& Mesh, primitive& Primitive);
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const uint_t RepeatPoints = 0);
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points and control point weights.
 /// An open uniform knot vector is automatically supplied.
-void add_curve(const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, mesh& Mesh, primitive& Primitive);
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const uint_t RepeatPoints = 0);
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points, control point weights, and knot vector.
-void add_curve(const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, mesh& Mesh, primitive& Primitive);
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, const uint_t RepeatPoints = 0);
 
 } // namespace nurbs_curve
 
