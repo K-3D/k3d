@@ -54,9 +54,15 @@ protected:
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Output file path.")) + init_value(filesystem::path()) + init_path_mode(ipath_property::WRITE) + init_path_type(""))
 	{
 		m_input_mesh.changed_signal().connect(hint::converter<
-			hint::convert<hint::any, hint::none> >(sigc::mem_fun(*this, &mesh_writer::write_file)));
+			hint::convert<hint::any, hint::none> >(make_write_file_slot()));
 		m_file.changed_signal().connect(hint::converter<
-			hint::convert<hint::any, hint::none> >(sigc::mem_fun(*this, &mesh_writer::write_file)));
+			hint::convert<hint::any, hint::none> >(make_write_file_slot()));
+	}
+	
+	/// Slot to call when the file needs to be written
+	sigc::slot<void, ihint*> make_write_file_slot()
+	{
+		return sigc::mem_fun(*this, &mesh_writer::write_file);
 	}
 
 	/// Stores the input mesh.
