@@ -208,7 +208,54 @@ primitive* validate(mesh& Mesh)
 		nurbs.varying_data);
 }
 
-} // namespace nurbs_curve
+void add_curve(const uint_t Order, const mesh::points_t& ControlPoints, mesh& Mesh, primitive& Primitive)
+{
+	add_curve(Order, ControlPoints, mesh::weights_t(ControlPoints.size(), 1), Mesh, Primitive);
+}
+
+void add_curve(const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, mesh& Mesh, primitive& Primitive)
+{
+	return_if_fail(Order >= 2);
+	return_if_fail(ControlPoints.size() >= Order);
+
+	mesh::knots_t knots;
+        knots.insert(knots.end(), Order, 0);
+	for(k3d::uint_t i = 1; i <= ControlPoints.size() - Order; ++i)
+		knots.insert(knots.end(), 1, i);
+	knots.insert(knots.end(), Order, ControlPoints.size() - Order + 1);
+
+	add_curve(Order, ControlPoints, Weights, knots, Mesh, Primitive);
+}
+
+void add_curve(const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, mesh& Mesh, primitive& Primitive)
+{
+	return_if_fail(Order >= 2);
+	return_if_fail(ControlPoints.size() >= Order);
+	return_if_fail(ControlPoints.size() == Weights.size());
+	return_if_fail(Mesh.points);
+	return_if_fail(Mesh.point_selection);
+
+	mesh::points_t& points = Mesh.points.writable();
+	mesh::selection_t& point_selection = Mesh.point_selection.writable();
+
+        Primitive.curve_first_points.push_back(Primitive.curve_points.size());
+        Primitive.curve_point_counts.push_back(ControlPoints.size());
+        Primitive.curve_orders.push_back(Order);
+        Primitive.curve_first_knots.push_back(Primitive.curve_knots.size());
+        Primitive.curve_selections.push_back(0);
+
+        for(k3d::uint_t i = 0; i != ControlPoints.size(); ++i)
+        {
+                Primitive.curve_points.push_back(points.size());
+                Primitive.curve_point_weights.push_back(Weights[i]);
+                points.push_back(ControlPoints[i]);
+                point_selection.push_back(0);
+        }
+
+        Primitive.curve_knots.insert(Primitive.curve_knots.end(), Knots.begin(), Knots.end());
+}
+
+} // inamespace nurbs_curve
 
 } // namespace k3d
 
