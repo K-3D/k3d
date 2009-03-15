@@ -43,7 +43,7 @@ namespace detail
 
 /// Traverse polygonal mesh, visiting faces, loops, and points.
 template<typename FunctorT>
-void traverse_polyhedra(const k3d::mesh& Mesh, FunctorT Functor)
+void traverse_polyhedra(const k3d::mesh& Mesh, FunctorT& Functor)
 {
 	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
 	return_if_fail(polyhedron);
