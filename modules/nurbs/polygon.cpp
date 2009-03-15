@@ -69,40 +69,26 @@ public:
 		const k3d::double_t radius = m_radius.pipeline_value();
 		const k3d::int32_t u_segments = m_u_segments.pipeline_value();
 
-		// Create curve ...
-		k3d::mesh::points_t& points = Output.points.create();
-		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
+		// Compute control points ...
+		k3d::mesh::points_t control_points;
+		for(k3d::int32_t i = 0; i != u_segments; ++i)
+		{
+			const k3d::double_t angle = k3d::pi_over_2() + k3d::pi_times_2() / static_cast<k3d::double_t>(u_segments) * static_cast<k3d::double_t>(i);
 
+			control_points.push_back(radius * k3d::point3(std::cos(angle), std::sin(angle), 0));
+		}
+
+		// Create curve ...
+		Output.points.create();
+		Output.point_selection.create();	
+		
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> primitive(k3d::nurbs_curve::create(Output));
 
 		primitive->first_curves.push_back(primitive->curve_first_points.size());
 		primitive->curve_counts.push_back(1);
 		primitive->materials.push_back(material);
 
-		primitive->curve_first_points.push_back(primitive->curve_points.size());
-		primitive->curve_point_counts.push_back(u_segments + 1);
-		primitive->curve_orders.push_back(2);
-		primitive->curve_first_knots.push_back(primitive->curve_knots.size());
-		primitive->curve_selections.push_back(0.0);
-
-		for(k3d::int32_t i = 0; i != u_segments; ++i)
-		{
-			const k3d::double_t angle = k3d::pi_over_2() + k3d::pi_times_2() / static_cast<k3d::double_t>(u_segments) * static_cast<k3d::double_t>(i);
-
-			primitive->curve_points.push_back(points.size());
-			primitive->curve_point_weights.push_back(1);
-
-			points.push_back(radius * k3d::point3(cos(angle), sin(angle), 0));
-			point_selection.push_back(0);
-		}
-		primitive->curve_points.push_back(0);
-		primitive->curve_point_weights.push_back(1);
-
-		primitive->curve_knots.push_back(0);
-		for(k3d::int32_t i = 0; i <= u_segments; ++i)
-			primitive->curve_knots.push_back(i);
-		primitive->curve_knots.push_back(u_segments);
-
+		k3d::nurbs_curve::add_curve(Output, *primitive, 2, control_points, 1);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

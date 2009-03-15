@@ -75,37 +75,22 @@ public:
 		const k3d::int32_t u_segments = m_u_segments.pipeline_value();
 
 		// Compute NURBS control points ...
-		std::vector<k3d::double_t> knots;
-		std::vector<k3d::double_t> weights;
-		std::vector<k3d::point3> control_points;
-		k3d::nurbs::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, thetamax, u_segments, knots, weights, control_points);
+		k3d::mesh::knots_t knots;
+		k3d::mesh::weights_t weights;
+		k3d::mesh::points_t control_points;
+		k3d::nurbs::circular_arc(k3d::vector3(radius, 0, 0), k3d::vector3(0, radius, 0), 0, thetamax, u_segments, knots, weights, control_points);
 
-		// Create points ...
-		k3d::mesh::points_t& points = Output.points.create(new k3d::mesh::points_t(control_points.size()));
-		k3d::mesh::selection_t& point_selection = Output.point_selection.create(new k3d::mesh::selection_t(control_points.size(), 0.0));
-		for(k3d::uint_t i = 0; i != control_points.size(); ++i)
-			points[i] = radius * control_points[i];
-		
-		// Create curve ...
+		// Create a NURBS curve primitive, and add a single curve ...
+		Output.points.create();
+		Output.point_selection.create();
+
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> primitive(k3d::nurbs_curve::create(Output));
 
 		primitive->first_curves.push_back(primitive->curve_first_points.size());
 		primitive->curve_counts.push_back(1);
 		primitive->materials.push_back(material);
 
-		primitive->curve_first_points.push_back(primitive->curve_points.size());
-		primitive->curve_point_counts.push_back(control_points.size());
-		primitive->curve_orders.push_back(3);
-		primitive->curve_first_knots.push_back(primitive->curve_knots.size());
-		primitive->curve_selections.push_back(0.0);
-
-		for(k3d::uint_t i = 0; i != control_points.size(); ++i)
-		{
-			primitive->curve_points.push_back(i);
-			primitive->curve_point_weights.push_back(weights[i]);
-		}
-
-		primitive->curve_knots.assign(knots.begin(), knots.end());
+		k3d::nurbs_curve::add_curve(Output, *primitive, 3, control_points, weights, knots);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
