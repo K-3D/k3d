@@ -43,3 +43,4 @@ extern k3d::iplugin_factory& mesh_reader_factory();
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::svg::io::mesh_reader_factory());
 K3D_MODULE_END
+
