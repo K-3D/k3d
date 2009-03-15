@@ -39,7 +39,6 @@
 #include <k3dsdk/point4.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/gprim_factory.h>
 #include <deque>
 #include "math.h"
 

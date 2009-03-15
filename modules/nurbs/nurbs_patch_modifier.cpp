@@ -1012,6 +1012,7 @@ void nurbs_patch_modifier::polygonize_patch(k3d::uint_t patch, k3d::uint_t segme
 {
 	MY_DEBUG << "Creating a polygonal representation of patch=" << patch << " with segments=" << segments << std::endl;
 
+/*
 	k3d::gprim_factory fac(*m_instance);
 	k3d::mesh::indices_t poly_points;
 
@@ -1057,6 +1058,7 @@ void nurbs_patch_modifier::polygonize_patch(k3d::uint_t patch, k3d::uint_t segme
 	{
 		delete_patch(patch);
 	}
+*/
 }
 
 void nurbs_patch_modifier::delete_patch(k3d::uint_t patch_idx)
