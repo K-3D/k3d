@@ -1088,12 +1088,11 @@ public:
 	void update_mesh(const k3d::mesh& Input, const k3d::mesh::selection_t& InputFaceSelection, k3d::mesh& Output, k3d::inode* Node)
 	{
 		k3d::timer total_timer;
-		k3d::mesh input_with_normals = Input;
-		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(input_with_normals));
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
 		if(!polyhedron)
 			return;
 
-		const k3d::mesh::points_t& points = *input_with_normals.points;
+		const k3d::mesh::points_t& points = *Input.points;
 		
 		// Manually keep track of some timing data, in order to get the total time over the loops
 		k3d::double_t face_center_time = 0;
@@ -1104,37 +1103,10 @@ public:
 		k3d::double_t face_vertex_data_time = 0;
 		k3d::timer timer;
 		
-		// Calculate the normals on the input
-		if(Node) Node->document().pipeline_profiler().start_execution(*Node, "Calculate Normals");
-		const k3d::uint_t face_begin = 0;
-		const k3d::uint_t face_end = polyhedron->face_first_loops.size();
-		k3d::mesh::normals_t uniform_normals(polyhedron->face_first_loops.size());
-		for(k3d::uint_t face = face_begin; face != face_end; ++face)
-			uniform_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, *input_with_normals.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
-		k3d::mesh::normals_t& vertex_normals = input_with_normals.vertex_data.create("sds_normals", new k3d::mesh::normals_t(points.size()));
-		for(k3d::uint_t face = face_begin; face != face_end; ++face)
-		{
-			const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-			const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-			for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-			{
-				const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-				for(k3d::uint_t edge = first_edge; ;)
-				{
-					vertex_normals[polyhedron->edge_points[edge]] += uniform_normals[face];
-
-					edge = polyhedron->clockwise_edges[edge];
-					if(edge == first_edge)
-						break;
-				}
-			}
-		}
-		if(Node) Node->document().pipeline_profiler().finish_execution(*Node, "Calculate Normals");
-		
 		for(k3d::uint_t level = 0; level != m_levels; ++level)
 		{
 			topology_data_t& topology_data = m_topology_data[level];
-			const k3d::mesh& input = level == 0 ? input_with_normals : m_intermediate_meshes[level - 1];
+			const k3d::mesh& input = level == 0 ? Input : m_intermediate_meshes[level - 1];
 			k3d::mesh& output = m_intermediate_meshes[level];
 			const k3d::mesh::selection_t& input_face_selection = level == 0 ? InputFaceSelection : *input.polyhedra->face_selection;
 		
@@ -1238,7 +1210,6 @@ public:
 		}
 		const k3d::double_t total = total_timer.elapsed();
 		k3d::log() << debug << "SDS update timings: Total: " << total << ", face centers: " << face_center_time << " (" << face_center_time/total*100 << "%), edge midpoints: " << edge_midpoint_time << " (" << edge_midpoint_time/total*100 << "%), point positions: " << point_position_time << " (" << point_position_time/total*100 << "%)" << std::endl;
-		k3d::log() << debug << "SDS face center time: " << face_center_time << ", positions: " << face_position_time << " (" << face_position_time/face_center_time*100 << "%), varying and uniform: " << face_varying_data_time << " (" << face_varying_data_time/face_center_time*100 << "%), vertex data: " << face_vertex_data_time << " (" << face_vertex_data_time/face_center_time*100 << "%)" << std::endl;
 		
 		Output = m_intermediate_meshes[m_levels - 1];
 	}
@@ -1257,7 +1228,6 @@ public:
 			}
 			last_count = face_count;
 		}
-		k3d::log() << debug << "SDS facet visit took " << t.elapsed() << "s" << std::endl;
 		
 		t.restart();
 		const k3d::mesh& mesh = m_intermediate_meshes[Level - 1];
@@ -1267,7 +1237,6 @@ public:
 		{
 			Visitor.on_vertex(points[point], normals ? normals->at(point) : k3d::normal3(0,0,1));
 		}
-		k3d::log() << debug << "SDS facet points visit took " << t.elapsed() << "s" << std::endl;
 	}
 	
 	void visit_boundary(const k3d::mesh& Mesh, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor)
@@ -1320,7 +1289,6 @@ public:
 				subedge = clockwise_edges[companions[clockwise_edges[subedge]]];
 			}
 		}
-		k3d::log() << debug << "SDS boundary visit took " << t.elapsed() << "s" << std::endl;
 	}
 	
 	void visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor)

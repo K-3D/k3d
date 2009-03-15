@@ -119,13 +119,9 @@ public:
 		m_point(0),
 		m_edge(0),
 		m_face(0)
-	{
-		k3d::log() << debug << "created SDS face visitor with " << PointCount << " points, " << EdgeCount << " edges and " << FaceCount << " faces" << std::endl; 
+	{ 
 	}
-	~face_visitor()
-	{
-		k3d::log() << debug << "SDS face visitor visited " << m_point << " points, " << m_edge << " edges and " << m_face << " faces" << std::endl;
-	}
+
 	void on_vertex(const k3d::point3& Point, const k3d::normal3& Normal)
 	{
 		points_array[m_point]= Point;
