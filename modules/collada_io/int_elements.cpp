@@ -24,10 +24,14 @@
 #include <dae.h>
 #include <dae/daeDom.h>
 #include "int_elements.h"
-#include <k3dsdk/gprim_factory.h>
 #include <iostream>
 #include <dom/domPolylist.h>
 #include <dom/domTriangles.h>
+
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
+
 using namespace std;
 namespace module
 {
@@ -46,7 +50,12 @@ namespace io
 		//k3d::log() << debug << "una geom" << std::endl;
 		domMesh *meshElement = geomElement.getMesh();
 
-		k3d::gprim_factory factory(Mesh);
+		k3d::mesh::points_t& points = Mesh.points.create();
+		k3d::mesh::texture_coordinates_t texture_coordinates;
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Mesh));
+		polyhedron->first_faces.push_back(0);
+		polyhedron->face_counts.push_back(0);
+		polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 
 		domInputLocalOffset* vertex_input;
 		domInputLocalOffset* normal_input;
@@ -128,11 +137,10 @@ namespace io
 
 			for ( unsigned int i = 0; i < floatArray_vertex->getCount(); i+=stride )
 			{
-				k3d::point4 vertex(floatArray_vertex->getValue()[i],
+				k3d::point3 vertex(floatArray_vertex->getValue()[i],
 						floatArray_vertex->getValue()[i+1],
-						floatArray_vertex->getValue()[i+2],
-						1);
-				factory.add_point(ccst*vertex);
+						floatArray_vertex->getValue()[i+2]);
+				points.push_back(ccst*vertex);
 			}
 
 			if(source_texcoord)
@@ -143,7 +151,7 @@ namespace io
 					k3d::texture3 texture(floatArray_texcoord->getValue()[i],
 									1-floatArray_texcoord->getValue()[i+1],
 									1);
-					factory.add_texcoord(texture);
+					texture_coordinates.push_back(texture);
 				}
 			}
 
@@ -163,21 +171,27 @@ namespace io
 		
 				// Copy all the indices from the domP into my structure.
 				int vcount = polygons->getVcount()->getValue()[i];
+				const k3d::uint_t face_first_edge = polyhedron->edge_points.size();
 				for(int v=0;v<vcount*max_offset;v+=max_offset)
 				{
 					if(v_offset!=-1)
-						vertex_coordinates.push_back(poly->getValue()[tot+v+v_offset]);		
-					if(n_offset!=-1)
-						normal_coordinates.push_back(poly->getValue()[tot+v+n_offset]);
+					{
+						polyhedron->edge_points.push_back(poly->getValue()[tot+v+v_offset]);
+						polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+						polyhedron->edge_selections.push_back(0.0);
+					}
 					if(t_offset!=-1)
 						texture_coordinates.push_back(poly->getValue()[tot+v+t_offset]);
 				}
 				tot+=vcount*max_offset;
-				// Push this polygon into the list of polygons in my structure.
-				factory.add_polygon(vertex_coordinates, texture_coordinates); //and soon texture_coordinates, normal_coordinates
+				polyhedron->clockwise_edges.back() = face_first_edge;
+				polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+				polyhedron->loop_first_edges.push_back(face_first_edge);
+				polyhedron->face_loop_counts.push_back(1);
+				polyhedron->face_materials.push_back(static_cast<k3d::imaterial*>(0));
+				polyhedron->face_selections.push_back(0.0);
+				++polyhedron->face_counts.back();
 			}
-
-			//Add points
 		}
 
 		for(int i=0; i<meshElement->getTriangles_array().getCount()>0; i++)
@@ -259,11 +273,10 @@ namespace io
 	
 			for ( unsigned int i = 0; i < floatArray_vertex->getCount(); i+=stride )
 			{
-				k3d::point4 vertex(floatArray_vertex->getValue()[i],
+				k3d::point3 vertex(floatArray_vertex->getValue()[i],
 						floatArray_vertex->getValue()[i+1],
-						floatArray_vertex->getValue()[i+2],
-						1);
-				factory.add_point(ccst*vertex);
+						floatArray_vertex->getValue()[i+2]);
+				points.push_back(ccst*vertex);
 			}
 
 			if(source_texcoord)
@@ -274,7 +287,7 @@ namespace io
 					k3d::texture3 texture(floatArray_texcoord->getValue()[i],
 									1-floatArray_texcoord->getValue()[i+1],
 									1);
-					factory.add_texcoord(texture);
+					texture_coordinates.push_back(texture);
 				}
 			}
 
@@ -294,22 +307,28 @@ namespace io
 		
 				// Copy all the indices from the domP into my structure.
 				int vcount = 3;
+				const k3d::uint_t face_first_edge = polyhedron->edge_points.size();
 				for(int v=0;v<vcount*max_offset;v+=max_offset)
 				{
 					if(v_offset!=-1)
-						vertex_coordinates.push_back(poly->getValue()[tot+v+v_offset]);		
-					if(n_offset!=-1)
-						normal_coordinates.push_back(poly->getValue()[tot+v+n_offset]);
+					{
+						polyhedron->edge_points.push_back(poly->getValue()[tot+v+v_offset]);
+						polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+						polyhedron->edge_selections.push_back(0.0);
+					}
 					if(t_offset!=-1)
 						texture_coordinates.push_back(poly->getValue()[tot+v+t_offset]);
 				}
 				tot+=vcount*max_offset;
-				// Push this polygon into the list of polygons in my structure.
-				factory.add_polygon(vertex_coordinates, texture_coordinates); //and soon texture_coordinates, normal_coordinates
+				polyhedron->clockwise_edges.back() = face_first_edge;
+				polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+				polyhedron->loop_first_edges.push_back(face_first_edge);
+				polyhedron->face_loop_counts.push_back(1);
+				polyhedron->face_materials.push_back(static_cast<k3d::imaterial*>(0));
+				polyhedron->face_selections.push_back(0.0);
+				++polyhedron->face_counts.back();
 			}
 		}
-
-		factory.attach_texcoords();
 	}
 
 	intLight::intLight(domLight& Light, const k3d::matrix4& ccst)
