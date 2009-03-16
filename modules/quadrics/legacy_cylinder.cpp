@@ -99,9 +99,12 @@ public:
 			if(thetamax == 0.0)
 				return;
 
-			std::vector<double> weights;
-			std::vector<k3d::point3> arc_points;
-			k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, 4, m_gl_u_knot_vector, weights, arc_points);
+			k3d::mesh::knots_t knots;
+			k3d::mesh::weights_t weights;
+			k3d::mesh::points_t arc_points;
+			k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, thetamax, 4, knots, weights, arc_points);
+
+			m_gl_u_knot_vector.assign(knots.begin(), knots.end());
 
 			for(unsigned long i = 0; i <= 2; ++i)
 			{

@@ -17,6 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "geometric_operations.h"
 #include "metadata.h"
 #include "nurbs_curve.h"
 #include "primitive_detail.h"
@@ -262,6 +263,50 @@ void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh:
 	}
 
         Primitive.curve_knots.insert(Primitive.curve_knots.end(), Knots.begin(), Knots.end());
+}
+
+void circular_arc(const vector3& X, const vector3& Y, const double_t StartAngle, const double_t EndAngle, const uint_t Segments, mesh::knots_t& Knots, mesh::weights_t& Weights, mesh::points_t& ControlPoints)
+{
+	return_if_fail(Segments);
+
+//	const double_t start_angle = std::min(StartAngle, EndAngle);
+//	const double_t end_angle = std::max(StartAngle, EndAngle);
+	const double_t theta = (EndAngle - StartAngle) / static_cast<double_t>(Segments);
+	const double_t weight = std::cos(std::fabs(theta) * 0.5);
+
+	Knots.clear();
+	Knots.insert(Knots.end(), 3, 0);
+	for(uint_t i = 1; i != Segments; ++i)
+		Knots.insert(Knots.end(), 2, i);
+	Knots.insert(Knots.end(), 3, Segments);
+
+	Weights.clear();
+	Weights.push_back(1.0);
+	for(uint_t i = 0; i != Segments; ++i)
+	{
+		Weights.push_back(weight);
+		Weights.push_back(1);
+	}
+
+	ControlPoints.clear();
+	ControlPoints.push_back(k3d::to_point(std::cos(StartAngle) * X + std::sin(StartAngle) * Y));
+	for(uint_t i = 0; i != Segments; ++i)
+	{
+		const double_t a0 = StartAngle + (theta * (i));
+		const double_t a2 = StartAngle + (theta * (i + 1));
+
+		const point3 p0(k3d::to_point(std::cos(a0) * X + std::sin(a0) * Y));
+		const point3 p2(k3d::to_point(std::cos(a2) * X + std::sin(a2) * Y));
+
+		const point3 t0(k3d::to_point(-std::sin(a0) * X + std::cos(a0) * Y));
+		const point3 t2(k3d::to_point(-std::sin(a2) * X + std::cos(a2) * Y));
+
+		point3 p1;
+		intersect_lines(p0, to_vector(t0), p2, to_vector(t2), p1);
+
+		ControlPoints.push_back(p1);
+		ControlPoints.push_back(p2);
+	}
 }
 
 } // namespace nurbs_curve

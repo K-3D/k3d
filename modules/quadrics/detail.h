@@ -33,7 +33,7 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/node_change_signal.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>

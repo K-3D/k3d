@@ -130,6 +130,18 @@ void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh:
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points, control point weights, and knot vector.
 void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, const uint_t RepeatPoints = 0);
 
+/** Computes a set of control points, weights, and knots that define an order-3 circular arc centered at the origin
+	\param X Defines the X axis of the plane containing the arc
+	\param Y Defines the Y axis of the plane containing the arc
+	\param StartAngle Start angle of the arc in radians
+	\param EndAngle End angle of the arc in radians
+	\param Segments The number of NURBS segments in the resulting arc
+	\param Knots Output container for the resulting arc knot vector
+	\param Weights Output container for the resulting arc control point weights
+	\param ControlPoints Output container for the resulting arc control point positions
+*/
+void circular_arc(const vector3& X, const vector3& Y, const double_t StartAngle, const double_t EndAngle, const uint_t Segments, mesh::knots_t& Knots, mesh::weights_t& Weights, mesh::points_t& ControlPoints);
+
 } // namespace nurbs_curve
 
 } // namespace k3d

@@ -1,7 +1,8 @@
 #include "nurbs_curve_modifier.h"
 
-#include <k3dsdk/metadata.h>
 #include <k3dsdk/linear_curve.h>
+#include <k3dsdk/metadata.h>
+#include <k3dsdk/nurbs_curve.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -1867,18 +1868,18 @@ void nurbs_curve_modifier::revolve_curve(k3d::uint_t curve, k3d::axis axis, doub
 
 	//create a circle with the given angle
 	k3d::mesh::knots_t u_knots;
-	std::vector<double> weights;
-	std::vector<k3d::point3> control_points;
+	k3d::mesh::weights_t weights;
+	k3d::mesh::points_t control_points;
 	switch (axis)
 	{
 	case k3d::Z :
-		k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, angle, segments, u_knots, weights, control_points);
+		k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, angle, segments, u_knots, weights, control_points);
 		break;
 	case k3d::X :
-		k3d::nurbs::circular_arc(k3d::point3(0, 0, 1), k3d::point3(0, 1, 0), 0, angle, segments, u_knots, weights, control_points);
+		k3d::nurbs_curve::circular_arc(k3d::vector3(0, 0, 1), k3d::vector3(0, 1, 0), 0, angle, segments, u_knots, weights, control_points);
 		break;
 	case k3d::Y :
-		k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 0, 1), 0, angle, segments, u_knots, weights, control_points);
+		k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 0, 1), 0, angle, segments, u_knots, weights, control_points);
 		break;
 	}
 

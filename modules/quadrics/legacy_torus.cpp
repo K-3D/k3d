@@ -84,13 +84,19 @@ public:
 			if(thetamax == 0.0 || phimin == phimax)
 				return;
 
-			std::vector<double> v_weights;
-			std::vector<k3d::point3> v_arc_points;
-			k3d::nurbs::circular_arc(k3d::point3(0, 1, 0), k3d::point3(0, 0, 1), phimin, phimax, 4, m_gl_v_knot_vector, v_weights, v_arc_points);
+			k3d::mesh::knots_t v_knots;
+			k3d::mesh::weights_t v_weights;
+			k3d::mesh::points_t v_arc_points;
+			k3d::nurbs_curve::circular_arc(k3d::vector3(0, 1, 0), k3d::vector3(0, 0, 1), phimin, phimax, 4, v_knots, v_weights, v_arc_points);
 
-			std::vector<double> u_weights;
-			std::vector<k3d::point3> u_arc_points;
-			k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, thetamax, 4, m_gl_u_knot_vector, u_weights, u_arc_points);
+			m_gl_v_knot_vector.assign(v_knots.begin(), v_knots.end());
+
+			k3d::mesh::knots_t u_knots;
+			k3d::mesh::weights_t u_weights;
+			k3d::mesh::points_t u_arc_points;
+			k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, thetamax, 4, u_knots, u_weights, u_arc_points);
+
+			m_gl_u_knot_vector.assign(u_knots.begin(), u_knots.end());
 
 			for(unsigned long v = 0; v != v_arc_points.size(); ++v)
 			{

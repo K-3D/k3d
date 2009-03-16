@@ -26,7 +26,6 @@
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/nurbs.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/xml.h>
 
@@ -103,8 +102,8 @@ static void parse_rect(const k3d::xml::element& SVG, transform_stack& Transforma
 		// Create a circular_arc in the positive quadrant and mirror points to generate corners ...
 		k3d::mesh::knots_t corner_knots;
 		k3d::mesh::weights_t corner_weights;
-		std::vector<k3d::point3> corner_control_points;
-		k3d::nurbs::circular_arc(k3d::vector3(rx, 0, 0), k3d::vector3(0, ry, 0), 0, k3d::pi() / 2, 1, corner_knots, corner_weights, corner_control_points);
+		k3d::mesh::points_t corner_control_points;
+		k3d::nurbs_curve::circular_arc(k3d::vector3(rx, 0, 0), k3d::vector3(0, ry, 0), 0, k3d::pi() / 2, 1, corner_knots, corner_weights, corner_control_points);
 
 		// Start the curve ...
 		k3d::mesh::points_t control_points;
@@ -178,7 +177,7 @@ static void parse_circle(const k3d::xml::element& SVG, transform_stack& Transfor
 	k3d::mesh::knots_t knots;
 	k3d::mesh::weights_t weights;
 	k3d::mesh::points_t control_points;
-	k3d::nurbs::circular_arc(k3d::vector3(r, 0, 0), k3d::vector3(0, r, 0), 0, k3d::pi_times_2(), 4, knots, weights, control_points);
+	k3d::nurbs_curve::circular_arc(k3d::vector3(r, 0, 0), k3d::vector3(0, r, 0), 0, k3d::pi_times_2(), 4, knots, weights, control_points);
 
 	for(k3d::uint_t i = 0; i != control_points.size(); ++i)
 		control_points[i] = Transformation.top() * (control_points[i] + k3d::vector3(cx, cy, 0));
@@ -196,7 +195,7 @@ static void parse_ellipse(const k3d::xml::element& SVG, transform_stack& Transfo
 	k3d::mesh::knots_t knots;
 	k3d::mesh::weights_t weights;
 	k3d::mesh::points_t control_points;
-	k3d::nurbs::circular_arc(k3d::vector3(rx, 0, 0), k3d::vector3(0, ry, 0), 0, k3d::pi_times_2(), 4, knots, weights, control_points);
+	k3d::nurbs_curve::circular_arc(k3d::vector3(rx, 0, 0), k3d::vector3(0, ry, 0), 0, k3d::pi_times_2(), 4, knots, weights, control_points);
 
 	for(k3d::uint_t i = 0; i != control_points.size(); ++i)
 		control_points[i] = Transformation.top() * (control_points[i] + k3d::vector3(cx, cy, 0));
@@ -308,7 +307,7 @@ static void create_arc(k3d::point4 p1, k3d::point4 p2, k3d::double_t phi, k3d::d
 			theta_two = theta_one + k3d::pi_times_2() +  delta_theta;
 
 
-	k3d::nurbs::circular_arc(k3d::point3(rx, 0, 0), k3d::point3(0, ry, 0), theta_one, theta_two, segments, knots, weights, control_points);
+	k3d::nurbs_curve::circular_arc(k3d::point3(rx, 0, 0), k3d::point3(0, ry, 0), theta_one, theta_two, segments, knots, weights, control_points);
 	if (theta_two < theta_one)
 	{
 		std::vector<k3d::point3> tmp_cp;

@@ -29,7 +29,6 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/nurbs.h>
 #include <k3dsdk/nurbs_curve.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -78,7 +77,7 @@ public:
 		k3d::mesh::knots_t knots;
 		k3d::mesh::weights_t weights;
 		k3d::mesh::points_t control_points;
-		k3d::nurbs::circular_arc(k3d::vector3(radius, 0, 0), k3d::vector3(0, radius, 0), 0, thetamax, u_segments, knots, weights, control_points);
+		k3d::nurbs_curve::circular_arc(k3d::vector3(radius, 0, 0), k3d::vector3(0, radius, 0), 0, thetamax, u_segments, knots, weights, control_points);
 
 		// Create a NURBS curve primitive, and add a single curve ...
 		Output.points.create();

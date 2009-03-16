@@ -28,7 +28,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -90,15 +90,15 @@ public:
 		const k3d::int32_t v_segments = m_v_segments.pipeline_value();
 
 		// Compute NURBS control points ...
-		std::vector<k3d::double_t> v_knots;
-		std::vector<k3d::double_t> v_weights;
-		std::vector<k3d::point3> v_control_points;
-		k3d::nurbs::circular_arc(k3d::vector3(0, 1, 0), k3d::vector3(0, 0, 1), phimin, phimax, v_segments, v_knots, v_weights, v_control_points);
+		k3d::mesh::knots_t v_knots;
+		k3d::mesh::weights_t v_weights;
+		k3d::mesh::points_t v_control_points;
+		k3d::nurbs_curve::circular_arc(k3d::vector3(0, 1, 0), k3d::vector3(0, 0, 1), phimin, phimax, v_segments, v_knots, v_weights, v_control_points);
 
-		std::vector<k3d::double_t> u_knots;
-		std::vector<k3d::double_t> u_weights;
-		std::vector<k3d::point3> u_control_points;
-		k3d::nurbs::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, thetamax, u_segments, u_knots, u_weights, u_control_points);
+		k3d::mesh::knots_t u_knots;
+		k3d::mesh::weights_t u_weights;
+		k3d::mesh::points_t u_control_points;
+		k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, thetamax, u_segments, u_knots, u_weights, u_control_points);
 
 		// Create patch ...
 		k3d::mesh::points_t& points = Output.points.create();

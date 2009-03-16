@@ -22,12 +22,13 @@
 */
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/geometric_operations.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -95,10 +96,10 @@ public:
 		const k3d::double_t r2 = p2[0];
 
 		// Compute NURBS control points ...
-		std::vector<k3d::double_t> u_knots;
-		std::vector<k3d::double_t> weights;
-		std::vector<k3d::point3> control_points;
-		k3d::nurbs::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, thetamax, 4, u_knots, weights, control_points);
+		k3d::mesh::knots_t u_knots;
+		k3d::mesh::weights_t weights;
+		k3d::mesh::points_t control_points;
+		k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, thetamax, 4, u_knots, weights, control_points);
 
 		// Create patch ...
 		k3d::mesh::points_t& points = Output.points.create();

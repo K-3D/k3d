@@ -28,7 +28,7 @@
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -99,15 +99,15 @@ public:
 		const k3d::vector3 offset2 = z2 * k3d::vector3(0, 0, 1);
 
 		// Compute NURBS control points ...
-		std::vector<k3d::double_t> knots1;
-		std::vector<k3d::double_t> weights1;
-		std::vector<k3d::point3> control_points1;
-		k3d::nurbs::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), thetamin1, thetamin1 + thetamax, 4, knots1, weights1, control_points1);
+		k3d::mesh::knots_t knots1;
+		k3d::mesh::weights_t weights1;
+		k3d::mesh::points_t control_points1;
+		k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), thetamin1, thetamin1 + thetamax, 4, knots1, weights1, control_points1);
 
-		std::vector<k3d::double_t> knots2;
-		std::vector<k3d::double_t> weights2;
-		std::vector<k3d::point3> control_points2;
-		k3d::nurbs::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), thetamin2, thetamin2 + thetamax, 4, knots2, weights2, control_points2);
+		k3d::mesh::knots_t knots2;
+		k3d::mesh::weights_t weights2;
+		k3d::mesh::points_t control_points2;
+		k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), thetamin2, thetamin2 + thetamax, 4, knots2, weights2, control_points2);
 
 		// Create patch ...
 		k3d::mesh::points_t& points = Output.points.create();

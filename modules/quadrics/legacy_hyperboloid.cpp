@@ -104,13 +104,17 @@ public:
 			const k3d::point3 offset1 = z1 * k3d::point3(0, 0, 1);
 			const k3d::point3 offset2 = z2 * k3d::point3(0, 0, 1);
 
-			std::vector<double> weights1;
-			std::vector<k3d::point3> arc_points1;
-			k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), thetamin1, thetamin1 + thetamax, 4, m_gl_u_knot_vector, weights1, arc_points1);
+			k3d::mesh::knots_t knots1;
+			k3d::mesh::weights_t weights1;
+			k3d::mesh::points_t arc_points1;
+			k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), thetamin1, thetamin1 + thetamax, 4, knots1, weights1, arc_points1);
 
-			std::vector<double> weights2;
-			std::vector<k3d::point3> arc_points2;
-			k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), thetamin2, thetamin2 + thetamax, 4, m_gl_u_knot_vector, weights2, arc_points2);
+			k3d::mesh::knots_t knots2;
+			k3d::mesh::weights_t weights2;
+			k3d::mesh::points_t arc_points2;
+			k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), thetamin2, thetamin2 + thetamax, 4, knots2, weights2, arc_points2);
+
+			m_gl_u_knot_vector.assign(knots2.begin(), knots2.end());
 
 			for(unsigned long j = 0; j != arc_points1.size(); ++j)
 			{

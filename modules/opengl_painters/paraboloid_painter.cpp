@@ -23,9 +23,10 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/geometric_operations.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_painter_gl.h>
-#include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/paraboloid.h>
@@ -127,10 +128,6 @@ public:
 		if(!Radius)
 			return;
 
-		std::vector<GLfloat> incomplete_gl_u_knot_vector;
-		std::vector<GLfloat> incomplete_gl_v_knot_vector;
-		std::vector<GLfloat> incomplete_gl_control_points;
-
 		const k3d::double_t z1 = ZMax ? ZMin / ZMax : 0.0;
 		const k3d::double_t z3 = 1.0;
 
@@ -149,35 +146,40 @@ public:
 		const k3d::double_t z2 = p2[1];
 		const k3d::double_t r2 = p2[0];
 
-		std::vector<k3d::double_t> weights;
-		std::vector<k3d::point3> arc_points;
-		k3d::nurbs::circular_arc(k3d::point3(1, 0, 0), k3d::point3(0, 1, 0), 0, SweepAngle, 4, incomplete_gl_u_knot_vector, weights, arc_points);
+		k3d::mesh::knots_t knots;
+		k3d::mesh::weights_t weights;
+		k3d::mesh::points_t arc_points;
+		k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, SweepAngle, 4, knots, weights, arc_points);
 
-		incomplete_gl_v_knot_vector.insert(incomplete_gl_v_knot_vector.end(), 3, 0);
-		incomplete_gl_v_knot_vector.insert(incomplete_gl_v_knot_vector.end(), 3, 1);
+		std::vector<GLfloat> gl_u_knot_vector(knots.begin(), knots.end());
+		std::vector<GLfloat> gl_v_knot_vector;
+		std::vector<GLfloat> gl_control_points;
+
+		gl_v_knot_vector.insert(gl_v_knot_vector.end(), 3, 0);
+		gl_v_knot_vector.insert(gl_v_knot_vector.end(), 3, 1);
 
 		for(k3d::uint_t j = 0; j != arc_points.size(); ++j)
 		{
-			incomplete_gl_control_points.push_back(weights[j] * r1 * Radius * arc_points[j][0]);
-			incomplete_gl_control_points.push_back(weights[j] * r1 * Radius * arc_points[j][1]);
-			incomplete_gl_control_points.push_back(weights[j] * z1 * ZMax);
-			incomplete_gl_control_points.push_back(weights[j]);
+			gl_control_points.push_back(weights[j] * r1 * Radius * arc_points[j][0]);
+			gl_control_points.push_back(weights[j] * r1 * Radius * arc_points[j][1]);
+			gl_control_points.push_back(weights[j] * z1 * ZMax);
+			gl_control_points.push_back(weights[j]);
 		}
 
 		for(k3d::uint_t j = 0; j != arc_points.size(); ++j)
 		{
-			incomplete_gl_control_points.push_back(weights[j] * r2 * Radius * arc_points[j][0]);
-			incomplete_gl_control_points.push_back(weights[j] * r2 * Radius * arc_points[j][1]);
-			incomplete_gl_control_points.push_back(weights[j] * z2 * ZMax);
-			incomplete_gl_control_points.push_back(weights[j]);
+			gl_control_points.push_back(weights[j] * r2 * Radius * arc_points[j][0]);
+			gl_control_points.push_back(weights[j] * r2 * Radius * arc_points[j][1]);
+			gl_control_points.push_back(weights[j] * z2 * ZMax);
+			gl_control_points.push_back(weights[j]);
 		}
 
 		for(k3d::uint_t j = 0; j != arc_points.size(); ++j)
 		{
-			incomplete_gl_control_points.push_back(weights[j] * r3 * Radius * arc_points[j][0]);
-			incomplete_gl_control_points.push_back(weights[j] * r3 * Radius * arc_points[j][1]);
-			incomplete_gl_control_points.push_back(weights[j] * z3 * ZMax);
-			incomplete_gl_control_points.push_back(weights[j]);
+			gl_control_points.push_back(weights[j] * r3 * Radius * arc_points[j][0]);
+			gl_control_points.push_back(weights[j] * r3 * Radius * arc_points[j][1]);
+			gl_control_points.push_back(weights[j] * z3 * ZMax);
+			gl_control_points.push_back(weights[j]);
 		}
 
 		GLUnurbsObj* const nurbs_renderer = gluNewNurbsRenderer();
@@ -190,7 +192,7 @@ public:
 		gluLoadSamplingMatrices(nurbs_renderer, gl_modelview_matrix, State.gl_projection_matrix, State.gl_viewport);
 
 		gluBeginSurface(nurbs_renderer);
-		gluNurbsSurface(nurbs_renderer, incomplete_gl_u_knot_vector.size(), &incomplete_gl_u_knot_vector[0], incomplete_gl_v_knot_vector.size(), &incomplete_gl_v_knot_vector[0], 4, 36, &incomplete_gl_control_points[0], 3, 3, GL_MAP2_VERTEX_4);
+		gluNurbsSurface(nurbs_renderer, gl_u_knot_vector.size(), &gl_u_knot_vector[0], gl_v_knot_vector.size(), &gl_v_knot_vector[0], 4, 36, &gl_control_points[0], 3, 3, GL_MAP2_VERTEX_4);
 		gluEndSurface(nurbs_renderer);
 
 		gluDeleteNurbsRenderer(nurbs_renderer);
