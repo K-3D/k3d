@@ -26,6 +26,7 @@
 #include "idocument.h"
 #include "inode.h"
 #include "ioption_property_ri.h"
+#include "ipipeline.h"
 #include "iuser_property.h"
 #include "metadata.h"
 #include "properties.h"
@@ -898,6 +899,17 @@ private:
 };
 
 } // namespace detail
+
+void connect(idocument& Document, iproperty* const From, iproperty* const To)
+{
+	return_if_fail(From);
+	return_if_fail(To);
+
+	ipipeline::dependencies_t dependencies;
+	dependencies.insert(std::make_pair(To, From));
+
+	Document.pipeline().set_dependencies(dependencies);
+}
 
 iproperty* get(iunknown& Object, const string_t& Name)
 {

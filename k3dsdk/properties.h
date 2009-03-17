@@ -30,11 +30,15 @@
 namespace k3d
 {
 
+class idocument;
 class inode;
 class iunknown;
 
 namespace property
 {
+
+/// Makes a connection from one property to another.
+void connect(idocument& Document, iproperty* const From, iproperty* const To);
 
 /// Returns a matching property by name, or NULL
 iproperty* get(iunknown& Object, const string_t& Name);
