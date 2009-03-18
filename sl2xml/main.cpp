@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 			std::cout << std::endl;
 			std::cout << "     gcc -E -P -x c <file> | sl2xml" << std::endl;
 			std::cout << std::endl;
-			exit(0);
+			return 0;
 		}
 		else if(argument == "--version")
 		{
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 			std::cout << K3D_COPYRIGHT << "  See the AUTHORS file for contributors." << std::endl;
 			std::cout << "Licensed under the GNU General Public License.  See the COPYING file for details." << std::endl;
 			std::cout << "K-3D Home Page: http://www.k-3d.com" << std::endl;
-			exit(0);
+			return 0;
 		}
 	}
 
