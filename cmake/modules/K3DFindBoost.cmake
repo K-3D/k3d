@@ -1,81 +1,42 @@
 SET(K3D_BOOST_FOUND 0)
 
-######################################################################
-# Posix specific configuration
-
-IF(UNIX)
-
-	SET(Boost_ADDITIONAL_VERSIONS 1.37 1.38)
-	FIND_PACKAGE(Boost 1.34.1 COMPONENTS program_options python regex)
-
-	SET(K3D_BOOST_FOUND ${Boost_FOUND})
-
-	SET(K3D_BOOST_INCLUDE_DIRS
-		${Boost_INCLUDE_DIRS}
-		)
-	SET(K3D_BOOST_PROGRAM_OPTIONS_LIBS
-		${Boost_PROGRAM_OPTIONS_LIBRARY}
-		)
-	SET(K3D_BOOST_PYTHON_LIBS
-		${Boost_PYTHON_LIBRARY}
-		)
-	SET(K3D_BOOST_REGEX_LIBS
-		${Boost_REGEX_LIBRARY}
-		)
-
-ENDIF(UNIX)
-
-######################################################################
-# Win32 specific configuration
-
+SET(Boost_ADDITIONAL_VERSIONS 1.37 1.38)
 IF(WIN32)
-	FIND_PATH(K3D_BOOST_INCLUDE_DIR boost
-		c:/boost/include/boost_1_34_1
-		DOC "Directory where the boost header files are located"
-		)
-	MARK_AS_ADVANCED(K3D_BOOST_INCLUDE_DIR)
-
-	SET(K3D_BOOST_LIB_DIR c:/boost/lib CACHE PATH "Directory where the boost libraries are located")
-	MARK_AS_ADVANCED(K3D_BOOST_LIB_DIR)
-
-        IF(MSVC)
-                SET(K3D_BOOST_PROGRAM_OPTIONS_LIB optimized libboost_program_options-vc80-mt debug libboost_program_options-vc80-mt-gd CACHE STRING "")
-        ELSE(MSVC)
-                SET(K3D_BOOST_PROGRAM_OPTIONS_LIB boost_program_options-mgw34-1_34_1 CACHE STRING "")
-        ENDIF(MSVC)
-	MARK_AS_ADVANCED(K3D_BOOST_PROGRAM_OPTIONS_LIB)
-
-        IF(MSVC)
-                SET(K3D_BOOST_PYTHON_LIB optimized boost_python-vc80-mt debug boost_python-vc80-mt-gd CACHE STRING "")
-        ELSE(MSVC)
-                SET(K3D_BOOST_PYTHON_LIB boost_python-mgw34-1_34_1 CACHE STRING "")
-        ENDIF(MSVC)
-	MARK_AS_ADVANCED(K3D_BOOST_PYTHON_LIB)
-
-        IF(MSVC)
-                SET(K3D_BOOST_REGEX_LIB optimized boost_regex-vc80-mt debug boost_regex-vc80-mt-gd CACHE STRING "")
-        ELSE(MSVC)
-                SET(K3D_BOOST_REGEX_LIB boost_regex-mgw34-1_34_1 CACHE STRING "")
-        ENDIF(MSVC)
-	MARK_AS_ADVANCED(K3D_BOOST_REGEX_LIB)
-
-
-	SET(K3D_BOOST_INCLUDE_DIRS
-		${K3D_BOOST_INCLUDE_DIR}
-		)
-	SET(K3D_BOOST_LIB_DIRS
-		${K3D_BOOST_LIB_DIR}
-		)
-	SET(K3D_BOOST_PROGRAM_OPTIONS_LIBS
-		${K3D_BOOST_PROGRAM_OPTIONS_LIB}
-		)
-	SET(K3D_BOOST_PYTHON_LIBS
-		${K3D_BOOST_PYTHON_LIB}
-		)
-	SET(K3D_BOOST_REGEX_LIBS
-		${K3D_BOOST_REGEX_LIB}
-		)
-	SET(K3D_BOOST_FOUND 1)
-
+	SET(BOOST_ROOT "C:/Program Files/Boost")
+	SET(Boost_COMPILER -gcc43)
 ENDIF(WIN32)
 
+#Make sure we only search for the system libary after boost version 1.35, courtesy of Geir Erikstad
+find_package(Boost)
+set(local_boost_version "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}")
+if (${local_boost_version} VERSION_LESS "1.35")
+   FIND_PACKAGE(Boost 1.34 COMPONENTS filesystem program_options python regex thread)
+else()
+   FIND_PACKAGE(Boost 1.34 COMPONENTS filesystem program_options python regex thread system)
+endif()
+
+SET(K3D_BOOST_FOUND ${Boost_FOUND})
+
+SET(K3D_BOOST_INCLUDE_DIRS
+	${Boost_INCLUDE_DIRS}
+	)
+SET(K3D_BOOST_PROGRAM_OPTIONS_LIBS
+	${Boost_PROGRAM_OPTIONS_LIBRARY}
+	)
+SET(K3D_BOOST_PYTHON_LIBS
+	${Boost_PYTHON_LIBRARY}
+	)
+SET(K3D_BOOST_REGEX_LIBS
+	${Boost_REGEX_LIBRARY}
+	)
+# Needed for collada_io
+SET(K3D_BOOST_FILESYSTEM_LIBS
+	${Boost_FILESYSTEM_LIBRARY}
+	)
+SET(K3D_BOOST_SYSTEM_LIBS
+	${Boost_SYSTEM_LIBRARY}
+	)
+# Needed for CGAL
+SET(K3D_BOOST_THREAD_LIBS
+	${Boost_THREAD_LIBRARY}
+	)
