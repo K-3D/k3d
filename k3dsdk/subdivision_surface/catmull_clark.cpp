@@ -79,6 +79,19 @@ void create_vertex_edge_lookup(const k3d::mesh::indices_t& EdgePoints, const k3d
 	}
 }
 
+/// True if Face is the first face containing Point
+k3d::bool_t first_corner(const k3d::uint_t Face, const k3d::uint_t Point, const k3d::mesh::indices_t& PointFirstFaces, const k3d::mesh::counts_t& PointFaceCounts, const k3d::mesh::indices_t& PointFaces)
+{
+	const k3d::uint_t face_begin = PointFirstFaces[Point];
+	const k3d::uint_t face_end = face_begin + PointFaceCounts[Point];
+	for(k3d::uint_t i = face_begin; i != face_end; ++i)
+	{
+		if(PointFaces[i] < Face)
+			return false;
+	}
+	return true;
+}
+
 /// Stores references to commonly used arrays, and defines some common checks for faces and edges
 class mesh_arrays
 {
@@ -120,18 +133,6 @@ public:
 						|| is_affected(face) && (face <= companion_face || !is_affected(companion_face)));
 	}
 	
-	/// True if the face that Edge belongs to comes before the face its companion belongs to, when considering corner points
-	/**
-	 * Note that the actual corner point affected by this check is the _endpoint_ of Edge, i.e. edge_points[clockwise_edges[Edge]]
-	 * This check does not account for selection, since corner points are added for both affected and unaffected faces
-	 */
-	k3d::bool_t first_corner(const k3d::uint_t Edge) const
-	{
-		const k3d::uint_t companion = companions[Edge];
-		const k3d::uint_t clockwise = clockwise_edges[Edge];
-		return edge_faces[clockwise] <= edge_faces[companions[clockwise]] && edge_faces[Edge] <= edge_faces[companion];
-	}
-	
 	/// True if the edge is part of the boundary of the mesh that is to be subdivided
 	/**
 	 * This means it is one of the following:
@@ -165,11 +166,19 @@ class per_face_component_counter
 {
 public:
 	per_face_component_counter(const mesh_arrays& MeshArrays,
+			const k3d::mesh::indices_t& EdgePoints,
+			const k3d::mesh::indices_t& PointFirstFaces,
+			const k3d::mesh::counts_t& PointFaceCounts,
+			const k3d::mesh::indices_t& PointFaces,
 			k3d::mesh::counts_t& FaceSubfaceCounts,
 			k3d::mesh::counts_t& FaceSubloopCounts,
 			k3d::mesh::counts_t& FaceEdgeCounts,
 			k3d::mesh::counts_t& FacePointCounts) :
 		m_mesh_arrays(MeshArrays),
+		m_edge_points(EdgePoints),
+		m_point_first_faces(PointFirstFaces),
+		m_point_face_counts(PointFaceCounts),
+		m_point_faces(PointFaces),
 		m_face_subface_counts(FaceSubfaceCounts),
 		m_face_subloop_counts(FaceSubloopCounts),
 		m_face_edge_counts(FaceEdgeCounts),
@@ -205,7 +214,8 @@ public:
 					} 
 					
 					// Count the new corner points, respecting face order
-					if(m_mesh_arrays.first_corner(edge))
+					
+					if(first_corner(Face, m_edge_points[m_mesh_arrays.clockwise_edges[edge]], m_point_first_faces, m_point_face_counts, m_point_faces))
 					{
 						++point_count;
 					}
@@ -232,7 +242,7 @@ public:
 					++point_count; // Count the midpoint
 				}
 				
-				if(m_mesh_arrays.first_corner(edge))
+				if(first_corner(Face, m_edge_points[m_mesh_arrays.clockwise_edges[edge]], m_point_first_faces, m_point_face_counts, m_point_faces))
 					++point_count;
 				
 				edge = m_mesh_arrays.clockwise_edges[edge];
@@ -244,6 +254,10 @@ public:
 	
 private:
 	const mesh_arrays& m_mesh_arrays;
+	const k3d::mesh::indices_t& m_edge_points;
+	const k3d::mesh::indices_t& m_point_first_faces;
+	const k3d::mesh::counts_t& m_point_face_counts;
+	const k3d::mesh::indices_t& m_point_faces;
 	k3d::mesh::counts_t& m_face_subface_counts;
 	k3d::mesh::counts_t& m_face_subloop_counts;
 	k3d::mesh::counts_t& m_face_edge_counts;
@@ -256,6 +270,9 @@ class point_index_calculator
 public:
 	point_index_calculator(const mesh_arrays& MeshArrays,
 			const k3d::mesh::indices_t& EdgePoints,
+			const k3d::mesh::indices_t& PointFirstFaces,
+			const k3d::mesh::counts_t& PointFaceCounts,
+			const k3d::mesh::indices_t& PointFaces,
 			const k3d::mesh::counts_t& FacePointCounts,
 			k3d::mesh::indices_t& CornerPoints,
 			k3d::mesh::indices_t& EdgeMidpoints,
@@ -263,6 +280,9 @@ public:
 			) :
 				m_mesh_arrays(MeshArrays),
 				m_edge_points(EdgePoints),
+				m_point_first_faces(PointFirstFaces),
+				m_point_face_counts(PointFaceCounts),
+				m_point_faces(PointFaces),
 				m_face_point_counts(FacePointCounts),
 				m_corner_points(CornerPoints),
 				m_edge_midpoints(EdgeMidpoints),
@@ -281,7 +301,7 @@ public:
 				const k3d::uint_t first_edge = m_mesh_arrays.loop_first_edges[loop];
 				for(k3d::uint_t edge = first_edge; ; )
 				{
-					if(m_mesh_arrays.first_corner(edge))
+					if(first_corner(Face, m_edge_points[m_mesh_arrays.clockwise_edges[edge]], m_point_first_faces, m_point_face_counts, m_point_faces))
 					{
 						const k3d::uint_t clockwise = m_mesh_arrays.clockwise_edges[edge]; 
 						m_corner_points[m_edge_points[clockwise]] = point_count;
@@ -309,8 +329,8 @@ public:
 					++point_count; // Count the midpoint
 				}
 				
-				if(m_mesh_arrays.first_corner(edge))
-				{
+				if(first_corner(Face, m_edge_points[m_mesh_arrays.clockwise_edges[edge]], m_point_first_faces, m_point_face_counts, m_point_faces))
+				{ 
 					m_corner_points[m_edge_points[clockwise]] = point_count;
 					++point_count;
 				}
@@ -325,6 +345,9 @@ public:
 private:
 	const mesh_arrays& m_mesh_arrays;
 	const k3d::mesh::indices_t& m_edge_points;
+	const k3d::mesh::indices_t& m_point_first_faces;
+	const k3d::mesh::counts_t& m_point_face_counts;
+	const k3d::mesh::indices_t& m_point_faces;
 	const k3d::mesh::counts_t& m_face_point_counts;
 	k3d::mesh::indices_t& m_corner_points;
 	k3d::mesh::indices_t& m_edge_midpoints;
@@ -683,6 +706,7 @@ public:
 		k3d::uint_t output_face = first_new_face;
 		for(k3d::uint_t edge = first_edge; ; )
 		{
+			return_if_fail(m_edge_midpoints[edge] != 0);
 			k3d::point3& midpoint = m_output_points[m_edge_midpoints[edge]];
 			const k3d::uint_t companion = m_mesh_arrays.companions[edge];
 			const k3d::uint_t output_first_edge = m_output_loop_first_edges[m_output_face_first_loops[output_face]];
@@ -778,6 +802,7 @@ public:
 
 	void operator()(const k3d::uint_t Point)
 	{
+		return_if_fail(m_corner_points[Point] != 0);
 		// Set initial position
 		k3d::point3& output_position = m_output_points[m_corner_points[Point]];
 		output_position = m_input_points[Point];
@@ -950,6 +975,10 @@ public:
 			k3d::mesh::selection_t& output_face_selection = output_polyhedra.face_selection.create();
 			k3d::mesh::materials_t& output_face_materials = output_polyhedra.face_materials.create();
 
+			k3d::mesh::indices_t point_first_faces;
+			k3d::mesh::counts_t point_face_counts;
+			k3d::mesh::indices_t point_faces;
+			
 			// store some common arrays
 			detail::mesh_arrays mesh_arrays(input_face_selection,
 					input_face_first_loops,
@@ -965,6 +994,15 @@ public:
 			timer.restart();
 			k3d::mesh::bools_t boundary_edges;
 			k3d::polyhedron::create_edge_adjacency_lookup(output_edge_points, output_clockwise_edges, boundary_edges, topology_data.companions);
+			k3d::polyhedron::create_vertex_face_lookup(input_face_first_loops,
+					input_face_loop_counts,
+					input_loop_first_edges,
+					input_edge_points,
+					input_clockwise_edges,
+					*input.points,
+					point_first_faces,
+					point_face_counts,
+					point_faces);
 			calculate_companions_time += timer.elapsed();
 
 			timer.restart();
@@ -977,6 +1015,10 @@ public:
 			k3d::mesh::indices_t face_edge_counts(input_face_count);
 			k3d::mesh::indices_t face_point_counts(input_face_count);
 			detail::per_face_component_counter per_face_component_counter(mesh_arrays,
+						input_edge_points,
+						point_first_faces,
+						point_face_counts,
+						point_faces,
 						topology_data.face_subface_counts,
 						face_subloop_counts,
 						face_edge_counts,
@@ -990,11 +1032,14 @@ public:
 			// We now have the following relationships between old and new geometry:
 			// first new component index = ..._counts[old component index - 1]
 			
-			topology_data.corner_points.resize(input.points->size());
+			topology_data.corner_points.resize(input.points->size(), 0);
 			topology_data.edge_midpoints.resize(input_edge_points.size());
 			topology_data.face_centers.resize(input_face_first_loops.size());
 			detail::point_index_calculator point_index_calculator(mesh_arrays,					
 					input_edge_points,
+					point_first_faces,
+					point_face_counts,
+					point_faces,
 					face_point_counts,
 					topology_data.corner_points,
 					topology_data.edge_midpoints,
@@ -1075,7 +1120,7 @@ public:
 		}
 		const k3d::double_t total = total_timer.elapsed();
 		k3d::log() << debug << "SDS create timings: Total: " << total 
-			<< ", copy input: " << copy_input_time << " (" << copy_input_time/total*100 << "%), calculate companions: "
+			<< ", copy input: " << copy_input_time << " (" << copy_input_time/total*100 << "%), calculate companions/point to face: "
 			<< calculate_companions_time << " (" << calculate_companions_time/total*100 << "%), calculate indices: "
 			<< calculate_indices_time << " (" << calculate_indices_time/total*100 << "%), allocate memory: "
 			<< allocate_memory_time << " (" << allocate_memory_time/total*100 << "%), subdivide topology: "
@@ -1125,7 +1170,8 @@ public:
 					input_loop_first_edges,
 					input_clockwise_edges,
 					topology_data.edge_faces,
-					topology_data.companions);
+					topology_data.companions
+					);
 			
 			k3d::mesh::polyhedra_t& output_polyhedra = output.polyhedra.writable();
 			
