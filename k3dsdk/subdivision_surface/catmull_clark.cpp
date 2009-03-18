@@ -802,7 +802,6 @@ public:
 
 	void operator()(const k3d::uint_t Point)
 	{
-		return_if_fail(m_corner_points[Point] != 0);
 		// Set initial position
 		k3d::point3& output_position = m_output_points[m_corner_points[Point]];
 		output_position = m_input_points[Point];
