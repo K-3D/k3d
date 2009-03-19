@@ -53,10 +53,10 @@ IF(K3D_INSTALL_AQSIS)
 	# Install generic aqsisrc, omitting paths (those are set at runtime through command line options)
 	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/aqsisrc DESTINATION bin)
 	#install msvcrt, needed since aqsis 1.4
-	INSTALL(FILES C:/WINDOWS/system32/msvcrt.dll DESTINATION bin)
-	INSTALL(FILES C:/WINDOWS/WinSxS/x86_Microsoft.VC80.CRT_1fc8b3b9a1e18e3b_8.0.50727.762_x-ww_6b128700/msvcp80.dll DESTINATION bin)
-	INSTALL(FILES C:/WINDOWS/WinSxS/x86_Microsoft.VC80.CRT_1fc8b3b9a1e18e3b_8.0.50727.762_x-ww_6b128700/msvcr80.dll DESTINATION bin)
-	INSTALL(FILES C:/WINDOWS/WinSxS/x86_Microsoft.VC80.CRT_1fc8b3b9a1e18e3b_8.0.50727.762_x-ww_6b128700/msvcm80.dll DESTINATION bin)
+	FIND_PROGRAM(VCREDIST_X86_2005 vcredist_x86_2005.exe DOC "Path to the Visual Studio C++ 2005 SP1 redistributable")
+	INSTALL(FILES ${VCREDIST_X86_2005} DESTINATION redist)
+	SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS
+		"ExecWait '\\\"$INSTDIR\\\\redist\\\\vcredist_x86_2005.exe\\\"'")
 ENDIF(K3D_INSTALL_AQSIS)
 
 IF(K3D_INSTALL_BOOST)
@@ -263,6 +263,13 @@ IF(K3D_INSTALL_PYTHON)
 			PATTERN *.pyo EXCLUDE
 			)
 	ENDIF(K3D_INSTALL_PYOPENGL)
+
+	#Needed for Python 2.6
+	FIND_PROGRAM(VCREDIST_X86_2008 vcredist_x86_2008.exe DOC "Path to the Visual Studio C++ 2008 SP1 redistributable")
+	INSTALL(FILES ${VCREDIST_X86_2008} DESTINATION redist)
+	SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS
+		"${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
+			ExecWait '\\\"$INSTDIR\\\\redist\\\\vcredist_x86_2008.exe\\\"'")
 
 ENDIF(K3D_INSTALL_PYTHON)
 
