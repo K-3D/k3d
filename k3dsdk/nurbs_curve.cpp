@@ -17,6 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "basic_math.h"
 #include "geometric_operations.h"
 #include "metadata.h"
 #include "nurbs_curve.h"
@@ -269,8 +270,6 @@ void circular_arc(const vector3& X, const vector3& Y, const double_t StartAngle,
 {
 	return_if_fail(Segments);
 
-//	const double_t start_angle = std::min(StartAngle, EndAngle);
-//	const double_t end_angle = std::max(StartAngle, EndAngle);
 	const double_t theta = (EndAngle - StartAngle) / static_cast<double_t>(Segments);
 	const double_t weight = std::cos(std::fabs(theta) * 0.5);
 
@@ -292,8 +291,8 @@ void circular_arc(const vector3& X, const vector3& Y, const double_t StartAngle,
 	ControlPoints.push_back(k3d::to_point(std::cos(StartAngle) * X + std::sin(StartAngle) * Y));
 	for(uint_t i = 0; i != Segments; ++i)
 	{
-		const double_t a0 = StartAngle + (theta * (i));
-		const double_t a2 = StartAngle + (theta * (i + 1));
+		const double_t a0 = mix(StartAngle, EndAngle, static_cast<double_t>(i) / static_cast<double_t>(Segments));
+		const double_t a2 = mix(StartAngle, EndAngle, static_cast<double_t>(i+1) / static_cast<double_t>(Segments));
 
 		const point3 p0(k3d::to_point(std::cos(a0) * X + std::sin(a0) * Y));
 		const point3 p2(k3d::to_point(std::cos(a2) * X + std::sin(a2) * Y));
