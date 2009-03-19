@@ -216,6 +216,7 @@ OPTION(K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE "Build the virtual offscreen OpenGL re
 OPTION(K3D_BUILD_VIRTUAL_OPENGL_PAINTERS_MODULE "Build virtual OpenGL painters modules" ON)
 OPTION(K3D_BUILD_WGL_MODULE "Build the Windows offscreen rendering module" ${WIN32})
 OPTION(K3D_BUILD_WINDOWS_MODULE "Build the Windows integration module" ${WIN32})
+OPTION(K3D_BUILD_XTRACKCAD_MODULE "Build the XTrackCAD Model Railroad integration module" ON)
 OPTION(K3D_BUILD_YAFRAY_MODULE "Build the YAFRAY render engine integration module" ON)
 
 OPTION(K3D_BUILD_PARALLEL "Enable parallel computation using the Threaded Building Blocks library" OFF)
