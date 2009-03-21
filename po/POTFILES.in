@@ -17,6 +17,7 @@ k3dsdk/mesh_selection_modifier.h
 k3dsdk/mesh_selection_sink.h
 k3dsdk/mesh_sink.h
 k3dsdk/mesh_source.h
+k3dsdk/mesh_writer.h
 k3dsdk/ngui/angle_axis.cpp
 k3dsdk/ngui/auto_property_page.cpp
 k3dsdk/ngui/auto_property_toolbar.cpp
@@ -196,6 +197,7 @@ modules/k3d_io/mesh_writer.cpp
 modules/k3dscript/engine.cpp
 modules/linear_curve/knot_curve.cpp
 modules/linear_curve/lissajous_curve.cpp
+modules/lipsync/papagayo_lipsync_reader.cpp
 modules/lsystem/l_parser.cpp
 modules/matrix/invert_matrix.cpp
 modules/md2_io/mesh_reader.cpp
@@ -217,7 +219,6 @@ modules/mesh/make_sds.cpp
 modules/mesh/merge_collinear_edges.cpp
 modules/mesh/merge_coplanar_faces.cpp
 modules/mesh/merge_mesh.cpp
-modules/mesh/mesh_stats.cpp
 modules/mesh/move_first_edge.cpp
 modules/mesh/sds_corner.cpp
 modules/mesh/sds_crease.cpp
@@ -229,6 +230,7 @@ modules/mesh/subdivide_faces.cpp
 modules/mesh/tag_color.cpp
 modules/mesh/triangulate_faces.cpp
 modules/mesh/weld.cpp
+modules/named_arrays/named_text_array.cpp
 modules/ngui_about/dialog.cpp
 modules/ngui_animation_timeline_panel/panel.cpp
 modules/ngui_assign_hotkeys/dialog.cpp
@@ -249,6 +251,7 @@ modules/ngui_pipeline_panel/graph_modifier.h
 modules/ngui_pipeline_panel/graph_source.h
 modules/ngui_pipeline_panel/panel.cpp
 modules/ngui_pipeline_profiler_panel/panel.cpp
+modules/ngui_python_shell/dialog.cpp
 modules/ngui_render_region_tool/tool.cpp
 modules/ngui_snap_tool/snap_tool_detail.h
 modules/ngui_snap_tool/tool.cpp
@@ -356,6 +359,7 @@ modules/pixie/raytrace_map.cpp
 modules/plot/least_squares_plot.cpp
 modules/plot/surface_plot.cpp
 modules/ply_io/mesh_reader.cpp
+modules/ply_io/mesh_writer.cpp
 modules/png_io/bitmap_importer.cpp
 modules/png_io/bitmap_reader.cpp
 modules/png_io/bitmap_writer.cpp
@@ -513,6 +517,7 @@ modules/virtual_opengl_painters/sds_point_painter.cpp
 modules/wgl/camera_to_bitmap.cpp
 modules/windows/disable_desktop_composition.cpp
 modules/windows/uri_handler.cpp
+modules/xtrackcad/document_importer.cpp
 modules/yafray/area_light.cpp
 modules/yafray/global_photon_light.cpp
 modules/yafray/hemi_light.cpp
@@ -529,5 +534,3 @@ share/scripts/scripted_plugins/ogre_exporter.py
 uimodules/ngui/splash_box.cpp
 uimodules/ngui/user_interface.cpp
 uimodules/qtui/user_interface.cpp
-k3dsdk/mesh_writer.h
-modules/ply_io/mesh_writer.cpp
