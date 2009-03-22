@@ -61,7 +61,6 @@ ENDIF(WIN32 AND MSVC)
 
 # Run tests to find external packages ...
 INCLUDE(K3DFind3ds)
-INCLUDE(K3DFindBoost)
 INCLUDE(K3DFindCairomm)
 INCLUDE(K3DFindCGAL)
 INCLUDE(K3DFindCollada)
@@ -230,7 +229,6 @@ OPTION(K3D_TEST_VBO "Run tests using VBO painters" OFF)
 MARK_AS_ADVANCED(K3D_TEST_VBO)
 
 # Find required external packages
-K3D_CHECK_REQUIRED_DEPENDENCY(K3D_BOOST_FOUND "Boost" "http://www.boost.org" "Note: in addition to the main Boost libraries, K-3D requires Boost.Program_options, Boost.Python, and Boost.Regex, which may be distributed separately on some systems.")
 K3D_CHECK_REQUIRED_DEPENDENCY(K3D_GLIBMM_FOUND "glibmm" "http://gtkmm.org" "")
 K3D_CHECK_REQUIRED_DEPENDENCY(K3D_OPENGL_FOUND "OpenGL" "http://opengl.org" "")
 K3D_CHECK_REQUIRED_DEPENDENCY(K3D_OPENGL_GLU_FOUND "OpenGL GLU" "http://opengl.org" "")
@@ -291,6 +289,9 @@ K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_TOOL_PROPERTIES_PANEL_MODULE)
 K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_TUTORIAL_RECORDER_MODULE)
 K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_UNDO_TREE_PANEL_MODULE)
 K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_UV_EDITOR_PANEL_MODULE)
+
+INCLUDE(K3DFindBoost)
+K3D_CHECK_REQUIRED_DEPENDENCY(K3D_BOOST_FOUND "Boost" "http://www.boost.org" "Note: in addition to the main Boost libraries, K-3D requires Boost.Program_options, Boost.Python, and Boost.Regex, which may be distributed separately on some systems.")
 
 IF(K3D_BUILD_PYTHON_MODULE OR K3D_BUILD_PYUI_MODULE)
 	INCLUDE(FindPythonLibs)

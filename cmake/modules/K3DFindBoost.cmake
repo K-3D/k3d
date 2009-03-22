@@ -1,19 +1,41 @@
 SET(K3D_BOOST_FOUND 0)
-
 SET(Boost_ADDITIONAL_VERSIONS 1.37 1.38)
+SET(K3D_BOOST_COMPILER "" CACHE STRING
+	"Compiler identification embedded in the boost library names")
+IF(NOT ${K3D_BOOST_COMPILER} STREQUAL "")
+	SET(Boost_COMPILER ${K3D_BOOST_COMPILER})
+ENDIF(NOT ${K3D_BOOST_COMPILER} STREQUAL "")
 IF(WIN32)
 	SET(BOOST_ROOT "C:/Program Files/Boost")
-	SET(Boost_COMPILER -gcc43)
 ENDIF(WIN32)
 
-#Make sure we only search for the system libary after boost version 1.35, courtesy of Geir Erikstad
 find_package(Boost)
-set(local_boost_version "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}")
-if (${local_boost_version} VERSION_LESS "1.35")
-   FIND_PACKAGE(Boost 1.34 COMPONENTS filesystem program_options python regex thread)
-else()
-   FIND_PACKAGE(Boost 1.34 COMPONENTS filesystem program_options python regex thread system)
-endif()
+
+#components that are always needed
+SET(K3D_BOOST_COMPONENTS program_options regex)
+
+# python lib
+IF(${K3D_BUILD_PYTHON_MODULE} STREQUAL "ON")
+	SET(K3D_BOOST_COMPONENTS ${K3D_BOOST_COMPONENTS} python)
+ENDIF()
+
+# libs needed by collada
+IF(${K3D_BUILD_COLLADA_IO_MODULE} STREQUAL "ON")
+	#Make sure we only search for the system libary after boost version 1.35, courtesy of Geir Erikstad
+	set(local_boost_version "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}")
+	if (${local_boost_version} VERSION_LESS "1.35")
+		SET(K3D_BOOST_COMPONENTS ${K3D_BOOST_COMPONENTS} filesystem)
+	else()
+		SET(K3D_BOOST_COMPONENTS ${K3D_BOOST_COMPONENTS} filesystem system)
+	endif()
+ENDIF()
+
+#libs needed by CGAL
+IF(${K3D_BUILD_CGAL_MODULE} STREQUAL "ON")
+	SET(K3D_BOOST_COMPONENTS ${K3D_BOOST_COMPONENTS} thread)
+ENDIF()
+
+FIND_PACKAGE(Boost 1.34 COMPONENTS ${K3D_BOOST_COMPONENTS})
 
 SET(K3D_BOOST_FOUND ${Boost_FOUND})
 
@@ -29,14 +51,12 @@ SET(K3D_BOOST_PYTHON_LIBS
 SET(K3D_BOOST_REGEX_LIBS
 	${Boost_REGEX_LIBRARY}
 	)
-# Needed for collada_io
 SET(K3D_BOOST_FILESYSTEM_LIBS
 	${Boost_FILESYSTEM_LIBRARY}
 	)
 SET(K3D_BOOST_SYSTEM_LIBS
 	${Boost_SYSTEM_LIBRARY}
 	)
-# Needed for CGAL
 SET(K3D_BOOST_THREAD_LIBS
 	${Boost_THREAD_LIBRARY}
 	)
