@@ -181,11 +181,13 @@ void setup_renderman_document(k3d::idocument& Document)
 // setup_selection_document
 
 /// Adds a node to store the document node selection
-k3d::inode* setup_selection_document(k3d::idocument& Document)
+k3d::iunknown* setup_selection_document(k3d::idocument& Document)
 {
-	k3d::imetadata* node_selection = k3d::plugin::create<k3d::imetadata>("NodeSelection", Document, "Node Selection");
+	k3d::imetadata* const node_selection = k3d::plugin::create<k3d::imetadata>("NodeSelection", Document, "Node Selection");
+	return_val_if_fail(node_selection, 0);
+
 	node_selection->set_metadata_value("ngui:unique_node", "node_selection"); // metadata to ensure this node is found by the UI layer
-	return dynamic_cast<k3d::inode*>(node_selection);
+	return node_selection;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -201,7 +203,7 @@ void setup_document(k3d::idocument& Document)
 	setup_camera_document(Document);
 	setup_renderman_document(Document);
 	
-	return_if_fail(k3d::property::set_internal_value(*gl_engine, "node_selection", setup_selection_document(Document)));
+	k3d::property::set_internal_value(*gl_engine, "node_selection", dynamic_cast<k3d::inode*>(setup_selection_document(Document)));
 }
 
 /// Add document nodes that need an opengl context for extension checking
