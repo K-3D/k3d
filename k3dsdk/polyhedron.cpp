@@ -501,6 +501,65 @@ primitive* validate(mesh& Mesh)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
+// add_face
+
+void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, imaterial* const Material)
+{
+	add_face(Mesh, Polyhedron, Vertices, std::vector<mesh::points_t>(), Material);
+}
+
+void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material)
+{
+	return_if_fail(Mesh.points);
+	return_if_fail(Mesh.point_selection);
+
+	return_if_fail(Polyhedron.first_faces.size() == 1);
+	return_if_fail(Polyhedron.face_counts.size() == 1);
+
+	return_if_fail(Vertices.size() > 1);
+	for(uint_t hole = 0; hole != Holes.size(); ++hole)
+		return_if_fail(Holes[hole].size() > 1);
+
+	mesh::points_t& points = Mesh.points.writable();
+	mesh::selection_t& point_selection = Mesh.point_selection.writable();
+
+	Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
+	Polyhedron.face_loop_counts.push_back(Holes.size() + 1);
+	Polyhedron.face_selections.push_back(0);
+	Polyhedron.face_materials.push_back(Material);
+
+	Polyhedron.loop_first_edges.push_back(Polyhedron.edge_points.size());
+	for(mesh::points_t::const_iterator point = Vertices.begin(); point != Vertices.end(); ++point)
+	{
+		Polyhedron.edge_points.push_back(points.size());
+		Polyhedron.clockwise_edges.push_back(Polyhedron.edge_points.size());
+		Polyhedron.edge_selections.push_back(0);
+		
+		points.push_back(*point);
+		point_selection.push_back(0);
+	}
+	Polyhedron.clockwise_edges.back() = Polyhedron.loop_first_edges.back();
+
+	for(uint_t hole = 0; hole != Holes.size(); ++hole)
+	{
+		Polyhedron.loop_first_edges.push_back(Polyhedron.edge_points.size());
+		for(mesh::points_t::const_iterator point = Holes[hole].begin(); point != Holes[hole].end(); ++point)
+		{
+			Polyhedron.edge_points.push_back(points.size());
+			Polyhedron.clockwise_edges.push_back(Polyhedron.edge_points.size());
+			Polyhedron.edge_selections.push_back(0);
+			
+			points.push_back(*point);
+			point_selection.push_back(0);
+		}
+		Polyhedron.clockwise_edges.back() = Polyhedron.loop_first_edges.back();
+	}
+
+	Polyhedron.first_faces[0] = 0;
+	Polyhedron.face_counts[0] = Polyhedron.face_first_loops.size();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 // is_triangles
 
 const bool_t is_triangles(const const_primitive& Polyhedron)

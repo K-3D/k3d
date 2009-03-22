@@ -151,6 +151,11 @@ const_primitive* validate(const mesh& Mesh);
 /** \deprecated This method exists for the sole purpose of easing the transition to generic primitives. */
 primitive* validate(mesh& Mesh);
 
+/// Adds a face to an existing primitive.
+void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, imaterial* const Material);
+/// Adds a face with holes to an existing primitive.
+void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material);
+
 /// Returns true iff every face in the given polyhedron is a triangle.
 const bool_t is_triangles(const const_primitive& Polyhedron);
 /// Returns true iff the given polyhedron is a solid (i.e. it has no topological holes).
