@@ -33,7 +33,7 @@
 #include <boost/scoped_ptr.hpp>
 
 #if defined K3D_API_DARWIN
-	#define GLU_NURBS_CALLBACK(callback) (GLvoid(*)(...))callback
+	#define GLU_NURBS_CALLBACK(callback) (GLvoid(*)())callback
 #elif defined K3D_API_WIN32
 	#define GLU_NURBS_CALLBACK(callback) (_GLUfuncptr)callback
 #else
