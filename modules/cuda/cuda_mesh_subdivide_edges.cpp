@@ -23,6 +23,7 @@
         \author Evan Lezar (evanlezar@gmail.com)
 */
 
+#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
@@ -30,8 +31,8 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
@@ -40,6 +41,8 @@
 
 #include "cuda_device_mesh.h"
 #include "cuda_mesh_topology_data.h"
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -159,7 +162,8 @@ public:
 
         // If there are no valid polyhedra, we give up
         document().pipeline_profiler().start_execution(*this, "Create:Validate input");
-        if(!k3d::validate_polyhedra(Input))
+        boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
+        if(!polyhedron)
         {
             document().pipeline_profiler().finish_execution(*this, "Create:Validate input");
             return;
@@ -297,7 +301,8 @@ public:
     {
         document().pipeline_profiler().start_execution(*this, "Update:Validate input");
 
-        if(!k3d::validate_polyhedra(Input))
+        boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
+				if(!polyhedron)
         {
             document().pipeline_profiler().finish_execution(*this, "Update:Validate input");
             return;
