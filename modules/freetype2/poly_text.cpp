@@ -18,27 +18,28 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
+
+#include "freetype.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/bezier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/share.h>
 
-#include <iterator>
+#include <boost/scoped_ptr.hpp>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_OUTLINE_H
+#include <iterator>
 
 namespace module
 {
@@ -49,20 +50,22 @@ namespace freetype2
 namespace detail
 {
 
+/// Defines a closed contour
+typedef k3d::mesh::points_t contour_t;
+/// Defines a collection of closed contours
+typedef std::vector<contour_t> contours_t;
+
 const k3d::filesystem::path default_font()
 {
 	return k3d::share_path() / k3d::filesystem::generic_path("fonts/VeraBd.ttf");
 }
 
-/// Defines a closed contour
-typedef std::vector<k3d::point3> contour_t;
-
 /// Returns the signed 2D area of a contour
-const double area(const contour_t& Contour)
+const k3d::double_t area(const contour_t& Contour)
 {
-	double result = 0;
+	k3d::double_t result = 0;
 
-	for(unsigned long i = 0; i != Contour.size(); ++i)
+	for(k3d::uint_t i = 0; i != Contour.size(); ++i)
 		result += (Contour[i][0] * Contour[(i+1)%Contour.size()][1]) - (Contour[(i+1)%Contour.size()][0] * Contour[i][1]);
 
 	return result * 0.5;
@@ -74,76 +77,11 @@ const bool clockwise(const contour_t& Contour)
 	return area(Contour) < 0;
 }
 
-/// Encapsulates the freetype FT_Library struct to provide RAII behavior
-class freetype_library
-{
-public:
-	freetype_library() :
-		m_initialized(0 == FT_Init_FreeType(&m_library))
-	{
-	}
-
-	~freetype_library()
-	{
-		if(m_initialized)
-			FT_Done_FreeType(m_library);
-	}
-
-	operator bool()
-	{
-		return m_initialized;
-	}
-
-	operator FT_Library()
-	{
-		return m_library;
-	}
-
-private:
-	const bool m_initialized;
-	FT_Library m_library;
-};
-
-/// Encapsulates the freetype FT_Face struct to provide RAII behavior
-class freetype_face
-{
-public:
-	freetype_face(FT_Library Library, const k3d::filesystem::path& Path) :
-		m_initialized(0 == FT_New_Face(Library, Path.native_filesystem_string().c_str(), 0, &m_face))
-	{
-	}
-
-	~freetype_face()
-	{
-		if(m_initialized)
-			FT_Done_Face(m_face);
-	}
-
-	operator bool()
-	{
-		return m_initialized;
-	}
-
-	operator FT_Face()
-	{
-		return m_face;
-	}
-
-	FT_Face& face()
-	{
-		return m_face;
-	}
-
-private:
-	const bool m_initialized;
-	FT_Face m_face;
-};
-
-/// Adds a freetype glyph outline to a k3d::legacy::mesh
+/// Adds a freetype glyph outline to a k3d::polyhedron::primitive
 class freetype_outline
 {
 public:
-	freetype_outline(const unsigned long CurveDivisions) :
+	freetype_outline(const k3d::uint_t CurveDivisions) :
 		curve_divisions(CurveDivisions)
 	{
 		ft_outline_funcs.move_to = raw_move_to_func;
@@ -154,7 +92,7 @@ public:
 		ft_outline_funcs.delta = 0;
 	}
 
-	void convert(FT_Outline& Outline, k3d::legacy::mesh& Mesh, k3d::legacy::polyhedron& Polyhedron, k3d::imaterial* const Material, const k3d::matrix4& Matrix)
+	void convert(FT_Outline& Outline, k3d::mesh& Mesh, k3d::polyhedron::primitive& Polyhedron, k3d::imaterial* const Material, const k3d::matrix4& Matrix)
 	{
 		contours.clear();
 
@@ -172,37 +110,21 @@ public:
 				hole_contours.push_back(*contour);
 		}
 
-		// Create faces ...
-		std::vector<k3d::legacy::face*> faces;
-		for(contours_t::iterator contour = face_contours.begin(); contour != face_contours.end(); ++contour)
-		{
-			std::vector<k3d::legacy::split_edge*> edges;
-			for(contour_t::iterator point = contour->begin(); point != contour->end(); ++point)
-			{
-				Mesh.points.push_back(new k3d::legacy::point(Matrix * (*point)));
-				edges.push_back(new k3d::legacy::split_edge(Mesh.points.back()));
-			}
-			k3d::legacy::loop_edges(edges.begin(), edges.end());
+		for(k3d::uint_t i = 0; i != face_contours.size(); ++i)
+			for(k3d::uint_t j = 0; j != face_contours[i].size(); ++j)
+				face_contours[i][j] = Matrix * face_contours[i][j];
 
-			Polyhedron.faces.push_back(new k3d::legacy::face(edges.front(), Material));
-			faces.push_back(Polyhedron.faces.back());
-		}
+		for(k3d::uint_t i = 0; i != hole_contours.size(); ++i)
+			for(k3d::uint_t j = 0; j != hole_contours[i].size(); ++j)
+				hole_contours[i][j] = Matrix * hole_contours[i][j];
 
-		// Add holes ...
-		for(contours_t::iterator contour = hole_contours.begin(); contour != hole_contours.end(); ++contour)
-		{
-			return_if_fail(!faces.empty());
+		// Create faces.  This is a bit of hack, because we assume that all hole contours belong to the first
+		// face contour ...
+		if(face_contours.size())
+			k3d::polyhedron::add_face(Mesh, Polyhedron, face_contours[0], hole_contours, Material);
 
-			std::vector<k3d::legacy::split_edge*> edges;
-			for(contour_t::iterator point = contour->begin(); point != contour->end(); ++point)
-			{
-				Mesh.points.push_back(new k3d::legacy::point(Matrix * (*point)));
-				edges.push_back(new k3d::legacy::split_edge(Mesh.points.back()));
-			}
-			k3d::legacy::loop_edges(edges.begin(), edges.end());
-
-			faces[0]->holes.push_back(edges.front());
-		}
+		for(k3d::uint_t i = 1; i < face_contours.size(); ++i)
+			k3d::polyhedron::add_face(Mesh, Polyhedron, face_contours[i], Material);
 	}
 
 private:
@@ -225,9 +147,9 @@ private:
 		control_points.push_back(Control);
 		control_points.push_back(To);
 
-		for(unsigned long i = 0; i != curve_divisions; ++i)
+		for(k3d::uint_t i = 0; i != curve_divisions; ++i)
 		{
-			contours.back().push_back(k3d::Bezier<k3d::point3>(control_points, static_cast<double>(i+1) / static_cast<double>(curve_divisions)));
+			contours.back().push_back(k3d::Bezier<k3d::point3>(control_points, static_cast<k3d::double_t>(i+1) / static_cast<k3d::double_t>(curve_divisions)));
 		}
 
 		last_point = To;
@@ -241,9 +163,9 @@ private:
 		control_points.push_back(Control2);
 		control_points.push_back(To);
 
-		for(unsigned long i = 0; i != curve_divisions; ++i)
+		for(k3d::uint_t i = 0; i != curve_divisions; ++i)
 		{
-			contours.back().push_back(k3d::Bezier<k3d::point3>(control_points, static_cast<double>(i+1) / static_cast<double>(curve_divisions)));
+			contours.back().push_back(k3d::Bezier<k3d::point3>(control_points, static_cast<k3d::double_t>(i+1) / static_cast<k3d::double_t>(curve_divisions)));
 		}
 
 		last_point = To;
@@ -324,12 +246,11 @@ private:
 
 #endif
 
-	const unsigned long curve_divisions;
+	const k3d::uint_t curve_divisions;
 
 	FT_Outline_Funcs ft_outline_funcs;
 
 	k3d::point3 last_point;
-	typedef std::vector<contour_t> contours_t;
 	contours_t contours;
 };
 
@@ -339,9 +260,9 @@ private:
 // poly_text
 
 class poly_text :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	poly_text(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -352,25 +273,32 @@ public:
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Font height")) + init_value(10.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::distance))),
 		m_orientation(init_owner(*this) + init_name("orientation") + init_label(_("Orientation")) + init_description(_("Orientation type (forward or backward along X, Y or Z axis)")) + init_value(k3d::PY) + init_enumeration(k3d::signed_axis_values()))
 	{
-		m_material.changed_signal().connect(make_reset_mesh_slot());
-		m_font_path.changed_signal().connect(make_reset_mesh_slot());
-		m_text.changed_signal().connect(make_reset_mesh_slot());
-		m_curve_divisions.changed_signal().connect(make_reset_mesh_slot());
-		m_height.changed_signal().connect(make_reset_mesh_slot());
-		m_orientation.changed_signal().connect(make_reset_mesh_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_font_path.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_text.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_curve_divisions.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_height.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_orientation.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		const k3d::filesystem::path font_path = m_font_path.pipeline_value();
-		const std::string text = m_text.pipeline_value();
-		const unsigned long curve_divisions = m_curve_divisions.pipeline_value();
-		const double height = m_height.pipeline_value();
+		Output = k3d::mesh();
+
 		k3d::imaterial* const material = m_material.pipeline_value();
+		const k3d::filesystem::path font_path = m_font_path.pipeline_value();
+		const k3d::string_t text = m_text.pipeline_value();
+		const k3d::int32_t curve_divisions = m_curve_divisions.pipeline_value();
+		const k3d::double_t height = m_height.pipeline_value();
 
 		k3d::matrix4 char_orientation;
 		k3d::vector3 offset_direction;
-
 		switch(m_orientation.pipeline_value())
 		{
 			case k3d::PX:
@@ -402,37 +330,41 @@ public:
 				break;
 		}
 
-		k3d::legacy::polyhedron* const polyhedron = new k3d::legacy::polyhedron();
-		Mesh.polyhedra.push_back(polyhedron);
-
-		detail::freetype_library ft_library;
+		library ft_library;
 		if(!ft_library)
 		{
 			k3d::log() << error << "Error initializing FreeType library" << std::endl;
 			return;
 		}
 
-		detail::freetype_face ft_face(ft_library, font_path);
+		face ft_face(ft_library, font_path);
 		if(!ft_face)
 		{
 			k3d::log() << error << "Error opening font file: " << font_path.native_console_string() << std::endl;
 			return;
 		}
 
-		if(!FT_IS_SCALABLE(ft_face.face()))
+		if(!ft_face.is_scalable())
 		{
 			k3d::log() << error << "Not a scalable font: " << font_path.native_console_string() << std::endl;
 			return;
 		}
 
-		const double normalize_height = 1.0 / static_cast<double>(ft_face.face()->bbox.yMax - ft_face.face()->bbox.yMin);
-		const double scale = normalize_height * height;
+		const k3d::double_t normalize_height = 1.0 / static_cast<k3d::double_t>(ft_face->bbox.yMax - ft_face->bbox.yMin);
+		const k3d::double_t scale = normalize_height * height;
 
 		detail::freetype_outline outline(curve_divisions);
 
-		double offset = 0;
+		Output.points.create();
+		Output.point_selection.create();
 
-		for(std::string::const_iterator c = text.begin(); c != text.end(); ++c)
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+		polyhedron->first_faces.push_back(0);
+		polyhedron->face_counts.push_back(0);
+		polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+
+		k3d::double_t offset = 0;
+		for(k3d::string_t::const_iterator c = text.begin(); c != text.end(); ++c)
 		{
 			if(0 != FT_Load_Glyph(ft_face, FT_Get_Char_Index(ft_face, static_cast<FT_ULong>(*c)), FT_LOAD_NO_SCALE | FT_LOAD_IGNORE_TRANSFORM))
 			{
@@ -443,15 +375,13 @@ public:
 			const k3d::matrix4 matrix =
 				k3d::translate3(offset_direction * (offset * scale)) * char_orientation * k3d::scale3(scale);
 
-			outline.convert(ft_face.face()->glyph->outline, Mesh, *polyhedron, material, matrix);
+			outline.convert(ft_face->glyph->outline, Output, *polyhedron, material, matrix);
 
-			offset += ft_face.face()->glyph->metrics.horiAdvance;
+			offset += ft_face->glyph->metrics.horiAdvance;
 		}
-
-		assert_warning(is_valid(*polyhedron));
 	}
 
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
@@ -469,9 +399,9 @@ public:
 
 private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_font_path;
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_text;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_text;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_curve_divisions;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
 	k3d_data(k3d::signed_axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_orientation;
 };
 
