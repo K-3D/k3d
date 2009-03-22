@@ -63,14 +63,18 @@ IF(K3D_BUILD_NGUI_MODULE)
 		--ui=${K3D_NGUI_BINARY}
 		)
 
-	ADD_CUSTOM_TARGET(run-debug
+	ADD_CUSTOM_TARGET(run-gdb
 		gdb --args
 		${k3d_BINARY_DIR}/bin/k3d
 		${K3D_DEFAULT_ARGUMENTS}
 		--ui=${K3D_NGUI_BINARY}
 		)
 
-	ADD_CUSTOM_TARGET(run-debug-core gdb ${k3d_BINARY_DIR}/bin/k3d core)
+	ADD_CUSTOM_TARGET(run-gdb-core
+		gdb
+		${k3d_BINARY_DIR}/bin/k3d
+		core
+		)
 
 	ADD_CUSTOM_TARGET(run-valgrind
 		valgrind -v
@@ -100,7 +104,7 @@ IF(K3D_BUILD_PYUI_MODULE)
 		--ui=${K3D_PYUI_BINARY}
 		)
 
-	ADD_CUSTOM_TARGET(run-debug-pyui
+	ADD_CUSTOM_TARGET(run-gdb-pyui
 		gdb --args
 		${k3d_BINARY_DIR}/bin/k3d
 		${K3D_DEFAULT_ARGUMENTS}
@@ -115,7 +119,7 @@ IF(K3D_BUILD_QTUI_MODULE)
 		--ui=${K3D_QTUI_BINARY}
 		)
 
-	ADD_CUSTOM_TARGET(run-debug-qtui
+	ADD_CUSTOM_TARGET(run-gdb-qtui
 		gdb --args
 		${k3d_BINARY_DIR}/bin/k3d
 		${K3D_DEFAULT_ARGUMENTS}
