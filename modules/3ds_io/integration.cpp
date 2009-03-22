@@ -44,7 +44,7 @@ static void add_nodes(k3d::mesh& Mesh, Lib3dsFile* file, Lib3dsNode* node, k3d::
 		{
 			Lib3dsFace* const f = &mesh->faceL[p];
 
-			polyhedron.face_counts.back() = polyhedron.face_counts.back() + 1;
+			polyhedron.shell_face_counts.back() = polyhedron.shell_face_counts.back() + 1;
 
 			polyhedron.face_first_loops.push_back(polyhedron.loop_first_edges.size());
 			polyhedron.face_loop_counts.push_back(1);
@@ -86,9 +86,9 @@ f3dsParser::f3dsParser(const char *filename, k3d::mesh &Mesh)
 	Mesh.point_selection.create();
 
 	boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Mesh));
-	polyhedron->first_faces.push_back(0);
-	polyhedron->face_counts.push_back(0);
-	polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+	polyhedron->shell_first_faces.push_back(0);
+	polyhedron->shell_face_counts.push_back(0);
+	polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 
 	/* No nodes?  Fabricate nodes to display all the meshes. */
 	if(!file->nodes)
