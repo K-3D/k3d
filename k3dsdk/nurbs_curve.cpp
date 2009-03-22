@@ -226,12 +226,12 @@ primitive* validate(mesh::primitive& Primitive)
 	return 0;
 }
 
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, imaterial* const Material, const uint_t RepeatPoints)
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const uint_t RepeatPoints)
 {
-	add_curve(Mesh, Primitive, Order, ControlPoints, mesh::weights_t(ControlPoints.size(), 1), Material, RepeatPoints);
+	add_curve(Mesh, Primitive, Order, ControlPoints, mesh::weights_t(ControlPoints.size(), 1), RepeatPoints);
 }
 
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, imaterial* const Material, const uint_t RepeatPoints)
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const uint_t RepeatPoints)
 {
 	return_if_fail(ControlPoints.size() + RepeatPoints >= Order);
 
@@ -241,10 +241,10 @@ void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh:
 		knots.insert(knots.end(), 1, i);
 	knots.insert(knots.end(), Order, ControlPoints.size() + RepeatPoints - Order + 1);
 
-	add_curve(Mesh, Primitive, Order, ControlPoints, Weights, knots, Material, RepeatPoints);
+	add_curve(Mesh, Primitive, Order, ControlPoints, Weights, knots, RepeatPoints);
 }
 
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, imaterial* const Material, const uint_t RepeatPoints)
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, const uint_t RepeatPoints)
 {
 	return_if_fail(Mesh.points);
 	return_if_fail(Mesh.point_selection);
@@ -257,7 +257,6 @@ void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh:
 	mesh::points_t& points = Mesh.points.writable();
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
 
-	Primitive.material.push_back(Material);
         Primitive.curve_first_points.push_back(Primitive.curve_points.size());
         Primitive.curve_point_counts.push_back(ControlPoints.size() + RepeatPoints);
         Primitive.curve_orders.push_back(Order);

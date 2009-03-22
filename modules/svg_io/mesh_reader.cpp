@@ -94,7 +94,7 @@ static void parse_rect(const k3d::xml::element& SVG, transform_stack& Transforma
 		control_points.push_back(Transformation.top() * k3d::point3(x + w, y + h, 0));
 		control_points.push_back(Transformation.top() * k3d::point3(x, y + h, 0));
 
-		k3d::nurbs_curve::add_curve(Mesh, Primitive, 2, control_points, 0, 1);
+		k3d::nurbs_curve::add_curve(Mesh, Primitive, 2, control_points, 1);
 	}
 	else
 	{
@@ -164,7 +164,7 @@ static void parse_rect(const k3d::xml::element& SVG, transform_stack& Transforma
 		knots.insert(knots.end(), 2, 7);
 		knots.insert(knots.end(), 3, 8);
 
-		k3d::nurbs_curve::add_curve(Mesh, Primitive, 3, control_points, weights, knots, 0, 1);
+		k3d::nurbs_curve::add_curve(Mesh, Primitive, 3, control_points, weights, knots, 1);
 	}
 }
 
@@ -246,7 +246,7 @@ static void parse_polygon(const k3d::xml::element& SVG, transform_stack& Transfo
 	if(control_points.size() < 2)
 		return;
 
-	k3d::nurbs_curve::add_curve(Mesh, Primitive, 2, control_points, 0, 1);
+	k3d::nurbs_curve::add_curve(Mesh, Primitive, 2, control_points, 1);
 }
 
 /*
@@ -773,11 +773,12 @@ public:
 
 			k3d::mesh::points_t& points = Mesh.points.create();
 			k3d::mesh::selection_t& point_selection = Mesh.point_selection.create();
+
 			boost::scoped_ptr<k3d::nurbs_curve::primitive> primitive(k3d::nurbs_curve::create(Mesh));
+			primitive->material.push_back(0);
 
 			parse_graphics(svg, transformation, Mesh, *primitive);
 
-			primitive->material.push_back(0);
 		}
 		catch(std::exception& e)
 		{
@@ -791,14 +792,13 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory < mesh_reader,
-		k3d::interface_list < k3d::imesh_source,
-		k3d::interface_list<k3d::imesh_storage> > > factory(
-		  k3d::uuid(0xa0149217, 0xf64844bb, 0x4ba01e8f, 0x21d7f651),
-		  "SVGMeshReader",
-		  _("Reader that loads external Scalable Vector Graphics (.svg) files into the document by reference"),
-		  "MeshReader",
-		  k3d::iplugin_factory::EXPERIMENTAL);
+		static k3d::document_plugin_factory<mesh_reader, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imesh_storage> > > factory(
+			k3d::uuid(0xa0149217, 0xf64844bb, 0x4ba01e8f, 0x21d7f651),
+			"SVGMeshReader",
+			_("Reader that loads external Scalable Vector Graphics (.svg) files into the document by reference"),
+			"MeshReader",
+			k3d::iplugin_factory::EXPERIMENTAL
+			);
 
 		return factory;
 	}

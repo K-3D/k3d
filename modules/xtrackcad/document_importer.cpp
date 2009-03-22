@@ -178,7 +178,7 @@ public:
 					points.push_back(transformation.top() * k3d::point3(width, 0, 0));
 					points.push_back(transformation.top() * k3d::point3(width, height, 0));
 					points.push_back(transformation.top() * k3d::point3(0, height, 0));
-					k3d::nurbs_curve::add_curve(*mesh, *curves, 2, points, 0, 1);
+					k3d::nurbs_curve::add_curve(*mesh, *curves, 2, points, 1);
 
 					curves->material.push_back(0);
 				}

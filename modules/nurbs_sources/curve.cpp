@@ -80,12 +80,13 @@ public:
 		Output.point_selection.create();
 
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> primitive(k3d::nurbs_curve::create(Output));
+		primitive->material.push_back(material);
 
 		k3d::mesh::points_t points;
 		for(k3d::uint_t i = 0; i != point_count; ++i)
 			points.push_back(k3d::point3(i * point_spacing, 0.0, 0.0)); //store the point (a straight line along x-axis)
 
-		k3d::nurbs_curve::add_curve(Output, *primitive, order, points, material);
+		k3d::nurbs_curve::add_curve(Output, *primitive, order, points);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

@@ -108,12 +108,12 @@ primitive* validate(mesh::primitive& GenericPrimitive);
 
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points.
 /// Control points will be assigned unity weights and an open uniform knot vector is automatically supplied.
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, imaterial* const Material = 0, const uint_t RepeatPoints = 0);
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const uint_t RepeatPoints = 0);
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points and control point weights.
 /// An open uniform knot vector is automatically supplied.
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, imaterial* const Material = 0, const uint_t RepeatPoints = 0);
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const uint_t RepeatPoints = 0);
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points, control point weights, and knot vector.
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, imaterial* const Material = 0, const uint_t RepeatPoints = 0);
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, const uint_t RepeatPoints = 0);
 
 /** Computes a set of control points, weights, and knots that define an order-3 circular arc centered at the origin
 	\param X Defines the X axis of the plane containing the arc

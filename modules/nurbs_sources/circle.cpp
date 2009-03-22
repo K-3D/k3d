@@ -87,8 +87,9 @@ public:
 		Output.point_selection.create();
 
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> primitive(k3d::nurbs_curve::create(Output));
+		primitive->material.push_back(material);
 
-		k3d::nurbs_curve::add_curve(Output, *primitive, 3, control_points, weights, knots, material);
+		k3d::nurbs_curve::add_curve(Output, *primitive, 3, control_points, weights, knots);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
