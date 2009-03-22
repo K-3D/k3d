@@ -2118,24 +2118,6 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 		}
 	}
 
-	if(Mesh.nurbs_curve_groups)
-	{
-		element& container = Container.append(element("nurbs_curve_groups"));
-		detail::save_array(container, element("first_curves"), Mesh.nurbs_curve_groups->first_curves, Context);
-		detail::save_array(container, element("curve_counts"), Mesh.nurbs_curve_groups->curve_counts, Context);
-		detail::save_array(container, element("materials"), Mesh.nurbs_curve_groups->materials, Context);
-		detail::save_arrays(container, element("constant_data"), Mesh.nurbs_curve_groups->constant_data, Context);
-		detail::save_array(container, element("curve_first_points"), Mesh.nurbs_curve_groups->curve_first_points, Context);
-		detail::save_array(container, element("curve_point_counts"), Mesh.nurbs_curve_groups->curve_point_counts, Context);
-		detail::save_array(container, element("curve_orders"), Mesh.nurbs_curve_groups->curve_orders, Context);
-		detail::save_array(container, element("curve_first_knots"), Mesh.nurbs_curve_groups->curve_first_knots, Context);
-		detail::save_array(container, element("curve_selection"), Mesh.nurbs_curve_groups->curve_selection, Context);
-		detail::save_arrays(container, element("uniform_data"), Mesh.nurbs_curve_groups->uniform_data, Context);
-		detail::save_array(container, element("curve_points"), Mesh.nurbs_curve_groups->curve_points, Context);
-		detail::save_array(container, element("curve_point_weights"), Mesh.nurbs_curve_groups->curve_point_weights, Context);
-		detail::save_array(container, element("curve_knots"), Mesh.nurbs_curve_groups->curve_knots, Context);
-	}
-
 	if(Mesh.nurbs_patches)
 	{
 		element& container = Container.append(element("nurbs_patches"));
@@ -2290,6 +2272,8 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "nurbs_curve_groups"))
 	{
+		assert_not_implemented();
+/*
 		mesh::nurbs_curve_groups_t* const nurbs_curve_groups = &Mesh.nurbs_curve_groups.create();
 		detail::load_array(*container, "first_curves", nurbs_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", nurbs_curve_groups->curve_counts, Context);
@@ -2304,6 +2288,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_array(*container, "curve_points", nurbs_curve_groups->curve_points, Context);
 		detail::load_array(*container, "curve_point_weights", nurbs_curve_groups->curve_point_weights, Context);
 		detail::load_array(*container, "curve_knots", nurbs_curve_groups->curve_knots, Context);
+*/
 	}
 
 	if(element* const container = find_element(Container, "bilinear_patches"))
@@ -2957,8 +2942,9 @@ void save(const mesh_selection& Selection, element& XML, const ipersistent::save
 	detail::save_selection(XML, Selection.points, "points");
 	detail::save_selection(XML, Selection.edges, "edges");
 	detail::save_selection(XML, Selection.faces, "faces");
-	detail::save_selection(XML, Selection.nurbs_curves, "nurbscurves");
 	detail::save_selection(XML, Selection.nurbs_patches, "nurbspatches");
+
+	assert_not_implemented();
 }
 
 void load(mesh_selection& Selection, element& XML, const ipersistent::load_context& Context)
@@ -2971,11 +2957,11 @@ void load(mesh_selection& Selection, element& XML, const ipersistent::load_conte
 			detail::load_selection(*xml_selection, Selection.edges);
 		if(xml_selection->name == "faces")
 			detail::load_selection(*xml_selection, Selection.faces);
-		if(xml_selection->name == "nurbscurves" || xml_selection->name == "nucurves")
-			detail::load_selection(*xml_selection, Selection.nurbs_curves);
 		if(xml_selection->name == "nurbspatches" || xml_selection->name == "nupatches")
 			detail::load_selection(*xml_selection, Selection.nurbs_patches);
 	}
+
+	assert_not_implemented();
 }
 
 } // namespace xml

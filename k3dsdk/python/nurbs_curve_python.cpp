@@ -43,9 +43,7 @@ public:
 	public:
 		typedef owned_instance_wrapper<k3d::nurbs_curve::const_primitive> wrapper;
 
-		static object first_curves(wrapper& Self) { return wrap(Self.wrapped().first_curves); }
-		static object curve_counts(wrapper& Self) { return wrap(Self.wrapped().curve_counts); }
-		static object materials(wrapper& Self) { return wrap(Self.wrapped().materials); }
+		static object material(wrapper& Self) { return wrap(Self.wrapped().material); }
 		static object curve_first_points(wrapper& Self) { return wrap(Self.wrapped().curve_first_points); }
 		static object curve_point_counts(wrapper& Self) { return wrap(Self.wrapped().curve_point_counts); }
 		static object curve_orders(wrapper& Self) { return wrap(Self.wrapped().curve_orders); }
@@ -64,9 +62,7 @@ public:
 	public:
 		typedef owned_instance_wrapper<k3d::nurbs_curve::primitive> wrapper;
 
-		static object first_curves(wrapper& Self) { return wrap(Self.wrapped().first_curves); }
-		static object curve_counts(wrapper& Self) { return wrap(Self.wrapped().curve_counts); }
-		static object materials(wrapper& Self) { return wrap(Self.wrapped().materials); }
+		static object material(wrapper& Self) { return wrap(Self.wrapped().material); }
 		static object curve_first_points(wrapper& Self) { return wrap(Self.wrapped().curve_first_points); }
 		static object curve_point_counts(wrapper& Self) { return wrap(Self.wrapped().curve_point_counts); }
 		static object curve_orders(wrapper& Self) { return wrap(Self.wrapped().curve_orders); }
@@ -86,7 +82,6 @@ public:
 		return wrap_owned(k3d::nurbs_curve::create(Mesh.wrapped()));
 	}
 
-/*
 	static object validate(mesh_primitive_wrapper& Primitive)
 	{
 		return wrap_owned(k3d::nurbs_curve::validate(Primitive.wrapped()));
@@ -96,7 +91,6 @@ public:
 	{
 		return wrap_owned(k3d::nurbs_curve::validate(Primitive.wrapped()));
 	}
-*/
 };
 
 void define_namespace_nurbs_curve()
@@ -104,17 +98,13 @@ void define_namespace_nurbs_curve()
 	scope outer = class_<nurbs_curve>("nurbs_curve", no_init)
 		.def("create", &nurbs_curve::create)
 		.staticmethod("create")
-/*
 		.def("validate", &nurbs_curve::validate)
 		.def("validate", &nurbs_curve::validate_const)
 		.staticmethod("validate")
-*/
 		;
 
 	class_<nurbs_curve::const_primitive::wrapper>("const_primitive", no_init)
-		.def("first_curves", &nurbs_curve::const_primitive::first_curves)
-		.def("curve_counts", &nurbs_curve::const_primitive::curve_counts)
-		.def("materials", &nurbs_curve::const_primitive::materials)
+		.def("material", &nurbs_curve::const_primitive::material)
 		.def("curve_first_points", &nurbs_curve::const_primitive::curve_first_points)
 		.def("curve_point_counts", &nurbs_curve::const_primitive::curve_point_counts)
 		.def("curve_orders", &nurbs_curve::const_primitive::curve_orders)
@@ -129,9 +119,7 @@ void define_namespace_nurbs_curve()
 		;
 
 	class_<nurbs_curve::primitive::wrapper>("primitive", no_init)
-		.def("first_curves", &nurbs_curve::primitive::first_curves)
-		.def("curve_counts", &nurbs_curve::primitive::curve_counts)
-		.def("materials", &nurbs_curve::primitive::materials)
+		.def("material", &nurbs_curve::primitive::material)
 		.def("curve_first_points", &nurbs_curve::primitive::curve_first_points)
 		.def("curve_point_counts", &nurbs_curve::primitive::curve_point_counts)
 		.def("curve_orders", &nurbs_curve::primitive::curve_orders)

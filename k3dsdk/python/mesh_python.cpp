@@ -113,111 +113,6 @@ object create_array(pipeline_data<array_type>& Data)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// const_nurbs_curve_groups
-
-class const_nurbs_curve_groups :
-	public instance_wrapper<const k3d::mesh::nurbs_curve_groups_t>
-{
-	typedef instance_wrapper<const k3d::mesh::nurbs_curve_groups_t> base;
-public:
-	const_nurbs_curve_groups() :
-		base()
-	{
-	}
-
-	const_nurbs_curve_groups(const k3d::mesh::nurbs_curve_groups_t* CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	const_nurbs_curve_groups(const k3d::mesh::nurbs_curve_groups_t& CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	object first_curves() { return wrap_const_array(wrapped().first_curves); }
-	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
-	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
-	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
-	object curve_orders() { return wrap_const_array(wrapped().curve_orders); }
-	object curve_first_knots() { return wrap_const_array(wrapped().curve_first_knots); }
-	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object curve_points() { return wrap_const_array(wrapped().curve_points); }
-	object curve_point_weights() { return wrap_const_array(wrapped().curve_point_weights); }
-	object curve_knots() { return wrap_const_array(wrapped().curve_knots); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// nurbs_curve_groups
-
-class nurbs_curve_groups :
-	public instance_wrapper<k3d::mesh::nurbs_curve_groups_t>
-{
-	typedef instance_wrapper<k3d::mesh::nurbs_curve_groups_t> base;
-public:
-	nurbs_curve_groups() :
-		base()
-	{
-	}
-
-	nurbs_curve_groups(k3d::mesh::nurbs_curve_groups_t* CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	nurbs_curve_groups(k3d::mesh::nurbs_curve_groups_t& CurveGroups) :
-		base(CurveGroups)
-	{
-	}
-
-	object first_curves() { return wrap_const_array(wrapped().first_curves); }
-	object curve_counts() { return wrap_const_array(wrapped().curve_counts); }
-	object materials() { return wrap_const_array(wrapped().materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object curve_first_points() { return wrap_const_array(wrapped().curve_first_points); }
-	object curve_point_counts() { return wrap_const_array(wrapped().curve_point_counts); }
-	object curve_orders() { return wrap_const_array(wrapped().curve_orders); }
-	object curve_first_knots() { return wrap_const_array(wrapped().curve_first_knots); }
-	object curve_selection() { return wrap_const_array(wrapped().curve_selection); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object curve_points() { return wrap_const_array(wrapped().curve_points); }
-	object curve_point_weights() { return wrap_const_array(wrapped().curve_point_weights); }
-	object curve_knots() { return wrap_const_array(wrapped().curve_knots); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-
-	object writable_first_curves() { return wrap_non_const_array(wrapped().first_curves); }
-	object writable_curve_counts() { return wrap_non_const_array(wrapped().curve_counts); }
-	object writable_materials() { return wrap_non_const_array(wrapped().materials); }
-	object writable_constant_data() { return wrap(wrapped().constant_data); }
-	object writable_curve_first_points() { return wrap_non_const_array(wrapped().curve_first_points); }
-	object writable_curve_point_counts() { return wrap_non_const_array(wrapped().curve_point_counts); }
-	object writable_curve_orders() { return wrap_non_const_array(wrapped().curve_orders); }
-	object writable_curve_first_knots() { return wrap_non_const_array(wrapped().curve_first_knots); }
-	object writable_curve_selection() { return wrap_non_const_array(wrapped().curve_selection); }
-	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
-	object writable_curve_points() { return wrap_non_const_array(wrapped().curve_points); }
-	object writable_curve_point_weights() { return wrap_non_const_array(wrapped().curve_point_weights); }
-	object writable_curve_knots() { return wrap_non_const_array(wrapped().curve_knots); }
-	object writable_varying_data() { return wrap(wrapped().varying_data); }
-
-	object create_first_curves() { return create_array(wrapped().first_curves); }
-	object create_curve_counts() { return create_array(wrapped().curve_counts); }
-	object create_materials() { return create_array(wrapped().materials); }
-	object create_curve_first_points() { return create_array(wrapped().curve_first_points); }
-	object create_curve_point_counts() { return create_array(wrapped().curve_point_counts); }
-	object create_curve_orders() { return create_array(wrapped().curve_orders); }
-	object create_curve_first_knots() { return create_array(wrapped().curve_first_knots); }
-	object create_curve_selection() { return create_array(wrapped().curve_selection); }
-	object create_curve_points() { return create_array(wrapped().curve_points); }
-	object create_curve_point_weights() { return create_array(wrapped().curve_point_weights); }
-	object create_curve_knots() { return create_array(wrapped().curve_knots); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_nurbs_patches
 
 class const_nurbs_patches :
@@ -515,18 +410,15 @@ void mesh::copy(const mesh& RHS)
 	wrapped() = RHS.wrapped();
 }
 
-object mesh::create_nurbs_curve_groups() { return detail::create_object<detail::nurbs_curve_groups, k3d::mesh::nurbs_curve_groups_t>(wrapped().nurbs_curve_groups); }
 object mesh::create_nurbs_patches() { return detail::create_object<detail::nurbs_patches, k3d::mesh::nurbs_patches_t>(wrapped().nurbs_patches); }
 object mesh::create_point_selection() { return detail::create_array(wrapped().point_selection); } 
 object mesh::create_points() { return detail::create_array(wrapped().points); }
 object mesh::create_polyhedra() { return detail::create_object<detail::polyhedra, k3d::mesh::polyhedra_t>(wrapped().polyhedra); } 
-object mesh::nurbs_curve_groups() { return detail::wrap_const_object<detail::const_nurbs_curve_groups>(wrapped().nurbs_curve_groups); } 
 object mesh::nurbs_patches() { return detail::wrap_const_object<detail::const_nurbs_patches>(wrapped().nurbs_patches); } 
 object mesh::point_selection() { return detail::wrap_const_array(wrapped().point_selection); } 
 object mesh::points() { return detail::wrap_const_array(wrapped().points); } 
 object mesh::polyhedra() { return detail::wrap_const_object<detail::const_polyhedra>(wrapped().polyhedra); } 
 object mesh::vertex_data() { return wrap(wrapped().vertex_data); } 
-object mesh::writable_nurbs_curve_groups() { return detail::wrap_non_const_object<detail::nurbs_curve_groups>(wrapped().nurbs_curve_groups); } 
 object mesh::writable_nurbs_patches() { return detail::wrap_non_const_object<detail::nurbs_patches>(wrapped().nurbs_patches); } 
 object mesh::writable_point_selection() { return detail::wrap_non_const_array(wrapped().point_selection); } 
 object mesh::writable_points() { return detail::wrap_non_const_array(wrapped().points); } 
@@ -629,67 +521,6 @@ static object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const st
 
 void define_class_mesh()
 {
-	class_<detail::const_nurbs_curve_groups>("const_nurbs_curve_groups",
-		"Stores an immutable (read-only) collection of NURBS curve primitives.")
-		.def("first_curves", &detail::const_nurbs_curve_groups::first_curves)
-		.def("curve_counts", &detail::const_nurbs_curve_groups::curve_counts)
-		.def("materials", &detail::const_nurbs_curve_groups::materials)
-		.def("constant_data", &detail::const_nurbs_curve_groups::constant_data)
-		.def("curve_first_points", &detail::const_nurbs_curve_groups::curve_first_points)
-		.def("curve_point_counts", &detail::const_nurbs_curve_groups::curve_point_counts)
-		.def("curve_orders", &detail::const_nurbs_curve_groups::curve_orders)
-		.def("curve_first_knots", &detail::const_nurbs_curve_groups::curve_first_knots)
-		.def("curve_selection", &detail::const_nurbs_curve_groups::curve_selection)
-		.def("uniform_data", &detail::const_nurbs_curve_groups::uniform_data)
-		.def("varying_data", &detail::const_nurbs_curve_groups::varying_data)
-		.def("curve_points", &detail::const_nurbs_curve_groups::curve_points)
-		.def("curve_point_weights", &detail::const_nurbs_curve_groups::curve_point_weights)
-		.def("curve_knots", &detail::const_nurbs_curve_groups::curve_knots);
-
-	class_<detail::nurbs_curve_groups>("nurbs_curve_groups",
-		"Stores a mutable (read-write) collection of NURBS curve primitives.")
-		.def("first_curves", &detail::nurbs_curve_groups::first_curves)
-		.def("curve_counts", &detail::nurbs_curve_groups::curve_counts)
-		.def("materials", &detail::nurbs_curve_groups::materials)
-		.def("constant_data", &detail::nurbs_curve_groups::constant_data)
-		.def("curve_first_points", &detail::nurbs_curve_groups::curve_first_points)
-		.def("curve_point_counts", &detail::nurbs_curve_groups::curve_point_counts)
-		.def("curve_orders", &detail::nurbs_curve_groups::curve_orders)
-		.def("curve_first_knots", &detail::nurbs_curve_groups::curve_first_knots)
-		.def("curve_selection", &detail::nurbs_curve_groups::curve_selection)
-		.def("uniform_data", &detail::nurbs_curve_groups::uniform_data)
-		.def("varying_data", &detail::nurbs_curve_groups::varying_data)
-		.def("curve_points", &detail::nurbs_curve_groups::curve_points)
-		.def("curve_point_weights", &detail::nurbs_curve_groups::curve_point_weights)
-		.def("curve_knots", &detail::nurbs_curve_groups::curve_knots)
-
-		.def("writable_first_curves", &detail::nurbs_curve_groups::writable_first_curves)
-		.def("writable_curve_counts", &detail::nurbs_curve_groups::writable_curve_counts)
-		.def("writable_materials", &detail::nurbs_curve_groups::writable_materials)
-		.def("writable_constant_data", &detail::nurbs_curve_groups::writable_constant_data)
-		.def("writable_curve_first_points", &detail::nurbs_curve_groups::writable_curve_first_points)
-		.def("writable_curve_point_counts", &detail::nurbs_curve_groups::writable_curve_point_counts)
-		.def("writable_curve_orders", &detail::nurbs_curve_groups::writable_curve_orders)
-		.def("writable_curve_first_knots", &detail::nurbs_curve_groups::writable_curve_first_knots)
-		.def("writable_curve_selection", &detail::nurbs_curve_groups::writable_curve_selection)
-		.def("writable_uniform_data", &detail::nurbs_curve_groups::writable_uniform_data)
-		.def("writable_varying_data", &detail::nurbs_curve_groups::writable_varying_data)
-		.def("writable_curve_points", &detail::nurbs_curve_groups::writable_curve_points)
-		.def("writable_curve_point_weights", &detail::nurbs_curve_groups::writable_curve_point_weights)
-		.def("writable_curve_knots", &detail::nurbs_curve_groups::writable_curve_knots)
-
-		.def("create_first_curves", &detail::nurbs_curve_groups::create_first_curves)
-		.def("create_curve_counts", &detail::nurbs_curve_groups::create_curve_counts)
-		.def("create_materials", &detail::nurbs_curve_groups::create_materials)
-		.def("create_curve_first_points", &detail::nurbs_curve_groups::create_curve_first_points)
-		.def("create_curve_point_counts", &detail::nurbs_curve_groups::create_curve_point_counts)
-		.def("create_curve_orders", &detail::nurbs_curve_groups::create_curve_orders)
-		.def("create_curve_first_knots", &detail::nurbs_curve_groups::create_curve_first_knots)
-		.def("create_curve_selection", &detail::nurbs_curve_groups::create_curve_selection)
-		.def("create_curve_points", &detail::nurbs_curve_groups::create_curve_points)
-		.def("create_curve_point_weights", &detail::nurbs_curve_groups::create_curve_point_weights)
-		.def("create_curve_knots", &detail::nurbs_curve_groups::create_curve_knots);
-
 	class_<detail::const_nurbs_patches>("const_nurbs_patches",
 		"Stores an immutable (read-only) collection of NURBS patch primitives.")
 		.def("patch_first_points", &detail::const_nurbs_patches::patch_first_points)
@@ -887,8 +718,6 @@ void define_class_mesh()
 
 	scope outer = class_<mesh>("mesh", 
 		"Stores a heterogeneous collection of geometric mesh primitives.", no_init)
-		.def("nurbs_curve_groups", &mesh::nurbs_curve_groups,
-			"Returns a L{const_nurbs_curve_groups} object containing an immutable (read-only) collection of NURBS curve primitives, or None.")
 		.def("nurbs_patches", &mesh::nurbs_patches,
 			"Returns a L{const_nurbs_patches} object containing an immutable (read-only) collection of NURBS patch primitives, or None.")
 		.def("vertex_data", &mesh::vertex_data,
@@ -899,8 +728,6 @@ void define_class_mesh()
 			"Returns an immutable (read-only) L{const_point3_array} object containing the geometric coordinates of every vertex in the mesh, or None.")
 		.def("polyhedra", &mesh::polyhedra,
 			"Returns a L{const_polyhedra} object containing a collection of immutable (read-only) polyhedron primitives, or None.")
-		.def("writable_nurbs_curve_groups", &mesh::writable_nurbs_curve_groups,
-			"Returns a L{nurbs_curve_groups} object containing a mutable (read-write) collection of NURBS curve primitives, or None.")
 		.def("writable_nurbs_patches", &mesh::writable_nurbs_patches,
 			"Returns a L{nurbs_patches} object containing a mutable (read-write) collection of NURBS patch primitives, or None.")
 		.def("writable_vertex_data", &mesh::writable_vertex_data,
@@ -913,8 +740,6 @@ void define_class_mesh()
 			"Returns a L{polyhedra} object containing a mutable (read-write) collection of polyhedron primitives, or None.")
 		.def("copy", &mesh::copy,
 			"Store a shallow copy of the given L{mesh}.")
-		.def("create_nurbs_curve_groups", &mesh::create_nurbs_curve_groups,
-			"Creates and returns a new L{nurbs_curve_groups} object for storing NURBS curve primitives.")
 		.def("create_nurbs_patches", &mesh::create_nurbs_patches,
 			"Creates and returns a new L{nurbs_patches} object for storing NURBS patch primitives.")
 		.def("create_point_selection", &mesh::create_point_selection,

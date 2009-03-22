@@ -243,10 +243,10 @@ struct select_split_edges
 				case k3d::selection::ABSOLUTE_CUBIC_CURVE:
 					Selection.cubic_curves.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
-*/
 				case k3d::selection::ABSOLUTE_NURBS_CURVE:
 					Selection.nurbs_curves.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
+*/
 
 				default:
 					break;
@@ -411,7 +411,6 @@ struct select_all_points
 		Selection.points = k3d::mesh_selection::component_select_all();
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
 		Selection.faces = k3d::mesh_selection::component_deselect_all();
-		Selection.nurbs_curves = k3d::mesh_selection::component_deselect_all();
 		Selection.nurbs_patches = k3d::mesh_selection::component_deselect_all();
 	}
 };
@@ -423,7 +422,6 @@ struct select_all_split_edges
 		Selection.points = k3d::mesh_selection::component_deselect_all();
 		Selection.edges = k3d::mesh_selection::component_select_all();
 		Selection.faces = k3d::mesh_selection::component_deselect_all();
-		Selection.nurbs_curves = k3d::mesh_selection::component_select_all();
 		Selection.nurbs_patches = k3d::mesh_selection::component_deselect_all();
 	}
 };
@@ -435,7 +433,6 @@ struct select_all_uniform
 		Selection.points = k3d::mesh_selection::component_deselect_all();
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
 		Selection.faces = k3d::mesh_selection::component_select_all();
-		Selection.nurbs_curves = k3d::mesh_selection::component_deselect_all();
 		Selection.nurbs_patches = k3d::mesh_selection::component_select_all();
 	}
 };
@@ -475,7 +472,6 @@ struct invert_split_edges
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		invert(Selection.edges);
-		invert(Selection.nurbs_curves);
 	}
 };
 
@@ -498,7 +494,6 @@ void deselect_gaps(k3d::mesh_selection& Selection)
 	deselect_gaps(Selection.points);
 	deselect_gaps(Selection.edges);
 	deselect_gaps(Selection.faces);
-	deselect_gaps(Selection.nurbs_curves);
 	deselect_gaps(Selection.nurbs_patches);
 }
 
@@ -597,7 +592,6 @@ struct convert_to_points
 			}
 		    }
 		}
-*/
 
 		// Convert nurbs curve selections to point selections ...
 		if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_first_points && Mesh.nurbs_curve_groups->curve_point_counts && Mesh.nurbs_curve_groups->curve_selection && Mesh.nurbs_curve_groups->curve_points)
@@ -618,7 +612,6 @@ struct convert_to_points
 		    }
 		}
 
-/*
 		// Convert bilinear patch selections to point selections ...
 		if(Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection && Mesh.bilinear_patches->patch_points)
 		{
@@ -681,7 +674,6 @@ struct convert_to_points
 		{
 			Selection.edges.clear();
 			Selection.faces.clear();
-			Selection.nurbs_curves.clear();
 			Selection.nurbs_patches.clear();
 		}
 
@@ -800,7 +792,6 @@ struct convert_to_split_edges
 				}
 			}
 		}
-*/
 		
 		// Convert point selections to nurbs curve selections ...
 		if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_first_points && Mesh.nurbs_curve_groups->curve_point_counts && Mesh.nurbs_curve_groups->curve_selection && Mesh.nurbs_curve_groups->curve_points && Mesh.point_selection)
@@ -830,6 +821,7 @@ struct convert_to_split_edges
 				}
 			}
 		}
+*/
 
 		// Convert face selections to edge selections ...
 		if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->clockwise_edges)
@@ -1003,7 +995,6 @@ struct convert_to_uniform
 		{
 			Selection.points.clear();
 			Selection.edges.clear();
-			Selection.nurbs_curves.clear();
 		}
 
 		// Ensure that anything not explicitly selected gets explicitly deselected ...
@@ -1062,7 +1053,6 @@ struct keep_selection
 					Selection.cubic_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
 			}
 		}
-*/
 		
 		if (Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_selection)
 		{
@@ -1073,7 +1063,6 @@ struct keep_selection
 			}
 		}
 
-/*
 		if (Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection)
 		{
 			for (k3d::uint_t patch = 0; patch != Mesh.bilinear_patches->patch_selection->size(); ++patch)

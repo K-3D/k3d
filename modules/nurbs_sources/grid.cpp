@@ -38,6 +38,9 @@ namespace module
 namespace nurbs
 {
 
+namespace source
+{
+
 /////////////////////////////////////////////////////////////////////////////
 // grid
 
@@ -166,6 +169,8 @@ k3d::iplugin_factory& grid_factory()
 {
 	return grid::get_factory();
 }
+
+} // namespace source
 
 } // namespace nurbs
 

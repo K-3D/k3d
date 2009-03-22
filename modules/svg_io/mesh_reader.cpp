@@ -94,7 +94,7 @@ static void parse_rect(const k3d::xml::element& SVG, transform_stack& Transforma
 		control_points.push_back(Transformation.top() * k3d::point3(x + w, y + h, 0));
 		control_points.push_back(Transformation.top() * k3d::point3(x, y + h, 0));
 
-		k3d::nurbs_curve::add_curve(Mesh, Primitive, 2, control_points, 1);
+		k3d::nurbs_curve::add_curve(Mesh, Primitive, 2, control_points, 0, 1);
 	}
 	else
 	{
@@ -164,7 +164,7 @@ static void parse_rect(const k3d::xml::element& SVG, transform_stack& Transforma
 		knots.insert(knots.end(), 2, 7);
 		knots.insert(knots.end(), 3, 8);
 
-		k3d::nurbs_curve::add_curve(Mesh, Primitive, 3, control_points, weights, knots, 1);
+		k3d::nurbs_curve::add_curve(Mesh, Primitive, 3, control_points, weights, knots, 0, 1);
 	}
 }
 
@@ -246,7 +246,7 @@ static void parse_polygon(const k3d::xml::element& SVG, transform_stack& Transfo
 	if(control_points.size() < 2)
 		return;
 
-	k3d::nurbs_curve::add_curve(Mesh, Primitive, 2, control_points, 1);
+	k3d::nurbs_curve::add_curve(Mesh, Primitive, 2, control_points, 0, 1);
 }
 
 /*
@@ -777,9 +777,7 @@ public:
 
 			parse_graphics(svg, transformation, Mesh, *primitive);
 
-			primitive->first_curves.push_back(0);
-			primitive->curve_counts.push_back(primitive->curve_first_points.size());
-			primitive->materials.push_back(0);
+			primitive->material.push_back(0);
 		}
 		catch(std::exception& e)
 		{

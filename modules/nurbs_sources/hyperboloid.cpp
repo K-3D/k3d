@@ -39,6 +39,9 @@ namespace module
 namespace nurbs
 {
 
+namespace source
+{
+
 /////////////////////////////////////////////////////////////////////////////
 // hyperboloid
 
@@ -186,6 +189,8 @@ k3d::iplugin_factory& hyperboloid_factory()
 {
 	return hyperboloid::get_factory();
 }
+
+} // namespace source
 
 } // namespace nurbs
 

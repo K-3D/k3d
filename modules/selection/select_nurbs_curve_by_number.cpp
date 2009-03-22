@@ -27,6 +27,9 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/nurbs_curve.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -45,24 +48,31 @@ class select_nurbs_curve_by_number :
 public:
 	select_nurbs_curve_by_number(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
+		m_primitive(init_owner(*this) + init_name("primitive") + init_label(_("Primitive Number")) + init_description(_("Primitive Number.")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0))),
 		m_index(init_owner(*this) + init_name("index") + init_label(_("Curve Index")) + init_description(_("Controls the curve to be selected.")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0)))
 	{
+		m_primitive.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
+
 		m_index.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
 	}
 
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if(Output.nurbs_curve_groups && Output.nurbs_curve_groups->curve_selection)
-		{
-		    k3d::mesh::nurbs_curve_groups_t& nurbs_curve_groups = Output.nurbs_curve_groups.writable();
-		    k3d::mesh::selection_t& curve_selection = nurbs_curve_groups.curve_selection.writable();
-			std::fill(curve_selection.begin(), curve_selection.end(), 0.0);
+		const k3d::int32_t primitive = m_primitive.pipeline_value();
+		if(primitive >= Output.primitives.size())
+			return;
 
-			const unsigned long index = m_index.pipeline_value();
-			if(index < curve_selection.size())
-				curve_selection[index] = 1.0;
-		}
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs_curve(k3d::nurbs_curve::validate(Output.primitives[primitive].writable()));
+		if(!nurbs_curve)
+			return;
+		
+		std::fill(nurbs_curve->curve_selections.begin(), nurbs_curve->curve_selections.end(), 0.0);
+
+		const k3d::int32_t index = m_index.pipeline_value();
+		if(index < nurbs_curve->curve_selections.size())
+			nurbs_curve->curve_selections[index] = 1.0;
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -80,6 +90,7 @@ public:
 	}
 
 private:
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_primitive;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_index;
 };
 

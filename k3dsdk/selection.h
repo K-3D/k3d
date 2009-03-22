@@ -85,8 +85,7 @@ ABSOLUTE_SPLIT_EDGE = 11,
 //ABSOLUTE_CUBIC_CURVE = 17,
 //NUCURVE_GROUP = 18,
 //NUCURVE = 19,
-/** \deprecated Storage for a zero-based NURBS curve index (relative to a mesh) */
-ABSOLUTE_NURBS_CURVE = 20,
+//ABSOLUTE_NURBS_CURVE = 20,
 //ABSOLUTE_BILINEAR_PATCH = 21,
 //ABSOLUTE_BICUBIC_PATCH = 22,
 /** \deprecated Storage for a zero-based NURBS patch index (relative to a mesh) */

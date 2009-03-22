@@ -18,9 +18,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
-		\author Bart Janssens (bart.janssens@lid.kviv.be)
+	\author Timothy M. Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
 #include <k3dsdk/attribute_array_copier.h>
@@ -33,7 +33,6 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/parallel/blocked_range.h>
 #include <k3dsdk/parallel/parallel_for.h>
@@ -173,69 +172,6 @@ void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyh
   	uniform_data_copier.push_back(face);
   for (k3d::uint_t edge = 0; edge != input_edge_points.size(); ++edge)
   	face_varying_data_copier.push_back(edge);
-}
-
-void merge_nurbs_curve_groups(k3d::mesh& Output, const k3d::mesh& Input)
-{
-	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(Input));
-	if(!nurbs_curve)
-		return;
-	
-	k3d::mesh::nurbs_curve_groups_t& output_nurbs_curve_groups = create_if_not_exists(Output.nurbs_curve_groups);
-	k3d::mesh::indices_t& output_first_curves = create_if_not_exists(output_nurbs_curve_groups.first_curves);
-	k3d::mesh::counts_t& output_curve_counts = create_if_not_exists(output_nurbs_curve_groups.curve_counts);
-	k3d::mesh::materials_t& output_materials = create_if_not_exists(output_nurbs_curve_groups.materials);
-	k3d::mesh::indices_t& output_curve_first_points = create_if_not_exists(output_nurbs_curve_groups.curve_first_points);
-	k3d::mesh::counts_t& output_curve_point_counts = create_if_not_exists(output_nurbs_curve_groups.curve_point_counts);
-	k3d::mesh::orders_t& output_curve_orders = create_if_not_exists(output_nurbs_curve_groups.curve_orders);
-	k3d::mesh::indices_t& output_curve_first_knots = create_if_not_exists(output_nurbs_curve_groups.curve_first_knots);
-	k3d::mesh::selection_t& output_curve_selection = create_if_not_exists(output_nurbs_curve_groups.curve_selection);
-	k3d::mesh::indices_t& output_curve_points = create_if_not_exists(output_nurbs_curve_groups.curve_points);
-	k3d::mesh::weights_t& output_curve_point_weights = create_if_not_exists(output_nurbs_curve_groups.curve_point_weights);
-	k3d::mesh::knots_t& output_curve_knots = create_if_not_exists(output_nurbs_curve_groups.curve_knots);
-	
-	const k3d::mesh::nurbs_curve_groups_t& input_nurbs_curve_groups = *Input.nurbs_curve_groups;
-	const k3d::mesh::indices_t& input_first_curves = *input_nurbs_curve_groups.first_curves;
-	const k3d::mesh::counts_t& input_curve_counts = *input_nurbs_curve_groups.curve_counts;
-	const k3d::mesh::materials_t& input_materials = *input_nurbs_curve_groups.materials;
-	const k3d::mesh::indices_t& input_curve_first_points = *input_nurbs_curve_groups.curve_first_points;
-	const k3d::mesh::counts_t& input_curve_point_counts = *input_nurbs_curve_groups.curve_point_counts;
-	const k3d::mesh::orders_t& input_curve_orders = *input_nurbs_curve_groups.curve_orders;
-	const k3d::mesh::indices_t& input_curve_first_knots = *input_nurbs_curve_groups.curve_first_knots;
-	const k3d::mesh::selection_t& input_curve_selection = *input_nurbs_curve_groups.curve_selection;
-	const k3d::mesh::indices_t& input_curve_points = *input_nurbs_curve_groups.curve_points;
-	const k3d::mesh::weights_t& input_curve_point_weights = *input_nurbs_curve_groups.curve_point_weights;
-	const k3d::mesh::knots_t& input_curve_knots = *input_nurbs_curve_groups.curve_knots;
-	
-	if (output_curve_points.empty()) // for the first appended mesh, we simply copy the named arrays
-  {
-  	output_nurbs_curve_groups.constant_data = input_nurbs_curve_groups.constant_data;
-  	output_nurbs_curve_groups.uniform_data = input_nurbs_curve_groups.uniform_data;
-  	output_nurbs_curve_groups.varying_data = input_nurbs_curve_groups.varying_data;
-  }
-	
-	extend_array(input_first_curves, output_first_curves, output_curve_first_points.size());
-	extend_array(input_curve_counts, output_curve_counts, 0);
-	output_materials.insert(output_materials.end(), input_materials.begin(), input_materials.end());
-	extend_array(input_curve_first_points, output_curve_first_points, output_curve_points.size());
-	extend_array(input_curve_point_counts, output_curve_point_counts, 0);
-	extend_array(input_curve_orders, output_curve_orders, 0);
-	extend_array(input_curve_first_knots, output_curve_first_knots, output_curve_knots.size());
-	extend_array(input_curve_selection, output_curve_selection, 0);
-	extend_array(input_curve_points, output_curve_points, Output.points->size());
-	extend_array(input_curve_point_weights, output_curve_point_weights, 0);
-	output_curve_knots.insert(output_curve_knots.end(), input_curve_knots.begin(), input_curve_knots.end());
-	
-	// Named arrays
-	k3d::attribute_array_copier constant_data_copier(input_nurbs_curve_groups.constant_data, output_nurbs_curve_groups.constant_data);
-	k3d::attribute_array_copier uniform_data_copier(input_nurbs_curve_groups.uniform_data, output_nurbs_curve_groups.uniform_data);
-	k3d::attribute_array_copier varying_data_copier(input_nurbs_curve_groups.varying_data, output_nurbs_curve_groups.varying_data);
-	for (k3d::uint_t curve_group = 0; curve_group != input_first_curves.size(); ++curve_group)
-  	constant_data_copier.push_back(curve_group);
-	for (k3d::uint_t curve = 0; curve != input_curve_first_points.size(); ++curve)
-		uniform_data_copier.push_back(curve);
-	for (k3d::uint_t point = 0; point != input_curve_points.size(); ++point)
-		varying_data_copier.push_back(point);
 }
 
 void merge_nurbs_patches(k3d::mesh& Output, const k3d::mesh& Input)
@@ -457,7 +393,6 @@ public:
 			detail::create_if_not_exists(Output.points);
 			
 			detail::merge_polyhedra(Output, mesh, m_same_polyhedron.pipeline_value());
-			detail::merge_nurbs_curve_groups(Output, mesh);
 			detail::merge_nurbs_patches(Output, mesh);
 
 			// Must be last to calculate correct offsets in other methods

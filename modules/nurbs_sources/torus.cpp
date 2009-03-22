@@ -39,31 +39,37 @@ namespace module
 namespace nurbs
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// sphere
+namespace source
+{
 
-class sphere :
+/////////////////////////////////////////////////////////////////////////////
+// torus
+
+class torus :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	sphere(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	torus(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_zmax(init_owner(*this) + init_name("zmax") + init_label(_("zmax")) + init_description(_("ZMax")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_zmin(init_owner(*this) + init_name("zmin") + init_label(_("zmin")) + init_description(_("ZMin")) + init_value(-1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("thetamax")) + init_description(_("thetamax")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
-		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Radial Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("Radial Segments")) + init_value(2) + init_constraint(constraint::minimum<k3d::int32_t>(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+		m_majorradius(init_owner(*this) + init_name("majorradius") + init_label(_("majorradius")) + init_description(_("Major Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_minorradius(init_owner(*this) + init_name("minorradius") + init_label(_("minorradius")) + init_description(_("Minor Radius")) + init_value(2.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_phimin(init_owner(*this) + init_name("phimin") + init_label(_("phimin")) + init_description(_("Phi Minimum")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
+		m_phimax(init_owner(*this) + init_name("phimax") + init_label(_("phimax")) + init_description(_("Phi Maximum")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
+		m_thetamax(init_owner(*this) + init_name("thetamax") + init_label(_("thetamax")) + init_description(_("Theta Maximum")) + init_value(k3d::radians(360.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
+		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("U Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("V Segments")) + init_value(4) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_material.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
-		m_radius.changed_signal().connect(k3d::hint::converter<
+		m_majorradius.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
-		m_zmax.changed_signal().connect(k3d::hint::converter<
+		m_minorradius.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
-		m_zmin.changed_signal().connect(k3d::hint::converter<
+		m_phimin.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_phimax.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 		m_thetamax.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
@@ -78,15 +84,13 @@ public:
 		Output = k3d::mesh();
 
 		k3d::imaterial* const material = m_material.pipeline_value();
-		const k3d::double_t radius = m_radius.pipeline_value();
-		const k3d::double_t zmax = m_zmax.pipeline_value();
-		const k3d::double_t zmin = m_zmin.pipeline_value();
+		const k3d::double_t majorradius = m_majorradius.pipeline_value();
+		const k3d::double_t minorradius = m_minorradius.pipeline_value();
+		const k3d::double_t phimin = m_phimin.pipeline_value();
+		const k3d::double_t phimax = m_phimax.pipeline_value();
 		const k3d::double_t thetamax = m_thetamax.pipeline_value();
 		const k3d::int32_t u_segments = m_u_segments.pipeline_value();
 		const k3d::int32_t v_segments = m_v_segments.pipeline_value();
-
-		const k3d::double_t phimin = (zmin > -1) ? asin(zmin) : -k3d::pi_over_2();
-		const k3d::double_t phimax = (zmax < 1) ? asin(zmax) : k3d::pi_over_2();
 
 		// Compute NURBS control points ...
 		k3d::mesh::knots_t v_knots;
@@ -116,9 +120,9 @@ public:
 
 		for(k3d::uint_t v = 0; v != v_control_points.size(); ++v)
 		{
-			const k3d::point3 offset = radius * v_control_points[v][2] * k3d::point3(0, 0, 1);
-			const k3d::double_t radius2 = radius * v_control_points[v][1];
-			const k3d::double_t v_weight = v_weights[v];
+			const k3d::point3 offset = minorradius * v_control_points[v][2] * k3d::point3(0, 0, 1);
+			const double radius2 = majorradius + (minorradius * v_control_points[v][1]);
+			const double v_weight = v_weights[v];
 
 			for(k3d::uint_t u = 0; u != u_control_points.size(); ++u)
 			{
@@ -143,10 +147,10 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<sphere, k3d::interface_list<k3d::imesh_source > > factory(
-		  k3d::uuid(0x082eeef0, 0x837f4277, 0xa7c21ff1, 0x839b286e),
-		  "NurbsSphere",
-		  _("Generates a NURBS sphere"),
+		static k3d::document_plugin_factory<torus, k3d::interface_list<k3d::imesh_source > > factory(
+		  k3d::uuid(0xc6cb880c, 0x4e4d4028, 0x8c77305f, 0x4b8f05a2),
+		  "NurbsTorus",
+		  _("Generates a NURBS torus"),
 		  "NURBS",
 		  k3d::iplugin_factory::STABLE);
 
@@ -154,25 +158,27 @@ public:
 	}
 
 private:
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_zmax;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_zmin;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_thetamax;
+	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_majorradius;
+	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_minorradius;
+	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_phimin;
+	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_phimax;
+	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_thetamax;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_segments;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_v_segments;
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// sphere_factory
+// torus_factory
 
-k3d::iplugin_factory& sphere_factory()
+k3d::iplugin_factory& torus_factory()
 {
-	return sphere::get_factory();
+	return torus::get_factory();
 }
+
+} // namespace source
 
 } // namespace nurbs
 
 } // namespace module
-
 
 

@@ -179,6 +179,7 @@ OPTION(K3D_BUILD_NGUI_UV_EDITOR_PANEL_MODULE "Build the user interface UV editor
 OPTION(K3D_BUILD_NLS "Build K-3D with native language support" ON)
 OPTION(K3D_BUILD_NUI_MODULE "Build the Null User Interface module" ON)
 OPTION(K3D_BUILD_NURBS_MODULE "Build the NURBS plugin module" ON)
+OPTION(K3D_BUILD_NURBS_SOURCES_MODULE "Build the NURBS sources plugin module" ON)
 OPTION(K3D_BUILD_OBJ_IO_MODULE "Build the Wavefront .obj file format module" ON)
 OPTION(K3D_BUILD_OPENCASCADE_MODULE "Build the OpenCascade module" ${K3D_OPENCASCADE_FOUND})
 OPTION(K3D_BUILD_OPENEXR_IO_MODULE "Build the OpenEXR file format module" ${K3D_OPENEXR_FOUND})

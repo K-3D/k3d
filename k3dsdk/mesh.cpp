@@ -378,40 +378,6 @@ const bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t&
 // almost_equal
 
 template<>
-class almost_equal<mesh::nurbs_curve_groups_t>
-{
-	typedef mesh::nurbs_curve_groups_t T;
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline const bool_t operator()(const T& A, const T& B)
-	{
-		return
-			detail::almost_equal(A.first_curves, B.first_curves, threshold) &&
-			detail::almost_equal(A.curve_counts, B.curve_counts, threshold) &&
-			detail::almost_equal(A.materials, B.materials, threshold) &&
-			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
-			detail::almost_equal(A.curve_first_points, B.curve_first_points, threshold) &&
-			detail::almost_equal(A.curve_point_counts, B.curve_point_counts, threshold) &&
-			detail::almost_equal(A.curve_orders, B.curve_orders, threshold) &&
-			detail::almost_equal(A.curve_first_knots, B.curve_first_knots, threshold) &&
-			detail::almost_equal(A.curve_selection, B.curve_selection, threshold) &&
-			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
-			detail::almost_equal(A.curve_points, B.curve_points, threshold) &&
-			detail::almost_equal(A.curve_point_weights, B.curve_point_weights, threshold) &&
-			detail::almost_equal(A.curve_knots, B.curve_knots, threshold);
-	}
-private:
-	const uint64_t threshold;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-template<>
 class almost_equal<mesh::nurbs_patches_t>
 {
 	typedef mesh::nurbs_patches_t T;
@@ -518,7 +484,6 @@ const bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) con
 		detail::almost_equal(vertex_data, Other.vertex_data, Threshold) &&
 		detail::almost_equal(primitives, Other.primitives, Threshold) &&
 
-		detail::almost_equal(nurbs_curve_groups, Other.nurbs_curve_groups, Threshold) &&
 		detail::almost_equal(nurbs_patches, Other.nurbs_patches, Threshold) &&
 		detail::almost_equal(polyhedra, Other.polyhedra, Threshold);
 }
@@ -541,47 +506,6 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 
 	// Convert primitives ...
 	primitives = RHS.primitives;
-
-	// Convert NURBS curves ...
-	if(RHS.nucurve_groups.size())
-	{
-		nurbs_curve_groups_t& nurbs_curve_groups = this->nurbs_curve_groups.create();
-		indices_t& first_curves = nurbs_curve_groups.first_curves.create();
-		counts_t& curve_counts = nurbs_curve_groups.curve_counts.create();
-		materials_t& materials = nurbs_curve_groups.materials.create();
-		indices_t& curve_first_points = nurbs_curve_groups.curve_first_points.create();
-		counts_t& curve_point_counts = nurbs_curve_groups.curve_point_counts.create();
-		orders_t& curve_orders = nurbs_curve_groups.curve_orders.create();
-		indices_t& curve_first_knots = nurbs_curve_groups.curve_first_knots.create();
-		selection_t& curve_selection = nurbs_curve_groups.curve_selection.create();
-		indices_t& curve_points = nurbs_curve_groups.curve_points.create();
-		weights_t& curve_point_weights = nurbs_curve_groups.curve_point_weights.create();
-		knots_t& curve_knots = nurbs_curve_groups.curve_knots.create();
-
-		for(legacy::mesh::nucurve_groups_t::const_iterator group = RHS.nucurve_groups.begin(); group != RHS.nucurve_groups.end(); ++group)
-		{
-			first_curves.push_back(curve_first_points.size());
-			curve_counts.push_back((*group)->curves.size());
-			materials.push_back((*group)->material);
-
-			for(legacy::nucurve_group::curves_t::const_iterator curve = (*group)->curves.begin(); curve != (*group)->curves.end(); ++curve)
-			{
-				curve_first_points.push_back(curve_points.size());
-				curve_point_counts.push_back((*curve)->knots.size() - (*curve)->order);
-				curve_orders.push_back((*curve)->order);
-				curve_first_knots.push_back(curve_knots.size());
-				curve_selection.push_back((*curve)->selection_weight);
-
-				for(legacy::nucurve::control_points_t::const_iterator point = (*curve)->control_points.begin(); point != (*curve)->control_points.end(); ++point)
-				{
-					curve_points.push_back(point_map[point->position]);
-					curve_point_weights.push_back(point->weight);
-				}
-
-				curve_knots.insert(curve_knots.end(), (*curve)->knots.begin(), (*curve)->knots.end());
-			}
-		}
-	}
 
 	// Convert NURBS patches ...
 	if(RHS.nupatches.size())
@@ -771,9 +695,6 @@ void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 	UnusedPoints.assign(Mesh.points ? Mesh.points->size() : 0, true);
 
 	// Mark points used by legacy primitives ...
-	if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_points)
-		detail::mark_used_points(*Mesh.nurbs_curve_groups->curve_points, UnusedPoints);
-
 	if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_points)
 		detail::mark_used_points(*Mesh.nurbs_patches->patch_points, UnusedPoints);
 
@@ -853,9 +774,6 @@ void mesh::delete_unused_points(mesh& Mesh)
 	}
 
 	// Update legacy mesh primitives so they use the correct indices ...
-	if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_points)
-		detail::remap_points(Mesh.nurbs_curve_groups.writable().curve_points.writable(), point_map);
-
 	if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_points)
 		detail::remap_points(Mesh.nurbs_patches.writable().patch_points.writable(), point_map);
 
@@ -1030,25 +948,6 @@ std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& 
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 {
 	Stream << detail::indentation << "mesh:\n" << push_indent;
-
-	if(RHS.nurbs_curve_groups)
-	{
-		Stream << detail::indentation << "nurbs_curve_groups:\n" << push_indent;
-
-		detail::print(Stream, "first_curves", RHS.nurbs_curve_groups->first_curves);
-		detail::print(Stream, "curve_counts", RHS.nurbs_curve_groups->curve_counts);
-		detail::print(Stream, "constant_data", RHS.nurbs_curve_groups->constant_data);
-		detail::print(Stream, "curve_first_points", RHS.nurbs_curve_groups->curve_first_points);
-		detail::print(Stream, "curve_point_counts", RHS.nurbs_curve_groups->curve_point_counts);
-		detail::print(Stream, "curve_orders", RHS.nurbs_curve_groups->curve_orders);
-		detail::print(Stream, "curve_selection", RHS.nurbs_curve_groups->curve_selection);
-		detail::print(Stream, "uniform_data", RHS.nurbs_curve_groups->uniform_data);
-		detail::print(Stream, "curve_points", RHS.nurbs_curve_groups->curve_points);
-		detail::print(Stream, "curve_point_weights", RHS.nurbs_curve_groups->curve_point_weights);
-		detail::print(Stream, "curve_knots", RHS.nurbs_curve_groups->curve_knots);
-		
-		Stream << pop_indent;
-	}
 
 	if(RHS.nurbs_patches)
 	{

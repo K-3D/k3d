@@ -590,6 +590,7 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 		}
 	}
 
+/*
 	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(Mesh));
 	if(nurbs_curve)
 	{
@@ -623,6 +624,7 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			}
 		}
 	}
+*/
 
 	boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs_patch(k3d::nurbs_patch::validate(Mesh));
 	if(nurbs_patch)

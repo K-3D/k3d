@@ -33,9 +33,7 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const mesh::indices_t& FirstCurves,
-		const mesh::counts_t& CurveCounts,
-		const mesh::materials_t& Materials,
+		const mesh::materials_t& Material,
 		const mesh::indices_t& CurveFirstPoints,
 		const mesh::counts_t& CurvePointCounts,
 		const mesh::orders_t& CurveOrders,
@@ -49,9 +47,7 @@ public:
 		const mesh::attribute_arrays_t& VaryingData
 		);
 
-	const mesh::indices_t& first_curves;
-	const mesh::counts_t& curve_counts;
-	const mesh::materials_t& materials;
+	const mesh::materials_t& material;
 	const mesh::indices_t& curve_first_points;
 	const mesh::counts_t& curve_point_counts;
 	const mesh::orders_t& curve_orders;
@@ -70,9 +66,7 @@ class primitive
 {
 public:
 	primitive(
-		mesh::indices_t& FirstCurves,
-		mesh::counts_t& CurveCounts,
-		mesh::materials_t& Materials,
+		mesh::materials_t& Material,
 		mesh::indices_t& CurveFirstPoints,
 		mesh::counts_t& CurvePointCounts,
 		mesh::orders_t& CurveOrders,
@@ -87,9 +81,7 @@ public:
 		);
 
 
-	mesh::indices_t& first_curves;
-	mesh::counts_t& curve_counts;
-	mesh::materials_t& materials;
+	mesh::materials_t& material;
 	mesh::indices_t& curve_first_points;
 	mesh::counts_t& curve_point_counts;
 	mesh::orders_t& curve_orders;
@@ -107,28 +99,21 @@ public:
 /// The caller is responsible for the lifetime of the returned object.
 primitive* create(mesh& Mesh);
 
-/** \deprecated This method exists for the sole purpose of easing the transition to generic primitives. */
-const_primitive* validate(const mesh& Mesh);
-/** \deprecated This method exists for the sole purpose of easing the transition to generic primitives. */
-primitive* validate(mesh& Mesh);
-
-/*
 /// Tests the given mesh primitive to see if it is a valid nurbs_curve primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 const_primitive* validate(const mesh::primitive& GenericPrimitive);
 /// Tests the given mesh primitive to see if it is a valid nurbs_curve primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 primitive* validate(mesh::primitive& GenericPrimitive);
-*/
 
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points.
 /// Control points will be assigned unity weights and an open uniform knot vector is automatically supplied.
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const uint_t RepeatPoints = 0);
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, imaterial* const Material = 0, const uint_t RepeatPoints = 0);
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points and control point weights.
 /// An open uniform knot vector is automatically supplied.
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const uint_t RepeatPoints = 0);
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, imaterial* const Material = 0, const uint_t RepeatPoints = 0);
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points, control point weights, and knot vector.
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, const uint_t RepeatPoints = 0);
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, imaterial* const Material = 0, const uint_t RepeatPoints = 0);
 
 /** Computes a set of control points, weights, and knots that define an order-3 circular arc centered at the origin
 	\param X Defines the X axis of the plane containing the arc

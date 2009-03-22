@@ -80,46 +80,44 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs(k3d::nurbs_curve::validate(Mesh));
-		if(!nurbs)
-			return;
-
-		const k3d::mesh::points_t& points = *Mesh.points;
-
-		k3d::gl::store_attributes attributes;
-		glDisable(GL_LIGHTING);
-
-		GLfloat gl_modelview_matrix[16];
-		glGetFloatv(GL_MODELVIEW_MATRIX, gl_modelview_matrix);
-		gluLoadSamplingMatrices(nurbs_renderer, gl_modelview_matrix, RenderState.gl_projection_matrix, RenderState.gl_viewport);
-
-		const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0);
-		const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
-
-		const k3d::uint_t group_begin = 0;
-		const k3d::uint_t group_end = group_begin + nurbs->first_curves.size();
-		for(k3d::uint_t group = group_begin; group != group_end; ++group)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			const k3d::uint_t curve_begin = nurbs->first_curves[group];
-			const k3d::uint_t curve_end = curve_begin + nurbs->curve_counts[group];
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(**primitive));
+			if(!nurbs_curve)
+				return;
+
+			const k3d::mesh::points_t& points = *Mesh.points;
+
+			k3d::gl::store_attributes attributes;
+			glDisable(GL_LIGHTING);
+
+			GLfloat gl_modelview_matrix[16];
+			glGetFloatv(GL_MODELVIEW_MATRIX, gl_modelview_matrix);
+			gluLoadSamplingMatrices(nurbs_renderer, gl_modelview_matrix, RenderState.gl_projection_matrix, RenderState.gl_viewport);
+
+			const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0, 0, 0);
+			const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
+
+			const k3d::uint_t curve_begin = 0;
+			const k3d::uint_t curve_end = curve_begin + nurbs_curve->curve_first_points.size();
 			for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
-				const k3d::uint_t curve_point_count = nurbs->curve_point_counts[curve];
-				const k3d::uint_t curve_point_begin = nurbs->curve_first_points[curve];
+				const k3d::uint_t curve_point_count = nurbs_curve->curve_point_counts[curve];
+				const k3d::uint_t curve_point_begin = nurbs_curve->curve_first_points[curve];
 				const k3d::uint_t curve_point_end = curve_point_begin + curve_point_count;
-				const k3d::uint_t curve_order = nurbs->curve_orders[curve];
-				const k3d::uint_t curve_first_knot = nurbs->curve_first_knots[curve];
+				const k3d::uint_t curve_order = nurbs_curve->curve_orders[curve];
+				const k3d::uint_t curve_first_knot = nurbs_curve->curve_first_knots[curve];
 
-				k3d::gl::color3d(nurbs->curve_selections[curve] ? selected_color : color);
+				k3d::gl::color3d(nurbs_curve->curve_selections[curve] ? selected_color : color);
 
-				std::vector<GLfloat> gl_knot_vector(&nurbs->curve_knots[curve_first_knot], &nurbs->curve_knots[curve_first_knot + curve_point_count + curve_order]);
+				std::vector<GLfloat> gl_knot_vector(&nurbs_curve->curve_knots[curve_first_knot], &nurbs_curve->curve_knots[curve_first_knot + curve_point_count + curve_order]);
 
 				std::vector<GLfloat> gl_control_points;
 				gl_control_points.reserve(4 * curve_point_count);
 				for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
 				{
-					const double curve_point_weight = nurbs->curve_point_weights[curve_point];
-					const k3d::point3 weighted_curve_point = curve_point_weight * points[nurbs->curve_points[curve_point]];
+					const k3d::double_t curve_point_weight = nurbs_curve->curve_point_weights[curve_point];
+					const k3d::point3 weighted_curve_point = curve_point_weight * points[nurbs_curve->curve_points[curve_point]];
 
 					gl_control_points.push_back(static_cast<GLfloat>(weighted_curve_point[0]));
 					gl_control_points.push_back(static_cast<GLfloat>(weighted_curve_point[1]));
@@ -136,43 +134,48 @@ public:
 
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!SelectionState.select_nurbs_curves)
+		if(!SelectionState.select_uniform)
 			return;
 
-		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs(k3d::nurbs_curve::validate(Mesh));
-		if(!nurbs)
-			return;
-
-		const k3d::mesh::points_t& points = *Mesh.points;
-
-		k3d::gl::store_attributes attributes;
-
-		GLfloat gl_modelview_matrix[16];
-		glGetFloatv(GL_MODELVIEW_MATRIX, gl_modelview_matrix);
-		gluLoadSamplingMatrices(nurbs_renderer, gl_modelview_matrix, RenderState.gl_projection_matrix, RenderState.gl_viewport);
-
-		const k3d::uint_t group_begin = 0;
-		const k3d::uint_t group_end = group_begin + nurbs->first_curves.size();
-		for(k3d::uint_t group = group_begin; group != group_end; ++group)
+		k3d::uint_t primitive_index = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive, ++primitive_index)
 		{
-			const k3d::uint_t curve_begin = nurbs->first_curves[group];
-			const k3d::uint_t curve_end = curve_begin + nurbs->curve_counts[group];
-			for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
-			{
-				const k3d::uint_t curve_point_count = nurbs->curve_point_counts[curve];
-				const k3d::uint_t curve_point_begin = nurbs->curve_first_points[curve];
-				const k3d::uint_t curve_point_end = curve_point_begin + curve_point_count;
-				const k3d::uint_t curve_order = nurbs->curve_orders[curve];
-				const k3d::uint_t curve_first_knot = nurbs->curve_first_knots[curve];
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(**primitive));
+			if(!nurbs_curve)
+				return;
 
-				std::vector<GLfloat> gl_knot_vector(&nurbs->curve_knots[curve_first_knot], &nurbs->curve_knots[curve_first_knot + curve_point_count + curve_order]);
+			const k3d::mesh::points_t& points = *Mesh.points;
+
+			k3d::gl::store_attributes attributes;
+			glDisable(GL_LIGHTING);
+
+			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
+
+			GLfloat gl_modelview_matrix[16];
+			glGetFloatv(GL_MODELVIEW_MATRIX, gl_modelview_matrix);
+			gluLoadSamplingMatrices(nurbs_renderer, gl_modelview_matrix, RenderState.gl_projection_matrix, RenderState.gl_viewport);
+
+			const k3d::uint_t curve_begin = 0;
+			const k3d::uint_t curve_end = curve_begin + nurbs_curve->curve_first_points.size();
+			k3d::uint_t curve_index = 0;
+			for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve, ++curve_index)
+			{
+				k3d::gl::push_selection_token(k3d::selection::UNIFORM, curve_index);
+
+				const k3d::uint_t curve_point_count = nurbs_curve->curve_point_counts[curve];
+				const k3d::uint_t curve_point_begin = nurbs_curve->curve_first_points[curve];
+				const k3d::uint_t curve_point_end = curve_point_begin + curve_point_count;
+				const k3d::uint_t curve_order = nurbs_curve->curve_orders[curve];
+				const k3d::uint_t curve_first_knot = nurbs_curve->curve_first_knots[curve];
+
+				std::vector<GLfloat> gl_knot_vector(&nurbs_curve->curve_knots[curve_first_knot], &nurbs_curve->curve_knots[curve_first_knot + curve_point_count + curve_order]);
 
 				std::vector<GLfloat> gl_control_points;
 				gl_control_points.reserve(4 * curve_point_count);
 				for(k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
 				{
-					const double curve_point_weight = nurbs->curve_point_weights[curve_point];
-					const k3d::point3 weighted_curve_point = curve_point_weight * points[nurbs->curve_points[curve_point]];
+					const k3d::double_t curve_point_weight = nurbs_curve->curve_point_weights[curve_point];
+					const k3d::point3 weighted_curve_point = curve_point_weight * points[nurbs_curve->curve_points[curve_point]];
 
 					gl_control_points.push_back(static_cast<GLfloat>(weighted_curve_point[0]));
 					gl_control_points.push_back(static_cast<GLfloat>(weighted_curve_point[1]));
@@ -180,14 +183,14 @@ public:
 					gl_control_points.push_back(static_cast<GLfloat>(curve_point_weight));
 				}
 
-				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_NURBS_CURVE, curve);
-
 				gluBeginCurve(nurbs_renderer);
 				gluNurbsCurve(nurbs_renderer, gl_knot_vector.size(), &gl_knot_vector[0], 4, &gl_control_points[0], curve_order, GL_MAP1_VERTEX_4);
 				gluEndCurve(nurbs_renderer);
 
-				k3d::gl::pop_selection_token(); // ABSOLUTE_NURBS_CURVE
+				k3d::gl::pop_selection_token(); // UNIFORM
 			}
+
+			k3d::gl::pop_selection_token(); // PRIMITIVE
 		}
 	}
 

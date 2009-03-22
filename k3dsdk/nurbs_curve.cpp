@@ -19,9 +19,11 @@
 
 #include "basic_math.h"
 #include "geometric_operations.h"
-#include "metadata.h"
+#include "metadata_keys.h"
 #include "nurbs_curve.h"
 #include "primitive_detail.h"
+#include "selection.h"
+#include "string_cast.h"
 
 #include <numeric>
 
@@ -35,9 +37,7 @@ namespace nurbs_curve
 // const_primitive
 
 const_primitive::const_primitive(
-	const mesh::indices_t& FirstCurves,
-	const mesh::counts_t& CurveCounts,
-	const mesh::materials_t& Materials,
+	const mesh::materials_t& Material,
 	const mesh::indices_t& CurveFirstPoints,
 	const mesh::counts_t& CurvePointCounts,
 	const mesh::orders_t& CurveOrders,
@@ -50,9 +50,7 @@ const_primitive::const_primitive(
 	const mesh::attribute_arrays_t& UniformData,
 	const mesh::attribute_arrays_t& VaryingData
 		) :
-	first_curves(FirstCurves),
-	curve_counts(CurveCounts),
-	materials(Materials),
+	material(Material),
 	curve_first_points(CurveFirstPoints),
 	curve_point_counts(CurvePointCounts),
 	curve_orders(CurveOrders),
@@ -71,9 +69,7 @@ const_primitive::const_primitive(
 // primitive
 
 primitive::primitive(
-	mesh::indices_t& FirstCurves,
-	mesh::counts_t& CurveCounts,
-	mesh::materials_t& Materials,
+	mesh::materials_t& Material,
 	mesh::indices_t& CurveFirstPoints,
 	mesh::counts_t& CurvePointCounts,
 	mesh::orders_t& CurveOrders,
@@ -86,9 +82,7 @@ primitive::primitive(
 	mesh::attribute_arrays_t& UniformData,
 	mesh::attribute_arrays_t& VaryingData
 		) :
-	first_curves(FirstCurves),
-	curve_counts(CurveCounts),
-	materials(Materials),
+	material(Material),
 	curve_first_points(CurveFirstPoints),
 	curve_point_counts(CurvePointCounts),
 	curve_orders(CurveOrders),
@@ -108,35 +102,25 @@ primitive::primitive(
 
 primitive* create(mesh& Mesh)
 {
-	mesh::nurbs_curve_groups_t& curves = Mesh.nurbs_curve_groups.create();
-	mesh::indices_t& first_curves = curves.first_curves.create();
-	mesh::counts_t& curve_counts = curves.curve_counts.create();
-	mesh::materials_t& materials = curves.materials.create();
-	mesh::indices_t& curve_first_points = curves.curve_first_points.create();
-	mesh::counts_t& curve_point_counts = curves.curve_point_counts.create();
-	mesh::orders_t& curve_orders = curves.curve_orders.create();
-	mesh::indices_t& curve_first_knots = curves.curve_first_knots.create();
-	mesh::selection_t& curve_selections = curves.curve_selection.create();
-	mesh::indices_t& curve_points = curves.curve_points.create();
-	mesh::weights_t& curve_point_weights = curves.curve_point_weights.create();
-	mesh::knots_t& curve_knots = curves.curve_knots.create();
+	mesh::primitive& generic_primitive = Mesh.primitives.create("nurbs_curve");
 
 	primitive* const result = new primitive(
-		first_curves,
-		curve_counts,
-		materials,
-		curve_first_points,
-		curve_point_counts,
-		curve_orders,
-		curve_first_knots,
-		curve_selections,
-		curve_points,
-		curve_point_weights,
-		curve_knots,
-		curves.constant_data,
-		curves.uniform_data,
-		curves.varying_data
+		generic_primitive.structure.create<mesh::materials_t>("material"),
+		generic_primitive.structure.create<mesh::indices_t>("curve_first_points"),
+		generic_primitive.structure.create<mesh::counts_t>("curve_point_counts"),
+		generic_primitive.structure.create<mesh::orders_t>("curve_orders"),
+		generic_primitive.structure.create<mesh::indices_t>("curve_first_knots"),
+		generic_primitive.structure.create<mesh::selection_t>("curve_selections"),
+		generic_primitive.structure.create<mesh::indices_t>("curve_points"),
+		generic_primitive.structure.create<mesh::weights_t>("curve_point_weights"),
+		generic_primitive.structure.create<mesh::knots_t>("curve_knots"),
+		generic_primitive.attributes["constant"],
+		generic_primitive.attributes["uniform"],
+		generic_primitive.attributes["varying"]
 		);
+
+	result->curve_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->curve_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
 }
@@ -144,78 +128,110 @@ primitive* create(mesh& Mesh)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-const bool_t legacy_validate_nurbs_curve_groups(const mesh& Mesh)
+const_primitive* validate(const mesh::primitive& Primitive)
 {
-	if(!Mesh.nurbs_curve_groups)
-		return false;
-
-	return_val_if_fail(Mesh.nurbs_curve_groups->first_curves, false);
-	return_val_if_fail(Mesh.nurbs_curve_groups->curve_counts, false);
-	return_val_if_fail(Mesh.nurbs_curve_groups->curve_first_points, false);
-	return_val_if_fail(Mesh.nurbs_curve_groups->curve_point_counts, false);
-	return_val_if_fail(Mesh.nurbs_curve_groups->curve_orders, false);
-	return_val_if_fail(Mesh.nurbs_curve_groups->curve_first_knots, false);
-	return_val_if_fail(Mesh.nurbs_curve_groups->curve_points, false);
-	return_val_if_fail(Mesh.nurbs_curve_groups->curve_point_weights, false);
-	return_val_if_fail(Mesh.nurbs_curve_groups->curve_knots, false);
-	return_val_if_fail(Mesh.nurbs_curve_groups->curve_selection, false);
-	return_val_if_fail(Mesh.nurbs_curve_groups->materials, false);
-
-	return true;
-}
-
-const_primitive* validate(const mesh& Mesh)
-{
-	if(!legacy_validate_nurbs_curve_groups(Mesh))
+	if(Primitive.type != "nurbs_curve")
 		return 0;
 
-	return new const_primitive(
-		*Mesh.nurbs_curve_groups->first_curves,
-		*Mesh.nurbs_curve_groups->curve_counts,
-		*Mesh.nurbs_curve_groups->materials,
-		*Mesh.nurbs_curve_groups->curve_first_points,
-		*Mesh.nurbs_curve_groups->curve_point_counts,
-		*Mesh.nurbs_curve_groups->curve_orders,
-		*Mesh.nurbs_curve_groups->curve_first_knots,
-		*Mesh.nurbs_curve_groups->curve_selection,
-		*Mesh.nurbs_curve_groups->curve_points,
-		*Mesh.nurbs_curve_groups->curve_point_weights,
-		*Mesh.nurbs_curve_groups->curve_knots,
-		Mesh.nurbs_curve_groups->constant_data,
-		Mesh.nurbs_curve_groups->uniform_data,
-		Mesh.nurbs_curve_groups->varying_data);
+	try
+	{
+		const mesh::materials_t& material = require_const_array<mesh::materials_t>(Primitive, "material");
+		const mesh::indices_t& curve_first_points = require_const_array<mesh::indices_t>(Primitive, "curve_first_points");
+		const mesh::counts_t& curve_point_counts = require_const_array<mesh::counts_t>(Primitive, "curve_point_counts");
+		const mesh::orders_t& curve_orders = require_const_array<mesh::orders_t>(Primitive, "curve_orders");
+		const mesh::indices_t& curve_first_knots = require_const_array<mesh::indices_t>(Primitive, "curve_first_knots");
+		const mesh::selection_t& curve_selections = require_const_array<mesh::selection_t>(Primitive, "curve_selections");
+		const mesh::indices_t& curve_points = require_const_array<mesh::indices_t>(Primitive, "curve_points");
+		const mesh::weights_t& curve_point_weights = require_const_array<mesh::weights_t>(Primitive, "curve_point_weights");
+		const mesh::knots_t& curve_knots = require_const_array<mesh::knots_t>(Primitive, "curve_knots");
+
+		const mesh::attribute_arrays_t& constant_data = require_const_attribute_arrays(Primitive, "constant");
+		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
+		const mesh::attribute_arrays_t& varying_data = require_const_attribute_arrays(Primitive, "varying");
+
+		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+
+		require_array_size(Primitive, material, "material", 1);
+		require_array_size(Primitive, curve_point_counts, "curve_point_counts", curve_first_points.size());
+		require_array_size(Primitive, curve_orders, "curve_orders", curve_first_points.size());
+		require_array_size(Primitive, curve_first_knots, "curve_first_knots", curve_first_points.size());
+		require_array_size(Primitive, curve_selections, "curve_selections", curve_first_points.size());
+		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_array_size(Primitive, curve_point_weights, "curve_point_weights", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_array_size(Primitive, curve_knots, "curve_knots",
+			std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0)
+			+ std::accumulate(curve_orders.begin(), curve_orders.end(), 0));
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", curve_first_points.size());
+		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+
+		return new const_primitive(material, curve_first_points, curve_point_counts, curve_orders, curve_first_knots, curve_selections, curve_points,curve_point_weights, curve_knots, constant_data, uniform_data, varying_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
+	}
+
+	return 0;
 }
 
-primitive* validate(mesh& Mesh)
+primitive* validate(mesh::primitive& Primitive)
 {
-	if(!legacy_validate_nurbs_curve_groups(Mesh))
+	if(Primitive.type != "nurbs_curve")
 		return 0;
 
-	mesh::nurbs_curve_groups_t& nurbs = Mesh.nurbs_curve_groups.writable();
+	try
+	{
+		mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, "material");
+		mesh::indices_t& curve_first_points = require_array<mesh::indices_t>(Primitive, "curve_first_points");
+		mesh::counts_t& curve_point_counts = require_array<mesh::counts_t>(Primitive, "curve_point_counts");
+		mesh::orders_t& curve_orders = require_array<mesh::orders_t>(Primitive, "curve_orders");
+		mesh::indices_t& curve_first_knots = require_array<mesh::indices_t>(Primitive, "curve_first_knots");
+		mesh::selection_t& curve_selections = require_array<mesh::selection_t>(Primitive, "curve_selections");
+		mesh::indices_t& curve_points = require_array<mesh::indices_t>(Primitive, "curve_points");
+		mesh::weights_t& curve_point_weights = require_array<mesh::weights_t>(Primitive, "curve_point_weights");
+		mesh::knots_t& curve_knots = require_array<mesh::knots_t>(Primitive, "curve_knots");
 
-	return new primitive(
-		nurbs.first_curves.writable(),
-		nurbs.curve_counts.writable(),
-		nurbs.materials.writable(),
-		nurbs.curve_first_points.writable(),
-		nurbs.curve_point_counts.writable(),
-		nurbs.curve_orders.writable(),
-		nurbs.curve_first_knots.writable(),
-		nurbs.curve_selection.writable(),
-		nurbs.curve_points.writable(),
-		nurbs.curve_point_weights.writable(),
-		nurbs.curve_knots.writable(),
-		nurbs.constant_data,
-		nurbs.uniform_data,
-		nurbs.varying_data);
+		mesh::attribute_arrays_t& constant_data = require_attribute_arrays(Primitive, "constant");
+		mesh::attribute_arrays_t& uniform_data = require_attribute_arrays(Primitive, "uniform");
+		mesh::attribute_arrays_t& varying_data = require_attribute_arrays(Primitive, "varying");
+
+		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+
+		require_array_size(Primitive, material, "material", 1);
+		require_array_size(Primitive, curve_point_counts, "curve_point_counts", curve_first_points.size());
+		require_array_size(Primitive, curve_orders, "curve_orders", curve_first_points.size());
+		require_array_size(Primitive, curve_first_knots, "curve_first_knots", curve_first_points.size());
+		require_array_size(Primitive, curve_selections, "curve_selections", curve_first_points.size());
+		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_array_size(Primitive, curve_point_weights, "curve_point_weights", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_array_size(Primitive, curve_knots, "curve_knots",
+			std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0)
+			+ std::accumulate(curve_orders.begin(), curve_orders.end(), 0));
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", curve_first_points.size());
+		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+
+		return new primitive(material, curve_first_points, curve_point_counts, curve_orders, curve_first_knots, curve_selections, curve_points,curve_point_weights, curve_knots, constant_data, uniform_data, varying_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
+	}
+
+	return 0;
 }
 
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const uint_t RepeatPoints)
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, imaterial* const Material, const uint_t RepeatPoints)
 {
-	add_curve(Mesh, Primitive, Order, ControlPoints, mesh::weights_t(ControlPoints.size(), 1), RepeatPoints);
+	add_curve(Mesh, Primitive, Order, ControlPoints, mesh::weights_t(ControlPoints.size(), 1), Material, RepeatPoints);
 }
 
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const uint_t RepeatPoints)
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, imaterial* const Material, const uint_t RepeatPoints)
 {
 	return_if_fail(ControlPoints.size() + RepeatPoints >= Order);
 
@@ -225,10 +241,10 @@ void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh:
 		knots.insert(knots.end(), 1, i);
 	knots.insert(knots.end(), Order, ControlPoints.size() + RepeatPoints - Order + 1);
 
-	add_curve(Mesh, Primitive, Order, ControlPoints, Weights, knots, RepeatPoints);
+	add_curve(Mesh, Primitive, Order, ControlPoints, Weights, knots, Material, RepeatPoints);
 }
 
-void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, const uint_t RepeatPoints)
+void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, imaterial* const Material, const uint_t RepeatPoints)
 {
 	return_if_fail(Mesh.points);
 	return_if_fail(Mesh.point_selection);
@@ -241,6 +257,7 @@ void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh:
 	mesh::points_t& points = Mesh.points.writable();
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
 
+	Primitive.material.push_back(Material);
         Primitive.curve_first_points.push_back(Primitive.curve_points.size());
         Primitive.curve_point_counts.push_back(ControlPoints.size() + RepeatPoints);
         Primitive.curve_orders.push_back(Order);

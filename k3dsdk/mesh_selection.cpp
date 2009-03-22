@@ -195,7 +195,6 @@ const mesh_selection mesh_selection::select_all()
 	result.points = component_select_all();
 	result.edges = component_select_all();
 	result.faces = component_select_all();
-	result.nurbs_curves = component_select_all();
 	result.nurbs_patches = component_select_all();
 
 	result.components.push_back(component(0, uint_t(-1), selection::CONSTANT, 0, uint_t(-1), 1.0));
@@ -215,7 +214,6 @@ const mesh_selection mesh_selection::deselect_all()
 	result.points = component_deselect_all();
 	result.edges = component_deselect_all();
 	result.faces = component_deselect_all();
-	result.nurbs_curves = component_deselect_all();
 	result.nurbs_patches = component_deselect_all();
 
 	result.components.push_back(component(0, uint_t(-1), selection::CONSTANT, 0, uint_t(-1), 0.0));
@@ -243,11 +241,6 @@ void mesh_selection::store(const mesh& Mesh, mesh_selection& Selection)
 	{
 		detail::store_selection(Mesh.polyhedra->edge_selection, Selection.edges);
 		detail::store_selection(Mesh.polyhedra->face_selection, Selection.faces);
-	}
-
-	if(Mesh.nurbs_curve_groups)
-	{
-		detail::store_selection(Mesh.nurbs_curve_groups->curve_selection, Selection.nurbs_curves);
 	}
 
 	if(Mesh.nurbs_patches)
@@ -284,10 +277,6 @@ void mesh_selection::store(const legacy::mesh& Mesh, mesh_selection& Selection)
 	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 		std::for_each((*polyhedron)->faces.begin(), (*polyhedron)->faces.end(), store_face_selection);
 
-	detail::legacy_store_selection store_nurbs_curve_selection(Selection.nurbs_curves);
-	for(legacy::mesh::nucurve_groups_t::const_iterator group = Mesh.nucurve_groups.begin(); group != Mesh.nucurve_groups.end(); ++group)
-		std::for_each((*group)->curves.begin(), (*group)->curves.end(), store_nurbs_curve_selection);
-
 	std::for_each(Mesh.nupatches.begin(), Mesh.nupatches.end(), detail::legacy_store_selection(Selection.nurbs_patches));
 }
 
@@ -306,12 +295,6 @@ void mesh_selection::merge(const mesh_selection& Selection, mesh& Mesh)
 	{
 		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
 		detail::merge_selection(Selection.faces, polyhedra.face_first_loops, polyhedra.face_selection);
-	}
-
-	if(Mesh.nurbs_curve_groups)
-	{
-		k3d::mesh::nurbs_curve_groups_t& nurbs_curve_groups = Mesh.nurbs_curve_groups.writable();
-		detail::merge_selection(Selection.nurbs_curves, nurbs_curve_groups.curve_first_points, nurbs_curve_groups.curve_selection);
 	}
 
 	if(Mesh.nurbs_patches)
@@ -373,7 +356,6 @@ void mesh_selection::merge(const mesh_selection& Selection, legacy::mesh& Mesh)
 	}
 
 	k3d::legacy::for_each_face(Mesh, detail::legacy_merge_selection(Selection.faces));
-	k3d::legacy::for_each_nucurve(Mesh, detail::legacy_merge_selection(Selection.nurbs_curves));
 	k3d::legacy::for_each_nupatch(Mesh, detail::legacy_merge_selection(Selection.nurbs_patches));
 }
 
@@ -387,7 +369,6 @@ void mesh_selection::clear()
 	points.clear();
 	edges.clear();
 	faces.clear();
-	nurbs_curves.clear();
 	nurbs_patches.clear();
 
 	components.clear();
@@ -399,7 +380,6 @@ bool mesh_selection::empty() const
 		points.empty() &&
 		edges.empty() &&
 		faces.empty() &&
-		nurbs_curves.empty() &&
 		nurbs_patches.empty() &&
 		components.empty();
 }
@@ -410,7 +390,6 @@ bool mesh_selection::operator==(const mesh_selection& RHS) const
 		points == RHS.points &&
 		edges == RHS.edges &&
 		faces == RHS.faces &&
-		nurbs_curves == RHS.nurbs_curves &&
 		nurbs_patches == RHS.nurbs_patches &&
 		components == RHS.components;
 }
@@ -525,7 +504,6 @@ std::ostream& operator<<(std::ostream& Stream, const mesh_selection& RHS)
 	Stream << "points:           " << RHS.points << "\n";
 	Stream << "edges:            " << RHS.edges << "\n";
 	Stream << "faces:            " << RHS.faces << "\n";
-	Stream << "nurbs_curves:     " << RHS.nurbs_curves << "\n";
 	Stream << "nurbs_patches:    " << RHS.nurbs_patches << "\n";
 
 	std::copy(RHS.components.begin(), RHS.components.end(), std::ostream_iterator<mesh_selection::component>(Stream, "\n"));

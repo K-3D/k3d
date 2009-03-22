@@ -85,6 +85,7 @@ public:
 			track_mesh->point_selection.create();
 
 			boost::scoped_ptr<k3d::nurbs_curve::primitive> track_curves(k3d::nurbs_curve::create(*track_mesh));
+			track_curves->material.push_back(0);
 
 			std::stack<k3d::matrix4> transformation;
 			transformation.push(k3d::scale3(1, -1, 1) * k3d::identity3());
@@ -177,11 +178,9 @@ public:
 					points.push_back(transformation.top() * k3d::point3(width, 0, 0));
 					points.push_back(transformation.top() * k3d::point3(width, height, 0));
 					points.push_back(transformation.top() * k3d::point3(0, height, 0));
-					k3d::nurbs_curve::add_curve(*mesh, *curves, 2, points, 1);
+					k3d::nurbs_curve::add_curve(*mesh, *curves, 2, points, 0, 1);
 
-					curves->first_curves.push_back(0);
-					curves->curve_counts.push_back(curves->curve_first_points.size());
-					curves->materials.push_back(0);
+					curves->material.push_back(0);
 				}
 				else if(token == "STRAIGHT" || token == "JOINT")
 				{
@@ -408,10 +407,6 @@ k3d::log() << debug << scale << " " << center << " " << radius << std::endl;
 				}
 			}
 			
-			track_curves->first_curves.push_back(0);
-			track_curves->curve_counts.push_back(track_curves->curve_first_points.size());
-			track_curves->materials.push_back(0);
-
 			return true;
 		}
 		catch(std::exception& e)

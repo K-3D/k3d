@@ -59,9 +59,6 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case ABSOLUTE_SPLIT_EDGE:
 			Stream << "absolute_split_edge";
 			break;
-		case ABSOLUTE_NURBS_CURVE:
-			Stream << "absolute_nurbs_curve";
-			break;
 		case ABSOLUTE_NURBS_PATCH:
 			Stream << "absolute_nurbs_patch";
 			break;
@@ -119,10 +116,8 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = ABSOLUTE_LINEAR_CURVE;
 	else if(buffer == "absolute_cubic_curve")
 		RHS = ABSOLUTE_CUBIC_CURVE;
-*/
 	else if(buffer == "absolute_nurbs_curve" || buffer == "absolute_nucurve")
 		RHS = ABSOLUTE_NURBS_CURVE;
-/*
 	else if(buffer == "absolute_bilinear_patch")
 		RHS = ABSOLUTE_BILINEAR_PATCH;
 	else if(buffer == "absolute_bicubic_patch")

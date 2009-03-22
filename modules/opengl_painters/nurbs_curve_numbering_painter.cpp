@@ -93,58 +93,55 @@ public:
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs(k3d::nurbs_curve::validate(Mesh));
-		if(!nurbs)
-			return;
-
-		const k3d::mesh::points_t& points = *Mesh.points;
-
-		if(!m_font)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			if(m_antialias.pipeline_value())
-				m_font.reset(new FTPixmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
-			else
-				m_font.reset(new FTBitmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
-
-			m_font->FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
-			m_font->UseDisplayList(true);
-			if(m_font->Error())
-			{
-				k3d::log() << error << "error initializing font" << std::endl;
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(**primitive));
+			if(!nurbs_curve)
 				return;
-			}
-		}
 
-		const k3d::double_t x_offset = m_x_offset.pipeline_value();
-		const k3d::double_t y_offset = m_y_offset.pipeline_value();
-		const k3d::double_t z_offset = m_z_offset.pipeline_value();
+			const k3d::mesh::points_t& points = *Mesh.points;
 
-		const k3d::color selected_color = m_selected_color.pipeline_value();
-		const k3d::color unselected_color = m_unselected_color.pipeline_value();
-
-		k3d::gl::store_attributes attributes;
-		glDisable(GL_LIGHTING);
-
-		const k3d::uint_t group_begin = 0;
-		const k3d::uint_t group_end = group_begin + nurbs->first_curves.size();
-
-		for(k3d::uint_t group = group_begin; group < group_end; ++group)
-		{
-			const k3d::uint_t curves_begin = nurbs->first_curves[group];
-			const k3d::uint_t curves_end = curves_begin + nurbs->curve_counts[group];
-			for(k3d::uint_t curve = curves_begin; curve < curves_end; curve++)
+			if(!m_font)
 			{
-				k3d::gl::color3d(nurbs->curve_selections[curve] ? selected_color : unselected_color);
+				if(m_antialias.pipeline_value())
+					m_font.reset(new FTPixmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
+				else
+					m_font.reset(new FTBitmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
+
+				m_font->FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
+				m_font->UseDisplayList(true);
+				if(m_font->Error())
+				{
+					k3d::log() << error << "error initializing font" << std::endl;
+					return;
+				}
+			}
+
+			const k3d::double_t x_offset = m_x_offset.pipeline_value();
+			const k3d::double_t y_offset = m_y_offset.pipeline_value();
+			const k3d::double_t z_offset = m_z_offset.pipeline_value();
+
+			const k3d::color selected_color = m_selected_color.pipeline_value();
+			const k3d::color unselected_color = m_unselected_color.pipeline_value();
+
+			k3d::gl::store_attributes attributes;
+			glDisable(GL_LIGHTING);
+
+			const k3d::uint_t curve_begin = 0;
+			const k3d::uint_t curve_end = curve_begin + nurbs_curve->curve_first_points.size();
+			for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
+			{
+				k3d::gl::color3d(nurbs_curve->curve_selections[curve] ? selected_color : unselected_color);
 
 				//calculate center
 				k3d::point3 center;
-				const k3d::uint_t points_begin = nurbs->curve_first_points[curve];
-				const k3d::uint_t points_end = points_begin + nurbs->curve_point_counts[curve];
+				const k3d::uint_t points_begin = nurbs_curve->curve_first_points[curve];
+				const k3d::uint_t points_end = points_begin + nurbs_curve->curve_point_counts[curve];
 
-				for(k3d::uint_t point = points_begin; point < points_end; point++)
-					center = center + points[nurbs->curve_points[point]];
+				for(k3d::uint_t point = points_begin; point != points_end; ++point)
+					center = center + points[nurbs_curve->curve_points[point]];
 
-				center = center / nurbs->curve_point_counts[curve];
+				center = center / nurbs_curve->curve_point_counts[curve];
 
 				//draw the number
 				const k3d::point3 position = center + k3d::point3(x_offset, y_offset, z_offset);

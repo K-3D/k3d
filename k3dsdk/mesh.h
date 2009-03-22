@@ -110,40 +110,6 @@ public:
 		primitive& create(const string_t& Type);
 	};
 
-	/// Defines storage for NURBS curve groups
-	class nurbs_curve_groups_t
-	{
-	public:
-		/// Stores the set of per-curve-group first points
-		pipeline_data<indices_t> first_curves;
-		/// Stores the set of per-curve-group curve counts
-		pipeline_data<counts_t> curve_counts;
-		/// Stores the set of per-curve-group materials
-		pipeline_data<materials_t> materials;
-		/// Stores user-defined per-curve-group data (maps to RenderMan constant data)
-		attribute_arrays_t constant_data;
-		/// Stores the set of per-curve first points
-		pipeline_data<indices_t> curve_first_points;
-		/// Stores the set of per-curve point counts
-		pipeline_data<counts_t> curve_point_counts;
-		/// Stores the set of per-curve orders
-		pipeline_data<orders_t> curve_orders;
-		/// Stores the set of per-curve first knots
-		pipeline_data<indices_t> curve_first_knots;
-		/// Stores per-curve selection state
-		pipeline_data<selection_t> curve_selection;
-		/// Stores user-defined per-curve data (maps to RenderMan uniform data)
-		attribute_arrays_t uniform_data;
-		/// Stores per-curve control points
-		pipeline_data<indices_t> curve_points;
-		/// Stores user-defined per-curve control point data (maps to RenderMan varying data)
-		attribute_arrays_t varying_data;
-		/// Stores per-curve control point weights
-		pipeline_data<weights_t> curve_point_weights;
-		/// Stores per-curve knot vectors
-		pipeline_data<knots_t> curve_knots;
-	};
-
 	/// Defines storage for NURBS patches
 	class nurbs_patches_t
 	{
@@ -265,8 +231,6 @@ public:
 	/// Stores mesh primitives
 	primitives_t primitives;
 
-	/// Stores nurbs curve groups
-	pipeline_data<nurbs_curve_groups_t> nurbs_curve_groups;
 	/// Stores nurbs patches
 	pipeline_data<nurbs_patches_t> nurbs_patches;
 	/// Stores polyhedra

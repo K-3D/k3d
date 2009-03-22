@@ -93,7 +93,6 @@ const k3d::gl::selection_state select_split_edges(bool Backfacing)
 
 	result.exclude_unselected_nodes = true;
 	result.select_split_edges = true;
-	result.select_nurbs_curves = true;
 	result.select_backfacing = Backfacing;
 
 	return result;
@@ -118,7 +117,6 @@ const k3d::gl::selection_state select_nodes()
 
 	result.select_points = true;
 	result.select_faces = true;
-	result.select_nurbs_curves = true;
 	result.select_nurbs_patches = true;
 	result.select_backfacing = true;
 	result.select_uniform = true;
@@ -832,7 +830,6 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	selection_state.exclude_unselected_nodes = true;
 	selection_state.select_points = true;
 	selection_state.select_faces = true;
-	selection_state.select_nurbs_curves = true;
 	selection_state.select_nurbs_patches = true;
 	selection_state.select_backfacing = Backfacing;
 	selection_state.select_uniform = true;
@@ -990,7 +987,6 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 			}
 		}
 	}
-*/
 	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_CURVE))
 	{
 		if(mesh->nurbs_curve_groups && mesh->nurbs_curve_groups->curve_first_points && mesh->nurbs_curve_groups->curve_point_counts && mesh->nurbs_curve_groups->curve_points)
@@ -1014,7 +1010,6 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 			}
 		}
 	}
-/*
 	else if(tokens.count(k3d::selection::ABSOLUTE_BILINEAR_PATCH))
 	{
 		assert_not_implemented();
@@ -1105,7 +1100,6 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	selection_state.exclude_unselected_nodes = true;
 	selection_state.select_split_edges = true;
 	selection_state.select_faces = true;
-	selection_state.select_nurbs_curves = true;
 	selection_state.select_backfacing = Backfacing;
 
 	const double sensitivity = 5;
@@ -1145,11 +1139,6 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	{
 		return record;
 	}
-	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_CURVE))
-	{
-		return record;
-	}
-
 
 	double distance = std::numeric_limits<double>::max();
 	k3d::selection::id selected_edge;
@@ -1169,7 +1158,7 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 				{
 					detail::select_nearest_edge(
 						*mesh->polyhedra->edge_points,
-						*mesh->polyhedra->clockwise_edges,
+					*mesh->polyhedra->clockwise_edges,
 						*mesh->points,
 						edge,
 						Coordinates,
