@@ -47,10 +47,10 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const mesh::indices_t& FirstFaces,
-		const mesh::counts_t& FaceCounts,
-//		const typed_array<int32_t>& PolyhedronTypes,
-		const mesh::polyhedra_t::types_t& PolyhedronTypes,
+		const mesh::indices_t& ShellFirstFaces,
+		const mesh::counts_t& ShellFaceCounts,
+//		const typed_array<int32_t>& ShellTypes,
+		const mesh::polyhedra_t::types_t& ShellTypes,
 		const mesh::indices_t& FaceFirstLoops,
 		const mesh::counts_t& FaceLoopCounts,
 		const mesh::selection_t& FaceSelections,
@@ -67,10 +67,10 @@ public:
 	/// Implicit conversion
 	const_primitive(const primitive& Primitive);
 
-	const mesh::indices_t& first_faces;
-	const mesh::counts_t& face_counts;
-//	const typed_array<int32_t>& polyhedron_types;
-	const mesh::polyhedra_t::types_t& polyhedron_types;
+	const mesh::indices_t& shell_first_faces;
+	const mesh::counts_t& shell_face_counts;
+//	const typed_array<int32_t>& shell_types;
+	const mesh::polyhedra_t::types_t& shell_types;
 	const mesh::indices_t& face_first_loops;
 	const mesh::counts_t& face_loop_counts;
 	const mesh::selection_t& face_selections;
@@ -89,10 +89,10 @@ class primitive
 {
 public:
 	primitive(
-		mesh::indices_t& FirstFaces,
-		mesh::counts_t& FaceCounts,
-//		typed_array<int32_t>& PolyhedronTypes,
-		mesh::polyhedra_t::types_t& PolyhedronTypes,
+		mesh::indices_t& ShellFirstFaces,
+		mesh::counts_t& ShellFaceCounts,
+//		typed_array<int32_t>& ShellTypes,
+		mesh::polyhedra_t::types_t& ShellTypes,
 		mesh::indices_t& FaceFirstLoops,
 		mesh::counts_t& FaceLoopCounts,
 		mesh::selection_t& FaceSelections,
@@ -106,10 +106,10 @@ public:
 		mesh::attribute_arrays_t& FaceVaryingData
 		);
 
-	mesh::indices_t& first_faces;
-	mesh::counts_t& face_counts;
-//	typed_array<int32_t>& polyhedron_types;
-	mesh::polyhedra_t::types_t& polyhedron_types;
+	mesh::indices_t& shell_first_faces;
+	mesh::counts_t& shell_face_counts;
+//	typed_array<int32_t>& shell_types;
+	mesh::polyhedra_t::types_t& shell_types;
 	mesh::indices_t& face_first_loops;
 	mesh::counts_t& face_loop_counts;
 	mesh::selection_t& face_selections;

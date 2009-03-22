@@ -92,11 +92,11 @@ public:
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		
-		const k3d::uint_t shell_count = polyhedron->first_faces.size();
+		const k3d::uint_t shell_count = polyhedron->shell_first_faces.size();
 		for(k3d::uint_t shell = 0; shell != shell_count; ++shell)
 		{
-			const k3d::uint_t face_begin = polyhedron->first_faces[shell];
-			const k3d::uint_t face_end = face_begin + polyhedron->face_counts[shell];
+			const k3d::uint_t face_begin = polyhedron->shell_first_faces[shell];
+			const k3d::uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
 				k3d::gl::normal3d(normals[face]);

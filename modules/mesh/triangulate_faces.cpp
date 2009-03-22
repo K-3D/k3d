@@ -126,9 +126,9 @@ private:
 				}
 			}
 
-			output_polyhedron->first_faces.push_back(0);
-			output_polyhedron->face_counts.push_back(output_polyhedron->face_first_loops.size());
-			output_polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+			output_polyhedron->shell_first_faces.push_back(0);
+			output_polyhedron->shell_face_counts.push_back(output_polyhedron->face_first_loops.size());
+			output_polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 		}
 
 	private:

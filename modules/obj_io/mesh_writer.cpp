@@ -90,11 +90,11 @@ private:
 			return;
 
 		const k3d::uint_t shell_begin = 0;
-		const k3d::uint_t shell_end = shell_begin + polyhedron->first_faces.size();
+		const k3d::uint_t shell_end = shell_begin + polyhedron->shell_first_faces.size();
 		for(k3d::uint_t shell = shell_begin; shell != shell_end; ++shell)
 		{
-			const k3d::uint_t face_begin = polyhedron->first_faces[shell];
-			const k3d::uint_t face_end = face_begin + polyhedron->face_counts[shell];
+			const k3d::uint_t face_begin = polyhedron->shell_first_faces[shell];
+			const k3d::uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
 				Output << "f";

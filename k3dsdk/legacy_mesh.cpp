@@ -663,13 +663,13 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 	if(polyhedron)
 	{
 		const uint_t shell_begin = 0;
-		const uint_t shell_end = shell_begin + polyhedron->first_faces.size();
+		const uint_t shell_end = shell_begin + polyhedron->shell_first_faces.size();
 		for(uint_t shell = shell_begin; shell != shell_end; ++shell)
 		{
 			legacy::polyhedron* const legacy_polyhedron = new legacy::polyhedron();
 			polyhedra.push_back(legacy_polyhedron);
 
-			switch(polyhedron->polyhedron_types[shell])
+			switch(polyhedron->shell_types[shell])
 			{
 				case k3d::mesh::polyhedra_t::POLYGONS:
 					legacy_polyhedron->type = legacy::polyhedron::POLYGONS;
@@ -679,8 +679,8 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 					break;
 			}
 
-			const uint_t face_begin = polyhedron->first_faces[shell];
-			const uint_t face_end = face_begin + polyhedron->face_counts[shell];
+			const uint_t face_begin = polyhedron->shell_first_faces[shell];
+			const uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
 			for(uint_t face = face_begin; face != face_end; ++face)
 			{
 				const uint_t loop_begin = polyhedron->face_first_loops[face];

@@ -42,10 +42,10 @@ namespace polyhedron
 // const_primitive
 
 const_primitive::const_primitive(
-	const mesh::indices_t& FirstFaces,
-	const mesh::counts_t& FaceCounts,
-//	const typed_array<int32_t>& PolyhedronTypes,
-	const mesh::polyhedra_t::types_t& PolyhedronTypes,
+	const mesh::indices_t& ShellFirstFaces,
+	const mesh::counts_t& ShellFaceCounts,
+//	const typed_array<int32_t>& ShellTypes,
+	const mesh::polyhedra_t::types_t& ShellTypes,
 	const mesh::indices_t& FaceFirstLoops,
 	const mesh::counts_t& FaceLoopCounts,
 	const mesh::selection_t& FaceSelections,
@@ -58,9 +58,9 @@ const_primitive::const_primitive(
 	const mesh::attribute_arrays_t& UniformData,
 	const mesh::attribute_arrays_t& FaceVaryingData
 		) :
-	first_faces(FirstFaces),
-	face_counts(FaceCounts),
-	polyhedron_types(PolyhedronTypes),
+	shell_first_faces(ShellFirstFaces),
+	shell_face_counts(ShellFaceCounts),
+	shell_types(ShellTypes),
 	face_first_loops(FaceFirstLoops),
 	face_loop_counts(FaceLoopCounts),
 	face_selections(FaceSelections),
@@ -76,9 +76,9 @@ const_primitive::const_primitive(
 }
 
 const_primitive::const_primitive(const primitive& Primitive) :
-	first_faces(Primitive.first_faces),
-	face_counts(Primitive.face_counts),
-	polyhedron_types(Primitive.polyhedron_types),
+	shell_first_faces(Primitive.shell_first_faces),
+	shell_face_counts(Primitive.shell_face_counts),
+	shell_types(Primitive.shell_types),
 	face_first_loops(Primitive.face_first_loops),
 	face_loop_counts(Primitive.face_loop_counts),
 	face_selections(Primitive.face_selections),
@@ -97,10 +97,10 @@ const_primitive::const_primitive(const primitive& Primitive) :
 // primitive
 
 primitive::primitive(
-	mesh::indices_t& FirstFaces,
-	mesh::counts_t& FaceCounts,
-//	typed_array<int32_t>& PolyhedronTypes,
-	mesh::polyhedra_t::types_t& PolyhedronTypes,
+	mesh::indices_t& ShellFirstFaces,
+	mesh::counts_t& ShellFaceCounts,
+//	typed_array<int32_t>& ShellTypes,
+	mesh::polyhedra_t::types_t& ShellTypes,
 	mesh::indices_t& FaceFirstLoops,
 	mesh::counts_t& FaceLoopCounts,
 	mesh::selection_t& FaceSelections,
@@ -113,9 +113,9 @@ primitive::primitive(
 	mesh::attribute_arrays_t& UniformData,
 	mesh::attribute_arrays_t& FaceVaryingData
 		) :
-	first_faces(FirstFaces),
-	face_counts(FaceCounts),
-	polyhedron_types(PolyhedronTypes),
+	shell_first_faces(ShellFirstFaces),
+	shell_face_counts(ShellFaceCounts),
+	shell_types(ShellTypes),
 	face_first_loops(FaceFirstLoops),
 	face_loop_counts(FaceLoopCounts),
 	face_selections(FaceSelections),
@@ -193,9 +193,9 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 
 		// Append a new polyhedron to the mesh ...
 		primitive* const polyhedron = create(Mesh);
-		polyhedron->first_faces.push_back(0);
-		polyhedron->face_counts.push_back(VertexCounts.size());
-		polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+		polyhedron->shell_first_faces.push_back(0);
+		polyhedron->shell_face_counts.push_back(VertexCounts.size());
+		polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 
 		uint_t face_vertex = 0;
 		const uint_t face_begin = 0;
@@ -260,9 +260,9 @@ primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imat
 		// Append a new polyhedron to the mesh ...
 		primitive* const polyhedron = create(Mesh);
 
-		polyhedron->first_faces.assign(1, 0);
-		polyhedron->face_counts.assign(1, rows * columns);
-		polyhedron->polyhedron_types.assign(1, mesh::polyhedra_t::POLYGONS);
+		polyhedron->shell_first_faces.assign(1, 0);
+		polyhedron->shell_face_counts.assign(1, rows * columns);
+		polyhedron->shell_types.assign(1, mesh::polyhedra_t::POLYGONS);
 		polyhedron->face_first_loops.resize(rows * columns);
 		polyhedron->face_loop_counts.assign(rows * columns, 1);
 		polyhedron->face_selections.assign(rows * columns, 0.0);
@@ -338,9 +338,9 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 		// Append a new polyhedron to the mesh ...
 		primitive* const polyhedron = create(Mesh);
 
-		polyhedron->first_faces.assign(1, 0);
-		polyhedron->face_counts.assign(1, rows * columns);
-		polyhedron->polyhedron_types.assign(1, mesh::polyhedra_t::POLYGONS);
+		polyhedron->shell_first_faces.assign(1, 0);
+		polyhedron->shell_face_counts.assign(1, rows * columns);
+		polyhedron->shell_types.assign(1, mesh::polyhedra_t::POLYGONS);
 		polyhedron->face_first_loops.resize(rows * columns);
 		polyhedron->face_loop_counts.assign(rows * columns, 1);
 		polyhedron->face_selections.assign(rows * columns, 0.0);
@@ -513,8 +513,9 @@ void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices,
 	return_if_fail(Mesh.points);
 	return_if_fail(Mesh.point_selection);
 
-	return_if_fail(Polyhedron.first_faces.size() == 1);
-	return_if_fail(Polyhedron.face_counts.size() == 1);
+	return_if_fail(Polyhedron.shell_first_faces.size() == 1);
+	return_if_fail(Polyhedron.shell_face_counts.size() == 1);
+	return_if_fail(Polyhedron.shell_types.size() == 1);
 
 	return_if_fail(Vertices.size() > 1);
 	for(uint_t hole = 0; hole != Holes.size(); ++hole)
@@ -555,8 +556,8 @@ void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices,
 		Polyhedron.clockwise_edges.back() = Polyhedron.loop_first_edges.back();
 	}
 
-	Polyhedron.first_faces[0] = 0;
-	Polyhedron.face_counts[0] = Polyhedron.face_first_loops.size();
+	Polyhedron.shell_first_faces[0] = 0;
+	Polyhedron.shell_face_counts[0] = Polyhedron.face_first_loops.size();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -607,7 +608,7 @@ const bool_t is_solid(const const_primitive& Polyhedron)
 
 const bool_t is_sds(const const_primitive& Polyhedron)
 {
-	return Polyhedron.polyhedron_types.size() && (Polyhedron.polyhedron_types[0] == mesh::polyhedra_t::CATMULL_CLARK);
+	return Polyhedron.shell_types.size() && (Polyhedron.shell_types[0] == mesh::polyhedra_t::CATMULL_CLARK);
 }
 
 //////////////////////////////////////////////////////////////////////////////

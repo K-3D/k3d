@@ -359,9 +359,9 @@ public:
 		Output.point_selection.create();
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
-		polyhedron->first_faces.push_back(0);
-		polyhedron->face_counts.push_back(0);
-		polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+		polyhedron->shell_first_faces.push_back(0);
+		polyhedron->shell_face_counts.push_back(0);
+		polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 
 		k3d::double_t offset = 0;
 		for(k3d::string_t::const_iterator c = text.begin(); c != text.end(); ++c)

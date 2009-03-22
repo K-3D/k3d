@@ -71,18 +71,18 @@ public:
 		const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.vertex_data;
 
 		const k3d::uint_t shell_begin = 0;
-		const k3d::uint_t shell_end = shell_begin + polyhedron->polyhedron_types.size();
+		const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();
 		for(k3d::uint_t shell = shell_begin; shell != shell_end; ++shell)
 		{
-			if(polyhedron->polyhedron_types[shell] != k3d::mesh::polyhedra_t::POLYGONS)
+			if(polyhedron->shell_types[shell] != k3d::mesh::polyhedra_t::POLYGONS)
 				continue;
 
 			// Get the set of all materials used in this polyhedron ...
 			typedef std::set<k3d::imaterial*> materials_t;
 			materials_t materials;
 
-			const k3d::uint_t faces_begin = polyhedron->first_faces[shell];
-			const k3d::uint_t faces_end = faces_begin + polyhedron->face_counts[shell];
+			const k3d::uint_t faces_begin = polyhedron->shell_first_faces[shell];
+			const k3d::uint_t faces_end = faces_begin + polyhedron->shell_face_counts[shell];
 			for(k3d::uint_t face = faces_begin; face != faces_end; ++face)
 				materials.insert(polyhedron->face_materials[face]);
 
@@ -108,8 +108,8 @@ public:
 				ri_vertex_data.add_arrays(vertex_data);
 				ri_vertex_data.add_array(k3d::ri::RI_P(), points);
 
-				const k3d::uint_t faces_begin = polyhedron->first_faces[shell];
-				const k3d::uint_t faces_end = faces_begin + polyhedron->face_counts[shell];
+				const k3d::uint_t faces_begin = polyhedron->shell_first_faces[shell];
+				const k3d::uint_t faces_end = faces_begin + polyhedron->shell_face_counts[shell];
 				for(k3d::uint_t face = faces_begin; face != faces_end; ++face)
 				{
 					if(polyhedron->face_materials[face] != material)

@@ -182,9 +182,9 @@ private:
 			if(!polyhedron)
 			{
 				polyhedron.reset(k3d::polyhedron::create(mesh));
-				polyhedron->first_faces.push_back(0);
-				polyhedron->face_counts.push_back(0);
-				polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+				polyhedron->shell_first_faces.push_back(0);
+				polyhedron->shell_face_counts.push_back(0);
+				polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 			}
 
 			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
@@ -204,7 +204,7 @@ private:
 			}
 			polyhedron->clockwise_edges.back() = first_edge;
 
-			polyhedron->face_counts.back() = polyhedron->face_counts.back() + 1;
+			polyhedron->shell_face_counts.back() = polyhedron->shell_face_counts.back() + 1;
 		}
 
 		void on_curve_surface_type(const k3d::string_t& Type)
