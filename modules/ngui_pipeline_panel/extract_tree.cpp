@@ -75,10 +75,10 @@ extract_tree::extract_tree() :
 	m_root.changed_signal().connect(make_reset_graph_slot());
 }
 
-void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Output)
+void extract_tree::on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 	return_if_fail(Input.topology);
-	const k3d::graph::adjacency_list_t& input_topology = *Input.topology;
+	const k3d::graph::undirected::adjacency_list_t& input_topology = *Input.topology;
 	const k3d::uint_t vertex_count = boost::num_vertices(input_topology);
 	const k3d::uint_t edge_count = boost::num_edges(input_topology);
 
@@ -89,7 +89,7 @@ void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 	boost::breadth_first_search(input_topology, m_root.pipeline_value(), visitor(extract_tree_visitor));
 
 	// Create a new graph, only copying those vertices and edges that were marked for extraction ...
-	k3d::graph::adjacency_list_t& output_topology = Output.topology.create();
+	k3d::graph::undirected::adjacency_list_t& output_topology = Output.topology.create();
 
 	Output.graph_data = Input.graph_data;
 	Output.vertex_data = Input.vertex_data.clone_types();
@@ -98,8 +98,8 @@ void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 	k3d::attribute_array_copier vertex_data_copier(Input.vertex_data, Output.vertex_data);
 	k3d::attribute_array_copier edge_data_copier(Input.edge_data, Output.edge_data);
 
-	std::map<k3d::graph::vertex_descriptor_t, k3d::graph::vertex_descriptor_t> vertex_map;
-	for(k3d::graph::vertex_descriptor_t vertex = 0; vertex != vertex_count; ++vertex)
+	std::map<k3d::graph::undirected::vertex_descriptor_t, k3d::graph::undirected::vertex_descriptor_t> vertex_map;
+	for(k3d::graph::undirected::vertex_descriptor_t vertex = 0; vertex != vertex_count; ++vertex)
 	{
 		if(extract_vertex[vertex])
 		{
@@ -108,9 +108,9 @@ void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 		}
 	}
 
-	for(std::pair<k3d::graph::edge_iterator_t, k3d::graph::edge_iterator_t> edges = boost::edges(input_topology); edges.first != edges.second; ++edges.first)
+	for(std::pair<k3d::graph::undirected::edge_iterator_t, k3d::graph::undirected::edge_iterator_t> edges = boost::edges(input_topology); edges.first != edges.second; ++edges.first)
 	{
-		const k3d::graph::edge_descriptor_t edge = *edges.first;
+		const k3d::graph::undirected::edge_descriptor_t edge = *edges.first;
 		const k3d::uint_t edge_index = input_topology[edge].index;
 
 		if(extract_edge[edge_index])
@@ -125,7 +125,7 @@ void extract_tree::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outp
 	root.push_back(vertex_map[m_root.pipeline_value()]);
 }
 
-void extract_tree::on_update_graph(const k3d::graph& Input, k3d::graph& Output)
+void extract_tree::on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 }
 

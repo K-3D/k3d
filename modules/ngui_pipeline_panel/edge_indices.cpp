@@ -36,18 +36,18 @@ edge_indices::edge_indices()
 {
 }
 
-void edge_indices::on_initialize_graph(const k3d::graph& Input, k3d::graph& Output)
+void edge_indices::on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 	Output = Input;
 
-	k3d::graph::adjacency_list_t& topology = Output.topology.writable();
+	k3d::graph::undirected::adjacency_list_t& topology = Output.topology.writable();
 
 	k3d::uint_t index = 0;
-	for(std::pair<k3d::graph::edge_iterator_t, k3d::graph::edge_iterator_t> edges = boost::edges(topology); edges.first != edges.second; ++index, ++edges.first)
+	for(std::pair<k3d::graph::undirected::edge_iterator_t, k3d::graph::undirected::edge_iterator_t> edges = boost::edges(topology); edges.first != edges.second; ++index, ++edges.first)
 		topology[*edges.first].index = index;
 }
 
-void edge_indices::on_update_graph(const k3d::graph& Input, k3d::graph& Output)
+void edge_indices::on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 }
 

@@ -72,7 +72,7 @@ tree_layout::tree_layout() :
 	m_row_offset.changed_signal().connect(make_reset_graph_slot());
 }
 
-void tree_layout::on_initialize_graph(const k3d::graph& Input, k3d::graph& Output)
+void tree_layout::on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 	// The input graph must be a tree ...
 	const k3d::graph::indices_t* const root_array = Input.graph_data.lookup<k3d::graph::indices_t>("root");
@@ -81,7 +81,7 @@ void tree_layout::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outpu
 	const k3d::uint_t root = root_array->at(0);
 
 	return_if_fail(Input.topology);
-	const k3d::graph::adjacency_list_t& input_topology = *Input.topology;
+	const k3d::graph::undirected::adjacency_list_t& input_topology = *Input.topology;
 	const k3d::uint_t vertex_count = boost::num_vertices(input_topology);
 
 	// Shallow-copy our input ...
@@ -97,7 +97,7 @@ void tree_layout::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outpu
 	const k3d::double_t column_offset = m_column_offset.pipeline_value();
 	const k3d::double_t row_offset = m_row_offset.pipeline_value();
 
-	k3d::graph::points_t& vertex_position = Output.vertex_data.create("position", new k3d::graph::points_t(vertex_count));
+	k3d::graph::points_2d_t& vertex_position = Output.vertex_data.create("position", new k3d::graph::points_2d_t(vertex_count));
 	for(k3d::uint_t vertex = 0; vertex != vertex_count; ++vertex)
 	{
 		const k3d::uint_t rank = vertex_rank[vertex];
@@ -108,7 +108,7 @@ void tree_layout::on_initialize_graph(const k3d::graph& Input, k3d::graph& Outpu
 	}
 }
 
-void tree_layout::on_update_graph(const k3d::graph& Input, k3d::graph& Output)
+void tree_layout::on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 }
 

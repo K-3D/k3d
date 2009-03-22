@@ -398,8 +398,8 @@ public:
 
 		m_root_node = Node;
 
-		k3d::graph& graph = *k3d::property::pipeline_value<k3d::graph*>(m_create_graph->output());
-		const k3d::graph::adjacency_list_t& topology = *graph.topology;
+		k3d::graph::undirected& graph = *k3d::property::pipeline_value<k3d::graph::undirected*>(m_create_graph->output());
+		const k3d::graph::undirected::adjacency_list_t& topology = *graph.topology;
 		const k3d::uint_t vertex_count = boost::num_vertices(topology);
 
 		const k3d::graph::nodes_t& vertex_node = *graph.vertex_data.lookup<k3d::graph::nodes_t>("node");
@@ -582,7 +582,7 @@ public:
 			Context->restore();
 
 			// Get the graph to be rendered ...
-			const k3d::graph& graph = *boost::any_cast<k3d::graph*>(k3d::property::pipeline_value(m_tree_layout->output()));
+			const k3d::graph::undirected& graph = *boost::any_cast<k3d::graph::undirected*>(k3d::property::pipeline_value(m_tree_layout->output()));
 
 //k3d::log() << debug << "input graph:\n" << graph << std::endl;
 
@@ -591,12 +591,12 @@ public:
 			return_if_fail(graph.vertex_data.count("position"));
 			return_if_fail(graph.edge_data.count("type"));
 
-			const k3d::graph::adjacency_list_t& topology = *graph.topology;
+			const k3d::graph::undirected::adjacency_list_t& topology = *graph.topology;
 			const k3d::uint_t vertex_count = boost::num_vertices(topology);
 			const k3d::uint_t edge_count = boost::num_edges(topology);
 
 			const k3d::graph::nodes_t& vertex_node = *graph.vertex_data.lookup<k3d::graph::nodes_t>("node");
-			const k3d::graph::points_t& vertex_position = *graph.vertex_data.lookup<k3d::graph::points_t>("position");
+			const k3d::graph::points_2d_t& vertex_position = *graph.vertex_data.lookup<k3d::graph::points_2d_t>("position");
 			const k3d::graph::indices_t& edge_type = *graph.edge_data.lookup<k3d::graph::indices_t>("type");
 			
 			// Render the graph edges ...
@@ -605,7 +605,7 @@ public:
 			Context->set_source_rgb(connection_color.red, connection_color.green, connection_color.blue);
 
 			k3d::uint_t edge_index = 0;
-			for(std::pair<k3d::graph::edge_iterator_t, k3d::graph::edge_iterator_t> edges = boost::edges(topology); edges.first != edges.second; ++edge_index, ++edges.first)
+			for(std::pair<k3d::graph::undirected::edge_iterator_t, k3d::graph::undirected::edge_iterator_t> edges = boost::edges(topology); edges.first != edges.second; ++edge_index, ++edges.first)
 			{
 				const k3d::uint_t source = boost::source(*edges.first, topology);
 				const k3d::uint_t target = boost::target(*edges.first, topology);

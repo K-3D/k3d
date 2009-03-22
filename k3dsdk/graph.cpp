@@ -28,10 +28,13 @@
 namespace k3d
 {
 
+namespace graph
+{
+
 namespace detail
 {
 
-static void print(std::ostream& Stream, const pipeline_data<graph::adjacency_list_t>& Topology)
+static void print(std::ostream& Stream, const pipeline_data<undirected::adjacency_list_t>& Topology)
 {
 	if(!Topology)
 		return;
@@ -39,7 +42,7 @@ static void print(std::ostream& Stream, const pipeline_data<graph::adjacency_lis
 	Stream << "  vertices: (" << boost::num_vertices(*Topology) << ")\n";
 
 	Stream << "  edges: (" << boost::num_edges(*Topology) << ")\n";
-	for(std::pair<graph::edge_iterator_t, graph::edge_iterator_t> edges = boost::edges(*Topology); edges.first != edges.second; ++edges.first)
+	for(std::pair<undirected::edge_iterator_t, undirected::edge_iterator_t> edges = boost::edges(*Topology); edges.first != edges.second; ++edges.first)
 		Stream << "    index: " << (*Topology)[*edges.first].index << " edge: " << *edges.first << "\n";
 }
 
@@ -70,16 +73,16 @@ static void print(std::ostream& Stream, const std::string& Name, const pipeline_
 		else if(print<graph::doubles_t>(Stream, *Array))
 		{
 		}
-		else if(print<graph::ints_t>(Stream, *Array))
+		else if(print<graph::integers_t>(Stream, *Array))
 		{
 		}
 		else if(print<graph::strings_t>(Stream, *Array))
 		{
 		}
-		else if(print<graph::points_t>(Stream, *Array))
+		else if(print<graph::points_2d_t>(Stream, *Array))
 		{
 		}
-		else if(print<graph::vectors_t>(Stream, *Array))
+		else if(print<graph::vectors_2d_t>(Stream, *Array))
 		{
 		}
 		else if(print<graph::nodes_t>(Stream, *Array))
@@ -103,14 +106,14 @@ static void print(std::ostream& Stream, const k3d::graph::attribute_arrays_t& Ar
 } // namespace detail
 
 ////////////////////////////////////////////////////////////////////////////////////
-// graph
+// undirected
 
-graph::graph()
+undirected::undirected()
 {
 }
 
 /** \todo Print the topology */
-std::ostream& operator<<(std::ostream& Stream, const graph& RHS)
+std::ostream& operator<<(std::ostream& Stream, const undirected& RHS)
 {
 	Stream << "topology:" << "\n";
 	detail::print(Stream, RHS.topology);
@@ -126,6 +129,8 @@ std::ostream& operator<<(std::ostream& Stream, const graph& RHS)
 
 	return Stream;
 }
+
+} // namespace graph
 
 } // namespace k3d
 

@@ -46,19 +46,19 @@ document_to_graph::document_to_graph(k3d::idocument& Document) :
 	m_include_painters.changed_signal().connect(make_reset_graph_slot());
 }
 
-void document_to_graph::on_initialize_graph(k3d::graph& Output)
+void document_to_graph::on_initialize_graph(k3d::graph::undirected& Output)
 {
 	const bool include_materials = m_include_materials.pipeline_value();
 	const bool include_painters = m_include_painters.pipeline_value();
 
 	const k3d::nodes_t nodes = m_document.nodes().collection();
 
-	k3d::graph::adjacency_list_t& topology = Output.topology.create();
+	k3d::graph::undirected::adjacency_list_t& topology = Output.topology.create();
 	k3d::graph::nodes_t& vertex_node = Output.vertex_data.create<k3d::graph::nodes_t>("node");
 	k3d::graph::indices_t& edge_type = Output.edge_data.create<k3d::graph::indices_t>("type");
 
 	// Insert nodes ...
-	std::map<k3d::inode*, k3d::graph::vertex_descriptor_t> node_map;
+	std::map<k3d::inode*, k3d::graph::undirected::vertex_descriptor_t> node_map;
 	for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 	{
 		if(!include_materials && dynamic_cast<k3d::imaterial*>(*node))
@@ -115,7 +115,7 @@ void document_to_graph::on_initialize_graph(k3d::graph& Output)
 	}
 }
 
-void document_to_graph::on_update_graph(k3d::graph& Output)
+void document_to_graph::on_update_graph(k3d::graph::undirected& Output)
 {
 }
 

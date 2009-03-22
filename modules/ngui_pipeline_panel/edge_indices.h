@@ -45,8 +45,8 @@ public:
 	edge_indices();
 
 private:
-	void on_initialize_graph(const k3d::graph& Input, k3d::graph& Output);
-	void on_update_graph(const k3d::graph& Input, k3d::graph& Output);
+	void on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output);
+	void on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output);
 };
 
 } // namespace pipeline

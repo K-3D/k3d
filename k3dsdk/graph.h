@@ -32,14 +32,36 @@ namespace k3d
 
 class inode;
 
-////////////////////////////////////////////////////////////////////////////////
-// graph
+namespace graph
+{
 
-/// Encapsulates a directed graph stored as an adjacency list
-class graph
+/// Defines storage for a generic collection of boolean values
+typedef typed_array<bool_t> bools_t;
+/// Defines storage for a generic collection of integer values
+typedef typed_array<int32_t> integers_t;
+/// Defines storage for a generic collection of index values
+typedef uint_t_array indices_t;
+/// Defines storage for a generic collection of floating-point values
+typedef typed_array<double_t> doubles_t;
+/// Defines storage for a generic collection of string values
+typedef typed_array<string_t> strings_t;
+/// Defines storage for a generic collection of two-dimensional points
+typedef typed_array<point2> points_2d_t;
+/// Defines storage for a generic collection of two-dimensional vectors
+typedef typed_array<vector2> vectors_2d_t;
+/// Defines storage for a generic collection of inode objects
+typedef typed_array<inode*> nodes_t;
+/// Defines a heterogeneous collection of named, shared arrays
+typedef k3d::attribute_arrays attribute_arrays_t;
+
+////////////////////////////////////////////////////////////////////////////////
+// undirected
+
+/// Encapsulates an undirected graph with arbitrary vertex and edge attributes
+class undirected
 {
 public:
-	graph();
+	undirected();
 
 	struct vertex
 	{
@@ -60,25 +82,6 @@ public:
 	typedef boost::graph_traits<adjacency_list_t>::out_edge_iterator out_edge_iterator_t;
 	typedef boost::graph_traits<adjacency_list_t>::in_edge_iterator in_edge_iterator_t;
 
-	/// Defines storage for a generic collection of boolean values
-	typedef typed_array<bool_t> bools_t;
-	/// Defines storage for a generic collection of integer values
-	typedef typed_array<int32_t> ints_t;
-	/// Defines storage for a generic collection of index values
-	typedef uint_t_array indices_t;
-	/// Defines storage for a generic collection of floating-point values
-	typedef typed_array<double_t> doubles_t;
-	/// Defines storage for a generic collection of string values
-	typedef typed_array<string_t> strings_t;
-	/// Defines storage for a generic collection of two-dimensional points
-	typedef typed_array<point2> points_t;
-	/// Defines storage for a generic collection of two-dimensional vectors
-	typedef typed_array<vector2> vectors_t;
-	/// Defines storage for a generic collection of inode objects
-	typedef typed_array<inode*> nodes_t;
-	/// Defines a heterogeneous collection of named, shared arrays
-	typedef k3d::attribute_arrays attribute_arrays_t;
-
 	/// Stores the graph topology
 	pipeline_data<adjacency_list_t> topology;
 	/// Stores user-defined per-graph data
@@ -90,7 +93,9 @@ public:
 };
 
 /// Stream serialization
-std::ostream& operator<<(std::ostream& Stream, const graph& RHS);
+std::ostream& operator<<(std::ostream& Stream, const undirected& RHS);
+
+} // namespace graph
 
 } // namespace k3d
 

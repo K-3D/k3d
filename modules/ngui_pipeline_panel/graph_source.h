@@ -65,22 +65,22 @@ public:
 	}
 
 protected:
-	k3d_data(k3d::graph*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output;
+	k3d_data(k3d::graph::undirected*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output;
 
 private:
-	void initialize_graph(k3d::graph& Output)
+	void initialize_graph(k3d::graph::undirected& Output)
 	{
 		on_initialize_graph(Output);
 		on_update_graph(Output);
 	}
 
-	void update_graph(k3d::graph& Output)
+	void update_graph(k3d::graph::undirected& Output)
 	{
 		on_update_graph(Output);
 	}
 
-	virtual void on_initialize_graph(k3d::graph& Output) = 0;
-	virtual void on_update_graph(k3d::graph& Output) = 0;
+	virtual void on_initialize_graph(k3d::graph::undirected& Output) = 0;
+	virtual void on_update_graph(k3d::graph::undirected& Output) = 0;
 };
 
 } // namespace pipeline

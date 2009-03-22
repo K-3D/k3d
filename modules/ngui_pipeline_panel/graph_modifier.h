@@ -43,7 +43,7 @@ class graph_modifier :
 {
 public:
 	graph_modifier() :
-		m_input(init_owner(*this) + init_name("input_graph") + init_label(_("Input Graph")) + init_description("Input graph") + init_value<k3d::graph*>(0)),
+		m_input(init_owner(*this) + init_name("input_graph") + init_label(_("Input Graph")) + init_description("Input graph") + init_value<k3d::graph::undirected*>(0)),
 		m_output(init_owner(*this) + init_name("output_graph") + init_label(_("Output Graph")) + init_description("Output graph"))
 	{
 		m_input.changed_signal().connect(make_reset_graph_slot());
@@ -73,29 +73,29 @@ public:
 	}
 
 protected:
-	k3d_data(k3d::graph*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input;
-	k3d_data(k3d::graph*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output;
+	k3d_data(k3d::graph::undirected*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input;
+	k3d_data(k3d::graph::undirected*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output;
 
 private:
-	void initialize_graph(k3d::graph& Output)
+	void initialize_graph(k3d::graph::undirected& Output)
 	{
-		if(const k3d::graph* const input = m_input.pipeline_value())
+		if(const k3d::graph::undirected* const input = m_input.pipeline_value())
 		{
 			on_initialize_graph(*input, Output);
 			on_update_graph(*input, Output);
 		}
 	}
 
-	void update_graph(k3d::graph& Output)
+	void update_graph(k3d::graph::undirected& Output)
 	{
-		if(const k3d::graph* const input = m_input.pipeline_value())
+		if(const k3d::graph::undirected* const input = m_input.pipeline_value())
 		{
 			on_update_graph(*input, Output);
 		}
 	}
 
-	virtual void on_initialize_graph(const k3d::graph& Input, k3d::graph& Output) = 0;
-	virtual void on_update_graph(const k3d::graph& Input, k3d::graph& Output) = 0;
+	virtual void on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output) = 0;
+	virtual void on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output) = 0;
 };
 
 } // namespace pipeline

@@ -54,8 +54,8 @@ public:
 private:
 	class coordinate_visitor;
 
-	void on_initialize_graph(const k3d::graph& Input, k3d::graph& Output);
-	void on_update_graph(const k3d::graph& Input, k3d::graph& Output);
+	void on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output);
+	void on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output);
 
 	k3d_data(double, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_column_offset;
 	k3d_data(double, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::writable_property, k3d::data::no_serialization) m_row_offset;

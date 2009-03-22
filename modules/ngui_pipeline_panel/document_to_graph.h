@@ -55,8 +55,8 @@ public:
 	}
 
 private:
-	void on_initialize_graph(k3d::graph& Output);
-	void on_update_graph(k3d::graph& Output);
+	void on_initialize_graph(k3d::graph::undirected& Output);
+	void on_update_graph(k3d::graph::undirected& Output);
 
 	k3d::idocument& m_document;
 
