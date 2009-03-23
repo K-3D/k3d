@@ -80,8 +80,6 @@ public:
 		const k3d::int32_t v_segments = m_v_segments.pipeline_value();
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> primitive(k3d::polyhedron::create_cylinder(Output, v_segments, u_segments, material));
-
-		k3d::log() << debug << Output << std::endl;
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
