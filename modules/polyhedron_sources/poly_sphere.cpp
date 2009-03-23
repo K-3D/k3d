@@ -30,7 +30,13 @@
 #include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/node.h>
 
-namespace libk3dprimitives
+namespace module
+{
+
+namespace polyhedron
+{
+
+namespace sources
 {
 
 namespace detail
@@ -511,6 +517,10 @@ k3d::iplugin_factory& poly_sphere_factory()
 	return poly_sphere_implementation::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace sources
+
+} // namespace polyhedron
+
+} // namespace module
 
 

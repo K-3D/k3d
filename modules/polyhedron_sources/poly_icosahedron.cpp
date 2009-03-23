@@ -33,7 +33,13 @@
 
 #include <boost/scoped_ptr.hpp>
 
-namespace libk3dprimitives
+namespace module
+{
+
+namespace polyhedron
+{
+
+namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -176,5 +182,9 @@ k3d::iplugin_factory& poly_icosahedron_factory()
 	return poly_icosahedron::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace sources
+
+} // namespace polyhedron
+
+} // namespace module
 

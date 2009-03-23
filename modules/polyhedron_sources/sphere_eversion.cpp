@@ -52,7 +52,13 @@ inline bool operator < (const k3d::point3& a, const k3d::point3& b)
 
 } // namespace k3d
 
-namespace libk3dprimitives
+namespace module
+{
+
+namespace polyhedron
+{
+
+namespace sources
 {
 
 namespace detail
@@ -1388,5 +1394,9 @@ k3d::iplugin_factory& sphere_eversion_factory()
 	return sphere_eversion_implementation::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace sources
+
+} // namespace polyhedron
+
+} // namespace module
 

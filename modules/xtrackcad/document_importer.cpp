@@ -235,8 +235,6 @@ public:
 					line >> scale >> unused >> center[0] >> center[1] >> unused >> radius;
 					center = transformation.top() * center;
 
-k3d::log() << debug << scale << " " << center << " " << radius << std::endl;
-
 					k3d::mesh::points_t points;
 					k3d::mesh::doubles_t angles;
 
@@ -385,11 +383,6 @@ k3d::log() << debug << scale << " " << center << " " << radius << std::endl;
 							arc_points[2] = transformation.top() * arc_points[2];
 
 							k3d::nurbs_curve::add_curve(*track_mesh, *track_curves, 3, arc_points, arc_weights, arc_knots);
-
-/*
-							arc_points[1] = transformation.top() * k3d::point3(0, 0, 0);
-							k3d::nurbs_curve::add_curve(*track_mesh, *track_curves, 2, arc_points);
-*/
 
 							transformation.pop();
 						}

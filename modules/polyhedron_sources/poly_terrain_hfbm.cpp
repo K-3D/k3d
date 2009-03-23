@@ -32,7 +32,13 @@
 #include <k3dsdk/noise.h>
 #include <k3dsdk/node.h>
 
-namespace libk3dprimitives
+namespace module
+{
+
+namespace polyhedron
+{
+
+namespace sources
 {
 
 /// A fractal terrain algorithm that creates heterogeneous terrains
@@ -263,5 +269,9 @@ k3d::iplugin_factory& poly_terrain_hfbm_factory()
 	return poly_terrain_hfbm_implementation::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace sources
+
+} // namespace polyhedron
+
+} // namespace module
 

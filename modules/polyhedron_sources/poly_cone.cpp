@@ -31,7 +31,13 @@
 
 #include <iterator>
 
-namespace libk3dprimitives
+namespace module
+{
+
+namespace polyhedron
+{
+
+namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -175,5 +181,9 @@ k3d::iplugin_factory& poly_cone_factory()
 	return poly_cone_implementation::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace sources
+
+} // namespace polyhedron
+
+} // namespace module
 

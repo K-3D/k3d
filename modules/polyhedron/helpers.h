@@ -1,5 +1,5 @@
-#ifndef MODULES_POLYHEDRA_HELPERS_H
-#define MODULES_POLYHEDRA_HELPERS_H
+#ifndef MODULES_POLYHEDRON_HELPERS_H
+#define MODULES_POLYHEDRON_HELPERS_H
 
 // K-3D
 // Copyright (c) 2005, Romain Behar
@@ -30,7 +30,10 @@
 
 #include <map>
 
-namespace libk3dpolyhedra
+namespace module
+{
+
+namespace polyhedron
 {
 
 namespace helpers
@@ -82,7 +85,9 @@ inline k3d::legacy::face* fill_hole(ReverseIteratorType RBegin, ReverseIteratorT
 
 } // namespace helpers
 
-} // namespace libk3dpolyhedra
+} // namespace polyhedron
 
-#endif // !MODULES_POLYHEDRA_HELPERS_H
+} // namespace module
+
+#endif // !MODULES_POLYHEDRON_HELPERS_H
 

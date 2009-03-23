@@ -56,7 +56,13 @@
 
 #define xcompl(x)(frac(x),(double)frax.n/(frax.n-frax.d))
 
-namespace libk3dprimitives
+namespace module
+{
+
+namespace polyhedron
+{
+
+namespace sources
 {
 
 namespace kaleido
@@ -1906,5 +1912,9 @@ k3d::iplugin_factory& polyhedron_factory()
 	return polyhedron_implementation::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace sources
+
+} // namespace polyhedron
+
+} // namespace module
 

@@ -33,7 +33,13 @@
 
 #include <complex>
 
-namespace libk3dprimitives
+namespace module
+{
+
+namespace polyhedron
+{
+
+namespace sources
 {
 
 /// Creates terrains out of a brownian movement using Fast Fourrier Transform
@@ -419,5 +425,9 @@ k3d::iplugin_factory& poly_terrain_fft_factory()
 	return poly_terrain_fft_implementation::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace sources
+
+} // namespace polyhedron
+
+} // namespace module
 

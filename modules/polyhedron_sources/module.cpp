@@ -23,8 +23,13 @@
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the primitives plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dprimitives
+namespace module
+{
+
+namespace polyhedron
+{
+
+namespace sources
 {
 
 extern k3d::iplugin_factory& poly_cone_factory();
@@ -41,21 +46,25 @@ extern k3d::iplugin_factory& poly_torus_factory();
 extern k3d::iplugin_factory& polyhedron_factory();
 extern k3d::iplugin_factory& sphere_eversion_factory();
 
-} // namespace libk3dprimitives
+} // namespace sources
+
+} // namespace polyhedron
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dprimitives::poly_cone_factory());
-	Registry.register_factory(libk3dprimitives::poly_cube_factory());
-	Registry.register_factory(libk3dprimitives::poly_cushion_factory());
-	Registry.register_factory(libk3dprimitives::poly_cylinder_factory());
-	Registry.register_factory(libk3dprimitives::poly_disk_factory());
-	Registry.register_factory(libk3dprimitives::poly_grid_factory());
-	Registry.register_factory(libk3dprimitives::poly_icosahedron_factory());
-	Registry.register_factory(libk3dprimitives::poly_sphere_factory());
-	Registry.register_factory(libk3dprimitives::poly_terrain_fft_factory());
-	Registry.register_factory(libk3dprimitives::poly_terrain_hfbm_factory());
-	Registry.register_factory(libk3dprimitives::poly_torus_factory());
-	Registry.register_factory(libk3dprimitives::polyhedron_factory());
-	Registry.register_factory(libk3dprimitives::sphere_eversion_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_cone_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_cube_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_cushion_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_cylinder_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_disk_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_grid_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_icosahedron_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_sphere_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_terrain_fft_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_terrain_hfbm_factory());
+	Registry.register_factory(module::polyhedron::sources::poly_torus_factory());
+	Registry.register_factory(module::polyhedron::sources::polyhedron_factory());
+	Registry.register_factory(module::polyhedron::sources::sphere_eversion_factory());
 K3D_MODULE_END
 

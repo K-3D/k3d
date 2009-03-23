@@ -31,7 +31,13 @@
 
 #include <iterator>
 
-namespace libk3dprimitives
+namespace module
+{
+
+namespace polyhedron
+{
+
+namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -145,6 +151,10 @@ k3d::iplugin_factory& poly_torus_factory()
 	return poly_torus_implementation::get_factory();
 }
 
-} // namespace libk3dprimitives
+} // namespace sources
+
+} // namespace polyhedron
+
+} // namespace module
 
 

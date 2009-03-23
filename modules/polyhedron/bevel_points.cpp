@@ -33,7 +33,10 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/utility.h>
 
-namespace libk3dpolyhedra
+namespace module
+{
+
+namespace polyhedron
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -441,5 +444,8 @@ k3d::iplugin_factory& bevel_points_factory()
 	return bevel_points_implementation::get_factory();
 }
 
-} // namespace libk3dpolyhedra
+} // namespace polyhedron
+
+} // namespace module
+
 
