@@ -22,15 +22,16 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 
-#include <iterator>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -45,64 +46,72 @@ namespace sources
 // poly_disk_implementation
 
 class poly_disk_implementation :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	poly_disk_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_height(init_owner(*this) + init_name("height") + init_label(_("height")) + init_description(_("Height")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Radial Segments")) + init_value(16) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("Radial Segments")) + init_value(2) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("Radial Segments")) + init_value(2) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_radius(init_owner(*this) + init_name("radius") + init_label(_("radius")) + init_description(_("Radius")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_height(init_owner(*this) + init_name("height") + init_label(_("height")) + init_description(_("Height")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
-		m_material.changed_signal().connect(make_reset_mesh_slot());
-		m_radius.changed_signal().connect(make_reset_mesh_slot());
-		m_height.changed_signal().connect(make_reset_mesh_slot());
-		m_u_segments.changed_signal().connect(make_reset_mesh_slot());
-		m_v_segments.changed_signal().connect(make_reset_mesh_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_u_segments.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_v_segments.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+
+		m_radius.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
+		m_height.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
 	}
 
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		const double radius = m_radius.pipeline_value();
-		const double height = m_height.pipeline_value();
-		const unsigned long u_segments = m_u_segments.pipeline_value();
-		const unsigned long v_segments = m_v_segments.pipeline_value();
+		Output = k3d::mesh();
+
 		k3d::imaterial* const material = m_material.pipeline_value();
+		const k3d::int32_t u_segments = m_u_segments.pipeline_value();
+		const k3d::int32_t v_segments = m_v_segments.pipeline_value();
 
-		Mesh.polyhedra.push_back(new k3d::legacy::polyhedron());
-		k3d::legacy::polyhedron& polyhedron = *Mesh.polyhedra.back();
+		boost::scoped_ptr<k3d::polyhedron::primitive> primitive(k3d::polyhedron::create_cylinder(Output, v_segments, u_segments, material));
 
-		// Create the disk
-		const k3d::legacy::grid_results_t grid = k3d::legacy::add_grid(Mesh, polyhedron, v_segments, u_segments, false, true, material);
-		const boost::multi_array<k3d::legacy::point*, 2>& points = boost::get<0>(grid);
-		const boost::multi_array<k3d::legacy::split_edge*, 3>& edges = boost::get<1>(grid);
+		k3d::log() << debug << Output << std::endl;
+	}
 
-		// Shape the disk points
-		for(unsigned long v = 0; v <= v_segments; ++v)
+	void on_update_mesh_geometry(k3d::mesh& Output)
+	{
+		const k3d::int32_t u_segments = m_u_segments.pipeline_value();
+		const k3d::int32_t v_segments = m_v_segments.pipeline_value();
+		const k3d::double_t radius = m_radius.pipeline_value();
+		const k3d::double_t height = m_height.pipeline_value();
+
+		k3d::mesh::points_t& points = Output.points.writable();
+
+		k3d::uint_t point = 0;
+		for(k3d::int32_t v = 0; v <= v_segments; ++v)
 		{
-			const double ring = static_cast<double>(v) / static_cast<double>(v_segments);
+			const k3d::double_t ring = static_cast<k3d::double_t>(v) / static_cast<k3d::double_t>(v_segments);
 
-			for(unsigned long u = 0; u != u_segments; ++u)
+			for(k3d::int32_t u = 0; u != u_segments; ++u, ++point)
 			{
-				const double theta = k3d::pi_times_2() * static_cast<double>(u) / static_cast<double>(u_segments);
+				const k3d::double_t theta = k3d::pi_times_2() * static_cast<k3d::double_t>(u) / static_cast<k3d::double_t>(u_segments);
 
-				double x = cos(theta);
-				double y = -sin(theta);
-				double z = height;
+				k3d::double_t x = cos(theta);
+				k3d::double_t y = -sin(theta);
+				k3d::double_t z = height;
 
 				x = radius * ring * x;
 				y = radius * ring * y;
 
-				points[v][u]->position = k3d::point3(x, y, z);
+				points[point] = k3d::point3(x, y, z);
 			}
 		}
-	}
-
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
-	{
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -118,10 +127,10 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_segments;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_v_segments;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_radius;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
 };
 
 /////////////////////////////////////////////////////////////////////////////
