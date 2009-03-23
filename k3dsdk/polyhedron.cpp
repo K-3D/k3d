@@ -332,7 +332,7 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 
 		const uint_t point_offset = points.size();
 		points.insert(points.end(), point_rows * point_columns, point3());
-		point_selection.insert(point_selection.end(), point_rows * point_columns, 0.0);
+		point_selection.insert(point_selection.end(), point_rows * point_columns, 0);
 		Mesh.vertex_data.resize(point_offset + (point_rows * point_columns));
 
 		// Append a new polyhedron to the mesh ...
@@ -343,12 +343,12 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 		polyhedron->shell_types.assign(1, mesh::polyhedra_t::POLYGONS);
 		polyhedron->face_first_loops.resize(rows * columns);
 		polyhedron->face_loop_counts.assign(rows * columns, 1);
-		polyhedron->face_selections.assign(rows * columns, 0.0);
+		polyhedron->face_selections.assign(rows * columns, 0);
 		polyhedron->face_materials.assign(rows * columns, Material);
 		polyhedron->loop_first_edges.resize(rows * columns);
 		polyhedron->edge_points.resize(4 * rows * columns);
 		polyhedron->clockwise_edges.resize(4 * rows * columns);
-		polyhedron->edge_selections.assign(4 * rows * columns, 0.0);
+		polyhedron->edge_selections.assign(4 * rows * columns, 0);
 		
 		mesh::indices_t::iterator face_first_loop = polyhedron->face_first_loops.begin();
 		mesh::indices_t::iterator loop_first_edge = polyhedron->loop_first_edges.begin();
@@ -364,10 +364,10 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 
 				*loop_first_edge++ = 4 * face_number;
 
-				*edge_point++ = point_offset + (column + (row * point_columns));
-				*edge_point++ = point_offset + ((column + (row * point_columns) + 1) % point_columns);
-				*edge_point++ = point_offset + ((column + ((row + 1) * point_columns) + 1) % point_columns);
-				*edge_point++ = point_offset + (column + ((row + 1) * point_columns));
+				*edge_point++ = point_offset + (row * point_columns) + (column);
+				*edge_point++ = point_offset + (row * point_columns) + ((column + 1) % point_columns);
+				*edge_point++ = point_offset + ((row + 1) * point_columns) + ((column + 1) % point_columns);
+				*edge_point++ = point_offset + ((row + 1) * point_columns) + (column);
 
 				*clockwise_edge++ = (4 * face_number) + 1;
 				*clockwise_edge++ = (4 * face_number) + 2;
