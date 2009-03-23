@@ -75,19 +75,16 @@ public:
 
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		document().pipeline_profiler().start_execution(*this, "Update Mesh Topology");
 		Output = k3d::mesh();
 		k3d::polyhedron::create_grid(Output, m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
-		document().pipeline_profiler().finish_execution(*this, "Update Mesh Topology");
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
-		document().pipeline_profiler().start_execution(*this, "Update Mesh Geometry");
-		const unsigned long point_rows = m_rows.pipeline_value() + 1;
-		const unsigned long point_columns = m_columns.pipeline_value() + 1;
-		const double width = m_width.pipeline_value();
-		const double height = m_height.pipeline_value();
+		const k3d::int32_t point_rows = m_rows.pipeline_value() + 1;
+		const k3d::int32_t point_columns = m_columns.pipeline_value() + 1;
+		const k3d::double_t width = m_width.pipeline_value();
+		const k3d::double_t height = m_height.pipeline_value();
 		const k3d::signed_axis orientation = m_orientation.pipeline_value();
 
 		k3d::vector3 x, y;
@@ -120,18 +117,17 @@ public:
 		}
 
 		k3d::mesh::points_t::iterator point = const_cast<k3d::mesh::points_t&>(*Output.points).begin();
-		for(unsigned long row = 0; row != point_rows; ++row)
+		for(k3d::int32_t row = 0; row != point_rows; ++row)
 		{
-			const double row_percent = 0.5 - (static_cast<double>(row) / static_cast<double>(point_rows-1));
+			const k3d::double_t row_percent = 0.5 - (static_cast<k3d::double_t>(row) / static_cast<k3d::double_t>(point_rows-1));
 
-			for(unsigned long column = 0; column != point_columns; ++column)
+			for(k3d::int32_t column = 0; column != point_columns; ++column)
 			{
-				const double column_percent = (static_cast<double>(column) / static_cast<double>(point_columns-1)) - 0.5;
+				const k3d::double_t column_percent = (static_cast<k3d::double_t>(column) / static_cast<k3d::double_t>(point_columns-1)) - 0.5;
 
 				*point++ = k3d::to_point((column_percent * x) + (row_percent * y));
 			}
 		}
-		document().pipeline_profiler().finish_execution(*this, "Update Mesh Geometry");
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -149,8 +145,8 @@ public:
 private:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_columns;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_rows;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
 	k3d_data(k3d::signed_axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_orientation;
 };
 
