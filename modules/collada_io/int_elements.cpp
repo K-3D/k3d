@@ -53,9 +53,9 @@ namespace io
 		k3d::mesh::points_t& points = Mesh.points.create();
 		k3d::mesh::texture_coordinates_t texture_coordinates;
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Mesh));
-		polyhedron->first_faces.push_back(0);
-		polyhedron->face_counts.push_back(0);
-		polyhedron->polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+		polyhedron->shell_first_faces.push_back(0);
+		polyhedron->shell_face_counts.push_back(0);
+		polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 
 		domInputLocalOffset* vertex_input;
 		domInputLocalOffset* normal_input;
@@ -190,7 +190,7 @@ namespace io
 				polyhedron->face_loop_counts.push_back(1);
 				polyhedron->face_materials.push_back(static_cast<k3d::imaterial*>(0));
 				polyhedron->face_selections.push_back(0.0);
-				++polyhedron->face_counts.back();
+				++polyhedron->shell_face_counts.back();
 			}
 		}
 
@@ -326,7 +326,7 @@ namespace io
 				polyhedron->face_loop_counts.push_back(1);
 				polyhedron->face_materials.push_back(static_cast<k3d::imaterial*>(0));
 				polyhedron->face_selections.push_back(0.0);
-				++polyhedron->face_counts.back();
+				++polyhedron->shell_face_counts.back();
 			}
 		}
 	}

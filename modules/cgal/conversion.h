@@ -60,9 +60,9 @@ public:
 	nef_visitor(k3d::polyhedron::primitive& Polyhedron, const CGAL::Object_index<Vertex_const_iterator>& VertexIndices)
 	: m_polyhedron(Polyhedron), m_vertex_indices(VertexIndices), m_edge(0)
 	{
-		m_polyhedron.first_faces.push_back(0);
-		m_polyhedron.face_counts.push_back(0);
-		m_polyhedron.polyhedron_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+		m_polyhedron.shell_first_faces.push_back(0);
+		m_polyhedron.shell_face_counts.push_back(0);
+		m_polyhedron.shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 	}
 	
 	void visit(Halffacet_const_handle OppositeFacet)
@@ -92,7 +92,7 @@ public:
 		m_polyhedron.face_loop_counts.push_back(1);
 		m_polyhedron.face_materials.push_back(static_cast<k3d::imaterial*>(0));
 		m_polyhedron.face_selections.push_back(0.0);
-		++m_polyhedron.face_counts.back();
+		++m_polyhedron.shell_face_counts.back();
 		++fc;
 		CGAL_For_all(fc, f->facet_cycles_end())
 		{
