@@ -1512,8 +1512,7 @@ public:
 
 			colors.push_back(detail::colors[color_index]);
 		}
-//		k3d::legacy::set_companions(polyhedron);
-//
+
 		primitive->shell_first_faces.push_back(0);
 		primitive->shell_face_counts.push_back(primitive->face_first_loops.size());
 		primitive->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
