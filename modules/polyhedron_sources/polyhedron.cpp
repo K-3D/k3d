@@ -21,14 +21,17 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <cctype>
 #include <cmath>
@@ -1434,9 +1437,9 @@ namespace detail
 // polyhedron_implementation
 
 class polyhedron_implementation :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	polyhedron_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -1446,59 +1449,77 @@ public:
 		m_dual(init_owner(*this) + init_name("dual") + init_label(_("Dual")) + init_description(_("Polyhedron's dual")) + init_value(false)),
 		m_size(init_owner(*this) + init_name("size") + init_label(_("Size")) + init_description(_("Polyhedron size (scale)")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar)))
 	{
-		m_material.changed_signal().connect(make_reset_mesh_slot());
-		m_number.changed_signal().connect(make_reset_mesh_slot());
-		m_dual.changed_signal().connect(make_reset_mesh_slot());
-		m_size.changed_signal().connect(make_reset_mesh_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_number.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_dual.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_size.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
+		Output = k3d::mesh();
+
 		k3d::imaterial* const material = m_material.pipeline_value();
-		const unsigned long number = m_number.pipeline_value();
-		const bool dual = m_dual.pipeline_value();
-		const double size= m_size.pipeline_value();
+		const k3d::int32_t number = m_number.pipeline_value();
+		const k3d::bool_t dual = m_dual.pipeline_value();
+		const k3d::double_t size= m_size.pipeline_value();
 		const std::string name = dual ? kaleido::uniform[number - 1].dual : kaleido::uniform[number - 1].name;
 
+		// Setup the mathematical polyhedron data ...
 		LoadPolyhedron(number, dual);
 
-		// Add geometry to the mesh ...
-		for(unsigned long i = 0; i != m_PolyhedronPoints.size(); ++i)
-			Mesh.points.push_back(new k3d::legacy::point(m_PolyhedronPoints[i] * m_PolyhedronScaling * size));
+		// Convert mathematical polyhedron to a K-3D polyhedron ...
+		k3d::mesh::points_t& points = Output.points.create();
+		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
 
-		Mesh.polyhedra.push_back(new k3d::legacy::polyhedron());
-		k3d::legacy::polyhedron& polyhedron = *Mesh.polyhedra.back();
+		boost::scoped_ptr<k3d::polyhedron::primitive> primitive(k3d::polyhedron::create(Output));
+		k3d::mesh::colors_t& colors = primitive->uniform_data.create<k3d::mesh::colors_t>("Cs");
 
-		unsigned long polygon_index = 0;
-		for(unsigned long i = 0; i != m_PolyhedronPaths.size(); ++i)
+		for(k3d::uint_t i = 0; i != m_PolyhedronPoints.size(); ++i)
+		{	
+			points.push_back(m_PolyhedronPoints[i] * m_PolyhedronScaling * size);
+			point_selection.push_back(0);
+		}
+
+		k3d::uint_t polygon_index = 0;
+		for(k3d::uint_t i = 0; i != m_PolyhedronPaths.size(); ++i, ++polygon_index)
 		{
 			if(!m_PolyhedronPaths[i].size())
 				continue;
 
-			std::vector<k3d::legacy::split_edge*> edges;
-			for(unsigned long j = 0; j != m_PolyhedronPaths[i].size(); ++j)
-				edges.push_back(new k3d::legacy::split_edge(Mesh.points[m_PolyhedronPaths[i][j]]));
+			primitive->face_first_loops.push_back(primitive->loop_first_edges.size());
+			primitive->face_loop_counts.push_back(1);
+			primitive->face_selections.push_back(0);
+			primitive->face_materials.push_back(material);
+			primitive->loop_first_edges.push_back(primitive->edge_points.size());
 
-			k3d::legacy::loop_edges(edges.begin(), edges.end());
+			for(k3d::uint_t j = 0; j != m_PolyhedronPaths[i].size(); ++j)
+			{
+				primitive->edge_points.push_back(m_PolyhedronPaths[i][j]);
+				primitive->clockwise_edges.push_back(primitive->edge_points.size());
+				primitive->edge_selections.push_back(0);
+			}
+			primitive->clockwise_edges.back() = primitive->loop_first_edges.back();
 
-			// Set material ...
 			unsigned long color_index = *m_polygon_colors.begin();
 			// Trick to handle special case #39 and #57
 			if(polygon_index < m_polygon_colors.size())
 				color_index = m_polygon_colors[polygon_index];
 
-			k3d::legacy::face* new_face = new k3d::legacy::face(edges.front(), material);
-			new_face->uniform_data["Cs"] = detail::colors[color_index];
-			polyhedron.faces.push_back(new_face);
-
-			polygon_index++;
+			colors.push_back(detail::colors[color_index]);
 		}
-		k3d::legacy::set_companions(polyhedron);
-
-		assert_warning(k3d::legacy::is_valid(polyhedron));
+//		k3d::legacy::set_companions(polyhedron);
+//
+		primitive->shell_first_faces.push_back(0);
+		primitive->shell_face_counts.push_back(primitive->face_first_loops.size());
+		primitive->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
 	}
 
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
@@ -1517,18 +1538,16 @@ public:
 private:
 	k3d::idocument& m_document;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_number;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_dual;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_dual;
 
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_size;
-
-	//k3d_data_property(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint) m_previous_materials;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_size;
 
 	/// Special variables and methods to generate polyhedra ...
 	typedef std::vector<k3d::point3> PolyhedronPoints;
 	PolyhedronPoints m_PolyhedronPoints;
 
 	std::string m_PolyhedronProperties;
-	double m_PolyhedronScaling;
+	k3d::double_t m_PolyhedronScaling;
 
 	typedef std::vector<int> PolyhedronPath;
 	typedef std::vector<PolyhedronPath> PolyhedronPaths;
@@ -1540,7 +1559,7 @@ private:
 	typedef std::map<unsigned long, k3d::imaterial*> material_map_t;
 	material_map_t m_materials;
 
-	void LoadPolyhedron(int PolyhedronIndex, bool Dual)
+	void LoadPolyhedron(int PolyhedronIndex, k3d::bool_t Dual)
 	{
 		// Clear out old data ...
 		m_PolyhedronPoints.clear();
@@ -1551,7 +1570,7 @@ private:
 		kaleido::Polyhedron* polyhedron = kaleido::kaleido(PolyhedronIndex);
 		return_if_fail(polyhedron);
 
-		double freeze = 0;
+		k3d::double_t freeze = 0;
 
 		if(!Dual)
 			vrmodel(polyhedron, polyhedron->v, polyhedron->V, polyhedron->f, polyhedron->F, false, AZ, EL, freeze);
@@ -1565,10 +1584,10 @@ private:
 			m_PolyhedronProperties += "infinite dual";
 
 			// Infinite duals have to scaled to a unit sphere
-			double maxlength = 0.0;
+			k3d::double_t maxlength = 0.0;
 			for(unsigned long i = 0; i < m_PolyhedronPoints.size(); i++)
 			{
-				double length = k3d::to_vector(m_PolyhedronPoints[i]).length();
+				k3d::double_t length = k3d::to_vector(m_PolyhedronPoints[i]).length();
 				if(length > maxlength)
 					maxlength = length;
 			}
@@ -1614,7 +1633,7 @@ private:
 		m_PolyhedronPaths.back().push_back(PointIndex4);
 	}
 
-	void vrmodel(kaleido::Polyhedron *P, const std::vector<kaleido::Kvector>& v, int V, const std::vector<kaleido::Kvector>& f, int F, const bool dual, double azimuth, double elevation, double angle)
+	void vrmodel(kaleido::Polyhedron *P, const std::vector<kaleido::Kvector>& v, int V, const std::vector<kaleido::Kvector>& f, int F, const k3d::bool_t dual, k3d::double_t azimuth, k3d::double_t elevation, k3d::double_t angle)
 	{
 		// Rotate frame
 		static kaleido::Kvector X(1,0,0), Y(0,1,0), Z(0,0,1);
@@ -1666,7 +1685,7 @@ private:
 				dual && (P->K == 5 && P->D > 30 ||
 				kaleido::denominator (P->m_faces[0]) != 1)) {
 				// find the center of the face
-				double h;
+				k3d::double_t h;
 				if (!dual && P->hemi && !P->ftype[i])
 					h = 0;
 				else
@@ -1675,7 +1694,7 @@ private:
 			} else if (dual && P->even != -1) {
 				// find the self-intersection of a crossed parallelogram. hit is set if v0v1 intersects v2v3
 				kaleido::Kvector v0, v1, v2, v3, c0, c1, p;
-				double d0, d1;
+				k3d::double_t d0, d1;
 				v0 = vb[P->incid[0][i]];
 				v1 = vb[P->incid[1][i]];
 				v2 = vb[P->incid[2][i]];
@@ -1699,7 +1718,7 @@ private:
 
 				kaleido::Kvector v0, v1, v2, v3, v01, v03, v21, v23, v0123, v0321 ;
 				kaleido::Kvector u;
-				double t = 1.5; //truncation adjustment factor
+				k3d::double_t t = 1.5; //truncation adjustment factor
 				j = !P->ftype[P->incid[0][i]];
 				v0 = vb[P->incid[j][i]];//real vertex
 				v1 = vb[P->incid[j+1][i]];//ideal vertex (unit kaleido::Kvector)
@@ -1745,7 +1764,7 @@ private:
 
 				kaleido::Kvector v0, v1, v2, v3, v4, v5, v6, v7, v01, v07, v21, v23;
 				kaleido::Kvector v43, v45, v65, v67, v0123, v0721, v4365, v4567;
-				double t = 1.5;//truncation adjustment factor
+				k3d::double_t t = 1.5;//truncation adjustment factor
 				kaleido::Kvector u;
 				for (j = 0; j < 8; j++)
 					if (P->ftype[P->incid[j][i]] == 3)
