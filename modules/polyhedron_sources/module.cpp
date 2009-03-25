@@ -42,7 +42,6 @@ extern k3d::iplugin_factory& poly_icosahedron_factory();
 extern k3d::iplugin_factory& poly_sphere_factory();
 extern k3d::iplugin_factory& poly_torus_factory();
 extern k3d::iplugin_factory& polyhedron_factory();
-extern k3d::iplugin_factory& sphere_eversion_factory();
 
 } // namespace sources
 
@@ -61,6 +60,5 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::polyhedron::sources::poly_sphere_factory());
 	Registry.register_factory(module::polyhedron::sources::poly_torus_factory());
 	Registry.register_factory(module::polyhedron::sources::polyhedron_factory());
-	Registry.register_factory(module::polyhedron::sources::sphere_eversion_factory());
 K3D_MODULE_END
 

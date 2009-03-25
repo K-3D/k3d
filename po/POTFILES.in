@@ -376,7 +376,6 @@ modules/polyhedron_sources/polyhedron.cpp
 modules/polyhedron_sources/poly_icosahedron.cpp
 modules/polyhedron_sources/poly_sphere.cpp
 modules/polyhedron_sources/poly_torus.cpp
-modules/polyhedron_sources/sphere_eversion.cpp
 modules/python/engine.cpp
 modules/qslim/quadric_decimation.cpp
 modules/quadrics/cone.cpp
