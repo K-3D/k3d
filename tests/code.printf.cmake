@@ -17,7 +17,7 @@ SET(SKIP_FILES
 	"^modules/md2_io/md2.cpp$"
 	"^modules/pdiff/CompareArgs.cpp$"
 	"^modules/pdiff/Metric.cpp$"
-	"^modules/primitives/polyhedron.cpp$"
+	"^modules/polyhedron_sources/polyhedron.cpp$"
 	"^modules/scalar/format_scalar.cpp$"
 	"^share/shaders/k3d_tile.h$"
 	"^tests/code.printf.cmake$"
