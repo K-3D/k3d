@@ -104,7 +104,6 @@ const k3d::gl::selection_state select_uniform(bool Backfacing)
 
 	result.exclude_unselected_nodes = true;
 	result.select_faces = true;
-	result.select_nurbs_patches = true;
 	result.select_backfacing = Backfacing;
 	result.select_uniform = true;
 
@@ -117,7 +116,6 @@ const k3d::gl::selection_state select_nodes()
 
 	result.select_points = true;
 	result.select_faces = true;
-	result.select_nurbs_patches = true;
 	result.select_backfacing = true;
 	result.select_uniform = true;
 	result.select_split_edges = true;
@@ -830,7 +828,6 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	selection_state.exclude_unselected_nodes = true;
 	selection_state.select_points = true;
 	selection_state.select_faces = true;
-	selection_state.select_nurbs_patches = true;
 	selection_state.select_backfacing = Backfacing;
 	selection_state.select_uniform = true;
 	selection_state.select_split_edges = true;
@@ -1056,7 +1053,6 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 			}
 		}
 	}
-*/
 	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_PATCH))
 	{
 		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs_patch(k3d::nurbs_patch::validate(*mesh));
@@ -1080,6 +1076,7 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 			}
 		}
 	}
+*/
 
 	if(distance < std::numeric_limits<double>::max())
 	{

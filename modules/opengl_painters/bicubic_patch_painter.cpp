@@ -146,15 +146,15 @@ public:
 			glMapGrid2d(u_count, 0.0, 1.0, v_count, 0.0, 1.0);
 
 			GLdouble gl_patch_points[4 * 4 * 3];
-			const size_t patch_begin = 0;
-			const size_t patch_end = patch_begin + (patch_points.size() / 16);
-			for(size_t patch = patch_begin; patch != patch_end; ++patch)
+			const k3d::uint_t patch_begin = 0;
+			const k3d::uint_t patch_end = patch_begin + (patch_points.size() / 16);
+			for(k3d::uint_t patch = patch_begin; patch != patch_end; ++patch)
 			{
 				GLdouble* gl_patch_point = gl_patch_points;
 				
-				const size_t point_begin = patch * 16;
-				const size_t point_end = point_begin + 16;
-				for(size_t point = point_begin; point != point_end; ++point)
+				const k3d::uint_t point_begin = patch * 16;
+				const k3d::uint_t point_end = point_begin + 16;
+				for(k3d::uint_t point = point_begin; point != point_end; ++point)
 				{
 					*gl_patch_point++ = points[patch_points[point]][0];
 					*gl_patch_point++ = points[patch_points[point]][1];

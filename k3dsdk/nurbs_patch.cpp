@@ -17,9 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "metadata.h"
+#include "metadata_keys.h"
 #include "nurbs_patch.h"
 #include "primitive_detail.h"
+#include "selection.h"
+#include "string_cast.h"
 
 #include <numeric>
 
@@ -46,8 +48,8 @@ const_primitive::const_primitive(
 	const mesh::weights_t& PatchPointWeights,
 	const mesh::knots_t& PatchUKnots,
 	const mesh::knots_t& PatchVKnots,
-	const mesh::counts_t& PatchTrimLoopCounts,
 	const mesh::indices_t& PatchFirstTrimLoops,
+	const mesh::counts_t& PatchTrimLoopCounts,
 	const mesh::indices_t& TrimLoopFirstCurves,
 	const mesh::counts_t& TrimLoopCurveCounts,
 	const mesh::selection_t& TrimLoopSelections,
@@ -78,8 +80,8 @@ const_primitive::const_primitive(
 	patch_point_weights(PatchPointWeights),
 	patch_u_knots(PatchUKnots),
 	patch_v_knots(PatchVKnots),
-	patch_trim_loop_counts(PatchTrimLoopCounts),
 	patch_first_trim_loops(PatchFirstTrimLoops),
+	patch_trim_loop_counts(PatchTrimLoopCounts),
 	trim_loop_first_curves(TrimLoopFirstCurves),
 	trim_loop_curve_counts(TrimLoopCurveCounts),
 	trim_loop_selections(TrimLoopSelections),
@@ -116,8 +118,8 @@ primitive::primitive(
 	mesh::weights_t& PatchPointWeights,
 	mesh::knots_t& PatchUKnots,
 	mesh::knots_t& PatchVKnots,
-	mesh::counts_t& PatchTrimLoopCounts,
 	mesh::indices_t& PatchFirstTrimLoops,
+	mesh::counts_t& PatchTrimLoopCounts,
 	mesh::indices_t& TrimLoopFirstCurves,
 	mesh::counts_t& TrimLoopCurveCounts,
 	mesh::selection_t& TrimLoopSelections,
@@ -148,8 +150,8 @@ primitive::primitive(
 	patch_point_weights(PatchPointWeights),
 	patch_u_knots(PatchUKnots),
 	patch_v_knots(PatchVKnots),
-	patch_trim_loop_counts(PatchTrimLoopCounts),
 	patch_first_trim_loops(PatchFirstTrimLoops),
+	patch_trim_loop_counts(PatchTrimLoopCounts),
 	trim_loop_first_curves(TrimLoopFirstCurves),
 	trim_loop_curve_counts(TrimLoopCurveCounts),
 	trim_loop_selections(TrimLoopSelections),
@@ -174,41 +176,44 @@ primitive::primitive(
 
 primitive* create(mesh& Mesh)
 {
-	mesh::nurbs_patches_t& patches = Mesh.nurbs_patches.create();
-	
+	mesh::primitive& generic_primitive = Mesh.primitives.create("nurbs_patch");
+
 	primitive* const result = new primitive(
-		patches.patch_first_points.create(),
-		patches.patch_u_point_counts.create(),
-		patches.patch_v_point_counts.create(),
-		patches.patch_u_orders.create(),
-		patches.patch_v_orders.create(),
-		patches.patch_u_first_knots.create(),
-		patches.patch_v_first_knots.create(),
-		patches.patch_selection.create(),
-		patches.patch_materials.create(),
-		patches.patch_points.create(),
-		patches.patch_point_weights.create(),
-		patches.patch_u_knots.create(),
-		patches.patch_v_knots.create(),
-		patches.patch_trim_curve_loop_counts.create(),
-		patches.patch_first_trim_curve_loops.create(),
-		patches.first_trim_curves.create(),
-		patches.trim_curve_counts.create(),
-		patches.trim_curve_loop_selection.create(),
-		patches.trim_curve_first_points.create(),
-		patches.trim_curve_point_counts.create(),
-		patches.trim_curve_orders.create(),
-		patches.trim_curve_first_knots.create(),
-		patches.trim_curve_selection.create(),
-		patches.trim_curve_points.create(),
-		patches.trim_curve_point_weights.create(),
-		patches.trim_curve_knots.create(),
-		patches.trim_points.create(),
-		patches.trim_point_selection.create(),
-		patches.constant_data,
-		patches.uniform_data,
-		patches.varying_data
+		generic_primitive.structure.create<mesh::indices_t>("patch_first_points"),
+		generic_primitive.structure.create<mesh::counts_t>("patch_u_point_counts"),
+		generic_primitive.structure.create<mesh::counts_t>("patch_v_point_counts"),
+		generic_primitive.structure.create<mesh::orders_t>("patch_u_orders"),
+		generic_primitive.structure.create<mesh::orders_t>("patch_v_orders"),
+		generic_primitive.structure.create<mesh::indices_t>("patch_u_first_knots"),
+		generic_primitive.structure.create<mesh::indices_t>("patch_v_first_knots"),
+		generic_primitive.structure.create<mesh::selection_t>("patch_selections"),
+		generic_primitive.structure.create<mesh::materials_t>("patch_materials"),
+		generic_primitive.structure.create<mesh::indices_t>("patch_points"),
+		generic_primitive.structure.create<mesh::weights_t>("patch_point_weights"),
+		generic_primitive.structure.create<mesh::knots_t>("patch_u_knots"),
+		generic_primitive.structure.create<mesh::knots_t>("patch_v_knots"),
+		generic_primitive.structure.create<mesh::indices_t>("patch_first_trim_loops"),
+		generic_primitive.structure.create<mesh::counts_t>("patch_trim_loop_counts"),
+		generic_primitive.structure.create<mesh::indices_t>("trim_loop_first_curves"),
+		generic_primitive.structure.create<mesh::counts_t>("trim_loop_curve_counts"),
+		generic_primitive.structure.create<mesh::selection_t>("trim_loop_selections"),
+		generic_primitive.structure.create<mesh::indices_t>("curve_first_points"),
+		generic_primitive.structure.create<mesh::counts_t>("curve_point_counts"),
+		generic_primitive.structure.create<mesh::orders_t>("curve_orders"),
+		generic_primitive.structure.create<mesh::indices_t>("curve_first_knots"),
+		generic_primitive.structure.create<mesh::selection_t>("curve_selections"),
+		generic_primitive.structure.create<mesh::indices_t>("curve_points"),
+		generic_primitive.structure.create<mesh::weights_t>("curve_point_weights"),
+		generic_primitive.structure.create<mesh::knots_t>("curve_knots"),
+		generic_primitive.structure.create<mesh::points_2d_t>("points"),
+		generic_primitive.structure.create<mesh::selection_t>("point_selections"),
+		generic_primitive.attributes["constant"],
+		generic_primitive.attributes["uniform"],
+		generic_primitive.attributes["varying"]
 		);
+
+	result->patch_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
 }
@@ -216,122 +221,118 @@ primitive* create(mesh& Mesh)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-const bool_t legacy_validate_nurbs_patches(const mesh& Mesh)
+const_primitive* validate(const mesh::primitive& Primitive)
 {
-	if(!Mesh.nurbs_patches)
-		return false;
-
-	return_val_if_fail(Mesh.nurbs_patches->patch_first_points, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_u_point_counts, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_v_point_counts, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_u_orders, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_v_orders, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_u_first_knots, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_v_first_knots, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_selection, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_materials, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_points, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_point_weights, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_u_knots, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_v_knots, false);
-
-	return_val_if_fail(Mesh.nurbs_patches->patch_trim_curve_loop_counts, false);
-	return_val_if_fail(Mesh.nurbs_patches->patch_first_trim_curve_loops, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_points, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_point_selection, false);
-	return_val_if_fail(Mesh.nurbs_patches->first_trim_curves, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_curve_counts, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_curve_loop_selection, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_curve_first_points, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_curve_point_counts, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_curve_orders, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_curve_first_knots, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_curve_selection, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_curve_points, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_curve_point_weights, false);
-	return_val_if_fail(Mesh.nurbs_patches->trim_curve_knots, false);
-
-	return true;
-}
-
-const_primitive* validate(const mesh& Mesh)
-{
-	if(!legacy_validate_nurbs_patches(Mesh))
+	if(Primitive.type != "nurbs_patch")
 		return 0;
+
+	try
+	{
+		const mesh::indices_t& patch_first_points = require_const_array<mesh::indices_t>(Primitive, "patch_first_points");
+		const mesh::counts_t& patch_u_point_counts = require_const_array<mesh::counts_t>(Primitive, "patch_u_point_counts");
+		const mesh::counts_t& patch_v_point_counts = require_const_array<mesh::counts_t>(Primitive, "patch_v_point_counts");
+		const mesh::orders_t& patch_u_orders = require_const_array<mesh::orders_t>(Primitive, "patch_u_orders");
+		const mesh::orders_t& patch_v_orders = require_const_array<mesh::orders_t>(Primitive, "patch_v_orders");
+		const mesh::indices_t& patch_u_first_knots = require_const_array<mesh::indices_t>(Primitive, "patch_u_first_knots");
+		const mesh::indices_t& patch_v_first_knots = require_const_array<mesh::indices_t>(Primitive, "patch_v_first_knots");
+		const mesh::selection_t& patch_selections = require_const_array<mesh::selection_t>(Primitive, "patch_selections");
+		const mesh::materials_t& patch_materials = require_const_array<mesh::materials_t>(Primitive, "patch_materials");
+		const mesh::indices_t& patch_points = require_const_array<mesh::indices_t>(Primitive, "patch_points");
+		const mesh::weights_t& patch_point_weights = require_const_array<mesh::weights_t>(Primitive, "patch_point_weights");
+		const mesh::knots_t& patch_u_knots = require_const_array<mesh::knots_t>(Primitive, "patch_u_knots");
+		const mesh::knots_t& patch_v_knots = require_const_array<mesh::knots_t>(Primitive, "patch_v_knots");
+		const mesh::indices_t& patch_first_trim_loops = require_const_array<mesh::indices_t>(Primitive, "patch_first_trim_loops");
+		const mesh::counts_t& patch_trim_loop_counts = require_const_array<mesh::counts_t>(Primitive, "patch_trim_loop_counts");
+		const mesh::indices_t& trim_loop_first_curves = require_const_array<mesh::indices_t>(Primitive, "trim_loop_first_curves");
+		const mesh::counts_t& trim_loop_curve_counts = require_const_array<mesh::counts_t>(Primitive, "trim_loop_curve_counts");
+		const mesh::selection_t& trim_loop_selections = require_const_array<mesh::selection_t>(Primitive, "trim_loop_selections");
+		const mesh::indices_t& curve_first_points = require_const_array<mesh::indices_t>(Primitive, "curve_first_points");
+		const mesh::counts_t& curve_point_counts = require_const_array<mesh::counts_t>(Primitive, "curve_point_counts");
+		const mesh::orders_t& curve_orders = require_const_array<mesh::orders_t>(Primitive, "curve_orders");
+		const mesh::indices_t& curve_first_knots = require_const_array<mesh::indices_t>(Primitive, "curve_first_knots");
+		const mesh::selection_t& curve_selections = require_const_array<mesh::selection_t>(Primitive, "curve_selections");
+		const mesh::indices_t& curve_points = require_const_array<mesh::indices_t>(Primitive, "curve_points");
+		const mesh::weights_t& curve_point_weights = require_const_array<mesh::weights_t>(Primitive, "curve_point_weights");
+		const mesh::knots_t& curve_knots = require_const_array<mesh::knots_t>(Primitive, "curve_knots");
+		const mesh::points_2d_t& points = require_const_array<mesh::points_2d_t>(Primitive, "points");
+		const mesh::selection_t& point_selections = require_const_array<mesh::selection_t>(Primitive, "point_selections");
+
+		const mesh::attribute_arrays_t& constant_data = require_const_attribute_arrays(Primitive, "constant");
+		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
+		const mesh::attribute_arrays_t& varying_data = require_const_attribute_arrays(Primitive, "varying");
+
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+
+		require_array_size(Primitive, patch_u_point_counts, "patch_u_point_counts", patch_first_points.size());
+		require_array_size(Primitive, patch_v_point_counts, "patch_v_point_counts", patch_first_points.size());
+		require_array_size(Primitive, patch_u_orders, "patch_u_orders", patch_first_points.size());
+		require_array_size(Primitive, patch_v_orders, "patch_v_orders", patch_first_points.size());
+		require_array_size(Primitive, patch_u_first_knots, "patch_u_first_knots", patch_first_points.size());
+		require_array_size(Primitive, patch_v_first_knots, "patch_v_first_knots", patch_first_points.size());
+		require_array_size(Primitive, patch_selections, "patch_selections", patch_first_points.size());
+		require_array_size(Primitive, patch_materials, "patch_materials", patch_first_points.size());
+//		require_array_size(Primitive, patch_points, "patch_points", std::accumulate(patch_point_counts.begin(), curve_point_counts.end(), 0));
+//		require_array_size(Primitive, patch_point_weights, "patch_point_weights", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_array_size(Primitive, patch_u_knots, "patch_u_knots",
+			std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)
+			+ std::accumulate(patch_u_orders.begin(), patch_u_orders.end(), 0));
+		require_array_size(Primitive, patch_v_knots, "patch_v_knots",
+			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
+			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
+
+		require_array_size(Primitive, patch_first_trim_loops, "patch_first_trim_loops", patch_first_points.size());
+		require_array_size(Primitive, patch_trim_loop_counts, "patch_trim_loop_counts", patch_first_points.size());
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", patch_first_points.size());
+//		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
 	return new const_primitive(
-		*Mesh.nurbs_patches->patch_first_points,
-		*Mesh.nurbs_patches->patch_u_point_counts,
-		*Mesh.nurbs_patches->patch_v_point_counts,
-		*Mesh.nurbs_patches->patch_u_orders,
-		*Mesh.nurbs_patches->patch_v_orders,
-		*Mesh.nurbs_patches->patch_u_first_knots,
-		*Mesh.nurbs_patches->patch_v_first_knots,
-		*Mesh.nurbs_patches->patch_selection,
-		*Mesh.nurbs_patches->patch_materials,
-		*Mesh.nurbs_patches->patch_points,
-		*Mesh.nurbs_patches->patch_point_weights,
-		*Mesh.nurbs_patches->patch_u_knots,
-		*Mesh.nurbs_patches->patch_v_knots,
-		*Mesh.nurbs_patches->patch_trim_curve_loop_counts,
-		*Mesh.nurbs_patches->patch_first_trim_curve_loops,
-		*Mesh.nurbs_patches->first_trim_curves,
-		*Mesh.nurbs_patches->trim_curve_counts,
-		*Mesh.nurbs_patches->trim_curve_loop_selection,
-		*Mesh.nurbs_patches->trim_curve_first_points,
-		*Mesh.nurbs_patches->trim_curve_point_counts,
-		*Mesh.nurbs_patches->trim_curve_orders,
-		*Mesh.nurbs_patches->trim_curve_first_knots,
-		*Mesh.nurbs_patches->trim_curve_selection,
-		*Mesh.nurbs_patches->trim_curve_points,
-		*Mesh.nurbs_patches->trim_curve_point_weights,
-		*Mesh.nurbs_patches->trim_curve_knots,
-		*Mesh.nurbs_patches->trim_points,
-		*Mesh.nurbs_patches->trim_point_selection,
-		Mesh.nurbs_patches->constant_data,
-		Mesh.nurbs_patches->uniform_data,
-		Mesh.nurbs_patches->varying_data);
+		patch_first_points,
+		patch_u_point_counts,
+		patch_v_point_counts,
+		patch_u_orders,
+		patch_v_orders,
+		patch_u_first_knots,
+		patch_v_first_knots,
+		patch_selections,
+		patch_materials,
+		patch_points,
+		patch_point_weights,
+		patch_u_knots,
+		patch_v_knots,
+		patch_first_trim_loops,
+		patch_trim_loop_counts,
+		trim_loop_first_curves,
+		trim_loop_curve_counts,
+		trim_loop_selections,
+		curve_first_points,
+		curve_point_counts,
+		curve_orders,
+		curve_first_knots,
+		curve_selections,
+		curve_points,
+		curve_point_weights,
+		curve_knots,
+		points,
+		point_selections,
+		constant_data,
+		uniform_data,
+		varying_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
+	}
+
+	return 0;
 }
 
-primitive* validate(mesh& Mesh)
+primitive* validate(mesh::primitive& Primitive)
 {
-	if(!legacy_validate_nurbs_patches(Mesh))
-		return 0;
-
-	mesh::nurbs_patches_t& nurbs = Mesh.nurbs_patches.writable();
-
-	return new primitive(
-		nurbs.patch_first_points.writable(),
-		nurbs.patch_u_point_counts.writable(),
-		nurbs.patch_v_point_counts.writable(),
-		nurbs.patch_u_orders.writable(),
-		nurbs.patch_v_orders.writable(),
-		nurbs.patch_u_first_knots.writable(),
-		nurbs.patch_v_first_knots.writable(),
-		nurbs.patch_selection.writable(),
-		nurbs.patch_materials.writable(),
-		nurbs.patch_points.writable(),
-		nurbs.patch_point_weights.writable(),
-		nurbs.patch_u_knots.writable(),
-		nurbs.patch_v_knots.writable(),
-		nurbs.patch_trim_curve_loop_counts.writable(),
-		nurbs.patch_first_trim_curve_loops.writable(),
-		nurbs.first_trim_curves.writable(),
-		nurbs.trim_curve_counts.writable(),
-		nurbs.trim_curve_loop_selection.writable(),
-		nurbs.trim_curve_first_points.writable(),
-		nurbs.trim_curve_point_counts.writable(),
-		nurbs.trim_curve_orders.writable(),
-		nurbs.trim_curve_first_knots.writable(),
-		nurbs.trim_curve_selection.writable(),
-		nurbs.trim_curve_points.writable(),
-		nurbs.trim_curve_point_weights.writable(),
-		nurbs.trim_curve_knots.writable(),
-		nurbs.trim_points.writable(),
-		nurbs.trim_point_selection.writable(),
-		nurbs.constant_data,
-		nurbs.uniform_data,
-		nurbs.varying_data);
+	assert_not_implemented();
+	return 0;
 }
 
 } // namespace nurbs_patch

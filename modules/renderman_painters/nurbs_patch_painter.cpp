@@ -23,8 +23,8 @@
 
 #include "array_helpers.h"
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/node.h>
@@ -65,123 +65,126 @@ public:
 
 	void paint_mesh(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
 	{
-		boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs(k3d::nurbs_patch::validate(Mesh));
-		if(!nurbs)
-			return;
-
-		const k3d::mesh::points_t& points = *Mesh.points;
-
-		const k3d::uint_t patch_begin = 0;
-		const k3d::uint_t patch_end = patch_begin + nurbs->patch_first_points.size();
-		for(k3d::uint_t patch = patch_begin; patch != patch_end; ++patch)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			k3d::ri::reals u_knots(nurbs->patch_u_knots.begin() + nurbs->patch_u_first_knots[patch], nurbs->patch_u_knots.begin() + nurbs->patch_u_first_knots[patch] + nurbs->patch_u_point_counts[patch] + nurbs->patch_u_orders[patch]);
-			k3d::ri::reals v_knots(nurbs->patch_v_knots.begin() + nurbs->patch_v_first_knots[patch], nurbs->patch_v_knots.begin() + nurbs->patch_v_first_knots[patch] + nurbs->patch_v_point_counts[patch] + nurbs->patch_v_orders[patch]);
+			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs(k3d::nurbs_patch::validate(**primitive));
+			if(!nurbs)
+				return;
 
-			array_copier ri_constant_data;
-			ri_constant_data.add_arrays(nurbs->constant_data);
+			const k3d::mesh::points_t& points = *Mesh.points;
 
-			array_copier ri_uniform_data;
-			ri_uniform_data.add_arrays(nurbs->uniform_data);
-
-			array_copier ri_varying_data;
-			ri_varying_data.add_arrays(nurbs->varying_data);
-
-			array_copier ri_vertex_data;
-			ri_vertex_data.add_arrays(Mesh.vertex_data);
-
-			k3d::typed_array<k3d::ri::hpoint>* const ri_points = new k3d::typed_array<k3d::ri::hpoint>();
-
-			const k3d::uint_t point_begin = nurbs->patch_first_points[patch];
-			const k3d::uint_t point_end = point_begin + (nurbs->patch_u_point_counts[patch] * nurbs->patch_v_point_counts[patch]);
-			for(k3d::uint_t point = point_begin; point != point_end; ++point)
+			const k3d::uint_t patch_begin = 0;
+			const k3d::uint_t patch_end = patch_begin + nurbs->patch_first_points.size();
+			for(k3d::uint_t patch = patch_begin; patch != patch_end; ++patch)
 			{
-				ri_points->push_back(k3d::ri::hpoint(
-					nurbs->patch_point_weights[point] * points[nurbs->patch_points[point]][0],
-					nurbs->patch_point_weights[point] * points[nurbs->patch_points[point]][1],
-					nurbs->patch_point_weights[point] * points[nurbs->patch_points[point]][2],
-					nurbs->patch_point_weights[point]));
+				k3d::ri::reals u_knots(nurbs->patch_u_knots.begin() + nurbs->patch_u_first_knots[patch], nurbs->patch_u_knots.begin() + nurbs->patch_u_first_knots[patch] + nurbs->patch_u_point_counts[patch] + nurbs->patch_u_orders[patch]);
+				k3d::ri::reals v_knots(nurbs->patch_v_knots.begin() + nurbs->patch_v_first_knots[patch], nurbs->patch_v_knots.begin() + nurbs->patch_v_first_knots[patch] + nurbs->patch_v_point_counts[patch] + nurbs->patch_v_orders[patch]);
 
-				ri_vertex_data.push_back(nurbs->patch_points[point]);
-			}
+				array_copier ri_constant_data;
+				ri_constant_data.add_arrays(nurbs->constant_data);
 
-			ri_constant_data.push_back(patch);
-			ri_uniform_data.push_back(patch);
-			ri_varying_data.insert(4 * patch, 4 * (patch + 1));
+				array_copier ri_uniform_data;
+				ri_uniform_data.add_arrays(nurbs->uniform_data);
 
-			k3d::ri::parameter_list ri_parameters;
-			ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
-			ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
-			ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
-			ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
-			ri_parameters.push_back(k3d::ri::parameter(k3d::ri::RI_PW(), k3d::ri::VERTEX, 1, ri_points));
+				array_copier ri_varying_data;
+				ri_varying_data.add_arrays(nurbs->varying_data);
 
-			k3d::ri::setup_material(nurbs->patch_materials[patch], RenderState);
-			
-			if(nurbs->patch_trim_loop_counts[patch])
-			{
-				k3d::ri::unsigned_integers ri_curve_counts;
-				k3d::ri::unsigned_integers ri_trim_orders;
-				k3d::ri::reals ri_trim_knots;
-				k3d::ri::reals ri_trim_mins;
-				k3d::ri::reals ri_trim_maxs;
-				k3d::ri::unsigned_integers ri_trim_point_counts;
-				k3d::ri::reals ri_trim_u;
-				k3d::ri::reals ri_trim_v;
-				k3d::ri::reals ri_trim_w;
-				
-				k3d::uint_t loops_start = nurbs->patch_first_trim_loops[patch];
-				k3d::uint_t loops_end = loops_start + nurbs->patch_trim_loop_counts[patch];
-				for (k3d::uint_t loop_index = loops_start; loop_index != loops_end; ++loop_index)
+				array_copier ri_vertex_data;
+				ri_vertex_data.add_arrays(Mesh.vertex_data);
+
+				k3d::typed_array<k3d::ri::hpoint>* const ri_points = new k3d::typed_array<k3d::ri::hpoint>();
+
+				const k3d::uint_t point_begin = nurbs->patch_first_points[patch];
+				const k3d::uint_t point_end = point_begin + (nurbs->patch_u_point_counts[patch] * nurbs->patch_v_point_counts[patch]);
+				for(k3d::uint_t point = point_begin; point != point_end; ++point)
 				{
-					k3d::uint_t curves_start = nurbs->trim_loop_first_curves[loop_index];
-					k3d::uint_t curves_end = curves_start + nurbs->trim_loop_curve_counts[loop_index];
-					ri_curve_counts.push_back(nurbs->trim_loop_curve_counts[loop_index]);
-					for (k3d::uint_t curve = curves_start; curve != curves_end; ++curve)
+					ri_points->push_back(k3d::ri::hpoint(
+						nurbs->patch_point_weights[point] * points[nurbs->patch_points[point]][0],
+						nurbs->patch_point_weights[point] * points[nurbs->patch_points[point]][1],
+						nurbs->patch_point_weights[point] * points[nurbs->patch_points[point]][2],
+						nurbs->patch_point_weights[point]));
+
+					ri_vertex_data.push_back(nurbs->patch_points[point]);
+				}
+
+				ri_constant_data.push_back(patch);
+				ri_uniform_data.push_back(patch);
+				ri_varying_data.insert(4 * patch, 4 * (patch + 1));
+
+				k3d::ri::parameter_list ri_parameters;
+				ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
+				ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
+				ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
+				ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
+				ri_parameters.push_back(k3d::ri::parameter(k3d::ri::RI_PW(), k3d::ri::VERTEX, 1, ri_points));
+
+				k3d::ri::setup_material(nurbs->patch_materials[patch], RenderState);
+				
+				if(nurbs->patch_trim_loop_counts[patch])
+				{
+					k3d::ri::unsigned_integers ri_curve_counts;
+					k3d::ri::unsigned_integers ri_trim_orders;
+					k3d::ri::reals ri_trim_knots;
+					k3d::ri::reals ri_trim_mins;
+					k3d::ri::reals ri_trim_maxs;
+					k3d::ri::unsigned_integers ri_trim_point_counts;
+					k3d::ri::reals ri_trim_u;
+					k3d::ri::reals ri_trim_v;
+					k3d::ri::reals ri_trim_w;
+					
+					k3d::uint_t loops_start = nurbs->patch_first_trim_loops[patch];
+					k3d::uint_t loops_end = loops_start + nurbs->patch_trim_loop_counts[patch];
+					for (k3d::uint_t loop_index = loops_start; loop_index != loops_end; ++loop_index)
 					{
-						ri_trim_orders.push_back(nurbs->curve_orders[curve]);
-						ri_trim_knots.insert(ri_trim_knots.end(), nurbs->curve_knots.begin() + nurbs->curve_first_knots[curve], nurbs->curve_knots.begin() + nurbs->curve_first_knots[curve] + nurbs->curve_point_counts[curve] + nurbs->curve_orders[curve]);
-						ri_trim_mins.push_back(nurbs->curve_knots[nurbs->curve_orders[curve] - 1]);
-						ri_trim_maxs.push_back(nurbs->curve_knots[nurbs->curve_point_counts[curve]]);
-						ri_trim_point_counts.push_back(nurbs->curve_point_counts[curve]);
-						k3d::uint_t points_start = nurbs->curve_first_points[curve];
-						k3d::uint_t points_end = points_start + nurbs->curve_point_counts[curve];
-						for (k3d::uint_t point = points_start; point != points_end; ++point)
+						k3d::uint_t curves_start = nurbs->trim_loop_first_curves[loop_index];
+						k3d::uint_t curves_end = curves_start + nurbs->trim_loop_curve_counts[loop_index];
+						ri_curve_counts.push_back(nurbs->trim_loop_curve_counts[loop_index]);
+						for (k3d::uint_t curve = curves_start; curve != curves_end; ++curve)
 						{
-							k3d::point2 control_point = nurbs->points[nurbs->curve_points[point]];
-							double weight = nurbs->curve_point_weights[point];
-							ri_trim_u.push_back(static_cast<k3d::ri::real>(control_point[0] * weight));
-							ri_trim_v.push_back(static_cast<k3d::ri::real>(control_point[1] * weight));
-							ri_trim_w.push_back(static_cast<k3d::ri::real>(weight));
+							ri_trim_orders.push_back(nurbs->curve_orders[curve]);
+							ri_trim_knots.insert(ri_trim_knots.end(), nurbs->curve_knots.begin() + nurbs->curve_first_knots[curve], nurbs->curve_knots.begin() + nurbs->curve_first_knots[curve] + nurbs->curve_point_counts[curve] + nurbs->curve_orders[curve]);
+							ri_trim_mins.push_back(nurbs->curve_knots[nurbs->curve_orders[curve] - 1]);
+							ri_trim_maxs.push_back(nurbs->curve_knots[nurbs->curve_point_counts[curve]]);
+							ri_trim_point_counts.push_back(nurbs->curve_point_counts[curve]);
+							k3d::uint_t points_start = nurbs->curve_first_points[curve];
+							k3d::uint_t points_end = points_start + nurbs->curve_point_counts[curve];
+							for (k3d::uint_t point = points_start; point != points_end; ++point)
+							{
+								k3d::point2 control_point = nurbs->points[nurbs->curve_points[point]];
+								double weight = nurbs->curve_point_weights[point];
+								ri_trim_u.push_back(static_cast<k3d::ri::real>(control_point[0] * weight));
+								ri_trim_v.push_back(static_cast<k3d::ri::real>(control_point[1] * weight));
+								ri_trim_w.push_back(static_cast<k3d::ri::real>(weight));
+							}
 						}
 					}
+					RenderState.stream.RiTrimCurve(
+						ri_curve_counts,
+						ri_trim_orders,
+						ri_trim_knots,
+						ri_trim_mins,
+						ri_trim_maxs,
+						ri_trim_point_counts,
+						ri_trim_u,
+						ri_trim_v,
+						ri_trim_w
+					);
 				}
-				RenderState.stream.RiTrimCurve(
-					ri_curve_counts,
-					ri_trim_orders,
-					ri_trim_knots,
-					ri_trim_mins,
-					ri_trim_maxs,
-					ri_trim_point_counts,
-					ri_trim_u,
-					ri_trim_v,
-					ri_trim_w
-				);
+				
+				RenderState.stream.RiNuPatchV(
+					nurbs->patch_u_point_counts[patch],
+					nurbs->patch_u_orders[patch],
+					u_knots,
+					u_knots[nurbs->patch_u_orders[patch] - 1],
+					u_knots[nurbs->patch_u_point_counts[patch]],
+					nurbs->patch_v_point_counts[patch],
+					nurbs->patch_v_orders[patch],
+					v_knots,
+					v_knots[nurbs->patch_v_orders[patch] - 1],
+					v_knots[nurbs->patch_v_point_counts[patch]],
+					ri_parameters
+					);
 			}
-			
-			RenderState.stream.RiNuPatchV(
-				nurbs->patch_u_point_counts[patch],
-				nurbs->patch_u_orders[patch],
-				u_knots,
-				u_knots[nurbs->patch_u_orders[patch] - 1],
-				u_knots[nurbs->patch_u_point_counts[patch]],
-				nurbs->patch_v_point_counts[patch],
-				nurbs->patch_v_orders[patch],
-				v_knots,
-				v_knots[nurbs->patch_v_orders[patch] - 1],
-				v_knots[nurbs->patch_v_point_counts[patch]],
-				ri_parameters
-				);
 		}
 	}
 

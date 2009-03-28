@@ -93,61 +93,64 @@ public:
 		if (!draw_selected && !draw_unselected)
 			return;
 
-		boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs(k3d::nurbs_patch::validate(Mesh));
-		if(!nurbs)
-			return;
-
-		if(!m_font)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			if (m_antialias.pipeline_value())
-				m_font.reset(new FTPixmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
-			else
-				m_font.reset(new FTBitmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
-
-			m_font->FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
-			m_font->UseDisplayList(true);
-			if (m_font->Error())
-			{
-				k3d::log() << error << "error initializing font" << std::endl;
+			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs(k3d::nurbs_patch::validate(**primitive));
+			if(!nurbs)
 				return;
-			}
-		}
 
-		const k3d::double_t x_offset = m_x_offset.pipeline_value();
-		const k3d::double_t y_offset = m_y_offset.pipeline_value();
-		const k3d::double_t z_offset = m_z_offset.pipeline_value();
-
-		const k3d::color selected_color = m_selected_color.pipeline_value();
-		const k3d::color unselected_color = m_unselected_color.pipeline_value();
-
-		const k3d::mesh::points_t& points = *Mesh.points;
-
-		k3d::gl::store_attributes attributes;
-		glDisable(GL_LIGHTING);
-
-		const k3d::uint_t patches_begin = 0;
-		const k3d::uint_t patches_end = patches_begin + nurbs->patch_first_points.size();
-		for (k3d::uint_t patch = patches_begin; patch < patches_end; patch++)
-		{
-			k3d::gl::color3d(nurbs->patch_selections[patch] ? selected_color : unselected_color);
-
-			//calculate center
-			k3d::point3 center;
-			const k3d::uint_t points_begin = nurbs->patch_first_points[patch];
-			const k3d::uint_t points_end = points_begin + (nurbs->patch_u_point_counts[patch] * nurbs->patch_v_point_counts[patch]);
-
-			for (k3d::uint_t point = points_begin; point < points_end; point++)
+			if(!m_font)
 			{
-				center = center + points[nurbs->patch_points[point]];
+				if (m_antialias.pipeline_value())
+					m_font.reset(new FTPixmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
+				else
+					m_font.reset(new FTBitmapFont(m_font_path.pipeline_value().native_filesystem_string().c_str()));
+
+				m_font->FaceSize(static_cast<unsigned int>(m_font_size.pipeline_value()));
+				m_font->UseDisplayList(true);
+				if (m_font->Error())
+				{
+					k3d::log() << error << "error initializing font" << std::endl;
+					return;
+				}
 			}
 
-			center = center / (nurbs->patch_u_point_counts[patch] * nurbs->patch_v_point_counts[patch]);
+			const k3d::double_t x_offset = m_x_offset.pipeline_value();
+			const k3d::double_t y_offset = m_y_offset.pipeline_value();
+			const k3d::double_t z_offset = m_z_offset.pipeline_value();
 
-			//draw the number
-			const k3d::point3 position = center + k3d::point3(x_offset, y_offset, z_offset);
+			const k3d::color selected_color = m_selected_color.pipeline_value();
+			const k3d::color unselected_color = m_unselected_color.pipeline_value();
 
-			glRasterPos3d(position[0], position[1], position[2]);
-			m_font->Render(k3d::string_cast(patch).c_str());
+			const k3d::mesh::points_t& points = *Mesh.points;
+
+			k3d::gl::store_attributes attributes;
+			glDisable(GL_LIGHTING);
+
+			const k3d::uint_t patches_begin = 0;
+			const k3d::uint_t patches_end = patches_begin + nurbs->patch_first_points.size();
+			for (k3d::uint_t patch = patches_begin; patch < patches_end; patch++)
+			{
+				k3d::gl::color3d(nurbs->patch_selections[patch] ? selected_color : unselected_color);
+
+				//calculate center
+				k3d::point3 center;
+				const k3d::uint_t points_begin = nurbs->patch_first_points[patch];
+				const k3d::uint_t points_end = points_begin + (nurbs->patch_u_point_counts[patch] * nurbs->patch_v_point_counts[patch]);
+
+				for (k3d::uint_t point = points_begin; point < points_end; point++)
+				{
+					center = center + points[nurbs->patch_points[point]];
+				}
+
+				center = center / (nurbs->patch_u_point_counts[patch] * nurbs->patch_v_point_counts[patch]);
+
+				//draw the number
+				const k3d::point3 position = center + k3d::point3(x_offset, y_offset, z_offset);
+
+				glRasterPos3d(position[0], position[1], position[2]);
+				m_font->Render(k3d::string_cast(patch).c_str());
+			}
 		}
 	}
 

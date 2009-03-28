@@ -28,6 +28,7 @@
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/polyhedron.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -94,23 +95,6 @@ private:
 			mesh(Mesh),
 			points(0),
 			point_selection(0),
-			point_weights(0),
-
-			nurbs_patches(0),
-			nurbs_patch_first_points(0),
-			nurbs_patch_u_point_counts(0),
-			nurbs_patch_v_point_counts(0),
-			nurbs_patch_u_orders(0),
-			nurbs_patch_v_orders(0),
-			nurbs_patch_u_first_knots(0),
-			nurbs_patch_v_first_knots(0),
-			nurbs_patch_selection(0),
-			nurbs_patch_materials(0),
-			nurbs_patch_points(0),
-			nurbs_patch_point_weights(0),
-			nurbs_patch_u_knots(0),
-			nurbs_patch_v_knots(0),
-
 			u_order(0),
 			v_order(0),
 			s0(0),
@@ -120,33 +104,14 @@ private:
 		{
 		}
 
-		~my_parser()
-		{
-			delete point_weights;
-		}
-
 	private:
 		k3d::mesh& mesh;
 		k3d::mesh::points_t* points;
 		k3d::mesh::selection_t* point_selection;
-		k3d::mesh::weights_t* point_weights; // Note: *not* part of the mesh!
+		boost::scoped_ptr<k3d::mesh::weights_t> point_weights; // Note: *not* part of the mesh!
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron;
-
-		k3d::mesh::nurbs_patches_t* nurbs_patches;
-		k3d::mesh::indices_t* nurbs_patch_first_points;
-		k3d::mesh::counts_t* nurbs_patch_u_point_counts;
-		k3d::mesh::counts_t* nurbs_patch_v_point_counts;
-		k3d::mesh::orders_t* nurbs_patch_u_orders;
-		k3d::mesh::orders_t* nurbs_patch_v_orders;
-		k3d::mesh::indices_t* nurbs_patch_u_first_knots;
-		k3d::mesh::indices_t* nurbs_patch_v_first_knots;
-		k3d::mesh::selection_t* nurbs_patch_selection;
-		k3d::mesh::materials_t* nurbs_patch_materials;
-		k3d::mesh::indices_t* nurbs_patch_points;
-		k3d::mesh::weights_t* nurbs_patch_point_weights;
-		k3d::mesh::knots_t* nurbs_patch_u_knots;
-		k3d::mesh::knots_t* nurbs_patch_v_knots;
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs_patch;
 
 		k3d::string_t curve_surface_type;
 		k3d::uint_t u_order;
@@ -170,7 +135,7 @@ private:
 				point_selection = &mesh.point_selection.create();
 
 			if(!point_weights)
-				point_weights = new k3d::mesh::weights_t(); // Note: *not* part of the mesh!
+				point_weights.reset(new k3d::mesh::weights_t()); // Note: *not* part of the mesh!
 
 			points->push_back(k3d::point3(Vertex[0], Vertex[1], Vertex[2]));
 			point_selection->push_back(0.0);
@@ -212,7 +177,7 @@ private:
 			curve_surface_type = Type;
 		}
 
-		void on_degree(const size_t& UDegree, const size_t& VDegree)
+		void on_degree(const k3d::uint_t& UDegree, const k3d::uint_t& VDegree)
 		{
 			u_order = UDegree + 1;
 			v_order = VDegree + 1;
@@ -254,64 +219,28 @@ private:
 			if(expected_vertex_count != vertex_coordinates.size())
 				throw std::runtime_error("invalid vertex count for bspline surface");
 
-			if(!nurbs_patches)
-				nurbs_patches = &mesh.nurbs_patches.create();
+			if(!nurbs_patch)
+				nurbs_patch.reset(k3d::nurbs_patch::create(mesh));
 
-			if(!nurbs_patch_first_points)
-				nurbs_patch_first_points = &nurbs_patches->patch_first_points.create();
-
-			if(!nurbs_patch_u_point_counts)
-				nurbs_patch_u_point_counts = &nurbs_patches->patch_u_point_counts.create();
-
-			if(!nurbs_patch_v_point_counts)
-				nurbs_patch_v_point_counts = &nurbs_patches->patch_v_point_counts.create();
-
-			if(!nurbs_patch_u_orders)
-				nurbs_patch_u_orders = &nurbs_patches->patch_u_orders.create();
-
-			if(!nurbs_patch_v_orders)
-				nurbs_patch_v_orders = &nurbs_patches->patch_v_orders.create();
-
-			if(!nurbs_patch_u_first_knots)
-				nurbs_patch_u_first_knots = &nurbs_patches->patch_u_first_knots.create();
-
-			if(!nurbs_patch_v_first_knots)
-				nurbs_patch_v_first_knots = &nurbs_patches->patch_v_first_knots.create();
-
-			if(!nurbs_patch_selection)
-				nurbs_patch_selection = &nurbs_patches->patch_selection.create();
-
-			if(!nurbs_patch_materials)
-				nurbs_patch_materials = &nurbs_patches->patch_materials.create();
-
-			if(!nurbs_patch_points)
-				nurbs_patch_points = &nurbs_patches->patch_points.create();
-
-			if(!nurbs_patch_point_weights)
-				nurbs_patch_point_weights = &nurbs_patches->patch_point_weights.create();
-
-			if(!nurbs_patch_u_knots)
-				nurbs_patch_u_knots = &nurbs_patches->patch_u_knots.create();
-
-			if(!nurbs_patch_v_knots)
-				nurbs_patch_v_knots = &nurbs_patches->patch_v_knots.create();
-
-			nurbs_patch_first_points->push_back(nurbs_patch_points->size());
-			nurbs_patch_u_point_counts->push_back(u_knots.size() - u_order);
-			nurbs_patch_v_point_counts->push_back(v_knots.size() - v_order);
-			nurbs_patch_u_orders->push_back(u_order);
-			nurbs_patch_v_orders->push_back(v_order);
-			nurbs_patch_u_first_knots->push_back(nurbs_patch_u_knots->size());
-			nurbs_patch_v_first_knots->push_back(nurbs_patch_v_knots->size());
-			nurbs_patch_selection->push_back(0);
-			nurbs_patch_materials->push_back(static_cast<k3d::imaterial*>(0));
-			nurbs_patch_points->insert(nurbs_patch_points->end(), vertex_coordinates.begin(), vertex_coordinates.end());
+			nurbs_patch->patch_first_points.push_back(nurbs_patch->patch_points.size());
+			nurbs_patch->patch_u_point_counts.push_back(u_knots.size() - u_order);
+			nurbs_patch->patch_v_point_counts.push_back(v_knots.size() - v_order);
+			nurbs_patch->patch_u_orders.push_back(u_order);
+			nurbs_patch->patch_v_orders.push_back(v_order);
+			nurbs_patch->patch_u_first_knots.push_back(nurbs_patch->patch_u_knots.size());
+			nurbs_patch->patch_v_first_knots.push_back(nurbs_patch->patch_v_knots.size());
+			nurbs_patch->patch_selections.push_back(0);
+			nurbs_patch->patch_materials.push_back(static_cast<k3d::imaterial*>(0));
+			nurbs_patch->patch_points.insert(nurbs_patch->patch_points.end(), vertex_coordinates.begin(), vertex_coordinates.end());
 
 			for(k3d::uint_t i = 0; i != vertex_coordinates.size(); ++i)
-				nurbs_patch_point_weights->push_back((*point_weights)[vertex_coordinates[i]]);
+				nurbs_patch->patch_point_weights.push_back((*point_weights)[vertex_coordinates[i]]);
 
-			nurbs_patch_u_knots->insert(nurbs_patch_u_knots->end(), u_knots.begin(), u_knots.end());
-			nurbs_patch_v_knots->insert(nurbs_patch_v_knots->end(), v_knots.begin(), v_knots.end());
+			nurbs_patch->patch_u_knots.insert(nurbs_patch->patch_u_knots.end(), u_knots.begin(), u_knots.end());
+			nurbs_patch->patch_v_knots.insert(nurbs_patch->patch_v_knots.end(), v_knots.begin(), v_knots.end());
+
+			nurbs_patch->patch_trim_loop_counts.push_back(0);
+			nurbs_patch->patch_first_trim_loops.push_back(0);
 
 			curve_surface_type.clear();
 			u_order = 0;

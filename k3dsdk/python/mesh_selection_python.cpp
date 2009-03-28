@@ -79,11 +79,6 @@ static const boost::python::object get_faces(const k3d::mesh_selection& Self)
 	return convert(Self.faces);
 }
 
-static const boost::python::object get_nurbs_patches(const k3d::mesh_selection& Self)
-{
-	return convert(Self.nurbs_patches);
-}
-
 static void set_points(k3d::mesh_selection& Self, const list& Value)
 {
 	Self.points = convert(Value);
@@ -97,11 +92,6 @@ static void set_edges(k3d::mesh_selection& Self, const list& Value)
 static void set_faces(k3d::mesh_selection& Self, const list& Value)
 {
 	Self.faces = convert(Value);
-}
-
-static void set_nurbs_patches(k3d::mesh_selection& Self, const list& Value)
-{
-	Self.nurbs_patches = convert(Value);
 }
 
 static boost::python::object component_select_all()
@@ -161,8 +151,6 @@ void define_class_mesh_selection()
 			"Stores changes in selection state for polyhedron vertices.")
 		.add_property("faces", get_faces, set_faces,
 			"Stores changes in selection state for polyhedron face primitives.")
-		.add_property("nurbs_patches", get_nurbs_patches, set_nurbs_patches,
-			"Stores changes in selection state for NURBS patch primitives.")
 		.def("component_deselect_all", component_deselect_all,
 			"Returns a list for use with L{mesh_selection} that deselects an entire range of mesh components.")
 		.staticmethod("component_deselect_all")

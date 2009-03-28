@@ -2118,45 +2118,6 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 		}
 	}
 
-	if(Mesh.nurbs_patches)
-	{
-		element& container = Container.append(element("nurbs_patches"));
-		detail::save_array(container, element("patch_first_points"), Mesh.nurbs_patches->patch_first_points, Context);
-		detail::save_array(container, element("patch_u_point_counts"), Mesh.nurbs_patches->patch_u_point_counts, Context);
-		detail::save_array(container, element("patch_v_point_counts"), Mesh.nurbs_patches->patch_v_point_counts, Context);
-		detail::save_array(container, element("patch_u_orders"), Mesh.nurbs_patches->patch_u_orders, Context);
-		detail::save_array(container, element("patch_v_orders"), Mesh.nurbs_patches->patch_v_orders, Context);
-		detail::save_array(container, element("patch_u_first_knots"), Mesh.nurbs_patches->patch_u_first_knots, Context);
-		detail::save_array(container, element("patch_v_first_knots"), Mesh.nurbs_patches->patch_v_first_knots, Context);
-		detail::save_array(container, element("patch_selection"), Mesh.nurbs_patches->patch_selection, Context);
-		detail::save_array(container, element("patch_materials"), Mesh.nurbs_patches->patch_materials, Context);
-		detail::save_arrays(container, element("constant_data"), Mesh.nurbs_patches->constant_data, Context);
-		detail::save_arrays(container, element("uniform_data"), Mesh.nurbs_patches->uniform_data, Context);
-		detail::save_array(container, element("patch_points"), Mesh.nurbs_patches->patch_points, Context);
-		detail::save_array(container, element("patch_point_weights"), Mesh.nurbs_patches->patch_point_weights, Context);
-		detail::save_array(container, element("patch_u_knots"), Mesh.nurbs_patches->patch_u_knots, Context);
-		detail::save_array(container, element("patch_v_knots"), Mesh.nurbs_patches->patch_v_knots, Context);
-		detail::save_arrays(container, element("varying_data"), Mesh.nurbs_patches->varying_data, Context);
-		if (Mesh.nurbs_patches->patch_trim_curve_loop_counts) // Check if there are trim curves
-		{
-			detail::save_array(container, element("patch_trim_curve_loop_counts"), Mesh.nurbs_patches->patch_trim_curve_loop_counts, Context);
-			detail::save_array(container, element("patch_first_trim_curve_loops"), Mesh.nurbs_patches->patch_first_trim_curve_loops, Context);
-			detail::save_array(container, element("trim_points"), Mesh.nurbs_patches->trim_points, Context);
-			detail::save_array(container, element("trim_point_selection"), Mesh.nurbs_patches->trim_point_selection, Context);
-			detail::save_array(container, element("first_trim_curves"), Mesh.nurbs_patches->first_trim_curves, Context);
-			detail::save_array(container, element("trim_curve_counts"), Mesh.nurbs_patches->trim_curve_counts, Context);
-			detail::save_array(container, element("trim_curve_loop_selection"), Mesh.nurbs_patches->trim_curve_loop_selection, Context);
-			detail::save_array(container, element("trim_curve_first_points"), Mesh.nurbs_patches->trim_curve_first_points, Context);
-			detail::save_array(container, element("trim_curve_point_counts"), Mesh.nurbs_patches->trim_curve_point_counts, Context);
-			detail::save_array(container, element("trim_curve_orders"), Mesh.nurbs_patches->trim_curve_orders, Context);
-			detail::save_array(container, element("trim_curve_first_knots"), Mesh.nurbs_patches->trim_curve_first_knots, Context);
-			detail::save_array(container, element("trim_curve_selection"), Mesh.nurbs_patches->trim_curve_selection, Context);
-			detail::save_array(container, element("trim_curve_points"), Mesh.nurbs_patches->trim_curve_points, Context);
-			detail::save_array(container, element("trim_curve_point_weights"), Mesh.nurbs_patches->trim_curve_point_weights, Context);
-			detail::save_array(container, element("trim_curve_knots"), Mesh.nurbs_patches->trim_curve_knots, Context);
-		}
-	}
-
 	if(Mesh.polyhedra)
 	{
 		element& container = Container.append(element("polyhedra"));
@@ -2323,6 +2284,8 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "nurbs_patches"))
 	{
+		assert_not_implemented();
+/*
 		mesh::nurbs_patches_t* const nurbs_patches = &Mesh.nurbs_patches.create();
 		detail::load_array(*container, "patch_first_points", nurbs_patches->patch_first_points, Context);
 		detail::load_array(*container, "patch_u_point_counts", nurbs_patches->patch_u_point_counts, Context);
@@ -2355,6 +2318,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_array(*container, "trim_curve_points", nurbs_patches->trim_curve_points, Context);
 		detail::load_array(*container, "trim_curve_point_weights", nurbs_patches->trim_curve_point_weights, Context);
 		detail::load_array(*container, "trim_curve_knots", nurbs_patches->trim_curve_knots, Context);
+*/
 	}
 
 	if(element* const container = find_element(Container, "polyhedra"))
@@ -2942,8 +2906,8 @@ void save(const mesh_selection& Selection, element& XML, const ipersistent::save
 	detail::save_selection(XML, Selection.points, "points");
 	detail::save_selection(XML, Selection.edges, "edges");
 	detail::save_selection(XML, Selection.faces, "faces");
-	detail::save_selection(XML, Selection.nurbs_patches, "nurbspatches");
 
+	// Handle generic primitives
 	assert_not_implemented();
 }
 
@@ -2957,10 +2921,9 @@ void load(mesh_selection& Selection, element& XML, const ipersistent::load_conte
 			detail::load_selection(*xml_selection, Selection.edges);
 		if(xml_selection->name == "faces")
 			detail::load_selection(*xml_selection, Selection.faces);
-		if(xml_selection->name == "nurbspatches" || xml_selection->name == "nupatches")
-			detail::load_selection(*xml_selection, Selection.nurbs_patches);
 	}
 
+	// Handle generic primitives
 	assert_not_implemented();
 }
 

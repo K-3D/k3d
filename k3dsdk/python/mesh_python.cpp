@@ -113,179 +113,6 @@ object create_array(pipeline_data<array_type>& Data)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// const_nurbs_patches
-
-class const_nurbs_patches :
-	public instance_wrapper<const k3d::mesh::nurbs_patches_t>
-{
-	typedef instance_wrapper<const k3d::mesh::nurbs_patches_t> base;
-public:
-	const_nurbs_patches() :
-		base()
-	{
-	}
-
-	const_nurbs_patches(const k3d::mesh::nurbs_patches_t* Patches) :
-		base(Patches)
-	{
-	}
-
-	const_nurbs_patches(const k3d::mesh::nurbs_patches_t& Patches) :
-		base(Patches)
-	{
-	}
-
-	object patch_first_points() { return wrap_const_array(wrapped().patch_first_points); }
-	object patch_u_point_counts() { return wrap_const_array(wrapped().patch_u_point_counts); }
-	object patch_v_point_counts() { return wrap_const_array(wrapped().patch_v_point_counts); }
-	object patch_u_orders() { return wrap_const_array(wrapped().patch_u_orders); }
-	object patch_v_orders() { return wrap_const_array(wrapped().patch_v_orders); }
-	object patch_u_first_knots() { return wrap_const_array(wrapped().patch_u_first_knots); }
-	object patch_v_first_knots() { return wrap_const_array(wrapped().patch_v_first_knots); }
-	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
-	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object patch_points() { return wrap_const_array(wrapped().patch_points); }
-	object patch_point_weights() { return wrap_const_array(wrapped().patch_point_weights); }
-	object patch_u_knots() { return wrap_const_array(wrapped().patch_u_knots); }
-	object patch_v_knots() { return wrap_const_array(wrapped().patch_v_knots); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-	object patch_trim_curve_loop_counts() { return wrap_const_array(wrapped().patch_trim_curve_loop_counts); }
-	object patch_first_trim_curve_loops() { return wrap_const_array(wrapped().patch_first_trim_curve_loops); }
-	object trim_points() { return wrap_const_array(wrapped().trim_points); }
-	object trim_point_selection() { return wrap_const_array(wrapped().trim_point_selection); }
-	object first_trim_curves() { return wrap_const_array(wrapped().first_trim_curves); }
-	object trim_curve_counts() { return wrap_const_array(wrapped().trim_curve_counts); }
-	object trim_curve_loop_selection() { return wrap_const_array(wrapped().trim_curve_loop_selection); }
-	object trim_curve_first_points() { return wrap_const_array(wrapped().trim_curve_first_points); }
-	object trim_curve_point_counts() { return wrap_const_array(wrapped().trim_curve_point_counts); }
-	object trim_curve_orders() { return wrap_const_array(wrapped().trim_curve_orders); }
-	object trim_curve_first_knots() { return wrap_const_array(wrapped().trim_curve_first_knots); }
-	object trim_curve_selection() { return wrap_const_array(wrapped().trim_curve_selection); }
-	object trim_curve_points() { return wrap_const_array(wrapped().trim_curve_points); }
-	object trim_curve_point_weights() { return wrap_const_array(wrapped().trim_curve_point_weights); }
-	object trim_curve_knots() { return wrap_const_array(wrapped().trim_curve_knots); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// nurbs_patches
-
-class nurbs_patches :
-	public instance_wrapper<k3d::mesh::nurbs_patches_t>
-{
-	typedef instance_wrapper<k3d::mesh::nurbs_patches_t> base;
-public:
-	nurbs_patches() :
-		base()
-	{
-	}
-
-	nurbs_patches(k3d::mesh::nurbs_patches_t* Patches) :
-		base(Patches)
-	{
-	}
-
-	nurbs_patches(k3d::mesh::nurbs_patches_t& Patches) :
-		base(Patches)
-	{
-	}
-
-	object patch_first_points() { return wrap_const_array(wrapped().patch_first_points); }
-	object patch_u_point_counts() { return wrap_const_array(wrapped().patch_u_point_counts); }
-	object patch_v_point_counts() { return wrap_const_array(wrapped().patch_v_point_counts); }
-	object patch_u_orders() { return wrap_const_array(wrapped().patch_u_orders); }
-	object patch_v_orders() { return wrap_const_array(wrapped().patch_v_orders); }
-	object patch_u_first_knots() { return wrap_const_array(wrapped().patch_u_first_knots); }
-	object patch_v_first_knots() { return wrap_const_array(wrapped().patch_v_first_knots); }
-	object patch_selection() { return wrap_const_array(wrapped().patch_selection); }
-	object patch_materials() { return wrap_const_array(wrapped().patch_materials); }
-	object constant_data() { return wrap(wrapped().constant_data); }
-	object uniform_data() { return wrap(wrapped().uniform_data); }
-	object patch_points() { return wrap_const_array(wrapped().patch_points); }
-	object patch_point_weights() { return wrap_const_array(wrapped().patch_point_weights); }
-	object patch_u_knots() { return wrap_const_array(wrapped().patch_u_knots); }
-	object patch_v_knots() { return wrap_const_array(wrapped().patch_v_knots); }
-	object varying_data() { return wrap(wrapped().varying_data); }
-	object patch_trim_curve_loop_counts() { return wrap_const_array(wrapped().patch_trim_curve_loop_counts); }
-	object patch_first_trim_curve_loops() { return wrap_const_array(wrapped().patch_first_trim_curve_loops); }
-	object trim_points() { return wrap_const_array(wrapped().trim_points); }
-	object trim_point_selection() { return wrap_const_array(wrapped().trim_point_selection); }
-	object first_trim_curves() { return wrap_const_array(wrapped().first_trim_curves); }
-	object trim_curve_counts() { return wrap_const_array(wrapped().trim_curve_counts); }
-	object trim_curve_loop_selection() { return wrap_const_array(wrapped().trim_curve_loop_selection); }
-	object trim_curve_first_points() { return wrap_const_array(wrapped().trim_curve_first_points); }
-	object trim_curve_point_counts() { return wrap_const_array(wrapped().trim_curve_point_counts); }
-	object trim_curve_orders() { return wrap_const_array(wrapped().trim_curve_orders); }
-	object trim_curve_first_knots() { return wrap_const_array(wrapped().trim_curve_first_knots); }
-	object trim_curve_selection() { return wrap_const_array(wrapped().trim_curve_selection); }
-	object trim_curve_points() { return wrap_const_array(wrapped().trim_curve_points); }
-	object trim_curve_point_weights() { return wrap_const_array(wrapped().trim_curve_point_weights); }
-	object trim_curve_knots() { return wrap_const_array(wrapped().trim_curve_knots); }
-
-	object writable_patch_first_points() { return wrap_non_const_array(wrapped().patch_first_points); }
-	object writable_patch_u_point_counts() { return wrap_non_const_array(wrapped().patch_u_point_counts); }
-	object writable_patch_v_point_counts() { return wrap_non_const_array(wrapped().patch_v_point_counts); }
-	object writable_patch_u_orders() { return wrap_non_const_array(wrapped().patch_u_orders); }
-	object writable_patch_v_orders() { return wrap_non_const_array(wrapped().patch_v_orders); }
-	object writable_patch_u_first_knots() { return wrap_non_const_array(wrapped().patch_u_first_knots); }
-	object writable_patch_v_first_knots() { return wrap_non_const_array(wrapped().patch_v_first_knots); }
-	object writable_patch_selection() { return wrap_non_const_array(wrapped().patch_selection); }
-	object writable_patch_materials() { return wrap_non_const_array(wrapped().patch_materials); }
-	object writable_constant_data() { return wrap(wrapped().constant_data); }
-	object writable_uniform_data() { return wrap(wrapped().uniform_data); }
-	object writable_patch_points() { return wrap_non_const_array(wrapped().patch_points); }
-	object writable_patch_point_weights() { return wrap_non_const_array(wrapped().patch_point_weights); }
-	object writable_patch_u_knots() { return wrap_non_const_array(wrapped().patch_u_knots); }
-	object writable_patch_v_knots() { return wrap_non_const_array(wrapped().patch_v_knots); }
-	object writable_varying_data() { return wrap(wrapped().varying_data); }
-	object writable_patch_trim_curve_loop_counts() { return wrap_non_const_array(wrapped().patch_trim_curve_loop_counts); }
-	object writable_patch_first_trim_curve_loops() { return wrap_non_const_array(wrapped().patch_first_trim_curve_loops); }
-	object writable_trim_points() { return wrap_non_const_array(wrapped().trim_points); }
-	object writable_trim_point_selection() { return wrap_non_const_array(wrapped().trim_point_selection); }
-	object writable_first_trim_curves() { return wrap_non_const_array(wrapped().first_trim_curves); }
-	object writable_trim_curve_counts() { return wrap_non_const_array(wrapped().trim_curve_counts); }
-	object writable_trim_curve_loop_selection() { return wrap_non_const_array(wrapped().trim_curve_loop_selection); }
-	object writable_trim_curve_first_points() { return wrap_non_const_array(wrapped().trim_curve_first_points); }
-	object writable_trim_curve_point_counts() { return wrap_non_const_array(wrapped().trim_curve_point_counts); }
-	object writable_trim_curve_orders() { return wrap_non_const_array(wrapped().trim_curve_orders); }
-	object writable_trim_curve_first_knots() { return wrap_non_const_array(wrapped().trim_curve_first_knots); }
-	object writable_trim_curve_selection() { return wrap_non_const_array(wrapped().trim_curve_selection); }
-	object writable_trim_curve_points() { return wrap_non_const_array(wrapped().trim_curve_points); }
-	object writable_trim_curve_point_weights() { return wrap_non_const_array(wrapped().trim_curve_point_weights); }
-	object writable_trim_curve_knots() { return wrap_non_const_array(wrapped().trim_curve_knots); }
-
-	object create_patch_first_points() { return create_array(wrapped().patch_first_points); }
-	object create_patch_u_point_counts() { return create_array(wrapped().patch_u_point_counts); }
-	object create_patch_v_point_counts() { return create_array(wrapped().patch_v_point_counts); }
-	object create_patch_u_orders() { return create_array(wrapped().patch_u_orders); }
-	object create_patch_v_orders() { return create_array(wrapped().patch_v_orders); }
-	object create_patch_u_first_knots() { return create_array(wrapped().patch_u_first_knots); }
-	object create_patch_v_first_knots() { return create_array(wrapped().patch_v_first_knots); }
-	object create_patch_selection() { return create_array(wrapped().patch_selection); }
-	object create_patch_materials() { return create_array(wrapped().patch_materials); }
-	object create_patch_points() { return create_array(wrapped().patch_points); }
-	object create_patch_point_weights() { return create_array(wrapped().patch_point_weights); }
-	object create_patch_u_knots() { return create_array(wrapped().patch_u_knots); }
-	object create_patch_v_knots() { return create_array(wrapped().patch_v_knots); }
-	object create_patch_trim_curve_loop_counts() { return create_array(wrapped().patch_trim_curve_loop_counts); }
-	object create_patch_first_trim_curve_loops() { return create_array(wrapped().patch_first_trim_curve_loops); }
-	object create_trim_points() { return create_array(wrapped().trim_points); }
-	object create_trim_point_selection() { return create_array(wrapped().trim_point_selection); }
-	object create_first_trim_curves() { return create_array(wrapped().first_trim_curves); }
-	object create_trim_curve_counts() { return create_array(wrapped().trim_curve_counts); }
-	object create_trim_curve_loop_selection() { return create_array(wrapped().trim_curve_loop_selection); }
-	object create_trim_curve_first_points() { return create_array(wrapped().trim_curve_first_points); }
-	object create_trim_curve_point_counts() { return create_array(wrapped().trim_curve_point_counts); }
-	object create_trim_curve_orders() { return create_array(wrapped().trim_curve_orders); }
-	object create_trim_curve_first_knots() { return create_array(wrapped().trim_curve_first_knots); }
-	object create_trim_curve_selection() { return create_array(wrapped().trim_curve_selection); }
-	object create_trim_curve_points() { return create_array(wrapped().trim_curve_points); }
-	object create_trim_curve_point_weights() { return create_array(wrapped().trim_curve_point_weights); }
-	object create_trim_curve_knots() { return create_array(wrapped().trim_curve_knots); }
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_polyhedra
 
 class const_polyhedra :
@@ -410,16 +237,13 @@ void mesh::copy(const mesh& RHS)
 	wrapped() = RHS.wrapped();
 }
 
-object mesh::create_nurbs_patches() { return detail::create_object<detail::nurbs_patches, k3d::mesh::nurbs_patches_t>(wrapped().nurbs_patches); }
 object mesh::create_point_selection() { return detail::create_array(wrapped().point_selection); } 
 object mesh::create_points() { return detail::create_array(wrapped().points); }
 object mesh::create_polyhedra() { return detail::create_object<detail::polyhedra, k3d::mesh::polyhedra_t>(wrapped().polyhedra); } 
-object mesh::nurbs_patches() { return detail::wrap_const_object<detail::const_nurbs_patches>(wrapped().nurbs_patches); } 
 object mesh::point_selection() { return detail::wrap_const_array(wrapped().point_selection); } 
 object mesh::points() { return detail::wrap_const_array(wrapped().points); } 
 object mesh::polyhedra() { return detail::wrap_const_object<detail::const_polyhedra>(wrapped().polyhedra); } 
 object mesh::vertex_data() { return wrap(wrapped().vertex_data); } 
-object mesh::writable_nurbs_patches() { return detail::wrap_non_const_object<detail::nurbs_patches>(wrapped().nurbs_patches); } 
 object mesh::writable_point_selection() { return detail::wrap_non_const_array(wrapped().point_selection); } 
 object mesh::writable_points() { return detail::wrap_non_const_array(wrapped().points); } 
 object mesh::writable_polyhedra() { return detail::wrap_non_const_object<detail::polyhedra>(wrapped().polyhedra); } 
@@ -521,135 +345,6 @@ static object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const st
 
 void define_class_mesh()
 {
-	class_<detail::const_nurbs_patches>("const_nurbs_patches",
-		"Stores an immutable (read-only) collection of NURBS patch primitives.")
-		.def("patch_first_points", &detail::const_nurbs_patches::patch_first_points)
-		.def("patch_u_point_counts", &detail::const_nurbs_patches::patch_u_point_counts)
-		.def("patch_v_point_counts", &detail::const_nurbs_patches::patch_v_point_counts)
-		.def("patch_u_orders", &detail::const_nurbs_patches::patch_u_orders)
-		.def("patch_v_orders", &detail::const_nurbs_patches::patch_v_orders)
-		.def("patch_u_first_knots", &detail::const_nurbs_patches::patch_u_first_knots)
-		.def("patch_v_first_knots", &detail::const_nurbs_patches::patch_v_first_knots)
-		.def("patch_selection", &detail::const_nurbs_patches::patch_selection)
-		.def("patch_materials", &detail::const_nurbs_patches::patch_materials)
-		.def("constant_data", &detail::const_nurbs_patches::constant_data)
-		.def("uniform_data", &detail::const_nurbs_patches::uniform_data)
-		.def("patch_points", &detail::const_nurbs_patches::patch_points)
-		.def("patch_point_weights", &detail::const_nurbs_patches::patch_point_weights)
-		.def("patch_u_knots", &detail::const_nurbs_patches::patch_u_knots)
-		.def("patch_v_knots", &detail::const_nurbs_patches::patch_v_knots)
-		.def("varying_data", &detail::const_nurbs_patches::varying_data)
-		.def("patch_trim_curve_loop_counts", &detail::const_nurbs_patches::patch_trim_curve_loop_counts)
-		.def("patch_first_trim_curve_loops", &detail::const_nurbs_patches::patch_first_trim_curve_loops)
-		.def("trim_points", &detail::const_nurbs_patches::trim_points)
-		.def("trim_point_selection", &detail::const_nurbs_patches::trim_point_selection)
-		.def("first_trim_curves", &detail::const_nurbs_patches::first_trim_curves)
-		.def("trim_curve_counts", &detail::const_nurbs_patches::trim_curve_counts)
-		.def("trim_curve_loop_selection", &detail::const_nurbs_patches::trim_curve_loop_selection)
-		.def("trim_curve_first_points", &detail::const_nurbs_patches::trim_curve_first_points)
-		.def("trim_curve_point_counts", &detail::const_nurbs_patches::trim_curve_point_counts)
-		.def("trim_curve_orders", &detail::const_nurbs_patches::trim_curve_orders)
-		.def("trim_curve_first_knots", &detail::const_nurbs_patches::trim_curve_first_knots)
-		.def("trim_curve_selection", &detail::const_nurbs_patches::trim_curve_selection)
-		.def("trim_curve_points", &detail::const_nurbs_patches::trim_curve_points)
-		.def("trim_curve_point_weights", &detail::const_nurbs_patches::trim_curve_point_weights)
-		.def("trim_curve_knots", &detail::const_nurbs_patches::trim_curve_knots);
-
-	class_<detail::nurbs_patches>("nurbs_patches",
-		"Stores a mutable (read-write) collection of NURBS patch primitives.")
-		.def("patch_first_points", &detail::nurbs_patches::patch_first_points)
-		.def("patch_u_point_counts", &detail::nurbs_patches::patch_u_point_counts)
-		.def("patch_v_point_counts", &detail::nurbs_patches::patch_v_point_counts)
-		.def("patch_u_orders", &detail::nurbs_patches::patch_u_orders)
-		.def("patch_v_orders", &detail::nurbs_patches::patch_v_orders)
-		.def("patch_u_first_knots", &detail::nurbs_patches::patch_u_first_knots)
-		.def("patch_v_first_knots", &detail::nurbs_patches::patch_v_first_knots)
-		.def("patch_selection", &detail::nurbs_patches::patch_selection)
-		.def("patch_materials", &detail::nurbs_patches::patch_materials)
-		.def("constant_data", &detail::nurbs_patches::constant_data)
-		.def("uniform_data", &detail::nurbs_patches::uniform_data)
-		.def("patch_points", &detail::nurbs_patches::patch_points)
-		.def("patch_point_weights", &detail::nurbs_patches::patch_point_weights)
-		.def("patch_u_knots", &detail::nurbs_patches::patch_u_knots)
-		.def("patch_v_knots", &detail::nurbs_patches::patch_v_knots)
-		.def("varying_data", &detail::nurbs_patches::varying_data)
-		.def("patch_trim_curve_loop_counts", &detail::nurbs_patches::patch_trim_curve_loop_counts)
-		.def("patch_first_trim_curve_loops", &detail::nurbs_patches::patch_first_trim_curve_loops)
-		.def("trim_points", &detail::nurbs_patches::trim_points)
-		.def("trim_point_selection", &detail::nurbs_patches::trim_point_selection)
-		.def("first_trim_curves", &detail::nurbs_patches::first_trim_curves)
-		.def("trim_curve_counts", &detail::nurbs_patches::trim_curve_counts)
-		.def("trim_curve_loop_selection", &detail::nurbs_patches::trim_curve_loop_selection)
-		.def("trim_curve_first_points", &detail::nurbs_patches::trim_curve_first_points)
-		.def("trim_curve_point_counts", &detail::nurbs_patches::trim_curve_point_counts)
-		.def("trim_curve_orders", &detail::nurbs_patches::trim_curve_orders)
-		.def("trim_curve_first_knots", &detail::nurbs_patches::trim_curve_first_knots)
-		.def("trim_curve_selection", &detail::nurbs_patches::trim_curve_selection)
-		.def("trim_curve_points", &detail::nurbs_patches::trim_curve_points)
-		.def("trim_curve_point_weights", &detail::nurbs_patches::trim_curve_point_weights)
-		.def("trim_curve_knots", &detail::nurbs_patches::trim_curve_knots)
-
-		.def("writable_patch_first_points", &detail::nurbs_patches::writable_patch_first_points)
-		.def("writable_patch_u_point_counts", &detail::nurbs_patches::writable_patch_u_point_counts)
-		.def("writable_patch_v_point_counts", &detail::nurbs_patches::writable_patch_v_point_counts)
-		.def("writable_patch_u_orders", &detail::nurbs_patches::writable_patch_u_orders)
-		.def("writable_patch_v_orders", &detail::nurbs_patches::writable_patch_v_orders)
-		.def("writable_patch_u_first_knots", &detail::nurbs_patches::writable_patch_u_first_knots)
-		.def("writable_patch_v_first_knots", &detail::nurbs_patches::writable_patch_v_first_knots)
-		.def("writable_patch_selection", &detail::nurbs_patches::writable_patch_selection)
-		.def("writable_patch_materials", &detail::nurbs_patches::writable_patch_materials)
-		.def("writable_constant_data", &detail::nurbs_patches::writable_constant_data)
-		.def("writable_uniform_data", &detail::nurbs_patches::writable_uniform_data)
-		.def("writable_patch_points", &detail::nurbs_patches::writable_patch_points)
-		.def("writable_patch_point_weights", &detail::nurbs_patches::writable_patch_point_weights)
-		.def("writable_patch_u_knots", &detail::nurbs_patches::writable_patch_u_knots)
-		.def("writable_patch_v_knots", &detail::nurbs_patches::writable_patch_v_knots)
-		.def("writable_varying_data", &detail::nurbs_patches::writable_varying_data)
-		.def("writable_patch_trim_curve_loop_counts", &detail::nurbs_patches::writable_patch_trim_curve_loop_counts)
-		.def("writable_patch_first_trim_curve_loops", &detail::nurbs_patches::writable_patch_first_trim_curve_loops)
-		.def("writable_trim_points", &detail::nurbs_patches::writable_trim_points)
-		.def("writable_trim_point_selection", &detail::nurbs_patches::writable_trim_point_selection)
-		.def("writable_first_trim_curves", &detail::nurbs_patches::writable_first_trim_curves)
-		.def("writable_trim_curve_counts", &detail::nurbs_patches::writable_trim_curve_counts)
-		.def("writable_trim_curve_loop_selection", &detail::nurbs_patches::writable_trim_curve_loop_selection)
-		.def("writable_trim_curve_first_points", &detail::nurbs_patches::writable_trim_curve_first_points)
-		.def("writable_trim_curve_point_counts", &detail::nurbs_patches::writable_trim_curve_point_counts)
-		.def("writable_trim_curve_orders", &detail::nurbs_patches::writable_trim_curve_orders)
-		.def("writable_trim_curve_first_knots", &detail::nurbs_patches::writable_trim_curve_first_knots)
-		.def("writable_trim_curve_selection", &detail::nurbs_patches::writable_trim_curve_selection)
-		.def("writable_trim_curve_points", &detail::nurbs_patches::writable_trim_curve_points)
-		.def("writable_trim_curve_point_weights", &detail::nurbs_patches::writable_trim_curve_point_weights)
-		.def("writable_trim_curve_knots", &detail::nurbs_patches::writable_trim_curve_knots)
-
-		.def("create_patch_first_points", &detail::nurbs_patches::create_patch_first_points)
-		.def("create_patch_u_point_counts", &detail::nurbs_patches::create_patch_u_point_counts)
-		.def("create_patch_v_point_counts", &detail::nurbs_patches::create_patch_v_point_counts)
-		.def("create_patch_u_orders", &detail::nurbs_patches::create_patch_u_orders)
-		.def("create_patch_v_orders", &detail::nurbs_patches::create_patch_v_orders)
-		.def("create_patch_u_first_knots", &detail::nurbs_patches::create_patch_u_first_knots)
-		.def("create_patch_v_first_knots", &detail::nurbs_patches::create_patch_v_first_knots)
-		.def("create_patch_selection", &detail::nurbs_patches::create_patch_selection)
-		.def("create_patch_materials", &detail::nurbs_patches::create_patch_materials)
-		.def("create_patch_points", &detail::nurbs_patches::create_patch_points)
-		.def("create_patch_point_weights", &detail::nurbs_patches::create_patch_point_weights)
-		.def("create_patch_u_knots", &detail::nurbs_patches::create_patch_u_knots)
-		.def("create_patch_v_knots", &detail::nurbs_patches::create_patch_v_knots)
-		.def("create_patch_trim_curve_loop_counts", &detail::nurbs_patches::create_patch_trim_curve_loop_counts)
-		.def("create_patch_first_trim_curve_loops", &detail::nurbs_patches::create_patch_first_trim_curve_loops)
-		.def("create_trim_points", &detail::nurbs_patches::create_trim_points)
-		.def("create_trim_point_selection", &detail::nurbs_patches::create_trim_point_selection)
-		.def("create_first_trim_curves", &detail::nurbs_patches::create_first_trim_curves)
-		.def("create_trim_curve_counts", &detail::nurbs_patches::create_trim_curve_counts)
-		.def("create_trim_curve_loop_selection", &detail::nurbs_patches::create_trim_curve_loop_selection)
-		.def("create_trim_curve_first_points", &detail::nurbs_patches::create_trim_curve_first_points)
-		.def("create_trim_curve_point_counts", &detail::nurbs_patches::create_trim_curve_point_counts)
-		.def("create_trim_curve_orders", &detail::nurbs_patches::create_trim_curve_orders)
-		.def("create_trim_curve_first_knots", &detail::nurbs_patches::create_trim_curve_first_knots)
-		.def("create_trim_curve_selection", &detail::nurbs_patches::create_trim_curve_selection)
-		.def("create_trim_curve_points", &detail::nurbs_patches::create_trim_curve_points)
-		.def("create_trim_curve_point_weights", &detail::nurbs_patches::create_trim_curve_point_weights)
-		.def("create_trim_curve_knots", &detail::nurbs_patches::create_trim_curve_knots);
-
 	class_<detail::const_polyhedra>("const_polyhedra",
 		"Stores an immutable (read-only) collection of polyhedron primitives.")
 		.def("first_faces", &detail::const_polyhedra::first_faces)
@@ -718,8 +413,6 @@ void define_class_mesh()
 
 	scope outer = class_<mesh>("mesh", 
 		"Stores a heterogeneous collection of geometric mesh primitives.", no_init)
-		.def("nurbs_patches", &mesh::nurbs_patches,
-			"Returns a L{const_nurbs_patches} object containing an immutable (read-only) collection of NURBS patch primitives, or None.")
 		.def("vertex_data", &mesh::vertex_data,
 			"Returns a L{const_named_arrays} object containing a collection of immutable (read-only) per-vertex data, or None.")
 		.def("point_selection", &mesh::point_selection,
@@ -728,8 +421,6 @@ void define_class_mesh()
 			"Returns an immutable (read-only) L{const_point3_array} object containing the geometric coordinates of every vertex in the mesh, or None.")
 		.def("polyhedra", &mesh::polyhedra,
 			"Returns a L{const_polyhedra} object containing a collection of immutable (read-only) polyhedron primitives, or None.")
-		.def("writable_nurbs_patches", &mesh::writable_nurbs_patches,
-			"Returns a L{nurbs_patches} object containing a mutable (read-write) collection of NURBS patch primitives, or None.")
 		.def("writable_vertex_data", &mesh::writable_vertex_data,
 			"Returns a L{named_arrays} object containing a collection of mutable (read-write) per-vertex data, or None.")
 		.def("writable_point_selection", &mesh::writable_point_selection,
@@ -740,8 +431,6 @@ void define_class_mesh()
 			"Returns a L{polyhedra} object containing a mutable (read-write) collection of polyhedron primitives, or None.")
 		.def("copy", &mesh::copy,
 			"Store a shallow copy of the given L{mesh}.")
-		.def("create_nurbs_patches", &mesh::create_nurbs_patches,
-			"Creates and returns a new L{nurbs_patches} object for storing NURBS patch primitives.")
 		.def("create_point_selection", &mesh::create_point_selection,
 			"Creates and returns a new L{double_array} object used to store the selection state of every vertex in the mesh.")
 		.def("create_points", &mesh::create_points,

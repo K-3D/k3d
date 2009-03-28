@@ -94,7 +94,6 @@ public:
 	records_t points;
 	records_t edges;
 	records_t faces;
-	records_t nurbs_patches;
 	//@}
 
 

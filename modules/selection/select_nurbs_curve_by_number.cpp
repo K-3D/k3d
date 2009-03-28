@@ -67,7 +67,7 @@ public:
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs_curve(k3d::nurbs_curve::validate(Output.primitives[primitive].writable()));
 		if(!nurbs_curve)
 			return;
-		
+
 		std::fill(nurbs_curve->curve_selections.begin(), nurbs_curve->curve_selections.end(), 0.0);
 
 		const k3d::int32_t index = m_index.pipeline_value();

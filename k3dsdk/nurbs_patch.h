@@ -46,8 +46,8 @@ public:
 		const mesh::weights_t& PatchPointWeights,
 		const mesh::knots_t& PatchUKnots,
 		const mesh::knots_t& PatchVKnots,
-		const mesh::counts_t& PatchTrimLoopCounts,
 		const mesh::indices_t& PatchFirstTrimLoops,
+		const mesh::counts_t& PatchTrimLoopCounts,
 		const mesh::indices_t& TrimLoopFirstCurves,
 		const mesh::counts_t& TrimLoopCurveCounts,
 		const mesh::selection_t& TrimLoopSelections,
@@ -79,8 +79,8 @@ public:
 	const mesh::weights_t& patch_point_weights;
 	const mesh::knots_t& patch_u_knots;
 	const mesh::knots_t& patch_v_knots;
-	const mesh::counts_t& patch_trim_loop_counts;
 	const mesh::indices_t& patch_first_trim_loops;
+	const mesh::counts_t& patch_trim_loop_counts;
 	const mesh::indices_t& trim_loop_first_curves;
 	const mesh::counts_t& trim_loop_curve_counts;
 	const mesh::selection_t& trim_loop_selections;
@@ -117,8 +117,8 @@ public:
 		mesh::weights_t& PatchPointWeights,
 		mesh::knots_t& PatchUKnots,
 		mesh::knots_t& PatchVKnots,
-		mesh::counts_t& PatchTrimLoopCounts,
 		mesh::indices_t& PatchFirstTrimLoops,
+		mesh::counts_t& PatchTrimLoopCounts,
 		mesh::indices_t& TrimLoopFirstCurves,
 		mesh::counts_t& TrimLoopCurveCounts,
 		mesh::selection_t& TrimLoopSelections,
@@ -150,8 +150,8 @@ public:
 	mesh::weights_t& patch_point_weights;
 	mesh::knots_t& patch_u_knots;
 	mesh::knots_t& patch_v_knots;
-	mesh::counts_t& patch_trim_loop_counts;
 	mesh::indices_t& patch_first_trim_loops;
+	mesh::counts_t& patch_trim_loop_counts;
 	mesh::indices_t& trim_loop_first_curves;
 	mesh::counts_t& trim_loop_curve_counts;
 	mesh::selection_t& trim_loop_selections;
@@ -174,19 +174,12 @@ public:
 /// The caller is responsible for the lifetime of the returned object.
 primitive* create(mesh& Mesh);
 
-/** \deprecated This method exists for the sole purpose of easing the transition to generic primitives. */
-const_primitive* validate(const mesh& Mesh);
-/** \deprecated This method exists for the sole purpose of easing the transition to generic primitives. */
-primitive* validate(mesh& Mesh);
-
-/*
 /// Tests the given mesh primitive to see if it is a valid nurbs_patch primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 const_primitive* validate(const mesh::primitive& GenericPrimitive);
 /// Tests the given mesh primitive to see if it is a valid nurbs_patch primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 primitive* validate(mesh::primitive& GenericPrimitive);
-*/
 
 } // namespace nurbs_patch
 

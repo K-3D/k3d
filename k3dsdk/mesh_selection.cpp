@@ -195,7 +195,6 @@ const mesh_selection mesh_selection::select_all()
 	result.points = component_select_all();
 	result.edges = component_select_all();
 	result.faces = component_select_all();
-	result.nurbs_patches = component_select_all();
 
 	result.components.push_back(component(0, uint_t(-1), selection::CONSTANT, 0, uint_t(-1), 1.0));
 	result.components.push_back(component(0, uint_t(-1), selection::UNIFORM, 0, uint_t(-1), 1.0));
@@ -214,7 +213,6 @@ const mesh_selection mesh_selection::deselect_all()
 	result.points = component_deselect_all();
 	result.edges = component_deselect_all();
 	result.faces = component_deselect_all();
-	result.nurbs_patches = component_deselect_all();
 
 	result.components.push_back(component(0, uint_t(-1), selection::CONSTANT, 0, uint_t(-1), 0.0));
 	result.components.push_back(component(0, uint_t(-1), selection::UNIFORM, 0, uint_t(-1), 0.0));
@@ -241,11 +239,6 @@ void mesh_selection::store(const mesh& Mesh, mesh_selection& Selection)
 	{
 		detail::store_selection(Mesh.polyhedra->edge_selection, Selection.edges);
 		detail::store_selection(Mesh.polyhedra->face_selection, Selection.faces);
-	}
-
-	if(Mesh.nurbs_patches)
-	{
-		detail::store_selection(Mesh.nurbs_patches->patch_selection, Selection.nurbs_patches);
 	}
 
 	// Handle generic mesh primitives ...
@@ -276,8 +269,6 @@ void mesh_selection::store(const legacy::mesh& Mesh, mesh_selection& Selection)
 	detail::legacy_store_selection store_face_selection(Selection.faces);
 	for(legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 		std::for_each((*polyhedron)->faces.begin(), (*polyhedron)->faces.end(), store_face_selection);
-
-	std::for_each(Mesh.nupatches.begin(), Mesh.nupatches.end(), detail::legacy_store_selection(Selection.nurbs_patches));
 }
 
 void mesh_selection::merge(const mesh_selection& Selection, mesh& Mesh)
@@ -295,12 +286,6 @@ void mesh_selection::merge(const mesh_selection& Selection, mesh& Mesh)
 	{
 		k3d::mesh::polyhedra_t& polyhedra = Mesh.polyhedra.writable();
 		detail::merge_selection(Selection.faces, polyhedra.face_first_loops, polyhedra.face_selection);
-	}
-
-	if(Mesh.nurbs_patches)
-	{
-		k3d::mesh::nurbs_patches_t& nurbs_patches = Mesh.nurbs_patches.writable();
-		detail::merge_selection(Selection.nurbs_patches, nurbs_patches.patch_materials, nurbs_patches.patch_selection);
 	}
 
 	// Handle generic mesh primitives ...
@@ -356,7 +341,6 @@ void mesh_selection::merge(const mesh_selection& Selection, legacy::mesh& Mesh)
 	}
 
 	k3d::legacy::for_each_face(Mesh, detail::legacy_merge_selection(Selection.faces));
-	k3d::legacy::for_each_nupatch(Mesh, detail::legacy_merge_selection(Selection.nurbs_patches));
 }
 
 void mesh_selection::add_component(const component& Component)
@@ -369,7 +353,6 @@ void mesh_selection::clear()
 	points.clear();
 	edges.clear();
 	faces.clear();
-	nurbs_patches.clear();
 
 	components.clear();
 }
@@ -380,7 +363,6 @@ bool mesh_selection::empty() const
 		points.empty() &&
 		edges.empty() &&
 		faces.empty() &&
-		nurbs_patches.empty() &&
 		components.empty();
 }
 
@@ -390,7 +372,6 @@ bool mesh_selection::operator==(const mesh_selection& RHS) const
 		points == RHS.points &&
 		edges == RHS.edges &&
 		faces == RHS.faces &&
-		nurbs_patches == RHS.nurbs_patches &&
 		components == RHS.components;
 }
 
@@ -504,7 +485,6 @@ std::ostream& operator<<(std::ostream& Stream, const mesh_selection& RHS)
 	Stream << "points:           " << RHS.points << "\n";
 	Stream << "edges:            " << RHS.edges << "\n";
 	Stream << "faces:            " << RHS.faces << "\n";
-	Stream << "nurbs_patches:    " << RHS.nurbs_patches << "\n";
 
 	std::copy(RHS.components.begin(), RHS.components.end(), std::ostream_iterator<mesh_selection::component>(Stream, "\n"));
 

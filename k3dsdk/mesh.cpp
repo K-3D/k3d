@@ -378,66 +378,6 @@ const bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t&
 // almost_equal
 
 template<>
-class almost_equal<mesh::nurbs_patches_t>
-{
-	typedef mesh::nurbs_patches_t T;
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline const bool_t operator()(const T& A, const T& B)
-	{
-		const bool_t patches_equal =
-			detail::almost_equal(A.patch_first_points, B.patch_first_points, threshold) &&
-			detail::almost_equal(A.patch_u_point_counts, B.patch_u_point_counts, threshold) &&
-			detail::almost_equal(A.patch_v_point_counts, B.patch_v_point_counts, threshold) &&
-			detail::almost_equal(A.patch_u_orders, B.patch_u_orders, threshold) &&
-			detail::almost_equal(A.patch_v_orders, B.patch_v_orders, threshold) &&
-			detail::almost_equal(A.patch_u_first_knots, B.patch_u_first_knots, threshold) &&
-			detail::almost_equal(A.patch_v_first_knots, B.patch_v_first_knots, threshold) &&
-			detail::almost_equal(A.patch_selection, B.patch_selection, threshold) &&
-			detail::almost_equal(A.patch_materials, B.patch_materials, threshold) &&
-			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
-			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
-			detail::almost_equal(A.patch_points, B.patch_points, threshold) &&
-			detail::almost_equal(A.patch_point_weights, B.patch_point_weights, threshold) &&
-			detail::almost_equal(A.patch_u_knots, B.patch_u_knots, threshold) &&
-			detail::almost_equal(A.patch_v_knots, B.patch_v_knots, threshold) &&
-			detail::almost_equal(A.varying_data, B.varying_data, threshold);
-
-		bool_t trim_curves_equal = true;
-		if (A.patch_trim_curve_loop_counts && B.patch_trim_curve_loop_counts)
-		{
-			trim_curves_equal =
-				detail::almost_equal(A.patch_trim_curve_loop_counts, B.patch_trim_curve_loop_counts, threshold) &&
-				detail::almost_equal(A.patch_first_trim_curve_loops, B.patch_first_trim_curve_loops, threshold) &&
-				detail::almost_equal(A.trim_points, B.trim_points, threshold) &&
-				detail::almost_equal(A.trim_point_selection, B.trim_point_selection, threshold) &&
-				detail::almost_equal(A.first_trim_curves, B.first_trim_curves, threshold) &&
-				detail::almost_equal(A.trim_curve_counts, B.trim_curve_counts, threshold) &&
-				detail::almost_equal(A.trim_curve_loop_selection, B.trim_curve_loop_selection, threshold) &&
-				detail::almost_equal(A.trim_curve_first_points, B.trim_curve_first_points, threshold) &&
-				detail::almost_equal(A.trim_curve_point_counts, B.trim_curve_point_counts, threshold) &&
-				detail::almost_equal(A.trim_curve_orders, B.trim_curve_orders, threshold) &&
-				detail::almost_equal(A.trim_curve_first_knots, B.trim_curve_first_knots, threshold) &&
-				detail::almost_equal(A.trim_curve_selection, B.trim_curve_selection, threshold) &&
-				detail::almost_equal(A.trim_curve_points, B.trim_curve_points, threshold) &&
-				detail::almost_equal(A.trim_curve_point_weights, B.trim_curve_point_weights, threshold) &&
-				detail::almost_equal(A.trim_curve_knots, B.trim_curve_knots, threshold);
-		}
-		
-		return patches_equal && trim_curves_equal;
-	}
-private:
-	const uint64_t threshold;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-template<>
 class almost_equal<mesh::polyhedra_t>
 {
 	typedef mesh::polyhedra_t T;
@@ -484,7 +424,6 @@ const bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) con
 		detail::almost_equal(vertex_data, Other.vertex_data, Threshold) &&
 		detail::almost_equal(primitives, Other.primitives, Threshold) &&
 
-		detail::almost_equal(nurbs_patches, Other.nurbs_patches, Threshold) &&
 		detail::almost_equal(polyhedra, Other.polyhedra, Threshold);
 }
 
@@ -506,47 +445,6 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 
 	// Convert primitives ...
 	primitives = RHS.primitives;
-
-	// Convert NURBS patches ...
-	if(RHS.nupatches.size())
-	{
-		nurbs_patches_t& nurbs_patches = this->nurbs_patches.create();
-		indices_t& patch_first_points = nurbs_patches.patch_first_points.create();
-		counts_t& patch_u_point_counts = nurbs_patches.patch_u_point_counts.create();
-		counts_t& patch_v_point_counts = nurbs_patches.patch_v_point_counts.create();
-		orders_t& patch_u_orders = nurbs_patches.patch_u_orders.create();
-		orders_t& patch_v_orders = nurbs_patches.patch_v_orders.create();
-		indices_t& patch_u_first_knots = nurbs_patches.patch_u_first_knots.create();
-		indices_t& patch_v_first_knots = nurbs_patches.patch_v_first_knots.create();
-		selection_t& patch_selection = nurbs_patches.patch_selection.create();
-		materials_t& patch_materials = nurbs_patches.patch_materials.create();
-		indices_t& patch_points = nurbs_patches.patch_points.create();
-		weights_t& patch_point_weights = nurbs_patches.patch_point_weights.create();
-		knots_t& patch_u_knots = nurbs_patches.patch_u_knots.create();
-		knots_t& patch_v_knots = nurbs_patches.patch_v_knots.create();
-
-		for(legacy::mesh::nupatches_t::const_iterator patch = RHS.nupatches.begin(); patch != RHS.nupatches.end(); ++patch)
-		{
-			patch_first_points.push_back(patch_points.size());
-			patch_u_point_counts.push_back((*patch)->u_knots.size() - (*patch)->u_order);
-			patch_v_point_counts.push_back((*patch)->v_knots.size() - (*patch)->v_order);
-			patch_u_orders.push_back((*patch)->u_order);
-			patch_v_orders.push_back((*patch)->v_order);
-			patch_u_first_knots.push_back(patch_u_knots.size());
-			patch_v_first_knots.push_back(patch_v_knots.size());
-			patch_selection.push_back((*patch)->selection_weight);
-			patch_materials.push_back((*patch)->material);
-
-			for(legacy::nupatch::control_points_t::const_iterator point = (*patch)->control_points.begin(); point != (*patch)->control_points.end(); ++point)
-			{
-				patch_points.push_back(point_map[point->position]);
-				patch_point_weights.push_back(point->weight);
-			}
-
-			patch_u_knots.insert(patch_u_knots.end(), (*patch)->u_knots.begin(), (*patch)->u_knots.end());
-			patch_v_knots.insert(patch_v_knots.end(), (*patch)->v_knots.begin(), (*patch)->v_knots.end());
-		}
-	}
 
 	// Convert polyhedra ...
 	if(RHS.polyhedra.size())
@@ -695,9 +593,6 @@ void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 	UnusedPoints.assign(Mesh.points ? Mesh.points->size() : 0, true);
 
 	// Mark points used by legacy primitives ...
-	if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_points)
-		detail::mark_used_points(*Mesh.nurbs_patches->patch_points, UnusedPoints);
-
 	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
 		detail::mark_used_points(*Mesh.polyhedra->edge_points, UnusedPoints);
 
@@ -774,9 +669,6 @@ void mesh::delete_unused_points(mesh& Mesh)
 	}
 
 	// Update legacy mesh primitives so they use the correct indices ...
-	if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_points)
-		detail::remap_points(Mesh.nurbs_patches.writable().patch_points.writable(), point_map);
-
 	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
 		detail::remap_points(Mesh.polyhedra.writable().edge_points.writable(), point_map);
 
@@ -948,42 +840,6 @@ std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& 
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 {
 	Stream << detail::indentation << "mesh:\n" << push_indent;
-
-	if(RHS.nurbs_patches)
-	{
-		Stream << detail::indentation << "nurbs_patches:\n" << push_indent;
-
-		detail::print(Stream, "patch_first_points", RHS.nurbs_patches->patch_first_points);
-		detail::print(Stream, "patch_u_point_counts", RHS.nurbs_patches->patch_u_point_counts);
-		detail::print(Stream, "patch_v_point_counts", RHS.nurbs_patches->patch_v_point_counts);
-		detail::print(Stream, "patch_u_orders", RHS.nurbs_patches->patch_u_orders);
-		detail::print(Stream, "patch_v_orders", RHS.nurbs_patches->patch_v_orders);
-		detail::print(Stream, "patch_selection", RHS.nurbs_patches->patch_selection);
-		detail::print(Stream, "constant_data", RHS.nurbs_patches->constant_data);
-		detail::print(Stream, "uniform_data", RHS.nurbs_patches->uniform_data);
-		detail::print(Stream, "patch_points", RHS.nurbs_patches->patch_points);
-		detail::print(Stream, "patch_point_weights", RHS.nurbs_patches->patch_point_weights);
-		detail::print(Stream, "patch_u_knots", RHS.nurbs_patches->patch_u_knots);
-		detail::print(Stream, "patch_v_knots", RHS.nurbs_patches->patch_v_knots);
-		detail::print(Stream, "varying_data", RHS.nurbs_patches->varying_data);
-		detail::print(Stream, "patch_trim_curve_loop_counts", RHS.nurbs_patches->patch_trim_curve_loop_counts);
-		detail::print(Stream, "patch_first_trim_curve_loops", RHS.nurbs_patches->patch_first_trim_curve_loops);
-		detail::print(Stream, "trim_points", RHS.nurbs_patches->trim_points);
-		detail::print(Stream, "trim_point_selection", RHS.nurbs_patches->trim_point_selection);
-		detail::print(Stream, "first_trim_curves", RHS.nurbs_patches->first_trim_curves);
-		detail::print(Stream, "trim_curve_counts", RHS.nurbs_patches->trim_curve_counts);
-		detail::print(Stream, "trim_curve_loop_selection", RHS.nurbs_patches->trim_curve_loop_selection);
-		detail::print(Stream, "trim_curve_first_points", RHS.nurbs_patches->trim_curve_first_points);
-		detail::print(Stream, "trim_curve_point_counts", RHS.nurbs_patches->trim_curve_point_counts);
-		detail::print(Stream, "trim_curve_orders", RHS.nurbs_patches->trim_curve_orders);
-		detail::print(Stream, "trim_curve_first_knots", RHS.nurbs_patches->trim_curve_first_knots);
-		detail::print(Stream, "trim_curve_selection", RHS.nurbs_patches->trim_curve_selection);
-		detail::print(Stream, "trim_curve_points", RHS.nurbs_patches->trim_curve_points);
-		detail::print(Stream, "trim_curve_point_weights", RHS.nurbs_patches->trim_curve_point_weights);
-		detail::print(Stream, "trim_curve_knots", RHS.nurbs_patches->trim_curve_knots);
-		
-		Stream << pop_indent;
-	}
 
 	if(RHS.polyhedra)
 	{

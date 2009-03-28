@@ -624,7 +624,6 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			}
 		}
 	}
-*/
 
 	boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs_patch(k3d::nurbs_patch::validate(Mesh));
 	if(nurbs_patch)
@@ -658,6 +657,7 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			}
 		}
 	}
+*/
 
 	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
 	if(polyhedron)

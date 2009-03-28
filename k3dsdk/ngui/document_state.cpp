@@ -277,10 +277,6 @@ struct select_uniform
 					Selection.faces.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
 
-				case k3d::selection::ABSOLUTE_NURBS_PATCH:
-					Selection.nurbs_patches.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
-					return;
-
 				default:
 					break;
 			}
@@ -411,7 +407,6 @@ struct select_all_points
 		Selection.points = k3d::mesh_selection::component_select_all();
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
 		Selection.faces = k3d::mesh_selection::component_deselect_all();
-		Selection.nurbs_patches = k3d::mesh_selection::component_deselect_all();
 	}
 };
 
@@ -422,7 +417,6 @@ struct select_all_split_edges
 		Selection.points = k3d::mesh_selection::component_deselect_all();
 		Selection.edges = k3d::mesh_selection::component_select_all();
 		Selection.faces = k3d::mesh_selection::component_deselect_all();
-		Selection.nurbs_patches = k3d::mesh_selection::component_deselect_all();
 	}
 };
 
@@ -433,7 +427,6 @@ struct select_all_uniform
 		Selection.points = k3d::mesh_selection::component_deselect_all();
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
 		Selection.faces = k3d::mesh_selection::component_select_all();
-		Selection.nurbs_patches = k3d::mesh_selection::component_select_all();
 	}
 };
 
@@ -480,7 +473,6 @@ struct invert_uniform
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		invert(Selection.faces);
-		invert(Selection.nurbs_patches);
 	}
 };
 
@@ -494,7 +486,6 @@ void deselect_gaps(k3d::mesh_selection& Selection)
 	deselect_gaps(Selection.points);
 	deselect_gaps(Selection.edges);
 	deselect_gaps(Selection.faces);
-	deselect_gaps(Selection.nurbs_patches);
 }
 
 /** \todo Handle adjacent edges */
@@ -649,7 +640,6 @@ struct convert_to_points
 				}
 			}
 		}
-*/
 
 		// Convert nurbs patch selections to point selections ...
 		if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_first_points && Mesh.nurbs_patches->patch_u_point_counts && Mesh.nurbs_patches->patch_v_point_counts && Mesh.nurbs_patches->patch_selection && Mesh.nurbs_patches->patch_points)
@@ -669,12 +659,12 @@ struct convert_to_points
 				}
 			}
 		}
+*/
 
 		if (!m_keep_selection)
 		{
 			Selection.edges.clear();
 			Selection.faces.clear();
-			Selection.nurbs_patches.clear();
 		}
 
 		// Ensure that anything not explicitly selected gets explicitly deselected ...
@@ -861,7 +851,6 @@ struct convert_to_split_edges
 		{
 			Selection.points.clear();
 			Selection.faces.clear();
-			Selection.nurbs_patches.clear();
 		}
 
 		// Ensure that anything not explicitly selected gets explicitly deselected ...
@@ -963,7 +952,6 @@ struct convert_to_uniform
 				}
 			}
 		}
-*/
 
 		// Convert point selections to nurbs patch selections ...
 		if(Mesh.point_selection && Mesh.nurbs_patches && Mesh.nurbs_patches->patch_first_points && Mesh.nurbs_patches->patch_u_point_counts && Mesh.nurbs_patches->patch_v_point_counts && Mesh.nurbs_patches->patch_selection && Mesh.nurbs_patches->patch_points)
@@ -990,6 +978,7 @@ struct convert_to_uniform
 				}
 			}
 		}
+*/
 
 		if (!m_keep_selection)
 		{
@@ -1080,7 +1069,7 @@ struct keep_selection
 					Selection.bicubic_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
 			}
 		}
-*/		
+
 		if (Mesh.nurbs_patches && Mesh.nurbs_patches->patch_selection)
 		{
 			for (k3d::uint_t patch = 0; patch != Mesh.nurbs_patches->patch_selection->size(); ++patch)
@@ -1089,6 +1078,7 @@ struct keep_selection
 					Selection.nurbs_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
 			}
 		}
+*/
 	}
 };
 

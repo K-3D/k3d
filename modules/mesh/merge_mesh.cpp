@@ -174,125 +174,6 @@ void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyh
   	face_varying_data_copier.push_back(edge);
 }
 
-void merge_nurbs_patches(k3d::mesh& Output, const k3d::mesh& Input)
-{
-	boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs_patch(k3d::nurbs_patch::validate(Input));
-	if(!nurbs_patch)
-		return;
-	
-	k3d::mesh::nurbs_patches_t& output_nurbs_patches = create_if_not_exists(Output.nurbs_patches);
-	k3d::mesh::indices_t& output_patch_first_points = create_if_not_exists(output_nurbs_patches.patch_first_points);
-	k3d::mesh::counts_t& output_patch_u_point_counts = create_if_not_exists(output_nurbs_patches.patch_u_point_counts);
-	k3d::mesh::counts_t& output_patch_v_point_counts = create_if_not_exists(output_nurbs_patches.patch_v_point_counts);
-	k3d::mesh::orders_t& output_patch_u_orders = create_if_not_exists(output_nurbs_patches.patch_u_orders);
-	k3d::mesh::orders_t& output_patch_v_orders = create_if_not_exists(output_nurbs_patches.patch_v_orders);
-	k3d::mesh::indices_t& output_patch_u_first_knots = create_if_not_exists(output_nurbs_patches.patch_u_first_knots);
-	k3d::mesh::indices_t& output_patch_v_first_knots = create_if_not_exists(output_nurbs_patches.patch_v_first_knots);
-	k3d::mesh::selection_t& output_patch_selection = create_if_not_exists(output_nurbs_patches.patch_selection);
-	k3d::mesh::materials_t& output_patch_materials = create_if_not_exists(output_nurbs_patches.patch_materials);
-	k3d::mesh::indices_t& output_patch_points = create_if_not_exists(output_nurbs_patches.patch_points);
-	k3d::mesh::weights_t& output_patch_point_weights = create_if_not_exists(output_nurbs_patches.patch_point_weights);
-	k3d::mesh::knots_t& output_patch_u_knots = create_if_not_exists(output_nurbs_patches.patch_u_knots);
-	k3d::mesh::knots_t& output_patch_v_knots = create_if_not_exists(output_nurbs_patches.patch_v_knots);
-	
-	const k3d::mesh::nurbs_patches_t& input_nurbs_patches = *Input.nurbs_patches;
-	const k3d::mesh::indices_t& input_patch_first_points = *input_nurbs_patches.patch_first_points;
-	const k3d::mesh::counts_t& input_patch_u_point_counts = *input_nurbs_patches.patch_u_point_counts;
-	const k3d::mesh::counts_t& input_patch_v_point_counts = *input_nurbs_patches.patch_v_point_counts;
-	const k3d::mesh::orders_t& input_patch_u_orders = *input_nurbs_patches.patch_u_orders;
-	const k3d::mesh::orders_t& input_patch_v_orders = *input_nurbs_patches.patch_v_orders;
-	const k3d::mesh::indices_t& input_patch_u_first_knots = *input_nurbs_patches.patch_u_first_knots;
-	const k3d::mesh::indices_t& input_patch_v_first_knots = *input_nurbs_patches.patch_v_first_knots;
-	const k3d::mesh::selection_t& input_patch_selection = *input_nurbs_patches.patch_selection;
-	const k3d::mesh::materials_t& input_patch_materials = *input_nurbs_patches.patch_materials;
-	const k3d::mesh::indices_t& input_patch_points = *input_nurbs_patches.patch_points;
-	const k3d::mesh::weights_t& input_patch_point_weights = *input_nurbs_patches.patch_point_weights;
-	const k3d::mesh::knots_t& input_patch_u_knots = *input_nurbs_patches.patch_u_knots;
-	const k3d::mesh::knots_t& input_patch_v_knots = *input_nurbs_patches.patch_v_knots;
-
-	if (input_nurbs_patches.patch_trim_curve_loop_counts && input_nurbs_patches.trim_points)
-	{
-		k3d::mesh::counts_t& output_patch_trim_curve_loop_counts = create_if_not_exists(output_nurbs_patches.patch_trim_curve_loop_counts);
-		k3d::mesh::indices_t& output_patch_first_trim_curve_loops = create_if_not_exists(output_nurbs_patches.patch_first_trim_curve_loops);
-		k3d::mesh::points_2d_t& output_trim_points = create_if_not_exists(output_nurbs_patches.trim_points);
-		k3d::mesh::selection_t& output_trim_point_selection = create_if_not_exists(output_nurbs_patches.trim_point_selection);
-		k3d::mesh::indices_t& output_first_trim_curves = create_if_not_exists(output_nurbs_patches.first_trim_curves);
-		k3d::mesh::counts_t& output_trim_curve_counts = create_if_not_exists(output_nurbs_patches.trim_curve_counts);
-		k3d::mesh::selection_t& output_trim_curve_loop_selection = create_if_not_exists(output_nurbs_patches.trim_curve_loop_selection);
-		k3d::mesh::indices_t& output_trim_curve_first_points = create_if_not_exists(output_nurbs_patches.trim_curve_first_points);
-		k3d::mesh::counts_t& output_trim_curve_point_counts = create_if_not_exists(output_nurbs_patches.trim_curve_point_counts);
-		k3d::mesh::orders_t& output_trim_curve_orders = create_if_not_exists(output_nurbs_patches.trim_curve_orders);
-		k3d::mesh::indices_t& output_trim_curve_first_knots = create_if_not_exists(output_nurbs_patches.trim_curve_first_knots);
-		k3d::mesh::selection_t& output_trim_curve_selection = create_if_not_exists(output_nurbs_patches.trim_curve_selection);
-		k3d::mesh::indices_t& output_trim_curve_points = create_if_not_exists(output_nurbs_patches.trim_curve_points);
-		k3d::mesh::weights_t& output_trim_curve_point_weights = create_if_not_exists(output_nurbs_patches.trim_curve_point_weights);
-		k3d::mesh::knots_t& output_trim_curve_knots = create_if_not_exists(output_nurbs_patches.trim_curve_knots);
-		
-		output_patch_first_trim_curve_loops.resize(output_patch_first_points.size(), 0);
-		output_patch_trim_curve_loop_counts.resize(output_patch_first_points.size(), 0);
-		
-		const k3d::mesh::counts_t& input_patch_trim_curve_loop_counts = *input_nurbs_patches.patch_trim_curve_loop_counts;
-		const k3d::mesh::indices_t& input_patch_first_trim_curve_loops = *input_nurbs_patches.patch_first_trim_curve_loops;
-		const k3d::mesh::points_2d_t& input_trim_points = *input_nurbs_patches.trim_points;
-		const k3d::mesh::selection_t& input_trim_point_selection = *input_nurbs_patches.trim_point_selection;
-		const k3d::mesh::indices_t& input_first_trim_curves = *input_nurbs_patches.first_trim_curves;
-		const k3d::mesh::counts_t& input_trim_curve_counts = *input_nurbs_patches.trim_curve_counts;
-		const k3d::mesh::selection_t& input_trim_curve_loop_selection = *input_nurbs_patches.trim_curve_loop_selection;
-		const k3d::mesh::indices_t& input_trim_curve_first_points = *input_nurbs_patches.trim_curve_first_points;
-		const k3d::mesh::counts_t& input_trim_curve_point_counts = *input_nurbs_patches.trim_curve_point_counts;
-		const k3d::mesh::orders_t& input_trim_curve_orders = *input_nurbs_patches.trim_curve_orders;
-		const k3d::mesh::indices_t& input_trim_curve_first_knots = *input_nurbs_patches.trim_curve_first_knots;
-		const k3d::mesh::selection_t& input_trim_curve_selection = *input_nurbs_patches.trim_curve_selection;
-		const k3d::mesh::indices_t& input_trim_curve_points = *input_nurbs_patches.trim_curve_points;
-		const k3d::mesh::weights_t& input_trim_curve_point_weights = *input_nurbs_patches.trim_curve_point_weights;
-		const k3d::mesh::knots_t& input_trim_curve_knots = *input_nurbs_patches.trim_curve_knots;
-		
-		extend_array(input_patch_trim_curve_loop_counts, output_patch_trim_curve_loop_counts, 0);
-		extend_array(input_patch_first_trim_curve_loops, output_patch_first_trim_curve_loops, output_first_trim_curves.size());
-		extend_array(input_trim_point_selection, output_trim_point_selection, 0);
-		extend_array(input_first_trim_curves, output_first_trim_curves, output_trim_curve_first_points.size());
-		extend_array(input_trim_curve_counts, output_trim_curve_counts, 0);
-		extend_array(input_trim_curve_loop_selection, output_trim_curve_loop_selection, 0);
-		extend_array(input_trim_curve_first_points, output_trim_curve_first_points, output_trim_curve_points.size());
-		extend_array(input_trim_curve_point_counts, output_trim_curve_point_counts, 0);
-		extend_array(input_trim_curve_orders, output_trim_curve_orders, 0);
-		extend_array(input_trim_curve_first_knots, output_trim_curve_first_knots, output_trim_curve_knots.size());
-		extend_array(input_trim_curve_selection, output_trim_curve_selection, 0);
-		extend_array(input_trim_curve_points, output_trim_curve_points, output_trim_points.size());
-		extend_array(input_trim_curve_point_weights, output_trim_curve_point_weights, 0);
-		extend_array(input_trim_curve_knots, output_trim_curve_knots, 0);
-		output_trim_points.insert(output_trim_points.end(), input_trim_points.begin(), input_trim_points.end());
-	}
-	
-	extend_array(input_patch_first_points, output_patch_first_points, output_patch_points.size());
-	extend_array(input_patch_u_point_counts, output_patch_u_point_counts, 0);
-	extend_array(input_patch_v_point_counts, output_patch_v_point_counts, 0);
-	extend_array(input_patch_u_orders, output_patch_u_orders, 0);
-	extend_array(input_patch_v_orders, output_patch_v_orders, 0);
-	extend_array(input_patch_u_first_knots, output_patch_u_first_knots, output_patch_u_knots.size());
-	extend_array(input_patch_v_first_knots, output_patch_v_first_knots, output_patch_v_knots.size());
-	extend_array(input_patch_selection, output_patch_selection, 0);
-	output_patch_materials.insert(output_patch_materials.end(), input_patch_materials.begin(), input_patch_materials.end());
-	extend_array(input_patch_points, output_patch_points, Output.points->size());
-	extend_array(input_patch_point_weights, output_patch_point_weights, 0);
-	extend_array(input_patch_u_knots, output_patch_u_knots, 0);
-	extend_array(input_patch_v_knots, output_patch_v_knots, 0);
-	
-	// Named arrays
-	k3d::attribute_array_copier constant_data_copier(input_nurbs_patches.constant_data, output_nurbs_patches.constant_data);
-	k3d::attribute_array_copier uniform_data_copier(input_nurbs_patches.uniform_data, output_nurbs_patches.uniform_data);
-	k3d::attribute_array_copier varying_data_copier(input_nurbs_patches.varying_data, output_nurbs_patches.varying_data);
-	for (k3d::uint_t patch = 0; patch != input_patch_selection.size(); ++patch)
-	{
-  	constant_data_copier.push_back(patch);
-  	uniform_data_copier.push_back(patch);
-  	varying_data_copier.push_back(patch);
-  	varying_data_copier.push_back(patch);
-  	varying_data_copier.push_back(patch);
-  	varying_data_copier.push_back(patch);
-	}
-}
-
 const k3d::uint_t merge_points(k3d::mesh& Output, const k3d::mesh& Input)
 {
 	if(!Input.points)
@@ -393,7 +274,6 @@ public:
 			detail::create_if_not_exists(Output.points);
 			
 			detail::merge_polyhedra(Output, mesh, m_same_polyhedron.pipeline_value());
-			detail::merge_nurbs_patches(Output, mesh);
 
 			// Must be last to calculate correct offsets in other methods
 			const k3d::uint_t point_offset = detail::merge_points(Output, mesh);

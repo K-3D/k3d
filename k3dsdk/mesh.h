@@ -110,74 +110,6 @@ public:
 		primitive& create(const string_t& Type);
 	};
 
-	/// Defines storage for NURBS patches
-	class nurbs_patches_t
-	{
-	public:
-		/// Stores the set of per-patch first points
-		pipeline_data<indices_t> patch_first_points;
-		/// Stores the set of per-patch point counts in the U parametric direction
-		pipeline_data<counts_t> patch_u_point_counts;
-		/// Stores the set of per-patch point counts in the V parametric direction
-		pipeline_data<counts_t> patch_v_point_counts;
-		/// Stores the set of per-patch orders in the U parametric direction
-		pipeline_data<orders_t> patch_u_orders;
-		/// Stores the set of per-patch orders in the V parametric direction
-		pipeline_data<orders_t> patch_v_orders;
-		/// Stores the set of per-patch first knots in the U parametric direction
-		pipeline_data<indices_t> patch_u_first_knots;
-		/// Stores the set of per-patch first knots in the V parametric direction
-		pipeline_data<indices_t> patch_v_first_knots;
-		/// Stores per-patch selection state
-		pipeline_data<selection_t> patch_selection;
-		/// Stores per-patch materials
-		pipeline_data<materials_t> patch_materials;
-		/// Stores user-defined per-patch data (maps to RenderMan constant data)
-		attribute_arrays_t constant_data;
-		/// Stores user-defined per-patch data (maps to RenderMan uniform data)
-		attribute_arrays_t uniform_data;
-		/// Stores per-patch control points
-		pipeline_data<indices_t> patch_points;
-		/// Stores per-patch control point weights
-		pipeline_data<weights_t> patch_point_weights;
-		/// Stores per-patch knot vectors in the U parametric direction
-		pipeline_data<knots_t> patch_u_knots;
-		/// Stores per-patch knot vectors in the V parametric direction
-		pipeline_data<knots_t> patch_v_knots;
-		/// Stores user-defined per-parametric-corner data (maps to RenderMan varying data)
-		attribute_arrays_t varying_data;
-		/// Stores the number of trim curve loops for each patch
-		pipeline_data<counts_t> patch_trim_curve_loop_counts;
-		/// Stores the first trim curve loop (index into first_trim_curves) for each patch
-		pipeline_data<indices_t> patch_first_trim_curve_loops;
-		/// Stores the trim curve control points, expressed in parameter space
-		pipeline_data<points_2d_t> trim_points;
-		/// Stores the trim curve control point selection
-		pipeline_data<selection_t> trim_point_selection;
-		/// Stores the set of per-curve-loop first curves (index into trim_curve_first_points)
-		pipeline_data<indices_t> first_trim_curves;
-		/// Stores the set of per-curve-loop curve counts
-		pipeline_data<counts_t> trim_curve_counts;
-		/// Stores per-curve-loop selection
-		pipeline_data<selection_t> trim_curve_loop_selection;
-		/// Stores the set of per-curve first points
-		pipeline_data<indices_t> trim_curve_first_points;
-		/// Stores the set of per-curve point counts
-		pipeline_data<counts_t> trim_curve_point_counts;
-		/// Stores the set of per-curve orders
-		pipeline_data<orders_t> trim_curve_orders;
-		/// Stores the set of per-curve first knots
-		pipeline_data<indices_t> trim_curve_first_knots;
-		/// Stores per-curve selection state
-		pipeline_data<selection_t> trim_curve_selection;
-		/// Stores per-curve control points
-		pipeline_data<indices_t> trim_curve_points;
-		/// Stores per-curve control point weights
-		pipeline_data<weights_t> trim_curve_point_weights;
-		/// Stores per-curve knot vectors
-		pipeline_data<knots_t> trim_curve_knots;
-	};
-
 	/// Defines storage for polyhedra (polygons and subdivision surfaces)
 	class polyhedra_t
 	{
@@ -231,8 +163,6 @@ public:
 	/// Stores mesh primitives
 	primitives_t primitives;
 
-	/// Stores nurbs patches
-	pipeline_data<nurbs_patches_t> nurbs_patches;
 	/// Stores polyhedra
 	pipeline_data<polyhedra_t> polyhedra;
 
