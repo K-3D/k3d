@@ -88,8 +88,7 @@ ABSOLUTE_SPLIT_EDGE = 11,
 //ABSOLUTE_NURBS_CURVE = 20,
 //ABSOLUTE_BILINEAR_PATCH = 21,
 //ABSOLUTE_BICUBIC_PATCH = 22,
-/** \deprecated Storage for a zero-based NURBS patch index (relative to a mesh) */
-ABSOLUTE_NURBS_PATCH = 23,
+//ABSOLUTE_NURBS_PATCH = 23,
 /// Storage for a user-defined index
 USER1 = 24,
 /// Storage for a zero-based primitive index (relative to a mesh)

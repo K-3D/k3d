@@ -59,9 +59,6 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case ABSOLUTE_SPLIT_EDGE:
 			Stream << "absolute_split_edge";
 			break;
-		case ABSOLUTE_NURBS_PATCH:
-			Stream << "absolute_nurbs_patch";
-			break;
 		case USER1:
 			Stream << "user1";
 			break;
@@ -122,9 +119,9 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = ABSOLUTE_BILINEAR_PATCH;
 	else if(buffer == "absolute_bicubic_patch")
 		RHS = ABSOLUTE_BICUBIC_PATCH;
-*/
 	else if(buffer == "absolute_nurbs_patch" || buffer == "absolute_nupatch")
 		RHS = ABSOLUTE_NURBS_PATCH;
+*/
 	else if(buffer == "user1")
 		RHS = USER1;
 	else if(buffer == "primitive")

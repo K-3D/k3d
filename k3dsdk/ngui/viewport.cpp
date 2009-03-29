@@ -1205,7 +1205,6 @@ k3d::selection::record control::pick_uniform(const k3d::point2& Coordinates, k3d
 			switch(token->type)
 			{
 				case k3d::selection::ABSOLUTE_FACE:
-				case k3d::selection::ABSOLUTE_NURBS_PATCH:
 				case k3d::selection::UNIFORM:
 					return *record;
 			}
