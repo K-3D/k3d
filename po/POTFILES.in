@@ -214,7 +214,6 @@ modules/mesh/fillet_edges.cpp
 modules/mesh/flip_orientation.cpp
 modules/mesh_instance/frozen_mesh.cpp
 modules/mesh_instance/mesh_instance.cpp
-modules/mesh/legacy_triangulate_faces.cpp
 modules/mesh/make_sds.cpp
 modules/mesh/merge_collinear_edges.cpp
 modules/mesh/merge_coplanar_faces.cpp
@@ -224,10 +223,8 @@ modules/mesh/sds_corner.cpp
 modules/mesh/sds_crease.cpp
 modules/mesh/sds_hole.cpp
 modules/mesh/set_material.cpp
-modules/mesh/smooth_shade.cpp
 modules/mesh/subdivide_edges.cpp
 modules/mesh/subdivide_faces.cpp
-modules/mesh/tag_color.cpp
 modules/mesh/triangulate_faces.cpp
 modules/mesh/weld.cpp
 modules/named_arrays/named_text_array.cpp
@@ -494,10 +491,6 @@ modules/test/mesh_diff.cpp
 modules/test/mesh_to_stdout.cpp
 modules/test/pipeline_profiler.cpp
 modules/test/selection_to_stdout.cpp
-modules/texture/cylinder_map.cpp
-modules/texture/planar_map.cpp
-modules/texture/sphere_map.cpp
-modules/texture/texture_map.cpp
 modules/tiff_io/bitmap_exporter.cpp
 modules/tiff_io/bitmap_importer.cpp
 modules/tiff_io/bitmap_reader.cpp

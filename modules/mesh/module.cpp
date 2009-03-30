@@ -59,19 +59,10 @@ extern k3d::iplugin_factory& sds_hole_factory();
 extern k3d::iplugin_factory& set_material_factory();
 extern k3d::iplugin_factory& show_component_numbering_factory();
 extern k3d::iplugin_factory& show_face_orientations_factory();
-extern k3d::iplugin_factory& smooth_shade_factory();
 extern k3d::iplugin_factory& subdivide_edges_factory();
 extern k3d::iplugin_factory& subdivide_faces_factory();
-extern k3d::iplugin_factory& tag_color_factory();
 extern k3d::iplugin_factory& triangulate_faces_factory();
 extern k3d::iplugin_factory& weld_factory();
-
-namespace legacy
-{
-
-extern k3d::iplugin_factory& triangulate_faces_factory();
-
-} // namespace legacy
 
 } // namespace mesh
 
@@ -105,13 +96,9 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh::sds_crease_factory());
 	Registry.register_factory(module::mesh::sds_hole_factory());
 	Registry.register_factory(module::mesh::set_material_factory());
-	Registry.register_factory(module::mesh::smooth_shade_factory());
 	Registry.register_factory(module::mesh::subdivide_edges_factory());
 	Registry.register_factory(module::mesh::subdivide_faces_factory());
-	Registry.register_factory(module::mesh::tag_color_factory());
 	Registry.register_factory(module::mesh::triangulate_faces_factory());
 	Registry.register_factory(module::mesh::weld_factory());
-
-	Registry.register_factory(module::mesh::legacy::triangulate_faces_factory());
 K3D_MODULE_END
 
