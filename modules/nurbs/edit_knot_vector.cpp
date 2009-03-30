@@ -133,7 +133,10 @@ public:
 	void reset_properties()
 	{
 		MY_DEBUG << "Reset Called" << std::endl;
-		m_knot_vector.set_value(extract_knots(*m_input_mesh.pipeline_value(), m_curve));
+		const k3d::mesh& mesh = *m_input_mesh.pipeline_value();
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs(get_first_nurbs_curve(mesh));
+		return_if_fail(nurbs);
+		m_knot_vector.set_value(extract_knots(*nurbs, m_curve));
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -141,13 +144,13 @@ public:
 		MY_DEBUG << "Create Called" << std::endl;
 		Output = Input;
 
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
 		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		nurbs_curve_modifier mod(Output);
+		nurbs_curve_modifier mod(Output, *nurbs);
 
 		m_curve = mod.selected_curve();
 
@@ -159,7 +162,7 @@ public:
 
 		const k3d::mesh::knots_t& knots = m_knot_vector.pipeline_value();
 
-		if (!insert_knots(knots, Output, m_curve))
+		if (!insert_knots(knots, *nurbs, m_curve))
 		{
 			k3d::log() << error << "Invalid Knot Vector on curve " << m_curve << std::endl;
 		}
@@ -171,7 +174,7 @@ public:
 		MY_DEBUG << "Update Called" << std::endl;
 		Output = Input;
 
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
 		if(!nurbs)
 			return;
 
@@ -179,7 +182,7 @@ public:
 
 		const k3d::mesh::knots_t& knots = m_knot_vector.pipeline_value();
 
-		nurbs_curve_modifier mod(Output);
+		nurbs_curve_modifier mod(Output, *nurbs);
 
 		m_curve = mod.selected_curve();
 
@@ -189,7 +192,7 @@ public:
 			return;
 		}
 
-		if (!insert_knots(knots, Output, m_curve))
+		if (!insert_knots(knots, *nurbs, m_curve))
 			k3d::log() << error << "Invalid Knot Vector on curve " << m_curve << std::endl;
 	}
 
@@ -209,14 +212,13 @@ private:
 	k3d::metadata::property< k3d_data(k3d::mesh::knots_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, array_serialization) > m_knot_vector;
 	int m_curve;
 
-	k3d::mesh::knots_t extract_knots(const k3d::mesh& Output, int curve)
+	k3d::mesh::knots_t extract_knots(const k3d::nurbs_curve::const_primitive& NurbsCurves, int curve)
 	{
-		const k3d::mesh::nurbs_curve_groups_t& groups = *Output.nurbs_curve_groups;
-		const k3d::mesh::knots_t& knots = *groups.curve_knots;
+		const k3d::mesh::knots_t& knots = NurbsCurves.curve_knots;
 		k3d::mesh::knots_t curve_knots;
 
-		const k3d::uint_t curve_knots_begin = (*groups.curve_first_knots)[curve];
-		const k3d::uint_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
+		const k3d::uint_t curve_knots_begin = NurbsCurves.curve_first_knots[curve];
+		const k3d::uint_t curve_knots_end = curve_knots_begin + NurbsCurves.curve_point_counts[curve] + NurbsCurves.curve_orders[curve];
 
 		for (k3d::uint_t i = curve_knots_begin; i < curve_knots_end; i++)
 			curve_knots.push_back(knots[i]);
@@ -224,13 +226,12 @@ private:
 		return curve_knots;
 	}
 
-	bool insert_knots(const k3d::mesh::knots_t& curve_knots, k3d::mesh& Output, int curve)
+	bool insert_knots(const k3d::mesh::knots_t& curve_knots, k3d::nurbs_curve::primitive& NurbsCurves, int curve)
 	{
-		k3d::mesh::nurbs_curve_groups_t& groups = Output.nurbs_curve_groups.writable();
-		k3d::mesh::knots_t& knots = groups.curve_knots.writable();
+		k3d::mesh::knots_t& knots = NurbsCurves.curve_knots;
 
-		const k3d::uint_t curve_knots_begin = (*groups.curve_first_knots)[curve];
-		const k3d::uint_t curve_knots_end = curve_knots_begin + (*groups.curve_point_counts)[curve] + (*groups.curve_orders)[curve];
+		const k3d::uint_t curve_knots_begin = NurbsCurves.curve_first_knots[curve];
+		const k3d::uint_t curve_knots_end = curve_knots_begin + NurbsCurves.curve_point_counts[curve] + NurbsCurves.curve_orders[curve];
 
 		if (curve_knots.size() != curve_knots_end - curve_knots_begin)
 			return false;

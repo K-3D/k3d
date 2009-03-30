@@ -73,7 +73,7 @@ public:
 	{
 		Output = Input;
 
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
 		if(!nurbs)
 			return;
 
@@ -81,17 +81,12 @@ public:
 
 		std::vector<k3d::uint_t> curves;
 
-		const k3d::uint_t group_begin = 0;
-		const k3d::uint_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
-		for (k3d::uint_t group = group_begin; group != group_end; ++group)
+		const k3d::uint_t curve_begin = 0;
+		const k3d::uint_t curve_end = nurbs->curve_first_points.size();
+		for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 		{
-			const k3d::uint_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
-			const k3d::uint_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
-			for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
-			{
-				if ((*Output.nurbs_curve_groups->curve_selection)[curve] > 0.0)
-					curves.push_back(curve);
-			}
+			if (nurbs->curve_selections[curve] > 0.0)
+				curves.push_back(curve);
 		}
 
 		if (curves.size() != 2)
@@ -100,7 +95,7 @@ public:
 		}
 		else
 		{
-			nurbs_curve_modifier mod(Output);
+			nurbs_curve_modifier mod(Output, *nurbs);
 			mod.traverse_curve(curves[0], curves[1], m_create_caps.pipeline_value());
 
 			if (m_delete_original.pipeline_value())

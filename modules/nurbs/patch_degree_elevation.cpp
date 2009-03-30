@@ -72,13 +72,13 @@ public:
 	{
 		Output = Input;
 
-		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(k3d::nurbs_patch::validate(Output));
-		if(nurbs)
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(get_first_nurbs_patch(Output));
+		if(!nurbs)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		nurbs_patch_modifier mod(Output);
+		nurbs_patch_modifier mod(Output, *nurbs);
 
 		std::vector<k3d::uint_t> my_patches = mod.get_selected_patches();
 

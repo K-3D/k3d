@@ -70,7 +70,7 @@ public:
 	{
 		Output = Input;
 
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
 		if(!nurbs)
 			return;
 
@@ -79,28 +79,23 @@ public:
 		std::vector<k3d::uint_t> curves;
 		std::vector<k3d::uint_t> points;
 
-		const k3d::uint_t group_begin = 0;
-		const k3d::uint_t group_end = group_begin + (*Output.nurbs_curve_groups->first_curves).size();
-		for (k3d::uint_t group = group_begin; group != group_end; ++group)
+		const k3d::uint_t curve_begin = 0;
+		const k3d::uint_t curve_end = nurbs->curve_first_points.size();
+		for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 		{
-			const k3d::uint_t curve_begin = (*Output.nurbs_curve_groups->first_curves)[group];
-			const k3d::uint_t curve_end = curve_begin + (*Output.nurbs_curve_groups->curve_counts)[group];
-			for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
+			const k3d::uint_t curve_point_begin = nurbs->curve_first_points[curve];
+			const k3d::uint_t curve_point_end = curve_point_begin + nurbs->curve_point_counts[curve];
+
+			const k3d::mesh::weights_t& orig_weights = nurbs->curve_point_weights;
+
+			boost::shared_ptr<k3d::mesh::weights_t> curve_point_weights(new k3d::mesh::weights_t());
+
+			for (k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
 			{
-				const k3d::uint_t curve_point_begin = (*Output.nurbs_curve_groups->curve_first_points)[curve];
-				const k3d::uint_t curve_point_end = curve_point_begin + (*Output.nurbs_curve_groups->curve_point_counts)[curve];
-
-				const k3d::mesh::weights_t& orig_weights = *Output.nurbs_curve_groups->curve_point_weights;
-
-				boost::shared_ptr<k3d::mesh::weights_t> curve_point_weights(new k3d::mesh::weights_t());
-
-				for (k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+				if ((*Output.point_selection)[nurbs->curve_points[curve_point]])
 				{
-					if ((*Output.point_selection)[(*Output.nurbs_curve_groups->curve_points)[curve_point]])
-					{
-						curves.push_back(curve);
-						points.push_back(curve_point);
-					}
+					curves.push_back(curve);
+					points.push_back(curve_point);
 				}
 			}
 		}
@@ -111,7 +106,7 @@ public:
 		}
 		else
 		{
-			nurbs_curve_modifier mod(Output);
+			nurbs_curve_modifier mod(Output, *nurbs);
 			mod.join_curves(points[0], curves[0], points[1], curves[1]);
 		}
 	}

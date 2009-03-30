@@ -83,13 +83,16 @@ public:
 	{
 		Output = Input;
 
-		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(k3d::nurbs_patch::validate(Output));
-		if(!nurbs)
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(get_first_nurbs_patch(Output));
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(get_first_nurbs_curve(Output));
+		if(!nurbs || !curves)
 			return;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
-		nurbs_patch_modifier mod(Output);
-		nurbs_curve_modifier mod2(Output);
+		nurbs_patch_modifier mod(Output, *nurbs);
+		
+		
+		nurbs_curve_modifier mod2(Output, *curves);
 
 		int my_patch = m_patch.pipeline_value();
 		int my_curve = m_curve.pipeline_value();
@@ -102,7 +105,7 @@ public:
 
 		if (my_patch < 0 || my_curve < 0)
 		{
-			k3d::log() << error << nurbs_debug << "There are no patches and curves with negative inidces!" << std::endl;
+			k3d::log() << error << nurbs_debug << "There are no patches and curves with negative indices!" << std::endl;
 			return;
 		}
 

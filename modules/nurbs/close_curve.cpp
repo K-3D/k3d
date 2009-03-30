@@ -71,18 +71,17 @@ public:
 	{
 		Output = Input;
 
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(k3d::nurbs_curve::validate(Output));
-		if(!nurbs)
-			return;
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
+		return_if_fail(nurbs);
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		nurbs_curve_modifier mod(Output);
+		nurbs_curve_modifier mod(Output, *nurbs);
 		int my_curve = mod.selected_curve();
 
 		if (my_curve < 0)
 		{
-			k3d::log() << error << "You need to select exactly curve!" << std::endl;
+			k3d::log() << error << "You need to select exactly one curve!" << std::endl;
 			return;
 		}
 

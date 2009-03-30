@@ -32,6 +32,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/data.h>
@@ -47,6 +48,11 @@ namespace module
 {
 namespace nurbs
 {
+
+/// Get the first NURBS patch, if any. The caller is responsible for the lifetime of the resulting object.
+k3d::nurbs_patch::primitive* get_first_nurbs_patch(k3d::mesh& Mesh);
+k3d::nurbs_patch::const_primitive* get_first_nurbs_patch(const k3d::mesh& Mesh);
+
 ///Simple representation of a nurbs curve, used to pass data between curves and patches
 struct nurbs_curve
 {
@@ -80,7 +86,7 @@ class nurbs_patch_modifier
 public:
 	///Create a nurbs_patch_modifier from the given mesh, working on its patches
 	///\param input The mesh to operate on
-	nurbs_patch_modifier(k3d::mesh& input);
+	nurbs_patch_modifier(k3d::mesh& input, k3d::nurbs_patch::primitive& NurbsPatches);
 
 	///Add a trimming curve to the chosen patch
 	///\param patch The patch we want to trim
@@ -180,36 +186,8 @@ private:
 	///\param shared If this is true then we'll try to use an existing point at the same position
 	k3d::uint_t insert_point(const k3d::point3& point, bool shared);
 
-	k3d::mesh *m_instance;
-	k3d::mesh::nurbs_patches_t *m_nurbs_patches;
-	k3d::mesh::indices_t *m_patch_first_points;
-	k3d::mesh::counts_t *m_patch_u_point_counts;
-	k3d::mesh::counts_t *m_patch_v_point_counts;
-	k3d::mesh::orders_t *m_patch_u_orders;
-	k3d::mesh::orders_t *m_patch_v_orders;
-	k3d::mesh::indices_t *m_patch_u_first_knots;
-	k3d::mesh::indices_t *m_patch_v_first_knots;
-	k3d::mesh::selection_t *m_patch_selection;
-	k3d::mesh::materials_t *m_patch_materials;
-	k3d::mesh::indices_t *m_patch_points;
-	k3d::mesh::weights_t *m_patch_point_weights;
-	k3d::mesh::knots_t *m_patch_u_knots;
-	k3d::mesh::knots_t *m_patch_v_knots;
-	k3d::mesh::counts_t *m_patch_trim_curve_loop_counts;
-	k3d::mesh::indices_t *m_patch_first_trim_curve_loops;
-	k3d::mesh::points_2d_t *m_trim_points;
-	k3d::mesh::selection_t *m_trim_point_selection;
-	k3d::mesh::indices_t *m_first_trim_curves;
-	k3d::mesh::counts_t *m_trim_curve_counts;
-	k3d::mesh::selection_t *m_trim_curve_loop_selection;
-	k3d::mesh::indices_t *m_trim_curve_first_points;
-	k3d::mesh::counts_t *m_trim_curve_point_counts;
-	k3d::mesh::orders_t *m_trim_curve_orders;
-	k3d::mesh::indices_t *m_trim_curve_first_knots;
-	k3d::mesh::selection_t *m_trim_curve_selection;
-	k3d::mesh::indices_t *m_trim_curve_points;
-	k3d::mesh::weights_t *m_trim_curve_point_weights;
-	k3d::mesh::knots_t *m_trim_curve_knots;
+	k3d::mesh& m_instance;
+	k3d::nurbs_patch::primitive& m_nurbs_patches;
 	k3d::mesh::points_t *m_mesh_points;
 	k3d::mesh::selection_t *m_point_selections;
 

@@ -36,6 +36,8 @@
 #include <k3dsdk/point3.h>
 #include <k3dsdk/selection.h>
 
+#include "nurbs_curve_modifier.h"
+
 #include <boost/scoped_ptr.hpp>
 
 #include <iostream>
@@ -72,43 +74,34 @@ public:
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		// There's no guarantee that the mesh contains NURBS!
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs_curve(k3d::nurbs_curve::validate(Output));
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs_curve(get_first_nurbs_curve(Output));
 		if(nurbs_curve)
 		{
-			// We need a mutable NURBS curve groups object since we're going to modify one of its arrays ...
-			k3d::mesh::nurbs_curve_groups_t& groups = Output.nurbs_curve_groups.writable();
 			// We need a mutable weights array to modify ...
-			k3d::mesh::weights_t& output_weights = groups.curve_point_weights.writable();
+			k3d::mesh::weights_t& output_weights = nurbs_curve->curve_point_weights;
 
 			// We need the original weights array as a reference ...
-			const k3d::mesh::weights_t& input_weights = *Input.nurbs_curve_groups->curve_point_weights;
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> input_nurbs_curve(get_first_nurbs_curve(Input));
+			const k3d::mesh::weights_t& input_weights = input_nurbs_curve->curve_point_weights;
 
 			//loop through all curves and check for selected points
-			const k3d::uint_t group_begin = 0;
-			const k3d::uint_t group_end = group_begin + (*groups.first_curves).size();
-			for (k3d::uint_t group = group_begin; group != group_end; ++group)
+			const k3d::uint_t curve_begin = 0;
+			const k3d::uint_t curve_end = nurbs_curve->curve_first_knots.size();
+			for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
 			{
-				const k3d::uint_t curve_begin = (*groups.first_curves)[group];
-				const k3d::uint_t curve_end = curve_begin + (*groups.curve_counts)[group];
-				for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
-				{
-					const k3d::uint_t curve_point_begin = (*groups.curve_first_points)[curve];
-					const k3d::uint_t curve_point_end = curve_point_begin + (*groups.curve_point_counts)[curve];
-					for (k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
-						output_weights[curve_point] = k3d::mix(input_weights[curve_point], weight, (*Output.point_selection)[(*groups.curve_points)[curve_point]]);
-				}
+				const k3d::uint_t curve_point_begin = nurbs_curve->curve_first_points[curve];
+				const k3d::uint_t curve_point_end = curve_point_begin + nurbs_curve->curve_point_counts[curve];
+				for (k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+					output_weights[curve_point] = k3d::mix(input_weights[curve_point], weight, (*Output.point_selection)[nurbs_curve->curve_points[curve_point]]);
 			}
 		}
 
-		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs_patch(k3d::nurbs_patch::validate(Output));
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs_patch(get_first_nurbs_patch(Output));
 		if(nurbs_patch)
 		{
-			k3d::mesh::nurbs_patches_t& nurbs_patches = Output.nurbs_patches.writable();
-			k3d::mesh::weights_t& patch_point_weights = nurbs_patches.patch_point_weights.writable();
-
-			for (int i = 0; i < patch_point_weights.size(); i++)
+			for (int i = 0; i < nurbs_patch->patch_point_weights.size(); i++)
 			{
-				patch_point_weights[i] = k3d::mix(patch_point_weights[i], weight, (*Output.point_selection)[(*nurbs_patches.patch_points)[i]]);
+				nurbs_patch->patch_point_weights[i] = k3d::mix(nurbs_patch->patch_point_weights[i], weight, (*Output.point_selection)[nurbs_patch->patch_points[i]]);
 			}
 		}
 	}

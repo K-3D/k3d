@@ -32,6 +32,7 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/nurbs.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/data.h>
@@ -39,9 +40,12 @@
 #include <k3dsdk/point4.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
-#include <deque>
-#include "math.h"
 
+#include <deque>
+
+#include <boost/scoped_ptr.hpp>
+
+#include "math.h"
 #include "nurbs_patch_modifier.h"
 
 #define MODULE_NURBS_DEBUG 0
@@ -59,13 +63,17 @@ struct nurbs_trim_curve;
 struct nurbs_patch;
 class nurbs_patch_modifier;
 
+/// Get the first NURBS curve, if any. The caller is responsible for the lifetime of the resulting object.
+k3d::nurbs_curve::primitive* get_first_nurbs_curve(k3d::mesh& Mesh);
+k3d::nurbs_curve::const_primitive* get_first_nurbs_curve(const k3d::mesh& Mesh);
+
 ///All NURBS curve editing methods and algorithms are packaged here
 class nurbs_curve_modifier
 {
 public:
-	///Create an instance of nurbs_curve_modifier working on the given mesh
+	///Create an instance of nurbs_curve_modifier working on the given mesh and curve
 	///\param input The mesh to work on
-	nurbs_curve_modifier(k3d::mesh& input);
+	nurbs_curve_modifier(k3d::mesh& input, k3d::nurbs_curve::primitive& Curve);
 
 	///Add a curve to this mesh - gprims add_nurbs_curve doesnt handle groups
 	///\param curve The curve to add
@@ -99,13 +107,6 @@ public:
 
 	///Returns the number of nurbs curves in this complete mesh
 	int count_all_curves_in_groups();
-
-	///Returns the curve group in which this curve is located
-	///\param curve The curve to search for
-	int get_curve_group(k3d::uint_t curve);
-
-	///Removes all empty groups
-	void remove_empty_groups();
 
 	///Delete the selected curve.  Note that unused points are left-behind.
 	///\param curve The curve to delete
@@ -277,21 +278,10 @@ private:
 	///because it works with the difference quotient
 	k3d::point3 calculate_curve_tangent(k3d::uint_t curve, double u);
 
-	k3d::mesh *m_instance;
-	k3d::mesh::nurbs_curve_groups_t *groups;
-	k3d::mesh::knots_t *curve_knots;
-	k3d::mesh::indices_t *curve_points;
-	k3d::mesh::weights_t *curve_point_weights;
-	k3d::mesh::counts_t *curve_counts;
-	k3d::mesh::orders_t *curve_orders;
-	k3d::mesh::counts_t *curve_point_counts;
-	k3d::mesh::indices_t *curve_first_points;
-	k3d::mesh::indices_t *curve_first_knots;
-	k3d::mesh::indices_t *first_curves;
-	k3d::mesh::selection_t *curve_selection;
-	k3d::mesh::selection_t *point_selection;
-	k3d::mesh::points_t *mesh_points;
-	k3d::mesh::materials_t *materials;
+	k3d::mesh& m_instance;
+	k3d::nurbs_curve::primitive& m_nurbs_curve;
+	k3d::mesh::selection_t* point_selection;
+	k3d::mesh::points_t* mesh_points;
 };
 
 }//namespace nurbs

@@ -42,6 +42,7 @@
 #include "mesh.h"
 #include "mesh_selection.h"
 #include "named_array_types.h"
+#include "nurbs_curve.h"
 #include "plugins.h"
 #include "properties.h"
 #include "result.h"
@@ -54,6 +55,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/mpl/for_each.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace k3d
 {
@@ -1933,6 +1935,16 @@ void load_array(const element& Container, const string_t& Storage, pipeline_data
 	load_array(*storage, *array, Context);
 }
 
+template<typename array_type>
+void load_array(const element& Container, const string_t& Storage, array_type& Array, const ipersistent::load_context& Context)
+{
+	const element* const storage = find_element(Container, Storage);
+	if(!storage)
+		return;
+
+	load_array(*storage, Array, Context);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // load_typed_array
 
@@ -2233,23 +2245,20 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "nurbs_curve_groups"))
 	{
-		assert_not_implemented();
-/*
-		mesh::nurbs_curve_groups_t* const nurbs_curve_groups = &Mesh.nurbs_curve_groups.create();
-		detail::load_array(*container, "first_curves", nurbs_curve_groups->first_curves, Context);
-		detail::load_array(*container, "curve_counts", nurbs_curve_groups->curve_counts, Context);
-		detail::load_array(*container, "materials", nurbs_curve_groups->materials, Context);
-		detail::load_arrays(*container, "constant_data", nurbs_curve_groups->constant_data, Context);
-		detail::load_array(*container, "curve_first_points", nurbs_curve_groups->curve_first_points, Context);
-		detail::load_array(*container, "curve_point_counts", nurbs_curve_groups->curve_point_counts, Context);
-		detail::load_array(*container, "curve_orders", nurbs_curve_groups->curve_orders, Context);
-		detail::load_array(*container, "curve_first_knots", nurbs_curve_groups->curve_first_knots, Context);
-		detail::load_array(*container, "curve_selection", nurbs_curve_groups->curve_selection, Context);
-		detail::load_arrays(*container, "uniform_data", nurbs_curve_groups->uniform_data, Context);
-		detail::load_array(*container, "curve_points", nurbs_curve_groups->curve_points, Context);
-		detail::load_array(*container, "curve_point_weights", nurbs_curve_groups->curve_point_weights, Context);
-		detail::load_array(*container, "curve_knots", nurbs_curve_groups->curve_knots, Context);
-*/
+		boost::scoped_ptr<nurbs_curve::primitive> nurbs_curves(nurbs_curve::create(Mesh));
+
+		detail::load_array(*container, "materials", nurbs_curves->material, Context);
+		detail::load_arrays(*container, "constant_data", nurbs_curves->constant_data, Context);
+		detail::load_array(*container, "curve_first_points", nurbs_curves->curve_first_points, Context);
+		detail::load_array(*container, "curve_point_counts", nurbs_curves->curve_point_counts, Context);
+		detail::load_array(*container, "curve_orders", nurbs_curves->curve_orders, Context);
+		detail::load_array(*container, "curve_first_knots", nurbs_curves->curve_first_knots, Context);
+		detail::load_array(*container, "curve_selection", nurbs_curves->curve_selections, Context);
+		detail::load_arrays(*container, "uniform_data", nurbs_curves->uniform_data, Context);
+		detail::load_array(*container, "curve_points", nurbs_curves->curve_points, Context);
+		detail::load_array(*container, "curve_point_weights", nurbs_curves->curve_point_weights, Context);
+		detail::load_array(*container, "curve_knots", nurbs_curves->curve_knots, Context);
+
 	}
 
 	if(element* const container = find_element(Container, "bilinear_patches"))
