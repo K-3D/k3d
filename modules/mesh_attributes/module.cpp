@@ -30,6 +30,7 @@ namespace mesh_attributes
 {
 
 extern k3d::iplugin_factory& calculate_normals_factory();
+extern k3d::iplugin_factory& named_text_array_factory();
 
 } // namespace mesh_attributes
 
@@ -37,5 +38,6 @@ extern k3d::iplugin_factory& calculate_normals_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh_attributes::calculate_normals_factory());
+	Registry.register_factory(module::mesh_attributes::named_text_array_factory());
 K3D_MODULE_END
 

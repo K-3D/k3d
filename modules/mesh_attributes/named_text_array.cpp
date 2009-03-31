@@ -36,7 +36,7 @@
 namespace module
 {
 
-namespace named_arrays
+namespace mesh_attributes
 {
 
 class named_text_array :
@@ -102,9 +102,9 @@ private:
 	
 k3d::iplugin_factory& named_text_array_factory()
 {
-	return module::named_arrays::named_text_array::get_factory();
+	return named_text_array::get_factory();
 }
 
-} // namespace named_arrays
+} // namespace mesh_attributes
 
 } // namespace module
