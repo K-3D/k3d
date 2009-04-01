@@ -227,7 +227,6 @@ modules/mesh/subdivide_edges.cpp
 modules/mesh/subdivide_faces.cpp
 modules/mesh/triangulate_faces.cpp
 modules/mesh/weld.cpp
-modules/named_arrays/named_text_array.cpp
 modules/ngui_about/dialog.cpp
 modules/ngui_animation_timeline_panel/panel.cpp
 modules/ngui_assign_hotkeys/dialog.cpp
@@ -524,3 +523,4 @@ share/scripts/scripted_plugins/ogre_exporter.py
 uimodules/ngui/splash_box.cpp
 uimodules/ngui/user_interface.cpp
 uimodules/qtui/user_interface.cpp
+modules/mesh_attributes/named_text_array.cpp
