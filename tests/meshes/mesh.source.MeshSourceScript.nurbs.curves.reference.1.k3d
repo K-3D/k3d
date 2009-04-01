@@ -1,20 +1,36 @@
 <?xml version="1.0" ?>
 <k3dml>
 	<mesh_arrays>
-		<points>-5 -5 0 5 -5 0 5 5 0 -5 5 0 5 -5 0 15 -5 0 15 5 0 5 5 0 15 -5 0 25 -5 0 25 5 0 15 5 0 -5 -5 -10 5 -5 -10 5 5 -10 -5 5 -10 5 -5 -10 15 -5 -10 15 5 -10 5 5 -10 15 -5 -10 25 -5 -10 25 5 -10 15 5 -10</points>
-		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</point_selection>
-		<nurbs_curve_groups>
-			<first_curves>0 3</first_curves>
-			<curve_counts>3 3</curve_counts>
-			<materials>0 0</materials>
-			<curve_first_points>0 4 8 12 16 20</curve_first_points>
-			<curve_point_counts>4 4 4 4 4 4</curve_point_counts>
-			<curve_orders>3 3 3 3 3 3</curve_orders>
-			<curve_first_knots>0 7 14 21 28 35</curve_first_knots>
-			<curve_selection>0 0 0 0 0 0</curve_selection>
-			<curve_points>0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</curve_points>
-			<curve_point_weights>1 0.5 1 1 1 0.5 1 1 1 0.5 1 1 1 0.5 1 1 1 0.5 1 1 1 0.5 1 1</curve_point_weights>
-			<curve_knots>1 1 1 2 3 3 3 1 1 1 2 3 3 3 1 1 1 2 3 3 3 1 1 1 2 3 3 3 1 1 1 2 3 3 3 1 1 1 2 3 3 3</curve_knots>
-		</nurbs_curve_groups>
+		<points>-5 -5 0 5 -5 0 5 5 0 -5 5 0 5 -5 0 15 -5 0 15 5 0 5 5 0 15 -5 0 25 -5 0 25 5 0 15 5 0</points>
+		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0</point_selection>
+		<vertex_data/>
+		<primitives>
+			<primitive type="nurbs_curve">
+				<structure>
+					<array name="curve_first_knots" type="k3d::uint_t">0 7 14</array>
+					<array name="curve_first_points" type="k3d::uint_t">0 4 8</array>
+					<array name="curve_knots" type="k3d::double_t">1 1 1 2 3 3 3 1 1 1 2 3 3 3 1 1 1 2 3 3 3</array>
+					<array name="curve_orders" type="k3d::uint_t">3 3 3</array>
+					<array name="curve_point_counts" type="k3d::uint_t">4 4 4</array>
+					<array name="curve_point_weights" type="k3d::double_t">1 0.5 1 1 1 0.5 1 1 1 0.5 1 1</array>
+					<array name="curve_points" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11
+						<metadata>
+							<pair name="k3d:domain">/points/indices()</pair>
+						</metadata>
+					</array>
+					<array name="curve_selections" type="k3d::double_t">0 0 0
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
+					<array name="material" type="k3d::imaterial*">0</array>
+				</structure>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="uniform"/>
+					<arrays type="varying"/>
+				</attributes>
+			</primitive>
+		</primitives>
 	</mesh_arrays>
 </k3dml>
