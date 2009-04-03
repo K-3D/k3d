@@ -95,8 +95,8 @@ public:
 		engine->execute(get_factory().name(), "import code\n", context);
 		engine->execute(get_factory().name(), "__console = code.InteractiveConsole(locals())\n", context);
 
-		engine->execute(get_factory().name(), "def quit():\n  print \"Use k3d.exit() if you want to exit K-3D.\"", context);
-		engine->execute(get_factory().name(), "def exit():\n  print \"Use k3d.exit() if you want to exit K-3D.\"", context);
+		engine->execute(get_factory().name(), "def quit():\n  global __close\n  __close = True\n", context);
+		engine->execute(get_factory().name(), "def exit():\n  global __close\n  __close = True\n", context);
 
 		engine->execute(get_factory().name(), "import sys\n", context);
 		engine->execute(get_factory().name(), "print \"Python \" + sys.version + \" on \" + sys.platform", context, &stdout_slot, &stderr_slot);
@@ -119,7 +119,15 @@ public:
 
 		k3d::iscript_engine::context_t context;
 		context["__incomplete"] = false;
+		context["__close"] = false;
+
 		engine->execute(get_factory().name(), console_command.str(), context, &stdout_slot, &stderr_slot);
+
+		if(boost::any_cast<k3d::bool_t>(context["__close"]))
+		{
+			close();
+			return;
+		}
 
 		print_prompt(boost::any_cast<k3d::bool_t>(context["__incomplete"]) ? "... " : ">>> ");
 	}
