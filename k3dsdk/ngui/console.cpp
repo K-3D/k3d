@@ -77,7 +77,7 @@ public:
 			buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
 			buffer->move_mark(begin_input, buffer->end());
 
-			if(command_history.empty() || input != command_history.back())
+			if(!input.empty() && (command_history.empty() || input != command_history.back()))
 				command_history.push_back(input);
 			command_index = command_history.size();
 			command_signal.emit(input);
@@ -135,7 +135,7 @@ public:
 					buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
 					buffer->move_mark(begin_input, buffer->end());
 
-					if(command_history.empty() || lines[i] != command_history.back())
+					if(!lines[i].empty() && (command_history.empty() || lines[i] != command_history.back()))
 						command_history.push_back(lines[i]);
 					command_index = command_history.size();
 					command_signal.emit(lines[i]);
