@@ -60,7 +60,7 @@ public:
 		view.set_buffer(buffer);
 		view.set_editable(false);
 		view.set_cursor_visible(false);
-		view.set_wrap_mode(Gtk::WRAP_CHAR);
+		view.set_wrap_mode(Gtk::WRAP_WORD);
 		view.signal_key_press_event().connect(sigc::mem_fun(*this, &implementation::on_key_press_event), false);
 
 		scrolled_window.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
