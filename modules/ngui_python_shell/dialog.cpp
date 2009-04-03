@@ -24,12 +24,13 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/command_tree.h>
+#include <k3dsdk/idocument_sink.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/console.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/result.h>
 
 #include <gtkmm/texttag.h>
@@ -55,7 +56,8 @@ namespace python_shell
 
 /// Provides an interactive Python shell dialog
 class dialog :
-	public libk3dngui::application_window
+	public libk3dngui::application_window,
+	public k3d::idocument_sink
 {
 	typedef libk3dngui::application_window base;
 
@@ -64,7 +66,8 @@ public:
 		engine(k3d::plugin::create<k3d::iscript_engine>("Python")),
 		stdout_slot(sigc::mem_fun(*this, &dialog::print_stdout)),
 		stderr_slot(sigc::mem_fun(*this, &dialog::print_stderr)),
-		console(Gtk::manage(new k3d::ngui::console::control(*this, "console")))
+		console(Gtk::manage(new k3d::ngui::console::control(*this, "console"))),
+		document(0)
 	{
 		k3d::command_tree().add(*this, "python_shell_window");
 
@@ -104,6 +107,11 @@ public:
 		print_prompt(">>> ");
 	}
 
+	void set_document(k3d::idocument* Document)
+	{
+		document = Document;
+	}
+
 	void on_command(const k3d::string_t& Command)
 	{
 		return_if_fail(engine);
@@ -120,6 +128,8 @@ public:
 		k3d::iscript_engine::context_t context;
 		context["__incomplete"] = false;
 		context["__close"] = false;
+		if(document)
+			context["Document"] = document;
 
 		engine->execute(get_factory().name(), console_command.str(), context, &stdout_slot, &stderr_slot);
 
@@ -158,6 +168,8 @@ public:
 	Glib::RefPtr<Gtk::TextTag> prompt_tag;
 	Glib::RefPtr<Gtk::TextTag> stdout_tag;
 	Glib::RefPtr<Gtk::TextTag> stderr_tag;
+
+	k3d::idocument* document;
 
 	static k3d::iplugin_factory& get_factory()
 	{

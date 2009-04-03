@@ -75,6 +75,7 @@
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/idocument_sink.h>
 #include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
@@ -2473,7 +2474,12 @@ private:
 	void on_scripting_python_shell()
 	{
 		if(Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUIPythonShellDialog"))
+		{
+			if(k3d::idocument_sink* const document_sink = dynamic_cast<k3d::idocument_sink*>(window))
+				document_sink->set_document(&document());
+
 			window->set_transient_for(*this);
+		}
 	}
 
 	void on_scripting_tutorial_recorder()
