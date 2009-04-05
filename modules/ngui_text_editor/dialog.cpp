@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,6 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "config.h"
+
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
@@ -28,35 +30,38 @@
 #include <k3dsdk/data.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
+#include <k3dsdk/idocument_sink.h>
+#include <k3dsdk/iproperty_sink.h>
 #include <k3dsdk/iscript_engine.h>
+#include <k3dsdk/istate_recorder_sink.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/ngui/application_state.h>
-#include <k3dsdk/ngui/button.h>
-#include <k3dsdk/ngui/check_menu_item.h>
-#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
-#include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/image_menu_item.h>
-#include <k3dsdk/ngui/image_toggle_button.h>
 #include <k3dsdk/ngui/menu_item.h>
 #include <k3dsdk/ngui/menubar.h>
 #include <k3dsdk/ngui/messages.h>
-#include <k3dsdk/ngui/savable_document_window.h>
 #include <k3dsdk/ngui/scripting.h>
-#include <k3dsdk/ngui/text_editor.h>
 #include <k3dsdk/ngui/toolbar.h>
-#include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/string_cast.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/state_change_set.h>
 
+#include <gtkmm/action.h>
+#include <gtkmm/actiongroup.h>
 #include <gtkmm/box.h>
-#include <gtkmm/paned.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/textview.h>
+#include <gtkmm/uimanager.h>
+
+#ifdef K3D_GTKSOURCEVIEW_FOUND
+	#include <gtksourceview/gtksourceview.h>
+	#include <gtksourceview/gtksourcelanguagemanager.h>
+#endif // K3D_GTKSOURCEVIEW_FOUND
 
 #include <boost/assign/list_of.hpp>
 
@@ -74,144 +79,303 @@ namespace text_editor
 {
 
 class dialog :
-	public k3d::ngui::text_editor,
-	public savable_document_window
+	public application_window,
+	public k3d::idocument_sink,
+	public k3d::iproperty_sink,
+	public k3d::istate_recorder_sink
 {
 public:
 	dialog() :
-		m_unsaved_changes(false),
-		m_running(false)
+		m_document(0),
+		m_state_recorder(0),
+		m_property(0),
+		m_running(false),
+#ifdef K3D_GTKSOURCEVIEW_FOUND
+		m_view(Glib::wrap(GTK_TEXT_VIEW(gtk_source_view_new())))
+#else // K3D_GTKSOURCEVIEW_FOUND
+		m_view(new Gtk::TextView())
+#endif // !K3D_GTKSOURCEVIEW_FOUND
 	{
-	}
+		m_actions = Gtk::ActionGroup::create();
 
-	void initialize(document_state& Document)
-	{
-		savable_document_window::initialize(Document);
+		m_actions->add(Gtk::Action::create("file", _("_File")));
+		m_actions->add(Gtk::Action::create("new", Gtk::Stock::NEW), sigc::mem_fun(*this, &dialog::on_new));
+		m_actions->add(Gtk::Action::create("open", Gtk::Stock::OPEN), sigc::mem_fun(*this, &dialog::on_open));
+		m_actions->add(Gtk::Action::create("save", Gtk::Stock::SAVE), sigc::mem_fun(*this, &dialog::on_save));
+		m_actions->add(Gtk::Action::create("save_as", Gtk::Stock::SAVE_AS), sigc::hide_return(sigc::mem_fun(*this, &dialog::on_save_as)));
+		m_actions->add(Gtk::Action::create("revert", Gtk::Stock::REVERT_TO_SAVED), sigc::mem_fun(*this, &dialog::on_revert));
+		m_actions->add(Gtk::Action::create("import", _("Import File ...")), sigc::mem_fun(*this, &dialog::on_import));
+		m_actions->add(Gtk::Action::create("export", _("Export File ...")), sigc::mem_fun(*this, &dialog::on_export));
+		m_actions->add(Gtk::Action::create("commit", _("Commit"), _("Commit modifications to the underlying property.")), sigc::mem_fun(*this, &dialog::on_commit));
+		m_actions->add(Gtk::Action::create("close", Gtk::Stock::CLOSE), sigc::mem_fun(*this, &dialog::close));
+		m_actions->add(Gtk::Action::create("edit", _("_Edit")));
+		m_actions->add(Gtk::Action::create("execute", Gtk::Stock::EXECUTE), sigc::mem_fun(*this, &dialog::on_execute));
 
-		k3d::command_tree().add(*this, get_factory().name(), dynamic_cast<k3d::icommand_node*>(&Document.document()));
+		m_ui_manager = Gtk::UIManager::create();
+		m_ui_manager->insert_action_group(m_actions);
+		add_accel_group(m_ui_manager->get_accel_group());
 
-		menubar::control* const menubar = new menubar::control(*this, "menus");
-
-		Gtk::Menu* const menu_file = new Gtk::Menu();
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_new", Gtk::Stock::NEW), sigc::mem_fun(*this, &dialog::on_file_new))));
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_open", Gtk::Stock::OPEN), sigc::mem_fun(*this, &dialog::on_file_open))));
-		menu_file->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_save", Gtk::Stock::SAVE), sigc::mem_fun(*this, &dialog::on_file_save))));
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_save_as", Gtk::Stock::SAVE_AS), sigc::mem_fun(*this, &dialog::on_file_save_as))));
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_revert", Gtk::Stock::REVERT_TO_SAVED), sigc::mem_fun(*this, &dialog::on_file_revert))));
-		menu_file->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
-		menu_file->items().push_back(*Gtk::manage(connect(new image_menu_item::control(*menubar, "file_close", Gtk::Stock::CLOSE), sigc::mem_fun(*this, &dialog::safe_close))));
-
-		Gtk::Menu* const menu_edit = new Gtk::Menu();
-		menu_edit->items().push_back(*Gtk::manage(
-			new menu_item::control(*menubar, "edit_play", _("Play")) <<
-			connect_menu_item(sigc::mem_fun(*this, &dialog::on_edit_play))));
-
-		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), *manage(menu_file)));
-		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Edit"), *manage(menu_edit)));
-
-		toolbar::control* const toolbar = new toolbar::control(*this, "toolbar");
-
-		toolbar->row(0).pack_start(*Gtk::manage(
-			new button::control(*toolbar, "play",
-				*Gtk::manage(new Gtk::Image(load_icon("play", Gtk::ICON_SIZE_BUTTON)))) <<
-			connect_button(sigc::mem_fun(*this, &dialog::on_edit_play)) <<
-			make_toolbar_button()), Gtk::PACK_SHRINK);
-
-		Gtk::HBox* const hbox1 = new Gtk::HBox(false);
-		hbox1->pack_start(*Gtk::manage(menubar), Gtk::PACK_SHRINK);
-		hbox1->pack_start(*Gtk::manage(toolbar), Gtk::PACK_SHRINK);
+		m_ui_manager->add_ui_from_string(
+			"<ui>"
+			"  <menubar name='menubar'>"
+			"    <menu action='file'>"
+			"      <menuitem action='new'/>"
+			"      <menuitem action='open'/>"
+			"      <menuitem action='save'/>"
+			"      <menuitem action='save_as'/>"
+			"      <menuitem action='revert'/>"
+			"      <menuitem action='import'/>"
+			"      <menuitem action='export'/>"
+			"      <menuitem action='commit'/>"
+			"      <separator/>"
+			"      <menuitem action='close'/>"
+			"    </menu>"
+			"    <menu action='edit'>"
+			"      <menuitem action='execute'/>"
+			"    </menu>"
+			"  </menubar>"
+			"  <toolbar name='toolbar'>"
+			"    <toolitem action='new'/>"
+			"    <toolitem action='open'/>"
+			"    <toolitem action='save'/>"
+			"    <toolitem action='commit'/>"
+			"    <separator/>"
+			"    <toolitem action='execute'/>"
+			"  </toolbar>"
+			"</ui>"
+			);
 
 		Gtk::ScrolledWindow* const scrolled_window = new Gtk::ScrolledWindow();
 		scrolled_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-		scrolled_window->add(m_script);
+		scrolled_window->add(*Gtk::manage(m_view));
 
 		m_cursor_position.set_alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER);
 
 		Gtk::VBox* const vbox1 = new Gtk::VBox(false);
-		vbox1->pack_start(*Gtk::manage(hbox1), Gtk::PACK_SHRINK);
-		vbox1->pack_start(*Gtk::manage(scrolled_window), Gtk::PACK_EXPAND_WIDGET);
+		vbox1->pack_start(*manage(m_ui_manager->get_widget("/menubar")), Gtk::PACK_SHRINK);
+		vbox1->pack_start(*manage(m_ui_manager->get_widget("/toolbar")), Gtk::PACK_SHRINK);
+		vbox1->pack_start(*manage(scrolled_window), Gtk::PACK_EXPAND_WIDGET);
 		vbox1->pack_start(m_cursor_position, Gtk::PACK_SHRINK);
 
 		add(*Gtk::manage(vbox1));
 		set_role(get_factory().name());
 		resize(600, 300);
 
-		file_new();
+		update_title();
+		update_widgets();
 		show_all();
 
-		m_script.get_buffer()->signal_changed().connect(sigc::mem_fun(*this, &dialog::on_script_changed));
-		m_script.get_buffer()->signal_mark_set().connect(sigc::mem_fun(*this, &dialog::on_mark_set));
+		m_view->get_buffer()->signal_changed().connect(sigc::mem_fun(*this, &dialog::update_title));
+		m_view->get_buffer()->signal_mark_set().connect(sigc::mem_fun(*this, &dialog::update_cursor_position));
 	}
 
-	~dialog()
+	void set_document(k3d::idocument* const Document)
 	{
+		m_document = Document;
 	}
 
-	void on_file_new()
+	void set_state_recorder(k3d::istate_recorder* const StateRecorder)
 	{
-		if(!save_changes())
+		m_state_recorder = StateRecorder;
+	}
+
+	void set_property(k3d::iproperty* const Property)
+	{
+		if(Property && Property->property_type() != typeid(k3d::string_t))
+		{
+			k3d::log() << error << "Unsupported property type." << std::endl;
 			return;
+		}
 
-		file_new();
+		m_property = Property;
+
+		set_text(m_property ? k3d::property::internal_value<k3d::string_t>(*m_property) : "");
+
+		update_title();
+		update_widgets();
 	}
 
-	void on_file_open()
+	void set_text(const k3d::string_t& Text)
 	{
-		if(!save_changes())
-			return;
+		const k3d::mime::type mime_type = k3d::mime::type::lookup(Text);
+
+#ifdef K3D_GTKSOURCEVIEW_FOUND
+		GtkSourceLanguageManager* const language_manager =  gtk_source_language_manager_get_default();
+		GtkSourceLanguage* const language = gtk_source_language_manager_guess_language(language_manager, 0, mime_type.str().c_str());
+		GtkSourceBuffer* const buffer = GTK_SOURCE_BUFFER(m_view->get_buffer()->gobj());
+		gtk_source_buffer_set_language(buffer, language);
+		gtk_source_buffer_set_highlight_syntax(buffer, true);
+#endif // K3D_GTKSOURCEVIEW_FOUND
+
+		m_view->get_buffer()->set_text(Text);
+		m_view->get_buffer()->set_modified(false);
+	}
+
+	void set_text(const k3d::filesystem::path& Path)
+	{
+		const k3d::mime::type mime_type = k3d::mime::type::lookup(Path);
+
+#ifdef K3D_GTKSOURCEVIEW_FOUND
+		GtkSourceLanguageManager* const language_manager =  gtk_source_language_manager_get_default();
+		GtkSourceLanguage* const language = gtk_source_language_manager_guess_language(language_manager, 0, mime_type.str().c_str());
+		GtkSourceBuffer* const buffer = GTK_SOURCE_BUFFER(m_view->get_buffer()->gobj());
+		gtk_source_buffer_set_language(buffer, language);
+		gtk_source_buffer_set_highlight_syntax(buffer, true);
+#endif // K3D_GTKSOURCEVIEW_FOUND
+
+		k3d::filesystem::igzstream stream(Path);
+		std::stringstream text;
+	        stream.get(*text.rdbuf(), '\0');
+
+		m_view->get_buffer()->set_text(text.str().c_str());
+		m_view->get_buffer()->set_modified(false);
+	}
+
+	void set_path(const k3d::filesystem::path& Path)
+	{
+		m_path = Path;
+		update_title();
+	}
+
+	void on_new()
+	{
+//		if(!save_changes())
+//			return;
+
+		set_text("");
+		update_title();
+	}
+
+	void on_open()
+	{
+//		if(!save_changes())
+//			return;
 
 		k3d::filesystem::path filepath;
-
 		{
-			file_chooser_dialog dialog(_("Open Script:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
+			file_chooser_dialog dialog(_("Open File:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
 			if(!dialog.get_file_path(filepath))
 				return;
 		}
 
-		file_open(filepath);
+		set_text(filepath);
+		set_path(filepath);
 	}
 
-	void on_file_save()
+	void on_save()
 	{
-		file_save();
-	}
-
-	void on_file_save_as()
-	{
-		file_save_as();
-	}
-
-	void on_file_revert()
-	{
-		if(!save_changes())
-			return;
-
 		if(m_path.empty())
-			file_new();
-		else
-			file_open(m_path);
+		{
+			on_save_as();
+			return;
+		}
+
+		k3d::filesystem::ofstream stream(m_path);
+		stream << m_view->get_buffer()->get_text();
+
+		m_view->get_buffer()->set_modified(false);
+		update_title();
 	}
 
-	void on_edit_play()
+	bool on_save_as()
 	{
-		const k3d::script::code code(m_script.get_buffer()->get_text());
+		{
+			file_chooser_dialog dialog(_("Save Script As::"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+			if(!dialog.get_file_path(m_path))
+				return false;
+		}
+
+		k3d::filesystem::ofstream stream(m_path);
+		stream << m_view->get_buffer()->get_text();
+
+		m_view->get_buffer()->set_modified(false);
+		set_path(m_path);
+
+		return true;
+	}
+
+	void on_revert()
+	{
+//		if(!save_changes())
+//			return;
+
+		if(m_property)
+		{
+			set_text(m_property ? k3d::property::internal_value<k3d::string_t>(*m_property) : "");
+		}
+		else if(m_path.empty())
+		{
+			set_text("");
+		}
+		else
+		{
+			set_text(m_path);
+		}
+	}
+
+	void on_import()
+	{
+		k3d::filesystem::path path;
+		{
+			file_chooser_dialog dialog(_("Import File:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
+			if(!dialog.get_file_path(path))
+				return;
+		}
+
+		set_text(path);
+	}
+
+	void on_export()
+	{
+		k3d::filesystem::path path;
+		{
+			file_chooser_dialog dialog(_("Export File:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+			if(!dialog.get_file_path(path))
+				return;
+		}
+
+		k3d::filesystem::ofstream stream(path);
+		stream << m_view->get_buffer()->get_text();
+	}
+
+	void on_commit()
+	{
+		if(m_property)
+		{
+			if(m_state_recorder)
+				m_state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
+
+			k3d::property::set_internal_value(*m_property, m_view->get_buffer()->get_text().raw());
+
+			if(m_state_recorder)
+				m_state_recorder->commit_change_set(m_state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_property->property_name(), K3D_CHANGE_SET_CONTEXT);
+		}
+	}
+
+	void on_execute()
+	{
+		const k3d::script::code code(m_view->get_buffer()->get_text());
 		const k3d::mime::type mime_type = k3d::mime::type::lookup(code.source());
 
 		if(mime_type.empty())
 		{
 			error_message(
-				_("Could not identify the MIME-type for this script.  K-3D supports multiple scripting languages, and the MIME-type is used to "
-				"match a script to the correct script engine. You can add a \"magic token\" at the beginning of a script to  "
-				"in the first 12 characters of a script for K-3D's built-in K3DScript engine.  If you are writing a K-3D script, check the documentation "
-				"for the scripting language you're writing in to see how to make it recognizable."));
+				_("Unknown script language"),
+				_("Could not identify the MIME-type for this script. "
+				" K-3D supports multiple scripting languages, and the MIME-type is used to "
+				"match scripts to the correct script engines. "
+				"You can add a \"magic token\" at the beginning of a script to "
+				"force identification of its MIME-type - for example, add \"#python\" at the "
+				"beginning of a Python script."
+				)); 
 			return;
 		}
 
 		const k3d::string_t name = get_title();
 
 		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
+		if(m_document)
+			context["Document"] = m_document;
 
 		m_running = true;
 		update_title();
@@ -222,13 +386,53 @@ public:
 		update_title();
 	}
 
-	void on_script_changed()
+	void update_title()
 	{
-		m_unsaved_changes = true;
-		update_title();
+		k3d::string_t title;
+
+		if(m_property)
+		{
+			if(m_property->property_node())
+			{
+				title = k3d::string_cast(boost::format(_("%1% \"%2%\" property")) % m_property->property_node()->name() % m_property->property_name());
+			}
+			else
+			{
+				title = k3d::string_cast(boost::format(_("%1%")) % m_property->property_name());
+			}
+		}
+		else if(!m_path.empty())
+		{
+			title = m_path.leaf().raw();
+		}
+		else
+		{
+			title = _("Untitled");
+		}
+
+		if(m_view->get_buffer()->get_modified())
+			title += _(" [changed]");
+
+		if(m_running)
+			title += _(" [running]");
+
+		set_title(title);
 	}
 
-	void on_mark_set(const Gtk::TextIter& Iterator, const Glib::RefPtr<Gtk::TextMark>& Mark)
+	void update_widgets()
+	{
+		m_actions->get_action("new")->set_visible(!m_property);
+		m_actions->get_action("open")->set_visible(!m_property);
+		m_actions->get_action("save")->set_visible(!m_property);
+		m_actions->get_action("save_as")->set_visible(!m_property);
+		m_actions->get_action("revert")->set_visible(true);
+		m_actions->get_action("import")->set_visible(m_property);
+		m_actions->get_action("export")->set_visible(m_property);
+		m_actions->get_action("commit")->set_visible(m_property);
+		m_actions->get_action("execute")->set_visible(!m_property);
+	}
+
+	void update_cursor_position(const Gtk::TextIter& Iterator, const Glib::RefPtr<Gtk::TextMark>& Mark)
 	{
 		if(Mark->get_name() != "insert")
 			return;
@@ -236,108 +440,37 @@ public:
 		m_cursor_position.set_text(k3d::string_cast(boost::format(_("Line: %1% Column: %2%")) % (Iterator.get_line() + 1) % (Iterator.get_visible_line_offset() + 1)));
 	}
 
-	void file_new()
-	{
-		m_script.get_buffer()->set_text("#python\n\nimport k3d\n\n");
-
-		m_path = k3d::filesystem::path();
-		m_unsaved_changes = false;
-		update_title();
-	}
-
-	void file_open(const k3d::filesystem::path& Path)
-	{
-		k3d::filesystem::igzstream stream(Path);
-
-		std::stringstream script;
-	        stream.get(*script.rdbuf(), '\0');
-		m_script.get_buffer()->set_text(script.str());
-
-		m_path = Path;
-		m_unsaved_changes = false;
-		update_title();
-	}
-
-	bool file_save()
-	{
-		if(m_path.empty())
-			return file_save_as();
-
-		k3d::filesystem::ofstream stream(m_path);
-		stream << m_script.get_buffer()->get_text();
-
-		m_unsaved_changes = false;
-		update_title();
-		return true;
-	}
-
-	bool file_save_as()
-	{
-		{
-			file_chooser_dialog dialog(_("Save Script As::"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
-			if(!dialog.get_file_path(m_path))
-				return false;
-		}
-
-		k3d::filesystem::ofstream stream(m_path);
-		stream << m_script.get_buffer()->get_text();
-
-		m_unsaved_changes = false;
-		update_title();
-		return true;
-	}
-
-	const bool unsaved_changes()
-	{
-		return m_unsaved_changes;
-	}
-
-	const std::string unsaved_document_title()
-	{
-		return get_script_title();
-	}
-
-	const bool save_unsaved_changes()
-	{
-		return file_save();
-	}
-	
-	std::string get_script_title()
-	{
-		return m_path.empty() ? _("Untitled Script") : m_path.leaf().raw();
-	}
-
-	void update_title()
-	{
-		std::string title = get_script_title();
-		if(m_unsaved_changes)
-			title += _(" [changed]");
-		if(m_running)
-			title += _(" [running]");
-
-		set_title(title);
-	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<dialog> factory(
 			k3d::uuid(0xca41ccc9, 0xb9433dec, 0x30c65c83, 0x40eb359b),
 			"NGUITextEditorDialog",
-			_("Provides a general-purpose dialog for editing text, scripts, and shaders."),
+			_("Provides a general-purpose dialog for editing source-code, text, scripts, and shaders."),
 			"NGUI Dialog",
-			k3d::iplugin_factory::EXPERIMENTAL
+			k3d::iplugin_factory::STABLE,
+			boost::assign::map_list_of("ngui:component-type", "dialog")
 			);
 
 		return factory;
 	}
-	/// Stores the file path (could be empty)
+
+	/// (Optional) document for the current text (could be NULL)
+	k3d::idocument* m_document;
+	/// (Optional) state recorder for making changes undoable (could be NULL)
+	k3d::istate_recorder* m_state_recorder;
+	/// (Optional) property source for the current text (could be NULL)
+	k3d::iproperty* m_property;
+	/// (Optional) file path source for the current text (could be empty)
 	k3d::filesystem::path m_path;
-	/// Set to true iff there are unsaved changes
-	bool m_unsaved_changes;
 	/// Set to true iff script playback is in progress
 	bool m_running;
-	/// Stores the script being recorded
-	Gtk::TextView m_script;
+
+	// Menu items
+	Glib::RefPtr<Gtk::ActionGroup> m_actions;
+	Glib::RefPtr<Gtk::UIManager> m_ui_manager;
+	/// Storage and editing for the current text
+	Gtk::TextView* const m_view;
 	/// Displays cursor position
 	Gtk::Label m_cursor_position;
 };

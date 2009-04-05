@@ -2461,11 +2461,10 @@ private:
 
 	void on_scripting_script_editor()
 	{
-		//create_script_editor(m_document_state);
 		if(Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUITextEditorDialog"))
 		{
-			if(k3d::ngui::text_editor* const text_editor = dynamic_cast<k3d::ngui::text_editor*>(window))
-				text_editor->initialize(m_document_state);
+			if(k3d::idocument_sink* const document_sink = dynamic_cast<k3d::idocument_sink*>(window))
+				document_sink->set_document(&document());
 
 			window->set_transient_for(*this);
 		}

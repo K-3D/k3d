@@ -1,0 +1,9 @@
+#ifndef MODULE_NGUI_TEXT_EDITOR_CONFIG_H
+#define MODULE_NGUI_TEXT_EDITOR_CONFIG_H
+
+// Generated file, do not edit!  Make changes to config.h.in instead.
+
+#cmakedefine K3D_GTKSOURCEVIEW_FOUND
+
+#endif // !MODULE_NGUI_TEXT_EDITOR_CONFIG_H
+

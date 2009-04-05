@@ -167,7 +167,6 @@ OPTION(K3D_BUILD_NGUI_PIPELINE_PROFILER_PANEL_MODULE "Build the user interface p
 OPTION(K3D_BUILD_NGUI_PYTHON_SHELL_MODULE "Build the interactive Python shell plugin module" ON)
 OPTION(K3D_BUILD_NGUI_RENDER_REGION_TOOL_MODULE "Build the user interface 'render region tool' plugin module" ON)
 OPTION(K3D_BUILD_NGUI_SNAP_TOOL_MODULE "Build the user interface 'snap tool' plugin module" ON)
-OPTION(K3D_BUILD_NGUI_SOURCE_EDITOR_MODULE "Build the user interface source-code editor plugin module" ${K3D_GTKSOURCEVIEW_FOUND})
 OPTION(K3D_BUILD_NGUI_TEXT_EDITOR_MODULE "Build the user interface text editor plugin module" ON)
 OPTION(K3D_BUILD_NGUI_TEST_CASE_RECORDER_MODULE "Build the user interface test-case recorder plugin module" ON)
 OPTION(K3D_BUILD_NGUI_TIMELINE_PANEL_MODULE "Build the user interface timeline panel plugin module" ON)

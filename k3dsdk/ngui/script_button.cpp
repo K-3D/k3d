@@ -30,47 +30,57 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_tree.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iproperty_sink.h>
+#include <k3dsdk/istate_recorder_sink.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/options.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/system.h>
 
 #include <gtkmm/tooltips.h>
 
-#include <k3dsdk/fstream.h>
 #include <boost/format.hpp>
 
 #include <sstream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace script_button
 {
 
-/// Specialization of k3d::script_button::data_proxy for use with k3d::iproperty objects
-template<>
-class data_proxy<k3d::iproperty> :
-	public idata_proxy
+/////////////////////////////////////////////////////////////////////////////
+// property_model
+
+/// Implementation of script_button::imodel for use with iproperty objects
+class property_model :
+	public imodel
 {
 public:
-	typedef k3d::iproperty data_t;
-
-	data_proxy(data_t& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
-		idata_proxy(StateRecorder, ChangeMessage),
+	property_model(iproperty& Data) :
 		m_readable_data(Data),
-		m_writable_data(dynamic_cast<k3d::iwritable_property*>(&Data))
+		m_writable_data(dynamic_cast<iwritable_property*>(&Data))
 	{
 	}
 
-	std::string value()
+	iproperty* property()
 	{
-		return boost::any_cast<std::string>(m_readable_data.property_internal_value());
+		return &m_readable_data;
 	}
 
-	void set_value(const std::string Value)
+	const string_t value()
+	{
+		return boost::any_cast<string_t>(m_readable_data.property_internal_value());
+	}
+
+	void set_value(const string_t& Value)
 	{
 		return_if_fail(m_writable_data);
 		m_writable_data->property_set_value(Value);
@@ -82,29 +92,31 @@ public:
 	}
 
 private:
-	data_proxy(const data_proxy& RHS);
-	data_proxy& operator=(const data_proxy& RHS);
-
-	data_t& m_readable_data;
-	k3d::iwritable_property* const m_writable_data;
+	iproperty& m_readable_data;
+	iwritable_property* const m_writable_data;
 };
 
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
+/////////////////////////////////////////////////////////////////////////////
+// model
+
+imodel* const model(iproperty& Property)
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<k3d::iproperty>(Data, StateRecorder, ChangeMessage));
+	return new property_model(Property);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+control::control(icommand_node& Parent, const string_t& Name, imodel* const Model, istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
 	base(false, 0),
 	m_load(_("Load")),
 	m_save(_("Save")),
 	m_edit(_("Edit Script")),
-	m_data(Data)
+	m_model(Model),
+	m_state_recorder(StateRecorder),
+	m_change_message(ChangeMessage)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
+	command_tree().add(*this, Name, &Parent);
 
 	m_load.signal_clicked().connect(sigc::mem_fun(*this, &control::on_load));
 	m_save.signal_clicked().connect(sigc::mem_fun(*this, &control::on_save));
@@ -121,124 +133,95 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	set_name("k3d-script-button");
 
 	// Update the display and ensure we get a notification anytime the data source changes ...
-	return_if_fail(m_data.get());
+	return_if_fail(m_model);
 
 	update(0);
-	m_data->changed_signal().connect(sigc::mem_fun(*this, &control::update));
+	m_model->changed_signal().connect(sigc::mem_fun(*this, &control::update));
 }
 
-void control::update(k3d::ihint*)
+control::~control()
 {
-	return_if_fail(m_data.get());
+	delete m_model;
+}
+
+void control::update(ihint*)
+{
+	return_if_fail(m_model);
 }
 
 void control::on_load()
 {
-	return_if_fail(m_data.get());
+	return_if_fail(m_model);
 
-	k3d::filesystem::path input_path;
+	filesystem::path input_path;
 
 	{
-		file_chooser_dialog dialog(_("Load Script:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
+		libk3dngui::file_chooser_dialog dialog(_("Load Script:"), options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
 		if(!dialog.get_file_path(input_path))
 			return;
 	}
 
 	std::stringstream buffer;
-	k3d::filesystem::ifstream input_stream(input_path);
+	filesystem::ifstream input_stream(input_path);
 	input_stream >> buffer.rdbuf();
 	input_stream.close();
 
-	if(buffer.str() != m_data->value())
+	if(buffer.str() != m_model->value())
 	{
-		if(m_data->state_recorder)
-			m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
+		if(m_state_recorder)
+			m_state_recorder->start_recording(create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
-		m_data->set_value(buffer.str());
+		m_model->set_value(buffer.str());
 
-		if(m_data->state_recorder)
-			m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message, K3D_CHANGE_SET_CONTEXT);
+		if(m_state_recorder)
+			m_state_recorder->commit_change_set(m_state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_change_message, K3D_CHANGE_SET_CONTEXT);
 	}
 }
 
 void control::on_save()
 {
-	return_if_fail(m_data.get());
+	return_if_fail(m_model);
 
-	k3d::filesystem::path output_path;
+	filesystem::path output_path;
 
 	{
-		file_chooser_dialog dialog(_("Save Script:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+		libk3dngui::file_chooser_dialog dialog(_("Save Script:"), options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		if(!dialog.get_file_path(output_path))
 			return;
 	}
 
-	k3d::filesystem::ofstream output_stream(output_path);
-	output_stream << m_data->value();
+	filesystem::ofstream output_stream(output_path);
+	output_stream << m_model->value();
 }
 
 void control::on_edit()
 {
-	return_if_fail(m_data.get());
+	return_if_fail(m_model);
 
-	try
+	if(Gtk::Window* const window = plugin::create<Gtk::Window>("NGUITextEditorDialog"))
 	{
-		k3d::filesystem::path temp_path = k3d::system::generate_temp_file();
-		return_if_fail(!temp_path.empty());
-
-		const k3d::script::code original_value(m_data->value());
-
-		k3d::iplugin_factory* const language = k3d::script::language(original_value).factory();
-		if(language && language->factory_id() == k3d::classes::PythonEngine())
-			temp_path = temp_path + ".py";
-		else if(language && language->factory_id() == k3d::classes::K3DScriptEngine())
-			temp_path = temp_path + ".k3dscript";
-		else
-			k3d::log() << warning << "unknown script language" << std::endl;
-
-
-		k3d::filesystem::ofstream output_stream(temp_path);
-		output_stream << original_value.source();
-		output_stream.close();
-
-		boost::format command_line(k3d::options::get_command(k3d::options::command::text_editor()));
-		command_line % temp_path.native_utf8_string().raw();
-		k3d::system::spawn_sync(command_line.str());
-
-		std::stringstream buffer;
-		k3d::filesystem::ifstream input_stream(temp_path);
-		input_stream >> buffer.rdbuf();
-		input_stream.close();
-
-		if(buffer.str() != original_value.source())
+		if(m_model->property())
 		{
-			if(m_data->state_recorder)
-				m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
-
-			m_data->set_value(buffer.str());
-
-			if(m_data->state_recorder)
-				m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), m_data->change_message, K3D_CHANGE_SET_CONTEXT);
+			if(iproperty_sink* const property_sink = dynamic_cast<iproperty_sink*>(window))
+				property_sink->set_property(m_model->property());
 		}
 
-		k3d::filesystem::remove(temp_path);
-	}
-	catch(std::exception& e)
-	{
-		k3d::log() << error << "Caught exception: " << e.what() << std::endl;
-	}
-	catch(...)
-	{
-		k3d::log() << error << "Caught unknown exception" << std::endl;
+		if(istate_recorder_sink* const state_recorder_sink = dynamic_cast<istate_recorder_sink*>(window))
+			state_recorder_sink->set_state_recorder(m_state_recorder);
+
+		if(Gtk::Window* const top_level = dynamic_cast<Gtk::Window*>(get_toplevel()))
+			window->set_transient_for(*top_level);
 	}
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
+const icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
 {
 	return ui_component::execute_command(Command, Arguments);
 }
 
 } // namespace script_button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

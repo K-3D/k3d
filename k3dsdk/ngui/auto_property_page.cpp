@@ -276,7 +276,7 @@ public:
 						}
 						else if(dynamic_cast<iscript_property*>(&property))
 						{
-							control = new script_button::control(m_parent, property_name, script_button::proxy(property, state_recorder, property_name));
+							control = new script_button::control(m_parent, property_name, script_button::model(property), state_recorder, property_name);
 						}
 						else if(ilist_property<string_t>* const list_property = dynamic_cast<ilist_property<string_t>*>(&property))
 						{
