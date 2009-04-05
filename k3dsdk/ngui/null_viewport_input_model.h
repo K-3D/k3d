@@ -26,7 +26,10 @@
 
 #include "viewport_input_model.h"
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -45,7 +48,9 @@ public:
 	virtual void key_release_event(viewport::control& Viewport, GdkEventKey* Event);
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_NULL_VIEWPORT_INPUT_MODEL_H
 

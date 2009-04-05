@@ -27,7 +27,10 @@
 #include <k3dsdk/options.h>
 #include <k3dsdk/xml.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace options
@@ -89,5 +92,7 @@ void enable_nag(const std::string& Type, const bool Enabled)
 
 } // namespace options
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares the libk3dngui::spin_button control, which provides a standard MVC UI for scalar values
+		\brief Declares the spin_button control, which provides a standard MVC UI for scalar values
 		\author Tim Shead (tshead@k-3d.com)
 		\author Dan Erikson <derikson@montana.com>
 */
@@ -36,7 +36,10 @@
 namespace k3d { class iproperty; }
 namespace k3d { class istate_recorder; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace spin_button
@@ -201,7 +204,9 @@ private:
 
 } // namespace spin_button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_SPIN_BUTTON_H
 

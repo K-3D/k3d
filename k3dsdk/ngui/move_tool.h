@@ -31,7 +31,10 @@
 
 #include <k3dsdk/property_collection.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -224,7 +227,9 @@ private:
 	k3d_data(k3d::point3, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_world_position;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_MOVE_TOOL_H
 

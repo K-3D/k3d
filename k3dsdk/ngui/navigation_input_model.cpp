@@ -50,7 +50,10 @@
 
 #include <gtkmm/menu.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -1118,5 +1121,7 @@ const k3d::icommand_node::result navigation_input_model::execute_command(const s
 	return m_implementation->execute_command(Command, Arguments);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

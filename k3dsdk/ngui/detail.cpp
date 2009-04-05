@@ -50,7 +50,10 @@
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/transform.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -266,5 +269,7 @@ void duplicate_selected_nodes(document_state& DocumentState)
 		DocumentState.view_node_properties_signal().emit(*new_nodes.begin());
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

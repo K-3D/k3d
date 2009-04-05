@@ -42,7 +42,7 @@
 #include <gtkmm/label.h>
 #include <gtk/gtk.h>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {

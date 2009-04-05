@@ -31,7 +31,10 @@
 
 #include <gtkmm/tooltips.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace check_button
@@ -175,5 +178,7 @@ void control::on_toggled()
 
 } // namespace check_button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

@@ -21,13 +21,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares the libk3dngui::entry control, which provides a standard MVC UI for string values
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/keyboard.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /// Converts GDK keyboard modifiers to our native keyboard modifier type
@@ -35,7 +37,9 @@ const k3d::key_modifiers convert(const unsigned int Modifiers);
 /// Converts our native keyboard modifier type to GDK keyboard modifiers
 const unsigned int convert(const k3d::key_modifiers Modifiers);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_KEYBOARD_H
 

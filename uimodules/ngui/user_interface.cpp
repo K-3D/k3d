@@ -80,8 +80,7 @@
 
 #include <iostream>
 
-// Temporary hack ...
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -464,22 +463,22 @@ public:
 
 	void message(const k3d::string_t& Message)
 	{
-		libk3dngui::message(Message);
+		k3d::ngui::message(Message);
 	}
 
 	void warning_message(const k3d::string_t& Message)
 	{
-		libk3dngui::warning_message(Message);
+		k3d::ngui::warning_message(Message);
 	}
 
 	void error_message(const k3d::string_t& Message)
 	{
-		libk3dngui::error_message(Message);
+		k3d::ngui::error_message(Message);
 	}
 
 	unsigned int query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
 	{
-		return libk3dngui::query_message(Message, DefaultOption, Options);
+		return k3d::ngui::query_message(Message, DefaultOption, Options);
 	}
 
 	bool tutorial_message(const k3d::string_t& Message)
@@ -502,7 +501,7 @@ public:
 
 	void synchronize()
 	{
-		libk3dngui::handle_pending_events();
+		k3d::ngui::handle_pending_events();
 	}
 
 	sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot)

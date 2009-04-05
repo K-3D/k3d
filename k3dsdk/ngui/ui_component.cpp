@@ -27,7 +27,10 @@
 #include <gtkmm/tooltips.h>
 #include <gtkmm/widget.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -89,5 +92,7 @@ const k3d::icommand_node::result ui_component::execute_command(const std::string
 	return base::execute_command(Command, Arguments);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

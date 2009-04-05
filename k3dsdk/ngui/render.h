@@ -33,7 +33,10 @@ namespace k3d { class irender_camera_frame; }
 namespace k3d { class irender_camera_animation; }
 namespace k3d { namespace gl { class irender_viewport; } }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -81,7 +84,9 @@ void render(k3d::icamera& Camera, k3d::irender_camera_preview& Engine);
 void render(k3d::icamera& Camera, k3d::irender_camera_frame& Engine);
 void render(document_state& DocumentState, k3d::icamera& Camera, k3d::irender_camera_animation& Engine);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_RENDER_H
 

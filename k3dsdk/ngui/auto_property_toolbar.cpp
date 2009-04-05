@@ -52,8 +52,6 @@
 #include <gtkmm/image.h>
 #include <gtkmm/stock.h>
 
-using namespace libk3dngui;
-
 namespace k3d
 {
 

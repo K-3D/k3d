@@ -42,7 +42,10 @@
 #include <k3dsdk/transform.h>
 #include <k3dsdk/utility_gl.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -208,7 +211,9 @@ protected:
 	}
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_TOOL_SELECTION_H
 

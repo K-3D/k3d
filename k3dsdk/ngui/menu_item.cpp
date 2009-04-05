@@ -30,7 +30,10 @@
 
 #include <iostream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace menu_item
@@ -82,5 +85,7 @@ void control::on_activate()
 
 } // namespace menu_item
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

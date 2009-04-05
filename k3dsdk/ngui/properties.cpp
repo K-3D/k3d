@@ -53,8 +53,6 @@
 #include <boost/format.hpp>
 #include <boost/mpl/for_each.hpp>
 
-using namespace libk3dngui;
-
 namespace k3d
 {
 

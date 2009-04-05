@@ -29,7 +29,10 @@
 
 #include <gtkmm/filechooserdialog.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /// Wraps the standard file dialog widget, adding K-3D-specific functionality
@@ -80,7 +83,9 @@ private:
 	Gtk::VBox* const extra_widget_container;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_FILE_CHOOSER_DIALOG_H
 

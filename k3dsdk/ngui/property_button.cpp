@@ -45,7 +45,10 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace property_button
@@ -100,6 +103,8 @@ void control::on_dependencies_changed(const k3d::ipipeline::dependencies_t& Depe
 
 } // namespace property_button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 

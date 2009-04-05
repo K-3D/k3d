@@ -28,7 +28,10 @@
 #include <k3dsdk/color.h>
 #include <gtkmm/window.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 //////////////////////////////////////////////////////////////////////////
@@ -60,7 +63,9 @@ private:
 	Glib::RefPtr<Gdk::GC> m_mask_gc;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_SCREEN_OVERLAY_H
 

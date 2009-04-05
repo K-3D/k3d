@@ -33,7 +33,10 @@
 #include <k3dsdk/property_collection.h>
 
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 typedef k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) bool_property_t;
@@ -253,5 +256,7 @@ viewport_input_model& selection_tool::get_input_model()
 	return m_implementation->m_input_model;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

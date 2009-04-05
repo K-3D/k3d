@@ -53,7 +53,7 @@
 #include <boost/assign/list_of.hpp>
 
 // Temporary hack
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -126,7 +126,7 @@ public:
 
 	void set_value(const k3d::bool_t Value)
 	{
-		libk3dngui::tool* const tool = m_document_state.get_tool(m_tool);
+		k3d::ngui::tool* const tool = m_document_state.get_tool(m_tool);
 		return_if_fail(tool);
 
 		m_document_state.set_active_tool(*tool);
@@ -151,7 +151,7 @@ struct implementation
 		m_document_state(DocumentState),
 		m_toolbox(false, 0)
 	{
-		libk3dngui::toolbar::control* const main_toolbar = new libk3dngui::toolbar::control(Parent, "main");
+		k3d::ngui::toolbar::control* const main_toolbar = new k3d::ngui::toolbar::control(Parent, "main");
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(*main_toolbar, "select",
 				new detail::active_tool_proxy(m_document_state, m_document_state.selection_tool()), 0,
@@ -296,7 +296,7 @@ struct implementation
 			const std::string toolbar_label = k3d::xml::attribute_text(*xml_toolbar, "label");
 			const std::string toolbar_description = k3d::xml::attribute_text(*xml_toolbar, "description");
 
-			libk3dngui::toolbar::control* const toolbar_widget = new libk3dngui::toolbar::control(Parent, toolbar_name);
+			k3d::ngui::toolbar::control* const toolbar_widget = new k3d::ngui::toolbar::control(Parent, toolbar_name);
 
 			for(k3d::xml::element::elements_t::const_iterator xml_button = xml_toolbar->children.begin(); xml_button != xml_toolbar->children.end(); ++xml_button)
 			{
@@ -426,7 +426,7 @@ struct implementation
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Unparent selected"), K3D_CHANGE_SET_CONTEXT);
 
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-			libk3dngui::unparent(**node);
+			k3d::ngui::unparent(**node);
 
 		m_document_state.deselect_all();
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
@@ -485,8 +485,8 @@ struct implementation
 // panel
 
 class panel :
-	public libk3dngui::panel::control,
-	public libk3dngui::ui_component,
+	public k3d::ngui::panel::control,
+	public k3d::ngui::ui_component,
         public Gtk::VBox
 {
 	typedef Gtk::VBox base;

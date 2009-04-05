@@ -37,7 +37,10 @@
 namespace Gtk { class DrawingArea; }
 namespace k3d { class istate_recorder; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace color_chooser
@@ -164,7 +167,9 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 
 } // namespace color_chooser
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_COLOR_CHOOSER_H
 

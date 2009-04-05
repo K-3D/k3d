@@ -49,7 +49,10 @@
 
 #include <k3dsdk/fstream.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -799,5 +802,7 @@ void rotate_tool::on_rotate(k3d::iunknown*)
 	rotate_targets(k3d::rotate3(m_rotation.internal_value()));
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

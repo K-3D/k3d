@@ -47,7 +47,10 @@
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/system.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -880,5 +883,7 @@ const k3d::icommand_node::result selection_input_model::execute_command(const st
 	return m_implementation->execute_command(Command, Arguments);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

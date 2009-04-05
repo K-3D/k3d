@@ -49,7 +49,10 @@
 #include <k3dsdk/properties.h>
 #include <k3dsdk/state_change_set.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace property_widget
@@ -294,5 +297,7 @@ void control::disconnect(k3d::inode* Node)
 
 } // namespace property_widget
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

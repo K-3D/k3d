@@ -29,7 +29,10 @@
 namespace k3d { class icommand_node; }
 namespace k3d { class iplugin_factory; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 // Forward declarations
@@ -38,6 +41,8 @@ namespace image_menu_item { class control; }
 /// Creates a menu item object based on a plugin type
 image_menu_item::control* create_menu_item(k3d::icommand_node& Parent, const std::string& NamePrefix, k3d::iplugin_factory& Factory);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_MENUS_H

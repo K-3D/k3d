@@ -31,7 +31,10 @@
 
 namespace k3d { class idocument; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -43,7 +46,7 @@ class document_state;
 class savable_document_window :
         public Gtk::Window,
 	public ui_component,
-	public unsaved_document
+	public k3d::ngui::unsaved_document
 {
 	typedef Gtk::Window base;
 
@@ -67,15 +70,17 @@ public:
 	void close();
 
 private:
-	unsaved_document* on_safe_close();
+	k3d::ngui::unsaved_document* on_safe_close();
 
 	/// Override in derived classes to handle cleanup when the window is closed
 	virtual void on_close();
 
-	document_state* m_document;
+	k3d::ngui::document_state* m_document;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_SAVABLE_DOCUMENT_WINDOW_H
 

@@ -39,7 +39,10 @@ namespace k3d { class ihint; }
 namespace k3d { class iproperty; }
 namespace k3d { class istate_recorder; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace bounding_box
@@ -108,7 +111,9 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 
 } // namespace bounding_box
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_BOUNDING_BOX_H
 

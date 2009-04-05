@@ -50,7 +50,7 @@
 #include <boost/assign/list_of.hpp>
 
 // Temporary hack
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -450,7 +450,7 @@ public:
 
 class panel :
 	public Gtk::VBox,
-	public libk3dngui::panel::control,
+	public k3d::ngui::panel::control,
 	public ui_component
 {
 	typedef Gtk::VBox base;

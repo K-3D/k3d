@@ -46,7 +46,7 @@ void open(const std::string& URI)
 	const plugin::factory::collection_t factories = plugin::factory::lookup<iuri_handler>();
 	if(factories.empty())
 	{
-		libk3dngui::error_message(k3d::string_cast(boost::format(_("Couldn't display %1%")) % URI), _("No plugin is available to open URIs."));
+		k3d::ngui::error_message(k3d::string_cast(boost::format(_("Couldn't display %1%")) % URI), _("No plugin is available to open URIs."));
 		return;
 	}
 
@@ -60,7 +60,7 @@ void open(const std::string& URI)
 		}
 	}
 
-	libk3dngui::error_message(k3d::string_cast(boost::format(_("Couldn't display %1%")) % URI), _("No application is configured to handle the given URI."));
+	k3d::ngui::error_message(k3d::string_cast(boost::format(_("Couldn't display %1%")) % URI), _("No application is configured to handle the given URI."));
 }
 
 } // namespace uri

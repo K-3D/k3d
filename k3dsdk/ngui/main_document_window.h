@@ -24,7 +24,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -32,7 +35,9 @@ class document_state;
 /// Create a new main document window, attaching it to the given document
 void create_main_document_window(document_state& DocumentState);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_MAIN_DOCUMENT_WINDOW_H
 

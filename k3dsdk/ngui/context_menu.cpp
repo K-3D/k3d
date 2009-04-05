@@ -69,7 +69,10 @@
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/utility_gl.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -645,5 +648,7 @@ Gtk::Menu* create_context_menu(document_state& DocumentState, k3d::icommand_node
 	return new detail::node_context_menu(DocumentState, Parent);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

@@ -67,8 +67,6 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/table.h>
 
-using namespace libk3dngui;
-
 namespace k3d
 {
 
@@ -331,9 +329,9 @@ public:
 						control = new point::control(m_parent, property_name, point::proxy(property));
 					}
 					// angle_axis properties ...
-					else if(property_type == typeid(angle_axis))
+					else if(property_type == typeid(k3d::angle_axis))
 					{
-						control = new libk3dngui::angle_axis::control(m_parent, property_name, libk3dngui::angle_axis::proxy(property, state_recorder, property_name));
+						control = new k3d::ngui::angle_axis::control(m_parent, property_name, k3d::ngui::angle_axis::proxy(property, state_recorder, property_name));
 					}
 					// Transformation properties ...
 					else if(property_type == typeid(matrix4))

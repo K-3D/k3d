@@ -36,7 +36,10 @@
 
 #include <boost/format.hpp>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -80,5 +83,7 @@ image_menu_item::control* create_menu_item(k3d::icommand_node& Parent, const std
 	return menu_item;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

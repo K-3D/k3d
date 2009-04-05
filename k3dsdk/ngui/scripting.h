@@ -29,7 +29,10 @@
 
 namespace k3d { namespace filesystem { class path; } }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /// Executes a script using a specific language and providing user feedback for errors
@@ -39,7 +42,9 @@ bool execute_script(const k3d::script::code& Script, const std::string& ScriptNa
 /// Executes a script, attempting to automatically recognize the language and providing user feedback for errors
 bool execute_script(const k3d::filesystem::path& Script, k3d::iscript_engine::context_t& Context);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_SCRIPTING_H
 

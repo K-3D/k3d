@@ -36,7 +36,10 @@
 
 #include <sstream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace selection_button
@@ -222,5 +225,7 @@ void control::update(k3d::ihint*)
 
 } // namespace selection_button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

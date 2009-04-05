@@ -35,7 +35,10 @@ namespace Gtk { class Image; }
 namespace k3d { class ihint; }
 namespace k3d { class iproperty; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace bitmap_preview
@@ -131,7 +134,9 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data);
 
 } // namespace bitmap_preview
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_BITMAP_PREVIEW_H
 

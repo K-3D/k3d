@@ -64,7 +64,10 @@
 
 using namespace k3d::selection;
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace viewport
@@ -1517,5 +1520,7 @@ const k3d::line3 mouse_to_world(viewport::control& Viewport, const k3d::point2& 
 	return k3d::line3(far_plane - near_plane, near_plane);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

@@ -41,7 +41,7 @@
 #include <k3dsdk/share.h>
 #include <k3dsdk/itransform_sink.h>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {

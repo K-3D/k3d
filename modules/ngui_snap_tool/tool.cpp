@@ -55,7 +55,7 @@
 
 #include <boost/assign/list_of.hpp>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -71,7 +71,7 @@ namespace snap
 
 /// Interactive tool that provides "snappable" transformations for objects
 class tool :
-	public libk3dngui::tool
+	public k3d::ngui::tool
 {
 public:
 	tool();
@@ -1137,7 +1137,7 @@ const k3d::icommand_node::result tool::execute_command(const std::string& Comman
 	if(result != RESULT_UNKNOWN_COMMAND)
 		return result;
 
-	return libk3dngui::tool::execute_command(Command, Arguments);
+	return k3d::ngui::tool::execute_command(Command, Arguments);
 }
 
 k3d::iproperty_collection* tool::get_property_collection()

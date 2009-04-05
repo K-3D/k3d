@@ -29,7 +29,10 @@
 
 #include <gtkmm/window.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -39,7 +42,7 @@ namespace libk3dngui
 class savable_application_window :
         public Gtk::Window,
 	public ui_component,
-	public unsaved_document
+	public k3d::ngui::unsaved_document
 {
 	typedef Gtk::Window base;
 
@@ -58,13 +61,15 @@ public:
 	void close();
 
 private:
-	unsaved_document* on_safe_close();
+	k3d::ngui::unsaved_document* on_safe_close();
 
 	/// Override in derived classes to handle cleanup when the window is closed
 	virtual void on_close();
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_SAVABLE_APPLICATION_WINDOW_H
 

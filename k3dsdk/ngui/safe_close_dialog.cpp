@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -35,7 +35,10 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/treeview.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace safe_close_dialog
@@ -55,7 +58,7 @@ public:
 	}
 
 	Gtk::TreeModelColumn<Glib::ustring> label;
-	Gtk::TreeModelColumn<bool> save;
+	Gtk::TreeModelColumn<bool_t> save;
 };
 
 } // namespace detail
@@ -64,11 +67,11 @@ int run(Gtk::Window& Parent, const std::string& Title)
 {
 	Gtk::MessageDialog dialog(Parent, "", false, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_NONE);
 
-	dialog.set_message(k3d::string_cast(boost::format(_("Save the changes to document \"%1%\" before closing?")) % Title));
+	dialog.set_message(string_cast(boost::format(_("Save the changes to document \"%1%\" before closing?")) % Title));
 	dialog.set_secondary_text( _("If you don't save, changes will be permanently lost (no undo)."));
 
-    Gtk::Button* const close_button = new Gtk::Button(_("Cl_ose without Saving"), true);
-    close_button->show();
+	Gtk::Button* const close_button = new Gtk::Button(_("Cl_ose without Saving"), true);
+	close_button->show();
 
 	dialog.add_action_widget(*Gtk::manage(close_button), Gtk::RESPONSE_CLOSE);
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -76,7 +79,7 @@ int run(Gtk::Window& Parent, const std::string& Title)
 
 	dialog.set_default_response(Gtk::RESPONSE_OK);
 
-    const int result = dialog.run();
+	const int result = dialog.run();
 
 	return result;
 }
@@ -90,7 +93,7 @@ int run(Gtk::Window& Parent, entries_t& UnsavedDocuments)
 
 	Gtk::MessageDialog dialog(Parent, "", false, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_NONE);
 
-	dialog.set_message(k3d::string_cast(boost::format(_("There are %1% documents with unsaved changes. Save changes before closing?")) % UnsavedDocuments.size()));
+	dialog.set_message(string_cast(boost::format(_("There are %1% documents with unsaved changes. Save changes before closing?")) % UnsavedDocuments.size()));
 	dialog.set_secondary_text(_("Select the documents you want to save:"));
 
 	detail::unsaved_document_columns columns;
@@ -131,8 +134,8 @@ int run(Gtk::Window& Parent, entries_t& UnsavedDocuments)
 
 	dialog.get_vbox()->show_all();
 
-    Gtk::Button* const close_button = new Gtk::Button(_("Cl_ose without Saving"), true);
-    close_button->show();
+	Gtk::Button* const close_button = new Gtk::Button(_("Cl_ose without Saving"), true);
+	close_button->show();
 
 	dialog.add_action_widget(*Gtk::manage(close_button), Gtk::RESPONSE_CLOSE);
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -147,4 +150,6 @@ int run(Gtk::Window& Parent, entries_t& UnsavedDocuments)
 
 } // namespace safe_close_dialog
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d

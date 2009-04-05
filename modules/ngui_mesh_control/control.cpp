@@ -40,6 +40,8 @@
 
 #include <gtk/gtkmain.h>
 
+using namespace k3d::ngui;
+
 namespace k3d
 {
 	/// Iterates over every structure in the given mesh, in hierarchical order, passing each structure to a functor.
@@ -109,7 +111,7 @@ public:
 	{
 	}
 
-	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent, k3d::iproperty& Property)
+	void initialize(document_state& DocumentState, k3d::icommand_node& Parent, k3d::iproperty& Property)
 	{
 		Gtk::Button* const menu_button = new Gtk::Button(_("Mesh Options"));
 		menu_button->signal_clicked().connect(sigc::bind(sigc::mem_fun(*this, &control::on_choose), &Property));
@@ -320,7 +322,7 @@ public:
 	{
 		k3d::filesystem::path output_path;
 		{
-			libk3dngui::file_chooser_dialog dialog(_("Save Mesh as GraphViz .dot file:"), "dotfile", Gtk::FILE_CHOOSER_ACTION_SAVE);
+			file_chooser_dialog dialog(_("Save Mesh as GraphViz .dot file:"), "dotfile", Gtk::FILE_CHOOSER_ACTION_SAVE);
 			if(!dialog.get_file_path(output_path))
 				return;
 		}

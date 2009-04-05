@@ -27,7 +27,10 @@
 #include <gtkmm/accelgroup.h>
 #include <gtkmm/cellrenderertext.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -53,7 +56,9 @@ private:
 	Glib::RefPtr<Gtk::AccelGroup> m_disabled_accel_group;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_HOTKEY_CELL_RENDERER_TEXT_H
 

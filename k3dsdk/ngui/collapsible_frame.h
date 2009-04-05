@@ -25,7 +25,10 @@
 // Forward declarations
 namespace Gtk { class Button; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace collapsible_frame
@@ -75,6 +78,8 @@ private:
 
 } // namespace collapsible_frame
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_COLLAPSIBLE_FRAME_H

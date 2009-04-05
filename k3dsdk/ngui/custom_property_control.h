@@ -26,7 +26,6 @@
 
 #include <k3dsdk/iunknown.h>
 
-namespace libk3dngui { class document_state; }
 namespace Gtk { class Widget; }
 
 namespace k3d
@@ -37,6 +36,8 @@ class iproperty;
 
 namespace ngui
 {
+
+class document_state;
 
 namespace custom_property
 {
@@ -49,7 +50,7 @@ public:
 	virtual ~control() {}
 
 	/// Called once at startup to initialize the control (this is necessary because plugins can't take constructor arguments).
-	virtual void initialize(libk3dngui::document_state& DocumentState, icommand_node& Parent, iproperty& Property) = 0;
+	virtual void initialize(document_state& DocumentState, icommand_node& Parent, iproperty& Property) = 0;
 
 protected:
 	control() {}

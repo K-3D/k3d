@@ -37,7 +37,10 @@
 namespace k3d { class ihint; }
 namespace k3d { class istate_recorder; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace check_menu_item
@@ -157,7 +160,9 @@ inline std::auto_ptr<idata_proxy> proxy()
 
 } // namespace check_menu_item
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_CHECK_MENU_ITEM_H
 

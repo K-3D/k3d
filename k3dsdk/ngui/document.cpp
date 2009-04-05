@@ -47,7 +47,10 @@
 #include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -300,5 +303,7 @@ void open_document(const k3d::filesystem::path& Path)
 	k3d::property::set_internal_value(document->title(), Path.leaf());
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

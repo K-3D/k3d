@@ -61,7 +61,7 @@
 #include <valarray>
 
 // Temporary hack ...
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -101,8 +101,8 @@ private:
 // panel
 
 class panel :
-	public libk3dngui::panel::control,
-	public libk3dngui::ui_component,
+	public k3d::ngui::panel::control,
+	public k3d::ngui::ui_component,
 	public Gtk::VBox
 {
 public:
@@ -154,7 +154,7 @@ public:
 		m_drawing_area.signal_scroll_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::scroll_event), true));
 	}
 
-	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(k3d::ngui::document_state& DocumentState, k3d::icommand_node& Parent)
 	{
 		k3d::command_tree().add(*this, "pipeline", &Parent);
 		m_document_state = &DocumentState;
@@ -200,7 +200,7 @@ public:
 		const unsigned long width = 512;
 		const unsigned long height = static_cast<unsigned long>(width * aspect_ratio());
 
-		libk3dngui::file_chooser_dialog dialog(_("Save PNG Image:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+		k3d::ngui::file_chooser_dialog dialog(_("Save PNG Image:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("PNG Image (*.png)"), "*.png");
 		dialog.add_all_files_filter();
 		dialog.append_extension(".png");
@@ -226,7 +226,7 @@ public:
 		const k3d::double_t width = 5 * 72.0;
 		const k3d::double_t height = width * aspect_ratio();
 
-		libk3dngui::file_chooser_dialog dialog(_("Save PDF Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+		k3d::ngui::file_chooser_dialog dialog(_("Save PDF Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("PDF Document (*.pdf)"), "*.pdf");
 		dialog.add_all_files_filter();
 		dialog.append_extension(".pdf");
@@ -250,7 +250,7 @@ public:
 		const k3d::double_t width = 5 * 72.0;
 		const k3d::double_t height = width * aspect_ratio();
 
-		libk3dngui::file_chooser_dialog dialog(_("Save Postscript Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+		k3d::ngui::file_chooser_dialog dialog(_("Save Postscript Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("Postscript Document (*.ps)"), "*.ps");
 		dialog.add_all_files_filter();
 		dialog.append_extension(".ps");
@@ -274,7 +274,7 @@ public:
 		const k3d::double_t width = 5 * 72.0;
 		const k3d::double_t height = width * aspect_ratio();
 
-		libk3dngui::file_chooser_dialog dialog(_("Save SVG Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+		k3d::ngui::file_chooser_dialog dialog(_("Save SVG Document:"), k3d::options::path::bitmaps(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		dialog.add_pattern_filter(_("SVG Document (*.svg)"), "*.svg");
 		dialog.add_all_files_filter();
 		dialog.append_extension(".svg");

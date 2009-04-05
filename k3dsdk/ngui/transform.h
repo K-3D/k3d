@@ -28,7 +28,10 @@
 
 namespace k3d { class inode; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /// Defines an ordered collection of objects whose transformation properties are chained together
@@ -49,7 +52,9 @@ std::ostream& operator<<(std::ostream&, const show_history&);
 /// Unparents a node
 void unparent(k3d::inode& Node);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_TRANSFORM_H
 

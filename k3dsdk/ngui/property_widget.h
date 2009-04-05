@@ -36,7 +36,10 @@ namespace k3d { class inode; }
 namespace k3d { class iproperty; }
 namespace k3d { class istate_recorder; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -188,7 +191,9 @@ std::auto_ptr<idata_proxy> proxy(document_state& DocumentState, data_t& Data, k3
 
 } // namespace property_widget
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_PROPERTY_WIDGET_H
 

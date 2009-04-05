@@ -38,7 +38,10 @@ namespace k3d { class idocument; }
 namespace k3d { class inode; }
 namespace k3d { namespace xml { class element; } }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace viewport { class control; }
@@ -121,7 +124,9 @@ private:
 	k3d::xml::element* const m_storage;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_COMMAND_ARGUMENTS_H
 

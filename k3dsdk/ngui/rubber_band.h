@@ -32,7 +32,10 @@
 namespace Gdk { class GC; }
 namespace Gtk { class Widget; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -55,6 +58,8 @@ private:
 	Glib::RefPtr<Gdk::GC> gc;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_RUBBER_BAND_H

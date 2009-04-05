@@ -30,7 +30,10 @@
 namespace Gdk { class Pixbuf; }
 namespace k3d { namespace filesystem { class path; } }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /// Processes any pending user interface events
@@ -46,7 +49,9 @@ const Gdk::Color convert(const k3d::color& RHS);
 /// Converts a Gdk::Color to a k3d::color
 const k3d::color convert(const Gdk::Color& RHS);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_UTILITY_H
 

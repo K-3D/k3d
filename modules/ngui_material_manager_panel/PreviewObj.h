@@ -44,7 +44,7 @@ namespace material_manager
 namespace mechanics
 {
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 class PreviewObj
 {

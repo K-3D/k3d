@@ -24,7 +24,10 @@
 #include "hotkey_entry.h"
 #include <gtkmm/window.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -54,5 +57,7 @@ bool hotkey_entry::on_focus_out_event(GdkEventFocus* Event)
 	return base::on_focus_out_event(Event);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

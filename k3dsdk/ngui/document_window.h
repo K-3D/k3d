@@ -30,7 +30,10 @@
 
 namespace k3d { class idocument; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -64,7 +67,9 @@ private:
 	document_state& m_document;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_DOCUMENT_WINDOW_H
 

@@ -49,7 +49,10 @@
 
 #include <sstream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -422,5 +425,7 @@ k3d::inode* upstream_mesh_modifier(k3d::inode& Object)
 	return 0;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

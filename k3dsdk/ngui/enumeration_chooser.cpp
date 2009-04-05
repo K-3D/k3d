@@ -37,7 +37,10 @@
 
 #include <boost/scoped_ptr.hpp>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace enumeration_chooser
@@ -291,5 +294,7 @@ void control::on_list_changed()
 
 } // namespace enumeration_chooser
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

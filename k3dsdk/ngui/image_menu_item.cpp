@@ -34,7 +34,10 @@
 
 #include <iostream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace image_menu_item
@@ -102,6 +105,8 @@ image_menu_item::control* connect(image_menu_item::control* const Control, const
 	return Control;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 

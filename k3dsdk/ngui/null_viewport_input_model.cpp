@@ -23,7 +23,10 @@
 
 #include "null_viewport_input_model.h"
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -54,5 +57,7 @@ void null_viewport_input_model::key_release_event(viewport::control& Viewport, G
 
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

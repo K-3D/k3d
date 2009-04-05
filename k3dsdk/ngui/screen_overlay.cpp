@@ -28,7 +28,10 @@
 #include <gdkmm/bitmap.h>
 #include <gtkmm/window.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,5 +108,7 @@ void screen_overlay::update()
 	handle_pending_events();
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

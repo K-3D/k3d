@@ -54,7 +54,10 @@
 
 #include <iostream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace panel_frame
@@ -407,5 +410,7 @@ const k3d::icommand_node::result control::execute_command(const k3d::string_t& C
 
 } // namespace panel_frame
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

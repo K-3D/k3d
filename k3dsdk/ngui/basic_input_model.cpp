@@ -28,7 +28,10 @@
 
 #include <map>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -452,5 +455,7 @@ sigc::connection basic_input_model::connect_key_release(const sigc::slot<void, c
 	return m_implementation->key_release.connect(Slot);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

@@ -68,6 +68,8 @@
 #include <sstream>
 #include <set>
 
+using namespace k3d::ngui;
+
 namespace module
 {
 
@@ -80,7 +82,7 @@ namespace uveditor
 namespace detail
 {
 
-std::vector<const k3d::mesh*> get_selected_meshes( libk3dngui::document_state& DocumentState )
+std::vector<const k3d::mesh*> get_selected_meshes(document_state& DocumentState )
 {
 	const k3d::nodes_t selected_nodes = DocumentState.selected_nodes();
 	k3d::imesh_source* mesh_source = 0;
@@ -95,10 +97,10 @@ std::vector<const k3d::mesh*> get_selected_meshes( libk3dngui::document_state& D
 }
 
 
-class uv_set_model : public libk3dngui::enumeration_chooser::imodel
+class uv_set_model : public enumeration_chooser::imodel
 {
 public:
-	uv_set_model( libk3dngui::document_state& DocumentState )
+	uv_set_model(document_state& DocumentState )
 		: m_document_state( DocumentState )
 	{
 		m_document_state.document_selection_change_signal().connect(sigc::mem_fun(*this, &uv_set_model::on_document_selection_changed));
@@ -165,7 +167,7 @@ public:
 	}
 
 private:
-	libk3dngui::document_state& m_document_state;
+	document_state& m_document_state;
 
 	sigc::signal<void, k3d::iunknown*> m_data_changed_signal;
 	sigc::signal<void> m_values_changed_signal;
@@ -179,8 +181,8 @@ private:
 // panel
 
 class panel :
-	public libk3dngui::panel::control,
-	public libk3dngui::ui_component,
+	public k3d::ngui::panel::control,
+	public k3d::ngui::ui_component,
 	public Gtk::VBox
 {
 public:
@@ -191,15 +193,15 @@ public:
 	{
 	}
 
-	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
 	{
 		m_document_state = &DocumentState;
 
 		k3d::command_tree().add(*this, "uveditor", &Parent);
 
-		//libk3dngui::enumeration_chooser::proxy(property, state_recorder, property_name)
+		//enumeration_chooser::proxy(property, state_recorder, property_name)
 		m_uv_set_model = new detail::uv_set_model( DocumentState );
-		m_set_chooser = Gtk::manage(new libk3dngui::enumeration_chooser::control( Parent, "Test", m_uv_set_model));
+		m_set_chooser = Gtk::manage(new enumeration_chooser::control( Parent, "Test", m_uv_set_model));
 		m_drawing_area = Gtk::manage(new Gtk::DrawingArea());
 		//pack_end(*Gtk::manage(new Gtk::Label(k3d::string_cast(_("Test")))), Gtk::PACK_SHRINK);
 		pack_start(*m_set_chooser, Gtk::PACK_SHRINK);
@@ -224,10 +226,10 @@ public:
 
 		m_drawing_area->add_events(Gdk::POINTER_MOTION_MASK | Gdk::SCROLL_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK);
 
-		m_drawing_area->signal_button_press_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &libk3dngui::basic_input_model::button_press_event), true));
-		m_drawing_area->signal_button_release_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &libk3dngui::basic_input_model::button_release_event), true));
-		m_drawing_area->signal_motion_notify_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &libk3dngui::basic_input_model::motion_notify_event), true));
-		m_drawing_area->signal_scroll_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &libk3dngui::basic_input_model::scroll_event), true));
+		m_drawing_area->signal_button_press_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::button_press_event), true));
+		m_drawing_area->signal_button_release_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::button_release_event), true));
+		m_drawing_area->signal_motion_notify_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::motion_notify_event), true));
+		m_drawing_area->signal_scroll_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::scroll_event), true));
 
         show_all();
 	}
@@ -496,10 +498,10 @@ private:
     GLEWContext* m_glew_context;
 
     Gtk::DrawingArea* m_drawing_area;
-    libk3dngui::enumeration_chooser::control* m_set_chooser;
+    enumeration_chooser::control* m_set_chooser;
     detail::uv_set_model* m_uv_set_model;
 	
-    libk3dngui::document_state* m_document_state;
+    document_state* m_document_state;
     k3d::icommand_node* m_parent;
 
 	k3d::double_t m_zoom_factor;
@@ -507,7 +509,7 @@ private:
 
 	k3d::point2 m_last_mouse;
 
-	libk3dngui::basic_input_model m_input_model;
+	basic_input_model m_input_model;
 };
 
 } // namespace pipeline

@@ -44,7 +44,10 @@
 #include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace text
@@ -276,5 +279,7 @@ const k3d::string_t control::change_message(const k3d::string_t& Value)
 
 } // namespace text
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

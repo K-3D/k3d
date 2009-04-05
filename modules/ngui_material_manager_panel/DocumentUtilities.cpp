@@ -25,7 +25,7 @@
 #include <k3dsdk/imaterial_sink.h>
 #include <k3dsdk/imesh_sink.h>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {

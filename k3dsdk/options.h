@@ -72,7 +72,6 @@ namespace command
 {
 
 inline const string_t bitmap_viewer() { return "bitmap_viewer"; }
-inline const string_t text_editor() { return "text_editor"; }
 
 } // namespace command
 

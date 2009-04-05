@@ -80,7 +80,10 @@
 #include <functional>
 #include <set>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -1910,7 +1913,7 @@ public:
 	tool* m_active_tool;
 
 	/// Store builtin tools (deprecated)
-	libk3dngui::selection_tool* m_selection_tool;
+	k3d::ngui::selection_tool* m_selection_tool;
 	tool* m_move_tool;
 	tool* m_rotate_tool;
 	tool* m_scale_tool;
@@ -1984,10 +1987,10 @@ document_state::document_state(k3d::idocument& Document) :
 
 	Document.close_signal().connect(sigc::mem_fun(*this, &document_state::on_document_close));
 
-	m_implementation->m_selection_tool = new libk3dngui::selection_tool(*this, "selection_tool");
-	m_implementation->m_move_tool = new libk3dngui::move_tool(*this, "move_tool");
-	m_implementation->m_rotate_tool = new libk3dngui::rotate_tool(*this, "rotate_tool");
-	m_implementation->m_scale_tool = new libk3dngui::scale_tool(*this, "scale_tool");
+	m_implementation->m_selection_tool = new k3d::ngui::selection_tool(*this, "selection_tool");
+	m_implementation->m_move_tool = new k3d::ngui::move_tool(*this, "move_tool");
+	m_implementation->m_rotate_tool = new k3d::ngui::rotate_tool(*this, "rotate_tool");
+	m_implementation->m_scale_tool = new k3d::ngui::scale_tool(*this, "scale_tool");
 
 	m_implementation->m_active_tool = m_implementation->m_selection_tool;
 	m_implementation->m_active_tool->activate();
@@ -2295,5 +2298,7 @@ void document_state::popup_context_menu(const bool UserAction)
 	m_implementation->popup_context_menu(UserAction);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

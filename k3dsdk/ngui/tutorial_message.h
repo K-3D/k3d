@@ -28,7 +28,10 @@
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/signal_system.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /// Singleton object that manages the global tutorial-message state
@@ -67,7 +70,9 @@ private:
 	implementation* const m_implementation;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_TUTORIAL_MESSAGE_H
 

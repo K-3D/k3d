@@ -32,7 +32,10 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/utility_gl.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -138,5 +141,7 @@ k3d::iproperty_collection* tool::get_property_collection()
 }
 
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

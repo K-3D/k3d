@@ -50,7 +50,10 @@
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace node_chooser
@@ -318,5 +321,7 @@ std::auto_ptr<iselection_filter> filter(k3d::iproperty& Data)
 
 } // namespace node_chooser
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

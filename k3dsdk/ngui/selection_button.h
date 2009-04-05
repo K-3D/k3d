@@ -38,7 +38,10 @@ namespace k3d { class ihint; }
 namespace k3d { class istate_recorder; }
 namespace Gtk { class Button; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace selection_button
@@ -162,7 +165,9 @@ inline std::auto_ptr<idata_proxy> proxy()
 
 } // namespace selection_button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_SELECTION_BUTTON_H
 

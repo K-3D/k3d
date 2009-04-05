@@ -42,7 +42,10 @@
 
 namespace k3d { namespace gl { class selection_state; } }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -203,7 +206,9 @@ const k3d::point2 ndc_to_widget(viewport::control& Viewport, const k3d::point2& 
 /// Converts widget coordinates to a line in world coordinates
 const k3d::line3 mouse_to_world(viewport::control& Viewport, const k3d::point2& WidgetCoords);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_VIEWPORT_H
 

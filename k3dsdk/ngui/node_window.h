@@ -30,7 +30,10 @@
 
 namespace k3d { class inode; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,7 +74,9 @@ private:
 	implementation* const m_implementation;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_NODE_WINDOW_H
 

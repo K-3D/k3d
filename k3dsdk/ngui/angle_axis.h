@@ -38,7 +38,10 @@ namespace k3d { class ihint; }
 namespace k3d { class iproperty; }
 namespace k3d { class istate_recorder; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace angle_axis
@@ -112,7 +115,9 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 
 } // namespace angle_axis
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_ANGLE_AXIS_H
 

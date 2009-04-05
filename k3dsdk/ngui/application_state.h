@@ -29,11 +29,14 @@
 
 namespace Gtk { class Window; }
 
-namespace libk3dngui
+namespace k3d { namespace ngui { class unsaved_document; } }
+
+namespace k3d
 {
 
-class unsaved_document;
-	
+namespace ngui
+{
+
 /// This ugly little fellow stores global (application-wide) user interface state in one place to minimize coupling between UI components
 class application_state
 {
@@ -42,7 +45,7 @@ public:
 	static application_state& instance();
 
 	/// Connects a slot to a signal that will be called prior to safe shutdown.
-	sigc::connection connect_safe_close_signal(const sigc::slot<unsaved_document*>& Slot);
+	sigc::connection connect_safe_close_signal(const sigc::slot<k3d::ngui::unsaved_document*>& Slot);
 	/// Attempts to safely close the application, saving unsaved documents and giving the user a chance to cancel.  Returns true iff the application will close.
 	bool safe_close(Gtk::Window& Parent);
 
@@ -66,7 +69,9 @@ private:
 	implementation* const m_implementation;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_APPLICATION_STATE_H
 

@@ -25,7 +25,10 @@
 namespace Glib { class ustring; }
 namespace Gtk { class Tooltips; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +65,9 @@ private:
 	bool m_enable_recording;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_UI_COMPONENT_H	
 

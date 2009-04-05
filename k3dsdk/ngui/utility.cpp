@@ -28,7 +28,10 @@
 #include <gdkmm/pixbuf.h>
 #include <gtkmm/main.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -108,5 +111,7 @@ const k3d::color convert(const Gdk::Color& RHS)
 	return k3d::color(RHS.get_red_p(), RHS.get_green_p(), RHS.get_blue_p());
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

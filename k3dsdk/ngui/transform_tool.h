@@ -43,7 +43,10 @@
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -497,7 +500,9 @@ protected:
 	connections_t m_connections;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_TRANSFORM_TOOL_H
 

@@ -2,7 +2,7 @@
 #define K3DSDK_NGUI_UNSAVED_DOCUMENT_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,7 +22,10 @@
 
 #include <k3dsdk/types.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -33,11 +36,11 @@ class unsaved_document
 {
 public:
 	/// Returns true iff there are unsaved changes to the underlying document.
-	virtual const k3d::bool_t unsaved_changes() = 0;
+	virtual const bool_t unsaved_changes() = 0;
 	/// Return a human-readable title for the underlying document.
-	virtual const k3d::string_t unsaved_document_title() = 0;
+	virtual const string_t unsaved_document_title() = 0;
 	/// Save the underlying document, returning true if it was saved successfully.  Implementations may need to the prompt the user for a filename, and should return false if the user cancels file selection.
-	virtual const k3d::bool_t save_unsaved_changes() = 0;
+	virtual const bool_t save_unsaved_changes() = 0;
 
 protected:
 	unsaved_document() {}
@@ -46,7 +49,9 @@ protected:
 	virtual ~unsaved_document() {}
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_UNSAVED_DOCUMENT_H	
 

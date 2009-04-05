@@ -27,7 +27,10 @@
 #include "ui_component.h"
 #include <gtkmm/box.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace toolbar
@@ -59,7 +62,9 @@ private:
 
 } // namespace toolbar
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_TOOLBAR_H
 

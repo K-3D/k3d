@@ -156,7 +156,7 @@ void control::on_load()
 	filesystem::path input_path;
 
 	{
-		libk3dngui::file_chooser_dialog dialog(_("Load Script:"), options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
+		file_chooser_dialog dialog(_("Load Script:"), options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
 		if(!dialog.get_file_path(input_path))
 			return;
 	}
@@ -185,7 +185,7 @@ void control::on_save()
 	filesystem::path output_path;
 
 	{
-		libk3dngui::file_chooser_dialog dialog(_("Save Script:"), options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+		file_chooser_dialog dialog(_("Save Script:"), options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 		if(!dialog.get_file_path(output_path))
 			return;
 	}

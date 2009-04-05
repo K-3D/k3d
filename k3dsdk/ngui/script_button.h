@@ -84,7 +84,7 @@ imodel* const model(iproperty& Property);
 /// Provides a UI for manipulating script data (i.e. the view and the controller from model-view-controller)
 class control :
 	public Gtk::HBox,
-	public libk3dngui::ui_component
+	public ui_component
 {
 	typedef Gtk::HBox base;
 

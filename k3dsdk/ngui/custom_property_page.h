@@ -26,7 +26,6 @@
 
 #include <k3dsdk/iunknown.h>
 
-namespace libk3dngui { class document_state; }
 namespace Gtk { class Widget; }
 
 namespace k3d
@@ -38,6 +37,8 @@ class inode;
 namespace ngui
 {
 
+class document_state;
+
 namespace custom_property_page
 {
 
@@ -47,7 +48,7 @@ class control
 public:
 	virtual ~control() {}
 
-	virtual Gtk::Widget& get_widget(libk3dngui::document_state& DocumentState, icommand_node& Parent, inode& Node) = 0;
+	virtual Gtk::Widget& get_widget(document_state& DocumentState, icommand_node& Parent, inode& Node) = 0;
 
 protected:
 	control() {}

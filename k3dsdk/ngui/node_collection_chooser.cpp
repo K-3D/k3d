@@ -52,7 +52,10 @@
 
 #include <boost/shared_ptr.hpp>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace node_collection_chooser
@@ -411,5 +414,7 @@ void control::on_edit()
 
 } // namespace node_collection_chooser
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

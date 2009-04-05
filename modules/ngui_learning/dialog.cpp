@@ -52,7 +52,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/assign/list_of.hpp>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -68,9 +68,9 @@ namespace learning
 
 /// Provides a menu of interactive tutorials and demonstration documents
 class dialog :
-	public libk3dngui::application_window
+	public k3d::ngui::application_window
 {
-	typedef libk3dngui::application_window base;
+	typedef k3d::ngui::application_window base;
 
 public:
 	dialog() :

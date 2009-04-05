@@ -29,7 +29,10 @@
 
 #include <gdk/gdkkeysyms.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -128,5 +131,7 @@ const k3d::icommand_node::result node_window::execute_command(const k3d::string_
 	return ui_component::execute_command(Command, Arguments);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

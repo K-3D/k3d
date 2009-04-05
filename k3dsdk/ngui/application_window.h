@@ -28,7 +28,10 @@
 
 #include <gtkmm/window.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -56,7 +59,9 @@ private:
 	virtual void on_close();
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_APPLICATION_WINDOW_H
 

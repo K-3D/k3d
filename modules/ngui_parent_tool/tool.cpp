@@ -53,7 +53,7 @@
 
 #include <boost/assign/list_of.hpp>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -297,7 +297,7 @@ struct implementation
 
 /// User-interface tool that provides interactive node parenting
 class tool :
-	public libk3dngui::tool
+	public k3d::ngui::tool
 {
 public:
 	tool() :

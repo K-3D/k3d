@@ -26,7 +26,10 @@
 
 #include <gdk/gdkevents.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -56,7 +59,9 @@ protected:
 	virtual ~input_model() {}
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_INPUT_MODEL_H
 

@@ -32,7 +32,10 @@
 
 #include <sstream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -400,5 +403,7 @@ k3d::xml::element* command_arguments::get_storage(const std::string& Name) const
 	return result;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

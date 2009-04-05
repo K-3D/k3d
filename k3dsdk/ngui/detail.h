@@ -30,7 +30,10 @@
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iplugin_factory.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 // Forward declarations
@@ -43,7 +46,9 @@ void instantiate_selected_nodes(document_state& DocumentState);
 /// Duplicates selected nodes with their input transformation, if any
 void duplicate_selected_nodes(document_state& DocumentState);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_DETAIL_H
 

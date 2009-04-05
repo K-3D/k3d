@@ -39,7 +39,10 @@
 
 #include <algorithm>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 const transform_history_t parent_to_node_history(k3d::inode& Object)
@@ -114,5 +117,7 @@ void unparent(k3d::inode& Node)
 		writable_parent->property_set_value(static_cast<k3d::inode*>(0));
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

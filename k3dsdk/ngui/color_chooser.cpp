@@ -42,7 +42,10 @@
 
 #include <iomanip>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace color_chooser
@@ -272,5 +275,7 @@ void control::data_changed(k3d::ihint*)
 
 } // namespace color_chooser
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

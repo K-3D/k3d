@@ -38,7 +38,10 @@
 
 #include <stack>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -140,5 +143,7 @@ bool execute_script(const k3d::filesystem::path& Script, k3d::iscript_engine::co
 	return detail::execute_script(script, Script.native_utf8_string().raw(), Context, language);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

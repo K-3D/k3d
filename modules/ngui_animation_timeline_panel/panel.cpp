@@ -60,7 +60,7 @@
 #include <boost/assign/list_of.hpp>
 
 // Temporary hack
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -431,7 +431,7 @@ void timeline::set_cursor(double x, double y)
 }
 
 class implementation :
-	public libk3dngui::asynchronous_update,
+	public k3d::ngui::asynchronous_update,
 	public k3d::property_collection
 {
 public:
@@ -887,8 +887,8 @@ public:
 // panel
 
 class panel :
-	public libk3dngui::panel::control,
-	public libk3dngui::ui_component,
+	public k3d::ngui::panel::control,
+	public k3d::ngui::ui_component,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;

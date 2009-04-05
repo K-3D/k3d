@@ -42,8 +42,7 @@
 #include <boost/assign/list_of.hpp>
 #include <sstream>
 
-// Temporary hack
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -59,9 +58,9 @@ namespace about
 
 /// Creates an "about" box that displays program version and copyright
 class dialog :
-	public libk3dngui::application_window
+	public k3d::ngui::application_window
 {
-	typedef libk3dngui::application_window base;
+	typedef k3d::ngui::application_window base;
 
 public:
 	dialog()

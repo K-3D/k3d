@@ -29,7 +29,10 @@
 
 namespace k3d { class icommand_node; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -57,7 +60,9 @@ protected:
 
 } // namespace panel
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_PANEL_H
 

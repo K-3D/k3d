@@ -27,7 +27,10 @@
 namespace k3d { namespace filesystem { class path; } }
 namespace k3d { class idocument; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -37,7 +40,9 @@ void create_document();
 /// Opens an existing document
 void open_document(const k3d::filesystem::path& Path);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_DOCUMENT_H
 

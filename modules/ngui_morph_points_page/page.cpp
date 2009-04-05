@@ -49,7 +49,7 @@ public:
 	{
 	}
 
-	Gtk::Widget& get_widget(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent, k3d::inode& Node)
+	Gtk::Widget& get_widget(k3d::ngui::document_state& DocumentState, k3d::icommand_node& Parent, k3d::inode& Node)
 	{
 		m_label.show();
 		return m_label;

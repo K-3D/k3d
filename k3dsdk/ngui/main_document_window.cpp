@@ -46,7 +46,6 @@
 #include "scripting.h"
 #include "statusbar.h"
 #include "target.h"
-#include "text_editor.h"
 #include "toolbar.h"
 #include "transform.h"
 #include "tutorial_message.h"
@@ -130,7 +129,10 @@
 
 #include <gtk/gtkbutton.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -1117,7 +1119,7 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		// Mesh modifiers
-		const factories_t& mesh_modifiers = libk3dngui::mesh_modifiers();
+		const factories_t& mesh_modifiers = k3d::ngui::mesh_modifiers();
 		if(!mesh_modifiers.empty())
 		{
 			Gtk::Menu* const submenu = new Gtk::Menu();
@@ -1137,7 +1139,7 @@ private:
 		}
 
 		// Transform modifiers
-		const factories_t& transform_modifiers = libk3dngui::transform_modifiers();
+		const factories_t& transform_modifiers = k3d::ngui::transform_modifiers();
 		if(!transform_modifiers.empty())
 		{
 			Gtk::Menu* const submenu = new Gtk::Menu();
@@ -2584,7 +2586,7 @@ private:
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Unparent selected"), K3D_CHANGE_SET_CONTEXT);
 
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-			libk3dngui::unparent(**node);
+			k3d::ngui::unparent(**node);
 
 		m_document_state.deselect_all();
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
@@ -3121,5 +3123,7 @@ void create_main_document_window(document_state& DocumentState)
 	new main_document_window(DocumentState);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

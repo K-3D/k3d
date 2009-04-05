@@ -26,7 +26,10 @@
 #include <k3dsdk/istate_recorder.h>
 #include <vector>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /// Defines an ordered collection of undo/redo hierarchy nodes
@@ -37,6 +40,8 @@ const parent_nodes_t parent_nodes(const k3d::istate_recorder::node* const Node);
 /// Given the state recorder for a document, returns the child that should be used by default for the next redo (if any, could return NULL)
 const k3d::istate_recorder::node* next_redo(k3d::istate_recorder& StateRecorder);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_UNDO_UTILITY_H

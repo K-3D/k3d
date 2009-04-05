@@ -39,7 +39,10 @@
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/stock.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -302,5 +305,7 @@ bool file_chooser_dialog::prompt_file_overwrite(const k3d::filesystem::path& Fil
 	return dialog.run() == Gtk::RESPONSE_OK;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

@@ -28,7 +28,10 @@
 #include <k3dsdk/signal_system.h>
 #include <gtkmm/button.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace button
@@ -58,7 +61,9 @@ public:
 
 } // namespace button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_BUTTON_H
 

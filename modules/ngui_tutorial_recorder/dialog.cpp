@@ -66,7 +66,7 @@
 
 #include <sstream>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {

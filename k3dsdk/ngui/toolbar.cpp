@@ -26,7 +26,10 @@
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/result.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace toolbar
@@ -56,6 +59,8 @@ Gtk::HBox& control::row(const unsigned int Row)
 
 } // namespace toolbar
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 

@@ -32,6 +32,8 @@
 
 #include <boost/assign/list_of.hpp>
 
+using namespace k3d::ngui;
+
 namespace module
 {
 
@@ -62,7 +64,7 @@ public:
 
 	/// Implementation of entry::imodel for use with knot vectors
 	class knot_vector_model :
-		public libk3dngui::entry::imodel
+		public entry::imodel
 	{
 	public:
 		knot_vector_model(k3d::iproperty& Data) :
@@ -130,9 +132,9 @@ public:
 		k3d::iwritable_property* const m_writable_data;
 	};
 
-	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent, k3d::iproperty& Property)
+	void initialize(document_state& DocumentState, k3d::icommand_node& Parent, k3d::iproperty& Property)
 	{
-		libk3dngui::entry::control* const control = new libk3dngui::entry::control(Parent, "knot_vector", new knot_vector_model(Property), &DocumentState.document().state_recorder());
+		entry::control* const control = new entry::control(Parent, "knot_vector", new knot_vector_model(Property), &DocumentState.document().state_recorder());
 		pack_start(*Gtk::manage(control), Gtk::PACK_EXPAND_WIDGET);
 	}
 

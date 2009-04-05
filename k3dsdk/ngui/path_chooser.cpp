@@ -45,7 +45,10 @@
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/tooltips.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace path_chooser
@@ -405,5 +408,7 @@ void control::on_reference_type_changed()
 
 } // namespace path_chooser
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

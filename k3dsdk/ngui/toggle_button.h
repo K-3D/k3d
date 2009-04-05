@@ -32,7 +32,10 @@
 
 namespace k3d { class istate_recorder; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace toggle_button
@@ -186,7 +189,9 @@ private:
 
 } // namespace toggle_button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_TOGGLE_BUTTON_H
 

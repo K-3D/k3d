@@ -33,7 +33,10 @@
 #include <gtkmm/entry.h>
 #include <gtkmm/window.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace combo_box
@@ -230,4 +233,6 @@ void control::set_new_value()
 
 } // namespace combo_box
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d

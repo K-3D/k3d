@@ -27,7 +27,10 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/system.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -149,5 +152,8 @@ sigc::connection tutorial_message::connect_hide_messages_signal(const sigc::slot
 	return m_implementation->hide_messages_signal.connect(Slot);
 }
 
-} // namespace libk3dui
+} // namespace ngui
+
+} // namespace k3d
+
 

@@ -23,7 +23,10 @@
 #include "undo_utility.h"
 #include <algorithm>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 const parent_nodes_t parent_nodes(const k3d::istate_recorder::node* const Node)
@@ -63,5 +66,7 @@ const k3d::istate_recorder::node* next_redo(k3d::istate_recorder& StateRecorder)
 	return 0;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

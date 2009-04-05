@@ -98,7 +98,7 @@
 #include "MaterialContentPanel.h"
 #include "GroupContentPanel.h"
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 using namespace k3d::data;
 
 namespace module{
@@ -269,7 +269,7 @@ void Model::clearModel()
 
 // [Implementation]*************************************************************
 
-class Implementation : public libk3dngui::asynchronous_update
+class Implementation : public k3d::ngui::asynchronous_update
 {
 public:
   Implementation(document_state& DocumentState, k3d::icommand_node& Parent) 
@@ -1073,8 +1073,8 @@ void Implementation::propertySignalRender(k3d::iunknown* t)
 // [Panel]************************************************************************************
      
 class Panel :
-  public libk3dngui::panel::control,
-  public libk3dngui::ui_component,
+  public k3d::ngui::panel::control,
+  public k3d::ngui::ui_component,
   public Gtk::VBox
 {
   //baseContainer is the preview & ctrl container

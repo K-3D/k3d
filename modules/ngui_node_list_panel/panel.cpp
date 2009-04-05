@@ -61,7 +61,7 @@
 #include <set>
 
 // Temporary hack
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -310,7 +310,7 @@ void sort_by_type_layout_policy::update_layout(graph& Graph)
 // implementation
 
 class implementation :
-	public libk3dngui::asynchronous_update
+	public k3d::ngui::asynchronous_update
 {
 public:
 	implementation(document_state& DocumentState) :
@@ -826,8 +826,8 @@ public:
 // panel
 
 class panel :
-	public libk3dngui::panel::control,
-	public libk3dngui::ui_component,
+	public k3d::ngui::panel::control,
+	public k3d::ngui::ui_component,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;

@@ -49,7 +49,10 @@
 #include <k3dsdk/share.h>
 #include <k3dsdk/xml.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -951,5 +954,7 @@ k3d::point3 move_tool::get_world_position()
 	return world_position();
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

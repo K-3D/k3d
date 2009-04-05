@@ -49,9 +49,9 @@ namespace log
 
 /// Provides a window for viewing the contents of the K-3D log
 class dialog :
-	public libk3dngui::application_window
+	public k3d::ngui::application_window
 {
-	typedef libk3dngui::application_window base;
+	typedef k3d::ngui::application_window base;
 
 public:
 	dialog() :

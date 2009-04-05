@@ -63,7 +63,10 @@
 
 #include <boost/format.hpp>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -852,5 +855,7 @@ void render(document_state& DocumentState, k3d::icamera& Camera, k3d::irender_ca
 	assert_warning(Engine.render_camera_animation(Camera, *k3d::get_time(DocumentState.document()),  frames, viewcompleted));
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

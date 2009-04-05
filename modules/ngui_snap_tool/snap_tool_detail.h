@@ -41,7 +41,7 @@
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace k3d { class isnap_source; }
 namespace k3d { class isnap_target; }
@@ -357,7 +357,7 @@ private:
 		/// Stores the average component position
 		k3d::point3 component_center;
 		/// Stores the list of selected points with their index
-		libk3dngui::detail::component_points_t selected_points;
+		k3d::ngui::detail::component_points_t selected_points;
 		/// Stores the tweak array when moving components
 		typedef std::vector<k3d::point3> tweaks_t;
 		tweaks_t tweaks;

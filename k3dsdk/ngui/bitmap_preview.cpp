@@ -32,7 +32,10 @@
 #include <boost/gil/extension/numeric/resample.hpp>
 #include <boost/gil/extension/numeric/sampler.hpp>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace bitmap_preview
@@ -169,6 +172,8 @@ void control::data_changed(k3d::ihint*)
 }
 
 } // namespace bitmap_preview
+
+} // namespace ngui
 
 } // namespace k3d
 

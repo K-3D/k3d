@@ -18,14 +18,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares the libk3dngui::entry control, which provides a standard MVC UI for string values
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "keyboard.h"
 #include <gdk/gdk.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 const k3d::key_modifiers convert(const unsigned int Modifiers)
@@ -72,5 +74,7 @@ const unsigned int convert(const k3d::key_modifiers Modifiers)
 	return result;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

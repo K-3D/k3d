@@ -29,7 +29,10 @@
 #include <string>
 #include <vector>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /// Displays an informational message in a modal dialog box
@@ -48,7 +51,9 @@ unsigned int query_message(const std::string& Message, const unsigned int Defaul
 /// Displays an information "nag" message in a modal dialog box
 void nag_message(const std::string& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage = k3d::ustring());
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_MESSAGES_H
 

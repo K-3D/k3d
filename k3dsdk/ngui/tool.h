@@ -33,7 +33,10 @@ namespace k3d { class inode; }
 namespace k3d { class iproperty_collection; }
 namespace k3d { class iviewport; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -103,7 +106,9 @@ private:
 	document_state* m_document_state;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_TOOL_H
 

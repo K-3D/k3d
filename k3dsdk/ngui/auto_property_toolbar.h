@@ -27,7 +27,6 @@
 #include <k3dsdk/types.h>
 
 namespace Gtk { class Widget; }
-namespace libk3dngui { class document_state; }
 
 namespace k3d
 {
@@ -38,6 +37,8 @@ class iunknown;
 namespace ngui
 {
 
+class document_state;
+
 namespace auto_property_toolbar
 {
 
@@ -45,7 +46,7 @@ namespace auto_property_toolbar
 class control
 {
 public:
-	control(libk3dngui::document_state& DocumentState, icommand_node& Parent, const string_t& Name);
+	control(document_state& DocumentState, icommand_node& Parent, const string_t& Name);
 	~control();
 
 	/// Called to set the toolbar contents based on the given object

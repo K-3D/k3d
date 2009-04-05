@@ -41,7 +41,10 @@ namespace k3d { class icamera; }
 namespace k3d { class iplugin_factory; }
 namespace k3d { namespace xml { class element; } }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -170,7 +173,9 @@ typedef std::vector<control*> controls;
 
 } // namespace panel_frame
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_PANEL_FRAME_H
 

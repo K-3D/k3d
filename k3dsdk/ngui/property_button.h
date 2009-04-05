@@ -31,7 +31,10 @@
 
 namespace Gtk { class Image; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace property_button
@@ -64,7 +67,9 @@ private:
 
 } // namespace property_button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_PROPERTY_BUTTON_H
 

@@ -26,7 +26,10 @@
 
 #include <iosfwd>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /// Enumerates available interactive selection modes
@@ -45,7 +48,9 @@ typedef enum
 std::ostream& operator<<(std::ostream& Stream, const selection_mode_t& Value);
 std::istream& operator>>(std::istream& Stream, selection_mode_t& Value);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_SELECTION_H
 

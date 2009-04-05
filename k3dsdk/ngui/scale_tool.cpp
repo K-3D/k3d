@@ -49,7 +49,10 @@
 
 #include <k3dsdk/fstream.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -968,5 +971,7 @@ k3d::point3 scale_tool::get_center()
 	return world_position();
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

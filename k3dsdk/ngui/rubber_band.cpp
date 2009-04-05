@@ -29,7 +29,10 @@
 #include <gdkmm/gc.h>
 #include <gtkmm/widget.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -68,5 +71,7 @@ void rubber_band::draw(Gtk::Widget& Widget)
 		static_cast<int>(b.height()));
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

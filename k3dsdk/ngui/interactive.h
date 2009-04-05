@@ -40,7 +40,10 @@ namespace Gtk { class Widget; }
 
 namespace k3d { class timer; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace interactive
@@ -84,7 +87,9 @@ void select_row(Gtk::ComboBox& ComboBox, const Gtk::TreeIter& Row);
 
 } // namespace interactive
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_INTERACTIVE_H
 

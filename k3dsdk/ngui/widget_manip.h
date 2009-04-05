@@ -32,7 +32,10 @@
 #include <gtkmm/tooltips.h>
 #include <glibmm/ustring.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -279,7 +282,9 @@ T* operator<<(T* LHS, const disable_recording& RHS)
 	return LHS;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_WIDGET_MANIP_H
 

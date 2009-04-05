@@ -24,7 +24,10 @@
 #include "hotkey_cell_renderer_text.h"
 #include <gtkmm/window.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -69,5 +72,7 @@ void hotkey_cell_renderer_text::on_edited(const Glib::ustring& path, const Glib:
 	base::on_edited(path, new_text);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

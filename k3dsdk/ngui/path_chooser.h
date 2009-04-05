@@ -38,7 +38,10 @@ namespace Gtk { class Button; }
 namespace Gtk { class ComboBox; }
 namespace k3d { class istate_recorder; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class hotkey_entry;
@@ -204,7 +207,9 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 
 } // namespace path_chooser
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_PATH_CHOOSER_H
 

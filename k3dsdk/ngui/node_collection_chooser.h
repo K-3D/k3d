@@ -31,7 +31,10 @@
 namespace k3d { class iproperty; }
 namespace k3d { class istate_recorder; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace node_collection_chooser
@@ -96,7 +99,9 @@ private:
 
 } // namespace node_collection_chooser
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_NODE_COLLECTION_CHOOSER_H
 

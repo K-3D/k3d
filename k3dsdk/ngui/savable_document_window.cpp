@@ -32,7 +32,10 @@
 #include <gtkmm/dialog.h>
 #include <gdk/gdkkeysyms.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -141,5 +144,7 @@ void savable_document_window::on_close()
 {
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

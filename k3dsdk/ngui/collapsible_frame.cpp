@@ -36,7 +36,10 @@
 
 #include <iostream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace collapsible_frame
@@ -212,6 +215,8 @@ Gtk::Button& control::toggle_button()
 
 } // namespace collapsible_frame
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 

@@ -58,7 +58,10 @@
 
 #include <set>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -1325,5 +1328,7 @@ void transform_tool::update_coordinate_system(k3d::iunknown*)
 	tool_selection::redraw_all();
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

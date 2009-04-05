@@ -32,7 +32,10 @@
 
 #include <iostream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -134,5 +137,7 @@ Glib::RefPtr<Gdk::Pixbuf> quiet_load_icon(const std::string& Name, const Gtk::Ic
 	return unknown_icon;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

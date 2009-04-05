@@ -67,8 +67,6 @@
 
 #include <sstream>
 
-using namespace libk3dngui;
-
 namespace module
 {
 
@@ -79,7 +77,7 @@ namespace text_editor
 {
 
 class dialog :
-	public application_window,
+	public k3d::ngui::application_window,
 	public k3d::idocument_sink,
 	public k3d::iproperty_sink,
 	public k3d::istate_recorder_sink
@@ -253,7 +251,7 @@ public:
 
 		k3d::filesystem::path filepath;
 		{
-			file_chooser_dialog dialog(_("Open File:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
+			k3d::ngui::file_chooser_dialog dialog(_("Open File:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
 			if(!dialog.get_file_path(filepath))
 				return;
 		}
@@ -280,7 +278,7 @@ public:
 	bool on_save_as()
 	{
 		{
-			file_chooser_dialog dialog(_("Save Script As::"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+			k3d::ngui::file_chooser_dialog dialog(_("Save Script As::"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 			if(!dialog.get_file_path(m_path))
 				return false;
 		}
@@ -317,7 +315,7 @@ public:
 	{
 		k3d::filesystem::path path;
 		{
-			file_chooser_dialog dialog(_("Import File:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
+			k3d::ngui::file_chooser_dialog dialog(_("Import File:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_OPEN);
 			if(!dialog.get_file_path(path))
 				return;
 		}
@@ -329,7 +327,7 @@ public:
 	{
 		k3d::filesystem::path path;
 		{
-			file_chooser_dialog dialog(_("Export File:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
+			k3d::ngui::file_chooser_dialog dialog(_("Export File:"), k3d::options::path::scripts(), Gtk::FILE_CHOOSER_ACTION_SAVE);
 			if(!dialog.get_file_path(path))
 				return;
 		}
@@ -359,7 +357,7 @@ public:
 
 		if(mime_type.empty())
 		{
-			error_message(
+			k3d::ngui::error_message(
 				_("Unknown script language"),
 				_("Could not identify the MIME-type for this script. "
 				" K-3D supports multiple scripting languages, and the MIME-type is used to "
@@ -380,7 +378,7 @@ public:
 		m_running = true;
 		update_title();
 
-		execute_script(code, name, context);
+		k3d::ngui::execute_script(code, name, context);
 
 		m_running = false;
 		update_title();

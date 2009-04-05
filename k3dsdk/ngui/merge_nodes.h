@@ -23,7 +23,10 @@
 // Forward declarations
 namespace k3d { class idocument; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace merge_nodes
@@ -33,7 +36,9 @@ void merge_nodes(k3d::idocument& Document);
 
 } // namespace merge_nodes
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_MERGE_NODES_H
 

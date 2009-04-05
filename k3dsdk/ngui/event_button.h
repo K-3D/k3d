@@ -22,7 +22,10 @@
 
 #include <gtkmm/button.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /// Defines a push-button that can handle any button event, not just LMB-click
@@ -50,6 +53,8 @@ private:
 	}
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_EVENT_BUTTON_H

@@ -27,7 +27,10 @@
 #include "ui_component.h"
 #include <gtkmm/statusbar.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace statusbar
@@ -49,7 +52,9 @@ public:
 
 } // namespace statusbar
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_STATUSBAR_H
 

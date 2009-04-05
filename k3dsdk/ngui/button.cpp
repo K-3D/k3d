@@ -36,7 +36,10 @@
 
 #include <iostream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace button
@@ -117,5 +120,7 @@ const k3d::icommand_node::result control::execute_command(const std::string& Com
 
 } // namespace button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

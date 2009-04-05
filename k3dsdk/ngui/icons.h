@@ -30,7 +30,10 @@
 namespace Gdk { class Pixbuf; }
 namespace Gtk { class IconSize; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 // Loads an (optionally themed) application icon
@@ -38,6 +41,8 @@ Glib::RefPtr<Gdk::Pixbuf> load_icon(const std::string& Name, const Gtk::IconSize
 // Loads an (optionally themed) application icon, without generating an error messages if the icon cannot be located
 Glib::RefPtr<Gdk::Pixbuf> quiet_load_icon(const std::string& Name, const Gtk::IconSize& Size);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_ICONS_H

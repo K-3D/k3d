@@ -30,7 +30,10 @@
 
 namespace Gtk { class Label; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace image_menu_item
@@ -66,7 +69,9 @@ public:
 /// Helper function that makes a connection to a menu item signal, to avoid temporaries
 image_menu_item::control* connect(image_menu_item::control* const Control, const sigc::slot<void>& Slot);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_IMAGE_MENU_ITEM_H
 

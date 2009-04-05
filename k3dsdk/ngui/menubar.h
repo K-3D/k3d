@@ -27,7 +27,10 @@
 #include "ui_component.h"
 #include <gtkmm/menubar.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace menubar
@@ -49,7 +52,9 @@ public:
 
 } // namespace menubar
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_MENUBAR_H
 

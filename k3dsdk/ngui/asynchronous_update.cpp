@@ -22,7 +22,10 @@
 
 #include <glibmm/main.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -63,5 +66,7 @@ bool asynchronous_update::on_idle()
 	return false;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

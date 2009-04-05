@@ -22,7 +22,10 @@
 
 #include <k3dsdk/signal_system.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -56,7 +59,9 @@ private:
 	bool m_block_updates;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_ASYNCHRONOUS_UPDATE_H
 

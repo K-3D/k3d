@@ -55,9 +55,9 @@ namespace pipeline_profiler
 // panel
 
 class panel :
-	public libk3dngui::panel::control,
-	public libk3dngui::ui_component,
-	public libk3dngui::asynchronous_update,
+	public k3d::ngui::panel::control,
+	public k3d::ngui::ui_component,
+	public k3d::ngui::asynchronous_update,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -99,7 +99,7 @@ public:
 		show_all();
 	}
 
-	void initialize(libk3dngui::document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(k3d::ngui::document_state& DocumentState, k3d::icommand_node& Parent)
 	{
 		k3d::command_tree().add(*this, "pipeline_profiler", &Parent);
 
@@ -274,7 +274,7 @@ private:
 				node_row = *m_model->append();
 
 				node_row[m_columns.node] = new_records[i].node;
-				node_row[m_columns.icon] = libk3dngui::quiet_load_icon(new_records[i].node->factory().name(), Gtk::ICON_SIZE_MENU);
+				node_row[m_columns.icon] = k3d::ngui::quiet_load_icon(new_records[i].node->factory().name(), Gtk::ICON_SIZE_MENU);
 				node_row[m_columns.name] = new_records[i].node->name();
 				node_row[m_columns.count] = 0;
 			}

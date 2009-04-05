@@ -30,7 +30,10 @@
 
 #include <gtkmm/eventbox.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace property_label
@@ -60,7 +63,9 @@ private:
 
 } // namespace property_label
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_PROPERTY_LABEL_H
 

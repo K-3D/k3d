@@ -42,12 +42,15 @@ namespace k3d { class idocument; }
 namespace k3d { class inode; }
 namespace k3d { class ipreview_render_engine; }
 namespace k3d { class istill_render_engine; }
+namespace k3d { namespace ngui { class unsaved_document; } }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class tool;
-class unsaved_document;
 namespace viewport { class control; }
 
 /// This ugly little fellow stores document-wide user interface state in one place to minimize coupling between the various per-document UI components
@@ -200,7 +203,9 @@ private:
 	viewport::control* m_focus_viewport;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_DOCUMENT_STATE_H
 

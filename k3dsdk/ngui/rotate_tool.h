@@ -30,7 +30,10 @@
 
 #include <k3dsdk/property_collection.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -222,7 +225,9 @@ private:
 	k3d_data(bool, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_auto_center;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_ROTATE_TOOL_H
 

@@ -25,7 +25,10 @@
 #include <k3dsdk/log.h>
 #include <iostream>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -71,5 +74,7 @@ std::istream& operator>>(std::istream& Stream, selection_mode_t& RHS)
         return Stream;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

@@ -54,7 +54,7 @@
 #include <k3dsdk/transform.h>
 #include <k3dsdk/xml.h>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -298,7 +298,7 @@ k3d::log() << debug << K3D_CHANGE_SET_CONTEXT << std::endl;
 	return_if_fail(mesh);
 
 	// Get selection and save initial position
-	component_center = libk3dngui::detail::get_selected_points(m_document_state.selection_mode().internal_value(), *mesh, selected_points);
+	component_center = k3d::ngui::detail::get_selected_points(m_document_state.selection_mode().internal_value(), *mesh, selected_points);
 }
 
 void snap_tool_detail::mesh_target::reset(k3d::iunknown*)

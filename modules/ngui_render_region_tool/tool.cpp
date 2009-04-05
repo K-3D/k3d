@@ -49,7 +49,7 @@
 
 #include <boost/assign/list_of.hpp>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -338,7 +338,7 @@ public:
 
 /// User-interface tool that provides interactive controls for cropped rendering
 class tool :
-	public libk3dngui::tool
+	public k3d::ngui::tool
 {
 public:
 	tool() :
@@ -367,7 +367,7 @@ public:
 		return RESULT_ERROR;
 	}
 
-	virtual libk3dngui::viewport_input_model& get_input_model()
+	virtual k3d::ngui::viewport_input_model& get_input_model()
 	{
 		return m_implementation->m_input_model;
 	}

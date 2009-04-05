@@ -43,7 +43,10 @@
 
 #include <set>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -325,5 +328,7 @@ void frame_selection(document_state& DocumentState, viewport::control& Viewport)
 	Viewport.set_target(target);
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

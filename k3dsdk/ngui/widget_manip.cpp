@@ -27,7 +27,10 @@
 #include <gtkmm/accelmap.h>
 #include <gtkmm/menuitem.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace detail
@@ -100,6 +103,8 @@ void enable_dynamic_accelerators_impl(Gtk::Widget* const Widget)
 	Widget->signal_key_press_event().connect(sigc::bind(sigc::ptr_fun(detail::dynamic_accelerator_on_key_press_event), Widget));
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 

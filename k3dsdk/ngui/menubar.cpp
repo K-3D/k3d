@@ -24,7 +24,10 @@
 #include "menubar.h"
 #include <k3dsdk/command_tree.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace menubar
@@ -41,5 +44,7 @@ control::control(k3d::icommand_node& Parent, const std::string& Name) :
 
 } // namespace menubar
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

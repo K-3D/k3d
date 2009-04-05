@@ -37,7 +37,10 @@
 
 #include <gtkmm/label.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace angle_axis
@@ -201,6 +204,8 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Property, k3d::istate_recorder*
 }
 
 } // namespace angle_axis
+
+} // namespace ngui
 
 } // namespace k3d
 

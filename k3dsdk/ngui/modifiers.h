@@ -37,7 +37,10 @@ namespace k3d { class itransform_sink; }
 namespace k3d { class itransform_source; }
 namespace k3d { class uuid; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -130,7 +133,9 @@ struct mesh_modifier
 	k3d::imesh_source* source;
 };
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_MODIFIERS_H
 

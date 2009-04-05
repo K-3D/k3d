@@ -38,7 +38,7 @@
 
 #include <boost/assign/list_of.hpp>
 
-using namespace libk3dngui;
+using namespace k3d::ngui;
 
 namespace module
 {
@@ -102,7 +102,7 @@ public:
 	/// Stores a reference to the owning document
 	document_state& m_document_state;
 	/// Stores the current tool to be displayed (if any)
-	libk3dngui::tool* m_tool;
+	k3d::ngui::tool* m_tool;
 	/// Contains the other widgets
 	Gtk::VBox m_vbox;
 	/// Displays the current tool name
@@ -125,8 +125,8 @@ public:
 // panel
 
 class panel :
-	public libk3dngui::panel::control,
-	public libk3dngui::ui_component,
+	public k3d::ngui::panel::control,
+	public k3d::ngui::ui_component,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;

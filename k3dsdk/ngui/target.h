@@ -24,7 +24,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -35,6 +38,8 @@ void aim_selection(document_state& DocumentState, viewport::control& Viewport);
 /// Frames the current selection in the given viewport by changing the viewport position
 void frame_selection(document_state& DocumentState, viewport::control& Viewport);
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_TARGET_H

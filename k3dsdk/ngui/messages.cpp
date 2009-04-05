@@ -34,7 +34,10 @@
 #include <gtkmm/label.h>
 #include <gtkmm/messagedialog.h>
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 void message(const std::string& Message, const std::string& SecondaryMessage)
@@ -121,5 +124,7 @@ void nag_message(const std::string& Type, const k3d::ustring& Message, const k3d
 	options::enable_nag(Type, show_message.get_active());
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

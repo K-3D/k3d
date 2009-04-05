@@ -57,7 +57,10 @@
 
 using namespace k3d::measurement;
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace spin_button
@@ -686,5 +689,7 @@ const k3d::string_t control::change_message(const double Value)
 
 } // namespace spin_button
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

@@ -29,7 +29,6 @@
 #include <vector>
 
 namespace Gtk { class Widget; }
-namespace libk3dngui { class document_state; }
 
 namespace k3d
 {
@@ -41,6 +40,8 @@ class iunknown;
 namespace ngui
 {
 
+class document_state;
+
 namespace auto_property_page
 {
 
@@ -48,7 +49,7 @@ namespace auto_property_page
 class control
 {
 public:
-	control(libk3dngui::document_state& DocumentState, icommand_node& Parent);
+	control(document_state& DocumentState, icommand_node& Parent);
 	~control();
 
 	/// Auto-generate controls for a single object of arbitrary type.

@@ -56,10 +56,10 @@ namespace python_shell
 
 /// Provides an interactive Python shell dialog
 class dialog :
-	public libk3dngui::application_window,
+	public k3d::ngui::application_window,
 	public k3d::idocument_sink
 {
-	typedef libk3dngui::application_window base;
+	typedef k3d::ngui::application_window base;
 
 public:
 	dialog() :

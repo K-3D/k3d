@@ -33,7 +33,12 @@
 
 #include <set>
 
-namespace libk3dngui
+using namespace k3d::ngui;
+
+namespace k3d
+{
+
+namespace ngui
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -157,5 +162,7 @@ const bool application_state::assign_hotkeys()
 	return m_implementation->m_assign_hotkeys;
 }
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 

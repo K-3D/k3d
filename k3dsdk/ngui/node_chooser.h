@@ -42,7 +42,10 @@ namespace Gtk { class MenuItem; }
 namespace k3d { class idocument; }
 namespace k3d { class istate_recorder; }
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 class document_state;
@@ -295,7 +298,9 @@ std::auto_ptr<iselection_filter> filter(k3d::iproperty& Data);
 
 } // namespace node_chooser
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
 #endif // !K3DSDK_NGUI_NODE_CHOOSER_H
 

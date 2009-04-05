@@ -65,7 +65,10 @@
 
 #endif // !K3D_API_WIN32
 
-namespace libk3dngui
+namespace k3d
+{
+
+namespace ngui
 {
 
 namespace interactive
@@ -893,5 +896,7 @@ void select_row(Gtk::ComboBox& ComboBox, const Gtk::TreeIter& Row)
 
 } // namespace interactive
 
-} // namespace libk3dngui
+} // namespace ngui
+
+} // namespace k3d
 
