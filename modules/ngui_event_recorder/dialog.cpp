@@ -33,6 +33,8 @@
 #include <gtkmm/label.h>
 #include <gtk/gtk.h>
 
+#include <boost/assign/list_of.hpp>
+
 #include <ostream>
 
 using namespace k3d::ngui;
@@ -233,7 +235,9 @@ public:
 			"NGUIEventRecorderDialog",
 			_("Sends a stream of user interface events to stderr, primarily intended for troubleshooting"),
 			"NGUI Dialog",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::EXPERIMENTAL,
+			boost::assign::map_list_of("ngui:component-type", "dialog")
+			);
 
 		return factory;
 	}
