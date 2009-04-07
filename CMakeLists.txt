@@ -150,6 +150,7 @@ OPTION(K3D_BUILD_NGUI_ANIMATION_TIMELINE_PANEL_MODULE "Build the experimental an
 OPTION(K3D_BUILD_NGUI_ASSIGN_HOTKEYS_MODULE "Build the user interface 'assign hotkeys' plugin module" ON)
 OPTION(K3D_BUILD_NGUI_COMMAND_NODE_INSPECTOR_MODULE "Build the user interface 'command node inspector' plugin module" ON)
 OPTION(K3D_BUILD_NGUI_EVENT_RECORDER_MODULE "Build the user interface 'event recorder' plugin module" ON)
+OPTION(K3D_BUILD_NGUI_ATK_EVENT_RECORDER_MODULE "Build the user interface ATK 'event recorder' plugin module" OFF)
 OPTION(K3D_BUILD_NGUI_KNIFE_TOOL_MODULE "Build the user interface 'knife tool' plugin module" OFF)
 OPTION(K3D_BUILD_NGUI_KNOT_VECTOR_CONTROL_MODULE "Build the custom knot-vector property control plugin module" ON)
 OPTION(K3D_BUILD_NGUI_LEARNING_MODULE "Build the user interface learning (tutorial) dialog plugin module" ON)
