@@ -320,30 +320,16 @@ K3D_CHECK_OPTIONAL_DEPENDENCY(K3D_BUILD_QTUI_MODULE QT4_FOUND "Qt4")
 K3D_CHECK_OPTIONAL_DEPENDENCY(K3D_BUILD_PARALLEL K3D_TBB_FOUND "Threading Building Blocks (http://threadingbuildingblocks.org)")
 K3D_CHECK_OPTIONAL_DEPENDENCY(K3D_BUILD_TIFF_IO_MODULE K3D_TIFF_FOUND "TIFF")
 
-# Compiler configuration
-IF(WIN32)
-	IF(MSVC)
-		SET(K3D_COMPILER_MSVC TRUE)
-	ELSE(MSVC)
-		SET(K3D_COMPILER_GCC TRUE)
-	ENDIF(MSVC)
-ELSE(WIN32)
-	SET(K3D_COMPILER_GCC TRUE)
-ENDIF(WIN32)
+# Capture system configuration
+INCLUDE(K3DSystemConfiguration)
 
-# Win32 API configuration
+# Win32 configuration
 IF(WIN32)
-	SET(K3D_API_WIN32 TRUE)
 	IF(NOT MSVC)
 		SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--enable-runtime-pseudo-reloc" CACHE STRING "" FORCE)
 		SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,--enable-runtime-pseudo-reloc -Wl,--export-all-symbols" CACHE STRING "" FORCE)
 	ENDIF(NOT MSVC)
 ENDIF(WIN32)
-
-# Darwin API configuration
-IF(APPLE)
-	SET(K3D_API_DARWIN TRUE)
-ENDIF(APPLE)
 
 # Setup output directories ...
 SET(EXECUTABLE_OUTPUT_PATH ${k3d_BINARY_DIR}/bin)

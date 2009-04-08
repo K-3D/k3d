@@ -3,11 +3,13 @@
 
 // Generated file, do not edit!  Make changes to k3d-platform-config.h.in instead.
 
-#cmakedefine K3D_API_WIN32
-#cmakedefine K3D_API_DARWIN
-
 #cmakedefine K3D_COMPILER_GCC
 #cmakedefine K3D_COMPILER_MSVC
+
+#cmakedefine K3D_PROCESSOR_I386
+
+#cmakedefine K3D_API_WIN32
+#cmakedefine K3D_API_DARWIN
 
 #cmakedefine K3D_SYMBOL_VISIBILITY
 
