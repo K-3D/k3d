@@ -6,7 +6,9 @@
 #cmakedefine K3D_COMPILER_GCC
 #cmakedefine K3D_COMPILER_MSVC
 
-#cmakedefine K3D_PROCESSOR_I386
+#define K3D_PROCESSOR "@K3D_PROCESSOR@"
+#cmakedefine K3D_PROCESSOR_386
+#cmakedefine K3D_PROCESSOR_686
 
 #cmakedefine K3D_API_WIN32
 #cmakedefine K3D_API_DARWIN
