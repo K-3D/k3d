@@ -31,7 +31,6 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/material_sink.h>
-#include <k3dsdk/nurbs.h>
 #include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/selection.h>

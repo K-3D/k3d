@@ -34,7 +34,6 @@
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/nurbs.h>
 #include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/point3.h>
 #include <k3dsdk/selection.h>

@@ -203,7 +203,7 @@ k3d::iplugin_factory& lissajous_curve_factory()
 	return lissajous_curve::get_factory();
 }
 
-} // namespace linear_curve3
+} // namespace linear_curve
 
 } // namespace module
 
