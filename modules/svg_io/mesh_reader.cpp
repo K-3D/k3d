@@ -29,9 +29,12 @@
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/xml.h>
 
+#include <boost/assign/list_of.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <stack>
+
+using namespace boost::assign;
 
 namespace module
 {
@@ -46,16 +49,10 @@ namespace io
 typedef std::stack<k3d::matrix4> transform_stack;
 
 /// Helper function for parse_path to extract a pair (x,y) regardless of the Format i.e. "x,y" or "x y".
-static void get_pair(k3d::double_t& x, k3d::double_t& y, std::istringstream& def_stream)
+static void get_pair(std::istream& Stream, k3d::double_t& X, k3d::double_t& Y)
 {
-	// Based on Tim's code in obj_io
-	def_stream >> x;
-	if (def_stream.peek() == ',' || def_stream.peek() == ' ')
-	{
-		char separator;
-		def_stream >> separator;
-		def_stream >> y;
-	}
+	char separator;
+	Stream >> X >> separator >> Y;
 }
 
 static void parse_line(const k3d::xml::element& SVG, transform_stack& Transformation, k3d::mesh& Mesh, k3d::nurbs_curve::primitive& Primitive)
@@ -88,13 +85,18 @@ static void parse_rect(const k3d::xml::element& SVG, transform_stack& Transforma
 
 	if(rx <=0 && ry <= 0)
 	{
-		k3d::mesh::points_t control_points;
-		control_points.push_back(Transformation.top() * k3d::point3(x, y, 0));
-		control_points.push_back(Transformation.top() * k3d::point3(x + w, y, 0));
-		control_points.push_back(Transformation.top() * k3d::point3(x + w, y + h, 0));
-		control_points.push_back(Transformation.top() * k3d::point3(x, y + h, 0));
+		k3d::mesh::points_t points;
+		points.push_back(Transformation.top() * k3d::point3(x, y, 0));
+		points.push_back(Transformation.top() * k3d::point3(x + w, y, 0));
+		points.push_back(Transformation.top() * k3d::point3(x + w, y + h, 0));
+		points.push_back(Transformation.top() * k3d::point3(x, y + h, 0));
 
-		k3d::nurbs_curve::add_curve(Mesh, Primitive, 2, control_points, 1);
+		k3d::mesh::orders_t orders(4, 2);
+		k3d::mesh::counts_t control_point_counts(4, 2);
+
+		k3d::mesh::indices_t control_points = boost::assign::list_of(0)(1)(1)(2)(2)(3)(3)(0);
+
+		k3d::nurbs_curve::add_curves(Mesh, Primitive, points, orders, control_point_counts, control_points);
 	}
 	else
 	{
@@ -105,66 +107,95 @@ static void parse_rect(const k3d::xml::element& SVG, transform_stack& Transforma
 		k3d::mesh::points_t corner_control_points;
 		k3d::nurbs_curve::circular_arc(k3d::vector3(rx, 0, 0), k3d::vector3(0, ry, 0), 0, k3d::pi() / 2, 1, corner_knots, corner_weights, corner_control_points);
 
-		// Start the curve ...
-		k3d::mesh::points_t control_points;
-		k3d::mesh::weights_t weights;
+		// Setup curves ...
+		k3d::mesh::points_t points;
+		k3d::mesh::orders_t orders;
+		k3d::mesh::counts_t control_point_counts;
+		k3d::mesh::indices_t control_points;
+		k3d::mesh::weights_t control_point_weights;
 		k3d::mesh::knots_t knots;
 
 		// Upper left corner ...
+		orders.push_back(3);
+		control_point_counts.push_back(corner_control_points.size());
+		knots.insert(knots.end(), corner_knots.begin(), corner_knots.end());
 		for(k3d::uint_t i = 0; i != corner_control_points.size(); ++i)
 		{
-			control_points.push_back(Transformation.top() * k3d::point3(x + rx - corner_control_points[i][0], y + ry - corner_control_points[i][1], 0));
-			weights.push_back(corner_weights[i]);
+			control_points.push_back(points.size());
+			control_point_weights.push_back(corner_weights[i]);
+			points.push_back(Transformation.top() * k3d::point3(x + rx - corner_control_points[i][0], y + ry - corner_control_points[i][1], 0));
 		}
 
 		// Top side ...
-		control_points.push_back(Transformation.top() * k3d::mix(k3d::point3(x + rx, y, 0), k3d::point3(x + w - rx, y, 0), 0.5));
-		weights.push_back(1);
+		orders.push_back(2);
+		control_point_counts.push_back(2);
+		k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
+		control_points.push_back(control_points.back());
+		control_points.push_back(points.size());
+		control_point_weights.push_back(1);
+		control_point_weights.push_back(1);
 
 		// Upper right corner ...
+		orders.push_back(3);
+		control_point_counts.push_back(corner_control_points.size());
+		knots.insert(knots.end(), corner_knots.begin(), corner_knots.end());
 		for(k3d::uint_t i = corner_control_points.size(); i != 0; --i)
 		{
-			control_points.push_back(Transformation.top() * k3d::point3(x + w - rx + corner_control_points[i-1][0], y + ry - corner_control_points[i-1][1], 0));
-			weights.push_back(weights[i-1]);
+			control_points.push_back(points.size());
+			control_point_weights.push_back(corner_weights[i-1]);
+			points.push_back(Transformation.top() * k3d::point3(x + w - rx + corner_control_points[i-1][0], y + ry - corner_control_points[i-1][1], 0));
 		}
 
 		// Right side ...
-		control_points.push_back(Transformation.top() * k3d::mix(k3d::point3(x + w, y + ry, 0), k3d::point3(x + w, y + h - ry, 0), 0.5));
-		weights.push_back(1);
+		orders.push_back(2);
+		control_point_counts.push_back(2);
+		k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
+		control_points.push_back(control_points.back());
+		control_points.push_back(points.size());
+		control_point_weights.push_back(1);
+		control_point_weights.push_back(1);
 
 		// Lower right corner
+		orders.push_back(3);
+		control_point_counts.push_back(corner_control_points.size());
+		knots.insert(knots.end(), corner_knots.begin(), corner_knots.end());
 		for(k3d::uint_t i = 0; i != corner_control_points.size(); ++i)
 		{
-			control_points.push_back(Transformation.top() * k3d::point3(x + w - rx + corner_control_points[i][0], y + h - ry + corner_control_points[i][1], 0));
-			weights.push_back(weights[i]);
+			control_points.push_back(points.size());
+			control_point_weights.push_back(corner_weights[i]);
+			points.push_back(Transformation.top() * k3d::point3(x + w - rx + corner_control_points[i][0], y + h - ry + corner_control_points[i][1], 0));
 		}
 
 		// Bottom side ...
-		control_points.push_back(Transformation.top() * k3d::mix(k3d::point3(x + rx, y + h, 0), k3d::point3(x + w - rx, y + h, 0), 0.5));
-		weights.push_back(1);
+		orders.push_back(2);
+		control_point_counts.push_back(2);
+		k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
+		control_points.push_back(control_points.back());
+		control_points.push_back(points.size());
+		control_point_weights.push_back(1);
+		control_point_weights.push_back(1);
 
 		// Lower left corner ...
+		orders.push_back(3);
+		control_point_counts.push_back(corner_control_points.size());
+		knots.insert(knots.end(), corner_knots.begin(), corner_knots.end());
 		for(k3d::uint_t i = corner_control_points.size(); i != 0; --i)
 		{
-			control_points.push_back(Transformation.top() * k3d::point3(x + rx - corner_control_points[i-1][0], y + h - ry + corner_control_points[i-1][1], 0));
-			weights.push_back(weights[i-1]);
+			control_points.push_back(points.size());
+			control_point_weights.push_back(corner_weights[i-1]);
+			points.push_back(Transformation.top() * k3d::point3(x + rx - corner_control_points[i-1][0], y + h - ry + corner_control_points[i-1][1], 0));
 		}
 
 		// Left side ...
-		control_points.push_back(Transformation.top() * k3d::mix(k3d::point3(x, y + h - ry, 0), k3d::point3(x, y + ry, 0), 0.5));
-		weights.push_back(1);
+		orders.push_back(2);
+		control_point_counts.push_back(2);
+		k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
+		control_points.push_back(control_points.back());
+		control_points.push_back(0);
+		control_point_weights.push_back(1);
+		control_point_weights.push_back(1);
 
-		knots.insert(knots.end(), 3, 0);
-		knots.insert(knots.end(), 2, 1);
-		knots.insert(knots.end(), 2, 2);
-		knots.insert(knots.end(), 2, 3);
-		knots.insert(knots.end(), 2, 4);
-		knots.insert(knots.end(), 2, 5);
-		knots.insert(knots.end(), 2, 6);
-		knots.insert(knots.end(), 2, 7);
-		knots.insert(knots.end(), 3, 8);
-
-		k3d::nurbs_curve::add_curve(Mesh, Primitive, 3, control_points, weights, knots, 1);
+		k3d::nurbs_curve::add_curves(Mesh, Primitive, points, orders, control_point_counts, control_points, control_point_weights, knots);
 	}
 }
 
@@ -330,225 +361,257 @@ static void create_arc(k3d::point4 p1, k3d::point4 p2, k3d::double_t phi, k3d::d
 
 static void parse_path(const k3d::xml::element& SVG, transform_stack& Transformation, k3d::mesh& Mesh, k3d::nurbs_curve::primitive& Primitive)
 {
-/*
-	int count = 0;
-	const k3d::string_t def_path = k3d::xml::attribute_text(SVG, "d");
-	char token;
-	k3d::double_t x, y;
-	int last, first;
-	bool is_arc = false;
-	//Check if coordinates are relative to each other or absolute to the current
-	//coordinate system
-	bool relative = false;
-	//slastpoint stores the second last point in the path
-	k3d::point4 slastpoint;
-	//lastpoint stores the last point in the path
-	k3d::point4 lastpoint;
-	//firstpoint stores the first point in the path
-	k3d::point4 firstpoint;
-
-	std::istringstream def_stream(def_path);
-
-	def_stream >> token;
-
-	if (token != 'M')
-		k3d::log() << error << "Error parsing path " << k3d::xml::attribute_text(SVG, "id") << " missing start point." << std::endl;
-
-	get_pair(x, y, def_stream);
-
-	//initialize the curve and add first point of curve
-	last = first = count;
-	count++;
-	firstpoint = k3d::point4(x, y, 0, 1);
-	lastpoint = k3d::point4(x, y, 0, 1);
-	add_point(firstpoint);
-
-	k3d::mesh::indices_t points;
+	// Setup curves ...
+	k3d::mesh::points_t points;
+	k3d::mesh::orders_t orders;
+	k3d::mesh::counts_t control_point_counts;
+	k3d::mesh::indices_t control_points;
+	k3d::mesh::weights_t control_point_weights;
 	k3d::mesh::knots_t knots;
-	k3d::mesh::weights_t weights;
 
-	knots.push_back(0);
-	knots.push_back(0);
+	std::stringstream data(k3d::xml::attribute_text(SVG, "d"));
 
-	while (!def_stream.eof())
+//k3d::log() << debug << data.str() << std::endl;
+
+	k3d::point3 current_point(0, 0, 0);
+	for(char token = data.get(); data; token = data.get())
 	{
-		k3d::uint_t order = 3;
+k3d::log() << debug << token << std::endl;
 
-		points.push_back(last);
-		def_stream >> token;
-		switch (token)
+		k3d::bool_t relative = false;
+		switch(token)
 		{
-			//Line_to attribute: creates a line from current point to (x,y)
-		case 'l':
-			relative = true;
-		case 'L':
-			order = 2;
-			slastpoint = k3d::point4(x, y, 0, 1);
-			get_pair(x, y, def_stream);
-			points.push_back(points.back());
-			points.push_back(count);
-			points.push_back(count);
-			count++;
-			if (relative)
+			case 'm':
 			{
-				x += lastpoint[0];
-				y += lastpoint[1];
+				relative = true;
 			}
-			lastpoint = k3d::point4(x, y, 0, 1);
-			add_point(lastpoint);
-			last = points.back();
-			break;
-			//Horizontal line: creates a line from current point to (current_x + x , current_y)
-		case 'h':
-			relative = true;
-		case 'H':
-			order = 2;
-			slastpoint = k3d::point4(x, y, 0, 1);
-			def_stream >> x;
-			points.push_back(points.back());
-			points.push_back(count);
-			points.push_back(count);
-			count++;
-			if (relative)
-				x += lastpoint[0];
-			lastpoint = k3d::point4(x, lastpoint[1], 0, 1);
-			add_point(lastpoint);
-			last = points.back();
-			break;
-			//Vertical line: creates a line from current point to (current_x , current_y + y)
-		case 'v':
-			relative = true;
-		case 'V':
-			order = 2;
-			slastpoint = k3d::point4(x, y, 0, 1);
-			def_stream >> y;
-			points.push_back(points.back());
-			points.push_back(count);
-			points.push_back(count);
-			count++;
-			if (relative)
-				y += lastpoint[1];
-			lastpoint = k3d::point4(lastpoint[0], y, 0, 1);
-			add_point(lastpoint);
-			last = points.back();
-			break;
-			//Closes the path addint the firstpoint as the last point
-		case 'Z':
-		case 'z':
-			order = 2;
-			slastpoint = k3d::point4(x, y, 0, 1);
-			lastpoint = firstpoint;
-			points.push_back(points.back());
-			points.push_back(first);
-			points.push_back(first);
-			break;
-			//Curve: Creates a cubic bezier spline from current point to (x3,y3) using (x1,y1) and (x2,y2)
-			//       as control points
-		case 'c':
-			relative = true;
-		case 'C':
-			order = 4;
-			for (int i = 0; i < 3; i++)
+			case 'M':
 			{
-				get_pair(x, y, def_stream);
-				points.push_back(count);
-				count++;
-				if (relative)
-				{
-					x += lastpoint[0];
-					y += lastpoint[1];
-				}
-				add_point(k3d::point4(x, y, 0, 1));
-				if (i == 1)
-					slastpoint = k3d::point4(x, y, 0, 1);
-			}
-			lastpoint = k3d::point4(x, y, 0, 1);
-			last = points.back();
+				k3d::double_t x, y = 0;
+				get_pair(data, x, y);
+				current_point[0] = relative ? current_point[0] + x : x;
+				current_point[1] = relative ? current_point[1] + y : y;
 
-			//if(knots.size()==0)
-			//	knots.push_back(0);
-			//else
-			//	knots.push_back(knots.back()+1);
-			//for(int i=0; i<2; i++)
-			//	knots.push_back(knots.back());
-			//knots.push_back(knots.back()+1);
-			//for(int i=0; i<2; i++)
-			//	knots.push_back(knots.back());
-			break;
-			//Smooth curve: Creates a cubic bezier spline from current point to (x2,y2)
-			//              using slastpoint and (x1 y1) as control points
-		case 's':
-			relative = true;
-		case 'S':
-			order = 4;
-			points.push_back(count);
-			count++;
-			add_point(k3d::point4(2*lastpoint[0] - slastpoint[0], 2*lastpoint[1] - slastpoint[1], 0, 1));
-			for (int i = 0; i < 2; i++)
-			{
-				get_pair(x, y, def_stream);
-				points.push_back(count);
-				count++;
-				if (relative)
-				{
-					x += lastpoint[0];
-					y += lastpoint[1];
-				}
-				add_point(k3d::point4(x, y, 0, 1));
-				if (i == 0)
-					slastpoint = k3d::point4(x, y, 0, 1);
+				points.push_back(current_point);
+				break;
 			}
-			lastpoint = k3d::point4(x, y, 0, 1);
-			last = points.back();
-			break;
-			//Quadratic curve: Creates a quadratic bezier spline from current point to (x2,y2)
-			//                 using (x1,y1) as the control point
-		case 'q':
-			relative = true;
-		case 'Q':
-			order = 3;
-			points.push_back(count);
-			for (int i = 0; i < 2; i++)
-			{
-				get_pair(x, y, def_stream);
-				points.push_back(count);
-				count++;
-				if (relative)
-				{
-					x += lastpoint[0];
-					y += lastpoint[1];
-				}
-				add_point(k3d::point4(x, y, 0, 1));
-				if (i == 0)
-					slastpoint = k3d::point4(x, y, 0, 1);
-			}
-			lastpoint = k3d::point4(x, y, 0, 1);
-			last = points.back();
-			break;
-			//Smooth quadratic curve: Creates a cubic bezier spline from current point to
-			// 				(x1,y1) using slastpoint as the control point
-		case 't':
-			relative = true;
-		case 'T':
-			order = 3;
-			points.push_back(count);
-			points.push_back(count);
-			count++;
-			slastpoint = k3d::point4(2 * lastpoint[0] - slastpoint[0], 2 * lastpoint[1] - slastpoint[1], 0, 1);
-			add_point(slastpoint);
 
-			get_pair(x, y, def_stream);
-			points.push_back(count);
-			count++;
-			if (relative)
+			case 'l':
 			{
-				x += lastpoint[0];
-				y += lastpoint[1];
+				relative = true;
 			}
-			add_point(k3d::point4(x, y, 0, 1));
-			lastpoint = k3d::point4(x, y, 0, 1);
-			last = points.back();
-			break;
+			case 'L':
+			{
+				k3d::double_t x, y = 0;
+				get_pair(data, x, y);
+				current_point[0] = relative ? current_point[0] + x : x;
+				current_point[1] = relative ? current_point[1] + y : y;
+
+				points.push_back(current_point);
+
+				orders.push_back(2);
+				control_point_counts.push_back(2);
+				k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
+				control_points.push_back(points.size() - 2);
+				control_points.push_back(points.size() - 1);
+				control_point_weights.push_back(1);
+				control_point_weights.push_back(1);
+
+				break;
+			}
+
+			case 'h':
+			{
+				relative = true;
+			}
+			case 'H':
+			{
+				k3d::double_t x = 0;
+				data >> x;
+				current_point[0] = relative ? current_point[0] + x : x;
+
+				points.push_back(current_point);
+
+				orders.push_back(2);
+				control_point_counts.push_back(2);
+				k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
+				control_points.push_back(points.size() - 2);
+				control_points.push_back(points.size() - 1);
+				control_point_weights.push_back(1);
+				control_point_weights.push_back(1);
+
+				break;
+			}
+
+			case 'v':
+			{
+				relative = true;
+			}
+			case 'V':
+			{
+				k3d::double_t y = 0;
+				data >> y;
+				current_point[1] = relative ? current_point[1] + y : y;
+
+				points.push_back(current_point);
+
+				orders.push_back(2);
+				control_point_counts.push_back(2);
+				k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
+				control_points.push_back(points.size() - 2);
+				control_points.push_back(points.size() - 1);
+				control_point_weights.insert(control_point_weights.end(), 2, 1);
+
+				break;
+			}
+
+			case 'c':
+			{
+				relative = true;
+			}
+			case 'C':
+			{
+				const k3d::point3 first_point = current_point;
+				for(int i = 0; i != 3; ++i)
+				{
+					k3d::double_t x, y = 0;
+					get_pair(data, x, y);
+					current_point[0] = relative ? first_point[0] + x : x;
+					current_point[1] = relative ? first_point[1] + y : y;
+
+					points.push_back(current_point);
+
+				}
+
+				orders.push_back(4);
+				control_point_counts.push_back(4);
+				k3d::nurbs_curve::add_open_uniform_knots(4, 4, knots);
+				control_points.push_back(points.size() - 4);
+				control_points.push_back(points.size() - 3);
+				control_points.push_back(points.size() - 2);
+				control_points.push_back(points.size() - 1);
+				control_point_weights.insert(control_point_weights.end(), 4, 1);
+
+				break;
+			}
+
+			case 's':
+			{
+				relative = true;
+			}
+			case 'S':
+			{
+				const k3d::point3 first_point = current_point;
+
+				const k3d::point3 previous_point = points[points.size() - 2];
+				current_point[0] = first_point[0] + (first_point[0] - previous_point[0]);
+				current_point[1] = first_point[1] + (first_point[1] - previous_point[1]);
+
+				points.push_back(current_point);
+
+				for(int i = 0; i != 2; ++i)
+				{
+					k3d::double_t x, y = 0;
+					get_pair(data, x, y);
+					current_point[0] = relative ? first_point[0] + x : x;
+					current_point[1] = relative ? first_point[1] + y : y;
+
+					points.push_back(current_point);
+
+				}
+
+				orders.push_back(4);
+				control_point_counts.push_back(4);
+				k3d::nurbs_curve::add_open_uniform_knots(4, 4, knots);
+				control_points.push_back(points.size() - 4);
+				control_points.push_back(points.size() - 3);
+				control_points.push_back(points.size() - 2);
+				control_points.push_back(points.size() - 1);
+				control_point_weights.insert(control_point_weights.end(), 4, 1);
+
+				break;
+			}
+
+			case 'q':
+			{
+				relative = true;
+			}
+			case 'Q':
+			{
+				const k3d::point3 first_point = current_point;
+				for(int i = 0; i != 2; ++i)
+				{
+					k3d::double_t x, y = 0;
+					get_pair(data, x, y);
+					current_point[0] = relative ? first_point[0] + x : x;
+					current_point[1] = relative ? first_point[1] + y : y;
+
+					points.push_back(current_point);
+
+				}
+
+				orders.push_back(3);
+				control_point_counts.push_back(3);
+				k3d::nurbs_curve::add_open_uniform_knots(3, 3, knots);
+				control_points.push_back(points.size() - 3);
+				control_points.push_back(points.size() - 2);
+				control_points.push_back(points.size() - 1);
+				control_point_weights.insert(control_point_weights.end(), 3, 1);
+
+				break;
+			}
+
+			case 't':
+			{
+				relative = true;
+			}
+			case 'T':
+			{
+				const k3d::point3 first_point = current_point;
+
+				const k3d::point3 previous_point = points[points.size() - 2];
+				current_point[0] = first_point[0] + (first_point[0] - previous_point[0]);
+				current_point[1] = first_point[1] + (first_point[1] - previous_point[1]);
+
+				points.push_back(current_point);
+
+				for(int i = 0; i != 1; ++i)
+				{
+					k3d::double_t x, y = 0;
+					get_pair(data, x, y);
+					current_point[0] = relative ? first_point[0] + x : x;
+					current_point[1] = relative ? first_point[1] + y : y;
+
+					points.push_back(current_point);
+
+				}
+
+				orders.push_back(3);
+				control_point_counts.push_back(3);
+				k3d::nurbs_curve::add_open_uniform_knots(3, 3, knots);
+				control_points.push_back(points.size() - 3);
+				control_points.push_back(points.size() - 2);
+				control_points.push_back(points.size() - 1);
+				control_point_weights.insert(control_point_weights.end(), 3, 1);
+
+				break;
+			}
+			case 'z':
+			case 'Z':
+			{
+				orders.push_back(2);
+				control_point_counts.push_back(2);
+				k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
+				control_points.push_back(points.size() - 1);
+				control_points.push_back(0);
+				control_point_weights.push_back(1);
+				control_point_weights.push_back(1);
+
+				break;
+			}
+		}
+
+/*
 			//Arc: creates an arc from current point to (x,y) with the semiaxes radius given by (rx,ry)
 			//     fa and fs: are used to choose from the possible 4 arcs created by the two given points
 			//     and the given radius
@@ -562,10 +625,10 @@ static void parse_path(const k3d::xml::element& SVG, transform_stack& Transforma
 			k3d::mesh::weights_t tmp_weights;
 			k3d::double_t cx, cy, rx, ry, phi, fa, fs;
 			k3d::point4 p1 = k3d::point4(x, y, 0, 1);
-			get_pair(rx, ry, def_stream);
-			def_stream >> phi;
-			get_pair(fa, fs, def_stream);
-			get_pair(x, y, def_stream);
+			get_pair(rx, ry, data);
+			data >> phi;
+			get_pair(fa, fs, data);
+			get_pair(x, y, data);
 			if (relative)
 			{
 				x += lastpoint[0];
@@ -616,6 +679,9 @@ static void parse_path(const k3d::xml::element& SVG, transform_stack& Transforma
 	relative = false;
 	is_arc = false;
 */
+	}
+
+	k3d::nurbs_curve::add_curves(Mesh, Primitive, points, orders, control_point_counts, control_points, control_point_weights, knots);
 }
 
 /// Main parsing function, doesn't handle grouping and just traverse the XML tree recursively
@@ -645,7 +711,7 @@ static void parse_graphics(const k3d::xml::element& SVG, transform_stack& Transf
 					//  (tx ty 0 1))
 					case 't':
 						trans_stream.ignore(9);
-						get_pair(x, y, trans_stream);
+						get_pair(trans_stream, x, y);
 						tmp_mat[0][3] = x;
 						tmp_mat[1][3] = y;
 						break;

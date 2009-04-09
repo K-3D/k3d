@@ -102,17 +102,8 @@
     <polygon
        points="400,400 500,500 400,500" />
     <path
-       d="M 102.85714,466.6479 L 405.71429,678.07647 C 405.71429,678.07647 265.71429,1015.2193 457.14286,892.36218 C 648.57143,769.50504 760,623.79075 577.14286,675.21933 C 394.28571,726.6479 794.28571,823.79075 462.85714,669.50504 C 131.42857,515.21933 540,1109.505 502.85714,798.07647 C 465.71429,486.6479 102.85714,463.79075 102.85714,466.6479 z "
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       id="path2166" />
+       d="M 600,800 L 700,900 h 100 v 50 c 0 100 100 100 100 200 z" />
+    <path
+       d="M 300,800 c 0,100 100,100 100,300 s 100 150 200 100 z" />
   </g>
-  <path
-     sodipodi:type="arc"
-     style="opacity:1;fill:#f0e6ad;fill-opacity:1;stroke:#000000;stroke-width:5.48999977;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-     id="path2397"
-     sodipodi:cx="173.61845"
-     sodipodi:cy="657.19379"
-     sodipodi:rx="67.104065"
-     sodipodi:ry="67.104065"
-     d="M 240.72252,657.19379 A 67.104065,67.104065 0 1 1 240.72252,657.19379 A 67.104065,67.104065 0 1 1 240.72252,657.19379 z" />
 </svg>
