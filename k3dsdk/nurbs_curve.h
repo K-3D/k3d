@@ -114,6 +114,17 @@ void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh:
 void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const uint_t RepeatPoints = 0);
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points, control point weights, and knot vector.
 void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const mesh::knots_t& Knots, const uint_t RepeatPoints = 0);
+/// Adds multiple curves to an existing primitive, specified by a set of points, curve orders, control point counts, and control point indices.
+/// Control points will be assigned unity weights, and curves will be assigned open uniform knot vectors.
+void add_curves(mesh& Mesh, primitive& Primitive, const mesh::points_t& Points, const mesh::orders_t& Orders, const mesh::counts_t& ControlPointCounts, const mesh::indices_t& ControlPoints);
+/// Adds multiple curves to an existing primitive, specified by a set of points, curve orders, control point counts, control point indices, and control point weights.
+/// Curves will be assigned open uniform knot vectors.
+void add_curves(mesh& Mesh, primitive& Primitive, const mesh::points_t& Points, const mesh::orders_t& Orders, const mesh::counts_t& ControlPointCounts, const mesh::indices_t& ControlPoints, const mesh::weights_t& ControlPointWeights);
+/// Adds multiple curves to an existing primitive, specified by a set of points, curve orders, control point counts, control point indices, control point weights, and knots.
+void add_curves(mesh& Mesh, primitive& Primitive, const mesh::points_t& Points, const mesh::orders_t& Orders, const mesh::counts_t& ControlPointCounts, const mesh::indices_t& ControlPoints, const mesh::weights_t& ControlPointWeights, const mesh::knots_t& Knots);
+
+/// Appends an open uniform knot vector to the given collection of knots.
+void add_open_uniform_knots(const uint_t Order, const uint_t ControlPointCount, mesh::knots_t& Knots);
 
 /** Computes a set of control points, weights, and knots that define an order-3 circular arc centered at the origin
 	\param X Defines the X axis of the plane containing the arc

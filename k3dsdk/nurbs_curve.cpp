@@ -233,14 +233,8 @@ void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh:
 
 void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const mesh::weights_t& Weights, const uint_t RepeatPoints)
 {
-	return_if_fail(ControlPoints.size() + RepeatPoints >= Order);
-
 	mesh::knots_t knots;
-        knots.insert(knots.end(), Order, 0);
-	for(uint_t i = 1; i <= ControlPoints.size() + RepeatPoints - Order; ++i)
-		knots.insert(knots.end(), 1, i);
-	knots.insert(knots.end(), Order, ControlPoints.size() + RepeatPoints - Order + 1);
-
+	add_open_uniform_knots(Order, ControlPoints.size() + RepeatPoints, knots);
 	add_curve(Mesh, Primitive, Order, ControlPoints, Weights, knots, RepeatPoints);
 }
 
@@ -280,6 +274,82 @@ void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh:
 	}
 
         Primitive.curve_knots.insert(Primitive.curve_knots.end(), Knots.begin(), Knots.end());
+}
+
+void add_curves(mesh& Mesh, primitive& Primitive, const mesh::points_t& Points, const mesh::orders_t& Orders, const mesh::counts_t& ControlPointCounts, const mesh::indices_t& ControlPoints)
+{
+	add_curves(Mesh, Primitive, Points, Orders, ControlPointCounts, ControlPoints, mesh::weights_t(ControlPoints.size(), 1));
+}
+
+void add_curves(mesh& Mesh, primitive& Primitive, const mesh::points_t& Points, const mesh::orders_t& Orders, const mesh::counts_t& ControlPointCounts, const mesh::indices_t& ControlPoints, const mesh::weights_t& ControlPointWeights)
+{
+	return_if_fail(Orders.size() == ControlPointCounts.size());
+
+	mesh::knots_t knots;
+	for(uint_t i = 0; i != Orders.size(); ++i)
+		add_open_uniform_knots(Orders[i], ControlPointCounts[i], knots);
+
+	add_curves(Mesh, Primitive, Points, Orders, ControlPointCounts, ControlPoints, ControlPointWeights, knots);
+}
+
+void add_curves(mesh& Mesh, primitive& Primitive, const mesh::points_t& Points, const mesh::orders_t& Orders, const mesh::counts_t& ControlPointCounts, const mesh::indices_t& ControlPoints, const mesh::weights_t& ControlPointWeights, const mesh::knots_t& Knots)
+{
+	// Sanity checking ...
+	return_if_fail(Mesh.points);
+	return_if_fail(Mesh.point_selection);
+
+	return_if_fail(Orders.size() == ControlPointCounts.size());
+
+	for(uint_t i = 0; i != Orders.size(); ++i)
+	{
+		return_if_fail(Orders[i] >= 2);
+		return_if_fail(ControlPointCounts[i] >= Orders[i]);
+	}
+
+	return_if_fail(ControlPoints.size() == std::accumulate(ControlPointCounts.begin(), ControlPointCounts.end(), 0));
+	for(uint_t i = 0; i != ControlPoints.size(); ++i)
+		return_if_fail(ControlPoints[i] < Points.size());
+
+	return_if_fail(ControlPointWeights.size() == ControlPoints.size());
+	return_if_fail(Knots.size() == std::accumulate(Orders.begin(), Orders.end(), 0) + ControlPoints.size());
+
+	// Update the primitive ...
+	mesh::points_t& points = Mesh.points.writable();
+	mesh::selection_t& point_selection = Mesh.point_selection.writable();
+
+	const uint_t point_offset = points.size();
+	points.insert(points.end(), Points.begin(), Points.end());
+	point_selection.insert(point_selection.end(), Points.size(), 0);
+
+	uint_t first_point_offset = Primitive.curve_points.size();
+	for(uint_t i = 0; i != ControlPoints.size(); ++i)
+	{
+		Primitive.curve_points.push_back(ControlPoints[i] + point_offset);
+	}
+	Primitive.curve_point_weights.insert(Primitive.curve_point_weights.end(), ControlPointWeights.begin(), ControlPointWeights.end());
+
+	uint_t first_knot_offset = Primitive.curve_knots.size();
+        Primitive.curve_knots.insert(Primitive.curve_knots.end(), Knots.begin(), Knots.end());
+
+	for(uint_t i = 0; i != Orders.size(); ++i)
+	{
+		Primitive.curve_first_points.push_back(first_point_offset);
+		Primitive.curve_point_counts.push_back(ControlPointCounts[i]);
+		Primitive.curve_orders.push_back(Orders[i]);
+		Primitive.curve_first_knots.push_back(first_knot_offset);
+		Primitive.curve_selections.push_back(0);
+
+		first_point_offset += ControlPointCounts[i];
+		first_knot_offset += Orders[i] + ControlPointCounts[i];
+	}
+}
+
+void add_open_uniform_knots(const uint_t Order, const uint_t ControlPointCount, mesh::knots_t& Knots)
+{
+        Knots.insert(Knots.end(), Order, 0);
+	for(uint_t i = 1; i <= ControlPointCount - Order; ++i)
+		Knots.insert(Knots.end(), 1, i);
+	Knots.insert(Knots.end(), Order, ControlPointCount - Order + 1);
 }
 
 void circular_arc(const vector3& X, const vector3& Y, const double_t StartAngle, const double_t EndAngle, const uint_t Segments, mesh::knots_t& Knots, mesh::weights_t& Weights, mesh::points_t& ControlPoints)
