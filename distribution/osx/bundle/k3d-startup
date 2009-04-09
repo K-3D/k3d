@@ -10,50 +10,8 @@ K3D_TEMP="/tmp/k3d/$UID"
 K3D_ETC="$K3D_TEMP/etc"
 K3D_PANGO_RC_FILE="$K3D_ETC/pango/pangorc"
 
-echo "running $0"
-echo "K3D_BUNDLE: $K3D_BUNDLE"
-
-#Detect if running Leopard. If so, do not start X11
-#Darwin version minus 4 will give a.b in Mac OS X 10.a.b
-darwin_version=`uname -r`
-stripped_darwin_version=${darwin_version%%.*}
-osx_version=`expr $stripped_darwin_version - 4`
-
-if [ $osx_version -ne '5' ]
-then
-   # Start X11 ...
-   ps -wx -ocommand | grep -e '[X]11.app' > /dev/null
-   if [ "$?" != "0" -a ! -f ~/.xinitrc ]; then
-      echo "rm -f ~/.xinitrc" > ~/.xinitrc
-      sed 's/xterm/# xterm/' /usr/X11R6/lib/X11/xinit/xinitrc >> ~/.xinitrc
-   fi	   	
-fi
-
-mkdir -p $K3D_TEMP
-cat << __END_OF_GETDISPLAY_SCRIPT__ > "$K3D_TEMP/getdisplay.sh"
-#!/bin/sh
-mkdir -p "$K3D_TEMP"
-
-if [ "\$DISPLAY"x == "x" ]; then
-    echo :0 > "$K3D_TEMP/display"
-else
-    echo \$DISPLAY > "$K3D_TEMP/display"
-fi
-__END_OF_GETDISPLAY_SCRIPT__
-chmod +x "$K3D_TEMP/getdisplay.sh"
-rm -f $K3D_TEMP/display
-open-x11 $K3D_TEMP/getdisplay.sh || \
-open -a XDarwin $K3D_TEMP/getdisplay.sh || \
-echo ":0" > $K3D_TEMP/display
-
-while [ "$?" == "0" -a ! -f $K3D_TEMP/display ];
-do
-  #echo "Waiting for display $K3D_TEMP/display"
-  sleep 1;
-done
-export "DISPLAY=`cat $K3D_TEMP/display`"
-
-ps -wx -ocommand | grep -e '[X]11' > /dev/null || exit 11
+echo "K-3D: Starting $0"
+echo "K-3D: K3D_BUNDLE: $K3D_BUNDLE"
 
 # Setup temporary runtime files
 rm -rf "$K3D_TEMP"
@@ -73,4 +31,6 @@ export "PATH=$K3D_RESOURCES/bin:$PATH"
 
 #export
 exec "$K3D_RESOURCES/bin/k3d" "--log-level=debug" "--plugins=$K3D_RESOURCES/lib/k3d/plugins" "--share=$K3D_RESOURCES/share/k3d" "--ui=$K3D_RESOURCES/lib/k3d/uiplugins/k3d-ngui.module"
+
+echo "K-3D: Finishing $0"
 
