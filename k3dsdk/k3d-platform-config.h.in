@@ -6,10 +6,6 @@
 #cmakedefine K3D_COMPILER_GCC
 #cmakedefine K3D_COMPILER_MSVC
 
-#define K3D_PROCESSOR "@K3D_PROCESSOR@"
-#cmakedefine K3D_PROCESSOR_386
-#cmakedefine K3D_PROCESSOR_686
-
 #cmakedefine K3D_API_WIN32
 #cmakedefine K3D_API_DARWIN
 
@@ -17,6 +13,9 @@
 
 #cmakedefine K3D_UINT_T_32_BITS
 #cmakedefine K3D_UINT_T_64_BITS
+
+#define K3D_OSX_MAJOR_VERSION @K3D_OSX_MAJOR_VERSION@
+#define K3D_OSX_MINOR_VERSION @K3D_OSX_MINOR_VERSION@
 
 #if defined K3D_COMPILER_GCC
 	#define K3D_COMPILER_NAME __VERSION__
