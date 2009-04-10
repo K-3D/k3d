@@ -88,7 +88,11 @@ public:
 		{
 			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(**primitive));
 			if(!nurbs_curve)
-				return;
+			{
+				if((*primitive)->type == "nurbs_curve")
+					k3d::log() << debug << "NurbsCurvePainter: found an invalid NURBS primitive" << std::endl;
+				continue;
+			}
 
 			const k3d::mesh::points_t& points = *Mesh.points;
 
@@ -146,7 +150,11 @@ public:
 		{
 			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(**primitive));
 			if(!nurbs_curve)
-				return;
+			{
+				if((*primitive)->type == "nurbs_curve")
+					k3d::log() << debug << "NurbsCurvePainter: found an invalid NURBS primitive" << std::endl;
+				continue;
+			}
 
 			const k3d::mesh::points_t& points = *Mesh.points;
 
