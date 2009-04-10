@@ -73,6 +73,7 @@ public:
 	///Create an instance of nurbs_curve_modifier working on the given mesh and curve
 	///\param input The mesh to work on
 	nurbs_curve_modifier(k3d::mesh& input, k3d::nurbs_curve::primitive& Curve);
+	~nurbs_curve_modifier();
 
 	///Add a curve to this mesh - gprims add_nurbs_curve doesnt handle groups
 	///\param curve The curve to add

@@ -8,6 +8,7 @@ setup = testing.setup_mesh_reader_test("K3DMeshReader","mesh.modifier.NurbsRuled
 
 modifier = setup.document.new_node("NurbsRuledSurface")
 modifier.delete_original = False
+modifier.mesh_selection = k3d.mesh_selection.select_all()
 
 document.set_dependency(modifier.get_property("input_mesh"), setup.reader.get_property("output_mesh"))
 

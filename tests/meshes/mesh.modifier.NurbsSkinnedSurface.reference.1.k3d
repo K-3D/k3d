@@ -2,49 +2,80 @@
 <k3dml>
 	<mesh_arrays>
 		<points>-1.5478850305604341 4.1829367926520584 0 -0.54788503056043414 4.1829367926520584 0 0.45211496943956586 4.1829367926520584 0 1.4521149694395659 4.1829367926520584 0 -1.3822841409534865 2.0339303723843059 0.26483167810042829 -0.38228414095348651 2.0339303723843059 1.0834136605127025 0.61771585904651349 2.0339303723843059 1.0834136605127025 1.6177158590465135 2.0339303723843059 0.26483167810042829 -0.85973830975782417 -1.3278489987514055 0 -0.44369013914679067 -1.3278489987514055 2.2500011701665557 0.55630986085320933 -1.3278489987514055 2.2500011701665557 0.9723580314642426 -1.3278489987514055 0</points>
-		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0</point_selection>
-		<nurbs_curve_groups>
-			<first_curves>0 1 2</first_curves>
-			<curve_counts>1 1 1</curve_counts>
-			<materials>0 0 0</materials>
-			<curve_first_points>0 4 8</curve_first_points>
-			<curve_point_counts>4 4 4</curve_point_counts>
-			<curve_orders>3 3 3</curve_orders>
-			<curve_first_knots>0 7 14</curve_first_knots>
-			<curve_selection>1 1 1</curve_selection>
-			<curve_points>0 1 2 3 4 5 6 7 8 9 10 11</curve_points>
-			<curve_point_weights>1 1 1 1 1 1 1 1 1 1 1 1</curve_point_weights>
-			<curve_knots>0 0 0 0.5 1 1 1 0 0 0 0.5 1 1 1 0 0 0 0.5 1 1 1</curve_knots>
-		</nurbs_curve_groups>
-		<nurbs_patches>
-			<patch_first_points>0</patch_first_points>
-			<patch_u_point_counts>4</patch_u_point_counts>
-			<patch_v_point_counts>3</patch_v_point_counts>
-			<patch_u_orders>3</patch_u_orders>
-			<patch_v_orders>3</patch_v_orders>
-			<patch_u_first_knots>0</patch_u_first_knots>
-			<patch_v_first_knots>0</patch_v_first_knots>
-			<patch_selection>0</patch_selection>
-			<patch_materials>0</patch_materials>
-			<patch_points>8 9 10 11 4 5 6 7 0 1 2 3</patch_points>
-			<patch_point_weights>1 1 1 1 1 1 1 1 1 1 1 1</patch_point_weights>
-			<patch_u_knots>0 0 0 0.5 1 1 1</patch_u_knots>
-			<patch_v_knots>0 0 0 1 1 1</patch_v_knots>
-			<patch_trim_curve_loop_counts>0</patch_trim_curve_loop_counts>
-			<patch_first_trim_curve_loops>0</patch_first_trim_curve_loops>
-			<trim_points/>
-			<trim_point_selection/>
-			<first_trim_curves/>
-			<trim_curve_counts/>
-			<trim_curve_loop_selection/>
-			<trim_curve_first_points/>
-			<trim_curve_point_counts/>
-			<trim_curve_orders/>
-			<trim_curve_first_knots/>
-			<trim_curve_selection/>
-			<trim_curve_points/>
-			<trim_curve_point_weights/>
-			<trim_curve_knots/>
-		</nurbs_patches>
+		<point_selection>1 1 1 1 1 1 1 1 1 1 1 1</point_selection>
+		<vertex_data/>
+		<primitives>
+			<primitive type="nurbs_curve">
+				<structure>
+					<array name="curve_first_knots" type="k3d::uint_t"/>
+					<array name="curve_first_points" type="k3d::uint_t"/>
+					<array name="curve_knots" type="k3d::double_t"/>
+					<array name="curve_orders" type="k3d::uint_t"/>
+					<array name="curve_point_counts" type="k3d::uint_t"/>
+					<array name="curve_point_weights" type="k3d::double_t"/>
+					<array name="curve_points" type="k3d::uint_t">
+						<metadata>
+							<pair name="k3d:domain">/points/indices()</pair>
+						</metadata>
+					</array>
+					<array name="curve_selections" type="k3d::double_t">
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
+					<array name="material" type="k3d::imaterial*">0</array>
+				</structure>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="uniform"/>
+					<arrays type="varying"/>
+				</attributes>
+			</primitive>
+			<primitive type="nurbs_patch">
+				<structure>
+					<array name="curve_first_knots" type="k3d::uint_t"/>
+					<array name="curve_first_points" type="k3d::uint_t"/>
+					<array name="curve_knots" type="k3d::double_t"/>
+					<array name="curve_orders" type="k3d::uint_t"/>
+					<array name="curve_point_counts" type="k3d::uint_t"/>
+					<array name="curve_point_weights" type="k3d::double_t"/>
+					<array name="curve_points" type="k3d::uint_t"/>
+					<array name="curve_selections" type="k3d::double_t"/>
+					<array name="patch_first_points" type="k3d::uint_t">0</array>
+					<array name="patch_first_trim_loops" type="k3d::uint_t">0</array>
+					<array name="patch_materials" type="k3d::imaterial*">0</array>
+					<array name="patch_point_weights" type="k3d::double_t">1 1 1 1 1 1 1 1 1 1 1 1</array>
+					<array name="patch_points" type="k3d::uint_t">8 9 10 11 4 5 6 7 0 1 2 3
+						<metadata>
+							<pair name="k3d:domain">/points/indices()</pair>
+						</metadata>
+					</array>
+					<array name="patch_selections" type="k3d::double_t">0
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
+					<array name="patch_trim_loop_counts" type="k3d::uint_t">0</array>
+					<array name="patch_u_first_knots" type="k3d::uint_t">0</array>
+					<array name="patch_u_knots" type="k3d::double_t">0 0 0 0.5 1 1 1</array>
+					<array name="patch_u_orders" type="k3d::uint_t">3</array>
+					<array name="patch_u_point_counts" type="k3d::uint_t">4</array>
+					<array name="patch_v_first_knots" type="k3d::uint_t">0</array>
+					<array name="patch_v_knots" type="k3d::double_t">0 0 0 1 1 1</array>
+					<array name="patch_v_orders" type="k3d::uint_t">3</array>
+					<array name="patch_v_point_counts" type="k3d::uint_t">3</array>
+					<array name="point_selections" type="k3d::double_t"/>
+					<array name="points" type="k3d::point2"/>
+					<array name="trim_loop_curve_counts" type="k3d::uint_t"/>
+					<array name="trim_loop_first_curves" type="k3d::uint_t"/>
+					<array name="trim_loop_selections" type="k3d::double_t"/>
+				</structure>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="uniform"/>
+					<arrays type="varying"/>
+				</attributes>
+			</primitive>
+		</primitives>
 	</mesh_arrays>
 </k3dml>

@@ -1,10 +1,36 @@
 <?xml version="1.0" ?>
 <k3dml>
 	<mesh_arrays>
-		<points>5 0 0 4.0691301944989151 2.905542885626923 0 1.4690596885376697 4.7793162305411014 0 -1.4690596885864524 4.7793162305261072 0 -4.0691301945285714 2.9055428855853886 0 -5 -5.1034119692792285e-11 0 -4.0691301944692588 -2.9055428856684564 0 -1.4690596884888873 -4.7793162305560966 0 1.4690596886352343 -4.779316230511113 0 4.0691301945582277 -2.9055428855438565 0 5 1.0206823938558457e-10 0</points>
+		<points>5 0 0 4.0691301944989151 2.905542885626923 0 1.4690596885376697 4.7793162305411014 0 -1.4690596885864524 4.7793162305261072 0 -4.0691301945285714 2.9055428855853891 0 -5 -5.1034119692792285e-11 0 -4.0691301944692588 -2.9055428856684564 0 -1.4690596884888873 -4.7793162305560966 0 1.4690596886352343 -4.779316230511113 0 4.0691301945582277 -2.9055428855438565 0 5 1.0206823938558457e-10 0</points>
 		<point_selection>0 0 0 0 0 0 0 0 0 0 0</point_selection>
 		<vertex_data/>
 		<primitives>
+			<primitive type="nurbs_curve">
+				<structure>
+					<array name="curve_first_knots" type="k3d::uint_t"/>
+					<array name="curve_first_points" type="k3d::uint_t"/>
+					<array name="curve_knots" type="k3d::double_t"/>
+					<array name="curve_orders" type="k3d::uint_t"/>
+					<array name="curve_point_counts" type="k3d::uint_t"/>
+					<array name="curve_point_weights" type="k3d::double_t"/>
+					<array name="curve_points" type="k3d::uint_t">
+						<metadata>
+							<pair name="k3d:domain">/points/indices()</pair>
+						</metadata>
+					</array>
+					<array name="curve_selections" type="k3d::double_t">
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
+					<array name="material" type="k3d::imaterial*">2</array>
+				</structure>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="uniform"/>
+					<arrays type="varying"/>
+				</attributes>
+			</primitive>
 			<primitive type="linear_curve">
 				<structure>
 					<array name="curve_first_points" type="k3d::uint_t">0</array>
@@ -19,7 +45,7 @@
 							<pair name="k3d:selection-component">uniform</pair>
 						</metadata>
 					</array>
-					<array name="material" type="k3d::imaterial*">0</array>
+					<array name="material" type="k3d::imaterial*">2</array>
 					<array name="periodic" type="k3d::bool_t">0</array>
 				</structure>
 				<attributes>
@@ -29,20 +55,5 @@
 				</attributes>
 			</primitive>
 		</primitives>
-		<nurbs_curve_groups>
-			<first_curves/>
-			<curve_counts/>
-			<materials/>
-			<constant_data/>
-			<curve_first_points/>
-			<curve_point_counts/>
-			<curve_orders/>
-			<curve_first_knots/>
-			<curve_selection/>
-			<uniform_data/>
-			<curve_points/>
-			<curve_point_weights/>
-			<curve_knots/>
-		</nurbs_curve_groups>
 	</mesh_arrays>
 </k3dml>

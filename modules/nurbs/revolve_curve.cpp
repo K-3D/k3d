@@ -82,6 +82,8 @@ public:
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
 		if(!nurbs)
 			return;
+		
+		k3d::log() << debug << "curve count: " << nurbs->curve_first_points.size() << std::endl;
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 

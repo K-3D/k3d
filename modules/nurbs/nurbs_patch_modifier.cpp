@@ -1099,11 +1099,8 @@ void nurbs_patch_modifier::extrude_patch(k3d::uint_t patch, k3d::axis axis, doub
 		c_mod.add_curve(v1_1, true);
 		c_mod.ruled_surface(6, 7);
 
-		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs_patches(get_first_nurbs_patch(m_instance));
-		if(!nurbs_patches)
-			nurbs_patches.reset(k3d::nurbs_patch::create(m_instance));
-		
-		nurbs_patch_modifier p_mod(tmp, *nurbs_patches);
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> tmp_nurbs_patches(get_first_nurbs_patch(tmp));
+		nurbs_patch_modifier p_mod(tmp, *tmp_nurbs_patches);
 		insert_patch(p_mod.extract_patch(0), true);
 		insert_patch(p_mod.extract_patch(1), true);
 		insert_patch(p_mod.extract_patch(2), true);

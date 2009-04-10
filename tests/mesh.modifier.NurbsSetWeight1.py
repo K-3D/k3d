@@ -4,12 +4,11 @@ import testing
 import k3d
 
 document = k3d.new_document()
-setup = testing.setup_mesh_reader_test("K3DMeshReader","mesh.modifier.NurbsSetWeightReference1.k3d")
+setup = testing.setup_mesh_modifier_test("NurbsCircle","NurbsSetWeight")
 
-modifier = setup.document.new_node("NurbsSetWeight")
+modifier = setup.modifier
 modifier.weight = 1.7
-
-document.set_dependency(modifier.get_property("input_mesh"), setup.reader.get_property("output_mesh"))
+modifier.mesh_selection = k3d.mesh_selection.select_all()
 
 testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsSetWeight1", 1)
 
