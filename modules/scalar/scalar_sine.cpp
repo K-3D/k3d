@@ -18,35 +18,34 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Applyies sine() operator to input value
-		\author Anders Dahnielson (anders@dahnielson.com)
+	\author Anders Dahnielson (anders@dahnielson.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
+#include "scalar_source.h"
+
 #include <k3d-i18n-config.h>
-#include <k3dsdk/node.h>
+#include <k3dsdk/document_plugin_factory.h>
 
 #include <cmath>
 
-namespace libk3dcore
+namespace module
 {
 
-class scalar_sine :
-	public k3d::node
+namespace scalar
 {
-	typedef k3d::node base;
+
+/// Applies the sine() operator to input value
+class scalar_sine :
+	public scalar_source
+{
+	typedef scalar_source base;
 public:
 	scalar_sine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_input(init_owner(*this) + init_name("input") + init_label(_("Input value")) + init_description(_("Input value")) + init_value(0.0)),
-		m_output(init_owner(*this) + init_name("output") + init_label(_("Output value")) + init_description(_("Sine wave function applied on input")) + init_slot(sigc::mem_fun(*this, &scalar_sine::get_value)))
+		base(Factory, Document, _("Sine wave function applied to input.")),
+		m_input(init_owner(*this) + init_name("input") + init_label(_("Input value")) + init_description(_("Input value")) + init_value(0.0))
 	{
-		m_input.changed_signal().connect(m_output.make_reset_slot());
-	}
-
-	double get_value()
-	{
-		return std::sin(m_input.pipeline_value());
+		m_input.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_value_slot()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -61,9 +60,12 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_input;
-	k3d_data(double, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_output;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_input;
 
+	void on_update_value(k3d::double_t& Output)
+	{
+		Output = std::sin(m_input.pipeline_value());
+	}
 };
 
 k3d::iplugin_factory& scalar_sine_factory()
@@ -71,6 +73,8 @@ k3d::iplugin_factory& scalar_sine_factory()
 	return scalar_sine::get_factory();
 }
 
-} //namespace libk3dcore
+} //namespace scalar
+
+} // namespace module
 
 

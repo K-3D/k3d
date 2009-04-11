@@ -27,7 +27,10 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/measurement.h>
 
-namespace libk3dcore
+namespace module
+{
+
+namespace scalar
 {
 
 class scalar_property :
@@ -64,6 +67,8 @@ k3d::iplugin_factory& scalar_property_factory()
 	return scalar_property::get_factory();
 }
 
-} //namespace libk3dcore
+} //namespace scalar
+
+} // namespace module
 
 

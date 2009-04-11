@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,38 +22,59 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "scalar_source.h"
+
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/expression/parser.h>
 #include <k3dsdk/iuser_property.h>
-#include <k3dsdk/node.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
-namespace libk3dcore
+namespace module
+{
+
+namespace scalar
 {
 
 class scalar_expression :
-	public k3d::node
+	public scalar_source
 {
-	typedef k3d::node base;
+	typedef scalar_source base;
 public:
 	scalar_expression(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
+		base(Factory, Document, _("Output value.")),
 		m_expression(init_owner(*this) + init_name("expression") + init_label(_("Expression")) + init_description(_("Expression to be evaluated.")) + init_value(std::string(_("cos(pi/2)")))),
-		m_output(init_owner(*this) + init_name("output") + init_label(_("Output")) + init_description(_("Output value.")) + init_slot(sigc::mem_fun(*this, &scalar_expression::get_value))),
 		m_user_property_changed_signal(*this)
 	{
-		m_expression.changed_signal().connect(m_output.make_reset_slot());
-		m_user_property_changed_signal.connect(m_output.make_reset_slot());
+		m_expression.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_value_slot()));
+		m_user_property_changed_signal.connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_value_slot()));
 	}
 
-	double get_value()
+	static k3d::iplugin_factory& get_factory()
 	{
-		const std::string expression = m_expression.pipeline_value();
+		static k3d::document_plugin_factory<scalar_expression > factory(
+			k3d::uuid(0x53de65d7, 0xee4a01e2, 0x259127b2, 0x676834f8),
+			"ScalarExpression",
+			_("Calculates a C-style expression, returning a scalar value as output"),
+			"Scalar",
+			k3d::iplugin_factory::STABLE);
 
-		std::string variables;
+		return factory;
+	}
+
+private:
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_expression;
+	k3d::user_property_changed_signal m_user_property_changed_signal;
+
+	void on_update_value(k3d::double_t& Output)
+	{
+		const k3d::string_t expression = m_expression.pipeline_value();
+
+		k3d::string_t variables;
 		std::vector<k3d::double_t> values;
 
 		const k3d::iproperty_collection::properties_t& properties = k3d::node::properties();
@@ -78,29 +99,13 @@ public:
 		if(!parser.parse(expression, variables))
 		{
 			k3d::log() << error << factory().name() << ": expression parsing failed: " << parser.last_parse_error() << std::endl;
-			return 0.0;
+			Output = 0.0;
+			return;
 		}
 
-		return parser.evaluate(&values[0]);
+		Output = parser.evaluate(&values[0]);
 	}
 
-	static k3d::iplugin_factory& get_factory()
-	{
-		static k3d::document_plugin_factory<scalar_expression > factory(
-			k3d::uuid(0x53de65d7, 0xee4a01e2, 0x259127b2, 0x676834f8),
-			"ScalarExpression",
-			_("Calculates a C-style expression, returning a scalar value as output"),
-			"Scalar",
-			k3d::iplugin_factory::STABLE);
-
-		return factory;
-	}
-
-private:
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_expression;
-	k3d_data(double, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_output;
-
-	k3d::user_property_changed_signal m_user_property_changed_signal;
 };
 
 k3d::iplugin_factory& scalar_expression_factory()
@@ -108,5 +113,7 @@ k3d::iplugin_factory& scalar_expression_factory()
 	return scalar_expression::get_factory();
 }
 
-} //namespace libk3dcore
+} //namespace scalar
+
+} // namespace module
 
