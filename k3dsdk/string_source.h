@@ -22,6 +22,7 @@
 
 #include "data.h"
 #include "istring_source.h"
+#include "value_demand_storage.h"
 
 namespace k3d
 {
@@ -36,9 +37,9 @@ public:
 		return m_output_string;
 	}
 
-	sigc::slot<void, ihint*> make_reset_string_slot()
+	sigc::slot<void, ihint*> make_update_string_slot()
 	{
-		return m_output_string.make_reset_slot();
+		return m_output_string.make_slot();
 	}
 
 protected:
@@ -48,19 +49,22 @@ protected:
 			+ init_name("output_string")
 			+ init_label(_("Output String"))
 			+ init_description("Output string")
-			+ init_slot(sigc::mem_fun(*this, &string_source<derived_t>::create_string)))
+			+ init_value(string_t()))
 	{
+		m_output_string.set_update_slot(sigc::mem_fun(*this, &string_source<derived_t>::execute));
 	}
 
 private:
-	std::string create_string()
+	k3d_data(std::string, data::immutable_name, data::change_signal, data::no_undo, data::value_demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_string;
+
+	/// Called whenever the output has been modified and needs to be updated.
+	void execute(const std::vector<ihint*>& Hints, string_t& Output)
 	{
-		return on_create_string();
+		// We can safely ignore any hints ...
+		on_update_string(Output);
 	}
 
-	virtual std::string on_create_string() = 0;
-
-	k3d_data(std::string, data::immutable_name, data::change_signal, data::no_undo, data::computed_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_string;
+	virtual void on_update_string(string_t& Output) = 0;
 };
 
 } // namespace k3d

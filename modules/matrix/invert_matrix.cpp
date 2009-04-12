@@ -45,17 +45,6 @@ public:
 	invert_matrix(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		m_input_matrix.changed_signal().connect(sigc::mem_fun(*this, &invert_matrix::reset_output_cache));
-	}
-
-	void reset_output_cache(k3d::ihint* const Hint)
-	{
-		m_output_matrix.reset(Hint);
-	}
-
-	k3d::matrix4 matrix()
-	{		
-		return k3d::inverse(m_input_matrix.pipeline_value());
 	}
 
 	k3d::iplugin_factory& factory()
@@ -74,6 +63,12 @@ public:
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
+	}
+
+private:
+	void on_update_matrix(const k3d::matrix4& Input, k3d::matrix4& Output)
+	{
+		Output = k3d::inverse(Input);
 	}
 };
 

@@ -22,6 +22,7 @@
 
 #include "data.h"
 #include "idouble_source.h"
+#include "value_demand_storage.h"
 
 namespace k3d
 {
@@ -36,26 +37,34 @@ public:
 		return m_output_double;
 	}
 
-	sigc::slot<void, ihint*> make_reset_double_slot()
+	sigc::slot<void, ihint*> make_update_double_slot()
 	{
-		return m_output_double.make_reset_slot();
+		return m_output_double.make_slot();
 	}
 
 protected:
 	double_source() :
-		m_output_double(init_owner(*static_cast<derived_t*>(this)) + init_name("output_double") + init_label(_("Output Double")) + init_description("Output double") + init_slot(sigc::mem_fun(*this, &double_source<derived_t>::create_double)))
+		m_output_double(
+			init_owner(*static_cast<derived_t*>(this))
+			+ init_name("output_double")
+			+ init_label(_("Output Double"))
+			+ init_description("Output double")
+			+ init_value(0.0))
 	{
+		m_output_double.set_update_slot(sigc::mem_fun(*this, &double_source<derived_t>::execute));
 	}
 
 private:
-	double_t create_double()
+	k3d_data(double_t, data::immutable_name, data::change_signal, data::no_undo, data::value_demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_double;
+
+	/// Called whenever the output has been modified and needs to be updated.
+	void execute(const std::vector<ihint*>& Hints, double_t& Output)
 	{
-		return on_create_double();
+		// We can safely ignore any hints ...
+		on_update_double(Output);
 	}
 
-	virtual double_t on_create_double() = 0;
-
-	k3d_data(double_t, data::immutable_name, data::change_signal, data::no_undo, data::computed_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_double;
+	virtual void on_update_double(double_t& Output) = 0;
 };
 
 } // namespace k3d

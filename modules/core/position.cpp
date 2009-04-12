@@ -18,18 +18,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/transformable.h>
 
-namespace libk3dcore
+namespace module
+{
+
+namespace core
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -48,16 +51,14 @@ public:
 		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y offset")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z offset")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
-		m_space.changed_signal().connect(m_output_matrix.make_reset_slot());
-		m_x.changed_signal().connect(m_output_matrix.make_reset_slot());
-		m_y.changed_signal().connect(m_output_matrix.make_reset_slot());
-		m_z.changed_signal().connect(m_output_matrix.make_reset_slot());
-	}
-
-	k3d::matrix4 matrix()
-	{
-		k3d::matrix4 result = m_input_matrix.pipeline_value() * m_space.pipeline_value() * translate3(k3d::vector3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value())) * k3d::inverse(m_space.pipeline_value());
-		return result;
+		m_space.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
+		m_x.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
+		m_y.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
+		m_z.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -74,10 +75,17 @@ public:
 		return factory;
 	}
 
+private:
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_space;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y;
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z;
+
+	void on_update_matrix(const k3d::matrix4& Input, k3d::matrix4& Output)
+	{
+		Output = Input * m_space.pipeline_value() * translate3(k3d::vector3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value())) * k3d::inverse(m_space.pipeline_value());
+	}
+
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -88,5 +96,7 @@ k3d::iplugin_factory& position_factory()
 	return position::get_factory();
 }
 
-} // namespace libk3dcore
+} // namespace core
+
+} // namespace module
 

@@ -18,14 +18,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements procedures required to export K-3D objects from the core module
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/module.h>
 
-/// Namespace reserved for the core plugin module, to protect public symbols from name clashes with other modules
-namespace libk3dcore
+namespace module
+{
+
+namespace core
 {
 
 extern k3d::iplugin_factory& axes_factory();
@@ -40,27 +41,27 @@ extern k3d::iplugin_factory& orientation_factory();
 extern k3d::iplugin_factory& position_factory();
 extern k3d::iplugin_factory& print_stdout_factory();
 extern k3d::iplugin_factory& scale_factory();
-extern k3d::iplugin_factory& show_matrix_factory();
 extern k3d::iplugin_factory& snap_factory();
 extern k3d::iplugin_factory& view_matrix_factory();
 
-} // namespace libk3dcore
+} // namespace core
+
+} // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(libk3dcore::axes_factory());
-	Registry.register_factory(libk3dcore::camera_factory());
-	Registry.register_factory(libk3dcore::color_property_factory());
-	Registry.register_factory(libk3dcore::format_time_factory());
-	Registry.register_factory(libk3dcore::frozen_transformation_factory());
-	Registry.register_factory(libk3dcore::look_at_factory());
-	Registry.register_factory(libk3dcore::multi_material_factory());
-	Registry.register_factory(libk3dcore::null_factory());
-	Registry.register_factory(libk3dcore::orientation_factory());
-	Registry.register_factory(libk3dcore::position_factory());
-	Registry.register_factory(libk3dcore::print_stdout_factory());
-	Registry.register_factory(libk3dcore::scale_factory());
-	Registry.register_factory(libk3dcore::show_matrix_factory());
-	Registry.register_factory(libk3dcore::snap_factory());
-	Registry.register_factory(libk3dcore::view_matrix_factory());
+	Registry.register_factory(module::core::axes_factory());
+	Registry.register_factory(module::core::camera_factory());
+	Registry.register_factory(module::core::color_property_factory());
+	Registry.register_factory(module::core::format_time_factory());
+	Registry.register_factory(module::core::frozen_transformation_factory());
+	Registry.register_factory(module::core::look_at_factory());
+	Registry.register_factory(module::core::multi_material_factory());
+	Registry.register_factory(module::core::null_factory());
+	Registry.register_factory(module::core::orientation_factory());
+	Registry.register_factory(module::core::position_factory());
+	Registry.register_factory(module::core::print_stdout_factory());
+	Registry.register_factory(module::core::scale_factory());
+	Registry.register_factory(module::core::snap_factory());
+	Registry.register_factory(module::core::view_matrix_factory());
 K3D_MODULE_END
 

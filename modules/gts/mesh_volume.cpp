@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,14 +22,15 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3d-i18n-config.h>
+#include "helpers.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
-
-#include "helpers.h"
+#include <k3dsdk/value_demand_storage.h>
 
 namespace module
 {
@@ -48,9 +49,12 @@ class mesh_volume :
 public:
 	mesh_volume(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_volume(init_owner(*this) + init_name("volume") + init_label(_("Volume")) + init_description(_("Mesh volume")) + init_slot(sigc::mem_fun(*this, &mesh_volume::get_volume)))
+		m_volume(init_owner(*this) + init_name("volume") + init_label(_("Volume")) + init_description(_("Mesh volume")) + init_value(0.0))
 	{
-		m_input_mesh.changed_signal().connect(m_volume.make_reset_slot());
+		m_input_mesh.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_volume.make_slot()));
+
+		m_volume.set_update_slot(sigc::mem_fun(*this, &mesh_volume::execute));
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -60,17 +64,6 @@ public:
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-	}
-
-	double get_volume()
-	{
-		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
-		{
-			const gts_ptr<GtsSurface> gts_surface = convert(*mesh);
-			return gts_surface_volume(gts_surface);
-		}
-
-		return 0;
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -88,7 +81,18 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_volume;
+	k3d_data(double, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_volume;
+
+	void execute(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Volume)
+	{
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
+		{
+			const gts_ptr<GtsSurface> gts_surface = convert(*mesh);
+			Volume = gts_surface_volume(gts_surface);
+		}
+
+		Volume = 0;
+	}
 };
 
 /////////////////////////////////////////////////////////////////////////////

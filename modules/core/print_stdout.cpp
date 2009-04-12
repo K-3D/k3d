@@ -28,7 +28,10 @@
 
 #include <boost/format.hpp>
 
-namespace libk3dcore
+namespace module
+{
+
+namespace core
 {
 
 class print_stdout :
@@ -69,6 +72,8 @@ k3d::iplugin_factory& print_stdout_factory()
 	return print_stdout::get_factory();
 }
 
-} //namespace libk3dcore
+} //namespace core
+
+} // namespace module
 
 

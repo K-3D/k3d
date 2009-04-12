@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,56 +18,43 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
-#include <k3dsdk/itransform_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/transformable.h>
 
-namespace libk3dcore
+namespace module
+{
+
+namespace core
 {
 
 /////////////////////////////////////////////////////////////////////////////
 // view_matrix
 
 class view_matrix :
-	public k3d::node,
-	public k3d::itransform_source
+	public k3d::transformable<k3d::node >
 {
-	typedef k3d::node base;
+	typedef k3d::transformable<k3d::node > base;
 
 public:
 	view_matrix(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_position(init_owner(*this) + init_name("position") + init_label(_("Position")) + init_description(_("Position")) + init_value(k3d::identity3())),
 		m_look(init_owner(*this) + init_name("look") + init_label(_("Look Position")) + init_description(_("Look Position")) + init_value(k3d::translate3(k3d::vector3(0, 0, 1)))),
-		m_up(init_owner(*this) + init_name("up") + init_label(_("Up Position")) + init_description(_("Up Position")) + init_value(k3d::translate3(k3d::vector3(0, 1, 0)))),
-		m_output(init_owner(*this) + init_name("output_matrix") + init_label(_("Output matrix")) + init_description(_("Read only")) + init_slot(sigc::mem_fun(*this, &view_matrix::output_value)))
+		m_up(init_owner(*this) + init_name("up") + init_label(_("Up Position")) + init_description(_("Up Position")) + init_value(k3d::translate3(k3d::vector3(0, 1, 0))))
 	{
-		m_position.changed_signal().connect(m_output.make_reset_slot());
-		m_look.changed_signal().connect(m_output.make_reset_slot());
-		m_up.changed_signal().connect(m_output.make_reset_slot());
-	}
-
-	k3d::iproperty& transform_source_output()
-	{
-		return m_output;
-	}
-
-	k3d::matrix4 output_value()
-	{
-		const k3d::point3 look_position = m_look.pipeline_value() * k3d::point3();
-		const k3d::point3 up_position = m_up.pipeline_value() * k3d::point3();
-		const k3d::point3 position = m_position.pipeline_value() * k3d::point3();
-
-		return k3d::view_matrix(
-			look_position - position,
-			up_position - position,
-			position);
+		m_position.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
+		m_look.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
+		m_up.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -83,10 +70,19 @@ public:
 		return factory;
 	}
 
+private:
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_position;
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_look;
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_up;
-	k3d_data(k3d::matrix4, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_output;
+
+	void on_update_matrix(const k3d::matrix4& Input, k3d::matrix4& Output)
+	{
+		const k3d::point3 look_position = m_look.pipeline_value() * k3d::point3();
+		const k3d::point3 up_position = m_up.pipeline_value() * k3d::point3();
+		const k3d::point3 position = m_position.pipeline_value() * k3d::point3();
+
+		Output = Input * k3d::view_matrix(look_position - position, up_position - position, position);
+	}
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -97,5 +93,7 @@ k3d::iplugin_factory& view_matrix_factory()
 	return view_matrix::get_factory();
 }
 
-} // namespace libk3dcore
+} // namespace core
+
+} // namespace module
 

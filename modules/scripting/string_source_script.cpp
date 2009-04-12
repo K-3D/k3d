@@ -23,10 +23,12 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
 #include <k3dsdk/string_source.h>
+#include <k3dsdk/type_registry.h>
 
 namespace module
 {
@@ -49,21 +51,8 @@ public:
 	{
 		set_script(k3d::resource::get_string("/module/scripting/string_source_script.py"));
 
-		connect_script_changed_signal(make_reset_string_slot());
-	}
-
-	std::string on_create_string()
-	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = std::string("");
-
-		execute_script(context);
-
-		return_val_if_fail(context["Output"].type() == typeid(std::string), std::string(""));
-
-		return boost::any_cast<std::string>(context["Output"]);
+		connect_script_changed_signal(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_string_slot()));
 	}
 
 	k3d::iplugin_factory& factory()
@@ -81,6 +70,26 @@ public:
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
+	}
+
+private:
+	void on_update_string(k3d::string_t& Output)
+	{
+		k3d::iscript_engine::context_t context;
+		context["Document"] = &document();
+		context["Node"] = static_cast<k3d::inode*>(this);
+		context["Output"] = std::string("");
+
+		execute_script(context);
+
+		if(context["Output"].type() == typeid(k3d::string_t))
+		{
+			Output = boost::any_cast<k3d::string_t>(context["Output"]);
+			return;
+		}
+
+		k3d::log() << error << "unsupported output type: " << k3d::demangle(context["output"].type()) << std::endl;
+		Output = k3d::string_t("");
 	}
 };
 

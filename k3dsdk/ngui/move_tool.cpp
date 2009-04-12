@@ -643,8 +643,10 @@ move_tool::move_tool(document_state& DocumentState, const std::string& Name) :
 	transform_tool_base(DocumentState.document(), DocumentState, Name),
 	m_mutex(false),
 	m_move(init_owner(*this) + init_name("move") + init_label(_("Move")) + init_description(_("Move")) + init_value(k3d::point3(0, 0, 0))),
-	m_world_position(init_owner(*this) + init_name("world_position") + init_label(_("World position")) + init_description(_("Manipulators' world position")) + init_slot(sigc::mem_fun(*this, &move_tool::get_world_position)))
+	m_world_position(init_owner(*this) + init_name("world_position") + init_label(_("World position")) + init_description(_("Manipulators' world position")) + init_value(k3d::point3(0, 0, 0)))
 {
+	m_world_position.set_update_slot(sigc::mem_fun(*this, &move_tool::get_world_position));
+
 	//navigation_model().connect_command_signal(sigc::mem_fun(*this, &move_tool::record_command));
 	m_move.connect_explicit_change_signal(sigc::mem_fun(*this, &move_tool::on_move));
 
@@ -833,7 +835,7 @@ void move_tool::on_document_selection_changed()
 	reset();
 
 	// Update world position
-	m_world_position.reset();
+	m_world_position.update();
 }
 
 void move_tool::on_redraw(viewport::control& Viewport)
@@ -946,12 +948,12 @@ void move_tool::on_move(k3d::iunknown*)
 	move_targets(k3d::to_vector(m_move.internal_value()));
 
 	// Update world position
-	m_world_position.reset();
+	m_world_position.update();
 }
 
-k3d::point3 move_tool::get_world_position()
+void move_tool::get_world_position(const std::vector<k3d::ihint*>& Hints, k3d::point3& Output)
 {
-	return world_position();
+	Output = world_position();
 }
 
 } // namespace ngui

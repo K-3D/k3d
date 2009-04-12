@@ -27,7 +27,10 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/node.h>
 
-namespace libk3dcore
+namespace module
+{
+
+namespace core
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -64,5 +67,7 @@ k3d::iplugin_factory& multi_material_factory()
 	return multi_material::get_factory();
 }
 
-} // namespace libk3dcore
+} // namespace core
+
+} // namespace module
 

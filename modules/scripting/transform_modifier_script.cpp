@@ -50,32 +50,8 @@ public:
 	{
 		set_script(k3d::resource::get_string("/module/scripting/transform_modifier_script.py"));
 		
-		connect_script_changed_signal(sigc::mem_fun(*this, &transform_modifier_script::reset_output_cache));
-	}
-
-	void reset_output_cache(k3d::ihint* const Hint)
-	{
-		m_output_matrix.reset(Hint);
-	}
-
-	k3d::matrix4 matrix()
-	{		
-		// Create a new output matrix, ready for modification by the script ...
-		const k3d::matrix4 input = m_input_matrix.pipeline_value();
-		k3d::matrix4 output = input;
-
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Input"] = input;
-		context["Output"] = output;
-
-		execute_script(context);
-
-		return_val_if_fail(context["Output"].type() == typeid(k3d::matrix4), output);
-		output = boost::any_cast<k3d::matrix4>(context["Output"]);
-
-		return output;
+		connect_script_changed_signal(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -89,6 +65,24 @@ public:
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
+	}
+
+private:
+	void on_update_matrix(const k3d::matrix4& Input, k3d::matrix4& Output)
+	{		
+		// Create a new output matrix, ready for modification by the script ...
+		Output = Input;
+
+		k3d::iscript_engine::context_t context;
+		context["Document"] = &document();
+		context["Node"] = static_cast<k3d::inode*>(this);
+		context["Input"] = Input;
+		context["Output"] = Output;
+
+		execute_script(context);
+
+		return_if_fail(context["Output"].type() == typeid(k3d::matrix4));
+		Output = boost::any_cast<k3d::matrix4>(context["Output"]);
 	}
 };
 

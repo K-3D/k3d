@@ -2,7 +2,7 @@
 #define K3DSDK_COLOR_SOURCE_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -23,6 +23,7 @@
 #include "color.h"
 #include "data.h"
 #include "icolor_source.h"
+#include "value_demand_storage.h"
 
 namespace k3d
 {
@@ -37,9 +38,10 @@ public:
 		return m_output_color;
 	}
 
-	sigc::slot<void, ihint*> make_reset_color_slot()
+	/// Returns a slot that should be connected to input properties to signal that the output has changed
+	sigc::slot<void, ihint*> make_update_color_slot()
 	{
-		return m_output_color.make_reset_slot();
+		return m_output_color.make_slot();
 	}
 
 protected:
@@ -49,19 +51,22 @@ protected:
 			+ init_name("output_color")
 			+ init_label(_("Output Color"))
 			+ init_description(_("Output color"))
-			+ init_slot(sigc::mem_fun(*this, &color_source<derived_t>::create_color)))
+			+ init_value(k3d::color(1, 1, 1)))
 	{
+		m_output_color.set_update_slot(sigc::mem_fun(*this, &color_source<derived_t>::execute));
 	}
 
 private:
-	color create_color()
+	k3d_data(color, data::immutable_name, data::change_signal, data::no_undo, data::value_demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_color;
+
+	/// Called whenever the output has been modified and needs to be updated.
+	void execute(const std::vector<ihint*>& Hints, color& Output)
 	{
-		return on_create_color();
+		// We can safely ignore any hints ...
+		on_update_color(Output);
 	}
 
-	virtual color on_create_color() = 0;
-
-	k3d_data(color, data::immutable_name, data::change_signal, data::no_undo, data::computed_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_color;
+	virtual void on_update_color(color& Output) = 0;
 };
 
 } // namespace k3d

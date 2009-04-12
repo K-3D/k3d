@@ -23,6 +23,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/int32_source.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/resource/resource.h>
@@ -50,24 +51,8 @@ public:
 	{
 		set_script(k3d::resource::get_string("/module/scripting/int32_source_script.py"));
 
-		connect_script_changed_signal(make_reset_int32_slot());
-	}
-
-	k3d::int32_t on_create_int32()
-	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = 0;
-
-		execute_script(context);
-
-		if(context["Output"].type() == typeid(k3d::int32_t))
-			return boost::any_cast<k3d::int32_t>(context["Output"]);
-
-		k3d::log() << error << "unsupported output type: " << k3d::demangle(context["Output"].type()) << std::endl;
-
-		return 0;
+		connect_script_changed_signal(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_int32_slot()));
 	}
 
 	k3d::iplugin_factory& factory()
@@ -86,6 +71,27 @@ public:
 
 		return factory;
 	}
+
+private:
+	void on_update_int32(k3d::int32_t& Output)
+	{
+		k3d::iscript_engine::context_t context;
+		context["Document"] = &document();
+		context["Node"] = static_cast<k3d::inode*>(this);
+		context["Output"] = 0;
+
+		execute_script(context);
+
+		if(context["Output"].type() == typeid(k3d::int32_t))
+		{
+			Output = boost::any_cast<k3d::int32_t>(context["Output"]);
+			return;
+		}
+
+		k3d::log() << error << "unsupported output type: " << k3d::demangle(context["output"].type()) << std::endl;
+		Output = 0;
+	}
+
 };
 
 /////////////////////////////////////////////////////////////////////////////

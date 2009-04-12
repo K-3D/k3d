@@ -46,7 +46,10 @@
 #endif	//far
 #endif	//WIN32
 
-namespace libk3dcore
+namespace module
+{
+
+namespace core
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -73,14 +76,14 @@ public:
 		m_right(init_owner(*this) + init_name("right") + init_label(_("Right")) + init_description(_("Right")) + init_value(2.0/3.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
 		m_top(init_owner(*this) + init_name("top") + init_label(_("Top")) + init_description(_("Top")) + init_value(0.5) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
 		m_bottom(init_owner(*this) + init_name("bottom") + init_label(_("Bottom")) + init_description(_("Bottom")) + init_value(-0.5) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_near(init_owner(*this) + init_name("near") + init_label(_("Near")) + init_description(_("Near Plane Distance")) + init_value(1.0) + init_constraint(constraint::minimum<double>(0.0)) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_far(init_owner(*this) + init_name("far") + init_label(_("Far")) + init_description(_("Far Plane Distance")) + init_value(1000.0) + init_constraint(constraint::minimum<double>(0.0)) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_crop_window_left(init_owner(*this) + init_name("crop_window_left") + init_label(_("Crop Window Left")) + init_description(_("Crop window left")) + init_value(0.0) + init_constraint(constraint::minimum<double>(0.0, constraint::maximum<double>(1.0))) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_crop_window_right(init_owner(*this) + init_name("crop_window_right") + init_label(_("Crop Window Right")) + init_description(_("Crop Window Right")) + init_value(1.0) + init_constraint(constraint::minimum<double>(0.0, constraint::maximum<double>(1.0)))  + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_crop_window_top(init_owner(*this) + init_name("crop_window_top") + init_label(_("Crop Window Top")) + init_description(_("Crop Window Top")) + init_value(0.0) + init_constraint(constraint::minimum<double>(0.0, constraint::maximum<double>(1.0)))  + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_crop_window_bottom(init_owner(*this) + init_name("crop_window_bottom") + init_label(_("Crop Window Bottom")) + init_description(_("Crop window bottom")) + init_value(1.0) + init_constraint(constraint::minimum<double>(0.0, constraint::maximum<double>(1.0)))  + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
+		m_near(init_owner(*this) + init_name("near") + init_label(_("Near")) + init_description(_("Near Plane Distance")) + init_value(1.0) + init_constraint(constraint::minimum<k3d::double_t>(0.0)) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_far(init_owner(*this) + init_name("far") + init_label(_("Far")) + init_description(_("Far Plane Distance")) + init_value(1000.0) + init_constraint(constraint::minimum<k3d::double_t>(0.0)) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_crop_window_left(init_owner(*this) + init_name("crop_window_left") + init_label(_("Crop Window Left")) + init_description(_("Crop window left")) + init_value(0.0) + init_constraint(constraint::minimum<k3d::double_t>(0.0, constraint::maximum<k3d::double_t>(1.0))) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
+		m_crop_window_right(init_owner(*this) + init_name("crop_window_right") + init_label(_("Crop Window Right")) + init_description(_("Crop Window Right")) + init_value(1.0) + init_constraint(constraint::minimum<k3d::double_t>(0.0, constraint::maximum<k3d::double_t>(1.0)))  + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
+		m_crop_window_top(init_owner(*this) + init_name("crop_window_top") + init_label(_("Crop Window Top")) + init_description(_("Crop Window Top")) + init_value(0.0) + init_constraint(constraint::minimum<k3d::double_t>(0.0, constraint::maximum<k3d::double_t>(1.0)))  + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
+		m_crop_window_bottom(init_owner(*this) + init_name("crop_window_bottom") + init_label(_("Crop Window Bottom")) + init_description(_("Crop window bottom")) + init_value(1.0) + init_constraint(constraint::minimum<k3d::double_t>(0.0, constraint::maximum<k3d::double_t>(1.0)))  + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
 		m_show_reference_plane(init_owner(*this) + init_name("show_reference_plane") + init_label(_("Show Reference Plane")) + init_description(_("Show Reference Plane")) + init_value(false)),
-		m_reference_plane(init_owner(*this) + init_name("reference_plane") + init_label(_("Reference Plane")) + init_description(_("Reference Plane Distance")) + init_value(0.0) + init_constraint(constraint::minimum<double>(0.0))  + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_reference_plane(init_owner(*this) + init_name("reference_plane") + init_label(_("Reference Plane")) + init_description(_("Reference Plane Distance")) + init_value(0.0) + init_constraint(constraint::minimum<k3d::double_t>(0.0))  + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_reference_plane_color(init_owner(*this) + init_name("reference_plane_color") + init_label(_("Reference Plane Color")) + init_description(_("Reference Plane Color")) + init_value(k3d::color(0, 0, 0.7))),
 		m_perspective_projection(m_left, m_right, m_top, m_bottom, m_near, m_far),
 		m_orthographic_projection(m_left, m_right, m_top, m_bottom, m_near, m_far)
@@ -138,7 +141,7 @@ public:
 
 	k3d::iprojection& projection()
 	{
-		const bool orthographic = m_orthographic.pipeline_value();
+		const k3d::bool_t orthographic = m_orthographic.pipeline_value();
 
 		if(orthographic)
 			return m_orthographic_projection;
@@ -208,10 +211,10 @@ public:
 
 	void on_position_changed(k3d::ihint* const Hint)
 	{
-		m_target_distance.reset(Hint);
+		m_target_distance.update(Hint);
 	}
 
-	double get_target_distance()
+	k3d::double_t get_target_distance()
 	{
 		const k3d::point3 position = k3d::node_to_world_matrix(navigation_target()) * k3d::point3(0, 0, 0);
 		return k3d::distance(position, m_world_target.pipeline_value());
@@ -245,15 +248,15 @@ public:
 
 	void draw_projection()
 	{
-		const bool orthographic = m_orthographic.pipeline_value();
-		const double left = m_left.pipeline_value();
-		const double right = m_right.pipeline_value();
-		const double top = m_top.pipeline_value();
-		const double bottom = m_bottom.pipeline_value();
-		const double near = m_near.pipeline_value();
-		const double far = m_far.pipeline_value();
+		const k3d::bool_t orthographic = m_orthographic.pipeline_value();
+		const k3d::double_t left = m_left.pipeline_value();
+		const k3d::double_t right = m_right.pipeline_value();
+		const k3d::double_t top = m_top.pipeline_value();
+		const k3d::double_t bottom = m_bottom.pipeline_value();
+		const k3d::double_t near = m_near.pipeline_value();
+		const k3d::double_t far = m_far.pipeline_value();
 
-		const double reference_plane = m_reference_plane.pipeline_value();
+		const k3d::double_t reference_plane = m_reference_plane.pipeline_value();
 		const k3d::color reference_plane_color = m_reference_plane_color.pipeline_value();
 
 		if(orthographic)
@@ -299,17 +302,17 @@ public:
 		}
 		else
 		{
-			const double p = far / near;
-			const double left2 = left * p;
-			const double right2 = right * p;
-			const double top2 = top * p;
-			const double bottom2 = bottom * p;
+			const k3d::double_t p = far / near;
+			const k3d::double_t left2 = left * p;
+			const k3d::double_t right2 = right * p;
+			const k3d::double_t top2 = top * p;
+			const k3d::double_t bottom2 = bottom * p;
 
-			const double q = reference_plane / near;
-			const double left3 = left * q;
-			const double right3 = right * q;
-			const double top3 = top * q;
-			const double bottom3 = bottom * q;
+			const k3d::double_t q = reference_plane / near;
+			const k3d::double_t left3 = left * q;
+			const k3d::double_t right3 = right * q;
+			const k3d::double_t top3 = top * q;
+			const k3d::double_t bottom3 = bottom * q;
 
 			// Draw the near plane ...
 			glBegin(GL_LINE_LOOP);
@@ -354,14 +357,14 @@ public:
 
 	void draw_reference_plane()
 	{
-		const bool orthographic = m_orthographic.pipeline_value();
-		const double left = m_left.pipeline_value();
-		const double right = m_right.pipeline_value();
-		const double top = m_top.pipeline_value();
-		const double bottom = m_bottom.pipeline_value();
-		const double near = m_near.pipeline_value();
+		const k3d::bool_t orthographic = m_orthographic.pipeline_value();
+		const k3d::double_t left = m_left.pipeline_value();
+		const k3d::double_t right = m_right.pipeline_value();
+		const k3d::double_t top = m_top.pipeline_value();
+		const k3d::double_t bottom = m_bottom.pipeline_value();
+		const k3d::double_t near = m_near.pipeline_value();
 
-		const double reference_plane = m_reference_plane.pipeline_value();
+		const k3d::double_t reference_plane = m_reference_plane.pipeline_value();
 		const k3d::color reference_plane_color = m_reference_plane_color.pipeline_value();
 
 		if(orthographic)
@@ -376,11 +379,11 @@ public:
 		}
 		else
 		{
-			const double q = reference_plane / near;
-			const double left3 = left * q;
-			const double right3 = right * q;
-			const double top3 = top * q;
-			const double bottom3 = bottom * q;
+			const k3d::double_t q = reference_plane / near;
+			const k3d::double_t left3 = left * q;
+			const k3d::double_t right3 = right * q;
+			const k3d::double_t top3 = top * q;
+			const k3d::double_t bottom3 = bottom * q;
 
 			k3d::gl::color3d(reference_plane_color);
 			glBegin(GL_LINE_LOOP);
@@ -395,15 +398,15 @@ public:
 	void draw()
 	{
 		// Our dimensions
-		const double bodylength = 0.5 * 0.5;
-		const double bodywidth = 0.25 * 0.5;
-		const double bodyheight = 0.25 * 0.5;
-		const double lenslength = 0.25 * 0.5;
-		const double lenswidth = 0.15 * 0.5;
-		const double lensheight = 0.1 * 0.5;
-		const double lensoffset = 0.05;
-		const double filmradius = 0.2;
-		const double filmwidth = 0.125 * 0.5;
+		const k3d::double_t bodylength = 0.5 * 0.5;
+		const k3d::double_t bodywidth = 0.25 * 0.5;
+		const k3d::double_t bodyheight = 0.25 * 0.5;
+		const k3d::double_t lenslength = 0.25 * 0.5;
+		const k3d::double_t lenswidth = 0.15 * 0.5;
+		const k3d::double_t lensheight = 0.1 * 0.5;
+		const k3d::double_t lensoffset = 0.05;
+		const k3d::double_t filmradius = 0.2;
+		const k3d::double_t filmwidth = 0.125 * 0.5;
 
 		glTranslated(0, 0, -0.25);
 
@@ -624,22 +627,22 @@ private:
 
 	k3d_data(k3d::itransform_source*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_navigation_target;
 	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_world_target;
-	k3d_data(double, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_target_distance;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_target_distance;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_aspect_ratio;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_projection;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_orthographic;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_left;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_right;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_top;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_bottom;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_near;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_far;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_crop_window_left;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_crop_window_right;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_crop_window_top;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_crop_window_bottom;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_reference_plane;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_reference_plane;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_projection;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_orthographic;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_left;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_right;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_top;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_bottom;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_near;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_far;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_crop_window_left;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_crop_window_right;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_crop_window_top;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_crop_window_bottom;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_reference_plane;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_reference_plane;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_reference_plane_color;
 
 	perspective_projection m_perspective_projection;
@@ -651,5 +654,7 @@ k3d::iplugin_factory& camera_factory()
 	return camera::get_factory();
 }
 
-} // namespace libk3dcore
+} // namespace core
+
+} // namespace module
 

@@ -42,7 +42,7 @@ public:
 		return m_output_bitmap;
 	}
 
-	/// Returns a slot that should be connected to input properties to signal that the output bitmap has changed.
+	/// Returns a slot that should be connected to input properties to signal that the output has changed.
 	sigc::slot<void, ihint*> make_update_bitmap_slot()
 	{
 		return m_output_bitmap.make_slot();
@@ -68,7 +68,7 @@ private:
 		return *static_cast<derived_t*>(this);
 	}
 
-	/// Called whenever the output bitmap has been modified and needs to be updated.
+	/// Called whenever the output has been modified and needs to be updated.
 	void execute(const std::vector<ihint*>& Hints, bitmap& Bitmap)
 	{
 		bool_t resize_bitmap = false;

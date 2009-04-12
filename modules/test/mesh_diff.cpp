@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,15 +18,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/user_property_changed_signal.h>
+#include <k3dsdk/value_demand_storage.h>
 
 namespace module
 {
@@ -45,41 +47,16 @@ class mesh_diff :
 public:
 	mesh_diff(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_equal(init_owner(*this) + init_name("equal") + init_label(_("Equal")) + init_description(_("True iff all input meshes are completely equivalent")) + init_slot(sigc::mem_fun(*this, &mesh_diff::get_equal))),
 		m_threshold(init_owner(*this) + init_name("threshold") + init_label(_("Threshold")) + init_description(_("Sets the maximum allowable difference between floating-point numbers")) + init_value(0) + init_constraint(constraint::minimum<k3d::int32_t>(0))),
+		m_equal(init_owner(*this) + init_name("equal") + init_label(_("Equal")) + init_description(_("True iff all input meshes are completely equivalent")) + init_value(true)),
 		m_user_property_changed_signal(*this)
 	{
-		m_threshold.changed_signal().connect(m_equal.make_reset_slot());
-		m_user_property_changed_signal.connect(m_equal.make_reset_slot());
-	}
+		m_threshold.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_equal.make_slot()));
+		m_user_property_changed_signal.connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_equal.make_slot()));
 
-	bool get_equal()
-	{
-		const k3d::int32_t threshold = m_threshold.pipeline_value();
-
-		const k3d::mesh* first_mesh = 0;
-		const k3d::iproperty_collection::properties_t& properties = node::properties();
-		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
-		{
-			k3d::iproperty& property = **prop;
-			if(property.property_type() == typeid(k3d::mesh*))
-			{
-				if(first_mesh)
-				{
-					if(const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property)))
-					{
-						if(!k3d::almost_equal<k3d::mesh>(threshold)(*first_mesh, *mesh))
-							return false;
-					}
-				}
-				else
-				{
-					first_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
-				}
-			}
-		}
-
-		return true;
+		m_equal.set_update_slot(sigc::mem_fun(*this, &mesh_diff::execute));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -95,10 +72,41 @@ public:
 		return factory;
 	}
 
-	k3d_data(bool, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_equal;
+private:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_threshold;
-
+	k3d_data(k3d::bool_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_equal;
 	k3d::user_property_changed_signal m_user_property_changed_signal;
+
+	void execute(const std::vector<k3d::ihint*>& Hints, k3d::bool_t& Output)
+	{
+		Output = true;
+		const k3d::int32_t threshold = m_threshold.pipeline_value();
+
+		const k3d::mesh* first_mesh = 0;
+		const k3d::iproperty_collection::properties_t& properties = node::properties();
+		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
+		{
+			k3d::iproperty& property = **prop;
+			if(property.property_type() == typeid(k3d::mesh*))
+			{
+				if(first_mesh)
+				{
+					if(const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property)))
+					{
+						if(!k3d::almost_equal<k3d::mesh>(threshold)(*first_mesh, *mesh))
+						{
+							Output = false;
+							return;
+						}
+					}
+				}
+				else
+				{
+					first_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
+				}
+			}
+		}
+	}
 };
 
 /////////////////////////////////////////////////////////////////////////////

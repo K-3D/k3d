@@ -1,4 +1,4 @@
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,16 +17,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
 #include <k3d-platform-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/user_interface.h>
+#include <k3dsdk/value_demand_storage.h>
 
 #include <limits>
 
@@ -49,15 +51,16 @@ namespace time
 class realtime_source :
 	public k3d::node
 {
-	typedef k3d::node  base;
+	typedef k3d::node base;
 
 public:
 	realtime_source(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_frame_rate(init_owner(*this) + init_name("frame_rate") + init_label(_("Frame rate")) + init_description(_("Frame rate")) + init_value(1.0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(std::numeric_limits<double>::epsilon()))),
-		m_time(init_owner(*this) + init_name("time") + init_label(_("Time")) + init_description(_("Time")) + init_slot(sigc::mem_fun(*this, &realtime_source::get_time)))
+		m_time(init_owner(*this) + init_name("time") + init_label(_("Time")) + init_description(_("Time")) + init_value(0.0))
 	{
 		m_frame_rate.changed_signal().connect(sigc::mem_fun(*this, &realtime_source::on_reset_source));
+		m_time.set_update_slot(sigc::mem_fun(*this, &realtime_source::execute));
 		on_reset_source(0);
 	}
 
@@ -66,23 +69,10 @@ public:
 		m_timeout_connection.disconnect();
 	}
 
-	void on_reset_source(k3d::ihint*)
+	void on_reset_source(k3d::ihint* Hint = 0)
 	{
 		m_timeout_connection.disconnect();
-		m_timeout_connection = k3d::user_interface().get_timer(m_frame_rate.pipeline_value(), sigc::bind(m_time.make_reset_slot(), static_cast<k3d::ihint*>(0)));
-	}
-
-	double get_time()
-	{
-#ifdef K3D_API_WIN32
-		timeb tv;
-		ftime(&tv);
-		return tv.time + (static_cast<double>(tv.millitm) / 1000);
-#else // K3D_API_WIN32
-		timeval tv;
-		gettimeofday(&tv, 0);
-		return tv.tv_sec + static_cast<double>(tv.tv_usec) / 1000000;
-#endif // !K3D_API_WIN32
+		m_timeout_connection = k3d::user_interface().get_timer(m_frame_rate.pipeline_value(), sigc::bind(m_time.make_slot(), static_cast<k3d::ihint*>(0)));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -99,9 +89,23 @@ public:
 
 private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_frame_rate;
-	k3d_data(double, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_time;
-
+	k3d_data(double, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_time;
 	sigc::connection m_timeout_connection;
+
+	/// Called whenever the output time has been modified and needs to be updated.
+	void execute(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Time)
+	{
+		// We can safely ignore any hints ...
+#ifdef K3D_API_WIN32
+		timeb tv;
+		ftime(&tv);
+		Time = tv.time + (static_cast<double>(tv.millitm) / 1000);
+#else // K3D_API_WIN32
+		timeval tv;
+		gettimeofday(&tv, 0);
+		Time = tv.tv_sec + static_cast<double>(tv.tv_usec) / 1000000;
+#endif // !K3D_API_WIN32
+	}
 };
 
 /////////////////////////////////////////////////////////////////////////////

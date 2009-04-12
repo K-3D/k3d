@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,22 +18,24 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
+#include <k3dsdk/isnappable.h>
 #include <k3dsdk/isnap_source.h>
 #include <k3dsdk/isnap_target.h>
-#include <k3dsdk/isnappable.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/transformable.h>
 #include <k3dsdk/transform.h>
 
-namespace libk3dcore
+namespace module
+{
+
+namespace core
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -72,17 +74,13 @@ k3d::isnap_target* get_snap_target(k3d::iunknown* Snappable)
 // snap
 
 class snap :
-	public k3d::node,
-	public k3d::itransform_source,
-	public k3d::itransform_sink
+	public k3d::transformable<k3d::node >
 {
-	typedef k3d::node base;
+	typedef k3d::transformable<k3d::node > base;
 
 public:
 	snap(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input_matrix(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3())),
-		m_output_matrix(init_owner(*this) + init_name("output_matrix") + init_label(_("Output matrix")) + init_description(_("Read only")) + init_slot(sigc::mem_fun(*this, &snap::output_value))),
 		m_source(init_owner(*this) + init_name("source") + init_label(_("Source Node")) + init_description(_("Source Node")) + init_value(static_cast<k3d::isnappable*>(0))),
 		m_snap_source(init_owner(*this) + init_name("snap_source") + init_label(_("Snap Source")) + init_description(_("Snap Source")) + init_value(std::string("-- None --")) + init_values(m_snap_sources)),
 		m_target(init_owner(*this) + init_name("target") + init_label(_("Target Node")) + init_description(_("Target Node")) + init_value(static_cast<k3d::isnappable*>(0))),
@@ -92,18 +90,22 @@ public:
 		m_source.changed_signal().connect(sigc::mem_fun(*this, &snap::on_source_changed));
 		m_target.changed_signal().connect(sigc::mem_fun(*this, &snap::on_target_changed));
 
-		m_input_matrix.changed_signal().connect(m_output_matrix.make_reset_slot());
-		m_source.changed_signal().connect(m_output_matrix.make_reset_slot());
-		m_snap_source.changed_signal().connect(m_output_matrix.make_reset_slot());
-		m_target.changed_signal().connect(m_output_matrix.make_reset_slot());
-		m_snap_target.changed_signal().connect(m_output_matrix.make_reset_slot());
-		m_snap_orientation.changed_signal().connect(m_output_matrix.make_reset_slot());
+		m_source.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
+		m_snap_source.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
+		m_target.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
+		m_snap_target.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
+		m_snap_orientation.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
 
-		on_source_changed(0);
-		on_target_changed(0);
+		on_source_changed();
+		on_target_changed();
 	}
 
-	void on_source_changed(k3d::iunknown*)
+	void on_source_changed(k3d::ihint* Hint = 0)
 	{
 		m_snap_sources.clear();
 		m_snap_sources.push_back(k3d::ienumeration_property::enumeration_value_t("-- None --", "-- None --", "-- None --"));
@@ -118,7 +120,7 @@ public:
 		m_snap_source.notify_enumeration_values_changed();
 	}
 
-	void on_target_changed(k3d::iunknown*)
+	void on_target_changed(k3d::ihint* Hint = 0)
 	{
 		m_snap_targets.clear();
 		m_snap_targets.push_back(k3d::ienumeration_property::enumeration_value_t("-- None --", "-- None --", "-- None --"));
@@ -133,29 +135,48 @@ public:
 		m_snap_target.notify_enumeration_values_changed();
 	}
 
-	k3d::iproperty& transform_source_output()
+	static k3d::iplugin_factory& get_factory()
 	{
-		return m_output_matrix;
+		static k3d::document_plugin_factory<snap,
+			k3d::interface_list<k3d::itransform_source,
+			k3d::interface_list<k3d::itransform_sink > > > factory(
+				k3d::uuid(0x176d4553, 0x65fc48ca, 0x845a8160, 0xd31b41ae),
+				"Snap",
+				_("Snaps one node to another"),
+				"Snap",
+				k3d::iplugin_factory::EXPERIMENTAL);
+
+		return factory;
 	}
 
-	k3d::iproperty& transform_sink_input()
-	{
-		return m_input_matrix;
-	}
+private:
+	k3d_data(k3d::isnappable*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_source;
+	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_snap_source;
+	k3d_data(k3d::isnappable*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_target;
+	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_snap_target;
+	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_snap_orientation;
 
-	k3d::matrix4 output_value()
+	k3d::ienumeration_property::enumeration_values_t m_snap_sources;
+	k3d::ienumeration_property::enumeration_values_t m_snap_targets;
+
+	void on_update_matrix(const k3d::matrix4& Input, k3d::matrix4& Output)
 	{
-		const k3d::matrix4 input_matrix = m_input_matrix.pipeline_value();
 		k3d::isnappable* const source_node = m_source.pipeline_value();
 		k3d::isnappable* const target_node = m_target.pipeline_value();
 
 		k3d::isnap_source* const source = get_snap_source(source_node);
 		if(!source)
-			return input_matrix;
+		{
+			Output = Input;
+			return;
+		}
 
 		k3d::isnap_target* const target = get_snap_target(target_node);
 		if(!target)
-			return input_matrix;
+		{
+			Output = Input;
+			return;
+		}
 
 		const k3d::matrix4 source_matrix = k3d::node_to_world_matrix(*source_node);
 		const k3d::matrix4 target_matrix = k3d::node_to_world_matrix(*target_node);
@@ -164,7 +185,10 @@ public:
 
 		k3d::point3 target_position;
 		if(!target->target_position(source_position, target_position))
-			return input_matrix;
+		{
+			Output = Input;
+			return;
+		}
 
 /*
 		if(m_snap_orientation.pipeline_value())
@@ -188,33 +212,9 @@ public:
 		}
 */
 
-		return k3d::translate3(target_position - source_position) * input_matrix;
+		Output = k3d::translate3(target_position - source_position) * Input;
 	}
 
-	static k3d::iplugin_factory& get_factory()
-	{
-		static k3d::document_plugin_factory<snap,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
-				k3d::uuid(0x176d4553, 0x65fc48ca, 0x845a8160, 0xd31b41ae),
-				"Snap",
-				_("Snaps one node to another"),
-				"Snap",
-				k3d::iplugin_factory::EXPERIMENTAL);
-
-		return factory;
-	}
-
-	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_input_matrix;
-	k3d_data(k3d::matrix4, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_output_matrix;
-	k3d_data(k3d::isnappable*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_source;
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_snap_source;
-	k3d_data(k3d::isnappable*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_target;
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_snap_target;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_snap_orientation;
-
-	k3d::ienumeration_property::enumeration_values_t m_snap_sources;
-	k3d::ienumeration_property::enumeration_values_t m_snap_targets;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -225,5 +225,7 @@ k3d::iplugin_factory& snap_factory()
 	return snap::get_factory();
 }
 
-} // namespace libk3dcore
+} // namespace core
+
+} // namespace module
 

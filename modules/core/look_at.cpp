@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,62 +18,38 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/transformable.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/vectors.h>
 
-namespace libk3dcore
+namespace module
+{
+
+namespace core
 {
 
 /////////////////////////////////////////////////////////////////////////////
 // look_at
 
 class look_at :
-	public k3d::node,
-	public k3d::itransform_source,
-	public k3d::itransform_sink
+	public k3d::transformable<k3d::node >
 {
-	typedef k3d::node base;
+	typedef k3d::transformable<k3d::node > base;
 
 public:
 	look_at(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3())),
-		m_target(init_owner(*this) + init_name("target_matrix") + init_label(_("Target matrix")) + init_description(_("Target matrix")) + init_value(k3d::identity3())),
-		m_output(init_owner(*this) + init_name("output_matrix") + init_label(_("Output matrix")) + init_description(_("Read only")) + init_slot(sigc::mem_fun(*this, &look_at::output_value)))
+		m_target(init_owner(*this) + init_name("target_matrix") + init_label(_("Target matrix")) + init_description(_("Target matrix")) + init_value(k3d::identity3()))
 	{
-		m_input.changed_signal().connect(m_output.make_reset_slot());
-		m_target.changed_signal().connect(m_output.make_reset_slot());
-	}
-
-	k3d::iproperty& transform_source_output()
-	{
-		return m_output;
-	}
-
-	k3d::iproperty& transform_sink_input()
-	{
-		return m_input;
-	}
-
-	k3d::matrix4 output_value()
-	{
-		const k3d::matrix4 input_matrix = m_input.pipeline_value();
-		const k3d::matrix4 target_matrix = m_target.pipeline_value();
-
-		const k3d::point3 from = input_matrix * k3d::point3(0, 0, 0);
-		const k3d::point3 to = target_matrix * k3d::point3(0, 0, 0);
-		const k3d::vector3 spherical = k3d::spherical(to - from);
-
-		return input_matrix * rotate3(k3d::quaternion(k3d::euler_angles(0, -spherical[2], spherical[1], k3d::euler_angles::ZXYstatic)));
+		m_target.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -90,9 +66,19 @@ public:
 		return factory;
 	}
 
-	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_input;
+private:
+	void on_update_matrix(const k3d::matrix4& Input, k3d::matrix4& Output)
+	{
+		const k3d::matrix4 target_matrix = m_target.pipeline_value();
+
+		const k3d::point3 from = Input * k3d::point3(0, 0, 0);
+		const k3d::point3 to = target_matrix * k3d::point3(0, 0, 0);
+		const k3d::vector3 spherical = k3d::spherical(to - from);
+
+		Output = Input * rotate3(k3d::quaternion(k3d::euler_angles(0, -spherical[2], spherical[1], k3d::euler_angles::ZXYstatic)));
+	}
+
 	k3d_data(k3d::matrix4, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_target;
-	k3d_data(k3d::matrix4, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_output;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -103,5 +89,7 @@ k3d::iplugin_factory& look_at_factory()
 	return look_at::get_factory();
 }
 
-} // namespace libk3dcore
+} // namespace core
+
+} // namespace module
 

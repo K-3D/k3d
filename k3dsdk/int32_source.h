@@ -22,6 +22,7 @@
 
 #include "data.h"
 #include "iint32_source.h"
+#include "value_demand_storage.h"
 
 namespace k3d
 {
@@ -36,9 +37,9 @@ public:
 		return m_output_int32;
 	}
 
-	sigc::slot<void, k3d::ihint*> make_reset_int32_slot()
+	sigc::slot<void, k3d::ihint*> make_update_int32_slot()
 	{
-		return m_output_int32.make_reset_slot();
+		return m_output_int32.make_slot();
 	}
 
 protected:
@@ -48,19 +49,22 @@ protected:
 			+ init_name("output_int32")
 			+ init_label(_("Output Int32"))
 			+ init_description("Output int32")
-			+ init_slot(sigc::mem_fun(*this, &int32_source<derived_t>::create_int32)))
+			+ init_value(0))
 	{
+		m_output_int32.set_update_slot(sigc::mem_fun(*this, &int32_source<derived_t>::execute));
 	}
 
 private:
-	int32_t create_int32()
+	k3d_data(k3d::int32_t, data::immutable_name, data::change_signal, data::no_undo, data::value_demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_int32;
+
+	/// Called whenever the output has been modified and needs to be updated.
+	void execute(const std::vector<ihint*>& Hints, int32_t& Output)
 	{
-		return on_create_int32();
+		// We can safely ignore any hints ...
+		on_update_int32(Output);
 	}
 
-	virtual int32_t on_create_int32() = 0;
-
-	k3d_data(k3d::int32_t, data::immutable_name, data::change_signal, data::no_undo, data::computed_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_int32;
+	virtual void on_update_int32(int32_t& Output) = 0;
 };
 
 } // namespace k3d

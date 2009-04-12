@@ -26,7 +26,10 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/node.h>
 
-namespace libk3dcore
+namespace module
+{
+
+namespace core
 {
 
 class null :
@@ -57,5 +60,7 @@ k3d::iplugin_factory& null_factory()
 	return null::get_factory();
 }
 
-} //namespace libk3dcore
+} //namespace core
+
+} // namespace module
 

@@ -30,6 +30,7 @@
 #include "transform_tool.h"
 
 #include <k3dsdk/property_collection.h>
+#include <k3dsdk/value_demand_storage.h>
 
 namespace k3d
 {
@@ -216,7 +217,8 @@ private:
 	k3d::vector3 mouse_move_action(viewport::control& Viewport, const k3d::point2& Coordinates);
 	void move_selection(const k3d::vector3& Delta);
 	void on_move(k3d::iunknown*);
-	k3d::point3 get_world_position();
+
+	void get_world_position(const std::vector<k3d::ihint*>& Hints, k3d::point3& Output);
 
 	/// Stores manipulators
 	detail::imanipulators<k3d::vector3>* m_manipulators;
@@ -224,7 +226,7 @@ private:
 	// Move value
 	bool m_mutex;
 	k3d_data(k3d::point3, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, writable_property, no_serialization) m_move;
-	k3d_data(k3d::point3, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_world_position;
+	k3d_data(k3d::point3, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_world_position;
 };
 
 } // namespace ngui

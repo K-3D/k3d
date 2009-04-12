@@ -41,7 +41,10 @@
 
 #include <boost/scoped_ptr.hpp>
 
-namespace libk3dcore
+namespace module
+{
+
+namespace core
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -308,5 +311,7 @@ k3d::iplugin_factory& axes_factory()
 	return axes::get_factory();
 }
 
-} // namespace libk3dcore
+} // namespace core
+
+} // namespace module
 

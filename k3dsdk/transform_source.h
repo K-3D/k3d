@@ -23,6 +23,7 @@
 #include "algebra.h"
 #include "data.h"
 #include "itransform_source.h"
+#include "value_demand_storage.h"
 
 namespace k3d
 {
@@ -35,8 +36,9 @@ class transform_source :
 public:
 	transform_source(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
-		m_output_matrix(init_owner(*this) + init_name("output_matrix") + init_label(_("Output Matrix")) + init_description("Output Matrix") + init_slot(sigc::mem_fun(*this, &transform_source<base_t>::create_matrix)))
+		m_output_matrix(init_owner(*this) + init_name("output_matrix") + init_label(_("Output Matrix")) + init_description("Output Matrix") + init_value(identity3()))
 	{
+		m_output_matrix.set_update_slot(sigc::mem_fun(*this, &transform_source<base_t>::execute));
 	}
 
 	iproperty& transform_source_output()
@@ -44,20 +46,24 @@ public:
 		return m_output_matrix;
 	}
 
-	sigc::slot<void, ihint*> make_reset_matrix_slot()
+	/// Returns a slot that should be connected to input properties to signal that the output has changed
+	sigc::slot<void, ihint*> make_update_matrix_slot()
 	{
-		return m_output_matrix.make_reset_slot();
+		return m_output_matrix.make_slot();
 	}
 
 private:
-	k3d::matrix4 create_matrix()
+	k3d_data(k3d::matrix4, data::immutable_name, data::change_signal, data::no_undo, data::value_demand_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_matrix;
+
+	/// Called whenever the output has been modified and needs to be updated.
+	void execute(const std::vector<ihint*>& Hints, matrix4& Output)
 	{
-		return on_create_matrix();
+		// We can safely ignore any hints ...
+		on_update_matrix(Output);
 	}
 
-	virtual k3d::matrix4 on_create_matrix() = 0;
-
-	k3d_data(k3d::matrix4, data::immutable_name, data::change_signal, data::no_undo, data::computed_storage, data::no_constraint, data::read_only_property, data::no_serialization) m_output_matrix;
+	/// Override this in derived classes, to return a new transformation matrix.
+	virtual void on_update_matrix(matrix4& Output) = 0;
 };
 
 } // namespace k3d

@@ -22,14 +22,15 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3d-i18n-config.h>
+#include "helpers.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
-
-#include "helpers.h"
+#include <k3dsdk/value_demand_storage.h>
 
 namespace module
 {
@@ -48,9 +49,12 @@ class mesh_area :
 public:
 	mesh_area(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_area(init_owner(*this) + init_name("area") + init_label(_("Mesh area")) + init_description(_("Mesh area")) + init_slot(sigc::mem_fun(*this, &mesh_area::get_area)))
+		m_area(init_owner(*this) + init_name("area") + init_label(_("Mesh area")) + init_description(_("Mesh area")) + init_value(0.0))
 	{
-		m_input_mesh.changed_signal().connect(m_area.make_reset_slot());
+		m_input_mesh.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_area.make_slot()));
+
+		m_area.set_update_slot(sigc::mem_fun(*this, &mesh_area::execute));
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -60,17 +64,6 @@ public:
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-	}
-
-	double get_area()
-	{
-		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
-		{
-			const gts_ptr<GtsSurface> gts_surface = convert(*mesh);
-			return gts_surface_area(gts_surface);
-		}
-
-		return 0;
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -88,7 +81,18 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_area;
+	k3d_data(double, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_area;
+
+	void execute(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Area)
+	{
+		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
+		{
+			const gts_ptr<GtsSurface> gts_surface = convert(*mesh);
+			Area = gts_surface_area(gts_surface);
+		}
+
+		Area = 0;
+	}
 };
 
 /////////////////////////////////////////////////////////////////////////////

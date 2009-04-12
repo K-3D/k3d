@@ -46,7 +46,7 @@ public:
 		return m_output_mesh;
 	}
 
-	/// Returns a slot that should be connected to input properties to signal that the output mesh has changed
+	/// Returns a slot that should be connected to input properties to signal that the output has changed
 	sigc::slot<void, ihint*> make_update_mesh_slot()
 	{
 		return m_output_mesh.make_slot();
@@ -64,7 +64,7 @@ protected:
 	k3d_data(mesh*, immutable_name, change_signal, no_undo, pointer_demand_storage, no_constraint, read_only_property, no_serialization) m_output_mesh;
 
 private:
-	/// Called whenever the output mesh has been modified and needs to be updated.
+	/// Called whenever the output has been modified and needs to be updated.
 	void execute(const std::vector<ihint*>& Hints, mesh& Mesh)
 	{
 		bool_t update_topology = false;
