@@ -8,15 +8,16 @@ SET(CTEST_INITIAL_CACHE "
 
 BUILD_TESTING:BOOL=ON
 CMAKE_BUILD_TYPE:STRING=Debug
-CMAKE_C_FLAGS:STRING="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
-CMAKE_CXX_FLAGS:STRING="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
-CMAKE_EXE_LINKER_FLAGS:STRING="-fprofile-arcs -ftest-coverage"
-CMAKE_MODULE_LINKER_FLAGS:STRING="-fprofile-arcs -ftest-coverage"
-CMAKE_SHARED_LINKER_FLAGS:STRING="-fprofile-arcs -ftest-coverage"
 K3D_BUILD_IMAGEMAGICK_IO_MODULE:BOOL=ON
 K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE:BOOL=OFF
 
 ")
+
+SET(CTEST_ENVIRONMENT
+  "CFLAGS=-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
+  "CXXFLAGS=-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
+  "LDFLAGS=-fprofile-arcs -ftest-coverage"
+)
 
 # Allow the caller to override test variables ... note that the caller MUST specify CTEST_BINARY_DIRECTORY at-a-minimum.
 SET(VARIABLE)
