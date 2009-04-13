@@ -460,3 +460,5 @@ K3D_ADD_TEST(mesh.source.CUDAPolyGridAndTransformPoints.benchmark.py PYTHON REQU
 
 K3D_ADD_TEST(mesh.source.CUDA.Breakdown.py PYTHON REQUIRES K3D_BUILD_CUDA_MODULE)
 K3D_ADD_TEST(mesh.modifier.CUDA.Breakdown.py PYTHON REQUIRES K3D_BUILD_CUDA_MODULE)
+
+K3D_ADD_TEST(scalar.source.PapagayoLipsyncReader.py PYTHON REQUIRES K3D_BUILD_LIPSYNC_MODULE)
