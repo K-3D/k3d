@@ -28,9 +28,9 @@ for test_case in test_cases:
   setup.source.time = test_case[0]
   source_mouth_value = 0.0
   mouths_in_zero = copy.deepcopy(mouths)
-  for mouth in test_case[1]:
+  for mouth,reference_value in test_case[1].iteritems():
     exec("source_mouth_value = setup.source."+mouth)
-    testing.scalar_comparison(source_mouth_value,test_case[1][mouth])
+    testing.scalar_comparison(source_mouth_value,reference_value)
     mouths_in_zero.remove(mouth)
   #Check the other mouths are in zero
   for mouth in mouths_in_zero:
