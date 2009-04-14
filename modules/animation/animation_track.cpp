@@ -29,6 +29,7 @@
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/tokens.h>
+#include <k3dsdk/value_demand_storage.h>
 #include <k3dsdk/vectors.h>
 
 #include "interpolator.h"
@@ -134,43 +135,46 @@ public:
 		base(Factory, Document),
 		m_time_input(init_owner(*this) + init_name("time_input") + init_label(("Time Input")) + init_description(("Time for the animation")) + init_value(Time)),
 		m_value_input(init_owner(*this) + init_name("value_input") + init_label(("Value Input")) + init_description(("Input that is keyframed when it changes")) + init_value(Value)),
-		m_output_value(init_owner(*this) + init_name("output_value") + init_label(("Output Value")) + init_description(("Interpolated output value")) + init_slot(sigc::mem_fun(*this, &animation_track::on_output_request))),
+		m_output_value(init_owner(*this) + init_name("output_value") + init_label(("Output Value")) + init_description(("Interpolated output value")) + init_value(value_t())),
 		m_interpolator(init_owner(*this) + init_name("interpolator") + init_label("Interpolator") + init_description("Method used to interpolate keyframes") + init_value(static_cast<interpolator_t*>(0))),
 		m_manual_keyframe(init_owner(*this) + init_name("manual_keyframe") + init_label(("Manual keyframe only")) + init_description(("If checked, keyframes are created only usint the timeline. Otherwise keyframes are created/updated whenever the Value Input changes")) + init_value(false)),
 		m_record(true),
 		m_no_interpolation(false)
 	{
-		m_time_input.changed_signal().connect(m_output_value.make_reset_slot());
+		m_output_value.set_update_slot(sigc::mem_fun(*this, &animation_track::on_output_request));
+		m_time_input.changed_signal().connect(m_output_value.make_slot());
 		m_value_input.changed_signal().connect(sigc::mem_fun(*this, &animation_track::on_value_change));
 	}
 	
-	value_t on_output_request()
+	void on_output_request(const std::vector<k3d::ihint*>& Hints, value_t& Output)
 	{
 		// If we're not supposed to interpolate, return the input
 		if (m_no_interpolation)
 		{
 			m_no_interpolation = false;
-			return m_value_input.pipeline_value();
+			Output = m_value_input.pipeline_value();
+			return;
 		}
 		// Interpolate value
-		value_t result;
 		interpolator_t* interpolator = m_interpolator.pipeline_value();
 		if (!interpolator)
-			return m_value_input.pipeline_value();
+		{
+			Output =  m_value_input.pipeline_value();
+			return;
+		}
 		typename interpolator_t::keyframes_t keyframes;
 		for (typename keyframes_t::iterator keyframe = m_keyframes.begin(); keyframe != m_keyframes.end(); ++keyframe)
 			keyframes.insert(std::make_pair(keyframe->first->pipeline_value(), keyframe->second->pipeline_value()));
 		time_t time = m_time_input.pipeline_value();
 		try
 		{
-			result =  interpolator->interpolate(time, keyframes);
+			Output = interpolator->interpolate(time, keyframes);
 		}
 		catch (insufficient_data_exception& e)
 		{
 			k3d::log() << warning << name() << ": Insufficient keyframe data to calculate value at time " << time << std::endl;
-			result =  m_value_input.pipeline_value();
+			Output =  m_value_input.pipeline_value();
 		}
-		return result;
 	}
 	
 	/// Create a keyframe from the current time and value inputs
@@ -230,7 +234,7 @@ public:
 	void reset_output(bool Interpolate = true)
 	{
 		m_no_interpolation = !Interpolate;
-		m_output_value.reset();
+		m_output_value.update();
 	}
 	
 	void delete_key(k3d::iproperty* TimeProperty)
@@ -422,7 +426,7 @@ private:
 
 	time_property_t m_time_input;
 	value_property_t m_value_input;
-	k3d_data(value_t, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::computed_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output_value;
+	k3d_data(value_t, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::value_demand_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output_value;
 	k3d_data(interpolator_t*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_interpolator;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_manual_keyframe;
 	keyframes_t m_keyframes;
