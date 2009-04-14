@@ -198,7 +198,7 @@ public:
 		m_interpolate(init_owner(*this) + init_name("interpolate") + init_label(_("Interpolate")) + init_description(_("Enables linear interpolation between mouths values.")) + init_value(true)),
 		m_interpolation_time(init_owner(*this) + init_name("interpolation_time") + init_label(_("Interpolation Time")) + init_description(_("Time for the transition from mouth to mouth")) + init_value(0.2) + init_step_increment(0.05) + init_units(typeid(k3d::measurement::time))),
 		// Mouths names:	AI  E  etc  FV  L  MBP  O  rest  U  WQ
-		#define INITIALIZE_MOUTH_PROPERTY(name_mouth) m_##name_mouth(init_owner(*this) + init_name(#name_mouth) + init_label(_(#name_mouth)) + init_description(_(#name_mouth" mouth value.")) + init_slot(sigc::mem_fun(*this, &papagayo_lipsync_reader::get_value_##name_mouth)))
+		#define INITIALIZE_MOUTH_PROPERTY(name_mouth) m_##name_mouth(init_owner(*this) + init_name(#name_mouth) + init_label(_(#name_mouth)) + init_description(_(#name_mouth" mouth value."))  + init_value(0.0))
 		INITIALIZE_MOUTH_PROPERTY(AI),
 		INITIALIZE_MOUTH_PROPERTY(E),
 		INITIALIZE_MOUTH_PROPERTY(etc),
@@ -211,8 +211,20 @@ public:
 		INITIALIZE_MOUTH_PROPERTY(WQ)
 	{
 		m_papagayo_file.changed_signal().connect(sigc::mem_fun(*this, &papagayo_lipsync_reader::load_papagayo_file));
-
-		#define CONNECT_CHANGE_SIGNAL(property,name_mouth) property.changed_signal().connect(m_##name_mouth.make_reset_slot())
+		
+		#define CONNECT_UPDATE_SLOT(name_mouth) m_##name_mouth.set_update_slot(sigc::mem_fun(*this, &papagayo_lipsync_reader::get_value_##name_mouth))
+			CONNECT_UPDATE_SLOT(AI);
+			CONNECT_UPDATE_SLOT(E);
+			CONNECT_UPDATE_SLOT(etc);
+			CONNECT_UPDATE_SLOT(FV);
+			CONNECT_UPDATE_SLOT(L);
+			CONNECT_UPDATE_SLOT(MBP);
+			CONNECT_UPDATE_SLOT(O);
+			CONNECT_UPDATE_SLOT(rest);
+			CONNECT_UPDATE_SLOT(U);
+			CONNECT_UPDATE_SLOT(WQ);
+			
+		#define CONNECT_CHANGE_SIGNAL(property,name_mouth) property.changed_signal().connect(m_##name_mouth.make_slot())
 			//Chaging the file changes the mouths
 			CONNECT_CHANGE_SIGNAL(m_papagayo_file,AI);
 			CONNECT_CHANGE_SIGNAL(m_papagayo_file,E);
@@ -258,34 +270,6 @@ public:
 			CONNECT_CHANGE_SIGNAL(m_time,U);
 			CONNECT_CHANGE_SIGNAL(m_time,WQ);
 	}
-	
-	void load_papagayo_file(k3d::ihint* Hint)
-	{
-		implementation.load_papagayo_file(m_papagayo_file.pipeline_value());
-	}
-
-	k3d::double_t get_property_value(k3d::string_t name)
-	{
-		if(m_interpolate.pipeline_value())
-			return implementation.get_mouth_value_interpolated
-				(
-					name,m_frame_rate.pipeline_value(),m_time.pipeline_value(),m_interpolation_time.pipeline_value()
-				);
-		else
-			return implementation.get_mouth_value(name,m_frame_rate.pipeline_value(),m_time.pipeline_value());
-	}
-	
-	#define FUNCTION_GET_VALUE_MOUTH(name_mouth) k3d::double_t get_value_##name_mouth() {return get_property_value(#name_mouth);}
-		FUNCTION_GET_VALUE_MOUTH(AI)
-		FUNCTION_GET_VALUE_MOUTH(E)
-		FUNCTION_GET_VALUE_MOUTH(etc)
-		FUNCTION_GET_VALUE_MOUTH(FV)
-		FUNCTION_GET_VALUE_MOUTH(L)
-		FUNCTION_GET_VALUE_MOUTH(MBP)
-		FUNCTION_GET_VALUE_MOUTH(O)
-		FUNCTION_GET_VALUE_MOUTH(rest)
-		FUNCTION_GET_VALUE_MOUTH(U)
-		FUNCTION_GET_VALUE_MOUTH(WQ)
 
 k3d::iplugin_factory& factory()
 	{
@@ -310,18 +294,49 @@ private:
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization)   m_interpolate;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_interpolation_time;
 	//mouths
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_AI;
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_E;
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_etc;
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_FV;
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_L;
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_MBP;
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_O;
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_rest;
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_U;
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, computed_storage, no_constraint, read_only_property, no_serialization) m_WQ;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_AI;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_E;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_etc;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_FV;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_L;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_MBP;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_O;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_rest;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_U;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_WQ;
 
 	detail::papagayo_lipsync_reader_implementation implementation;
+	
+	void load_papagayo_file(k3d::ihint* Hint)
+	{
+		implementation.load_papagayo_file(m_papagayo_file.pipeline_value());
+	}
+
+	k3d::double_t get_property_value(k3d::string_t name)
+	{
+		if(m_interpolate.pipeline_value())
+			return implementation.get_mouth_value_interpolated
+				(
+					name,m_frame_rate.pipeline_value(),m_time.pipeline_value(),m_interpolation_time.pipeline_value()
+				);
+		else
+			return implementation.get_mouth_value(name,m_frame_rate.pipeline_value(),m_time.pipeline_value());
+	}
+
+// 	void scalar_source::execute(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Output)
+// 	#define FUNCTION_GET_VALUE_MOUTH(name_mouth) k3d::double_t get_value_##name_mouth() {return get_property_value(#name_mouth);}
+	#define FUNCTION_GET_VALUE_MOUTH(name_mouth) void get_value_##name_mouth(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Output) { Output = get_property_value(#name_mouth);}
+		FUNCTION_GET_VALUE_MOUTH(AI)
+		FUNCTION_GET_VALUE_MOUTH(E)
+		FUNCTION_GET_VALUE_MOUTH(etc)
+		FUNCTION_GET_VALUE_MOUTH(FV)
+		FUNCTION_GET_VALUE_MOUTH(L)
+		FUNCTION_GET_VALUE_MOUTH(MBP)
+		FUNCTION_GET_VALUE_MOUTH(O)
+		FUNCTION_GET_VALUE_MOUTH(rest)
+		FUNCTION_GET_VALUE_MOUTH(U)
+		FUNCTION_GET_VALUE_MOUTH(WQ)
+	
 }; //class papagayo_lipsync_reader
 
 
