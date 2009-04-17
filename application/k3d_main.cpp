@@ -286,7 +286,7 @@ const arguments_t parse_startup_arguments(const arguments_t& Arguments, bool& Qu
 		}
 		else if(argument->string_key == "ui")
 		{
-			if(argument->value[0] == "none")
+			if(argument->value[0] == "nui" || argument->value[0] == "none")
 				g_user_interface_path = g_default_nui_path;
 			else if(argument->value[0] == "ngui")
 				g_user_interface_path = g_default_ngui_path;
