@@ -23,21 +23,25 @@ import k3d
 import sys
 import SocketServer
 
+console = code.InteractiveConsole()
+console.push("__close = False\n")
+console.push("def exit():\n  global __close\n  __close = True\n")
+console.push("def quit():\n  global __close\n  __close = True\n")
+
 class request_handler(SocketServer.BaseRequestHandler):
 
 	def __init__(self, request, client_address, server):
 		sys.stdout = self
 		sys.stderr = self
+
 		SocketServer.BaseRequestHandler.__init__(self, request, client_address, server)
 
 	def write(self, output):
 		self.request.send(output)
 
 	def handle(self):
-		console = code.InteractiveConsole()
-		console.push("__close = False\n")
-		console.push("def exit():\n  global __close\n  __close = True\n")
-		console.push("def quit():\n  global __close\n  __close = True\n")
+		global console
+		console.locals["__close"] = False
 
 		sys.stdout.write(">>> ")
 		while True:
