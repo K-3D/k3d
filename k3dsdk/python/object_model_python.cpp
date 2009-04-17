@@ -99,6 +99,8 @@
 #include <k3dsdk/render_state_ri.h> // MinGW needs typeinfo
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/share.h>
+#include <k3dsdk/time_source.h>
+#include <k3dsdk/transform.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_interface.h>
 
@@ -315,6 +317,16 @@ const k3d::vector3 module_to_vector3(const k3d::point3& v)
 	return k3d::to_vector(v);
 }
 
+const k3d::point3 module_world_position(iunknown_wrapper& Node)
+{
+	return k3d::world_position(Node.wrapped());
+}
+
+object module_get_time(idocument_wrapper& Document)
+{
+	return wrap_unknown(k3d::get_time(Document.wrapped()));
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // k3d module
 
@@ -442,6 +454,10 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
 	def("ui", module_ui,
 		"Returns the singleton runtime user interface plugin instance.");
+	def("world_position", module_world_position,
+		"Returns a node's position in world coordinates (returns the origin for non-transformable nodes)");
+	def("get_time", module_get_time,
+		"Returns the time property for a document (could return NULL)");
 
 	scope().attr("__doc__") = "Provides access to the K-3D API";
 }
