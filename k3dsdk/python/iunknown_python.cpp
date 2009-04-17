@@ -26,6 +26,7 @@
 #include "idocument_exporter_python.h"
 #include "idocument_importer_python.h"
 #include "ifile_change_notifier_python.h"
+#include "ikeyframer_python.h"
 #include "imesh_storage_python.h"
 #include "imetadata_python.h"
 #include "inode_python.h"
@@ -66,6 +67,7 @@ object wrap_unknown(iunknown& Unknown)
 	define_methods_idocument_exporter(Unknown, result);
 	define_methods_idocument_importer(Unknown, result);
 	define_methods_ifile_change_notifier(Unknown, result);
+	define_methods_ikeyframer(Unknown, result);
 	define_methods_imesh_storage(Unknown, result);
 	define_methods_imetadata(Unknown, result);
 	define_methods_inode(Unknown, result);

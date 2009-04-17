@@ -91,6 +91,8 @@ ADD_LIBRARY(k3dsdk-python-interfaces SHARED
 	idocument_python.h
 	ifile_change_notifier_python.cpp
 	ifile_change_notifier_python.h
+	ikeyframer_python.cpp
+	ikeyframer_python.h
 	imesh_storage_python.cpp
 	imesh_storage_python.h
 	imetadata_python.cpp
