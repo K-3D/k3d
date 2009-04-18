@@ -185,7 +185,7 @@ class almost_equal<point2>
 	typedef point2 T;
 public:
 	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
-	inline const bool operator()(const T& A, const T& B) const
+	inline bool operator()(const T& A, const T& B) const
 	{
 		return std::equal(A.n, A.n + 2, B.n, almost_equal<double>(threshold));
 	}

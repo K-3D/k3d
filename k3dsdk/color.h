@@ -109,7 +109,7 @@ public:
 	/// Converts a sample from a float
 	static inline sample_type convert(const float Sample) { return static_cast<sample_type>(clamp(Sample, float(0), float(1)) * maximum()); }
 	/// Converts a sample from a double
-	static inline sample_type convert(const double Sample) { return static_cast<sample_type>(clamp(Sample, double(0), double(1)) * maximum()); }
+	static inline sample_type convert(const double_t Sample) { return static_cast<sample_type>(clamp(Sample, double_t(0), double_t(1)) * maximum()); }
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -141,7 +141,7 @@ public:
 	/// Converts a sample from a float
 	static inline sample_type convert(const float Sample) { return static_cast<sample_type>(clamp(Sample, float(0), float(1)) * maximum()); }
 	/// Converts a sample from a double
-	static inline sample_type convert(const double Sample) { return static_cast<sample_type>(clamp(Sample, double(0), double(1)) * maximum()); }
+	static inline sample_type convert(const double_t Sample) { return static_cast<sample_type>(clamp(Sample, double_t(0), double_t(1)) * maximum()); }
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ public:
 	/// Converts a sample from a float
 	static inline sample_type convert(const float Sample) { return static_cast<sample_type>(Sample); }
 	/// Converts a sample from a double
-	static inline sample_type convert(const double Sample) { return static_cast<sample_type>(static_cast<float>(Sample)); }
+	static inline sample_type convert(const double_t Sample) { return static_cast<sample_type>(static_cast<float>(Sample)); }
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -207,7 +207,7 @@ public:
 	/// Converts a sample from a float
 	static inline sample_type convert(const sample_type Sample) { return static_cast<sample_type>(Sample); }
 	/// Converts a sample from a double
-	static inline sample_type convert(const double Sample) { return static_cast<sample_type>(Sample); }
+	static inline sample_type convert(const double_t Sample) { return static_cast<sample_type>(Sample); }
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -215,11 +215,11 @@ public:
 
 /// Specialization of color_traits for double samples
 template<>
-class color_traits<double>
+class color_traits<double_t>
 {
 public:
 	/// Defines the sample type for this specialization
-	typedef double sample_type;
+	typedef double_t sample_type;
 
 	/// Returns the minimum value of a sample
 	static inline sample_type minimum() { return 0; }
@@ -249,7 +249,7 @@ public:
 class basic_hsv
 {
 public:
-	typedef double sample_type;
+	typedef double_t sample_type;
 	typedef color_traits<sample_type> sample_traits;
 	typedef basic_hsv this_type;
 
@@ -620,12 +620,12 @@ public:
 			return;
 		}
 
-		const double h = RHS.hue / 60;
-		const double i = floor(h);
-		const double f = h - i;
-		const double p = RHS.value * (1 - RHS.saturation);
-		const double q = RHS.value * (1 - (RHS.saturation * f));
-		const double t = RHS.value * (1 - (RHS.saturation * (1 - f)));
+		const double_t h = RHS.hue / 60;
+		const double_t i = floor(h);
+		const double_t f = h - i;
+		const double_t p = RHS.value * (1 - RHS.saturation);
+		const double_t q = RHS.value * (1 - (RHS.saturation * f));
+		const double_t t = RHS.value * (1 - (RHS.saturation * (1 - f)));
 
 		if(0.0 == i)
 		{
@@ -665,7 +665,7 @@ public:
 		}
 	}
 
-	const double* data() const
+	const double_t* data() const
 	{
 		return &red;
 	}
@@ -690,12 +690,12 @@ public:
 		return this_type(LHS.red - RHS.red, LHS.green - RHS.green, LHS.blue - RHS.blue);
 	}
 	
-	friend const this_type operator*(const this_type& LHS, const double RHS)
+	friend const this_type operator*(const this_type& LHS, const double_t RHS)
 	{
 		return this_type(LHS.red * RHS, LHS.green * RHS, LHS.blue * RHS);
 	}
 
-	friend const this_type operator*(const double LHS, const this_type& RHS)
+	friend const this_type operator*(const double_t LHS, const this_type& RHS)
 	{
 		return RHS * LHS;
 	}
@@ -815,7 +815,7 @@ public:
 };
 
 /// Convenience typedef for our "standard" color type
-typedef basic_rgb<double> color;
+typedef basic_rgb<double_t> color;
 
 /// Specialization of almost_equal that tests two color objects for near-equality
 template<>
@@ -824,13 +824,13 @@ class almost_equal<color>
 	typedef color T;
 public:
 	almost_equal(const boost::uint64_t Threshold) : test(Threshold) { }
-	inline const bool operator()(const T& A, const T& B) const
+	inline bool_t operator()(const T& A, const T& B) const
 	{
 		return test(A.red, B.red) && test(A.green, B.green) && test(A.blue, B.blue);
 	}
 
 private:
-	const almost_equal<double> test;
+	const almost_equal<double_t> test;
 };
 
 } // namespace k3d

@@ -47,7 +47,7 @@ class almost_equal<imaterial*>
 {
 public:
 	almost_equal(const boost::uint64_t) { } 
-	inline const bool operator()(imaterial* const A, imaterial* const B) const { return A == B; }
+	inline bool_t operator()(imaterial* const A, imaterial* const B) const { return A == B; }
 };
 
 } // namespace k3d

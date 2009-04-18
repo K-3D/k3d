@@ -58,7 +58,7 @@ named_arrays named_arrays::clone() const
 	return result;
 }
 
-const bool_t named_arrays::almost_equal(const named_arrays& Other, const uint64_t Threshold) const
+bool_t named_arrays::almost_equal(const named_arrays& Other, const uint64_t Threshold) const
 {
 	// If we have differing numbers of arrays, we definitely aren't equal
 	if(size() != Other.size())

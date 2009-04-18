@@ -101,12 +101,12 @@ public:
 		return base_type::size();
 	}
 
-	const bool_t empty() const
+	bool_t empty() const
 	{
 		return base_type::empty();
 	}
 
-	const bool_t almost_equal(const array& Other, const uint64_t Threshold) const
+	bool_t almost_equal(const array& Other, const uint64_t Threshold) const
 	{
 		const this_type* const other = dynamic_cast<const this_type*>(&Other);
 		if(!other)
@@ -115,7 +115,7 @@ public:
 		return almost_equal(*other, Threshold);
 	}
 
-	const bool_t almost_equal(const this_type& Other, const uint64_t Threshold) const
+	bool_t almost_equal(const this_type& Other, const uint64_t Threshold) const
 	{
 		if(base_type::size() != Other.size())
 			return false;

@@ -43,7 +43,7 @@ void set_thread_count(const int32_t Count);
 /// Set the preferred grainsize to be used for parallel operations
 void set_grain_size(const uint_t GrainSize);
 /// Get the preferred grainsize to be used for parallel operations
-const uint_t grain_size();
+uint_t grain_size();
 
 } // namespace parallel
 

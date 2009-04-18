@@ -33,10 +33,10 @@ namespace parallel
 
 static uint_t g_grain_size = 10000; 
 
-void set_thread_count(const int32_t Count)
-{
 #ifdef K3D_BUILD_PARALLEL
 
+void set_thread_count(const int32_t Count)
+{
 	static ::tbb::task_scheduler_init scheduler(::tbb::task_scheduler_init::automatic);
 
 	scheduler.terminate();
@@ -44,16 +44,22 @@ void set_thread_count(const int32_t Count)
 		scheduler.initialize(::tbb::task_scheduler_init::automatic);
 	else
 		scheduler.initialize(Count);
-
-#endif // K3D_BUILD_PARALLEL
 }
+
+#else // K3D_BUILD_PARALLEL
+
+void set_thread_count(const int32_t)
+{
+}
+
+#endif // !K3D_BUILD_PARALLEL
 
 void set_grain_size(const uint_t GrainSize)
 {
 	g_grain_size = GrainSize;
 }
 
-const uint_t grain_size()
+uint_t grain_size()
 {
 	return g_grain_size;
 }

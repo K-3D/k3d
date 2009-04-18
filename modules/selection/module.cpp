@@ -33,6 +33,7 @@ namespace selection
 extern k3d::iplugin_factory& grow_selection_factory();
 extern k3d::iplugin_factory& mesh_selection_factory();
 extern k3d::iplugin_factory& node_selection_factory();
+extern k3d::iplugin_factory& nurbs_curve_selection_converter_factory();
 extern k3d::iplugin_factory& select_bicubic_patch_by_number_factory();
 extern k3d::iplugin_factory& select_bilinear_patch_by_number_factory();
 extern k3d::iplugin_factory& select_clockwise_factory();
@@ -57,6 +58,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::selection::grow_selection_factory());
 	Registry.register_factory(module::selection::mesh_selection_factory());
 	Registry.register_factory(module::selection::node_selection_factory());
+	Registry.register_factory(module::selection::nurbs_curve_selection_converter_factory());
 	Registry.register_factory(module::selection::select_bicubic_patch_by_number_factory());
 	Registry.register_factory(module::selection::select_bilinear_patch_by_number_factory());
 	Registry.register_factory(module::selection::select_clockwise_factory());

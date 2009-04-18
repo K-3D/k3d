@@ -33,7 +33,7 @@ class almost_equal
 {
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const
+	inline bool_t operator()(const T A, const T B) const
 	{
 		// This will be triggered if this template is ever instantiated
 		BOOST_STATIC_ASSERT(sizeof(T) == 0);
@@ -48,7 +48,7 @@ class almost_equal<bool_t>
 	typedef bool_t T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests int8_t for equality
@@ -58,7 +58,7 @@ class almost_equal<int8_t>
 	typedef int8_t T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests int16_t for equality
@@ -68,7 +68,7 @@ class almost_equal<int16_t>
 	typedef int16_t T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests int32_t for equality
@@ -78,7 +78,7 @@ class almost_equal<int32_t>
 	typedef int32_t T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests int64_t for equality
@@ -88,7 +88,7 @@ class almost_equal<int64_t>
 	typedef int64_t T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests uint8_t for equality
@@ -98,7 +98,7 @@ class almost_equal<uint8_t>
 	typedef uint8_t T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests uint16_t for equality
@@ -108,7 +108,7 @@ class almost_equal<uint16_t>
 	typedef uint16_t T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests uint32_t for equality
@@ -118,7 +118,7 @@ class almost_equal<uint32_t>
 	typedef uint32_t T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests uint64_t for equality
@@ -128,7 +128,7 @@ class almost_equal<uint64_t>
 	typedef uint64_t T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests two double_t values for near-equality - based on "Comparing floating point numbers" by Bruce Dawson
@@ -143,7 +143,7 @@ public:
 	{
 	}
 
-	inline const bool_t operator()(const T A, const T B) const
+	inline bool_t operator()(const T A, const T B) const
 	{
 		const int64_t difference = representable_difference(A, B);
 		return difference < 0 ? -difference <= threshold : difference <= threshold;
@@ -173,7 +173,7 @@ class almost_equal<string_t>
 	typedef string_t T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 #ifdef K3D_API_DARWIN
@@ -186,7 +186,7 @@ class almost_equal<unsigned long>
 	typedef unsigned long T;
 public:
 	almost_equal(const uint64_t) { }
-	inline const bool_t operator()(const T A, const T B) const { return A == B; }
+	inline bool_t operator()(const T A, const T B) const { return A == B; }
 };
 
 #endif // K3D_API_DARWIN

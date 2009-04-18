@@ -99,7 +99,7 @@ public:
 		named_attribute_arrays_t attributes;
 
 		/// Compares two primitives for equality using the fuzzy semantics of almost_equal
-		const bool_t almost_equal(const primitive& Other, const uint64_t Threshold) const;
+		bool_t almost_equal(const primitive& Other, const uint64_t Threshold) const;
 	};
 
 	/// Defines storage for a collection of primitives
@@ -167,7 +167,7 @@ public:
 	pipeline_data<polyhedra_t> polyhedra;
 
 	/// Compares two meshes for equality using the fuzzy semantics of almost_equal
-	const bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;
+	bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;
 
 	/// Conversion from a legacy mesh to a new mesh
 	mesh& operator=(const k3d::legacy::mesh& RHS);
@@ -241,7 +241,7 @@ class almost_equal<mesh::polyhedra_t::polyhedron_type>
 {
 public:
 	almost_equal(const uint64_t) { } 
-	inline const bool_t operator()(const mesh::polyhedra_t::polyhedron_type A, const mesh::polyhedra_t::polyhedron_type B) const { return A == B; }
+	inline bool_t operator()(const mesh::polyhedra_t::polyhedron_type A, const mesh::polyhedra_t::polyhedron_type B) const { return A == B; }
 };
 
 /// Specialization of almost_equal that tests k3d::mesh for equality
@@ -256,7 +256,7 @@ public:
 	{
 	}
 
-	inline const bool_t operator()(const T& A, const T& B) const
+	inline bool_t operator()(const T& A, const T& B) const
 	{
 		return A.almost_equal(B, threshold);
 	}
@@ -276,7 +276,7 @@ public:
 	{
 	}
 
-	inline const bool_t operator()(const T& A, const T& B) const
+	inline bool_t operator()(const T& A, const T& B) const
 	{
 		return A.almost_equal(B, threshold);
 	}

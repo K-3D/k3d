@@ -231,7 +231,7 @@ class almost_equal<vector4>
 	typedef vector4 T;
 public:
 	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
-	inline const bool operator()(const T& A, const T& B) const
+	inline bool_t operator()(const T& A, const T& B) const
 	{
 		return std::equal(A.n, A.n + 4, B.n, almost_equal<double_t>(threshold));
 	}

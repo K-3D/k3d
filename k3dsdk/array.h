@@ -52,10 +52,10 @@ public:
 	/// Returns the size of this array
 	virtual const uint_t size() const = 0;
 	/// Returns true iff this array is empty
-	virtual const bool_t empty() const = 0;
+	virtual bool_t empty() const = 0;
 	/// Returns true iff this array is equivalent to another, using the imprecise semantics of almost_equal to compare values.
 	/// \note: Returns false if given an array with a different concrete type.
-	virtual const bool_t almost_equal(const array& Other, const uint64_t Threshold) const = 0;
+	virtual bool_t almost_equal(const array& Other, const uint64_t Threshold) const = 0;
 
 	/// Sets a new name-value pair, overwriting the value if the name already exists
 	void set_metadata_value(const string_t& Name, const string_t& Value);
@@ -84,7 +84,7 @@ public:
 	{
 	}
 
-	inline const bool operator()(const T& A, const T& B) const
+	inline bool_t operator()(const T& A, const T& B) const
 	{
 		return A.almost_equal(B, threshold);
 	}

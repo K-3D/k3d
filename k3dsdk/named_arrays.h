@@ -76,7 +76,7 @@ public:
 	/// Returns an object containing deep copies of all the original arrays.
 	named_arrays clone() const;
 	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
-	const bool_t almost_equal(const named_arrays& Other, const uint64_t Threshold) const;
+	bool_t almost_equal(const named_arrays& Other, const uint64_t Threshold) const;
 };
 
 /// Specialization of almost_equal that tests named_arrays for equality
@@ -91,7 +91,7 @@ public:
 	{
 	}
 
-	inline const bool_t operator()(const T& A, const T& B) const
+	inline bool_t operator()(const T& A, const T& B) const
 	{
 		return A.almost_equal(B, threshold);
 	}

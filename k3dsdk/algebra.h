@@ -1278,7 +1278,7 @@ class almost_equal<matrix4>
 	typedef matrix4 T;
 public:
 	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
-	inline const bool operator()(const T& A, const T& B) const
+	inline bool_t operator()(const T& A, const T& B) const
 	{
 		return std::equal(A.v, A.v + 4, B.v, almost_equal<vector4>(threshold));
 	}

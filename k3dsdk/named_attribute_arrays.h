@@ -36,7 +36,7 @@ public:
 	/// Return an attribute_array by name, or NULL
 	attribute_arrays* writable(const string_t& Name);
 	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
-	const bool_t almost_equal(const named_attribute_arrays& Other, const uint64_t Threshold) const;
+	bool_t almost_equal(const named_attribute_arrays& Other, const uint64_t Threshold) const;
 };
 
 /// Specialization of almost_equal that tests named_attribute_arrays for equality
@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-	inline const bool_t operator()(const T& A, const T& B) const
+	inline bool_t operator()(const T& A, const T& B) const
 	{
 		return A.almost_equal(B, threshold);
 	}

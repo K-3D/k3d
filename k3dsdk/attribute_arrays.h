@@ -79,7 +79,7 @@ public:
 	/// Returns an object containing copies of a half-open range of all the original arrays.
 	attribute_arrays clone(const uint_t Begin, const uint_t End) const;
 	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
-	const bool_t almost_equal(const attribute_arrays& Other, const uint64_t Threshold) const;
+	bool_t almost_equal(const attribute_arrays& Other, const uint64_t Threshold) const;
 
 	typedef std::vector<const attribute_arrays*> attribute_arrays_collection;
 	static attribute_arrays clone_types(const attribute_arrays_collection& AttributeArrays);
@@ -103,7 +103,7 @@ public:
 	{
 	}
 
-	inline const bool_t operator()(const T& A, const T& B) const
+	inline bool_t operator()(const T& A, const T& B) const
 	{
 		return A.almost_equal(B, threshold);
 	}

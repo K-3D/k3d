@@ -286,7 +286,7 @@ void print(std::ostream& Stream, const string_t& Label, const mesh::named_attrib
 
 /// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
 template<typename T>
-const bool_t almost_equal(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, const uint64_t Threshold)
+bool_t almost_equal(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, const uint64_t Threshold)
 {
 	if(A.get() == B.get())
 		return true;
@@ -301,7 +301,7 @@ const bool_t almost_equal(const pipeline_data<typed_array<T> >& A, const pipelin
 // almost_equal
 
 /// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
-const bool_t almost_equal(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, const uint64_t Threshold)
+bool_t almost_equal(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, const uint64_t Threshold)
 {
 	if(A.get() == B.get())
 		return true;
@@ -317,7 +317,7 @@ const bool_t almost_equal(const pipeline_data<uint_t_array>& A, const pipeline_d
 
 /// Return true iff two shared objects are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
 template<typename T>
-const bool_t almost_equal(const pipeline_data<T>& A, const pipeline_data<T>& B, const uint64_t Threshold)
+bool_t almost_equal(const pipeline_data<T>& A, const pipeline_data<T>& B, const uint64_t Threshold)
 {
 	if(A.get() == B.get())
 		return true;
@@ -333,7 +333,7 @@ const bool_t almost_equal(const pipeline_data<T>& A, const pipeline_data<T>& B, 
 
 /// Return true iff two sets of attributes arrays are equivalent (we provide this function mainly for consistency).
 
-const bool_t almost_equal(const mesh::attribute_arrays_t& A, const mesh::attribute_arrays_t& B, const uint64_t Threshold)
+bool_t almost_equal(const mesh::attribute_arrays_t& A, const mesh::attribute_arrays_t& B, const uint64_t Threshold)
 {
 	return k3d::almost_equal<mesh::attribute_arrays_t>(Threshold)(A, B);
 }
@@ -343,7 +343,7 @@ const bool_t almost_equal(const mesh::attribute_arrays_t& A, const mesh::attribu
 
 /// Return true iff two sets of primitives are equivalent.
 
-const bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t& B, const uint64_t Threshold)
+bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t& B, const uint64_t Threshold)
 {
 	// If we have differing numbers of primitives, they definitely aren't equal
 	if(A.size() != B.size())
@@ -387,7 +387,7 @@ public:
 	{
 	}
 
-	inline const bool_t operator()(const T& A, const T& B)
+	inline bool_t operator()(const T& A, const T& B)
 	{
 		return
 			detail::almost_equal(A.first_faces, B.first_faces, threshold) &&
@@ -416,7 +416,7 @@ mesh::mesh()
 {
 }
 
-const bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) const
+bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) const
 {
 	return
 		detail::almost_equal(points, Other.points, Threshold) &&
@@ -689,7 +689,7 @@ mesh::primitive::primitive(const string_t& Type) :
 {
 }
 
-const bool_t mesh::primitive::almost_equal(const primitive& Other, const uint64_t Threshold) const
+bool_t mesh::primitive::almost_equal(const primitive& Other, const uint64_t Threshold) const
 {
 	return
 		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&

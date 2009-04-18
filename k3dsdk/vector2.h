@@ -225,9 +225,9 @@ class almost_equal<vector2>
 	typedef vector2 T;
 public:
 	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
-	inline const bool operator()(const T& A, const T& B) const
+	inline bool_t operator()(const T& A, const T& B) const
 	{
-		return std::equal(A.n, A.n + 2, B.n, almost_equal<double>(threshold));
+		return std::equal(A.n, A.n + 2, B.n, almost_equal<double_t>(threshold));
 	}
 
 private:

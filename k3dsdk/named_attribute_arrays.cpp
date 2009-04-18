@@ -37,7 +37,7 @@ attribute_arrays* named_attribute_arrays::writable(const string_t& Name)
 	return result == end() ? static_cast<attribute_arrays*>(0) : &result->second;
 }
 
-const bool_t named_attribute_arrays::almost_equal(const named_attribute_arrays& Other, const uint64_t Threshold) const
+bool_t named_attribute_arrays::almost_equal(const named_attribute_arrays& Other, const uint64_t Threshold) const
 {
 	// If our sizes differ, we definitely ain't equal
 	if(size() != Other.size())

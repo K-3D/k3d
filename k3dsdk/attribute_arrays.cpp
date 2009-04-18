@@ -68,7 +68,7 @@ attribute_arrays attribute_arrays::clone(const uint_t Begin, const uint_t End) c
 	return result;
 }
 
-const bool_t attribute_arrays::almost_equal(const attribute_arrays& Other, const uint64_t Threshold) const
+bool_t attribute_arrays::almost_equal(const attribute_arrays& Other, const uint64_t Threshold) const
 {
 	// If we have differing numbers of arrays, we definitely aren't equal
 	if(size() != Other.size())
