@@ -65,7 +65,7 @@ void print_type(const std::string& Type)
 	std::cout << format % Type % actual_type.str() % actual_size.str() << "\n";
 }
 
-int main(int argc, char* argv[])
+int main(int, char*[])
 {
 	print_headers();
 	print_divider();
