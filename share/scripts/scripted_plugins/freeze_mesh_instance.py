@@ -26,7 +26,7 @@ class FreezeMeshInstance:
 		
 	def freeze_instances(self,mode="all"):
 		id_msh_inst = self.get_factory_id("MeshInstance")
-		selection_node = Document.get_node_by_metadata("inode_selection", "ngui:unique_node", "node_selection")
+		selection_node = Document.get_node_by_metadata("ngui:unique_node", "node_selection")
 		if(mode == "all"):
 			for node in self.doc.nodes():
 				if id_msh_inst == node.factory().factory_id():

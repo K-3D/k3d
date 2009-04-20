@@ -121,7 +121,7 @@ else: #keep
 
 Document.start_change_set()
 try: 
-	selection_node = Document.get_node_by_metadata("inode_selection", "ngui:unique_node", "node_selection")
+	selection_node = Document.get_node_by_metadata("ngui:unique_node", "node_selection")
 	id_msh_inst = get_factory_id("MeshInstance")
 	for node in Document.nodes():
 		if id_msh_inst == node.factory().factory_id() and selection_node.selection_weight(node):
