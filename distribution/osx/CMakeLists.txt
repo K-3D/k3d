@@ -156,11 +156,11 @@ IF(K3D_INSTALL_GTKMM)
   K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libXmu.6.dylib)
   K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libXrandr.2.dylib)
   K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libXt.6.dylib)
-  K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libgio-2.0.dylib)
-  K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libgiomm-2.4.dylib)
-  K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libgthread-2.0.dylib)
-#  K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libjasper.1.0.0.dylib)
-#  K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libpixman-1.0.14.0.dylib)
+  K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libgio-2.0.0.dylib)
+  K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libgiomm-2.4.1.dylib)
+  K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libgthread-2.0.0.dylib)
+  K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libjasper.1.dylib)
+  K3D_INSTALL_DYLIB(${K3D_MACPORT_DIR}/lib/libpixman-1.0.dylib)
 #  /usr/lib/libXplugin.1.dylib
 
 	INSTALL(DIRECTORY
