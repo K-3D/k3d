@@ -27,6 +27,7 @@ SET(SOURCES
 	tessmono.h
 	)
 
+LIST(REMOVE_ITEM CMAKE_C_FLAGS "-Wall")
 
 ADD_LIBRARY(k3dsdk-sgi-tesselator SHARED ${SOURCES})
 K3D_GENERATE_DEF_FILE(k3dsdk-sgi-tesselator)
