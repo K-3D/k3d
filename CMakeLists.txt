@@ -182,7 +182,6 @@ OPTION(K3D_BUILD_NURBS_SOURCES_MODULE "Build the NURBS sources plugin module" ON
 OPTION(K3D_BUILD_OBJ_IO_MODULE "Build the Wavefront .obj file format module" ON)
 OPTION(K3D_BUILD_OPENCASCADE_MODULE "Build the OpenCascade module" ${K3D_OPENCASCADE_FOUND})
 OPTION(K3D_BUILD_OPENEXR_IO_MODULE "Build the OpenEXR file format module" ${K3D_OPENEXR_FOUND})
-OPTION(K3D_BUILD_OPENGL_FRAMEBUFFER_MODULE "Build the GL_EXT_FRAMEBUFFER offscreen rendering module" OFF)
 OPTION(K3D_BUILD_OPENGL_MODULE "Build the OpenGL integration module" ON)
 OPTION(K3D_BUILD_OPENGL_PAINTERS_MODULE "Build the OpenGL mesh painters module" ON)
 OPTION(K3D_BUILD_OSX_MODULE "Build the Mac OSX integration plugin module" ${K3D_BUILD_OSX_MODULE_DEFAULT})
