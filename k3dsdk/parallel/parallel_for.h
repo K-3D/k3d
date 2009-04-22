@@ -26,9 +26,9 @@
 
 #include <k3d-parallel-config.h>
 
-#ifdef K3D_BUILD_PARALLEL
+#ifdef K3D_ENABLE_PARALLEL
 #include <tbb/parallel_for.h>
-#endif // K3D_BUILD_PARALLEL
+#endif // K3D_ENABLE_PARALLEL
 
 namespace k3d
 {
@@ -39,7 +39,7 @@ namespace parallel
 template<typename RangeT, typename BodyT>
 void parallel_for(const RangeT& Range, const BodyT& Body);
 
-#ifdef K3D_BUILD_PARALLEL
+#ifdef K3D_ENABLE_PARALLEL
 
 template<typename RangeT, typename BodyT>
 void parallel_for(const RangeT& Range, const BodyT& Body)
@@ -47,7 +47,7 @@ void parallel_for(const RangeT& Range, const BodyT& Body)
 	::tbb::parallel_for(Range, Body);
 }
 
-#else // K3D_BUILD_PARALLEL
+#else // K3D_ENABLE_PARALLEL
 
 template<typename RangeT, typename BodyT>
 void parallel_for(const RangeT& Range, const BodyT& Body)
@@ -55,7 +55,7 @@ void parallel_for(const RangeT& Range, const BodyT& Body)
 	Body(Range);
 }
 
-#endif // !K3D_BUILD_PARALLEL
+#endif // !K3D_ENABLE_PARALLEL
 
 } // namespace parallel
 

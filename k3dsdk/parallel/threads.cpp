@@ -21,9 +21,9 @@
 
 #include <k3d-parallel-config.h>
 
-#ifdef K3D_BUILD_PARALLEL
+#ifdef K3D_ENABLE_PARALLEL
 #include <tbb/task_scheduler_init.h>
-#endif // K3D_BUILD_PARALLEL
+#endif // K3D_ENABLE_PARALLEL
 
 namespace k3d
 {
@@ -33,7 +33,7 @@ namespace parallel
 
 static uint_t g_grain_size = 10000; 
 
-#ifdef K3D_BUILD_PARALLEL
+#ifdef K3D_ENABLE_PARALLEL
 
 void set_thread_count(const int32_t Count)
 {
@@ -46,13 +46,13 @@ void set_thread_count(const int32_t Count)
 		scheduler.initialize(Count);
 }
 
-#else // K3D_BUILD_PARALLEL
+#else // K3D_ENABLE_PARALLEL
 
 void set_thread_count(const int32_t)
 {
 }
 
-#endif // !K3D_BUILD_PARALLEL
+#endif // !K3D_ENABLE_PARALLEL
 
 void set_grain_size(const uint_t GrainSize)
 {

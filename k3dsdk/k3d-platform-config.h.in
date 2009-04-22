@@ -9,7 +9,7 @@
 #cmakedefine K3D_API_WIN32
 #cmakedefine K3D_API_DARWIN
 
-#cmakedefine K3D_SYMBOL_VISIBILITY
+#cmakedefine K3D_ENABLE_SYMBOL_VISIBILITY
 
 #cmakedefine K3D_UINT_T_32_BITS
 #cmakedefine K3D_UINT_T_64_BITS

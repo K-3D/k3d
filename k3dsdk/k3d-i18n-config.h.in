@@ -3,18 +3,18 @@
 
 // Generated file, do not edit!  Make changes to k3d-i18n-config.h.in instead.
 
-#cmakedefine K3D_BUILD_NLS
+#cmakedefine K3D_ENABLE_NLS
 
-#ifdef K3D_BUILD_NLS
+#ifdef K3D_ENABLE_NLS
 
 	#include <libintl.h>
 	#define _(String) gettext(String)
 
-#else // K3D_BUILD_NLS
+#else // K3D_ENABLE_NLS
 
 	#define _(String) (String)
 
-#endif // !K3D_BUILD_NLS
+#endif // !K3D_ENABLE_NLS
 
 #endif // K3DSDK_I18N_CONFIG_H
 

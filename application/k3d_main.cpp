@@ -655,9 +655,9 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 			("exit", "Exits the program (useful after running scripts in batch mode.")
 			("help,h", "Prints this help message and exits.")
 			("list-gl-extensions", "List available OpenGL extensions and exit.")
-#ifdef K3D_BUILD_NLS
+#ifdef K3D_ENABLE_NLS
 			("locale", boost::program_options::value<k3d::string_t>(), "Overrides the path for loading locales")
-#endif // K3D_BUILD_NLS
+#endif // K3D_ENABLE_NLS
 			("log-level", boost::program_options::value<k3d::string_t>(), "Specifies the minimum message priority to log - valid values are \"warning\", \"information\", \"debug\" [default: warning].")
 			("options", boost::program_options::value<k3d::string_t>(), "Overrides the filepath for storing user options [default: /home/tshead/.k3d/options.k3d].")
 			("plugins", boost::program_options::value<k3d::string_t>(), "Overrides the path(s) for loading plugin libraries [default: /usr/local/k3d/lib/k3d].")
@@ -720,7 +720,7 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 		// Set the share path ...
 		k3d::set_share_path(g_share_path);
 
-#ifdef K3D_BUILD_NLS
+#ifdef K3D_ENABLE_NLS
 		k3d::filesystem::path locale_path = g_share_path / k3d::filesystem::generic_path("locale");
 		if(!g_override_locale_path.empty())
 			locale_path = g_override_locale_path;
@@ -731,7 +731,7 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 		bindtextdomain("k3d", locale_path.native_filesystem_string().c_str());
 		bind_textdomain_codeset("k3d", "UTF-8");
 		textdomain("k3d");
-#endif // K3D_BUILD_NLS
+#endif // K3D_ENABLE_NLS
 
 		// Load user options ...
 		k3d::options::file_storage user_options(g_options_path);

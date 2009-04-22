@@ -32,7 +32,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // K3D_MODULE_EXPORT
 
-#if defined K3D_SYMBOL_VISIBILITY
+#if defined K3D_ENABLE_SYMBOL_VISIBILITY
 	#if defined K3D_COMPILER_GCC
 		#define K3D_MODULE_EXPORT __attribute__ ((visibility("default")))
 	#elif defined K3D_COMPILER_MSVC
