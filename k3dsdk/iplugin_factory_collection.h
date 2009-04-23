@@ -2,7 +2,7 @@
 #define K3DSDK_IPLUGIN_FACTORY_COLLECTION_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,8 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares iplugin_factory_collection, an abstract interface for a collection of plugin factory objects
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -32,7 +31,6 @@
 namespace k3d
 {
 
-// Forward declarations
 class iplugin_factory;
 
 /// Abstract factory interface for plugin objects
@@ -47,8 +45,8 @@ public:
 
 protected:
 	iplugin_factory_collection() {}
-	iplugin_factory_collection(const iplugin_factory_collection& RHS) {}
-	iplugin_factory_collection& operator = (const iplugin_factory_collection& RHS) { return *this; }
+	iplugin_factory_collection(const iplugin_factory_collection&) {}
+	iplugin_factory_collection& operator=(const iplugin_factory_collection&) { return *this; }
 	virtual ~iplugin_factory_collection() {}
 };
 
