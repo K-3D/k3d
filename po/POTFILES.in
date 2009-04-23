@@ -299,7 +299,6 @@ modules/opencascade/opencascade_mesh_reader.cpp
 modules/openexr_io/bitmap_importer.cpp
 modules/opengl/material.cpp
 modules/opengl/render_engine.cpp
-modules/opengl_framebuffer/camera_to_bitmap.cpp
 modules/opengl_painters/bezier_triangle_patch_painter.cpp
 modules/opengl_painters/bicubic_patch_painter.cpp
 modules/opengl_painters/bilinear_patch_painter.cpp
