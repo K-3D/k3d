@@ -151,14 +151,14 @@ public:
 
 private:
 	/// Convert a double_t to a lexicographically-ordered twos-complement integer
-	inline static const int64_t to_integer(const double_t Value)
+	inline static int64_t to_integer(const double_t Value)
 	{
 		const int64_t value = *(int64_t*)&Value;
 		return value < 0 ? 0x8000000000000000LL - value : value;
 	}
 
 	/// Given two double_t, returns their difference expressed as the number of uniquely-representable floating-point values that separate them
-	inline static const int64_t representable_difference(const double_t A, const double_t B)
+	inline static int64_t representable_difference(const double_t A, const double_t B)
 	{
 		return to_integer(B) - to_integer(A);
 	}

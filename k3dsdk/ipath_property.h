@@ -76,12 +76,12 @@ public:
 	typedef std::vector<pattern_filter> pattern_filters_t;
 	
 	/// Returns the path "mode", which indicates whether the path will be used for an input or an output file
-	virtual const mode_t property_path_mode() = 0;
+	virtual mode_t property_path_mode() = 0;
 	/// Returns the path "type", used to categorize the purpose of the path and store most-recent-used paths
 	virtual const std::string property_path_type() = 0;
 
 	/// Returns the path "reference", which indicates how the external resource will be referenced - by absolute path, relative path, or inline
-	virtual const reference_t property_path_reference() = 0;
+	virtual reference_t property_path_reference() = 0;
 	virtual void set_property_path_reference(const reference_t) = 0;
 	/// Defines a signal that will be emitted anytime the path reference is modified
 	typedef sigc::signal<void> path_reference_changed_signal_t;

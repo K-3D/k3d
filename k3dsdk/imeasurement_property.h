@@ -41,7 +41,7 @@ class imeasurement_property :
 {
 public:
 	/// Returns the suggested step increment to use when modifying the property value
-	virtual const double property_step_increment() = 0;
+	virtual double property_step_increment() = 0;
 	/// Returns the real-world units-of-measure stored by the property
 	virtual const std::type_info& property_units() = 0;
 
