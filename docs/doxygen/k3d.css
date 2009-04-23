@@ -13,6 +13,11 @@ a.qindex, a.qindex:visited, a.qindex:active, a.qindex:hover
 	color: DarkRed;
 }
 
+a.el, a.el:visited, a.el:active, a.el:hover
+{
+        color: DarkRed;
+}
+
 .memitem
 {
 	background-color: #eedddd;
