@@ -74,6 +74,7 @@ public:
 		{
 			k3d::log() << error << k3d_file_reference << ": error opening [" << Path.native_console_string() << "]" << std::endl;
 			k3d::log() << error << e.what() << std::endl;
+			Output = k3d::mesh();
 			return;
 		}
 	}
