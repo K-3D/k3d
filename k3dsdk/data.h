@@ -700,7 +700,7 @@ public:
 		return true;
 	}
 
-	const ipath_property::mode_t property_path_mode()
+	ipath_property::mode_t property_path_mode()
 	{
 		return m_mode;
 	}
@@ -710,7 +710,7 @@ public:
 		return m_type;
 	}
 
-	const ipath_property::reference_t property_path_reference()
+	ipath_property::reference_t property_path_reference()
 	{
 		return m_reference;
 	}
@@ -1394,7 +1394,7 @@ public:
 		return true;
 	}
 
-	const double property_step_increment()
+	double property_step_increment()
 	{
 		return m_step_increment;
 	}
@@ -2082,15 +2082,15 @@ protected:
 	{
 	}
 
-	void start_recording(istate_recorder& StateRecorder)
+	void start_recording(istate_recorder&)
 	{
 	}
 
-	void set_value(ihint* const Hint)
+	void set_value(ihint* const)
 	{
 	}
 
-	void finish_recording(istate_recorder& StateRecorder)
+	void finish_recording(istate_recorder&)
 	{
 	}
 };

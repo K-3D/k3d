@@ -96,7 +96,7 @@ public:
 		base_type::resize(NewSize, Value);
 	}
 
-	const uint_t size() const
+	uint_t size() const
 	{
 		return base_type::size();
 	}

@@ -50,7 +50,7 @@ public:
 	/// Sets the size of this array.
 	virtual void resize(const uint_t NewSize) = 0;
 	/// Returns the size of this array
-	virtual const uint_t size() const = 0;
+	virtual uint_t size() const = 0;
 	/// Returns true iff this array is empty
 	virtual bool_t empty() const = 0;
 	/// Returns true iff this array is equivalent to another, using the imprecise semantics of almost_equal to compare values.
