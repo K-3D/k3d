@@ -29,6 +29,7 @@
 #include <gts.h>
 
 namespace k3d { class mesh; }
+namespace k3d { namespace polyhedron { class const_primitive; } }
 
 namespace module
 {
@@ -37,12 +38,7 @@ namespace gts
 {
 
 /// Converts a K-3D mesh into a GtsSurface
-GtsSurface* convert(const k3d::mesh& Mesh);
-
-/*
-/// Converts a GtsSurface into a K-3D mesh
-const k3d::mesh convert(GtsSurface* Surface);
-*/
+GtsSurface* convert(const k3d::mesh& Mesh, const k3d::polyhedron::const_primitive& Polyhedron);
 
 /// Smart pointer for holding GTS objects
 template<typename T>

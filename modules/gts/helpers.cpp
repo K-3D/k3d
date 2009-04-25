@@ -47,16 +47,14 @@ class triangulator :
 	typedef k3d::triangulator base;
 
 public:
-	GtsSurface* process(const k3d::mesh& Mesh)
+	GtsSurface* process(const k3d::mesh& Mesh, const k3d::polyhedron::const_primitive& Polyhedron)
 	{
 		gts_surface = gts_surface_new(gts_surface_class(), gts_face_class(), gts_edge_class(), gts_vertex_class());
 
 		mesh_points = Mesh.points.get();
 		gts_vertices.assign(mesh_points->size(), 0);
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(polyhedron)
-			base::process(Mesh, *polyhedron);
+		base::process(Mesh, Polyhedron);
 
 		gts_vertices.clear();
 		mesh_points = 0;
@@ -105,9 +103,9 @@ private:
 
 } // namespace detail
 
-GtsSurface* convert(const k3d::mesh& Mesh)
+GtsSurface* convert(const k3d::mesh& Mesh, const k3d::polyhedron::const_primitive& Polyhedron)
 {
-	return detail::triangulator().process(Mesh);
+	return detail::triangulator().process(Mesh, Polyhedron);
 }
 
 /*

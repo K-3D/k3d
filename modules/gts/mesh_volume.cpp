@@ -31,6 +31,7 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/value_demand_storage.h>
+#include <k3dsdk/polyhedron.h>
 
 namespace module
 {
@@ -81,17 +82,26 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_volume;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_volume;
 
 	void execute(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Volume)
 	{
-		if(k3d::mesh* const mesh = m_input_mesh.pipeline_value())
+		Volume = 0;
+
+		k3d::mesh* const mesh = m_input_mesh.pipeline_value();
+		if(!mesh)
+			return;
+
+		for(k3d::mesh::primitives_t::const_iterator primitive = mesh->primitives.begin(); primitive != mesh->primitives.end(); ++primitive)
 		{
-			const gts_ptr<GtsSurface> gts_surface = convert(*mesh);
-			Volume = gts_surface_volume(gts_surface);
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron)
+				continue;
+
+			const gts_ptr<GtsSurface> gts_surface = convert(*mesh, *polyhedron);
+			Volume += gts_surface_volume(gts_surface);
 		}
 
-		Volume = 0;
 	}
 };
 
