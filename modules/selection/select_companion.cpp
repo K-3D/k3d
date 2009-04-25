@@ -18,8 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
-		\author Bart Janssens <bart.janssens@lid.kviv.be>
+	\author Timothy M. Shead (tshead@k-3d.com)
+	\author Bart Janssens <bart.janssens@lid.kviv.be>
 */
 
 #include <k3d-i18n-config.h>
@@ -57,59 +57,60 @@ public:
 		m_keep_original_selection(init_owner(*this) + init_name("keep_original_selection") + init_label(_("Keep Original Selection")) + init_description(_("Keep the original selection, rather than selecting only the companions")) + init_value(false))
 	{
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
-      k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 		m_keep_original_selection.changed_signal().connect(k3d::hint::converter<
-      k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-    const k3d::bool_t keep_selection = m_keep_original_selection.pipeline_value();
+		const k3d::bool_t keep_selection = m_keep_original_selection.pipeline_value();
       
-    k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-      boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
-      if(!polyhedron)
-        continue;
-	
-      const k3d::mesh::selection_t original_edge_selections = polyhedron->edge_selections;
-  	
-      k3d::mesh::bools_t boundary_edges;
-      k3d::mesh::indices_t companions;
-      k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, boundary_edges, companions);
-    
-      std::fill(polyhedron->edge_selections.begin(), polyhedron->edge_selections.end(), 0.0);
-       
-      const k3d::uint_t edge_begin = 0;
-      const k3d::uint_t edge_end = edge_begin + polyhedron->edge_selections.size(); 
-      for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
-      {
-        if(original_edge_selections[edge])
-        {
-          polyhedron->edge_selections[companions[edge]] = original_edge_selections[edge];
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+			if(!polyhedron)
+				continue;
 
-          if(keep_selection)
-            polyhedron->edge_selections[edge] = original_edge_selections[edge];
-        }
-      }
-    }
+			const k3d::mesh::selection_t original_edge_selections = polyhedron->edge_selections;
+
+			k3d::mesh::bools_t boundary_edges;
+			k3d::mesh::indices_t companions;
+			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, boundary_edges, companions);
+
+			std::fill(polyhedron->edge_selections.begin(), polyhedron->edge_selections.end(), 0.0);
+
+			const k3d::uint_t edge_begin = 0;
+			const k3d::uint_t edge_end = edge_begin + polyhedron->edge_selections.size(); 
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+			{
+				if(original_edge_selections[edge])
+				{
+					polyhedron->edge_selections[companions[edge]] = original_edge_selections[edge];
+
+					if(keep_selection)
+						polyhedron->edge_selections[edge] = original_edge_selections[edge];
+				}
+			}
+		}
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<select_companion,
-				k3d::interface_list<k3d::imesh_source,
-				k3d::interface_list<k3d::imesh_sink> > > factory(
-				k3d::uuid(0x636a062d, 0x80fc4b53, 0x8f0149e8, 0x4de9c520),
-				"SelectCompanion",
-				"Select the companion of an edge. If multiple edges are selected the first one in the list is selected and all others are deselected",
-				"Selection",
-				k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::interface_list<k3d::imesh_source,
+			k3d::interface_list<k3d::imesh_sink> > > factory(
+			k3d::uuid(0x636a062d, 0x80fc4b53, 0x8f0149e8, 0x4de9c520),
+			"SelectCompanion",
+			"Select the companion of an edge. If multiple edges are selected the first one in the list is selected and all others are deselected",
+			"Selection",
+			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
+
 private:
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_keep_original_selection;
 };

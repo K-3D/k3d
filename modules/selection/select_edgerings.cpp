@@ -70,59 +70,52 @@ public:
 private:	
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
-		if(!input_polyhedron)
-			return;
-		
-		m_companions.clear();
-		m_valences.clear();
-		m_boundary_edges.clear();
-
-		if (m_companions.empty() || m_valences.empty() || m_boundary_edges.empty())
-		{
-			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, m_boundary_edges, m_companions);
-			k3d::polyhedron::create_vertex_valence_lookup(Input.points->size(), input_polyhedron->edge_points, m_valences);
-		}
-		
-		// Make sure the Output selection arrays contain the correct selection
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 		
-		const k3d::mesh::indices_t& edge_points = input_polyhedron->edge_points;
-		const k3d::mesh::selection_t edge_selection = *Output.polyhedra->edge_selection;
-		const k3d::mesh::indices_t& clockwise_edges = input_polyhedron->clockwise_edges;
-		const k3d::uint_t edge_count = edge_selection.size();
-		k3d::mesh::polyhedra_t& target_polyhedra = Output.polyhedra.writable();
-		k3d::mesh::selection_t& target_selection = target_polyhedra.edge_selection.writable();
-		for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			double selection_weight = edge_selection[edge];
-			if (selection_weight)
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+			if(!polyhedron)
+				continue;
+	
+			k3d::mesh::indices_t companions;
+			k3d::mesh::bools_t boundary_edges;
+			k3d::mesh::counts_t valences;
+
+			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, boundary_edges, companions);
+			k3d::polyhedron::create_vertex_valence_lookup(Output.points->size(), polyhedron->edge_points, valences);
+			
+			const k3d::mesh::selection_t original_edge_selections = polyhedron->edge_selections;
+
+			const k3d::uint_t edge_begin = 0;
+			const k3d::uint_t edge_end = edge_begin + original_edge_selections.size();
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 			{
-				for (k3d::uint_t ringedge = edge; ; )
+				const k3d::double_t selection_weight = original_edge_selections[edge];
+				if(selection_weight)
 				{
-					target_selection[ringedge] = selection_weight;
-					
-					if (input_polyhedron->clockwise_edges[input_polyhedron->clockwise_edges[input_polyhedron->clockwise_edges[input_polyhedron->clockwise_edges[ringedge]]]] != ringedge) // Not a quad
-						break;
-					
-					k3d::uint_t transverse_edge = input_polyhedron->clockwise_edges[input_polyhedron->clockwise_edges[ringedge]];
-					target_selection[transverse_edge] = selection_weight;
-					
-					if (m_boundary_edges[transverse_edge]) // No companion
-						break;
-					
-					ringedge = m_companions[transverse_edge];
-					
-					if (ringedge == edge) // loop complete
-						break;
+					for(k3d::uint_t ringedge = edge; ; )
+					{
+						polyhedron->edge_selections[ringedge] = selection_weight;
+						
+						if(polyhedron->clockwise_edges[polyhedron->clockwise_edges[polyhedron->clockwise_edges[polyhedron->clockwise_edges[ringedge]]]] != ringedge) // Not a quad
+							break;
+						
+						k3d::uint_t transverse_edge = polyhedron->clockwise_edges[polyhedron->clockwise_edges[ringedge]];
+						polyhedron->edge_selections[transverse_edge] = selection_weight;
+						
+						if(boundary_edges[transverse_edge]) // No companion
+							break;
+						
+						ringedge = companions[transverse_edge];
+						
+						if(ringedge == edge) // loop complete
+							break;
+					}
 				}
 			}
 		}
 	}
-	
-	k3d::mesh::indices_t m_companions;
-	k3d::mesh::bools_t m_boundary_edges;
-	k3d::mesh::counts_t m_valences;
 };
 
 /////////////////////////////////////////////////////////////////////////////

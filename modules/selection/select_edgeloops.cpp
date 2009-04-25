@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,8 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
-		\author Bart Janssens (bart.janssens@lid.kviv.be)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
 #include <k3d-i18n-config.h>
@@ -80,75 +80,74 @@ public:
 private:
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
-		if(!input_polyhedron)
-			return;
-		
-		m_companions.clear();
-		m_valences.clear();
-		m_boundary_edges.clear();
+		const k3d::bool_t a_side = m_ring_side_a.pipeline_value();
+		const k3d::bool_t b_side = m_ring_side_b.pipeline_value();
 
-		if (m_companions.empty() || m_valences.empty() || m_boundary_edges.empty())
-		{
-			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, m_boundary_edges, m_companions);
-			k3d::polyhedron::create_vertex_valence_lookup(Input.points->size(), input_polyhedron->edge_points, m_valences);
-		}
-		
-		// Make sure the Output selection arrays contain the correct selection
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
-		
-		const k3d::mesh::selection_t edge_selection = *Output.polyhedra->edge_selection;
-		const k3d::uint_t edge_count = edge_selection.size();
-		k3d::mesh::polyhedra_t& target_polyhedra = Output.polyhedra.writable();
-		k3d::mesh::selection_t& target_selection = target_polyhedra.edge_selection.writable();
-		
-		bool a_side = m_ring_side_a.pipeline_value();
-		bool b_side = m_ring_side_b.pipeline_value();
-		
-		if (!a_side && !b_side) // Use the classical algorithm
+
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+			if(!polyhedron)
+				continue;
+
+			m_companions.clear();
+			m_valences.clear();
+			m_boundary_edges.clear();
+
+			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, m_boundary_edges, m_companions);
+			k3d::polyhedron::create_vertex_valence_lookup(Output.points->size(), polyhedron->edge_points, m_valences);
+			
+			const k3d::mesh::selection_t original_edge_selections = polyhedron->edge_selections;
+		
+			const k3d::uint_t edge_begin = 0;
+			const k3d::uint_t edge_end = edge_begin + original_edge_selections.size();
+	
+			if(!a_side && !b_side) // Use the classical algorithm
 			{
-				double selection_weight = edge_selection[edge];
-				if (selection_weight)
+				for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 				{
-					for (k3d::uint_t loopedge = edge; ; )
+					const k3d::double_t selection_weight = original_edge_selections[edge];
+					if(selection_weight)
 					{
-						target_selection[loopedge] = selection_weight;
-						
-						if (m_valences[input_polyhedron->edge_points[input_polyhedron->clockwise_edges[loopedge]]] != 4) // Next edge in loop is ambiguous
-							break;
-						
-						if (m_boundary_edges[input_polyhedron->clockwise_edges[loopedge]]) // No companion
-							break;
-						
-						loopedge = input_polyhedron->clockwise_edges[m_companions[input_polyhedron->clockwise_edges[loopedge]]];
-						if (loopedge == edge) // loop complete
-							break;
+						for(k3d::uint_t loopedge = edge; ; )
+						{
+							polyhedron->edge_selections[loopedge] = selection_weight;
+							
+							if(m_valences[polyhedron->edge_points[polyhedron->clockwise_edges[loopedge]]] != 4) // Next edge in loop is ambiguous
+								break;
+							
+							if(m_boundary_edges[polyhedron->clockwise_edges[loopedge]]) // No companion
+								break;
+							
+							loopedge = polyhedron->clockwise_edges[m_companions[polyhedron->clockwise_edges[loopedge]]];
+							if(loopedge == edge) // loop complete
+								break;
+						}
 					}
 				}
 			}
-		}
-		else // Use the edgerings on either side of the edge
-		{
-			for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
+			else // Use the edgerings on either side of the edge
 			{
-				double selection_weight = input_polyhedron->edge_selections[edge];
-				if (selection_weight)
+				for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 				{
-					if (!m_boundary_edges[edge] && input_polyhedron->edge_selections[m_companions[edge]] && m_companions[edge] > edge)
-						continue; // we'll catch this one when we reach its companion
-					if (a_side)
-						select_with_edgering(selection_weight, input_polyhedron->clockwise_edges[edge], input_polyhedron->clockwise_edges, target_selection);
-					if (b_side && !m_boundary_edges[edge])
-						select_with_edgering(selection_weight, input_polyhedron->clockwise_edges[m_companions[edge]], input_polyhedron->clockwise_edges, target_selection);
+					k3d::double_t selection_weight = polyhedron->edge_selections[edge];
+					if(selection_weight)
+					{
+						if(!m_boundary_edges[edge] && polyhedron->edge_selections[m_companions[edge]] && m_companions[edge] > edge)
+							continue; // we'll catch this one when we reach its companion
+						if(a_side)
+							select_with_edgering(selection_weight, polyhedron->clockwise_edges[edge], polyhedron->clockwise_edges, polyhedron->edge_selections);
+						if(b_side && !m_boundary_edges[edge])
+							select_with_edgering(selection_weight, polyhedron->clockwise_edges[m_companions[edge]], polyhedron->clockwise_edges, polyhedron->edge_selections);
+					}
 				}
 			}
 		}
 	}
 	
 	// Select an edge loop at the side of an edgering starting at Edge
-	void select_with_edgering(const double SelectionWeight, const k3d::uint_t Edge, const k3d::mesh::indices_t& ClockwiseEdges, k3d::mesh::selection_t& TargetSelection)
+	void select_with_edgering(const k3d::double_t SelectionWeight, const k3d::uint_t Edge, const k3d::mesh::indices_t& ClockwiseEdges, k3d::mesh::selection_t& TargetSelection)
 	{
 		for (k3d::uint_t ringedge = Edge; ; )
 		{
@@ -176,8 +175,8 @@ private:
 	k3d::mesh::bools_t m_boundary_edges;
 	k3d::mesh::counts_t m_valences;
 	
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_ring_side_a;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_ring_side_b;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_ring_side_a;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_ring_side_b;
 };
 
 /////////////////////////////////////////////////////////////////////////////
