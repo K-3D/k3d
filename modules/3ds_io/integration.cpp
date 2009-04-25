@@ -88,7 +88,7 @@ f3dsParser::f3dsParser(const char *filename, k3d::mesh &Mesh)
 	boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Mesh));
 	polyhedron->shell_first_faces.push_back(0);
 	polyhedron->shell_face_counts.push_back(0);
-	polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+	polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
 	/* No nodes?  Fabricate nodes to display all the meshes. */
 	if(!file->nodes)
