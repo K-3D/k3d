@@ -112,47 +112,50 @@ private:
 		if(Input.points)
 			points = *Input.points;
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
-		if(polyhedron)
-			triangulator(points, vertices).process(Input, *polyhedron);			
-
-		// Write header data ...
-		Output << "ply\n";
-		Output << "format ascii 1.0\n";
-		Output << "comment Written by K-3D " << K3D_VERSION << "\n";
-
-		Output << "element vertex " << points.size() << "\n";
-		Output << "property float x\n";
-		Output << "property float y\n";
-		Output << "property float z\n";
-
-		Output << "element face " << vertices.size() / 3 << "\n";
-		Output << "property list uchar int vertex_indices\n";
-		
-		Output << "end_header\n";
-
-		// Write vertex data ...
-		std::copy(points.begin(), points.end(), std::ostream_iterator<k3d::point3>(Output, "\n"));
-
-		// Write face data ...
-		const k3d::uint_t vertex_begin = 0;
-		const k3d::uint_t vertex_end = vertex_begin + vertices.size();
-		for(k3d::uint_t vertex = vertex_begin; vertex != vertex_end; ++vertex)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
-			switch(vertex % 3)
-			{
-				case 0:
-					Output << "3 " << vertices[vertex];
-					break;
-				case 1:
-					Output << " " << vertices[vertex];
-					break;
-				case 2:
-					Output << " " << vertices[vertex] << "\n";
-					break;
-			}
-		}
-	}
+      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+      if(polyhedron)
+        triangulator(points, vertices).process(Input, *polyhedron);
+    }
+
+    // Write header data ...
+    Output << "ply\n";
+    Output << "format ascii 1.0\n";
+    Output << "comment Written by K-3D " << K3D_VERSION << "\n";
+
+    Output << "element vertex " << points.size() << "\n";
+    Output << "property float x\n";
+    Output << "property float y\n";
+    Output << "property float z\n";
+
+    Output << "element face " << vertices.size() / 3 << "\n";
+    Output << "property list uchar int vertex_indices\n";
+    
+    Output << "end_header\n";
+
+    // Write vertex data ...
+    std::copy(points.begin(), points.end(), std::ostream_iterator<k3d::point3>(Output, "\n"));
+
+    // Write face data ...
+    const k3d::uint_t vertex_begin = 0;
+    const k3d::uint_t vertex_end = vertex_begin + vertices.size();
+    for(k3d::uint_t vertex = vertex_begin; vertex != vertex_end; ++vertex)
+    {
+      switch(vertex % 3)
+      {
+        case 0:
+          Output << "3 " << vertices[vertex];
+          break;
+        case 1:
+          Output << " " << vertices[vertex];
+          break;
+        case 2:
+          Output << " " << vertices[vertex] << "\n";
+          break;
+      }
+    }
+  }
 };
 
 k3d::iplugin_factory& mesh_writer_factory()

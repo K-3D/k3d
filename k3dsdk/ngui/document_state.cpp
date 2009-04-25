@@ -127,6 +127,7 @@ const bool is_split_edge_selected(const k3d::selection::record& Record)
 	if(!mesh)
 		return false;
 
+/*
 	if(mesh->polyhedra && mesh->polyhedra->edge_selection)
 	{
 		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_SPLIT_EDGE);
@@ -134,7 +135,6 @@ const bool is_split_edge_selected(const k3d::selection::record& Record)
 			return (*mesh->polyhedra->edge_selection)[id];
 	}
 
-/*
 	if(mesh->linear_curve_groups && mesh->linear_curve_groups->curve_selection)
 	{
 		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_LINEAR_CURVE);
@@ -160,12 +160,14 @@ const bool is_uniform_selected(const k3d::selection::record& Record)
 	if(!mesh)
 		return false;
 
+/*
 	if(mesh->polyhedra && mesh->polyhedra->face_selection)
 	{
 		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_FACE);
 		if(id < mesh->polyhedra->face_selection->size())
 			return (*mesh->polyhedra->face_selection)[id];
 	}
+*/
 
 	return false;
 }
@@ -229,6 +231,7 @@ struct select_split_edges
 			const k3d::uint_t edge = token->id;
 			switch(token->type)
 			{
+/*
 				case k3d::selection::ABSOLUTE_SPLIT_EDGE:
 					Selection.edges.push_back(k3d::mesh_selection::record(edge, edge+1, weight));
 					if(edge < companions.size() && companions[edge] != edge)
@@ -238,7 +241,6 @@ struct select_split_edges
 					}
 					return;
 
-/*
 				case k3d::selection::ABSOLUTE_LINEAR_CURVE:
 					Selection.linear_curves.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
@@ -271,20 +273,6 @@ struct select_uniform
 
 	void operator()(const k3d::selection::record& Record, k3d::mesh_selection& Selection) const
 	{
-		// Legacy selection behavior ...
-		for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
-		{
-			switch(token->type)
-			{
-				case k3d::selection::ABSOLUTE_FACE:
-					Selection.faces.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
-					return;
-
-				default:
-					break;
-			}
-		}
-
 		// Generic geometry selection behavior ...
 		k3d::mesh_selection::component current_component(0, 0, k3d::selection::UNIFORM);
 		for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
@@ -353,10 +341,14 @@ void select_components(const k3d::selection::records& Selection, const k3d::doub
 			k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(node);
 			if(mesh_source)
 				mesh = k3d::property::pipeline_value<k3d::mesh*>(mesh_source->mesh_source_output());
+
+      assert_not_implemented();
+     /*
 			if(mesh && mesh->polyhedra && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
 			{
 				k3d::polyhedron::create_edge_adjacency_lookup(*mesh->polyhedra->edge_points, *mesh->polyhedra->clockwise_edges, boundary_edges, companions);
-			}
+    	}
+      */
 		}
 
 		if(!sink)
@@ -408,8 +400,11 @@ struct select_all_points
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection.points = k3d::mesh_selection::component_select_all();
+    assert_not_implemented();
+/*
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
 		Selection.faces = k3d::mesh_selection::component_deselect_all();
+*/
 	}
 };
 
@@ -418,8 +413,11 @@ struct select_all_split_edges
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection.points = k3d::mesh_selection::component_deselect_all();
+    assert_not_implemented();
+/*
 		Selection.edges = k3d::mesh_selection::component_select_all();
 		Selection.faces = k3d::mesh_selection::component_deselect_all();
+*/
 	}
 };
 
@@ -428,8 +426,11 @@ struct select_all_uniform
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection.points = k3d::mesh_selection::component_deselect_all();
+    assert_not_implemented();
+/*
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
 		Selection.faces = k3d::mesh_selection::component_select_all();
+*/
 	}
 };
 
@@ -467,7 +468,10 @@ struct invert_split_edges
 {
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
+    assert_not_implemented();
+    /*
 		invert(Selection.edges);
+    */
 	}
 };
 
@@ -475,7 +479,10 @@ struct invert_uniform
 {
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
+    assert_not_implemented();
+    /*
 		invert(Selection.faces);
+    */
 	}
 };
 
@@ -487,8 +494,11 @@ void deselect_gaps(k3d::mesh_selection::records_t& Records)
 void deselect_gaps(k3d::mesh_selection& Selection)
 {
 	deselect_gaps(Selection.points);
+assert_not_implemented();
+/*
 	deselect_gaps(Selection.edges);
 	deselect_gaps(Selection.faces);
+*/
 }
 
 /** \todo Handle adjacent edges */
@@ -507,6 +517,8 @@ struct convert_to_points
 				Selection.points.push_back(k3d::mesh_selection::record(point, 1.0));
 		}
 
+assert_not_implemented();
+/*
 		// Convert edge selections to point selections ...
 		if(Mesh.polyhedra && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges)
 		{
@@ -548,7 +560,6 @@ struct convert_to_points
 			} 
 		}
 
-/*
 		// Convert linear curve selections to point selections ...
 		if(Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_first_points && Mesh.linear_curve_groups->curve_point_counts && Mesh.linear_curve_groups->curve_selection && Mesh.linear_curve_groups->curve_points)
 		{
@@ -666,8 +677,11 @@ struct convert_to_points
 
 		if (!m_keep_selection)
 		{
+      assert_not_implemented();
+      /*
 			Selection.edges.clear();
 			Selection.faces.clear();
+      */
 		}
 
 		// Ensure that anything not explicitly selected gets explicitly deselected ...
@@ -698,6 +712,8 @@ struct convert_to_split_edges
 	
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
+    assert_not_implemented();
+/*
 		// Convert point selections to edge selections ...
 		if(Mesh.polyhedra && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges && Mesh.polyhedra->edge_selection && Mesh.point_selection)
 		{
@@ -727,7 +743,6 @@ struct convert_to_split_edges
 			}
 		}
 
-/*
 		// Convert point selections to linear curve selections ...
 		if(Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_first_points && Mesh.linear_curve_groups->curve_point_counts && Mesh.linear_curve_groups->curve_selection && Mesh.linear_curve_groups->curve_points && Mesh.point_selection)
 		{
@@ -814,7 +829,6 @@ struct convert_to_split_edges
 				}
 			}
 		}
-*/
 
 		// Convert face selections to edge selections ...
 		if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->clockwise_edges)
@@ -849,11 +863,16 @@ struct convert_to_split_edges
 				}
 			}
 		}
+*/
 
 		if (!m_keep_selection)
 		{
 			Selection.points.clear();
+
+      assert_not_implemented();
+      /*
 			Selection.faces.clear();
+      */
 		}
 
 		// Ensure that anything not explicitly selected gets explicitly deselected ...
@@ -869,6 +888,8 @@ struct convert_to_uniform
 	convert_to_uniform(bool KeepSelection) : m_keep_selection(KeepSelection) {}
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
+    assert_not_implemented();
+/*
 		// Convert point and edge selections to face selections ...
 		if(Mesh.point_selection && Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges && Mesh.polyhedra->edge_selection)
 		{
@@ -903,7 +924,6 @@ struct convert_to_uniform
 			}
 		}
 
-/*
 		// Convert point selections to bilinear patch selections ...
 		if(Mesh.point_selection && Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection && Mesh.bilinear_patches->patch_points)
 		{
@@ -986,7 +1006,10 @@ struct convert_to_uniform
 		if (!m_keep_selection)
 		{
 			Selection.points.clear();
+      assert_not_implemented();
+      /*
 			Selection.edges.clear();
+      */
 		}
 
 		// Ensure that anything not explicitly selected gets explicitly deselected ...
@@ -1009,6 +1032,7 @@ struct keep_selection
 			}
 		}
 		
+/*
 		if (Mesh.polyhedra && Mesh.polyhedra->edge_selection)
 		{
 			for (k3d::uint_t edge = 0; edge != Mesh.polyhedra->edge_selection->size(); ++edge)
@@ -1027,7 +1051,6 @@ struct keep_selection
 			}
 		}
 
-/*
 		if (Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_selection)
 		{
 			for (k3d::uint_t curve = 0; curve != Mesh.linear_curve_groups->curve_selection->size(); ++curve)

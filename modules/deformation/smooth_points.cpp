@@ -21,11 +21,14 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_deformation_modifier.h>
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -52,41 +55,42 @@ public:
 
 	void on_deform_mesh(const k3d::mesh& Input, const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const double smoothing = m_smoothing.pipeline_value();
+    const k3d::double_t smoothing = m_smoothing.pipeline_value();
 
-        k3d::mesh::points_t sums(InputPoints.size(), k3d::point3(0, 0, 0));
-        std::vector<size_t> counts(InputPoints.size(), 0);
+    k3d::mesh::points_t sums(InputPoints.size(), k3d::point3(0, 0, 0));
+    std::vector<k3d::uint_t> counts(InputPoints.size(), 0);
 
-        if(Input.polyhedra && Input.polyhedra->edge_points && Input.polyhedra->clockwise_edges)
-        {
-            const k3d::mesh::indices_t& edge_points = *Input.polyhedra->edge_points;
-            const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
+		{
+      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+      if(!polyhedron)
+        continue;
 
-            const size_t edge_begin = 0;
-            const size_t edge_end = edge_begin + edge_points.size();
-            for(size_t edge = edge_begin; edge != edge_end; ++edge)
-            {
-                sums[edge_points[edge]] += k3d::to_vector(InputPoints[edge_points[clockwise_edges[edge]]]);
-                counts[edge_points[edge]] += 1;
+      const k3d::uint_t edge_begin = 0;
+      const k3d::uint_t edge_end = edge_begin + polyhedron->edge_points.size();
+      for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+      {
+        sums[polyhedron->edge_points[edge]] += k3d::to_vector(InputPoints[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
+        counts[polyhedron->edge_points[edge]] += 1;
 
-                sums[edge_points[clockwise_edges[edge]]] += k3d::to_vector(InputPoints[edge_points[edge]]);
-                counts[edge_points[clockwise_edges[edge]]] += 1;
-            }
-        }
+        sums[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]] += k3d::to_vector(InputPoints[polyhedron->edge_points[edge]]);
+        counts[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]] += 1;
+      }
+    }
 
-        const size_t point_begin = 0;
-        const size_t point_end = point_begin + OutputPoints.size();
+    const k3d::uint_t point_begin = 0;
+    const k3d::uint_t point_end = point_begin + OutputPoints.size();
 
-        for(size_t point = point_begin; point != point_end; ++point)
-        {
-            if(counts[point])
-                sums[point] /= counts[point];
-            else
-                sums[point] = InputPoints[point];
-        }
+    for(k3d::uint_t point = point_begin; point != point_end; ++point)
+    {
+      if(counts[point])
+        sums[point] /= counts[point];
+      else
+        sums[point] = InputPoints[point];
+    }
 
-        for(size_t point = point_begin; point != point_end; ++point)
-            OutputPoints[point] = k3d::mix(InputPoints[point], sums[point], smoothing * PointSelection[point]);
+    for(k3d::uint_t point = point_begin; point != point_end; ++point)
+      OutputPoints[point] = k3d::mix(InputPoints[point], sums[point], smoothing * PointSelection[point]);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -104,7 +108,7 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_smoothing;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_smoothing;
 };
 
 /////////////////////////////////////////////////////////////////////////////

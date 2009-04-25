@@ -319,91 +319,94 @@ private:
 		if(!mesh)
 			return;
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh));
-		if(!polyhedron)
-			return;
-
-		// Triangulate the mesh faces ...
-		k3d::mesh::points_t points(*(mesh->points));
-		const k3d::matrix4 transformation = k3d::node_to_world_matrix(MeshInstance); 
-		for (k3d::uint_t point = 0; point != points.size(); ++point)
-			points[point] = points[point] * transformation;
-		k3d::mesh::indices_t a_points;
-		k3d::mesh::indices_t b_points;
-		k3d::mesh::indices_t c_points;
-		k3d::mesh::materials_t materials;
-		create_triangles(polyhedron->face_materials, points, a_points, b_points, c_points, materials).process(*mesh, *polyhedron);
-
-		// Sort faces by material ...
-		typedef std::vector<k3d::uint_t> faces_t;
-		typedef std::map<k3d::imaterial*, faces_t> sorted_faces_t;
-		sorted_faces_t sorted_faces;
-		for(k3d::uint_t i = 0; i != a_points.size(); ++i)
-			sorted_faces[materials[i]].push_back(i);
-
-		Stream << "<!-- K-3D plugin: " << MeshInstance.factory().name() << " name: " << MeshInstance.name() << " -->\n";
-
-		// Write out each group of faces that shares the same material ...
-		k3d::uint_t index = 0;
-		for(sorted_faces_t::const_iterator i = sorted_faces.begin(); i != sorted_faces.end(); ++i, ++index)
+		for(k3d::mesh::primitives_t::const_iterator primitive = mesh->primitives.begin(); primitive != mesh->primitives.end(); ++primitive)
 		{
-			const k3d::string_t object_name = Name + "_" + k3d::string_cast(index);
+      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+      if(!polyhedron)
+        continue;
 
-			k3d::imaterial* const material = i->first;
-			const faces_t& faces = i->second;
+      // Triangulate the mesh faces ...
+      k3d::mesh::points_t points(*(mesh->points));
+      const k3d::matrix4 transformation = k3d::node_to_world_matrix(MeshInstance); 
+      for (k3d::uint_t point = 0; point != points.size(); ++point)
+        points[point] = points[point] * transformation;
+      k3d::mesh::indices_t a_points;
+      k3d::mesh::indices_t b_points;
+      k3d::mesh::indices_t c_points;
+      k3d::mesh::materials_t materials;
+      create_triangles(polyhedron->face_materials, points, a_points, b_points, c_points, materials).process(*mesh, *polyhedron);
 
-			k3d::string_t shader_name = "shader_0";
-			bool shadow = true;
-			bool emit_rad = true;
-			bool recv_rad = true;
-			bool caustics = true;
-			double caus_IOR = 1.0;
-			k3d::color caus_rcolor(0, 0, 0);
-			k3d::color caus_tcolor(0, 0, 0);
-			double autosmooth_value = 89.9;
-			bool has_orco = false;
+      // Sort faces by material ...
+      typedef std::vector<k3d::uint_t> faces_t;
+      typedef std::map<k3d::imaterial*, faces_t> sorted_faces_t;
+      sorted_faces_t sorted_faces;
+      for(k3d::uint_t i = 0; i != a_points.size(); ++i)
+        sorted_faces[materials[i]].push_back(i);
 
-			if(k3d::yafray::imaterial* const yafray_material = k3d::material::lookup<k3d::yafray::imaterial>(material))
-			{
-				shader_name = ShaderNames.count(yafray_material) ? ShaderNames.find(yafray_material)->second : "shader_0";
+      Stream << "<!-- K-3D plugin: " << MeshInstance.factory().name() << " name: " << MeshInstance.name() << " -->\n";
 
-				shadow = k3d::property::pipeline_value<bool>(*yafray_material, "shadow");
-				emit_rad = k3d::property::pipeline_value<bool>(*yafray_material, "emit_rad");
-				recv_rad = k3d::property::pipeline_value<bool>(*yafray_material, "recv_rad");
-				caustics = k3d::property::pipeline_value<bool>(*yafray_material, "caustics");
-				caus_IOR = k3d::property::pipeline_value<double>(*yafray_material, "caus_IOR");
-				caus_rcolor = k3d::property::pipeline_value<k3d::color>(*yafray_material, "caus_rcolor");
-				caus_tcolor = k3d::property::pipeline_value<k3d::color>(*yafray_material, "caus_tcolor");
-				autosmooth_value = k3d::property::pipeline_value<double>(*yafray_material, "mesh_autosmooth_value");
-				has_orco = k3d::property::pipeline_value<bool>(*yafray_material, "has_orco");
-			}
+      // Write out each group of faces that shares the same material ...
+      k3d::uint_t index = 0;
+      for(sorted_faces_t::const_iterator i = sorted_faces.begin(); i != sorted_faces.end(); ++i, ++index)
+      {
+        const k3d::string_t object_name = Name + "_" + k3d::string_cast(index);
+
+        k3d::imaterial* const material = i->first;
+        const faces_t& faces = i->second;
+
+        k3d::string_t shader_name = "shader_0";
+        bool shadow = true;
+        bool emit_rad = true;
+        bool recv_rad = true;
+        bool caustics = true;
+        double caus_IOR = 1.0;
+        k3d::color caus_rcolor(0, 0, 0);
+        k3d::color caus_tcolor(0, 0, 0);
+        double autosmooth_value = 89.9;
+        bool has_orco = false;
+
+        if(k3d::yafray::imaterial* const yafray_material = k3d::material::lookup<k3d::yafray::imaterial>(material))
+        {
+          shader_name = ShaderNames.count(yafray_material) ? ShaderNames.find(yafray_material)->second : "shader_0";
+
+          shadow = k3d::property::pipeline_value<bool>(*yafray_material, "shadow");
+          emit_rad = k3d::property::pipeline_value<bool>(*yafray_material, "emit_rad");
+          recv_rad = k3d::property::pipeline_value<bool>(*yafray_material, "recv_rad");
+          caustics = k3d::property::pipeline_value<bool>(*yafray_material, "caustics");
+          caus_IOR = k3d::property::pipeline_value<double>(*yafray_material, "caus_IOR");
+          caus_rcolor = k3d::property::pipeline_value<k3d::color>(*yafray_material, "caus_rcolor");
+          caus_tcolor = k3d::property::pipeline_value<k3d::color>(*yafray_material, "caus_tcolor");
+          autosmooth_value = k3d::property::pipeline_value<double>(*yafray_material, "mesh_autosmooth_value");
+          has_orco = k3d::property::pipeline_value<bool>(*yafray_material, "has_orco");
+        }
 
 
-			Stream << "<object name=\"" << object_name << "\"";
-			Stream << " shader_name=\"" << shader_name << "\"";
-			Stream << " shadow=\"" << (shadow ? "on" : "off") << "\"";
-			Stream << " emit_rad=\"" << (emit_rad ? "on" : "off") << "\"";
-			Stream << " recv_rad=\"" << (recv_rad ? "on" : "off") << "\"";
-			Stream << " caustics=\"" << (caustics ? "on" : "off") << "\"";
-			Stream << " caus_IOR=\"" << caus_IOR << "\"";
-			Stream << ">\n";
-			Stream << "	<attributes>\n";
-			Stream << "		<caus_rcolor r=\"" << caus_rcolor.red << "\" g=\"" << caus_rcolor.green << "\" b=\"" << caus_rcolor.blue << "\"/>\n";
-			Stream << "		<caus_tcolor r=\"" << caus_tcolor.red << "\" g=\"" << caus_tcolor.green << "\" b=\"" << caus_tcolor.blue << "\"/>\n";
-			Stream << "	</attributes>\n";
-			Stream << "	<mesh autosmooth=\"" << autosmooth_value << "\">\n";
-			Stream << "		<points>\n";
-			// Note: we write out every point here, to keep things simple
-			for(k3d::uint_t i = 0; i != points.size(); ++i)
-				Stream << "			<p x=\"" << points[i][0] << "\" y=\"" << points[i][1] << "\" z=\"" << points[i][2] << "\"/>\n";
-			Stream << "		</points>\n";
-			Stream << "		<faces>\n";
-			for(faces_t::const_iterator face = faces.begin(); face != faces.end(); ++face)
-				Stream << "			<f a=\"" << a_points[*face] << "\" b=\"" << b_points[*face] << "\" c=\"" << c_points[*face] << "\"/>\n";
-			Stream << "		</faces>\n";
-			Stream << "	</mesh>\n";
-			Stream << "</object>\n";
-		}
+        Stream << "<object name=\"" << object_name << "\"";
+        Stream << " shader_name=\"" << shader_name << "\"";
+        Stream << " shadow=\"" << (shadow ? "on" : "off") << "\"";
+        Stream << " emit_rad=\"" << (emit_rad ? "on" : "off") << "\"";
+        Stream << " recv_rad=\"" << (recv_rad ? "on" : "off") << "\"";
+        Stream << " caustics=\"" << (caustics ? "on" : "off") << "\"";
+        Stream << " caus_IOR=\"" << caus_IOR << "\"";
+        Stream << ">\n";
+        Stream << "	<attributes>\n";
+        Stream << "		<caus_rcolor r=\"" << caus_rcolor.red << "\" g=\"" << caus_rcolor.green << "\" b=\"" << caus_rcolor.blue << "\"/>\n";
+        Stream << "		<caus_tcolor r=\"" << caus_tcolor.red << "\" g=\"" << caus_tcolor.green << "\" b=\"" << caus_tcolor.blue << "\"/>\n";
+        Stream << "	</attributes>\n";
+        Stream << "	<mesh autosmooth=\"" << autosmooth_value << "\">\n";
+        Stream << "		<points>\n";
+        // Note: we write out every point here, to keep things simple
+        for(k3d::uint_t i = 0; i != points.size(); ++i)
+          Stream << "			<p x=\"" << points[i][0] << "\" y=\"" << points[i][1] << "\" z=\"" << points[i][2] << "\"/>\n";
+        Stream << "		</points>\n";
+        Stream << "		<faces>\n";
+        for(faces_t::const_iterator face = faces.begin(); face != faces.end(); ++face)
+          Stream << "			<f a=\"" << a_points[*face] << "\" b=\"" << b_points[*face] << "\" c=\"" << c_points[*face] << "\"/>\n";
+        Stream << "		</faces>\n";
+        Stream << "	</mesh>\n";
+        Stream << "</object>\n";
+      }
+    }
 	}
 
 	bool render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath, const bool VisibleRender)

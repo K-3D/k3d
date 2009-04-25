@@ -64,7 +64,7 @@ public:
 		if(primitive >= Output.primitives.size())
 			return;
 
-		boost::scoped_ptr<k3d::cubic_curve::primitive> curves(k3d::cubic_curve::validate(Output.primitives[primitive].writable()));
+		boost::scoped_ptr<k3d::cubic_curve::primitive> curves(k3d::cubic_curve::validate(Output.primitives[primitive]));
 		if(!curves)
 			return;
 		

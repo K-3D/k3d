@@ -54,43 +54,46 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
-		if(!polyhedron)
-			return;
-
-		Output.points = Input.points;
-		Output.point_selection = Input.point_selection;
-		Output.vertex_data = Input.vertex_data;
-
-		boost::scoped_ptr<k3d::bilinear_patch::primitive> primitive(k3d::bilinear_patch::create(Output));
-
-		const k3d::uint_t face_begin = 0;
-		const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
-		for(k3d::uint_t face = face_begin; face != face_end; ++face)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
-			std::vector<k3d::uint_t> edges;
+      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+      if(!polyhedron)
+        continue;
 
-			const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
-			for(k3d::uint_t edge = first_edge; ;)
-			{
-				edges.push_back(edge);
+      Output.points = Input.points;
+      Output.point_selection = Input.point_selection;
+      Output.vertex_data = Input.vertex_data;
 
-				edge = polyhedron->clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
-			}
+      boost::scoped_ptr<k3d::bilinear_patch::primitive> primitive(k3d::bilinear_patch::create(Output));
 
-			if(edges.size() != 4)
-				continue;
+      const k3d::uint_t face_begin = 0;
+      const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
+      for(k3d::uint_t face = face_begin; face != face_end; ++face)
+      {
+        std::vector<k3d::uint_t> edges;
 
-			primitive->patch_selections.push_back(polyhedron->face_selections[face]);
-			primitive->patch_materials.push_back(polyhedron->face_materials[face]);
+        const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
+        for(k3d::uint_t edge = first_edge; ;)
+        {
+          edges.push_back(edge);
 
-			primitive->patch_points.push_back(polyhedron->edge_points[edges[0]]);
-			primitive->patch_points.push_back(polyhedron->edge_points[edges[1]]);
-			primitive->patch_points.push_back(polyhedron->edge_points[edges[3]]); // Bilinear patch control points *aren't* in clockwise order!
-			primitive->patch_points.push_back(polyhedron->edge_points[edges[2]]);
-		}
+          edge = polyhedron->clockwise_edges[edge];
+          if(edge == first_edge)
+            break;
+        }
+
+        if(edges.size() != 4)
+          continue;
+
+        primitive->patch_selections.push_back(polyhedron->face_selections[face]);
+        primitive->patch_materials.push_back(polyhedron->face_materials[face]);
+
+        primitive->patch_points.push_back(polyhedron->edge_points[edges[0]]);
+        primitive->patch_points.push_back(polyhedron->edge_points[edges[1]]);
+        primitive->patch_points.push_back(polyhedron->edge_points[edges[3]]); // Bilinear patch control points *aren't* in clockwise order!
+        primitive->patch_points.push_back(polyhedron->edge_points[edges[2]]);
+      }
+    }
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

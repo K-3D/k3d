@@ -152,6 +152,17 @@ primitive* validate(mesh::primitive& Primitive)
 	return 0;
 }
 
+primitive* validate(pipeline_data<mesh::primitive>& Primitive)
+{
+  if(!Primitive.get())
+    return 0;
+
+	if(Primitive->type != "teapot")
+		return 0;
+
+  return validate(Primitive.writable());
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 // points
 

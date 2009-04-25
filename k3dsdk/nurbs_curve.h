@@ -105,6 +105,9 @@ const_primitive* validate(const mesh::primitive& GenericPrimitive);
 /// Tests the given mesh primitive to see if it is a valid nurbs_curve primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 primitive* validate(mesh::primitive& GenericPrimitive);
+/// Tests the given mesh primitive to see if it is a valid nurbs_curve primitive, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* validate(pipeline_data<mesh::primitive>& GenericPrimitive);
 
 /// Adds a curve to an existing primitive, specified using the order of the curve and a set of control points.
 /// Control points will be assigned unity weights and an open uniform knot vector is automatically supplied.

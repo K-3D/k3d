@@ -180,8 +180,6 @@ void define_const_typed_array_classes()
 		"Stores an immutable (read-only) collection of 32-bit integer values.");
 	define_class_const_typed_array<const k3d::typed_array<k3d::int64_t> >("const_typed_array_int64_t",
 		"Stores an immutable (read-only) collection of 64-bit integer values.");
-	define_class_const_typed_array<const k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("const_typed_array_mesh_polyhedra_t_polyhedron_type",
-		"Stores an immutable (read-only) collection of polyhedron type values.");
 	define_class_const_typed_array<const k3d::typed_array<k3d::imaterial*> >("const_typed_array_imaterial",
 		"Stores an immutable (read-only) collection of L{imaterial} objects.");
 	define_class_const_typed_array<const k3d::typed_array<k3d::inode*> >("const_typed_array_inode",

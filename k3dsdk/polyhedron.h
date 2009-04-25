@@ -49,8 +49,7 @@ public:
 	const_primitive(
 		const mesh::indices_t& ShellFirstFaces,
 		const mesh::counts_t& ShellFaceCounts,
-//		const typed_array<int32_t>& ShellTypes,
-		const mesh::polyhedra_t::types_t& ShellTypes,
+		const typed_array<int32_t>& ShellTypes,
 		const mesh::indices_t& FaceFirstLoops,
 		const mesh::counts_t& FaceLoopCounts,
 		const mesh::selection_t& FaceSelections,
@@ -69,8 +68,7 @@ public:
 
 	const mesh::indices_t& shell_first_faces;
 	const mesh::counts_t& shell_face_counts;
-//	const typed_array<int32_t>& shell_types;
-	const mesh::polyhedra_t::types_t& shell_types;
+	const typed_array<int32_t>& shell_types;
 	const mesh::indices_t& face_first_loops;
 	const mesh::counts_t& face_loop_counts;
 	const mesh::selection_t& face_selections;
@@ -91,8 +89,7 @@ public:
 	primitive(
 		mesh::indices_t& ShellFirstFaces,
 		mesh::counts_t& ShellFaceCounts,
-//		typed_array<int32_t>& ShellTypes,
-		mesh::polyhedra_t::types_t& ShellTypes,
+		typed_array<int32_t>& ShellTypes,
 		mesh::indices_t& FaceFirstLoops,
 		mesh::counts_t& FaceLoopCounts,
 		mesh::selection_t& FaceSelections,
@@ -108,8 +105,7 @@ public:
 
 	mesh::indices_t& shell_first_faces;
 	mesh::counts_t& shell_face_counts;
-//	typed_array<int32_t>& shell_types;
-	mesh::polyhedra_t::types_t& shell_types;
+	typed_array<int32_t>& shell_types;
 	mesh::indices_t& face_first_loops;
 	mesh::counts_t& face_loop_counts;
 	mesh::selection_t& face_selections;
@@ -146,10 +142,15 @@ primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imat
 /// lifetime of the returned object.
 primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
 
-/** \deprecated This method exists for the sole purpose of easing the transition to generic primitives. */
-const_primitive* validate(const mesh& Mesh);
-/** \deprecated This method exists for the sole purpose of easing the transition to generic primitives. */
-primitive* validate(mesh& Mesh);
+/// Tests the given mesh primitive to see if it is a valid polyhedron, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
+const_primitive* validate(const mesh::primitive& GenericPrimitive);
+/// Tests the given mesh primitive to see if it is a valid polyhedron, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* validate(mesh::primitive& GenericPrimitive);
+/// Tests the given mesh primitive to see if it is a valid polyhedron, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* validate(pipeline_data<mesh::primitive>& GenericPrimitive);
 
 /// Adds a face to an existing primitive.
 void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, imaterial* const Material);

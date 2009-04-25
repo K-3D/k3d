@@ -69,29 +69,9 @@ static const boost::python::object get_points(const k3d::mesh_selection& Self)
 	return convert(Self.points);
 }
 
-static const boost::python::object get_edges(const k3d::mesh_selection& Self)
-{
-	return convert(Self.edges);
-}
-
-static const boost::python::object get_faces(const k3d::mesh_selection& Self)
-{
-	return convert(Self.faces);
-}
-
 static void set_points(k3d::mesh_selection& Self, const list& Value)
 {
 	Self.points = convert(Value);
-}
-
-static void set_edges(k3d::mesh_selection& Self, const list& Value)
-{
-	Self.edges = convert(Value);
-}
-
-static void set_faces(k3d::mesh_selection& Self, const list& Value)
-{
-	Self.faces = convert(Value);
 }
 
 static boost::python::object component_select_all()
@@ -147,10 +127,6 @@ void define_class_mesh_selection()
 		// Deprecated
 		.add_property("points", get_points, set_points,
 			"Stores changes in selection state for mesh vertices.")
-		.add_property("edges", get_edges, set_edges,
-			"Stores changes in selection state for polyhedron vertices.")
-		.add_property("faces", get_faces, set_faces,
-			"Stores changes in selection state for polyhedron face primitives.")
 		.def("component_deselect_all", component_deselect_all,
 			"Returns a list for use with L{mesh_selection} that deselects an entire range of mesh components.")
 		.staticmethod("component_deselect_all")

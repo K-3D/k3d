@@ -44,8 +44,7 @@ namespace polyhedron
 const_primitive::const_primitive(
 	const mesh::indices_t& ShellFirstFaces,
 	const mesh::counts_t& ShellFaceCounts,
-//	const typed_array<int32_t>& ShellTypes,
-	const mesh::polyhedra_t::types_t& ShellTypes,
+	const typed_array<int32_t>& ShellTypes,
 	const mesh::indices_t& FaceFirstLoops,
 	const mesh::counts_t& FaceLoopCounts,
 	const mesh::selection_t& FaceSelections,
@@ -99,8 +98,7 @@ const_primitive::const_primitive(const primitive& Primitive) :
 primitive::primitive(
 	mesh::indices_t& ShellFirstFaces,
 	mesh::counts_t& ShellFaceCounts,
-//	typed_array<int32_t>& ShellTypes,
-	mesh::polyhedra_t::types_t& ShellTypes,
+	typed_array<int32_t>& ShellTypes,
 	mesh::indices_t& FaceFirstLoops,
 	mesh::counts_t& FaceLoopCounts,
 	mesh::selection_t& FaceSelections,
@@ -135,6 +133,9 @@ primitive::primitive(
 
 primitive* create(mesh& Mesh)
 {
+  assert_not_implemented();
+  return 0;
+/*
 	mesh::polyhedra_t& polyhedron = Mesh.polyhedra.create();
 
 	primitive* const result = new primitive(
@@ -155,6 +156,7 @@ primitive* create(mesh& Mesh)
 		);
 
 	return result;
+*/
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +197,7 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 		primitive* const polyhedron = create(Mesh);
 		polyhedron->shell_first_faces.push_back(0);
 		polyhedron->shell_face_counts.push_back(VertexCounts.size());
-		polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+		polyhedron->shell_types.push_back(POLYGONS);
 
 		uint_t face_vertex = 0;
 		const uint_t face_begin = 0;
@@ -262,7 +264,7 @@ primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imat
 
 		polyhedron->shell_first_faces.assign(1, 0);
 		polyhedron->shell_face_counts.assign(1, rows * columns);
-		polyhedron->shell_types.assign(1, mesh::polyhedra_t::POLYGONS);
+		polyhedron->shell_types.assign(1, POLYGONS);
 		polyhedron->face_first_loops.resize(rows * columns);
 		polyhedron->face_loop_counts.assign(rows * columns, 1);
 		polyhedron->face_selections.assign(rows * columns, 0.0);
@@ -340,7 +342,7 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 
 		polyhedron->shell_first_faces.assign(1, 0);
 		polyhedron->shell_face_counts.assign(1, rows * columns);
-		polyhedron->shell_types.assign(1, mesh::polyhedra_t::POLYGONS);
+		polyhedron->shell_types.assign(1, POLYGONS);
 		polyhedron->face_first_loops.resize(rows * columns);
 		polyhedron->face_loop_counts.assign(rows * columns, 1);
 		polyhedron->face_selections.assign(rows * columns, 0);
@@ -389,6 +391,7 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
+/*
 const bool_t legacy_validate_polyhedra(const mesh& Mesh)
 {
 	if(!Mesh.polyhedra)
@@ -450,9 +453,13 @@ const bool_t legacy_validate_polyhedra(const mesh& Mesh)
 	}
 	return true;
 }
+*/
 
-const_primitive* validate(const mesh& Mesh)
+const_primitive* validate(const mesh::primitive& Primitive)
 {
+  assert_not_implemented();
+  return 0;
+/*
 	if(!legacy_validate_polyhedra(Mesh))
 		return 0;
 
@@ -471,13 +478,14 @@ const_primitive* validate(const mesh& Mesh)
 		Mesh.polyhedra->constant_data,
 		Mesh.polyhedra->uniform_data,
 		Mesh.polyhedra->face_varying_data);
+*/
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-// validate
-
-primitive* validate(mesh& Mesh)
+primitive* validate(mesh::primitive& Primitive)
 {
+  assert_not_implemented();
+  return 0;
+/*
 	if(!legacy_validate_polyhedra(Mesh))
 		return 0;
 
@@ -498,6 +506,18 @@ primitive* validate(mesh& Mesh)
 		polyhedron.constant_data,
 		polyhedron.uniform_data,
 		polyhedron.face_varying_data);
+*/
+}
+
+primitive* validate(pipeline_data<mesh::primitive>& Primitive)
+{
+  if(!Primitive.get())
+    return 0;
+
+  if(Primitive->type != "polyhedron")
+    return 0;
+
+  return validate(Primitive.writable());
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -608,7 +628,7 @@ const bool_t is_solid(const const_primitive& Polyhedron)
 
 const bool_t is_sds(const const_primitive& Polyhedron)
 {
-	return Polyhedron.shell_types.size() && (Polyhedron.shell_types[0] == mesh::polyhedra_t::CATMULL_CLARK);
+	return Polyhedron.shell_types.size() && (Polyhedron.shell_types[0] == CATMULL_CLARK);
 }
 
 //////////////////////////////////////////////////////////////////////////////

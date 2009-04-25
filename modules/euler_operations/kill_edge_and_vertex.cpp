@@ -65,26 +65,29 @@ public:
 
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 	
-		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output));	
-		if(!polyhedron)
-			return;
-
-		k3d::mesh::indices_t edge_list;
-		const k3d::uint_t edge_begin = 0;
-		const k3d::uint_t edge_end = edge_begin + polyhedron->edge_selections.size();
-		for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			if(polyhedron->edge_selections[edge])
-				edge_list.push_back(edge);
-		}
-		
-		const k3d::mesh::points_t& points = *Input.points;
-		
-		k3d::mesh::bools_t boundary_edges;
-		k3d::mesh::indices_t companions;
-		k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, boundary_edges, companions);
-		
-		k3d::euler::kill_edge_and_vertex(*polyhedron, edge_list, boundary_edges, companions, points.size());
+      boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+      if(!polyhedron)
+        continue;
+
+      k3d::mesh::indices_t edge_list;
+      const k3d::uint_t edge_begin = 0;
+      const k3d::uint_t edge_end = edge_begin + polyhedron->edge_selections.size();
+      for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+      {
+        if(polyhedron->edge_selections[edge])
+          edge_list.push_back(edge);
+      }
+      
+      const k3d::mesh::points_t& points = *Input.points;
+      
+      k3d::mesh::bools_t boundary_edges;
+      k3d::mesh::indices_t companions;
+      k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, boundary_edges, companions);
+      
+      k3d::euler::kill_edge_and_vertex(*polyhedron, edge_list, boundary_edges, companions, points.size());
+    }
 		
 		k3d::mesh::delete_unused_points(Output);
 	}

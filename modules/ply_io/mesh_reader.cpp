@@ -146,7 +146,7 @@ public:
 		
 				polyhedron->shell_first_faces.push_back(polyhedron->face_first_loops.size());
 				polyhedron->shell_face_counts.push_back(element_count);
-				polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+				polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
 				polyhedron->face_first_loops.reserve(element_count);
 				polyhedron->face_loop_counts.reserve(element_count);

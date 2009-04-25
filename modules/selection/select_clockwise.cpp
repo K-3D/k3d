@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,14 +22,12 @@
 		\author Bart Janssens <bart.janssens@lid.kviv.be>
 */
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/basic_math.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/utility.h>
 
 #include <iomanip>
@@ -54,47 +52,45 @@ public:
 		base(Factory, Document)
 	{
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
-					k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+      k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if(Output.polyhedra && Output.polyhedra->edge_selection)
+    k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			k3d::mesh::selection_t input_edge_selection = *Input.polyhedra->edge_selection;
-			const k3d::mesh_selection mesh_selection = m_mesh_selection.pipeline_value();
-			k3d::mesh_selection::merge(mesh_selection.edges, input_edge_selection);
-			
-			k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.writable();
-			k3d::mesh::selection_t& edge_selection = polyhedra.edge_selection.writable();
-			std::fill(edge_selection.begin(), edge_selection.end(), 0.0);
-			const k3d::mesh::indices_t& clockwise_edges = *Input.polyhedra->clockwise_edges;
-			
-			for(k3d::uint_t edge = 0; edge != edge_selection.size(); ++edge)
+      boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+      if(!polyhedron)
+        continue;
+
+      k3d::mesh::selection_t original_edge_selections = polyhedron->edge_selections;
+			std::fill(polyhedron->edge_selections.begin(), polyhedron->edge_selections.end(), 0.0);
+		
+      const k3d::uint_t edge_begin = 0;
+      const k3d::uint_t edge_end = edge_begin + original_edge_selections.size();	
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 			{
-				if(input_edge_selection[edge])
+				if(original_edge_selections[edge])
 				{
-					edge_selection[clockwise_edges[edge]] = 1.0;
+					polyhedron->edge_selections[polyhedron->clockwise_edges[edge]] = 1.0;
 					break;
 				}
 			}
-		}
-	}
-
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
+    }
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<select_clockwise,
-				k3d::interface_list<k3d::imesh_source,
-				k3d::interface_list<k3d::imesh_sink> > > factory(
-				k3d::uuid(0xea623f75, 0x19264b07, 0xbfa105a4, 0xba070bed),
-				"SelectClockwise",
-				"Select the clockwise edge of an edge. If multiple edges are selected the first one in the list is selected and all others are deselected",
-				"Selection",
-				k3d::iplugin_factory::EXPERIMENTAL);
+      k3d::interface_list<k3d::imesh_source,
+      k3d::interface_list<k3d::imesh_sink> > > factory(
+      k3d::uuid(0xea623f75, 0x19264b07, 0xbfa105a4, 0xba070bed),
+      "SelectClockwise",
+      "Select the clockwise edge of an edge. If multiple edges are selected the first one in the list is selected and all others are deselected",
+      "Selection",
+      k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}

@@ -43,7 +43,7 @@ class named_text_array :
 	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
-	typedef k3d::typed_array<k3d::string_t> strings_t;
+
 public:
 	named_text_array(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
@@ -59,21 +59,29 @@ public:
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
+
 		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
-		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output));
-		
+
 		const k3d::string_t array_name = m_array_name.pipeline_value();
+		const k3d::string_t default_value = m_default_value.pipeline_value();
 		const k3d::string_t value = m_value.pipeline_value();
-		if(!polyhedron->uniform_data.lookup<strings_t>(array_name))
+
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			polyhedron->uniform_data.create(array_name, new strings_t(polyhedron->face_first_loops.size(), m_default_value.pipeline_value()));
-		}
-		strings_t& string_data = *(polyhedron->uniform_data.writable<strings_t>(array_name));
-		for(k3d::uint_t face = 0; face != polyhedron->face_first_loops.size(); ++face)
-		{
-			if(polyhedron->face_selections[face])
-				string_data[face] = value;
-		}
+      boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+      if(!polyhedron)
+        continue;
+
+      k3d::mesh::strings_t& string_data = polyhedron->uniform_data.create(array_name, new k3d::mesh::strings_t(polyhedron->face_first_loops.size(), default_value));
+
+      const k3d::uint_t face_begin = 0;
+      const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
+      for(k3d::uint_t face = face_begin; face != face_end; ++face)
+      {
+        if(polyhedron->face_selections[face])
+          string_data[face] = value;
+      }
+    }
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -108,3 +116,4 @@ k3d::iplugin_factory& named_text_array_factory()
 } // namespace mesh_attributes
 
 } // namespace module
+

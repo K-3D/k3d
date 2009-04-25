@@ -80,6 +80,9 @@ const_primitive* validate(const mesh::primitive& GenericPrimitive);
 /// Tests the given mesh primitive to see if it is a valid bicubic_patch primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 primitive* validate(mesh::primitive& GenericPrimitive);
+/// Tests the given mesh primitive to see if it is a valid bicubic_patch primitive, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* validate(pipeline_data<mesh::primitive>& GenericPrimitive);
 
 } // namespace bicubic_patch
 

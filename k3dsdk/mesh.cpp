@@ -374,41 +374,6 @@ bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t& B, co
 
 } // namespace detail
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-template<>
-class almost_equal<mesh::polyhedra_t>
-{
-	typedef mesh::polyhedra_t T;
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B)
-	{
-		return
-			detail::almost_equal(A.first_faces, B.first_faces, threshold) &&
-			detail::almost_equal(A.face_counts, B.face_counts, threshold) &&
-			detail::almost_equal(A.types, B.types, threshold) &&
-			detail::almost_equal(A.constant_data, B.constant_data, threshold) &&
-			detail::almost_equal(A.face_first_loops, B.face_first_loops, threshold) &&
-			detail::almost_equal(A.face_loop_counts, B.face_loop_counts, threshold) &&
-			detail::almost_equal(A.face_selection, B.face_selection, threshold) &&
-			detail::almost_equal(A.face_materials, B.face_materials, threshold) &&
-			detail::almost_equal(A.uniform_data, B.uniform_data, threshold) &&
-			detail::almost_equal(A.loop_first_edges, B.loop_first_edges, threshold) &&
-			detail::almost_equal(A.edge_points, B.edge_points, threshold) &&
-			detail::almost_equal(A.clockwise_edges, B.clockwise_edges, threshold) &&
-			detail::almost_equal(A.edge_selection, B.edge_selection, threshold) &&
-			detail::almost_equal(A.face_varying_data, B.face_varying_data, threshold);
-	}
-private:
-	const uint64_t threshold;
-};
-
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh
 
@@ -422,9 +387,8 @@ bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) const
 		detail::almost_equal(points, Other.points, Threshold) &&
 		detail::almost_equal(point_selection, Other.point_selection, Threshold) &&
 		detail::almost_equal(vertex_data, Other.vertex_data, Threshold) &&
-		detail::almost_equal(primitives, Other.primitives, Threshold) &&
-
-		detail::almost_equal(polyhedra, Other.polyhedra, Threshold);
+		detail::almost_equal(primitives, Other.primitives, Threshold)
+    ;
 }
 
 mesh& mesh::operator=(const legacy::mesh& RHS)
@@ -446,6 +410,7 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 	// Convert primitives ...
 	primitives = RHS.primitives;
 
+/*
 	// Convert polyhedra ...
 	if(RHS.polyhedra.size())
 	{
@@ -527,6 +492,7 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 			types.push_back(type);
 		}
 	}
+*/
 
 	return *this;
 }
@@ -591,12 +557,6 @@ void mesh::deep_copy(const mesh& From, mesh& To)
 void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 {
 	UnusedPoints.assign(Mesh.points ? Mesh.points->size() : 0, true);
-
-	// Mark points used by legacy primitives ...
-	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
-		detail::mark_used_points(*Mesh.polyhedra->edge_points, UnusedPoints);
-
-	// Mark points used by generic mesh primitives ...
 	visit_arrays(Mesh, detail::mark_used_primitive_points(UnusedPoints));
 }
 
@@ -668,10 +628,6 @@ void mesh::delete_unused_points(mesh& Mesh)
 		}
 	}
 
-	// Update legacy mesh primitives so they use the correct indices ...
-	if(Mesh.polyhedra && Mesh.polyhedra->edge_points)
-		detail::remap_points(Mesh.polyhedra.writable().edge_points.writable(), point_map);
-
 	// Update generic mesh primitives so they use the correct indices ...
 	visit_arrays(Mesh, detail::remap_primitive_points(point_map));
 
@@ -679,7 +635,6 @@ void mesh::delete_unused_points(mesh& Mesh)
 	points.resize(points_remaining);
 	point_selection.resize(points_remaining);
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::primitive
@@ -706,6 +661,7 @@ mesh::primitive& mesh::primitives_t::create(const string_t& Type)
 	return back().create(new mesh::primitive(Type));
 }
 
+/*
 ////////////////////////////////////////////////////////////////////////////////////
 // serialization
 
@@ -739,7 +695,6 @@ std::istream& operator>>(std::istream& Stream, mesh::polyhedra_t::polyhedron_typ
 	return Stream;
 }
 
-/*
 std::ostream& operator<<(std::ostream& Stream, const mesh::blobbies_t::primitive_type& RHS)
 {
 	switch(RHS)
@@ -840,27 +795,6 @@ std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& 
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 {
 	Stream << detail::indentation << "mesh:\n" << push_indent;
-
-	if(RHS.polyhedra)
-	{
-		Stream << detail::indentation << "polyhedra:\n" << push_indent;
-
-		detail::print(Stream, "first_faces", RHS.polyhedra->first_faces);
-		detail::print(Stream, "face_counts", RHS.polyhedra->face_counts);
-		detail::print(Stream, "types", RHS.polyhedra->types);
-		detail::print(Stream, "constant_data", RHS.polyhedra->constant_data);
-		detail::print(Stream, "face_first_loops", RHS.polyhedra->face_first_loops);
-		detail::print(Stream, "face_loop_counts", RHS.polyhedra->face_loop_counts);
-		detail::print(Stream, "face_selection", RHS.polyhedra->face_selection);
-		detail::print(Stream, "uniform_data", RHS.polyhedra->uniform_data);
-		detail::print(Stream, "loop_first_edges", RHS.polyhedra->loop_first_edges);
-		detail::print(Stream, "edge_points", RHS.polyhedra->edge_points);
-		detail::print(Stream, "clockwise_edges", RHS.polyhedra->clockwise_edges);
-		detail::print(Stream, "edge_selection", RHS.polyhedra->edge_selection);
-		detail::print(Stream, "face_varying_data", RHS.polyhedra->face_varying_data);
-		
-		Stream << pop_indent;
-	}
 
 	detail::print(Stream, "points", RHS.points);
 	detail::print(Stream, "point_selection", RHS.point_selection);

@@ -1515,7 +1515,7 @@ public:
 
 		primitive->shell_first_faces.push_back(0);
 		primitive->shell_face_counts.push_back(primitive->face_first_loops.size());
-		primitive->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+		primitive->shell_types.push_back(k3d::polyhedron::POLYGONS);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

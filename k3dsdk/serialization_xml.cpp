@@ -2130,25 +2130,6 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 			}
 		}
 	}
-
-	if(Mesh.polyhedra)
-	{
-		element& container = Container.append(element("polyhedra"));
-		detail::save_array(container, element("first_faces"), Mesh.polyhedra->first_faces, Context);
-		detail::save_array(container, element("face_counts"), Mesh.polyhedra->face_counts, Context);
-		detail::save_array(container, element("types"), Mesh.polyhedra->types, Context);
-		detail::save_arrays(container, element("constant_data"), Mesh.polyhedra->constant_data, Context);
-		detail::save_array(container, element("face_first_loops"), Mesh.polyhedra->face_first_loops, Context);
-		detail::save_array(container, element("face_loop_counts"), Mesh.polyhedra->face_loop_counts, Context);
-		detail::save_array(container, element("face_selection"), Mesh.polyhedra->face_selection, Context);
-		detail::save_array(container, element("face_materials"), Mesh.polyhedra->face_materials, Context);
-		detail::save_arrays(container, element("uniform_data"), Mesh.polyhedra->uniform_data, Context);
-		detail::save_array(container, element("loop_first_edges"), Mesh.polyhedra->loop_first_edges, Context);
-		detail::save_array(container, element("edge_points"), Mesh.polyhedra->edge_points, Context);
-		detail::save_array(container, element("clockwise_edges"), Mesh.polyhedra->clockwise_edges, Context);
-		detail::save_array(container, element("edge_selection"), Mesh.polyhedra->edge_selection, Context);
-		detail::save_arrays(container, element("face_varying_data"), Mesh.polyhedra->face_varying_data, Context);
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2336,6 +2317,8 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 	if(element* const container = find_element(Container, "polyhedra"))
 	{
+		assert_not_implemented();
+/*		
 		mesh::polyhedra_t* const polyhedra = &Mesh.polyhedra.create();
 		detail::load_array(*container, "first_faces", polyhedra->first_faces, Context);
 		detail::load_array(*container, "face_counts", polyhedra->face_counts, Context);
@@ -2351,6 +2334,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_array(*container, "clockwise_edges", polyhedra->clockwise_edges, Context);
 		detail::load_array(*container, "edge_selection", polyhedra->edge_selection, Context);
 		detail::load_arrays(*container, "face_varying_data", polyhedra->face_varying_data, Context);
+*/
 	}
 
 /*
@@ -2917,8 +2901,6 @@ void load(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Con
 void save(const mesh_selection& Selection, element& XML, const ipersistent::save_context& Context)
 {
 	detail::save_selection(XML, Selection.points, "points");
-	detail::save_selection(XML, Selection.edges, "edges");
-	detail::save_selection(XML, Selection.faces, "faces");
 
 	// Handle generic primitives
 	assert_not_implemented();
@@ -2930,10 +2912,13 @@ void load(mesh_selection& Selection, element& XML, const ipersistent::load_conte
 	{
 		if(xml_selection->name == "points")
 			detail::load_selection(*xml_selection, Selection.points);
+
+/*
 		if(xml_selection->name == "edges")
 			detail::load_selection(*xml_selection, Selection.edges);
 		if(xml_selection->name == "faces")
 			detail::load_selection(*xml_selection, Selection.faces);
+*/
 	}
 
 	// Handle generic primitives

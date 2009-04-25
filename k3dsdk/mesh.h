@@ -74,6 +74,8 @@ public:
 	typedef typed_array<point2> points_2d_t;
 	/// Defines storage for a generic collection of 3D points
 	typedef typed_array<point3> points_t;
+	/// Defines storage for a generic collection of strings
+	typedef typed_array<string_t> strings_t;
 	/// Defines storage for a generic collection of 3D texture coordinates
 	typedef typed_array<texture3> texture_coordinates_t;
 	/// Defines storage for a generic collection of 3D vectors
@@ -110,50 +112,6 @@ public:
 		primitive& create(const string_t& Type);
 	};
 
-	/// Defines storage for polyhedra (polygons and subdivision surfaces)
-	class polyhedra_t
-	{
-	public:
-		/// Defines allowable polyhedron types
-		typedef enum
-		{
-			POLYGONS,
-			CATMULL_CLARK,
-		} polyhedron_type;
-
-		/// Defines storage for per-polyhedron types
-		typedef typed_array<polyhedron_type> types_t;
-
-		/// Stores per-polyhedron first faces
-		pipeline_data<indices_t> first_faces;
-		/// Stores per-polyhedron face counts
-		pipeline_data<counts_t> face_counts;
-		/// Stores per-polyhedron types
-		pipeline_data<types_t> types;
-		/// Stores user-defined per-polyhedron data (maps to RenderMan constant data)
-		attribute_arrays_t constant_data;
-		/// Stores per-face first loops
-		pipeline_data<indices_t> face_first_loops;
-		/// Stores per-face loop counts
-		pipeline_data<counts_t> face_loop_counts;
-		/// Stores per-face selection state
-		pipeline_data<selection_t> face_selection;
-		/// Stores per-face materials
-		pipeline_data<materials_t> face_materials;
-		/// Stores user-defined per-face data (maps to RenderMan uniform data)
-		attribute_arrays_t uniform_data;
-		/// Stores per-loop first edges
-		pipeline_data<indices_t> loop_first_edges;
-		/// Stores the start point of each edge
-		pipeline_data<indices_t> edge_points;
-		/// Stores the next edge in clockwise direction
-		pipeline_data<indices_t> clockwise_edges;
-		/// Stores per-edge selection state
-		pipeline_data<selection_t> edge_selection;
-		/// Stores user-defined per-edge data (maps to RenderMan facevarying data)
-		attribute_arrays_t face_varying_data;
-	};
-
 	/// Stores the set of mesh points
 	pipeline_data<points_t> points;
 	/// Stores per-point selection state
@@ -162,9 +120,6 @@ public:
 	attribute_arrays_t vertex_data;
 	/// Stores mesh primitives
 	primitives_t primitives;
-
-	/// Stores polyhedra
-	pipeline_data<polyhedra_t> polyhedra;
 
 	/// Compares two meshes for equality using the fuzzy semantics of almost_equal
 	bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;
@@ -229,20 +184,7 @@ public:
 };
 
 /// Stream serialization
-std::ostream& operator<<(std::ostream& Stream, const mesh::polyhedra_t::polyhedron_type& RHS);
-/// Stream extraction
-std::istream& operator>>(std::istream& Stream, mesh::polyhedra_t::polyhedron_type& RHS);
-
-/// Stream serialization
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS);
-
-template<>
-class almost_equal<mesh::polyhedra_t::polyhedron_type>
-{
-public:
-	almost_equal(const uint64_t) { } 
-	inline bool_t operator()(const mesh::polyhedra_t::polyhedron_type A, const mesh::polyhedra_t::polyhedron_type B) const { return A == B; }
-};
 
 /// Specialization of almost_equal that tests k3d::mesh for equality
 template<>

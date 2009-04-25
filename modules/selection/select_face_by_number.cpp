@@ -22,11 +22,12 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 
 namespace module
 {
@@ -45,24 +46,31 @@ class select_face_by_number :
 public:
 	select_face_by_number(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
+		m_primitive(init_owner(*this) + init_name("primitive") + init_label(_("Primitive Number")) + init_description(_("Primitive Number.")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0))),
 		m_index(init_owner(*this) + init_name("index") + init_label(_("Face Index")) + init_description(_("Face Index")) + init_value(0L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0)))
 	{
+		m_primitive.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
+
 		m_index.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
 	}
 
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		if(Output.polyhedra && Output.polyhedra->face_selection)
-		{
-		    k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.writable();
-		    k3d::mesh::selection_t& face_selection = polyhedra.face_selection.writable();
-			std::fill(face_selection.begin(), face_selection.end(), 0.0);
+		const k3d::int32_t primitive = m_primitive.pipeline_value();
+		if(primitive >= Output.primitives.size())
+			return;
 
-			const unsigned long index = m_index.pipeline_value();
-			if(index < face_selection.size())
-				face_selection[index] = 1.0;
-		}
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output.primitives[primitive]));
+		if(!polyhedron)
+			return;
+		
+    std::fill(polyhedron->face_selections.begin(), polyhedron->face_selections.end(), 0.0);
+
+    const k3d::int32_t index = m_index.pipeline_value();
+    if(index < polyhedron->face_selections.size())
+      polyhedron->face_selections[index] = 1.0;
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -80,6 +88,7 @@ public:
 	}
 
 private:
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_primitive;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_index;
 };
 

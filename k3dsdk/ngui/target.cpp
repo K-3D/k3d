@@ -90,6 +90,7 @@ void traverse_selected_points(const k3d::mesh& Mesh, visitor_t& Visitor)
 template<typename visitor_t>
 void traverse_selected_edge_points(const k3d::mesh& Mesh, visitor_t& Visitor)
 {
+/*
 	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
 	return_if_fail(polyhedron);
 	const k3d::mesh::points_t& points = *Mesh.points;
@@ -104,12 +105,14 @@ void traverse_selected_edge_points(const k3d::mesh& Mesh, visitor_t& Visitor)
 			Visitor(edge_points[clockwise_edges[edge]], points[edge_points[clockwise_edges[edge]]]);
 		}
 	}
+*/
 }
 
 // For each selected face, visit all of its points (multiple visits per point possible!)
 template<typename visitor_t>
 void traverse_selected_face_points(const k3d::mesh& Mesh, visitor_t& Visitor)
 {
+/*
 	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
 	return_if_fail(polyhedron);
 	const k3d::mesh::points_t& points = *Mesh.points;
@@ -139,6 +142,7 @@ void traverse_selected_face_points(const k3d::mesh& Mesh, visitor_t& Visitor)
 			}
 		}
 	}
+*/
 }
 
 /// Computes the average position of selected nodes, returns false when no selected node was found.

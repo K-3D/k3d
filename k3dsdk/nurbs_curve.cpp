@@ -226,6 +226,17 @@ primitive* validate(mesh::primitive& Primitive)
 	return 0;
 }
 
+primitive* validate(pipeline_data<mesh::primitive>& Primitive)
+{
+  if(!Primitive.get())
+    return 0;
+
+	if(Primitive->type != "nurbs_curve")
+		return 0;
+
+  return validate(Primitive.writable());
+}
+
 void add_curve(mesh& Mesh, primitive& Primitive, const uint_t Order, const mesh::points_t& ControlPoints, const uint_t RepeatPoints)
 {
 	add_curve(Mesh, Primitive, Order, ControlPoints, mesh::weights_t(ControlPoints.size(), 1), RepeatPoints);

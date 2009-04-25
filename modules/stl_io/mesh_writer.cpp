@@ -103,39 +103,42 @@ public:
 private:
 	void on_write_mesh(const k3d::mesh& Input, const k3d::filesystem::path& OutputPath, std::ostream& Output)
 	{
-		// Store polyhedra ...
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
-		if(!polyhedron)
-			return;
-		
-		return_if_fail(k3d::polyhedron::is_triangles(*polyhedron));
-
-		detail::solids_t solids;
-		detail::extract_solids(*polyhedron, m_solid_labels.pipeline_value(), solids);
-		const k3d::mesh::points_t& points = *Input.points;
-		
-		for(detail::solids_t::const_iterator solid = solids.begin(); solid != solids.end(); ++solid)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
-			Output << "solid " << solid->first << "\n";
-			const k3d::mesh::indices_t corner_indices = solid->second;
-			for(k3d::uint_t corner = 0; corner != corner_indices.size(); ++corner)
-			{
-				if(corner % 3 == 0)
-				{
-					Output << "facet normal 0.0 0.0 0.0\n";
-					Output << "  outer loop\n";
-				}
+      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+      if(!polyhedron)
+        continue;
+      
+      if(!k3d::polyhedron::is_triangles(*polyhedron))
+        continue;
 
-				Output << "    vertex " << points[corner_indices[corner]] << "\n";
+      detail::solids_t solids;
+      detail::extract_solids(*polyhedron, m_solid_labels.pipeline_value(), solids);
+      const k3d::mesh::points_t& points = *Input.points;
+      
+      for(detail::solids_t::const_iterator solid = solids.begin(); solid != solids.end(); ++solid)
+      {
+        Output << "solid " << solid->first << "\n";
+        const k3d::mesh::indices_t corner_indices = solid->second;
+        for(k3d::uint_t corner = 0; corner != corner_indices.size(); ++corner)
+        {
+          if(corner % 3 == 0)
+          {
+            Output << "facet normal 0.0 0.0 0.0\n";
+            Output << "  outer loop\n";
+          }
 
-				if((corner+1) % 3 == 0)
-				{
-					Output << "  endloop\n";
-					Output << "endfacet\n";
-				}
-			}
-			Output << "endsolid\n";
-		}
+          Output << "    vertex " << points[corner_indices[corner]] << "\n";
+
+          if((corner+1) % 3 == 0)
+          {
+            Output << "  endloop\n";
+            Output << "endfacet\n";
+          }
+        }
+        Output << "endsolid\n";
+      }
+    }
 	}
 
 private:

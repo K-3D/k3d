@@ -332,8 +332,6 @@ void define_typed_array_classes()
 		"Stores a mutable (read-write) collection of 32-bit integer values.");
 	define_class_typed_array<k3d::typed_array<k3d::int64_t> >("typed_array_int64_t",
 		"Stores a mutable (read-write) collection of 64-bit integer values.");
-	define_class_typed_array<k3d::typed_array<k3d::mesh::polyhedra_t::polyhedron_type> >("typed_array_mesh_polyheda_t_polyhedron_type",
-		"Stores a mutable (read-write) collection of polyhedron type values.");
 	define_class_typed_array<k3d::typed_array<k3d::imaterial*> >("typed_array_imaterial",
 		"Stores a mutable (read-write) collection of L{imaterial} objects.");
 	define_class_typed_array<k3d::typed_array<k3d::inode*> >("typed_array_inode",

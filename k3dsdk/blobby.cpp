@@ -253,6 +253,17 @@ primitive* validate(mesh::primitive& Primitive)
 	return 0;
 }
 
+primitive* validate(pipeline_data<mesh::primitive>& Primitive)
+{
+  if(!Primitive.get())
+    return 0;
+
+	if(Primitive->type != "blobby")
+		return 0;
+
+  return validate(Primitive.writable());
+}
+
 } // namespace blobby
 
 } // namespace k3d

@@ -63,78 +63,81 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input));
-		if(!polyhedron)
-			return;
-
-		const k3d::double_t radius = m_radius.pipeline_value();
-		const operation_t type = m_type.pipeline_value();
-		k3d::imaterial* const material = m_material.pipeline_value();
-
-		// Build a list of edges, eliminating duplicates (neighbors) as we go ...
-		const k3d::mesh::points_t& points = *Input.points;
-
-		typedef std::set<std::pair<k3d::uint_t, k3d::uint_t> > edges_t;
-		edges_t edges;
-
-		const k3d::uint_t edge_begin = 0;
-		const k3d::uint_t edge_end = edge_begin + polyhedron->edge_points.size();
-		for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
-			edges.insert(std::make_pair(
-				std::min(polyhedron->edge_points[edge], polyhedron->edge_points[polyhedron->clockwise_edges[edge]]),
-				std::max(polyhedron->edge_points[edge], polyhedron->edge_points[polyhedron->clockwise_edges[edge]])));
-		}
+      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+      if(!polyhedron)
+        continue;
 
-		// Setup arrays to build a new blobby ...
-		boost::scoped_ptr<k3d::blobby::primitive> blobby(k3d::blobby::create(Output));
+      const k3d::double_t radius = m_radius.pipeline_value();
+      const operation_t type = m_type.pipeline_value();
+      k3d::imaterial* const material = m_material.pipeline_value();
 
-		blobby->first_primitives.push_back(blobby->primitives.size());
-		blobby->primitive_counts.push_back(edges.size());
-		blobby->first_operators.push_back(blobby->operators.size());
-		blobby->operator_counts.push_back(1);
-		blobby->materials.push_back(material);
+      // Build a list of edges, eliminating duplicates (neighbors) as we go ...
+      const k3d::mesh::points_t& points = *Input.points;
 
-		// Add a blobby segment for each edge ...
-		for(edges_t::const_iterator edge = edges.begin(); edge != edges.end(); ++edge)
-		{
-			blobby->primitives.push_back(k3d::blobby::SEGMENT);
-			blobby->primitive_first_floats.push_back(blobby->floats.size());
-			blobby->primitive_float_counts.push_back(23);
+      typedef std::set<std::pair<k3d::uint_t, k3d::uint_t> > edges_t;
+      edges_t edges;
 
-			blobby->floats.push_back(points[edge->first][0]);
-			blobby->floats.push_back(points[edge->first][1]);
-			blobby->floats.push_back(points[edge->first][2]);
-			blobby->floats.push_back(points[edge->second][0]);
-			blobby->floats.push_back(points[edge->second][1]);
-			blobby->floats.push_back(points[edge->second][2]);
-			blobby->floats.push_back(radius);
+      const k3d::uint_t edge_begin = 0;
+      const k3d::uint_t edge_end = edge_begin + polyhedron->edge_points.size();
+      for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+      {
+        edges.insert(std::make_pair(
+          std::min(polyhedron->edge_points[edge], polyhedron->edge_points[polyhedron->clockwise_edges[edge]]),
+          std::max(polyhedron->edge_points[edge], polyhedron->edge_points[polyhedron->clockwise_edges[edge]])));
+      }
 
-			k3d::matrix4 matrix = k3d::transpose(k3d::identity3());
-			blobby->floats.insert(blobby->floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
-		}
+      // Setup arrays to build a new blobby ...
+      boost::scoped_ptr<k3d::blobby::primitive> blobby(k3d::blobby::create(Output));
 
-		// Merge the edges together ...
-		switch(type)
-		{
-			case ADD:
-				blobby->operators.push_back(k3d::blobby::ADD);
-				break;
-			case MULT:
-				blobby->operators.push_back(k3d::blobby::MULTIPLY);
-				break;
-			case MIN:
-				blobby->operators.push_back(k3d::blobby::MINIMUM);
-				break;
-			case MAX:
-				blobby->operators.push_back(k3d::blobby::MAXIMUM);
-				break;
-		}
-		blobby->operator_first_operands.push_back(blobby->operands.size());
-		blobby->operator_operand_counts.push_back(edges.size() + 1);
-		blobby->operands.push_back(edges.size());
-		for(k3d::uint_t i = 0; i != edges.size(); ++i)
-			blobby->operands.push_back(i);
+      blobby->first_primitives.push_back(blobby->primitives.size());
+      blobby->primitive_counts.push_back(edges.size());
+      blobby->first_operators.push_back(blobby->operators.size());
+      blobby->operator_counts.push_back(1);
+      blobby->materials.push_back(material);
+
+      // Add a blobby segment for each edge ...
+      for(edges_t::const_iterator edge = edges.begin(); edge != edges.end(); ++edge)
+      {
+        blobby->primitives.push_back(k3d::blobby::SEGMENT);
+        blobby->primitive_first_floats.push_back(blobby->floats.size());
+        blobby->primitive_float_counts.push_back(23);
+
+        blobby->floats.push_back(points[edge->first][0]);
+        blobby->floats.push_back(points[edge->first][1]);
+        blobby->floats.push_back(points[edge->first][2]);
+        blobby->floats.push_back(points[edge->second][0]);
+        blobby->floats.push_back(points[edge->second][1]);
+        blobby->floats.push_back(points[edge->second][2]);
+        blobby->floats.push_back(radius);
+
+        k3d::matrix4 matrix = k3d::transpose(k3d::identity3());
+        blobby->floats.insert(blobby->floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
+      }
+
+      // Merge the edges together ...
+      switch(type)
+      {
+        case ADD:
+          blobby->operators.push_back(k3d::blobby::ADD);
+          break;
+        case MULT:
+          blobby->operators.push_back(k3d::blobby::MULTIPLY);
+          break;
+        case MIN:
+          blobby->operators.push_back(k3d::blobby::MINIMUM);
+          break;
+        case MAX:
+          blobby->operators.push_back(k3d::blobby::MAXIMUM);
+          break;
+      }
+      blobby->operator_first_operands.push_back(blobby->operands.size());
+      blobby->operator_operand_counts.push_back(edges.size() + 1);
+      blobby->operands.push_back(edges.size());
+      for(k3d::uint_t i = 0; i != edges.size(); ++i)
+        blobby->operands.push_back(i);
+    }
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

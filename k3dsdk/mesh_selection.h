@@ -92,8 +92,6 @@ public:
 	static const records_t component_deselect_all();
 
 	records_t points;
-	records_t edges;
-	records_t faces;
 	//@}
 
 

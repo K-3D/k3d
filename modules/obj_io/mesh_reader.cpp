@@ -149,7 +149,7 @@ private:
 				polyhedron.reset(k3d::polyhedron::create(mesh));
 				polyhedron->shell_first_faces.push_back(0);
 				polyhedron->shell_face_counts.push_back(0);
-				polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+				polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 			}
 
 			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());

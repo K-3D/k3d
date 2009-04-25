@@ -878,6 +878,8 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	double distance = std::numeric_limits<double>::max();
 	k3d::selection::id selected_point;
 
+  assert_not_implemented();
+/*
 	if(tokens.count(k3d::selection::ABSOLUTE_SPLIT_EDGE))
 	{
 		if(mesh->polyhedra && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
@@ -938,7 +940,6 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 			}
 		}
 	}
-/*
 	else if(tokens.count(k3d::selection::ABSOLUTE_LINEAR_CURVE))
 	{
 		assert_not_implemented();
@@ -1143,6 +1144,8 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	double distance = std::numeric_limits<double>::max();
 	k3d::selection::id selected_edge;
 
+  assert_not_implemented();
+/*
 	if(tokens.count(k3d::selection::ABSOLUTE_FACE))
 	{
 		if(mesh->polyhedra && mesh->polyhedra->face_first_loops && mesh->polyhedra->face_loop_counts && mesh->polyhedra->loop_first_edges && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
@@ -1176,6 +1179,7 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 			}
 		}
 	}
+*/
 
 	if(distance < std::numeric_limits<double>::max())
 	{

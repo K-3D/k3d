@@ -102,9 +102,14 @@ public:
 		return wrap_owned(k3d::polyhedron::create(Mesh.wrapped(), vertices, vertex_counts, vertex_indices, material));
 	}
 
-	static object validate(mesh& Mesh)
+	static object validate(mesh_primitive_wrapper& Primitive)
 	{
-		return wrap_owned(k3d::polyhedron::validate(Mesh.wrapped()));
+		return wrap_owned(k3d::polyhedron::validate(Primitive.wrapped()));
+	}
+
+	static object validate_const(const_mesh_primitive_wrapper& Primitive)
+	{
+		return wrap_owned(k3d::polyhedron::validate(Primitive.wrapped()));
 	}
 
 	static bool_t is_triangles(polyhedron::const_primitive::wrapper& Polyhedron)
@@ -138,6 +143,7 @@ void define_namespace_polyhedron()
 			"Creates a polyhedron, populating it from a list of vertices, a list of per-face vertex counts, a list of per-face vertices, and an optional material node.")
 		.staticmethod("create")
 		.def("validate", &polyhedron::validate)
+		.def("validate", &polyhedron::validate_const)
 		.staticmethod("validate")
 		.def("is_triangles", &polyhedron::is_triangles)
 		.def("is_triangles", &polyhedron::is_triangles2)

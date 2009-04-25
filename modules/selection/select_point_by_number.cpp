@@ -58,7 +58,7 @@ public:
 			k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
 			std::fill(point_selection.begin(), point_selection.end(), 0.0);
 
-			const unsigned long index = m_index.pipeline_value();
+			const k3d::int32_t index = m_index.pipeline_value();
 			if(index < point_selection.size())
 				point_selection[index] = 1.0;
 		}

@@ -186,12 +186,12 @@ void remove_deleted_geometry(polyhedron::primitive& Output,
 	}
 	const mesh::indices_t first_faces = Output.shell_first_faces;
 	const mesh::indices_t face_counts = Output.shell_face_counts;
-	const mesh::polyhedra_t::types_t types = Output.shell_types;
+	const typed_array<int32_t> types = Output.shell_types;
 	mesh::indices_t& output_first_faces = Output.shell_first_faces;
 	output_first_faces.clear();
 	mesh::indices_t& output_face_counts = Output.shell_face_counts;
 	output_face_counts.clear();
-	mesh::polyhedra_t::types_t& output_types = Output.shell_types;
+	typed_array<int32_t>& output_types = Output.shell_types;
 	output_types.clear();
 	mesh::counts_t faces_to_delete_sum(FacesToDelete.size());
 	detail::cumulative_sum(FacesToDelete, faces_to_delete_sum);

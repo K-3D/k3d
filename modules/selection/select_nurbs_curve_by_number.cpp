@@ -64,7 +64,7 @@ public:
 		if(primitive >= Output.primitives.size())
 			return;
 
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs_curve(k3d::nurbs_curve::validate(Output.primitives[primitive].writable()));
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs_curve(k3d::nurbs_curve::validate(Output.primitives[primitive]));
 		if(!nurbs_curve)
 			return;
 

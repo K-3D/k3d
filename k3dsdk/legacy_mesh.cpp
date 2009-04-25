@@ -657,7 +657,6 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			}
 		}
 	}
-*/
 
 	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
 	if(polyhedron)
@@ -712,7 +711,7 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 						legacy_face->selection_weight = polyhedron->face_selections[face];
 					}
 
-					/** \todo Support faces with holes */
+					/// \todo Support faces with holes
 					break;
 				}
 			}
@@ -720,6 +719,7 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 			set_companions(*legacy_polyhedron);
 		}
 	}
+*/
 
 	return *this;
 }

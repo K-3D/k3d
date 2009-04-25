@@ -117,7 +117,9 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			component_center += to_vector(points[point]);
 		}
 	}
-	
+
+  assert_not_implemented();
+  /*	
 	if(Mesh.polyhedra)
 	{
 		// Get selected lines
@@ -171,6 +173,7 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 			component_center += to_vector(points[*point]);
 		}
 	}
+*/
 	
 	// Compute average position
 	const double point_number = static_cast<double>(PointList.size());

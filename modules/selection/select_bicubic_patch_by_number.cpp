@@ -64,7 +64,7 @@ public:
 		if(primitive >= Output.primitives.size())
 			return;
 
-		boost::scoped_ptr<k3d::bicubic_patch::primitive> patches(k3d::bicubic_patch::validate(Output.primitives[primitive].writable()));
+		boost::scoped_ptr<k3d::bicubic_patch::primitive> patches(k3d::bicubic_patch::validate(Output.primitives[primitive]));
 		if(!patches)
 			return;
 		
