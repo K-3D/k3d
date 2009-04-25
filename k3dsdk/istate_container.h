@@ -38,8 +38,8 @@ public:
 
 protected:
 	istate_container() {}
-	istate_container(const istate_container& RHS) {}
-	istate_container& operator = (const istate_container& RHS) { return *this; }
+	istate_container(const istate_container&) {}
+	istate_container& operator = (const istate_container&) { return *this; }
 };
 
 } // namespace k3d

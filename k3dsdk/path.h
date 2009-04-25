@@ -165,7 +165,7 @@ bool_t rename(const path& Source, const path& Target);
 bool_t copy_file(const path& Source, const path& Target);
 
 /// Returns true iff the Target exists and is newer than the Source
-const bool_t up_to_date(const path& Source, const path& Target);
+bool_t up_to_date(const path& Source, const path& Target);
 
 /// Splits a string containing delimited paths (such as the PATH environment variable) into a collection of individual paths
 /** \note: Splits the string using the filesystem delimiter for the native system (the system we were compiled on). */

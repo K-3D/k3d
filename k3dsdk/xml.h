@@ -141,7 +141,7 @@ public:
 class same_name
 {
 public:
-	same_name(const std::string& Name) : name(name) {}
+	same_name(const std::string& Name) : name(Name) {}
 
 	template<typename T>
 	bool operator()(const T& Val) { return Val.name == name; }

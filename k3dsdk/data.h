@@ -2255,7 +2255,7 @@ public:
 	{
 	}
 
-	const char* const name() const
+	const char* name() const
 	{
 		return m_name;
 	}
@@ -2278,7 +2278,7 @@ public:
 	{
 	}
 
-	const char* const label() const
+	const char* label() const
 	{
 		return m_label;
 	}
@@ -2301,7 +2301,7 @@ public:
 	{
 	}
 
-	const char* const description() const
+	const char* description() const
 	{
 		return m_description;
 	}
@@ -2349,7 +2349,7 @@ public:
 	{
 	}
 
-	const ipath_property::mode_t path_mode() const
+	ipath_property::mode_t path_mode() const
 	{
 		return m_mode;
 	}
@@ -2443,7 +2443,7 @@ public:
 	{
 	}
 
-	const double step_increment() const
+	double step_increment() const
 	{
 		return m_step_increment;
 	}

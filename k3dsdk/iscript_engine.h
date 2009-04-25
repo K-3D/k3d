@@ -103,8 +103,8 @@ public:
 
 protected:
 	iscript_engine() {}
-	iscript_engine(const iscript_engine& RHS) {}
-	iscript_engine& operator = (const iscript_engine& RHS) { return *this; }
+	iscript_engine(const iscript_engine&) {}
+	iscript_engine& operator = (const iscript_engine&) { return *this; }
 };
 
 } // namespace k3d

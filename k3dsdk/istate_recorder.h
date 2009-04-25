@@ -95,8 +95,8 @@ public:
 
 protected:
 	istate_recorder() {}
-	istate_recorder(const istate_recorder& RHS) {}
-	istate_recorder& operator = (const istate_recorder& RHS) { return *this; }
+	istate_recorder(const istate_recorder&) {}
+	istate_recorder& operator = (const istate_recorder&) { return *this; }
 	virtual ~istate_recorder() {}
 };
 

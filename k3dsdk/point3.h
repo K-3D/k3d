@@ -176,13 +176,13 @@ inline const point3 operator/(const point3& a, const double d)
 }
 
 /// Equality
-inline const bool operator==(const point3& a, const point3& b)
+inline bool operator==(const point3& a, const point3& b)
 {
 	return (a.n[0] == b.n[0]) && (a.n[1] == b.n[1]) && (a.n[2] == b.n[2]);
 }
 
 /// Inequality
-inline const bool operator!=(const point3& a, const point3& b)
+inline bool operator!=(const point3& a, const point3& b)
 {
 	return !(a == b);
 }

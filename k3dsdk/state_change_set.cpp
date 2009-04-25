@@ -107,12 +107,12 @@ void state_change_set::redo()
 	m_implementation->m_redo_signal.emit();
 }
 
-const size_t state_change_set::undo_count() const
+size_t state_change_set::undo_count() const
 {
 	return m_implementation->m_old_states.size();
 }
 
-const size_t state_change_set::redo_count() const
+size_t state_change_set::redo_count() const
 {
 	return m_implementation->m_new_states.size();
 }

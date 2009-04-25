@@ -709,7 +709,7 @@ bool_t copy_file(const path& Source, const path& Target)
 //////////////////////////////////////////////////////////////////////////////////
 // up_to_date
 
-const bool_t up_to_date(const path& Source, const path& Target)
+bool_t up_to_date(const path& Source, const path& Target)
 {
 	// Get the last modification time of the source ...
 	time_t source_modified = 0;

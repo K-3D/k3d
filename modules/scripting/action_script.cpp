@@ -47,7 +47,7 @@ public:
 		set_script(k3d::resource::get_string("/module/scripting/action_script.py"));
 	}
 
-	const k3d::bool_t execute(k3d::iscript_engine::context_t& Context)
+	k3d::bool_t execute(k3d::iscript_engine::context_t& Context)
 	{
 		return execute_script(Context);
 	}

@@ -37,7 +37,7 @@ class persistent_lookup :
 public:
 	persistent_lookup();
 
-	const id_type lookup_id(iunknown* Object);
+	id_type lookup_id(iunknown* Object);
 	iunknown* lookup_object(const id_type ID);
 
 	void insert_lookup(const id_type ID, iunknown* Object);

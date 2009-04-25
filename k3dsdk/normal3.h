@@ -173,7 +173,7 @@ inline const normal3 operator/(const normal3& a, const double d)
 }
 
 /// Returns the dot product of two normals
-inline const double operator*(const normal3& a, const normal3& b)
+inline double operator*(const normal3& a, const normal3& b)
 {
 	return a.n[0] * b.n[0] + a.n[1] * b.n[1] + a.n[2] * b.n[2];
 }
@@ -185,19 +185,19 @@ inline const normal3 operator^(const normal3& a, const normal3& b)
 }
 
 /// Equality
-inline const bool operator==(const normal3& a, const normal3& b)
+inline bool operator==(const normal3& a, const normal3& b)
 {
 	return a.n[0] == b.n[0] && a.n[1] == b.n[1] && a.n[2] == b.n[2];
 }
 
 /// Inequality
-inline const bool operator!=(const normal3& a, const normal3& b)
+inline bool operator!=(const normal3& a, const normal3& b)
 {
 	return a.n[0] != b.n[0] || a.n[1] != b.n[1] || a.n[2] != b.n[2];
 }
 
 /// Returns the length of a normal
-inline const double length(const normal3& Normal)
+inline double length(const normal3& Normal)
 {
 	return Normal.length();
 }

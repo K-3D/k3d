@@ -38,7 +38,7 @@ public:
 	/// Defines a unique identifier that can be serialized
 	typedef unsigned long id_type;
 	/// Returns a unique identifier for the given object that can be used in serialization
-	virtual const id_type lookup_id(iunknown* Object) = 0;
+	virtual id_type lookup_id(iunknown* Object) = 0;
 	/// Given a unique identifier, returns the corresponding object (could return NULL)
 	virtual iunknown* lookup_object(const id_type ID) = 0;
 	

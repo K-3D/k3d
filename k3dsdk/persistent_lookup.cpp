@@ -35,7 +35,7 @@ persistent_lookup::persistent_lookup()
 	m_object_map[0] = 0;
 }
 	
-const ipersistent_lookup::id_type persistent_lookup::lookup_id(iunknown* Object)
+ipersistent_lookup::id_type persistent_lookup::lookup_id(iunknown* Object)
 {
 	if(!m_id_map.count(Object))
 	{

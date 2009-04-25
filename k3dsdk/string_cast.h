@@ -93,7 +93,7 @@ inline const std::string from_string(const std::string& Value, const std::string
 
 /// Specialization of from_string for filesystem::path
 template<>
-inline const filesystem::path from_string(const std::string& Value, const filesystem::path& DefaultValue)
+inline const filesystem::path from_string(const std::string& Value, const filesystem::path&)
 {
 	return filesystem::native_path(ustring::from_utf8(Value));
 }

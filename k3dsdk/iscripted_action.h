@@ -36,7 +36,7 @@ class iscripted_action :
 {
 public:
 	/// When called, the underlying object will execute a script using the given context
-	virtual const k3d::bool_t execute(iscript_engine::context_t& Context) = 0;
+	virtual bool_t execute(iscript_engine::context_t& Context) = 0;
 
 protected:
 	iscripted_action() {}

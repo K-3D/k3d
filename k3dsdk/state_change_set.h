@@ -58,9 +58,9 @@ public:
 	void redo();
 
 	/// Returns the number of stored undo state containers (mainly for debugging)
-	const size_t undo_count() const;
+	size_t undo_count() const;
 	/// Returns the number of stored redo state containers (mainly for debugging)
-	const size_t redo_count() const;
+	size_t redo_count() const;
 	
 private:
 	state_change_set(const state_change_set&);
