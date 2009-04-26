@@ -133,30 +133,26 @@ primitive::primitive(
 
 primitive* create(mesh& Mesh)
 {
-  assert_not_implemented();
-  return 0;
-/*
-	mesh::polyhedra_t& polyhedron = Mesh.polyhedra.create();
+	mesh::primitive& generic_primitive = Mesh.primitives.create("polyhedron");
 
 	primitive* const result = new primitive(
-		polyhedron.first_faces.create(),
-		polyhedron.face_counts.create(),
-		polyhedron.types.create(),
-		polyhedron.face_first_loops.create(),
-		polyhedron.face_loop_counts.create(),
-		polyhedron.face_selection.create(),
-		polyhedron.face_materials.create(),
-		polyhedron.loop_first_edges.create(),
-		polyhedron.edge_points.create(),
-		polyhedron.clockwise_edges.create(),
-		polyhedron.edge_selection.create(),
-		polyhedron.constant_data,
-		polyhedron.uniform_data,
-		polyhedron.face_varying_data
+		generic_primitive.structure.create<mesh::indices_t>("shell_first_faces"),
+		generic_primitive.structure.create<mesh::counts_t>("shell_face_counts"),
+		generic_primitive.structure.create<typed_array<int32_t> >("shell_types"),
+		generic_primitive.structure.create<mesh::indices_t>("face_first_loops"),
+		generic_primitive.structure.create<mesh::counts_t>("face_loop_counts"),
+		generic_primitive.structure.create<mesh::selection_t>("face_selections"),
+		generic_primitive.structure.create<mesh::materials_t>("face_materials"),
+		generic_primitive.structure.create<mesh::indices_t>("loop_first_edges"),
+		generic_primitive.structure.create<mesh::indices_t>("edge_points"),
+		generic_primitive.structure.create<mesh::indices_t>("clockwise_edges"),
+		generic_primitive.structure.create<mesh::selection_t>("edge_selections"),
+		generic_primitive.attributes["constant_data"],
+		generic_primitive.attributes["uniform_data"],
+		generic_primitive.attributes["face_varying_data"]
 		);
 
 	return result;
-*/
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
