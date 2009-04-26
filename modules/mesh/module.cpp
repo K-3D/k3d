@@ -36,7 +36,6 @@ extern k3d::iplugin_factory& bevel_faces_factory();
 extern k3d::iplugin_factory& bridge_edges_factory();
 extern k3d::iplugin_factory& bridge_faces_factory();
 extern k3d::iplugin_factory& cap_hole_factory();
-extern k3d::iplugin_factory& catmull_clark_subdivision_factory();
 extern k3d::iplugin_factory& collapse_edges_factory();
 extern k3d::iplugin_factory& collapse_faces_factory();
 extern k3d::iplugin_factory& connect_vertices_factory();
@@ -76,7 +75,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh::bridge_edges_factory());
 	Registry.register_factory(module::mesh::bridge_faces_factory());
 	Registry.register_factory(module::mesh::cap_hole_factory());
-	Registry.register_factory(module::mesh::catmull_clark_subdivision_factory());
 	Registry.register_factory(module::mesh::collapse_edges_factory());
 	Registry.register_factory(module::mesh::collapse_faces_factory());
 	Registry.register_factory(module::mesh::connect_vertices_factory());
