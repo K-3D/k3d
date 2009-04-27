@@ -62,63 +62,54 @@ public:
 	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
-		try
+
+		boost::scoped_ptr<md2Model> model(new md2Model(Path.native_filesystem_string().c_str()));
+
+		const k3d::int32_t frame = m_frame.pipeline_value();
+		if(frame < 0 || frame >= model->get_num_frames())
 		{
-			boost::scoped_ptr<md2Model> model(new md2Model(Path.native_filesystem_string().c_str()));
-
-			const k3d::int32_t frame = m_frame.pipeline_value();
-			if(frame < 0 || frame >= model->get_num_frames())
-			{
-				k3d::log() << error << "frame [" << frame << "] out-of-range for [" << Path.native_console_string() << "]" << std::endl;
-				return;
-			}
-
-			const k3d::int32_t vertex_count = model->get_num_vertices();
-			const k3d::int32_t triangle_count = model->get_num_triangles();
-
-			k3d::mesh::points_t& points = Output.points.create(new k3d::mesh::points_t(vertex_count));
-			k3d::mesh::selection_t& point_selection = Output.point_selection.create(new k3d::mesh::selection_t(vertex_count, 0.0));
-			for(k3d::int32_t i = 0; i != vertex_count; ++i)
-				points[i] = model->get_point(frame, i);
-
-			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
-
-			polyhedron->shell_first_faces.push_back(polyhedron->face_first_loops.size());
-			polyhedron->shell_face_counts.push_back(triangle_count);
-			polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-
-			polyhedron->face_first_loops.reserve(triangle_count);
-			polyhedron->face_loop_counts.reserve(triangle_count);
-			polyhedron->face_selections.reserve(triangle_count);
-			polyhedron->face_materials.reserve(triangle_count);
-			polyhedron->loop_first_edges.reserve(triangle_count);
-			polyhedron->edge_points.reserve(3 * triangle_count);
-			polyhedron->clockwise_edges.reserve(3 * triangle_count);
-			polyhedron->edge_selections.reserve(3 * triangle_count);
-
-			for(k3d::int32_t i = 0; i != triangle_count; ++i)
-			{
-				polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
-				polyhedron->face_loop_counts.push_back(1);
-				polyhedron->face_selections.push_back(0);
-				polyhedron->face_materials.push_back(0);
-				polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
-
-				for(k3d::uint_t j = 0; j != 3; ++j)
-				{
-					polyhedron->edge_points.push_back(model->get_index(i, j));
-					polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
-					polyhedron->edge_selections.push_back(0);
-				}
-				polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
-			}
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << error << k3d_file_reference << ": error opening [" << Path.native_console_string() << "]" << std::endl;
-			k3d::log() << error << e.what() << std::endl;
-			Output = k3d::mesh();
+			k3d::log() << error << "frame [" << frame << "] out-of-range for [" << Path.native_console_string() << "]" << std::endl;
 			return;
+		}
+
+		const k3d::int32_t vertex_count = model->get_num_vertices();
+		const k3d::int32_t triangle_count = model->get_num_triangles();
+
+		k3d::mesh::points_t& points = Output.points.create(new k3d::mesh::points_t(vertex_count));
+		k3d::mesh::selection_t& point_selection = Output.point_selection.create(new k3d::mesh::selection_t(vertex_count, 0.0));
+		for(k3d::int32_t i = 0; i != vertex_count; ++i)
+			points[i] = model->get_point(frame, i);
+
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+
+		polyhedron->shell_first_faces.push_back(polyhedron->face_first_loops.size());
+		polyhedron->shell_face_counts.push_back(triangle_count);
+		polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+
+		polyhedron->face_first_loops.reserve(triangle_count);
+		polyhedron->face_loop_counts.reserve(triangle_count);
+		polyhedron->face_selections.reserve(triangle_count);
+		polyhedron->face_materials.reserve(triangle_count);
+		polyhedron->loop_first_edges.reserve(triangle_count);
+		polyhedron->edge_points.reserve(3 * triangle_count);
+		polyhedron->clockwise_edges.reserve(3 * triangle_count);
+		polyhedron->edge_selections.reserve(3 * triangle_count);
+
+		for(k3d::int32_t i = 0; i != triangle_count; ++i)
+		{
+			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+			polyhedron->face_loop_counts.push_back(1);
+			polyhedron->face_selections.push_back(0);
+			polyhedron->face_materials.push_back(0);
+			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
+
+			for(k3d::uint_t j = 0; j != 3; ++j)
+			{
+				polyhedron->edge_points.push_back(model->get_index(i, j));
+				polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+				polyhedron->edge_selections.push_back(0);
+			}
+			polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
 		}
 	}
 
