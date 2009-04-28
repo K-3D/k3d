@@ -204,7 +204,7 @@ std::ostream& operator<<(std::ostream& Stream, const declaration& RHS);
 std::ostream& operator<<(std::ostream& Stream, const attribute& RHS);
 /// Serializes an XML document to a stream
 std::ostream& operator<<(std::ostream& Stream, const element& RHS);
-/// Extracts an XML document from a stream
+/// Extracts an XML document from a stream.  Throws std::runtime_error if there are any problems.
 std::istream& operator>>(std::istream& Stream, element& RHS);
 
 /// Abstract interface used to provide feedback during long parsing operations
@@ -228,7 +228,7 @@ public:
 	void show_activity() {}
 };
 
-/// Parses an XML document from a stream
+/// Parses an XML document from a stream.  Throws std::runtime_error if there are any problems.
 void parse(element& Root, std::istream& InputStream, const std::string& StreamName, progress& Progress);
 
 } // namespace xml
