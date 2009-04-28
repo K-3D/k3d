@@ -175,7 +175,7 @@ OPTION(K3D_BUILD_NGUI_TOOLBAR_PANEL_MODULE "Build the user interface toolbar pan
 OPTION(K3D_BUILD_NGUI_TOOL_PROPERTIES_PANEL_MODULE "Build the user interface tool properties panel plugin module" ON)
 OPTION(K3D_BUILD_NGUI_TUTORIAL_RECORDER_MODULE "Build the user interface tutorial recorder plugin module" ON)
 OPTION(K3D_BUILD_NGUI_UNDO_TREE_PANEL_MODULE "Build the user interface undo panel plugin module" ON)
-OPTION(K3D_BUILD_NGUI_UV_EDITOR_PANEL_MODULE "Build the user interface UV editor panel plugin module" ON)
+OPTION(K3D_BUILD_NGUI_UV_EDITOR_PANEL_MODULE "Build the user interface UV editor panel plugin module" OFF)
 OPTION(K3D_BUILD_NUI_MODULE "Build the Null User Interface module" ON)
 OPTION(K3D_BUILD_NURBS_MODULE "Build the NURBS plugin module" ON)
 OPTION(K3D_BUILD_NURBS_SOURCES_MODULE "Build the NURBS sources plugin module" ON)
