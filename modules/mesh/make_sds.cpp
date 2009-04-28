@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,15 +18,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/node.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 
-#include <iterator>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -53,18 +54,20 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		const bool interpolateboundary = m_interpolateboundary.pipeline_value();
-
 		Output = Input;
 
-		if(Output.polyhedra && Output.polyhedra->types)
+		const k3d::bool_t interpolateboundary = m_interpolateboundary.pipeline_value();
+
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			k3d::mesh::polyhedra_t& polyhedra = Output.polyhedra.writable();
-			k3d::mesh::polyhedra_t::types_t& types = polyhedra.types.writable();
-			std::fill(types.begin(), types.end(), k3d::mesh::polyhedra_t::CATMULL_CLARK);
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+			if(!polyhedron)
+				continue;
+
+			std::fill(polyhedron->shell_types.begin(), polyhedron->shell_types.end(), k3d::polyhedron::CATMULL_CLARK);
 			
 			if(interpolateboundary)
-				polyhedra.constant_data.create("interpolateboundary", new k3d::typed_array<k3d::string_t>(types.size(), "interpolateboundary"));
+				polyhedron->constant_data.create("interpolateboundary", new k3d::typed_array<k3d::string_t>(polyhedron->shell_types.size(), "interpolateboundary"));
 		}
 	}
 
@@ -87,7 +90,7 @@ public:
 	}
 
 private:
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_interpolateboundary;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_interpolateboundary;
 };
 
 /////////////////////////////////////////////////////////////////////////////
