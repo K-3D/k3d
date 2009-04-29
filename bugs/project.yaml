@@ -1,0 +1,25 @@
+--- !ditz.rubyforge.org,2008-03-06/project 
+name: K-3D
+version: "0.5"
+components: 
+- !ditz.rubyforge.org,2008-03-06/component 
+  name: K-3D
+releases: 
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: 0.8.0.0
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2009-04-29 01:21:57.847477 Z
+    - Timothy M. Shead <tshead@k-3d.com>
+    - created
+    - ""
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: 1.0.0.0
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2009-04-29 01:22:55.792756 Z
+    - Timothy M. Shead <tshead@k-3d.com>
+    - created
+    - ""

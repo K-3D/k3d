@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Generic Primitive Refactoring
+desc: Complete the action items documented in http://www.k-3d.org/wiki/Generic_Mesh_Primitives - fix all broken plugins and tests.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-04-29 02:07:25.539153 Z
+references: []
+
+id: a35971476137c99b326c5df30dc1c65c05d251fa
+log_events: 
+- - 2009-04-29 02:07:26.514654 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""

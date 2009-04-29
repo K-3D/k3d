@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Replace interactive tutorial code with ATK-based tests
+desc: As described in http://www.k-3d.org/wiki/User_Interface_Testing - remove K-3D's interactive tutorial code, simplify all UI components, and replace existing UI regression tests with alternatives such as ATK-based tests.
+type: :task
+component: K-3D
+release: 1.0.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-04-29 02:14:17.324186 Z
+references: []
+
+id: daee8a01c7a1e37079658831fb65738559dc0493
+log_events: 
+- - 2009-04-29 02:14:18.668078 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
