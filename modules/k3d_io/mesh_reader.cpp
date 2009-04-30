@@ -56,23 +56,32 @@ public:
 	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
+		try
+		{
+			k3d::filesystem::igzstream file(Path);
+			if(!file)
+			{
+				k3d::log() << error << k3d_file_reference << ": error opening [" << Path.native_console_string() << "]" << std::endl;
+				return;
+			}
 
-		k3d::filesystem::igzstream file(Path);
-		if(!file)
+			k3d::xml::element xml_document("k3dml");
+			file >> xml_document;
+
+			const k3d::filesystem::path root_path = Path.branch_path();
+			k3d::persistent_lookup lookup;
+			k3d::ipersistent::load_context context(root_path, lookup);
+
+			if(k3d::xml::element* const xml_mesh_arrays = k3d::xml::find_element(xml_document, "mesh_arrays"))
+				k3d::xml::load(Output, *xml_mesh_arrays, context);
+		}
+		catch(std::exception& e)
 		{
 			k3d::log() << error << k3d_file_reference << ": error opening [" << Path.native_console_string() << "]" << std::endl;
+			k3d::log() << error << e.what() << std::endl;
+			Output = k3d::mesh();
 			return;
 		}
-
-		k3d::xml::element xml_document("k3dml");
-		file >> xml_document;
-
-		const k3d::filesystem::path root_path = Path.branch_path();
-		k3d::persistent_lookup lookup;
-		k3d::ipersistent::load_context context(root_path, lookup);
-
-		if(k3d::xml::element* const xml_mesh_arrays = k3d::xml::find_element(xml_document, "mesh_arrays"))
-			k3d::xml::load(Output, *xml_mesh_arrays, context);
 	}
 
 	static k3d::iplugin_factory& get_factory()
