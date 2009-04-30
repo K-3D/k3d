@@ -49,182 +49,22 @@ namespace module
 namespace mesh
 {
 
-namespace detail
-{
-
-template<typename ArrayT>
-class merge_array_worker
-{
-public:
-	merge_array_worker(const ArrayT& InputArray, ArrayT& OutputArray, const k3d::uint_t OriginalSize, const typename ArrayT::value_type Offset) :
-		m_input_array(InputArray),
-		m_output_array(OutputArray),
-		m_original_size(OriginalSize),
-		m_offset(Offset) {}
-	void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
-	{
-		const k3d::uint_t begin = range.begin();
-		const k3d::uint_t end = range.end();
-		
-		for(k3d::uint_t index = begin; index != end; ++index)
-		{
-			m_output_array[m_original_size + index] = m_input_array[index] + m_offset; 
-		}
-	}
-private:
-	const ArrayT& m_input_array;
-	ArrayT& m_output_array;
-	const k3d::uint_t m_original_size;
-	const typename ArrayT::value_type m_offset;
-};
-
-template<typename ArrayT>
-void extend_array(const ArrayT& InputArray, ArrayT& OutputArray, const typename ArrayT::value_type Offset)
-{
-	const k3d::uint_t original_size = OutputArray.size();
-	OutputArray.resize(original_size + InputArray.size());
-	k3d::parallel::parallel_for(
-		k3d::parallel::blocked_range<k3d::uint_t>(0, InputArray.size(), k3d::parallel::grain_size()),
-		merge_array_worker<ArrayT>(InputArray, OutputArray, original_size, Offset));
-}
-
-template<typename DataT>
-typename DataT::value_type& create_if_not_exists(DataT& Data)
-{
-	if(Data.get())
-		return Data.writable();
-	return Data.create();
-}
-
-/// Appends the polyhedra of mesh Input to those of mesh Output, putting everything in one single polyhedron if SinglePolyhedron is true.
-void merge_polyhedra(k3d::mesh& Output, const k3d::mesh& Input, bool SinglePolyhedron = true)
-{
-	boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input));
-	if(!input_polyhedron)
-		return;
-	k3d::mesh::polyhedra_t& output_polyhedra = create_if_not_exists(Output.polyhedra);
-	k3d::mesh::indices_t& output_first_faces = create_if_not_exists(output_polyhedra.first_faces);
-	k3d::mesh::counts_t& output_face_counts = create_if_not_exists(output_polyhedra.face_counts);
-	k3d::mesh::polyhedra_t::types_t& output_types = create_if_not_exists(output_polyhedra.types);
-	k3d::mesh::indices_t& output_face_first_loops = create_if_not_exists(output_polyhedra.face_first_loops);
-	k3d::mesh::counts_t& output_face_loop_counts = create_if_not_exists(output_polyhedra.face_loop_counts);
-	k3d::mesh::selection_t& output_face_selection = create_if_not_exists(output_polyhedra.face_selection);
-	k3d::mesh::materials_t& output_face_materials = create_if_not_exists(output_polyhedra.face_materials);
-	k3d::mesh::indices_t& output_loop_first_edges = create_if_not_exists(output_polyhedra.loop_first_edges);
-	k3d::mesh::indices_t& output_edge_points = create_if_not_exists(output_polyhedra.edge_points);
-	k3d::mesh::indices_t& output_clockwise_edges = create_if_not_exists(output_polyhedra.clockwise_edges);
-	k3d::mesh::selection_t& output_edge_selection = create_if_not_exists(output_polyhedra.edge_selection);
-	
-	const k3d::mesh::polyhedra_t& input_polyhedra = *Input.polyhedra;
-	const k3d::mesh::indices_t& input_first_faces = *input_polyhedra.first_faces;
-	const k3d::mesh::counts_t& input_face_counts = *input_polyhedra.face_counts;
-	const k3d::mesh::polyhedra_t::types_t& input_types = *input_polyhedra.types;
-	const k3d::mesh::indices_t& input_face_first_loops = *input_polyhedra.face_first_loops;
-	const k3d::mesh::counts_t& input_face_loop_counts = *input_polyhedra.face_loop_counts;
-	const k3d::mesh::selection_t& input_face_selection = *input_polyhedra.face_selection;
-	const k3d::mesh::materials_t& input_face_materials = *input_polyhedra.face_materials;
-	const k3d::mesh::indices_t& input_loop_first_edges = *input_polyhedra.loop_first_edges;
-	const k3d::mesh::indices_t& input_edge_points = *input_polyhedra.edge_points;
-	const k3d::mesh::indices_t& input_clockwise_edges = *input_polyhedra.clockwise_edges;
-	const k3d::mesh::selection_t& input_edge_selection = *input_polyhedra.edge_selection;
-	
-  extend_array(input_face_selection, output_face_selection, 0);
-  extend_array(input_face_first_loops, output_face_first_loops, output_loop_first_edges.size());
-  output_face_loop_counts.insert(output_face_loop_counts.end(), input_face_loop_counts.begin(), input_face_loop_counts.end());
-  output_face_materials.insert(output_face_materials.end(), input_face_materials.begin(), input_face_materials.end());
-  extend_array(input_edge_selection, output_edge_selection, 0);
-  extend_array(input_loop_first_edges, output_loop_first_edges, output_edge_points.size());
-  extend_array(input_clockwise_edges, output_clockwise_edges, output_edge_points.size());
-  extend_array(input_edge_points, output_edge_points, Output.points->size());
-  
-  if (output_types.empty()) // for the first appended mesh, we simply copy the named arrays
-  {
-  	output_polyhedra.constant_data = input_polyhedra.constant_data;
-	  output_polyhedra.uniform_data = input_polyhedra.uniform_data;
-	  output_polyhedra.face_varying_data = input_polyhedra.face_varying_data;
-  }
-  
-  if (!SinglePolyhedron)
-  {
-    output_types.insert(output_types.end(), input_types.begin(), input_types.end());
-    extend_array(input_first_faces, output_first_faces, output_face_loop_counts.size() - input_face_first_loops.size());
-    output_face_counts.insert(output_face_counts.end(), input_face_counts.begin(), input_face_counts.end());
-    
-  }
-  else if (output_types.empty())
-  {
-  	output_first_faces.push_back(0);
-  	output_face_counts.push_back(output_face_first_loops.size());
-  	output_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
-  }
-  else
-  {
-  	output_face_counts[0] = output_face_first_loops.size();
-  }
-  
-  // Take care of named arrays
-  k3d::attribute_array_copier constant_data_copier(input_polyhedra.constant_data, output_polyhedra.constant_data);
-  k3d::attribute_array_copier uniform_data_copier(input_polyhedra.uniform_data, output_polyhedra.uniform_data);
-  k3d::attribute_array_copier face_varying_data_copier(input_polyhedra.face_varying_data, output_polyhedra.face_varying_data);
-  for (k3d::uint_t polyhedron = 0; polyhedron != input_first_faces.size(); ++polyhedron)
-  	constant_data_copier.push_back(polyhedron);
-  for (k3d::uint_t face = 0; face != input_face_first_loops.size(); ++face)
-  	uniform_data_copier.push_back(face);
-  for (k3d::uint_t edge = 0; edge != input_edge_points.size(); ++edge)
-  	face_varying_data_copier.push_back(edge);
-}
-
-const k3d::uint_t merge_points(k3d::mesh& Output, const k3d::mesh& Input)
-{
-	if(!Input.points)
-		return 0;
-
-	k3d::mesh::points_t& output_points = create_if_not_exists(Output.points);
-	const k3d::uint_t point_offset = Output.points->size();
-
-	k3d::mesh::selection_t& output_point_selection = create_if_not_exists(Output.point_selection);
-	const k3d::mesh::points_t& input_points = *Input.points;
-	const k3d::mesh::selection_t& input_point_selection = *Input.point_selection;
-	
-	if (output_points.empty())
-		Output.vertex_data = Input.vertex_data;
-	
-	extend_array(input_point_selection, output_point_selection, 0);
-	output_points.insert(output_points.end(), input_points.begin(), input_points.end());
-	
-	k3d::attribute_array_copier vertex_data_copier(Input.vertex_data, Output.vertex_data);
-	for (k3d::uint_t point = 0; point != input_points.size(); ++point)
-		vertex_data_copier.push_back(point);
-
-	return point_offset;
-}
-
-}
 /////////////////////////////////////////////////////////////////////////////
-// merge_mesh_implementation
+// merge_mesh
 
-class merge_mesh_implementation :
+class merge_mesh :
 	public k3d::imulti_mesh_sink,
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	merge_mesh_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	merge_mesh(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_user_property_changed_signal(*this),
-		m_same_polyhedron(init_owner(*this) + init_name("same_polyhedron") + init_label(_("Same polyhedron")) + init_description(_("Merge meshes in a single polyhedron")) + init_value(true))
+		m_user_property_changed_signal(*this)
 	{
-		m_user_property_changed_signal.connect(sigc::mem_fun(*this, &merge_mesh_implementation::mesh_changed));
-		m_same_polyhedron.changed_signal().connect(sigc::mem_fun(*this, &merge_mesh_implementation::mesh_changed));
-	}
-	
-	void mesh_changed(k3d::ihint* Hint)
-	{
-		if (dynamic_cast<k3d::hint::mesh_geometry_changed*>(Hint))
-			m_output_mesh.update(Hint);
-		else
-			m_output_mesh.update(k3d::hint::mesh_topology_changed::instance());
+		m_user_property_changed_signal.connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
 	class offset_point_indices
@@ -257,7 +97,10 @@ public:
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
+		k3d::mesh::points_t& output_points = Output.points.create();
+		k3d::mesh::selection_t& output_point_selection = Output.point_selection.create();
 
+		// For each input mesh ...
 		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
 		for(k3d::iproperty_collection::properties_t::const_iterator p = properties.begin(); p != properties.end(); ++p)
 		{
@@ -265,19 +108,20 @@ public:
 			if(property.property_type() != typeid(k3d::mesh*))
 				continue;
 
-			if(!k3d::property::pipeline_value<k3d::mesh*>(property))
+			const k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(property);
+			if(!mesh)
 				continue;
 
-			const k3d::mesh& mesh = *k3d::property::pipeline_value<k3d::mesh*>(property);
-			
-			// Make sure the points array is defined
-			detail::create_if_not_exists(Output.points);
-			
-			detail::merge_polyhedra(Output, mesh, m_same_polyhedron.pipeline_value());
+			// Merge points into the output ...
+			const k3d::uint_t point_offset = output_points.size();
+			if(mesh->points && mesh->point_selection)
+			{
+				output_points.insert(output_points.end(), mesh->points->begin(), mesh->points->end());
+				output_point_selection.insert(output_point_selection.end(), mesh->point_selection->begin(), mesh->point_selection->end());
+			}
 
-			// Must be last to calculate correct offsets in other methods
-			const k3d::uint_t point_offset = detail::merge_points(Output, mesh);
-			for(k3d::mesh::primitives_t::const_iterator primitive = mesh.primitives.begin(); primitive != mesh.primitives.end(); ++primitive)
+			// Merge primitives into the output ...
+			for(k3d::mesh::primitives_t::const_iterator primitive = mesh->primitives.begin(); primitive != mesh->primitives.end(); ++primitive)
 			{
 				Output.primitives.push_back(*primitive);
 				k3d::mesh::primitive& new_primitive = Output.primitives.back().writable();
@@ -288,27 +132,11 @@ public:
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
-		Output.points.writable().clear();
-		Output.point_selection.writable().clear();
-		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
-		for(k3d::iproperty_collection::properties_t::const_iterator p = properties.begin(); p != properties.end(); ++p)
-		{
-			k3d::iproperty& property = **p;
-			if(property.property_type() != typeid(k3d::mesh*))
-				continue;
-
-			if(!k3d::property::pipeline_value<k3d::mesh*>(property))
-				continue;
-
-			const k3d::mesh& mesh = *k3d::property::pipeline_value<k3d::mesh*>(property);
-
-			detail::merge_points(Output, mesh);
-		}
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<merge_mesh_implementation, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imulti_mesh_sink> > > factory(
+		static k3d::document_plugin_factory<merge_mesh, k3d::interface_list<k3d::imesh_source, k3d::interface_list<k3d::imulti_mesh_sink> > > factory(
 			k3d::uuid(0x50aef311, 0xf5264da2, 0x9c5995e8, 0xdc2e4ddf),
 			"MergeMesh",
 			_("Merges two meshes into one"),
@@ -320,7 +148,6 @@ public:
 
 private:
 	k3d::user_property_changed_signal m_user_property_changed_signal;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_same_polyhedron;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -328,9 +155,10 @@ private:
 
 k3d::iplugin_factory& merge_mesh_factory()
 {
-	return merge_mesh_implementation::get_factory();
+	return merge_mesh::get_factory();
 }
 
 } // namespace mesh
 
 } // namespace module
+
