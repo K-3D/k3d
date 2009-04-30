@@ -186,7 +186,7 @@ inline const vector4 operator*(const double_t d, const vector4& a)
 }
 
 /// Returns the dot product of two vectors
-inline const double_t operator*(const vector4& a, const vector4& b)
+inline double_t operator*(const vector4& a, const vector4& b)
 {
 	return a.n[0] * b.n[0] + a.n[1] * b.n[1] + a.n[2] * b.n[2] + a.n[3] * b.n[3];
 }
@@ -199,19 +199,19 @@ inline const vector4 operator/(const vector4& a, const double_t d)
 }
 
 /// Equality
-inline const bool operator==(const vector4& a, const vector4& b)
+inline bool operator==(const vector4& a, const vector4& b)
 {
 	return a.n[0] == b.n[0] && a.n[1] == b.n[1] && a.n[2] == b.n[2] && a.n[3] == b.n[3];
 }
 
 /// Inequality
-inline const bool operator!=(const vector4& a, const vector4& b)
+inline bool operator!=(const vector4& a, const vector4& b)
 {
 	return a.n[0] != b.n[0] || a.n[1] != b.n[1] || a.n[2] != b.n[2] || a.n[3] != b.n[3];
 }
 
 /// Returns the length of a vector
-inline const double_t length(const vector4& Vector)
+inline double_t length(const vector4& Vector)
 {
 	return Vector.length();
 }

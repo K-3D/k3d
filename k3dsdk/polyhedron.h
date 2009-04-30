@@ -158,13 +158,13 @@ void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices,
 void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material);
 
 /// Returns true iff every face in the given polyhedron is a triangle.
-const bool_t is_triangles(const const_primitive& Polyhedron);
+bool_t is_triangles(const const_primitive& Polyhedron);
 /// Returns true iff the given polyhedron is a solid (i.e. it has no topological holes).
-const bool_t is_solid(const const_primitive& Polyhedron);
+bool_t is_solid(const const_primitive& Polyhedron);
 /// Returns true iff the given polyhedron should be rendered as a Subdivision surface
 /** \note The implementation looks at the flags set on the first (outer) shell.  We
 should consider whether SDS should be set on a per-shell basis? */
-const bool_t is_sds(const const_primitive& Polyhedron);
+bool_t is_sds(const const_primitive& Polyhedron);
 
 /// Calculates the center (average) for an edge loop (returns the origin for degenerate cases).
 const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);

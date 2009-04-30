@@ -492,7 +492,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////
 // attribute_array_copier::strict_copy
 
-const bool_t attribute_array_copier::strict_copy::copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const
+bool_t attribute_array_copier::strict_copy::copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const
 {
 	if(SourceName != TargetName)
 		return false;
@@ -519,7 +519,7 @@ void attribute_array_copier::strict_copy::unused_target(const string_t& TargetNa
 ////////////////////////////////////////////////////////////////////////////
 // attribute_array_copier::copy_subset
 
-const bool_t attribute_array_copier::copy_subset::copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const
+bool_t attribute_array_copier::copy_subset::copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const
 {
 	return SourceName == TargetName && typeid(Source) == typeid(Target);
 }

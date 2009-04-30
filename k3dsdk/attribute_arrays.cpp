@@ -132,7 +132,7 @@ void attribute_arrays::resize(const uint_t NewSize)
 		array->second.writable().resize(NewSize);
 }
 
-const bool_t attribute_arrays::match_size(const uint_t Size) const
+bool_t attribute_arrays::match_size(const uint_t Size) const
 {
 	for(const_iterator array = begin(); array != end(); ++array)
 	{

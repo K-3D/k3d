@@ -117,13 +117,11 @@ public:
 
 	double& operator[](const unsigned int i)
 	{
-		assert_warning((i >= 0) && (i <= 2));
 		return n[i];
 	}
 
 	double operator[](const unsigned int i) const
 	{
-		return_val_if_fail((i >= 0) && (i <= 2), 0);
 		return n[i];
 	}
 

@@ -36,8 +36,8 @@ class imaterial :
 {
 protected:
 	imaterial() {}
-	imaterial(const imaterial& RHS) {}
-	imaterial& operator=(const imaterial& RHS) { return *this; }
+	imaterial(const imaterial&) {}
+	imaterial& operator=(const imaterial&) { return *this; }
 	virtual ~imaterial() {}
 };
 

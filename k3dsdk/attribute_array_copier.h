@@ -44,7 +44,7 @@ public:
 		/// Return true to indicate that the given source array should be copied to the given target array.  Note that this method
 		/// will be called once for every permutation of source and unused-target arrays, so a derivative could implement special behavior
 		/// including mapping source and target arrays with different names, mapping a single source array to multiple target arrays, etc.
-		virtual const bool_t copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const = 0;
+		virtual bool_t copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const = 0;
 		/// Called once for each source array that isn't used.  Implementations may optionally choose to generate errors.
 		virtual void unused_source(const string_t& SourceName, const array& Source) const = 0;
 		/// Called once for each target array that isn't used.  Implementations may optionally choose to generate errors.
@@ -58,7 +58,7 @@ public:
 		public copy_policy
 	{
 	public:
-		const bool_t copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const; 
+		bool_t copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const; 
 		void unused_source(const string_t& SourceName, const array& Source) const; 
 		void unused_target(const string_t& TargetName, const array& Target) const; 
 	};
@@ -70,7 +70,7 @@ public:
 		public copy_policy
 	{
 	public:
-		const bool_t copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const; 
+		bool_t copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const; 
 		void unused_source(const string_t& SourceName, const array& Source) const; 
 		void unused_target(const string_t& TargetName, const array& Target) const; 
 	};

@@ -175,13 +175,13 @@ inline const texture3 operator/(const texture3& a, const double d)
 }
 
 /// Equality
-inline const bool operator==(const texture3& a, const texture3& b)
+inline bool operator==(const texture3& a, const texture3& b)
 {
 	return (a.n[0] == b.n[0]) && (a.n[1] == b.n[1]) && (a.n[2] == b.n[2]);
 }
 
 /// Inequality
-inline const bool operator!=(const texture3& a, const texture3& b)
+inline bool operator!=(const texture3& a, const texture3& b)
 {
 	return !(a == b);
 }

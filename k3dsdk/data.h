@@ -106,12 +106,12 @@ class with_serialization :
 	BOOST_STATIC_ASSERT((!boost::is_pointer<value_t>::value));
 
 public:
-	void save(xml::element& Element, const ipersistent::save_context& Context)
+	void save(xml::element& Element, const ipersistent::save_context&)
 	{
 		Element.append(xml::element("property", string_cast(property_policy_t::internal_value()), xml::attribute("name", property_policy_t::name())));
 	}
 
-	void load(xml::element& Element, const ipersistent::load_context& Context)
+	void load(xml::element& Element, const ipersistent::load_context&)
 	{
 		std::string value = Element.text;
 		property_policy_t::set_value(from_string(value, property_policy_t::internal_value()));
@@ -2114,11 +2114,11 @@ public:
 
 protected:
 	template<typename init_t>
-	change_signal(const init_t& Init)
+	change_signal(const init_t&)
 	{
 	}
 
-	void start_recording(istate_recorder& StateRecorder)
+	void start_recording(istate_recorder&)
 	{
 	}
 

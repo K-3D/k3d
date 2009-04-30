@@ -50,13 +50,13 @@ inline double pi_times_2()
 }
 
 /// Converts degrees to radians
-inline const double radians(const double degrees)
+inline double radians(const double degrees)
 {
 	return degrees * 0.01745329252;
 }
 
 /// Converts radians to degrees
-inline const double degrees(const double radians)
+inline double degrees(const double radians)
 {
 	return radians * 57.2957795131;
 }

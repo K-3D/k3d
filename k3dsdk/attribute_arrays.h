@@ -88,7 +88,7 @@ public:
 	void resize(const uint_t NewSize);
 
 	/// Returns true if every array in the collection matches the given size (or there aren't any arrays in the collection).
-	const bool_t match_size(const uint_t Size) const;
+	bool_t match_size(const uint_t Size) const;
 };
 
 /// Specialization of almost_equal that tests attribute_arrays for equality

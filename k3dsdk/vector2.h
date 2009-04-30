@@ -107,13 +107,11 @@ public:
 
 	double& operator[](const unsigned int i)
 	{
-		assert_warning((i == 0) || (i == 1));
 		return n[i];
 	}
 
 	double operator[](const unsigned int i) const
 	{
-		return_val_if_fail((i == 0) || (i == 1), 0);
 		return n[i];
 	}
 
@@ -174,7 +172,7 @@ inline const vector2 operator*(const double d, const vector2& a)
 }
 
 /// Returns the dot product of two vectors
-inline const double operator*(const vector2& a, const vector2& b)
+inline double operator*(const vector2& a, const vector2& b)
 {
 	return a.n[0] * b.n[0] + a.n[1] * b.n[1];
 }
@@ -187,19 +185,19 @@ inline const vector2 operator/(const vector2& a, const double d)
 }
 
 /// Equality
-inline const bool operator==(const vector2& a, const vector2& b)
+inline bool operator==(const vector2& a, const vector2& b)
 {
 	return a.n[0] == b.n[0] && a.n[1] == b.n[1];
 }
 
 /// Inequality
-inline const bool operator!=(const vector2& a, const vector2& b)
+inline bool operator!=(const vector2& a, const vector2& b)
 {
 	return a.n[0] != b.n[0] || a.n[1] != b.n[1];
 }
 
 /// Returns the length of a vector
-inline const double length(const vector2& Vector)
+inline double length(const vector2& Vector)
 {
 	return Vector.length();
 }

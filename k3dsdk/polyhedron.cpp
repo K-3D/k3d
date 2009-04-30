@@ -579,7 +579,7 @@ void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices,
 /////////////////////////////////////////////////////////////////////////////////////////////
 // is_triangles
 
-const bool_t is_triangles(const const_primitive& Polyhedron)
+bool_t is_triangles(const const_primitive& Polyhedron)
 {
 	const uint_t face_begin = 0;
 	const uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
@@ -606,7 +606,7 @@ const bool_t is_triangles(const const_primitive& Polyhedron)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // is_solid
 
-const bool_t is_solid(const const_primitive& Polyhedron)
+bool_t is_solid(const const_primitive& Polyhedron)
 {
 	// K-3D uses a split-edge data structure to represent polyhedra.
 	// We test for solidity by counting the number of edges that
@@ -622,7 +622,7 @@ const bool_t is_solid(const const_primitive& Polyhedron)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // is_sds
 
-const bool_t is_sds(const const_primitive& Polyhedron)
+bool_t is_sds(const const_primitive& Polyhedron)
 {
 	return Polyhedron.shell_types.size() && (Polyhedron.shell_types[0] == CATMULL_CLARK);
 }

@@ -145,13 +145,13 @@ inline point3& point3::operator-=(const vector3& v)
 // vector3 / normal3 operations
 
 /// Returns the dot product of a vector and a normal
-inline const double operator*(const vector3& a, const normal3& b)
+inline double operator*(const vector3& a, const normal3& b)
 {
 	return a.n[0] * b.n[0] + a.n[1] * b.n[1] + a.n[2] * b.n[2];
 }
 
 /// Returns the dot product of a normal and a vector
-inline const double operator*(const normal3& a, const vector3& b)
+inline double operator*(const normal3& a, const vector3& b)
 {
 	return a.n[0] * b.n[0] + a.n[1] * b.n[1] + a.n[2] * b.n[2];
 }
@@ -216,19 +216,19 @@ inline const point3 cartesian(const point4& p)
 }
 
 /// Returns the distance between two points
-inline const double distance(const point2& P1, const point2& P2)
+inline double distance(const point2& P1, const point2& P2)
 {
 	return length(P2 - P1);
 }
 
 /// Returns the distance between two points
-inline const double distance(const point3& P1, const point3& P2)
+inline double distance(const point3& P1, const point3& P2)
 {
 	return length(P2 - P1);
 }
 
 /// Returns the distance between two points
-inline const double distance(const point4& P1, const point4& P2)
+inline double distance(const point4& P1, const point4& P2)
 {
 	return length(P2 - P1);
 }
