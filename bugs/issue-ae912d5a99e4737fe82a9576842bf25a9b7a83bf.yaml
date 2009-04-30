@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Create tests to ensure that new code uses the standard K-3D types.
+desc: ""
+type: :task
+component: K-3D
+release: 
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-04-30 05:26:34.718270 Z
+references: []
+
+id: ae912d5a99e4737fe82a9576842bf25a9b7a83bf
+log_events: 
+- - 2009-04-30 05:26:35.581870 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
