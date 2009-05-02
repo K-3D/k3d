@@ -205,7 +205,7 @@ template<>
 class hint_traits<bitmap_dimensions_changed>
 {
 public:
-	static const bool_t match(ihint* Hint)
+	static bool_t match(ihint* Hint)
 	{
 		return dynamic_cast<bitmap_dimensions_changed*>(Hint);
 	}
@@ -221,7 +221,7 @@ template<>
 class hint_traits<bitmap_pixels_changed>
 {
 public:
-	static const bool_t match(ihint* Hint)
+	static bool_t match(ihint* Hint)
 	{
 		return dynamic_cast<bitmap_pixels_changed*>(Hint);
 	}
@@ -237,7 +237,7 @@ template<>
 class hint_traits<selection_changed>
 {
 public:
-	static const bool_t match(ihint* Hint)
+	static bool_t match(ihint* Hint)
 	{
 		return dynamic_cast<selection_changed*>(Hint);
 	}
@@ -253,7 +253,7 @@ template<>
 class hint_traits<mesh_topology_changed>
 {
 public:
-	static const bool_t match(ihint* Hint)
+	static bool_t match(ihint* Hint)
 	{
 		return dynamic_cast<mesh_topology_changed*>(Hint);
 	}
@@ -269,7 +269,7 @@ template<>
 class hint_traits<mesh_geometry_changed>
 {
 public:
-	static const bool_t match(ihint* Hint)
+	static bool_t match(ihint* Hint)
 	{
 		return dynamic_cast<mesh_geometry_changed*>(Hint);
 	}
@@ -285,7 +285,7 @@ template<>
 class hint_traits<any>
 {
 public:
-	static const bool_t match(ihint* Hint)
+	static bool_t match(ihint*)
 	{
 		return true;
 	}
@@ -295,7 +295,7 @@ template<>
 class hint_traits<none>
 {
 public:
-	static const bool_t match(ihint* Hint)
+	static bool_t match(ihint*)
 	{
 		return false;
 	}
@@ -351,7 +351,7 @@ void execute(ihint* const Hint, const slot_t& Slot)
 }
 
 template<>
-inline void execute<last_conversion>(ihint* const Hint, const slot_t& Slot)
+inline void execute<last_conversion>(ihint* const Hint, const slot_t&)
 {
 	std::cerr << "unhandled hint: " << print(Hint) << std::endl;
 }

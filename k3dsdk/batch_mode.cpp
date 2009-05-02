@@ -33,7 +33,7 @@ namespace detail
 {
 
 /// Stores the global batch (no user intervention) mode state
-bool g_batch_mode = false;
+bool_t g_batch_mode = false;
 	
 } // namespace detail
 	
@@ -42,7 +42,7 @@ void set_batch_mode(const bool Mode)
 	detail::g_batch_mode = Mode;
 }
 
-const bool batch_mode()
+bool_t batch_mode()
 {
 	return detail::g_batch_mode;
 }

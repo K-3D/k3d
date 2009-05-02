@@ -184,8 +184,9 @@ const std::string unique_name(inode_collection& Nodes, const std::string& Name)
 
 		// Find trailing space followed by a number and increment ('k3d 5' -> 'k3d 6', 'k3d3' -> 'k3d3 2')
 		std::string::iterator c = base.end();
-		while(--c != base.begin() &&
-			*c >= '0' && *c <= '9');
+		while(--c != base.begin() && *c >= '0' && *c <= '9')
+		{
+		}
 
 		if(*c == ' ')
 		{

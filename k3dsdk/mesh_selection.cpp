@@ -336,7 +336,7 @@ void mesh_selection::clear()
 	components.clear();
 }
 
-bool mesh_selection::empty() const
+bool_t mesh_selection::empty() const
 {
 	return
 		points.empty() &&
@@ -344,7 +344,7 @@ bool mesh_selection::empty() const
     ;
 }
 
-bool mesh_selection::operator==(const mesh_selection& RHS) const
+bool_t mesh_selection::operator==(const mesh_selection& RHS) const
 {
 	return
 		points == RHS.points &&
@@ -352,7 +352,7 @@ bool mesh_selection::operator==(const mesh_selection& RHS) const
     ;
 }
 
-bool mesh_selection::operator!=(const mesh_selection& RHS) const
+bool_t mesh_selection::operator!=(const mesh_selection& RHS) const
 {
 	return !(operator==(RHS));
 }
@@ -401,12 +401,12 @@ void mesh_selection::component::clear()
 	weight.clear();
 }
 
-const bool_t mesh_selection::component::empty() const
+bool_t mesh_selection::component::empty() const
 {
 	return (primitive_begin == primitive_end) || index_begin.empty();
 }
 
-bool mesh_selection::component::operator==(const component& RHS) const
+bool_t mesh_selection::component::operator==(const component& RHS) const
 {
 	return type == RHS.type
 		&& primitive_begin == RHS.primitive_begin

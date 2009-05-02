@@ -384,6 +384,8 @@ private:
 	class array_copier
 	{
 	public:
+		virtual ~array_copier() {}
+
 		/// Called to append a value (identified by index) from the source array to the target array
 		virtual void push_back(const uint_t Index) = 0;
 		/// Called to compute a weighted sum from the source array and append the result to the target array
@@ -401,9 +403,9 @@ private:
 	class copier_factory
 	{
 	public:
-		static const bool create_copier(const array& Source, array& Target, copiers_t& Copiers)
+		static bool_t create_copier(const array& Source, array& Target, copiers_t& Copiers)
 		{
-			bool result = false;
+			bool_t result = false;
 			boost::mpl::for_each<named_array_types>(copier_factory(Source, Target, Copiers, result));
 			return result;
 		}
@@ -425,7 +427,7 @@ private:
 		}
 
 	private:
-		copier_factory(const array& Source, array& Target, copiers_t& Copiers, bool& Created) :
+		copier_factory(const array& Source, array& Target, copiers_t& Copiers, bool_t& Created) :
 			source(Source),
 			target(Target),
 			copiers(Copiers),
@@ -482,7 +484,7 @@ private:
 		const array& source;
 		array& target;
 		copiers_t& copiers;
-		bool& created;
+		bool_t& created;
 	};
 
 	/// Stores a collection of array_copier objects that handle copying between each source/target pair of arrays
@@ -524,7 +526,7 @@ bool_t attribute_array_copier::copy_subset::copy(const string_t& SourceName, con
 	return SourceName == TargetName && typeid(Source) == typeid(Target);
 }
 
-void attribute_array_copier::copy_subset::unused_source(const string_t& SourceName, const array& Source) const
+void attribute_array_copier::copy_subset::unused_source(const string_t&, const array&) const
 {
 }
 

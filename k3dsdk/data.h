@@ -1921,7 +1921,7 @@ protected:
 
 private:
 	/// This little bit of magic allows us to "call" the derived undo policy when our state is modified internally, e.g. if the node is deleted
-	virtual void internal_set_value(const value_t& Value, ihint* const Hint)
+	virtual void internal_set_value(const value_t&, ihint* const)
 	{
 	}
 

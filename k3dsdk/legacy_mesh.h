@@ -868,14 +868,14 @@ grid_results_t add_grid(mesh& Mesh, polyhedron& Polyhedron, const unsigned long 
 void deep_copy(const mesh& Input, mesh& Output);
 
 /// Returns the number of segments in a linear curve, based on the control point count and wrap state
-const unsigned long segment_count(const linear_curve& Curve, const bool Wrap);
+unsigned long segment_count(const linear_curve& Curve, const bool Wrap);
 /// Returns the number of segments in a cubic curve, based on the control point count, basis, and wrap state
-const unsigned long segment_count(const cubic_curve& Curve, const bool Wrap);
+unsigned long segment_count(const cubic_curve& Curve, const bool Wrap);
 
 /// Returns the number of varying parameters in a linear curve, based on the control point count and wrap state
-const unsigned long varying_count(const linear_curve& Curve, const bool Wrap);
+unsigned long varying_count(const linear_curve& Curve, const bool Wrap);
 /// Returns the number of varying parameters in a cubic curve, based on the control point count, basis, and wrap state
-const unsigned long varying_count(const cubic_curve& Curve, const bool Wrap);
+unsigned long varying_count(const cubic_curve& Curve, const bool Wrap);
 
 /// Returns true iff the given polyhedron contains valid data
 bool is_valid(const polyhedron& Polyhedron);

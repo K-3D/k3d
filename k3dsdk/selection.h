@@ -112,7 +112,7 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS);
 std::istream& operator>>(std::istream& Stream, type& RHS);
 
 typedef GLuint id;
-const id null_id();
+id null_id();
 
 struct token
 {
@@ -133,8 +133,8 @@ struct record
 	record();
 	static const record empty_record();
 
-	const bool empty() const;
-	const id get_id(const selection::type Type) const;
+	bool empty() const;
+	id get_id(const selection::type Type) const;
 	const token get_token(const selection::type Type) const;
 
 	GLuint zmin;
@@ -148,7 +148,7 @@ std::istream& operator>>(std::istream& Stream, record& RHS);
 
 typedef std::vector<record> records;
 
-const id node_id(inode*);
+id node_id(inode*);
 const record make_record(inode*);
 const records make_records(inode*);
 
@@ -156,7 +156,7 @@ inode* get_node(const record& Record);
 mesh* get_mesh(const record& Record);
 
 template<typename T>
-const bool is_selected(T* Object)
+bool is_selected(T* Object)
 {
 	iselectable* const selectable = dynamic_cast<iselectable*>(Object);
 	return selectable && selectable->get_selection_weight();

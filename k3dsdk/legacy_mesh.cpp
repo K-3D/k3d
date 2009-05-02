@@ -925,7 +925,7 @@ struct point_map_t :
 		return operator[](Key);
 	}
 
-	void visit_constant(blobby::constant& Constant)
+	void visit_constant(blobby::constant&)
 	{
 	}
 
@@ -1135,7 +1135,7 @@ void deep_copy(const mesh& Input, mesh& Output)
 /////////////////////////////////////////////////////////////////////////////
 // segment_count
 
-const unsigned long segment_count(const linear_curve& Curve, const bool Wrap)
+unsigned long segment_count(const linear_curve& Curve, const bool Wrap)
 {
 	if(Wrap)
 		return Curve.control_points.size();
@@ -1143,7 +1143,7 @@ const unsigned long segment_count(const linear_curve& Curve, const bool Wrap)
 	return Curve.control_points.size() ? Curve.control_points.size() - 1 : 0;
 }
 
-const unsigned long segment_count(const cubic_curve& Curve, const bool Wrap)
+unsigned long segment_count(const cubic_curve& Curve, const bool Wrap)
 {
 	const unsigned long vstep = 3;
 
@@ -1156,12 +1156,12 @@ const unsigned long segment_count(const cubic_curve& Curve, const bool Wrap)
 /////////////////////////////////////////////////////////////////////////////
 // varying count
 
-const unsigned long varying_count(const linear_curve& Curve, const bool Wrap)
+unsigned long varying_count(const linear_curve& Curve, const bool Wrap)
 {
 	return Wrap ? segment_count(Curve, Wrap) : segment_count(Curve, Wrap) + 1;
 }
 
-const unsigned long varying_count(const cubic_curve& Curve, const bool Wrap)
+unsigned long varying_count(const cubic_curve& Curve, const bool Wrap)
 {
 	return Wrap ? segment_count(Curve, Wrap) : segment_count(Curve, Wrap) + 1;
 }

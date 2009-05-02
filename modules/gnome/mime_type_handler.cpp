@@ -54,7 +54,7 @@ public:
 	{
 	}
 
-	const bool identify_mime_type(const k3d::filesystem::path& File, k3d::string_t& FileType)
+	k3d::bool_t identify_mime_type(const k3d::filesystem::path& File, k3d::string_t& FileType)
 	{
 		const char* const mime_type = gnome_vfs_get_mime_type_for_name(File.native_filesystem_string().c_str());
 		return_val_if_fail(mime_type, false);
@@ -68,7 +68,7 @@ public:
 		return true;
 	}
 
-	const bool identify_mime_type(const k3d::string_t& Data, k3d::string_t& DataType)
+	k3d::bool_t identify_mime_type(const k3d::string_t& Data, k3d::string_t& DataType)
 	{
 		return false;
 	}

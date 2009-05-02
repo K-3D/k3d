@@ -65,7 +65,7 @@ public:
 		return true;
 	}
 
-	const k3d::bool_t identify_mime_type(const k3d::filesystem::path& File, k3d::string_t& FileType)
+	k3d::bool_t identify_mime_type(const k3d::filesystem::path& File, k3d::string_t& FileType)
 	{
 		if(test_type(".bmp", "image/bmp", File, FileType)) return true;
 		if(test_type(".jpe", "image/jpeg", File, FileType)) return true;
@@ -98,7 +98,7 @@ public:
 		return false;
 	}
 
-	const k3d::bool_t test_type(const k3d::string_t& TestToken, const k3d::string_t& TestType, const k3d::string_t& Data, k3d::string_t& DataType)
+	k3d::bool_t test_type(const k3d::string_t& TestToken, const k3d::string_t& TestType, const k3d::string_t& Data, k3d::string_t& DataType)
 	{
 		if(Data.substr(0, TestToken.size()) != TestToken)
 			return false;
@@ -109,7 +109,7 @@ public:
 		return true;
 	}
 
-	const k3d::bool_t identify_mime_type(const k3d::string_t& Data, k3d::string_t& DataType)
+	k3d::bool_t identify_mime_type(const k3d::string_t& Data, k3d::string_t& DataType)
 	{
 		if(test_type("#python", "text/x-python", Data, DataType)) return true;
 		if(test_type("#k3dscript", "text/x-k3dscript", Data, DataType)) return true;

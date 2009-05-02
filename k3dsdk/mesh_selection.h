@@ -122,7 +122,7 @@ public:
 
 		void add_range(const uint_t IndexBegin, const uint_t IndexEnd, const double_t Weight);
 		void clear();
-		const bool_t empty() const;
+		bool_t empty() const;
 
 		uint_t primitive_begin;
 		uint_t primitive_end;

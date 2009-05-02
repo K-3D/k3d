@@ -65,7 +65,7 @@ void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& O
 	on_deform_mesh(input_points, selection, output_points);
 }
 
-void mesh_simple_deformation_modifier::on_selection_changed(ihint* Hint)
+void mesh_simple_deformation_modifier::on_selection_changed(ihint*)
 {
 	m_selection_changed = true;
 }

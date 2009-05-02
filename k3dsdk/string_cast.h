@@ -17,7 +17,7 @@ namespace k3d
 
 /// Converts any serializable type to a string
 template<typename type>
-const std::string string_cast(const type& RHS)
+const string_t string_cast(const type& RHS)
 {
 	std::ostringstream buffer;
 	if(std::numeric_limits<type>::is_specialized)
@@ -27,16 +27,16 @@ const std::string string_cast(const type& RHS)
 	return buffer.str();
 }
 
-/// Specialization of string_cast for type bool
+/// Specialization of string_cast for type bool_t
 template<>
-inline const std::string string_cast<bool>(const bool& RHS)
+inline const string_t string_cast<bool_t>(const bool_t& RHS)
 {
 	return RHS ? "true" : "false";
 }
 
 /// Specialization of string_cast for strings
 template<>
-inline const std::string string_cast<std::string>(const std::string& RHS)
+inline const string_t string_cast<string_t>(const string_t& RHS)
 {
 	return RHS;
 }
@@ -44,14 +44,14 @@ inline const std::string string_cast<std::string>(const std::string& RHS)
 /// Specialization of string_cast() for filesystem::path
 /** \todo Is this really the correct behavior?  */
 template<>
-inline const std::string string_cast<filesystem::path>(const filesystem::path& RHS)
+inline const string_t string_cast<filesystem::path>(const filesystem::path& RHS)
 {
 	return RHS.native_utf8_string().raw();
 }
 
 /// Specialization of string_cast() for boost::format
 template<>
-inline const std::string string_cast<boost::format>(const boost::format& RHS)
+inline const string_t string_cast<boost::format>(const boost::format& RHS)
 {
 	return RHS.str();
 }
@@ -61,7 +61,7 @@ inline const std::string string_cast<boost::format>(const boost::format& RHS)
 
 /// Converts a string into any serializeable type
 template<typename type>
-const type from_string(const std::string& Value, const type& Default)
+const type from_string(const string_t& Value, const type& Default)
 {
 	type result = Default;
 	std::istringstream stream(Value.c_str());
@@ -70,11 +70,11 @@ const type from_string(const std::string& Value, const type& Default)
 	return result;
 }
 
-/// Specialization of from_string for type bool
+/// Specialization of from_string for type bool_t
 template<>
-inline const bool from_string(const std::string& Value, const bool& Default)
+inline const bool_t from_string(const string_t& Value, const bool_t& Default)
 {
-	bool result = Default;
+	bool_t result = Default;
 
 	if(Value == "true")
 		result = true;
@@ -86,14 +86,14 @@ inline const bool from_string(const std::string& Value, const bool& Default)
 
 /// Specialization of from_string for strings
 template<>
-inline const std::string from_string(const std::string& Value, const std::string& Default)
+inline const string_t from_string(const string_t& Value, const string_t&)
 {
 	return Value;
 }
 
 /// Specialization of from_string for filesystem::path
 template<>
-inline const filesystem::path from_string(const std::string& Value, const filesystem::path&)
+inline const filesystem::path from_string(const string_t& Value, const filesystem::path&)
 {
 	return filesystem::native_path(ustring::from_utf8(Value));
 }

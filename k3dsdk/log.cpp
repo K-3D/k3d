@@ -165,7 +165,7 @@ void log_cache(const time_t Timestamp, const log_level_t Level, const std::strin
 
 #ifndef K3D_API_WIN32
 
-void log_syslog(const time_t Timestamp, const log_level_t Level, const std::string& Message)
+void log_syslog(const time_t, const log_level_t Level, const std::string& Message)
 {
 	if(!g_log_syslog)
 		return;

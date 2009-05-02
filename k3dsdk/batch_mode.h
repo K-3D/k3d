@@ -21,14 +21,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
+
+#include "types.h"
 
 namespace k3d
 {
 
 /// Returns the current batch (no user intervention) mode state
-const bool batch_mode();
+bool_t batch_mode();
 
 } // namespace k3d
 

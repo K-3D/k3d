@@ -43,12 +43,12 @@ namespace conversion
 class multiplicative
 {
 public:
-	const double to_si(const double RHS) const
+	double to_si(const double RHS) const
 	{
 		return RHS * m_constant;
 	}
 
-	const double from_si(const double RHS) const
+	double from_si(const double RHS) const
 	{
 		return RHS / m_constant;
 	}
@@ -130,7 +130,7 @@ public:
 	{
 	}
 
-	const double to_si() const
+	double to_si() const
 	{
 		return m_quantity.to_si();
 	}
@@ -177,7 +177,7 @@ public:
 		return m_value;
 	}
 
-	const double value() const
+	double value() const
 	{
 		return m_value;
 	}
@@ -187,7 +187,7 @@ public:
 		return m_units;
 	}
 
-	const double to_si() const
+	double to_si() const
 	{
 		return m_units.to_si(m_value);
 	}

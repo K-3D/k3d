@@ -144,7 +144,7 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 	return Stream;
 }
 
-const id null_id()
+id null_id()
 {
 	return static_cast<id>(-1);
 }
@@ -200,12 +200,12 @@ const record record::empty_record()
 	return record();
 }
 
-const bool record::empty() const
+bool record::empty() const
 {
 	return tokens.empty();
 }
 
-const id record::get_id(const type Type) const
+id record::get_id(const type Type) const
 {
 	for(tokens_t::const_iterator token = tokens.begin(); token != tokens.end(); ++token)
 	{
@@ -255,7 +255,7 @@ std::istream& operator>>(std::istream& Stream, record& RHS)
 //////////////////////////////////////////////////////////////////////////////////
 // node_id
 
-const id node_id(inode* Node)
+id node_id(inode* Node)
 {
 	return detail::node_lookup.lookup_id(Node);
 }

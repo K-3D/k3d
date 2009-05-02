@@ -45,20 +45,20 @@ public:
 	/// Returns the MIME type of a data stream (could return an empty value if the data cannot be identified)
 	static const type lookup(const string_t& Data);
 
-	const bool operator==(const string_t&) const;
-	const bool operator==(const type&) const;
-	const bool operator!=(const type&) const;
+	bool_t operator==(const string_t&) const;
+	bool_t operator==(const type&) const;
+	bool_t operator!=(const type&) const;
 
 	const string_t str() const;
 
-	const bool empty() const;
-	operator bool() const;
+	bool_t empty() const;
+	operator bool_t() const;
 
 private:
 	string_t value;
 };
 
-const bool operator==(const string_t&, const type&);
+bool_t operator==(const string_t&, const type&);
 
 } // namespace mime
 

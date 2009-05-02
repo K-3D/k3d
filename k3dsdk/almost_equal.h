@@ -145,8 +145,7 @@ public:
 
 	inline bool_t operator()(const T A, const T B) const
 	{
-		const int64_t difference = representable_difference(A, B);
-		return difference < 0 ? -difference <= threshold : difference <= threshold;
+		return representable_difference(A, B) <= threshold;
 	}
 
 private:
@@ -158,9 +157,11 @@ private:
 	}
 
 	/// Given two double_t, returns their difference expressed as the number of uniquely-representable floating-point values that separate them
-	inline static int64_t representable_difference(const double_t A, const double_t B)
+	inline static uint64_t representable_difference(const double_t A, const double_t B)
 	{
-		return to_integer(B) - to_integer(A);
+		const int64_t a = to_integer(A);
+		const int64_t b = to_integer(B);
+		return a > b ? a - b : b - a;
 	}
 
 	const uint64_t threshold;

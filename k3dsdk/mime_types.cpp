@@ -69,7 +69,7 @@ const handlers_t& get_handlers()
 {
 	// Cache a collection of MIME-type handlers ...
 	static handlers_t handlers;
-	static bool initialized = false;
+	static bool_t initialized = false;
 
 	if(!initialized)
 	{
@@ -130,17 +130,17 @@ const type type::lookup(const string_t& Data)
 	return data_type;
 }
 
-const bool type::operator==(const string_t& RHS) const
+bool_t type::operator==(const string_t& RHS) const
 {
 	return value == RHS;
 }
 
-const bool type::operator==(const type& RHS) const
+bool_t type::operator==(const type& RHS) const
 {
 	return value == RHS.value;
 }
 
-const bool type::operator!=(const type& RHS) const
+bool_t type::operator!=(const type& RHS) const
 {
 	return value != RHS.value;
 }
@@ -150,17 +150,17 @@ const string_t type::str() const
 	return value;
 }
 
-const bool type::empty() const
+bool_t type::empty() const
 {
 	return value.empty();
 }
 
-type::operator bool() const
+type::operator bool_t() const
 {
 	return value.empty();
 }
 
-const bool operator==(const string_t& LHS, const type& RHS)
+bool_t operator==(const string_t& LHS, const type& RHS)
 {
 	return RHS == LHS;
 }

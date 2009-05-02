@@ -143,7 +143,7 @@ private:
 		}
 	}
 
-	void combine(GLdouble Coords[3], void* VertexData[4], GLfloat Weight[4], void** OutputData)
+	void combine(GLdouble Coords[3], void* [4], GLfloat [4], void** OutputData)
 	{
 		point* const new_point = new point(point3(Coords[0], Coords[1], Coords[2]));
 		*OutputData = new_point;

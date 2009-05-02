@@ -38,7 +38,7 @@ public:
 	{
 	protected:
 		copy_policy() {}
-		~copy_policy() {}
+		virtual ~copy_policy() {}
 
 	public:
 		/// Return true to indicate that the given source array should be copied to the given target array.  Note that this method
