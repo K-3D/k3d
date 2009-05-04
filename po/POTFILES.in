@@ -205,7 +205,6 @@ modules/mesh/array_2d.cpp
 modules/mesh/array_3d.cpp
 modules/mesh/bevel_faces.cpp
 modules/mesh/cap_hole.cpp
-modules/mesh/catmull_clark_subdivider.cpp
 modules/mesh/collapse_edges.cpp
 modules/mesh/face_normals.cpp
 modules/mesh/fillet_edges.cpp
@@ -484,6 +483,7 @@ modules/selection/select_nurbs_patch_by_number.cpp
 modules/selection/select_point_by_number.cpp
 modules/stl_io/mesh_reader.cpp
 modules/stl_io/mesh_writer.cpp
+modules/subdivision_surface/catmull_clark_subdivider.cpp
 modules/svg_io/mesh_reader.cpp
 modules/test/legacy_mesh_conversion.cpp
 modules/test/memory_pools.cpp
