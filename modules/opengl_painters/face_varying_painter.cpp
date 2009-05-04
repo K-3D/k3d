@@ -80,10 +80,6 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-
 		const k3d::mesh::points_t& points = *Mesh.points;
 		const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
 
@@ -103,28 +99,33 @@ public:
 		glPointSize(m_point_size.pipeline_value());
 		const k3d::double_t offset = m_offset.pipeline_value();
 
-		glBegin(GL_POINTS);
-		const k3d::uint_t face_begin = 0;
-		const k3d::uint_t face_end = polyhedron->face_first_loops.size();
-		for(k3d::uint_t face = face_begin; face != face_end; ++face)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-			const k3d::uint_t loop_end = loop_begin +polyhedron->face_loop_counts[face];
-			for(k3d::uint_t loop = 0; loop != loop_end; ++loop)
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+			glBegin(GL_POINTS);
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = polyhedron->face_first_loops.size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-				for(k3d::uint_t edge = first_edge; ;)
+				const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+				const k3d::uint_t loop_end = loop_begin +polyhedron->face_loop_counts[face];
+				for(k3d::uint_t loop = 0; loop != loop_end; ++loop)
 				{
-					color4d(polyhedron->edge_selections[edge] ? selected_color : color);
-					k3d::gl::vertex3d(detail::get_offset_point(polyhedron->edge_points, polyhedron->clockwise_edges, points, edge, offset));
-					edge = polyhedron->clockwise_edges[edge];
-					if(edge == first_edge)
-						break;
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+					for(k3d::uint_t edge = first_edge; ;)
+					{
+						color4d(polyhedron->edge_selections[edge] ? selected_color : color);
+						k3d::gl::vertex3d(detail::get_offset_point(polyhedron->edge_points, polyhedron->clockwise_edges, points, edge, offset));
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
 				}
 			}
+			glEnd();
 		}
-		glEnd();
-
 		glPointSize(old_point_size);
 		disable_blending();
 	}
@@ -132,10 +133,6 @@ public:
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if(!SelectionState.select_split_edges)
-			return;
-
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
 			return;
 
 		const k3d::mesh::points_t& points = *Mesh.points;
@@ -151,28 +148,34 @@ public:
 		glPointSize(m_point_size.pipeline_value());
 		const k3d::double_t offset = m_offset.pipeline_value();
 
-		const k3d::uint_t face_begin = 0;
-		const k3d::uint_t face_end = polyhedron->face_first_loops.size();
-		for(k3d::uint_t face = face_begin; face != face_end; ++face)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-			const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-			for(k3d::uint_t loop = 0; loop != loop_end; ++loop)
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = polyhedron->face_first_loops.size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-				for(k3d::uint_t edge = first_edge; ;)
+				const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+				const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+				for(k3d::uint_t loop = 0; loop != loop_end; ++loop)
 				{
-					k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
-
-					glBegin(GL_POINTS);
-					k3d::gl::vertex3d(detail::get_offset_point(polyhedron->edge_points, polyhedron->clockwise_edges, points, edge, offset));
-					glEnd();
-
-					k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
-
-					edge = polyhedron->clockwise_edges[edge];
-					if(edge == first_edge)
-						break;
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+					for(k3d::uint_t edge = first_edge; ;)
+					{
+						k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
+	
+						glBegin(GL_POINTS);
+						k3d::gl::vertex3d(detail::get_offset_point(polyhedron->edge_points, polyhedron->clockwise_edges, points, edge, offset));
+						glEnd();
+	
+						k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
+	
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
 				}
 			}
 		}

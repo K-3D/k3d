@@ -58,31 +58,34 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-
 		const k3d::mesh::points_t& points = *Mesh.points;
 		
-		k3d::gl::store_attributes attributes;
-		glDisable(GL_LIGHTING);
-
-		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-		
-		enable_blending();
-		
-		glBegin(GL_LINES);
-		const k3d::uint_t edge_count = polyhedron->edge_points.size();
-		for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			color4d(polyhedron->edge_selections[edge] ? selected_color : color);
-			k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
-			k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
-		}
-		glEnd();
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
 		
-		disable_blending();
+			k3d::gl::store_attributes attributes;
+			glDisable(GL_LIGHTING);
+	
+			const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+			const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+			
+			enable_blending();
+			
+			glBegin(GL_LINES);
+			const k3d::uint_t edge_count = polyhedron->edge_points.size();
+			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
+			{
+				color4d(polyhedron->edge_selections[edge] ? selected_color : color);
+				k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
+				k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
+			}
+			glEnd();
+			
+			disable_blending();
+		}
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
@@ -90,34 +93,34 @@ public:
 		if(!SelectionState.select_split_edges)
 			return;
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-		
-		if(polyhedron->edge_points.empty())
-			return;
-
 		const k3d::mesh::points_t& points = *Mesh.points;
-		
-		k3d::gl::store_attributes attributes;
-		glDisable(GL_LIGHTING);
 
-		const k3d::uint_t edge_count = polyhedron->edge_points.size();
-		for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			if(SelectionState.select_backfacing || 
-				(!SelectionState.select_backfacing && 
-				!backfacing(points[polyhedron->edge_points[edge]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(polyhedron->edge_points[edge]))
-										&& !backfacing(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(polyhedron->edge_points[polyhedron->clockwise_edges[edge]]))))
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+		
+			k3d::gl::store_attributes attributes;
+			glDisable(GL_LIGHTING);
+	
+			const k3d::uint_t edge_count = polyhedron->edge_points.size();
+			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
-				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
-	
-				glBegin(GL_LINES);
-				k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
-				k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
-				glEnd();
-	
-				k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
+				if(SelectionState.select_backfacing || 
+					(!SelectionState.select_backfacing && 
+					!backfacing(points[polyhedron->edge_points[edge]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(polyhedron->edge_points[edge]))
+											&& !backfacing(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(polyhedron->edge_points[polyhedron->clockwise_edges[edge]]))))
+				{
+					k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
+		
+					glBegin(GL_LINES);
+					k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
+					k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
+					glEnd();
+		
+					k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
+				}
 			}
 		}
 	}

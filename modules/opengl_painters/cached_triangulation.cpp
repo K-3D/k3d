@@ -39,10 +39,16 @@ void cached_triangulation::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter
 	{
 		m_progress = 0;
 		m_point_links.resize(Mesh.points->size());
-		m_points.resize(Mesh.polyhedra->edge_points->size());
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		k3d::triangulator::process(Mesh, *polyhedron);
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(polyhedron.get() && !k3d::polyhedron::is_sds(*polyhedron))
+			{
+				m_points.resize(m_points.size() + polyhedron->edge_points.size());
+				k3d::triangulator::process(Mesh, *polyhedron);
+			}
+		}
 	}
 	else
 	{

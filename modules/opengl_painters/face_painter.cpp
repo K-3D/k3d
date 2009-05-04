@@ -24,6 +24,7 @@
 #include "cached_triangulation.h"
 #include "colored_selection_painter_gl.h"
 #include "normal_cache.h"
+#include "utility.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/array.h>
@@ -67,116 +68,117 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if(k3d::polyhedron::is_sds(*polyhedron))
-			return;
-		
-		k3d::gl::store_attributes attributes;
-
-		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
-
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0, 1.0);
-		
-		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-		
-		document().pipeline_profiler().start_execution(*this, "Triangulate");
-		cached_triangulation& triangles = get_data<cached_triangulation>(&Mesh, this);
-		document().pipeline_profiler().finish_execution(*this, "Triangulate");
-		const k3d::mesh::indices_t& face_starts = triangles.face_starts();
-		if (face_starts.empty())
-			return;
-		const k3d::mesh::points_t& points = triangles.points();
-		const cached_triangulation::indices_t& indices = triangles.indices();
-		
-		glEnable(GL_LIGHTING);
-		enable_blending();
-		
-		const k3d::mesh::indices_t& edge_points = polyhedron->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = polyhedron->clockwise_edges;
-		const k3d::mesh::indices_t& loop_first_edges = polyhedron->loop_first_edges;
-		const k3d::mesh::indices_t& face_first_loops = polyhedron->face_first_loops;
-		const k3d::mesh::indices_t& face_loop_counts = polyhedron->face_loop_counts;
-		const k3d::mesh::points_t& mesh_points = *Mesh.points;
-		const k3d::mesh::selection_t& face_selection = polyhedron->face_selections;
-		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
-
-		glBegin(GL_TRIANGLES);
-		for (k3d::uint_t face = 0; face != face_starts.size(); ++face)
+		k3d::uint_t face_offset = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			k3d::uint_t startindex = face_starts[face];
-			k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
-			const color_t& face_color = face_selection[face] ? selected_color : color;
-			k3d::gl::normal3d(n_cache.face_normals(this).at(face));
-			k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
-			for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
-				k3d::gl::vertex3d(points[indices[corner]]);
-		}
-		glEnd();
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+			
+			if(k3d::polyhedron::is_sds(*polyhedron))
+				continue;
 		
-		disable_blending();
+			k3d::gl::store_attributes attributes;
+	
+			glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
+	
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonOffset(1.0, 1.0);
+			
+			const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+			const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+			
+			document().pipeline_profiler().start_execution(*this, "Triangulate");
+			cached_triangulation& triangles = get_data<cached_triangulation>(&Mesh, this);
+			document().pipeline_profiler().finish_execution(*this, "Triangulate");
+			const k3d::mesh::indices_t& face_starts = triangles.face_starts();
+			if (face_starts.empty())
+				return;
+			const k3d::mesh::points_t& points = triangles.points();
+			const cached_triangulation::indices_t& indices = triangles.indices();
+			
+			glEnable(GL_LIGHTING);
+			enable_blending();
+			
+			const k3d::mesh::selection_t& face_selections = polyhedron->face_selections;
+			normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
+	
+			glBegin(GL_TRIANGLES);
+			for (k3d::uint_t face = 0; face != face_selections.size(); ++face)
+			{
+				k3d::uint_t startindex = face_starts[face + face_offset];
+				k3d::uint_t endindex = face+face_offset+1 == face_starts.size() ? indices.size() : face_starts[face+1 + face_offset];
+				const color_t& face_color = face_selections[face] ? selected_color : color;
+				k3d::gl::normal3d(n_cache.face_normals(this).at(face));
+				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
+				for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
+					k3d::gl::vertex3d(points[indices[corner]]);
+			}
+			glEnd();
+		
+			disable_blending();
+			
+			face_offset += polyhedron->face_first_loops.size();
+		}
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if (k3d::polyhedron::is_sds(*polyhedron))
-			return;
-			
-		if (!SelectionState.select_faces)
-			return;
-
-		k3d::gl::store_attributes attributes;
-		
-		glDisable(GL_LIGHTING);
-
-		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		k3d::gl::set(GL_CULL_FACE, !SelectionState.select_backfacing);
-
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0, 1.0);
-		
-		cached_triangulation& triangles = get_data<cached_triangulation>(&Mesh, this); 
-		
-		const k3d::mesh::indices_t& face_starts = triangles.face_starts();
-		if (face_starts.empty())
-			return;
-		const k3d::mesh::points_t& points = triangles.points();
-		const cached_triangulation::indices_t& indices = triangles.indices();
-		
-		k3d::uint_t face_count = polyhedron->face_first_loops.size();
-		for(k3d::uint_t face = 0; face != face_count; ++face)
+		k3d::uint_t face_offset = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
-
-			k3d::uint_t startindex = face_starts[face];
-			k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
-			glBegin(GL_TRIANGLES);
-			for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
-				k3d::gl::vertex3d(points[indices[corner]]);
-			glEnd();
-
-			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+			
+			if (k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+				
+			if (!SelectionState.select_faces)
+				continue;
+	
+			k3d::gl::store_attributes attributes;
+			
+			glDisable(GL_LIGHTING);
+	
+			glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			k3d::gl::set(GL_CULL_FACE, !SelectionState.select_backfacing);
+	
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonOffset(1.0, 1.0);
+			
+			cached_triangulation& triangles = get_data<cached_triangulation>(&Mesh, this); 
+			
+			const k3d::mesh::indices_t& face_starts = triangles.face_starts();
+			if (face_starts.empty())
+				return;
+			const k3d::mesh::points_t& points = triangles.points();
+			const cached_triangulation::indices_t& indices = triangles.indices();
+			
+			k3d::uint_t face_count = polyhedron->face_first_loops.size();
+			for(k3d::uint_t face = 0; face != face_count; ++face)
+			{
+				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
+	
+				k3d::uint_t startindex = face_starts[face+face_offset];
+				k3d::uint_t endindex = face+face_offset+1 == (face_starts.size()) ? indices.size() : face_starts[face+face_offset+1];
+				glBegin(GL_TRIANGLES);
+				for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
+					k3d::gl::vertex3d(points[indices[corner]]);
+				glEnd();
+	
+				k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+			}
+			face_offset += face_count;
 		}
 	}
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if (k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_non_sds_polyhedra(Mesh))
 			return;
 		
 		schedule_data<cached_triangulation>(&Mesh, Hint, this);

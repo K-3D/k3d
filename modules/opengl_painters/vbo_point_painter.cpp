@@ -22,6 +22,7 @@
 
 #include "colored_selection_painter_gl.h"
 #include "normal_cache.h"
+#include "utility.h"
 #include "vbo.h"
 
 #include <k3d-i18n-config.h>
@@ -117,8 +118,7 @@ public:
 		if (!SelectionState.select_points)
 			return;
 		
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		bool valid_polyhedra = polyhedron && !Mesh.polyhedra->face_first_loops->empty();
+		bool valid_polyhedra = has_non_empty_polyhedra(Mesh);
 		
 		clean_vbo_state();
 

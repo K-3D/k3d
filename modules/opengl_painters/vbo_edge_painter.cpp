@@ -22,6 +22,7 @@
 
 #include "colored_selection_painter_gl.h"
 #include "normal_cache.h"
+#include "utility.h"
 #include "vbo.h"
 
 #include <k3d-i18n-config.h>
@@ -65,8 +66,7 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
+		if(!has_non_empty_polyhedra(Mesh))
 			return;
 		
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
@@ -82,27 +82,35 @@ public:
 		edge_selection& selected_edges = get_data<edge_selection>(&Mesh, this);
 		
 		get_data<point_vbo>(&Mesh, this).bind();
-		get_data<edge_vbo>(&Mesh, this).bind();
 		
-		size_t edge_count = Mesh.polyhedra->edge_points->size();
-		const selection_records_t& edge_selection_records = selected_edges.records();
-		if (!edge_selection_records.empty())
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			for (selection_records_t::const_iterator record = edge_selection_records.begin(); record != edge_selection_records.end(); ++record)
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+		
+			get_data<edge_vbo>(&Mesh, this).bind(primitive->get());
+			
+			const k3d::uint_t edge_count = polyhedron->edge_points.size();
+			const selection_records_t& edge_selection_records = selected_edges.records(primitive->get());
+			if (!edge_selection_records.empty())
 			{
-				color4d(record->weight ? selected_color : color);
-				size_t start = record->begin * 2;
-				size_t end = record->end;
-				end = end > edge_count ? edge_count : end;
-				end *= 2;
-				size_t count = end - start;
-				glDrawElements(GL_LINES, count, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + start);
+				for (selection_records_t::const_iterator record = edge_selection_records.begin(); record != edge_selection_records.end(); ++record)
+				{
+					color4d(record->weight ? selected_color : color);
+					size_t start = record->begin * 2;
+					size_t end = record->end;
+					end = end > edge_count ? edge_count : end;
+					end *= 2;
+					size_t count = end - start;
+					glDrawElements(GL_LINES, count, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + start);
+				}
 			}
-		}
-		else
-		{
-			color4d(color);
-			glDrawElements(GL_LINES, Mesh.polyhedra->edge_points->size() * 2, GL_UNSIGNED_INT, 0);
+			else
+			{
+				color4d(color);
+				glDrawElements(GL_LINES, polyhedron->edge_points.size() * 2, GL_UNSIGNED_INT, 0);
+			}
 		}
 		
 		clean_vbo_state();
@@ -113,14 +121,10 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
+		if(!has_non_empty_polyhedra(Mesh))
 			return;
 			
 		if (!SelectionState.select_split_edges)
-			return;
-		
-		if(Mesh.polyhedra->edge_points->empty())
 			return;
 		
 		k3d::gl::store_attributes attributes;
@@ -129,25 +133,32 @@ public:
 		clean_vbo_state();
 		
 		get_data<point_vbo>(&Mesh, this).bind();
-		get_data<edge_vbo>(&Mesh, this).bind();
 		
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::mesh::points_t& points = *Mesh.points;
-		
-		const size_t edge_count = Mesh.polyhedra->edge_points->size();
-		for(size_t edge = 0; edge < edge_count; ++edge)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			if (SelectionState.select_backfacing || 
-					(!SelectionState.select_backfacing && 
-							!backfacing(points[edge_points[edge]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(edge_points[edge]))
-							&& !backfacing(points[edge_points[clockwise_edges[edge]]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(edge_points[clockwise_edges[edge]]))))
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+		
+			get_data<edge_vbo>(&Mesh, this).bind(primitive->get());
+			
+			const k3d::mesh::indices_t& edge_points = polyhedron->edge_points;
+			const k3d::mesh::indices_t& clockwise_edges = polyhedron->clockwise_edges;
+			const k3d::mesh::points_t& points = *Mesh.points;
+			
+			const size_t edge_count = polyhedron->edge_points.size();
+			for(size_t edge = 0; edge < edge_count; ++edge)
 			{
-				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
-	
-				glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + 2*edge);
-	
-				k3d::gl::pop_selection_token();
+				if (SelectionState.select_backfacing || 
+						(!SelectionState.select_backfacing && 
+								!backfacing(points[edge_points[edge]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(edge_points[edge]))
+								&& !backfacing(points[edge_points[clockwise_edges[edge]]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(edge_points[clockwise_edges[edge]]))))
+				{
+					k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
+		
+					glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + 2*edge);
+		
+					k3d::gl::pop_selection_token();
+				}
 			}
 		}
 		
@@ -158,8 +169,7 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 		
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
+		if(!has_non_empty_polyhedra(Mesh))
 			return;
 		
 		schedule_data<point_vbo>(&Mesh, Hint, this);

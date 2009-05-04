@@ -129,47 +129,49 @@ void point_vbo::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 // Class edge_vbo
 ////////
 
-void edge_vbo::bind()
+void edge_vbo::bind(const k3d::mesh::primitive* Primitive)
 {
-	if(!m_vbo)
+	if(m_vbos.find(Primitive) == m_vbos.end())
 	{
-		throw vbo_exception("edge_vbo is null");
+		throw vbo_exception("No VBO for edges");
 	}
-	if(!glIsBuffer(*m_vbo))
+	vbo& the_vbo = m_vbos[Primitive];
+	if(!glIsBuffer(the_vbo))
 	{
 		throw vbo_exception("edge_vbo is not a buffer!");
 	}
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, the_vbo);
 }
 
 void edge_vbo::on_schedule(k3d::inode* Painter)
 {
-	delete m_vbo;
-	m_vbo = 0;
+	m_vbos.clear();
 }
 
 void edge_vbo::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
-	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-	return_if_fail(polyhedron);
-	if (m_vbo)
+	if(m_vbos.size())
 		return;
-	
-	m_vbo = new vbo();
-	
-	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_vbo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * edge_points.size() * 2, 0, GL_STATIC_DRAW); // left uninited
-	// init index buffer with indices from edge_points and clockwise_edges
-	GLuint* indices = static_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE)); // map buffer memory in indices
-	for (size_t i = 0; i < edge_points.size(); ++i)
+	for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 	{
-		indices[2*i] = static_cast<GLuint>(edge_points[i]);
-		indices[2*i + 1] = static_cast<GLuint>(edge_points[clockwise_edges[i]]);
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+		if(!polyhedron.get())
+			continue;
+	
+		const k3d::mesh::indices_t& edge_points = polyhedron->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = polyhedron->clockwise_edges;
+		
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vbos[primitive->get()]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * edge_points.size() * 2, 0, GL_STATIC_DRAW); // left uninited
+		// init index buffer with indices from edge_points and clockwise_edges
+		GLuint* indices = static_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE)); // map buffer memory in indices
+		for (size_t i = 0; i < edge_points.size(); ++i)
+		{
+			indices[2*i] = static_cast<GLuint>(edge_points[i]);
+			indices[2*i + 1] = static_cast<GLuint>(edge_points[clockwise_edges[i]]);
+		}
+		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER); // release indices
 	}
-	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER); // release indices
 }
 
 ///////////////
@@ -424,14 +426,16 @@ private:
 
 typedef k3d::typed_array<std::string> tags_t;
 
-void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache)
+void sds_face_vbo::update(const k3d::mesh::primitive* Primitive, const k3d::uint_t Level, sds_cache& Cache)
 {
+	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*Primitive));
+	return_if_fail(polyhedron && k3d::polyhedron::is_sds(*polyhedron));
 	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
 	{
-		if(Mesh.polyhedra->constant_data.lookup<tags_t>("interpolateboundary"))
+		if(polyhedron->constant_data.lookup<tags_t>("interpolateboundary"))
 		{
-			face_visitor visitor(Cache.point_count(), Cache.edge_count(), Mesh.polyhedra->face_first_loops->size());
-			Cache.visit_surface(Level, visitor);
+			face_visitor visitor(Cache.point_count(), Cache.edge_count(Primitive), polyhedron->face_first_loops.size());
+			Cache.visit_surface(Primitive, Level, visitor);
 			
 			m_point_vbo = new vbo();
 			glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
@@ -450,11 +454,11 @@ void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_ca
 		}
 		else // interpolateboundary not set
 		{
-			k3d::polyhedron::create_edge_adjacency_lookup(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, m_boundary_edges, m_companions);
-			k3d::polyhedron::create_boundary_face_lookup(*Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->face_loop_counts, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->clockwise_edges, m_boundary_edges, m_companions, boundary_faces);
+			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, m_boundary_edges, m_companions);
+			k3d::polyhedron::create_boundary_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, m_boundary_edges, m_companions, boundary_faces);
 			
 			face_visitor_no_boundary visitor(boundary_faces);
-			Cache.visit_surface(Level, visitor);
+			Cache.visit_surface(Primitive, Level, visitor);
 			
 			m_point_vbo = new vbo();
 			glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
@@ -480,7 +484,7 @@ void sds_face_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_ca
 		GLuint* indices = static_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY));
 	
 		update_face_vbo_visitor visitor(points);
-		Cache.visit_surface(Level, visitor);
+		Cache.visit_surface(Primitive, Level, visitor);
 		
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
@@ -541,12 +545,14 @@ private:
 	k3d::uint_t m_edge;
 };
 
-void sds_edge_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache)
+void sds_edge_vbo::update(const k3d::mesh::primitive* Primitive, const k3d::uint_t Level, sds_cache& Cache)
 {
+	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*Primitive));
+	return_if_fail(polyhedron && k3d::polyhedron::is_sds(*polyhedron));
 	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
 	{
-		edge_visitor visitor(Mesh.polyhedra->edge_points->size());
-		Cache.visit_boundary(Mesh, Level, visitor);
+		edge_visitor visitor(polyhedron->edge_points.size());
+		Cache.visit_boundary(Primitive, Level, visitor);
 		
 		m_point_vbo = new vbo();
 		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
@@ -561,7 +567,7 @@ void sds_edge_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_ca
 		k3d::point3* points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 		
 		update_edge_vbo_visitor visitor(edge_starts, points);
-		Cache.visit_boundary(Mesh, Level, visitor);
+		Cache.visit_boundary(Primitive, Level, visitor);
 		
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 	}
@@ -597,12 +603,12 @@ private:
 	k3d::uint_t m_index;
 };
 
-void sds_point_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache)
+void sds_point_vbo::update(const k3d::mesh::primitive* Primitive, const k3d::uint_t Level, sds_cache& Cache)
 {
 	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
 	{
 		point_visitor visitor;
-		Cache.visit_corners(Level, visitor);
+		Cache.visit_corners(Primitive, Level, visitor);
 		
 		m_point_vbo = new vbo();
 		glBindBuffer(GL_ARRAY_BUFFER, *m_point_vbo);
@@ -616,7 +622,7 @@ void sds_point_vbo::update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_c
 		k3d::point3* points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 		
 		update_point_vbo_visitor visitor(points);
-		Cache.visit_corners(Level, visitor);
+		Cache.visit_corners(Primitive, Level, visitor);
 		
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 	}

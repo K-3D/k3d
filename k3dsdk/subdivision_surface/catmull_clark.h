@@ -27,7 +27,10 @@
 
 #include <k3dsdk/inode.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/types.h>
+
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace k3d
 {
@@ -92,30 +95,37 @@ protected:
 /// Stores a hierarchy of Catmull-Clark levels, and provides methods to create and update this hierarchy
 class catmull_clark_subdivider
 {
-	typedef std::vector<k3d::mesh> meshes_t;
+	typedef std::vector<k3d::mesh::points_t> points_t;
+	typedef boost::ptr_vector<k3d::polyhedron::primitive> polyhedra_t;
 public:
 	/// Create an empty Catmull-Clark mesh hierarchy with the given number of levels.
-	catmull_clark_subdivider(const k3d::uint_t Levels);
+	catmull_clark_subdivider(const k3d::uint_t Levels = 2);
 	
 	~catmull_clark_subdivider();
+	
+	/// Set the number of SDS levels (rebuilds the cache)
+	void set_levels(const k3d::uint_t Levels);
 	
 	/// Creates the topology of the hierarchy, with the final level being in Output
 	/**
 	 * Note: the Node is passed in order to enable pipeline profiling
 	 */
-	void create_mesh(const k3d::mesh& Input, const k3d::mesh::selection_t& InputFaceSelection, k3d::mesh& Output, k3d::inode* Node = 0);
+	void create_mesh(const k3d::mesh::points_t& InputPoints, const k3d::polyhedron::const_primitive& InputPolyhedron, const k3d::mesh::selection_t& InputFaceSelection, k3d::inode* Node = 0);
 	
 	/// Updates the point coordinates throughout the hierarchy, with the final level in Output
 	/**
 	 * Note: the Node is passed in order to enable pipeline profiling
 	 */
-	void update_mesh(const k3d::mesh& Input, const k3d::mesh::selection_t& InputFaceSelection, k3d::mesh& Output, k3d::inode* Node = 0);
+	void update_mesh(const k3d::mesh::points_t& InputPoints, const k3d::polyhedron::const_primitive& InputPolyhedron, const k3d::attribute_arrays& InputVertexData, const k3d::mesh::selection_t& InputFaceSelection, k3d::inode* Node = 0);
+	
+	/// Stores the subdivided mesh in the provided structures
+	void copy_output(k3d::mesh::points_t& Points, k3d::polyhedron::primitive& Polyhedron, k3d::attribute_arrays& VertexData);
 	
 	/// Visit the data representing the SDS patch surface
 	void visit_surface(const k3d::uint_t Level, ipatch_surface_visitor& Visitor);
 	
 	/// Visit the data representing the SDS patch boundaries, using the given source mesh (needed for topology info)
-	void visit_boundary(const k3d::mesh& Mesh, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor);
+	void visit_boundary(const k3d::polyhedron::const_primitive Polyhedron, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor);
 	
 	/// Visit the data representing the patch corners
 	void visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor);

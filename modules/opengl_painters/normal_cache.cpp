@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "normal_cache.h"
+#include "utility.h"
 
 #include <k3dsdk/hints.h>
 #include <k3dsdk/icamera.h>
@@ -41,41 +42,97 @@ namespace painters
 namespace detail
 {
 
+/// Calclate the normal for the given global face index (cumulative index over all polyhedra)
+const k3d::normal3 normal(const k3d::uint_t GlobalFace, const k3d::mesh& Mesh)
+{
+	k3d::uint_t faces_end = 0;
+	for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+	{
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+		if(!polyhedron.get())
+			continue;
+		faces_end += polyhedron->face_first_loops.size();
+		if(GlobalFace < faces_end)
+		{
+			const k3d::uint_t face = GlobalFace - (faces_end - polyhedron->face_first_loops.size());
+			return k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+		}
+	}
+}
+
+typedef std::set<k3d::uint_t> index_set_t;
+void get_affected_points(const k3d::mesh& Mesh, const k3d::uint_t GlobalFace, index_set_t& AffectedPoints)
+{
+	k3d::uint_t faces_end = 0;
+	for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+	{
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+		if(!polyhedron.get())
+			continue;
+		faces_end += polyhedron->face_first_loops.size();
+		if(GlobalFace < faces_end)
+		{
+			const k3d::uint_t face = GlobalFace - (faces_end - polyhedron->face_first_loops.size());
+			const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+			const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+			for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+			{
+				const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+				for(k3d::uint_t edge = first_edge; ; )
+				{
+					AffectedPoints.insert(polyhedron->edge_points[edge]);
+					edge = polyhedron->clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
+				}
+			}
+			return;
+		}
+	}
+}
+
 /// Traverse polygonal mesh, visiting faces, loops, and points.
 template<typename FunctorT>
 void traverse_polyhedra(const k3d::mesh& Mesh, FunctorT& Functor)
 {
-	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-	return_if_fail(polyhedron);
-
-	const k3d::mesh::points_t& points = *Mesh.points;
-	const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-	const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-	const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-	
-	const k3d::uint_t face_count = face_first_loops.size();
-	for(k3d::uint_t face = 0; face != face_count; ++face)
+	k3d::uint_t face_offset = 0;
+	for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 	{
-		Functor.on_face_start(face);
-		const k3d::uint_t loop_begin = face_first_loops[face];
-		const k3d::uint_t loop_end = loop_begin + face_loop_counts[face];
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+		if(!polyhedron.get())
+			continue;
 
-		for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+		const k3d::mesh::points_t& points = *Mesh.points;
+		const k3d::mesh::indices_t& face_first_loops = polyhedron->face_first_loops;
+		const k3d::mesh::counts_t& face_loop_counts = polyhedron->face_loop_counts;
+		const k3d::mesh::indices_t& loop_first_edges = polyhedron->loop_first_edges;
+		const k3d::mesh::indices_t& edge_points = polyhedron->edge_points;
+		const k3d::mesh::indices_t& clockwise_edges = polyhedron->clockwise_edges;
+		
+		const k3d::uint_t face_count = face_first_loops.size();
+		for(k3d::uint_t poly_face = 0; poly_face != face_count; ++poly_face)
 		{
-			Functor.on_loop(loop);
-			const k3d::uint_t first_edge = loop_first_edges[loop];
-
-			for(k3d::uint_t edge = first_edge; ; )
+			const k3d::uint_t face = poly_face + face_offset;
+			Functor.on_face_start(face);
+			const k3d::uint_t loop_begin = face_first_loops[face];
+			const k3d::uint_t loop_end = loop_begin + face_loop_counts[face];
+	
+			for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
 			{
-				Functor.on_edge(edge, edge_points[edge], edge_points[clockwise_edges[edge]], points[edge_points[edge]], points[edge_points[clockwise_edges[edge]]]);
-				edge = clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
+				Functor.on_loop(loop);
+				const k3d::uint_t first_edge = loop_first_edges[loop];
+	
+				for(k3d::uint_t edge = first_edge; ; )
+				{
+					Functor.on_edge(edge, edge_points[edge], edge_points[clockwise_edges[edge]], points[edge_points[edge]], points[edge_points[clockwise_edges[edge]]]);
+					edge = clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
+				}
 			}
+			Functor.on_face_end(face);
 		}
-		Functor.on_face_end(face);
+		face_offset += face_count;
 	}
 }
 
@@ -93,7 +150,7 @@ public:
 	
 	void on_face_end(const k3d::uint_t Face)
 	{
-		f_normals[Face] = k3d::normalize(m_normal); 
+		f_normals.push_back(k3d::normalize(m_normal)); 
 		m_normal = k3d::normal3(0,0,0);
 	}
 	
@@ -132,15 +189,9 @@ protected:
 	
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-		if(polyhedron->face_first_loops.empty())
-			return;
 		// Resize arrays and initialize normals if the topology changed
-		if (f_normals.empty())
+		if (point_to_faces.empty())
 		{
-			f_normals.resize(polyhedron->face_first_loops.size());
 			point_to_faces.resize(Mesh.points->size());
 			detail::traverse_polyhedra(Mesh, *this);
 		}
@@ -149,7 +200,7 @@ protected:
 			const k3d::mesh::indices_t& faces = point_to_faces[indices[i]];
 			for (k3d::uint_t j = 0; j != faces.size(); ++j)
 			{
-				f_normals[faces[j]] = k3d::polyhedron::normal(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, *Mesh.points, Mesh.polyhedra->loop_first_edges->at(Mesh.polyhedra->face_first_loops->at(faces[j])));
+				f_normals[faces[j]] = detail::normal(faces[j], Mesh);
 			}
 		}
 		indices.clear();
@@ -185,9 +236,7 @@ protected:
 	
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		return_if_fail(polyhedron);
-		if (polyhedron->face_first_loops.empty())
+		if(!has_non_empty_polyhedra(Mesh))
 			return;
 		face_normals& f_normals = get_data<face_normals>(&Mesh, Painter);
 		// Resize arrays and initialize normals if the topology changed
@@ -207,26 +256,14 @@ protected:
 		const k3d::mesh::points_t& points = *Mesh.points;
 		
 		// not only the moved points, but all points belonging to deformed faces need to be updated
-		std::set<k3d::uint_t> affected_points;
+		detail::index_set_t affected_points;
 		for (k3d::uint_t i = 0; i != indices.size(); ++i)
 		{
 			const k3d::mesh::indices_t& faces = f_normals.point_to_faces[indices[i]];
 			for (k3d::uint_t j = 0; j != faces.size(); ++j)
 			{
 				k3d::uint_t face = faces[j];
-				const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-				const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-				{
-					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-					for(k3d::uint_t edge = first_edge; ; )
-					{
-						affected_points.insert(polyhedron->edge_points[edge]);
-						edge = polyhedron->clockwise_edges[edge];
-						if(edge == first_edge)
-							break;
-					}
-				}
+				detail::get_affected_points(Mesh, face, affected_points);
 			}
 		}
 		for (std::set<k3d::uint_t>::iterator point = affected_points.begin(); point != affected_points.end(); ++point)

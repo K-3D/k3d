@@ -107,10 +107,6 @@ public:
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-
 		if(!m_font)
 		{
 			if(m_antialias.pipeline_value())
@@ -128,28 +124,32 @@ public:
 		}
 
 		const k3d::double_t offset = m_offset.pipeline_value();
-
 		const k3d::mesh::points_t& points = *Mesh.points;
-
-		const k3d::uint_t face_count = polyhedron->face_first_loops.size();
-
-		// Calculate face centers and normals ...
-		k3d::typed_array<k3d::point3> centers(face_count);
-		k3d::typed_array<k3d::normal3> normals(face_count);
-		for(k3d::uint_t face = 0; face != face_count; ++face)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			centers[face] = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
-			normals[face] = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
+	
+			// Calculate face centers and normals ...
+			k3d::typed_array<k3d::point3> centers(face_count);
+			k3d::typed_array<k3d::normal3> normals(face_count);
+			for(k3d::uint_t face = 0; face != face_count; ++face)
+			{
+				centers[face] = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+				normals[face] = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+			}
+	
+			k3d::gl::store_attributes attributes;
+			glDisable(GL_LIGHTING);
+	
+			if(draw_selected)
+				draw(centers, normals, m_selected_color.pipeline_value(), offset, selected_faces(*polyhedron), *m_font);
+	
+			if(draw_unselected)
+				draw(centers, normals, m_unselected_color.pipeline_value(), offset, unselected_faces(*polyhedron), *m_font);
 		}
-
-		k3d::gl::store_attributes attributes;
-		glDisable(GL_LIGHTING);
-
-		if(draw_selected)
-			draw(centers, normals, m_selected_color.pipeline_value(), offset, selected_faces(Mesh), *m_font);
-
-		if(draw_unselected)
-			draw(centers, normals, m_unselected_color.pipeline_value(), offset, unselected_faces(Mesh), *m_font);
 	}
 	
 	static k3d::iplugin_factory& get_factory()

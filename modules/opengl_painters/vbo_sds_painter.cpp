@@ -23,6 +23,7 @@
 #include "colored_selection_painter_gl.h"
 #include "sds_cache.h"
 #include "selection_cache.h"
+#include "utility.h"
 #include "vbo.h"
 
 #include <k3d-i18n-config.h>
@@ -74,11 +75,7 @@ public:
 	
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-
-		if (!k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_sds_polyhedra(Mesh))
 			return;
 		
 		sds_vbo<vbo_t>& vbo_cache = get_data<sds_vbo<vbo_t> >(&Mesh, this);
@@ -87,20 +84,22 @@ public:
 		
 		enable_blending();
 		clean_vbo_state();
-		k3d::uint_t levels = m_levels.pipeline_value(); 
-		vbo_cache.bind(levels, this);
-		draw(vbo_cache.cache(levels, this), get_data<selection_t>(&Mesh, this), RenderState); 
+		k3d::uint_t levels = m_levels.pipeline_value();
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get() || k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+			vbo_cache.bind(levels, this, primitive->get());
+			draw(primitive->get(), vbo_cache.cache(levels, this, primitive->get()), get_data<selection_t>(&Mesh, this), RenderState);
+		}
 		clean_vbo_state();
 		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if(!k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_sds_polyhedra(Mesh))
 			return;
 		
 		sds_vbo<vbo_t>& cache = get_data<sds_vbo<vbo_t> >(&Mesh, this);
@@ -108,9 +107,15 @@ public:
 		k3d::gl::store_attributes attributes;
 		
 		clean_vbo_state();
-		k3d::uint_t levels = m_levels.pipeline_value(); 
-		cache.bind(levels, this);
-		select(cache.cache(levels, this), SelectionState);
+		k3d::uint_t levels = m_levels.pipeline_value();
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get() || k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+			cache.bind(levels, this, primitive->get());
+			select(cache.cache(levels, this, primitive->get()), SelectionState);
+		}
 		clean_vbo_state();
 	}
 	
@@ -118,8 +123,7 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
+		if(!has_sds_polyhedra(Mesh))
 			return;
 		
 		schedule_data<selection_t>(&Mesh, Hint, this);
@@ -130,7 +134,7 @@ protected:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
 	
 	// override to choose drawing mode
-	virtual void draw(vbo_t& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState) = 0;
+	virtual void draw(const k3d::mesh::primitive* Primitive, vbo_t& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState) = 0;
 	
 	// override to choose selection mode
 	virtual void select(vbo_t& Cache, const k3d::gl::painter_selection_state& SelectionState) = 0;
@@ -161,7 +165,7 @@ public:
 		return factory;
 	}
 protected:
-	virtual void draw(vbo_t& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
+	virtual void draw(const k3d::mesh::primitive* Primitive, vbo_t& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
 	{
 		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
 		glEnable(GL_CULL_FACE);
@@ -174,7 +178,7 @@ protected:
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 
 		k3d::uint_t face_count = Cache.face_starts.size();
-		const selection_records_t& face_selection_records = Selection.records();
+		const selection_records_t& face_selection_records = Selection.records(Primitive);
 		if (!face_selection_records.empty())
 		{
 			for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
@@ -260,7 +264,7 @@ public:
 	}
 	
 private:
-	virtual void draw(vbo_t& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
+	virtual void draw(const k3d::mesh::primitive* Primitive, vbo_t& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
 	{
 		glDisable(GL_LIGHTING);
 		
@@ -269,7 +273,7 @@ private:
 		
 		k3d::uint_t edge_count = Cache.edge_starts.size();
 		
-		const selection_records_t& edge_selection_records = Selection.records();
+		const selection_records_t& edge_selection_records = Selection.records(Primitive);
 		if (!edge_selection_records.empty())
 		{
 			for (selection_records_t::const_iterator record = edge_selection_records.begin(); record != edge_selection_records.end() && record->begin < edge_count; ++record)
@@ -352,7 +356,7 @@ public:
 	}
 	
 private:
-	virtual void draw(vbo_t& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
+	virtual void draw(const k3d::mesh::primitive* Primitive, vbo_t& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
 	{
 		glDisable(GL_LIGHTING);
 		

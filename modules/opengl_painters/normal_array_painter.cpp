@@ -163,9 +163,11 @@ public:
 		{
 			case k3d::STORAGE_CLASS_UNIFORM:
 			{
-				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-				if(polyhedron)
+				for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 				{
+					boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+					if(!polyhedron.get())
+						continue;
 					if(const k3d::mesh::normals_t* const array = polyhedron->uniform_data.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
@@ -187,9 +189,11 @@ public:
 
 			case k3d::STORAGE_CLASS_FACEVARYING:
 			{
-				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-				if(polyhedron)
+				for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 				{
+					boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+					if(!polyhedron.get())
+						continue;
 					if(const k3d::mesh::normals_t* const array = polyhedron->face_varying_data.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
@@ -226,9 +230,11 @@ public:
 
 			case k3d::STORAGE_CLASS_VERTEX:
 			{
-				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-				if(polyhedron)
+				for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 				{
+					boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+					if(!polyhedron.get())
+						continue;
 					if(const k3d::mesh::normals_t* const array = Mesh.vertex_data.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;

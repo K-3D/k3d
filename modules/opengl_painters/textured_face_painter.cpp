@@ -42,6 +42,8 @@
 
 #include <boost/scoped_ptr.hpp>
 
+#include "utility.h"
+
 namespace module
 {
 
@@ -92,11 +94,7 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if(k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_non_sds_polyhedra(Mesh))
 			return;
 		
 		k3d::bitmap* const bitmap = m_bitmap.pipeline_value();
@@ -142,61 +140,63 @@ public:
 		glEnable(GL_LIGHTING);
 		enable_blending();
 		
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::indices_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-		const k3d::mesh::points_t& mesh_points = *Mesh.points;
-		const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
-		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
-
-		const k3d::typed_array<k3d::texture3>* texcoords = 0;
-		for(k3d::named_arrays::const_iterator array_it = Mesh.polyhedra->face_varying_data.begin(); array_it != Mesh.polyhedra->face_varying_data.end(); ++array_it)
+		k3d::uint_t face_offset = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			texcoords = dynamic_cast<const k3d::typed_array<k3d::texture3>* >(array_it->second.get());
-			if(texcoords)
-				break;
-		}
-
-		glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glBindTexture(GL_TEXTURE_2D, m_texture_name);
-
-		glBegin(GL_TRIANGLES);
-		for (k3d::uint_t face = 0; face != face_starts.size(); ++face)
-		{
-			k3d::uint_t startindex = face_starts[face];
-			k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
-			const color_t& face_color = face_selection[face] ? selected_color : color;
-			k3d::gl::normal3d(n_cache.face_normals(this).at(face));
-			k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
-			k3d::uint_t point_offset = indices[startindex];
-			k3d::uint_t edge_offset = loop_first_edges[face_first_loops[face]];
-			for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
-			{
-				if(texcoords)
-				{
-					// TODO: This mapping isn't very nice, but the idea is to get the edge index of the triangulated point
-					//		 Maybe it's possible some better way already?
-					size_t coord_index = (indices[corner]-point_offset) + edge_offset;
-					glTexCoord2d((*texcoords)[coord_index].n[0], (*texcoords)[coord_index].n[1]);
-				}
-				k3d::gl::vertex3d(points[indices[corner]]);
-			}
-		}
-		glEnd();
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+			
+			if (k3d::polyhedron::is_sds(*polyhedron))
+				continue;
 		
+			normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
+	
+			const k3d::typed_array<k3d::texture3>* texcoords = 0;
+			for(k3d::named_arrays::const_iterator array_it = polyhedron->face_varying_data.begin(); array_it != polyhedron->face_varying_data.end(); ++array_it)
+			{
+				texcoords = dynamic_cast<const k3d::typed_array<k3d::texture3>* >(array_it->second.get());
+				if(texcoords)
+					break;
+			}
+	
+			glEnable(GL_TEXTURE_2D);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glBindTexture(GL_TEXTURE_2D, m_texture_name);
+	
+			glBegin(GL_TRIANGLES);
+			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
+			for (k3d::uint_t poly_face = 0; poly_face != face_starts.size(); ++poly_face)
+			{
+				const k3d::uint_t face = poly_face + face_offset;
+				k3d::uint_t startindex = face_starts[face];
+				k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
+				const color_t& face_color = polyhedron->face_selections[poly_face] ? selected_color : color;
+				k3d::gl::normal3d(n_cache.face_normals(this).at(face));
+				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
+				k3d::uint_t point_offset = indices[startindex];
+				k3d::uint_t edge_offset = polyhedron->loop_first_edges[polyhedron->face_first_loops[poly_face]];
+				for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
+				{
+					if(texcoords)
+					{
+						// TODO: This mapping isn't very nice, but the idea is to get the edge index of the triangulated point
+						//		 Maybe it's possible some better way already?
+						size_t coord_index = (indices[corner]-point_offset) + edge_offset;
+						glTexCoord2d((*texcoords)[coord_index].n[0], (*texcoords)[coord_index].n[1]);
+					}
+					k3d::gl::vertex3d(points[indices[corner]]);
+				}
+			}
+			glEnd();
+			face_offset += face_count;
+		}
 		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if (k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_non_sds_polyhedra(Mesh))
 			return;
 			
 		if (!SelectionState.select_faces)
@@ -221,29 +221,37 @@ public:
 		const k3d::mesh::points_t& points = triangles.points();
 		const cached_triangulation::indices_t& indices = triangles.indices();
 		
-		size_t face_count = Mesh.polyhedra->face_first_loops->size();
-		for(size_t face = 0; face != face_count; ++face)
+		k3d::uint_t face_offset = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
-
-			k3d::uint_t startindex = face_starts[face];
-			k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
-			glBegin(GL_TRIANGLES);
-			for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
-				k3d::gl::vertex3d(points[indices[corner]]);
-			glEnd();
-
-			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+			
+			if (k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
+			for(k3d::uint_t poly_face = 0; poly_face != face_count; ++poly_face)
+			{
+				const k3d::uint_t face = poly_face + face_offset;
+				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, poly_face);
+	
+				k3d::uint_t startindex = face_starts[face];
+				k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
+				glBegin(GL_TRIANGLES);
+				for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
+					k3d::gl::vertex3d(points[indices[corner]]);
+				glEnd();
+	
+				k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+			}
+			face_offset += face_count;
 		}
 	}
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if (k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_non_sds_polyhedra(Mesh))
 			return;
 		
 		schedule_data<cached_triangulation>(&Mesh, Hint, this);

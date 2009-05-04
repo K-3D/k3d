@@ -25,6 +25,9 @@
  */
 
 #include <k3dsdk/mesh_selection.h>
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -64,9 +67,9 @@ class component_selection : public scheduler
 public:
 	component_selection(const k3d::mesh* const Mesh) {}
 	/// Provide access to the stored selection records
-	const selection_records_t& records() const
+	const selection_records_t& records(const k3d::mesh::primitive* Polyhedron)
 	{
-		return m_selection_records;
+		return m_selection_records[Polyhedron];
 	}
 
 protected:
@@ -78,20 +81,36 @@ protected:
 	{
 		on_schedule(Painter);
 	}
-	selection_records_t m_selection_records;
+	std::map<const k3d::mesh::primitive*, selection_records_t> m_selection_records;
 };
 
-/// Implement component_selection::on_execute for a point selection
-class point_selection : public component_selection
+/// point selection
+class point_selection : public scheduler
 {
 public:
-	point_selection(const k3d::mesh* const Mesh) : component_selection(Mesh) {}
+	point_selection(const k3d::mesh* const Mesh) {}
+	
+	const selection_records_t& records() const
+	{
+		return m_selection_records;
+	}
 protected:
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 	{
 		if (m_selection_records.empty())
+		{
 			detail::copy_selection(*Mesh.point_selection, m_selection_records);
+		}
 	}
+	void on_schedule(k3d::inode* Painter)
+	{
+		m_selection_records.clear();
+	}
+	void on_schedule(k3d::hint::selection_changed* Hint, k3d::inode* Painter)
+	{
+		on_schedule(Painter);
+	}
+	selection_records_t m_selection_records;
 };
 
 /// Implement component_selection::on_execute for an edge selection
@@ -103,7 +122,15 @@ protected:
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 	{
 		if (m_selection_records.empty())
-			detail::copy_selection(*Mesh.polyhedra->edge_selection, m_selection_records);
+		{
+			for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+			{
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+				if(!polyhedron.get())
+					continue;
+				detail::copy_selection(polyhedron->edge_selections, m_selection_records[primitive->get()]);
+			}
+		}
 	}
 };
 
@@ -116,7 +143,15 @@ protected:
 	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 	{
 		if (m_selection_records.empty())
-			detail::copy_selection(*Mesh.polyhedra->face_selection, m_selection_records);
+		{
+			for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+			{
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+				if(!polyhedron.get())
+					continue;
+				detail::copy_selection(polyhedron->face_selections, m_selection_records[primitive->get()]);
+			}
+		}
 	}
 };
 

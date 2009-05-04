@@ -23,6 +23,7 @@
 
 #include "cached_triangulation.h"
 #include "colored_selection_painter_gl.h"
+#include "utility.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/array.h>
@@ -66,14 +67,7 @@ public:
 	}
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
-	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if(k3d::polyhedron::is_sds(*polyhedron))
-			return;
-		
+	{		
 		k3d::gl::store_attributes attributes;
 
 		// Draw solid polygons for masking ...
@@ -97,49 +91,49 @@ public:
 		const k3d::mesh::points_t& points = triangles.points();
 		const cached_triangulation::indices_t& indices = triangles.indices();
 		
-		glBegin(GL_TRIANGLES);
-		for (k3d::uint_t face = 0; face != face_starts.size(); ++face)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			k3d::uint_t startindex = face_starts[face];
-			k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
-			for(k3d::uint_t corner = startindex; corner != endindex; ++corner)
-				k3d::gl::vertex3d(points[indices[corner]]);
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get() || k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+			
+			glBegin(GL_TRIANGLES);
+			for (k3d::uint_t face = 0; face != face_starts.size(); ++face)
+			{
+				k3d::uint_t startindex = face_starts[face];
+				k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
+				for(k3d::uint_t corner = startindex; corner != endindex; ++corner)
+					k3d::gl::vertex3d(points[indices[corner]]);
+			}
+			glEnd();
+	
+			// Draw wireframe edges ...
+			glDepthMask(GL_FALSE);
+			glColorMask(true, true, true, true);
+			glDisable(GL_POLYGON_OFFSET_FILL);
+	
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_LINE_SMOOTH);
+			glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	
+			glLineWidth(m_line_width.pipeline_value());
+	
+			glBegin(GL_LINES);
+			const k3d::uint_t edge_count = polyhedron->edge_points.size();
+			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
+			{
+				color4d(polyhedron->edge_selections[edge] ? selected_color : color);
+				k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
+				k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
+			}
+			glEnd();
 		}
-		glEnd();
-
-		// Draw wireframe edges ...
-		glDepthMask(GL_FALSE);
-		glColorMask(true, true, true, true);
-		glDisable(GL_POLYGON_OFFSET_FILL);
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_LINE_SMOOTH);
-		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-		glLineWidth(m_line_width.pipeline_value());
-
-		glBegin(GL_LINES);
-		const k3d::uint_t edge_count = polyhedron->edge_points.size();
-		for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
-		{
-			color4d(polyhedron->edge_selections[edge] ? selected_color : color);
-			k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
-			k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
-		}
-		glEnd();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if (!SelectionState.select_faces)
-			return;
-
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if (k3d::polyhedron::is_sds(*polyhedron))
 			return;
 			
 		k3d::gl::store_attributes attributes;
@@ -157,30 +151,34 @@ public:
 			return;
 		const k3d::mesh::points_t& points = triangles.points();
 		const cached_triangulation::indices_t& indices = triangles.indices();
-		
-		k3d::uint_t face_count = polyhedron->face_first_loops.size();
-		for(k3d::uint_t face = 0; face != face_count; ++face)
+		k3d::uint_t face_offset = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
-
-			k3d::uint_t startindex = face_starts[face];
-			k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
-			glBegin(GL_TRIANGLES);
-			for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
-				k3d::gl::vertex3d(points[indices[corner]]);
-			glEnd();
-
-			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get() || k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+			k3d::uint_t face_count = polyhedron->face_first_loops.size();
+			for(k3d::uint_t poly_face = 0; poly_face != face_count; ++poly_face)
+			{
+				const k3d::uint_t face = poly_face + face_offset;
+				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
+	
+				k3d::uint_t startindex = face_starts[face];
+				k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
+				glBegin(GL_TRIANGLES);
+				for (k3d::uint_t corner = startindex; corner != endindex; ++corner)
+					k3d::gl::vertex3d(points[indices[corner]]);
+				glEnd();
+	
+				k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+			}
+			face_offset += face_count;
 		}
 	}
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if(k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_non_sds_polyhedra(Mesh))
 			return;
 		
 		schedule_data<cached_triangulation>(&Mesh, Hint, this);

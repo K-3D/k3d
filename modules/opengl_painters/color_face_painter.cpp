@@ -60,58 +60,61 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if(k3d::polyhedron::is_sds(*polyhedron))
-			return;
-
-		const k3d::mesh::points_t& points = *Mesh.points;
-
-		const k3d::uint_t face_count = polyhedron->face_first_loops.size();
-
-		// Calculate face normals ...
-		k3d::typed_array<k3d::normal3> normals(face_count, k3d::normal3(0, 0, 1));
-		for(k3d::uint_t face = 0; face != face_count; ++face)
-			normals[face] = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
-
-		// Define a default face color array (in case the user's choice of color array doesn't exist) ...
-		k3d::typed_array<k3d::color> default_color_array;
-
-		// Get the color array ...
-		color_array_proxy color(m_array_type.pipeline_value(), m_color_array.pipeline_value(), Mesh);
-
-		k3d::gl::store_attributes attributes;
-		glEnable(GL_LIGHTING);
-
-		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
-
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0, 1.0);
-		
-		const k3d::uint_t shell_count = polyhedron->shell_first_faces.size();
-		for(k3d::uint_t shell = 0; shell != shell_count; ++shell)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			const k3d::uint_t face_begin = polyhedron->shell_first_faces[shell];
-			const k3d::uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
-			for(k3d::uint_t face = face_begin; face != face_end; ++face)
-			{
-				k3d::gl::normal3d(normals[face]);
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+			
+			if(k3d::polyhedron::is_sds(*polyhedron))
+				continue;
 	
-				glBegin(GL_POLYGON);
-				const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
-				for(k3d::uint_t edge = first_edge; ; )
+			const k3d::mesh::points_t& points = *Mesh.points;
+	
+			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
+	
+			// Calculate face normals ...
+			k3d::typed_array<k3d::normal3> normals(face_count, k3d::normal3(0, 0, 1));
+			for(k3d::uint_t face = 0; face != face_count; ++face)
+				normals[face] = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+	
+			// Define a default face color array (in case the user's choice of color array doesn't exist) ...
+			k3d::typed_array<k3d::color> default_color_array;
+	
+			// Get the color array ...
+			color_array_proxy color(m_array_type.pipeline_value(), m_color_array.pipeline_value(), *polyhedron, Mesh.vertex_data);
+	
+			k3d::gl::store_attributes attributes;
+			glEnable(GL_LIGHTING);
+	
+			glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
+	
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonOffset(1.0, 1.0);
+			
+			const k3d::uint_t shell_count = polyhedron->shell_first_faces.size();
+			for(k3d::uint_t shell = 0; shell != shell_count; ++shell)
+			{
+				const k3d::uint_t face_begin = polyhedron->shell_first_faces[shell];
+				const k3d::uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
+				for(k3d::uint_t face = face_begin; face != face_end; ++face)
 				{
-					k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, color(shell, face, edge));
-					k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
-					edge = polyhedron->clockwise_edges[edge];
-					if(edge == first_edge)
-						break;
+					k3d::gl::normal3d(normals[face]);
+		
+					glBegin(GL_POLYGON);
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
+					for(k3d::uint_t edge = first_edge; ; )
+					{
+						k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, color(shell, face, edge));
+						k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
+					glEnd();
 				}
-				glEnd();
 			}
 		}
 	}
@@ -121,40 +124,43 @@ public:
 		if(!SelectionState.select_faces)
 			return;
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-		
-		if(k3d::polyhedron::is_sds(*polyhedron))
-			return;
-
-		const k3d::mesh::points_t& points = *Mesh.points;
-
-		const k3d::uint_t face_count = polyhedron->face_first_loops.size();
-
-		k3d::gl::store_attributes attributes;
-		glDisable(GL_LIGHTING);
-
-		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
-
-		for(k3d::uint_t face = 0; face != face_count; ++face)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
-
-			glBegin(GL_POLYGON);
-			const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
-			for(k3d::uint_t edge = first_edge; ; )
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+		
+			if(k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+	
+			const k3d::mesh::points_t& points = *Mesh.points;
+	
+			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
+	
+			k3d::gl::store_attributes attributes;
+			glDisable(GL_LIGHTING);
+	
+			glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			k3d::gl::set(GL_CULL_FACE, RenderState.draw_two_sided);
+	
+			for(k3d::uint_t face = 0; face != face_count; ++face)
 			{
-				k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
-				edge = polyhedron->clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
+				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
+	
+				glBegin(GL_POLYGON);
+				const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
+				for(k3d::uint_t edge = first_edge; ; )
+				{
+					k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
+					edge = polyhedron->clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
+				}
+				glEnd();
+	
+				k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
 			}
-			glEnd();
-
-			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
 		}
 	}
 	
@@ -239,24 +245,25 @@ private:
 		// Note: we assume the polyhedra are valid here
 		color_array_proxy(const array_t ArrayType,
 				const k3d::string_t& ArrayName,
-				const k3d::mesh& Mesh) :
+				const k3d::polyhedron::const_primitive& Polyhedron,
+				const k3d::attribute_arrays& VertexData) :
 					m_array_type(ArrayType),
-					m_edge_points(*Mesh.polyhedra->edge_points)
+					m_edge_points(Polyhedron.edge_points)
 		{
 			m_color_array = 0;
 			switch(m_array_type)
 			{
 			case CONSTANT:
-				m_color_array = Mesh.polyhedra->constant_data.lookup<k3d::mesh::colors_t>(ArrayName);
+				m_color_array = Polyhedron.constant_data.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
 			case UNIFORM:
-				m_color_array = Mesh.polyhedra->uniform_data.lookup<k3d::mesh::colors_t>(ArrayName);
+				m_color_array = Polyhedron.uniform_data.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
 			case VARYING:
-				m_color_array = Mesh.polyhedra->face_varying_data.lookup<k3d::mesh::colors_t>(ArrayName);
+				m_color_array = Polyhedron.face_varying_data.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
 			case VERTEX:
-				m_color_array = Mesh.vertex_data.lookup<k3d::mesh::colors_t>(ArrayName);
+				m_color_array = VertexData.lookup<k3d::mesh::colors_t>(ArrayName);
 			}
 		}
 		

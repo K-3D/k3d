@@ -140,8 +140,7 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
+		if(!has_non_empty_polyhedra(Mesh))
 			return;
 
 		if(!m_font)
@@ -163,32 +162,38 @@ public:
 		const k3d::double_t edge_offset = m_edge_offset.pipeline_value();
 		const k3d::double_t face_offset = m_face_offset.pipeline_value();
 
-		const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-		const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-		const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-		const k3d::mesh::points_t& points = *Mesh.points;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+			const k3d::mesh::indices_t& face_first_loops = polyhedron->face_first_loops;
+			const k3d::mesh::counts_t& face_loop_counts = polyhedron->face_loop_counts;
+			const k3d::mesh::indices_t& loop_first_edges = polyhedron->loop_first_edges;
+			const k3d::mesh::indices_t& edge_points = polyhedron->edge_points;
+			const k3d::mesh::indices_t& clockwise_edges = polyhedron->clockwise_edges;
+			const k3d::mesh::points_t& points = *Mesh.points;
 
-		const size_t face_count = face_first_loops.size();
-
-		// Calculate face normals ...
-		k3d::typed_array<k3d::normal3> normals(face_count);
-		for(size_t face = 0; face != face_count; ++face)
-			normals[face] = k3d::polyhedron::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
-
-		k3d::gl::store_attributes attributes;
-		glDisable(GL_LIGHTING);
-		
-		// Try some different types for the array to print
-		const k3d::string_t array_name = m_array_name.pipeline_value();
-		detail::strings_t string_array;
-		detail::named_array_to_strings<k3d::mesh::colors_t>(Mesh.polyhedra->face_varying_data, array_name, string_array);
-		detail::named_array_to_strings<k3d::mesh::normals_t>(Mesh.polyhedra->face_varying_data, array_name, string_array);
-		detail::named_array_to_strings<k3d::mesh::indices_t>(Mesh.polyhedra->face_varying_data, array_name, string_array);
-		detail::named_array_to_strings<k3d::mesh::weights_t>(Mesh.polyhedra->face_varying_data, array_name, string_array);
-		
-		draw(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, normals, m_color.pipeline_value(), edge_offset, face_offset, *m_font, string_array);
+			const size_t face_count = face_first_loops.size();
+	
+			// Calculate face normals ...
+			k3d::typed_array<k3d::normal3> normals(face_count);
+			for(size_t face = 0; face != face_count; ++face)
+				normals[face] = k3d::polyhedron::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
+	
+			k3d::gl::store_attributes attributes;
+			glDisable(GL_LIGHTING);
+			
+			// Try some different types for the array to print
+			const k3d::string_t array_name = m_array_name.pipeline_value();
+			detail::strings_t string_array;
+			detail::named_array_to_strings<k3d::mesh::colors_t>(polyhedron->face_varying_data, array_name, string_array);
+			detail::named_array_to_strings<k3d::mesh::normals_t>(polyhedron->face_varying_data, array_name, string_array);
+			detail::named_array_to_strings<k3d::mesh::indices_t>(polyhedron->face_varying_data, array_name, string_array);
+			detail::named_array_to_strings<k3d::mesh::weights_t>(polyhedron->face_varying_data, array_name, string_array);
+			
+			draw(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, normals, m_color.pipeline_value(), edge_offset, face_offset, *m_font, string_array);
+		}
 	}
 	
 	static k3d::iplugin_factory& get_factory()

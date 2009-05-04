@@ -71,60 +71,60 @@ public:
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-
-		const k3d::mesh::points_t& points = *Mesh.points;
-
-		const k3d::uint_t face_count = polyhedron->face_first_loops.size();
-		
+		const k3d::mesh::points_t& points = *Mesh.points;		
 		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
-		if(draw_selected)
+		k3d::uint_t face_offset = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			k3d::gl::color3d(m_selected_color.pipeline_value());
-
-			glBegin(GL_LINES);
-			for(k3d::uint_t face = 0; face != face_count; ++face)
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+		
+			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
+			
+			if(draw_selected)
 			{
-				if(polyhedron->face_selections[face])
+				k3d::gl::color3d(m_selected_color.pipeline_value());
+	
+				glBegin(GL_LINES);
+				for(k3d::uint_t face = 0; face != face_count; ++face)
 				{
-					k3d::point3 center = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
-					k3d::gl::vertex3d(center);
-					k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face)));
+					if(polyhedron->face_selections[face])
+					{
+						k3d::point3 center = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+						k3d::gl::vertex3d(center);
+						k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face + face_offset)));
+					}
 				}
+				glEnd();
 			}
-			glEnd();
-		}
-
-		if(draw_unselected)
-		{
-			k3d::gl::color3d(m_unselected_color.pipeline_value());
-
-			glBegin(GL_LINES);
-			for(k3d::uint_t face = 0; face != face_count; ++face)
+	
+			if(draw_unselected)
 			{
-				if(!polyhedron->face_selections[face])
+				k3d::gl::color3d(m_unselected_color.pipeline_value());
+	
+				glBegin(GL_LINES);
+				for(k3d::uint_t face = 0; face != face_count; ++face)
 				{
-					k3d::point3 center = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
-					k3d::gl::vertex3d(center);
-					k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face)));
+					if(!polyhedron->face_selections[face])
+					{
+						k3d::point3 center = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+						k3d::gl::vertex3d(center);
+						k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face + face_offset)));
+					}
 				}
+				glEnd();
 			}
-			glEnd();
+			face_offset += face_count;
 		}
 	}
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
-	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-		
+	{		
 		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 	

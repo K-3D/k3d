@@ -46,30 +46,27 @@ sds_cache::~sds_cache()
 	}
 	m_changed_connections.clear();
 	m_deleted_connections.clear();
-	delete m_cache;
 }
 
-void sds_cache::visit_surface(const k3d::uint_t Level, k3d::sds::ipatch_surface_visitor& Visitor)
+void sds_cache::visit_surface(const k3d::mesh::primitive* Polyhedron, const k3d::uint_t Level, k3d::sds::ipatch_surface_visitor& Visitor)
 {
-	return_if_fail(m_cache);
-	m_cache->visit_surface(Level, Visitor);
+	m_caches[Polyhedron].visit_surface(Level, Visitor);
 }
 
-void sds_cache::visit_boundary(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::ipatch_boundary_visitor& Visitor)
+void sds_cache::visit_boundary(const k3d::mesh::primitive* Polyhedron, const k3d::uint_t Level, k3d::sds::ipatch_boundary_visitor& Visitor)
 {
-	return_if_fail(m_cache);
-	m_cache->visit_boundary(Mesh, Level, Visitor);
+	boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*Polyhedron));
+	m_caches[Polyhedron].visit_boundary(*polyhedron, Level, Visitor);
 }
 
-void sds_cache::visit_corners(const k3d::uint_t Level, k3d::sds::ipatch_corner_visitor& Visitor)
+void sds_cache::visit_corners(const k3d::mesh::primitive* Polyhedron, const k3d::uint_t Level, k3d::sds::ipatch_corner_visitor& Visitor)
 {
-	return_if_fail(m_cache);
-	m_cache->visit_corners(Level, Visitor);
+	m_caches[Polyhedron].visit_corners(Level, Visitor);
 }
 
 void sds_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 {
-	if (m_cache && m_selection_changed)
+	if (m_caches.size() && m_selection_changed)
 	{
 		m_selection_changed = false;
 		return;
@@ -79,58 +76,62 @@ void sds_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 	{
 		point_selection[m_indices[i]] = true;
 	}
-	
-	
+
 	k3d::mesh input_with_normals = Mesh;
-	boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(input_with_normals));
-	if(!polyhedron)
-		return;
-
 	const k3d::mesh::points_t& points = *input_with_normals.points;
-	
-	// Calculate the normals on the input
-	if(Painter) Painter->document().pipeline_profiler().start_execution(*Painter, "Calculate Normals");
-	const k3d::uint_t face_begin = 0;
-	const k3d::uint_t face_end = polyhedron->face_first_loops.size();
-	k3d::mesh::normals_t uniform_normals(polyhedron->face_first_loops.size());
-	for(k3d::uint_t face = face_begin; face != face_end; ++face)
-		uniform_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, *input_with_normals.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
-	k3d::mesh::normals_t& vertex_normals = input_with_normals.vertex_data.create("sds_normals", new k3d::mesh::normals_t(points.size()));
-	for(k3d::uint_t face = face_begin; face != face_end; ++face)
+	m_point_count = points.size();
+	m_edge_counts.clear();
+	m_face_counts.clear();
+	for(k3d::mesh::primitives_t::const_iterator primitive = input_with_normals.primitives.begin(); primitive != input_with_normals.primitives.end(); ++primitive)
 	{
-		const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-		const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-		for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+		if(!polyhedron.get() || !k3d::polyhedron::is_sds(*polyhedron))
+			continue;
+		m_edge_counts[primitive->get()] = polyhedron->edge_points.size();
+		m_face_counts[primitive->get()] = polyhedron->face_first_loops.size();
+		// Calculate the normals on the input
+		if(Painter) Painter->document().pipeline_profiler().start_execution(*Painter, "Calculate Normals");
+		const k3d::uint_t face_begin = 0;
+		const k3d::uint_t face_end = polyhedron->face_first_loops.size();
+		k3d::mesh::normals_t uniform_normals(polyhedron->face_first_loops.size());
+		for(k3d::uint_t face = face_begin; face != face_end; ++face)
+			uniform_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, *input_with_normals.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
+		k3d::mesh::normals_t& vertex_normals = input_with_normals.vertex_data.create("sds_normals", new k3d::mesh::normals_t(points.size()));
+		for(k3d::uint_t face = face_begin; face != face_end; ++face)
 		{
-			const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-			for(k3d::uint_t edge = first_edge; ;)
+			const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+			const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+			for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
 			{
-				vertex_normals[polyhedron->edge_points[edge]] += uniform_normals[face];
-
-				edge = polyhedron->clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
+				const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+				for(k3d::uint_t edge = first_edge; ;)
+				{
+					vertex_normals[polyhedron->edge_points[edge]] += uniform_normals[face];
+	
+					edge = polyhedron->clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
+				}
 			}
 		}
+		if(Painter) Painter->document().pipeline_profiler().finish_execution(*Painter, "Calculate Normals");
+		
+		k3d::mesh::selection_t face_selections(polyhedron->face_selections.size(), 1.0);
+		
+		if(m_caches.find(primitive->get()) == m_caches.end())
+		{
+			k3d::log() << debug << "SDS: Creating new SDS cache with " << m_levels << " levels" << std::endl;
+			m_caches[primitive->get()].set_levels(m_levels);
+			m_caches[primitive->get()].create_mesh(points, *polyhedron, face_selections, Painter);
+		}
+		m_caches[primitive->get()].update_mesh(points, *polyhedron, input_with_normals.vertex_data, face_selections, Painter);
 	}
-	if(Painter) Painter->document().pipeline_profiler().finish_execution(*Painter, "Calculate Normals");
-	
-	k3d::mesh::selection_t face_selections(polyhedron->face_selections.size(), 1.0);
-	
-	if (!m_cache)
-	{
-		k3d::log() << debug << "SDS: Creating new SDS cache with " << m_levels << " levels" << std::endl;
-		m_cache = new k3d::sds::catmull_clark_subdivider(m_levels);
-		m_cache->create_mesh(input_with_normals, face_selections, m_mesh, Painter);
-	}
-	m_cache->update_mesh(input_with_normals, face_selections, m_mesh, Painter);
 }
 
 void sds_cache::on_schedule(k3d::inode* Painter) 
 {
 	register_painter(Painter);
-	delete m_cache;
-	m_cache = 0;
+	m_caches.clear();
 	m_selection_changed = false;
 }
 void sds_cache::on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
@@ -159,7 +160,7 @@ void sds_cache::level_changed(k3d::ihint* Hint)
 			highest = *level_it;
 		}
 	}
-	if (!m_cache || m_levels != levels)
+	if (m_caches.empty() || m_levels != levels)
 	{
 		m_levels = levels;
 		schedule(highest->property_node());

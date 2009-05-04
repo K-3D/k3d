@@ -22,6 +22,7 @@
 */
 
 #include "normal_cache.h"
+#include "utility.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -71,15 +72,13 @@ public:
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
+		if(!has_non_empty_polyhedra(Mesh))
 			return;
+		
 
 		const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
 		const k3d::mesh::points_t& points = *Mesh.points;
-
 		const k3d::uint_t point_count = points.size();
-		
 		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
 
 		k3d::gl::store_attributes attributes;
@@ -120,8 +119,7 @@ public:
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
+		if(!has_non_empty_polyhedra(Mesh))
 			return;
 		
 		schedule_data<normal_cache>(&Mesh, Hint, this);

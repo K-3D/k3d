@@ -25,6 +25,9 @@
 */
 
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -75,73 +78,82 @@ private:
 class selected_edges
 {
 public:
-	selected_edges(const k3d::mesh& Mesh) :
-		edge_selection(*Mesh.polyhedra->edge_selection)
+	selected_edges(const k3d::polyhedron::const_primitive& Polyhedron) :
+		edge_selections(Polyhedron.edge_selections)
 	{
 	}
 
 	bool operator()(const size_t Edge) const
 	{
-		return edge_selection[Edge];
+		return edge_selections[Edge];
 	}
 
 private:
-	const k3d::mesh::selection_t& edge_selection;	
+	const k3d::mesh::selection_t& edge_selections;	
 };
 
 /// Functor object that returns "true" for unselected edges only
 class unselected_edges
 {
 public:
-	unselected_edges(const k3d::mesh& Mesh) :
-		edge_selection(*Mesh.polyhedra->edge_selection)
+	unselected_edges(const k3d::polyhedron::const_primitive& Polyhedron) :
+		edge_selections(Polyhedron.edge_selections)
 	{
 	}
 
 	bool operator()(const size_t Edge) const
 	{
-		return !edge_selection[Edge];
+		return !edge_selections[Edge];
 	}
 
 private:
-	const k3d::mesh::selection_t& edge_selection;	
+	const k3d::mesh::selection_t& edge_selections;	
 };
 
 /// Functor object that returns "true" for selected faces only
 class selected_faces
 {
 public:
-	selected_faces(const k3d::mesh& Mesh) :
-		face_selection(*Mesh.polyhedra->face_selection)
+	selected_faces(const k3d::polyhedron::const_primitive& Polyhedron) :
+		face_selections(Polyhedron.face_selections)
 	{
 	}
 
 	bool operator()(const size_t Face) const
 	{
-		return face_selection[Face];
+		return face_selections[Face];
 	}
 
 private:
-	const k3d::mesh::selection_t& face_selection;	
+	const k3d::mesh::selection_t& face_selections;	
 };
 
 /// Functor object that returns "true" for unselected faces only
 class unselected_faces
 {
 public:
-	unselected_faces(const k3d::mesh& Mesh) :
-		face_selection(*Mesh.polyhedra->face_selection)
+	unselected_faces(const k3d::polyhedron::const_primitive& Polyhedron) :
+		face_selections(Polyhedron.face_selections)
 	{
 	}
 
 	bool operator()(const size_t Face) const
 	{
-		return !face_selection[Face];
+		return !face_selections[Face];
 	}
 
 private:
-	const k3d::mesh::selection_t& face_selection;	
+	const k3d::mesh::selection_t& face_selections;	
 };
+
+/// Returns true if the given mesh contains non-empty polyhedra
+k3d::bool_t has_non_empty_polyhedra(const k3d::mesh& Mesh);
+
+/// Returns true if the given mesh contains non-SDS polyhedra
+k3d::bool_t has_non_sds_polyhedra(const k3d::mesh& Mesh);
+
+/// Returns true if the given mesh contains SDS polyhedra
+k3d::bool_t has_sds_polyhedra(const k3d::mesh& Mesh);
 
 } // namespace painters
 

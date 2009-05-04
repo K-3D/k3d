@@ -41,6 +41,8 @@
 #include "sds_cache.h"
 #include "selection_cache.h"
 
+#include <boost/ptr_container/ptr_map.hpp>
+
 namespace module
 {
 
@@ -77,6 +79,8 @@ private:
 	GLuint m_name;
 };
 
+typedef boost::ptr_map<const k3d::mesh::primitive*, vbo> vbos_t;
+
 /// Keep track of point position data in a VBO
 class point_vbo : public scheduler
 {
@@ -103,16 +107,16 @@ private:
 class edge_vbo : public scheduler
 {
 public:
-	edge_vbo(const k3d::mesh* const Mesh) : m_vbo(0) {}
+	edge_vbo(const k3d::mesh* const Mesh) {}
 	/// Bind the internal VBO for usage by the array drawing commands
-	void bind();
+	void bind(const k3d::mesh::primitive* Primitive);
 protected:
 	void on_schedule(k3d::inode* Painter);
 	/// Creates the edge vbo
 	virtual void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
 private:
 	/// Stores the data itself
-	vbo* m_vbo;
+	vbos_t m_vbos;
 };
 
 /// VBOs used to paint a triangulated mesh
@@ -164,18 +168,19 @@ public:
 	}
 	
 	/// Binds the vbo's at the given level
-	void bind(k3d::uint_t Level, k3d::inode* Painter)
+	void bind(k3d::uint_t Level, k3d::inode* Painter, const k3d::mesh::primitive* Primitive)
 	{
-		cache(Level, Painter).bind();
+		cache(Level, Painter, Primitive).bind();
 	}
 	
 	/// Get the cache at the requested level
-	component_t& cache(k3d::uint_t Level, k3d::inode* Painter)
+	component_t& cache(k3d::uint_t Level, k3d::inode* Painter, const k3d::mesh::primitive* Primitive)
 	{
-		std::pair<typename caches_t::iterator, bool> result = m_caches.insert(std::make_pair(Level, component_t()));
+		caches_per_level_t& caches = m_caches[Primitive];
+		std::pair<typename caches_per_level_t::iterator, bool> result = caches.insert(std::make_pair(Level, component_t()));
 		if (result.second)
-			result.first->second.update(*m_mesh, Level, get_data<sds_cache>(m_mesh, Painter));
-		return m_caches[Level];
+			result.first->second.update(Primitive, Level, get_data<sds_cache>(m_mesh, Painter));
+		return caches[Level];
 	}
 	
 protected:
@@ -184,7 +189,15 @@ protected:
 	{
 		return_if_fail(Painter);
 		k3d::int32_t level = k3d::property::pipeline_value<k3d::int32_t>(*Painter, "levels");
-		m_caches.insert(std::make_pair(level, component_t())).first->second.update(Mesh, level, get_data<sds_cache>(&Mesh, Painter));
+		sds_cache& cache = get_data<sds_cache>(&Mesh, Painter);
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get() || !k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+			caches_per_level_t& caches = m_caches[primitive->get()];
+			caches.insert(std::make_pair(level, component_t())).first->second.update(primitive->get(), level, cache);
+		}
 	}
 	
 	void on_schedule(k3d::inode* Painter) 
@@ -238,7 +251,8 @@ private:
 	typedef std::map<k3d::inode*, sigc::connection> connections_t;
 	connections_t m_changed_connections; // connections to changed_signals
 	connections_t m_deleted_connections; // connections to deleted_signals
-	typedef std::map<k3d::uint_t, component_t> caches_t;
+	typedef std::map<k3d::uint_t, component_t> caches_per_level_t;
+	typedef std::map<const k3d::mesh::primitive*, caches_per_level_t> caches_t;
 	caches_t m_caches; // stores an sds_vbo cache per level
 	const k3d::mesh* const m_mesh;
 };
@@ -256,7 +270,7 @@ public:
 	}
 	
 	/// Update the cache using the supplied sds cache
-	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache);
+	void update(const k3d::mesh::primitive* Primitive, const k3d::uint_t Level, sds_cache& Cache);
 	
 	/// Bind the VBOs
 	void bind();
@@ -289,7 +303,7 @@ public:
 	}
 	
 	/// Update the cache using the supplied sds cache
-	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache);
+	void update(const k3d::mesh::primitive* Primitive, const k3d::uint_t Level, sds_cache& Cache);
 	
 	/// Bind the VBOs
 	void bind();
@@ -315,7 +329,7 @@ public:
 	}
 	
 	/// Update the cache using the supplied sds cache
-	void update(const k3d::mesh& Mesh, const k3d::uint_t Level, sds_cache& Cache);
+	void update(const k3d::mesh::primitive* Primitive, const k3d::uint_t Level, sds_cache& Cache);
 	
 	/// Bind the VBOs
 	void bind();

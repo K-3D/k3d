@@ -23,6 +23,7 @@
 
 #include "cached_triangulation.h"
 #include "colored_selection_painter_gl.h"
+#include "utility.h"
 #include "vbo.h"
 
 #include <k3d-i18n-config.h>
@@ -69,11 +70,7 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if (k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_non_sds_polyhedra(Mesh))
 			return;
 
 		k3d::gl::store_attributes attributes;
@@ -95,31 +92,40 @@ public:
 		document().pipeline_profiler().finish_execution(*this, "Triangulate");
 		face_selection& selected_faces = get_data<face_selection>(&Mesh, this);
 		
-		size_t face_count = Mesh.polyhedra->face_first_loops->size();
-		const selection_records_t& face_selection_records = selected_faces.records();
-		
-		glEnable(GL_LIGHTING);
-		
-		clean_vbo_state();
-		
-		vbos.bind();
-		
-		if (!face_selection_records.empty())
+		k3d::uint_t face_offset = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
-			{ // color by selection
-				const color_t& face_color = record->weight ? selected_color : color;
-				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
-				size_t start = record->begin;
-				size_t end = record->end;
-				end = end > face_count ? face_count : end;
-				vbos.draw_range(start, end, this);
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get() || k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+		
+			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
+			const selection_records_t& face_selection_records = selected_faces.records(primitive->get());
+			
+			glEnable(GL_LIGHTING);
+			
+			clean_vbo_state();
+			
+			vbos.bind();
+			if (!face_selection_records.empty())
+			{
+				for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
+				{ // color by selection
+					const color_t& face_color = record->weight ? selected_color : color;
+					k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
+					size_t start = record->begin + face_offset;
+					size_t end = record->end;
+					end = end > face_count ? face_count : end;
+					end += face_offset;
+					vbos.draw_range(start, end, this);
+				}
 			}
-		}
-		else
-		{ // empty selection, everything has the same color
-			color4d(color);
-			vbos.draw_range(0, face_count, this);
+			else
+			{ // empty selection, everything has the same color
+				color4d(color);
+				vbos.draw_range(face_offset, face_count + face_offset, this);
+			}
+			face_offset += face_count;
 		}
 		
 		clean_vbo_state();
@@ -130,11 +136,7 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if (k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_non_sds_polyhedra(Mesh))
 			return;
 			
 		if (!SelectionState.select_faces)
@@ -157,14 +159,24 @@ public:
 		
 		vbos.bind();
 		
-		size_t face_count = Mesh.polyhedra->face_first_loops->size();
-		for(size_t face = 0; face != face_count; ++face)
+		k3d::uint_t face_offset = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
-
-			vbos.draw_range(face, face+1, this);
-
-			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get() || k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+		
+			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
+			for(k3d::uint_t poly_face = 0; poly_face != face_count; ++poly_face)
+			{
+				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, poly_face);
+	
+				const k3d::uint_t face = poly_face + face_offset;
+				vbos.draw_range(face, face+1, this);
+	
+				k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+			}
+			face_offset += face_count;
 		}
 		
 		clean_vbo_state();
@@ -174,11 +186,7 @@ public:
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 		
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-		
-		if (k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_non_sds_polyhedra(Mesh))
 			return;
 		
 		schedule_data<triangle_vbo>(&Mesh, Hint, this);

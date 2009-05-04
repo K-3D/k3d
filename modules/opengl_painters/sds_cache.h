@@ -30,6 +30,9 @@
 #include <k3dsdk/properties.h>
 #include <k3dsdk/subdivision_surface/catmull_clark.h>
 
+#include <boost/ptr_container/ptr_map.hpp>
+#include <map>
+
 #include "painter_cache.h"
 
 namespace module
@@ -48,30 +51,30 @@ typedef k3d::basic_rgba<double, k3d::color_traits<double> > color_t;
 class sds_cache : public scheduler
 {
 public:
-	sds_cache(const k3d::mesh* const Mesh) : m_levels(2), m_cache(0), m_selection_changed(false) {}
+	sds_cache(const k3d::mesh* const Mesh) : m_levels(2), m_selection_changed(false) {}
 	
 	~sds_cache();
 	
 	/// Visit the data representing the SDS patch surface
-	void visit_surface(const k3d::uint_t Level, k3d::sds::ipatch_surface_visitor& Visitor);
+	void visit_surface(const k3d::mesh::primitive* Polyhedron, const k3d::uint_t Level, k3d::sds::ipatch_surface_visitor& Visitor);
 	
 	/// Visit the data representing the SDS patch boundaries
-	void visit_boundary(const k3d::mesh& Mesh, const k3d::uint_t Level, k3d::sds::ipatch_boundary_visitor& Visitor);
+	void visit_boundary(const k3d::mesh::primitive* Polyhedron, const k3d::uint_t Level, k3d::sds::ipatch_boundary_visitor& Visitor);
 	
 	/// Visit the data representing the patch corners
-	void visit_corners(const k3d::uint_t Level, k3d::sds::ipatch_corner_visitor& Visitor);
+	void visit_corners(const k3d::mesh::primitive* Polyhedron, const k3d::uint_t Level, k3d::sds::ipatch_corner_visitor& Visitor);
 	
 	const k3d::uint_t point_count() const
 	{
-		return m_mesh.points->size();
+		return m_point_count;
 	}
-	const k3d::uint_t edge_count() const
+	const k3d::uint_t edge_count(const k3d::mesh::primitive* Polyhedron)
 	{
-		return m_mesh.polyhedra->edge_points->size();
+		return m_edge_counts[Polyhedron];
 	}
-	const k3d::uint_t face_count() const
+	const k3d::uint_t face_count(const k3d::mesh::primitive* Polyhedron)
 	{
-		return m_mesh.polyhedra->face_first_loops->size();
+		return m_face_counts[Polyhedron];
 	}
 	
 protected:
@@ -101,10 +104,11 @@ private:
 	typedef std::map<const k3d::inode*, sigc::connection> connections_t;
 	connections_t m_changed_connections; // connections to changed_signals
 	connections_t m_deleted_connections; // connections to deleted_signals
-	k3d::sds::catmull_clark_subdivider* m_cache;
+	boost::ptr_map<const k3d::mesh::primitive*, k3d::sds::catmull_clark_subdivider> m_caches;
 	bool m_selection_changed;
-	/// The mesh at the highest level
-	k3d::mesh m_mesh;
+	k3d::uint_t m_point_count;
+	std::map<const k3d::mesh::primitive*, k3d::uint_t> m_edge_counts;
+	std::map<const k3d::mesh::primitive*, k3d::uint_t> m_face_counts;
 };
 
 /// Stores SDS face data in OpenGL-compatible arrays

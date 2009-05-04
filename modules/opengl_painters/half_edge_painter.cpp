@@ -107,18 +107,20 @@ public:
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
-		if(draw_selected)
-			draw(*polyhedron, *Mesh.points, m_selected_color.pipeline_value(), selected_edges(Mesh));
-
-		if(draw_unselected)
-			draw(*polyhedron, *Mesh.points, m_unselected_color.pipeline_value(), unselected_edges(Mesh));
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron.get())
+				continue;
+			if(draw_selected)
+				draw(*polyhedron, *Mesh.points, m_selected_color.pipeline_value(), selected_edges(*polyhedron));
+	
+			if(draw_unselected)
+				draw(*polyhedron, *Mesh.points, m_unselected_color.pipeline_value(), unselected_edges(*polyhedron));
+		}
 	}
 	
 	static k3d::iplugin_factory& get_factory()

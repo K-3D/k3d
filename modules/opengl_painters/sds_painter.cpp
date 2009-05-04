@@ -23,6 +23,7 @@
 #include "colored_selection_painter_gl.h"
 #include "sds_cache.h"
 #include "selection_cache.h"
+#include "utility.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -72,37 +73,33 @@ public:
 	
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
+		if(!has_sds_polyhedra(Mesh))
 			return;
-
-		if(!k3d::polyhedron::is_sds(*polyhedron))
-			return;
-		
 		k3d::gl::store_attributes attributes;
 		
 		enable_blending();
-		draw(Mesh, get_data<sds_cache>(&Mesh, this), get_data<selection_t>(&Mesh, this), RenderState);
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		{
+			draw(**primitive, get_data<sds_cache>(&Mesh, this), get_data<selection_t>(&Mesh, this), RenderState);
+		}
 		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
-			return;
-			
-		if(!k3d::polyhedron::is_sds(*polyhedron))
+		if(!has_sds_polyhedra(Mesh))
 			return;
 		
 		k3d::gl::store_attributes attributes;
-		select(Mesh, get_data<sds_cache>(&Mesh, this), SelectionState);
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		{
+			select(**primitive, get_data<sds_cache>(&Mesh, this), SelectionState);
+		}
 	}
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh));
-		if(!polyhedron)
+		if(!has_sds_polyhedra(Mesh))
 			return;
 
 		schedule_data<selection_t>(&Mesh, Hint, this);
@@ -113,10 +110,10 @@ protected:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_levels;
 	
 	// override to choose drawing mode
-	virtual void draw(const k3d::mesh& Mesh, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState) = 0;
+	virtual void draw(const k3d::mesh::primitive& Primitive, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState) = 0;
 	
 	// override to choose selection mode
-	virtual void select(const k3d::mesh& Mesh, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState) = 0;
+	virtual void select(const k3d::mesh::primitive& Primitive, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState) = 0;
 };
 
 ////////////////////////////////:
@@ -144,8 +141,11 @@ public:
 		return factory;
 	}
 protected:
-	virtual void draw(const k3d::mesh& Mesh, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
+	virtual void draw(const k3d::mesh::primitive& Primitive, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
 	{
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Primitive));
+		if(!polyhedron.get() || !k3d::polyhedron::is_sds(*polyhedron))
+			return;
 		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
 		glEnable(GL_CULL_FACE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -156,21 +156,21 @@ protected:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
-		const k3d::bool_t interpolateboundary = Mesh.polyhedra->constant_data.lookup<strings_t>("interpolateboundary") ? true : false;
+		const k3d::bool_t interpolateboundary = polyhedron->constant_data.lookup<strings_t>("interpolateboundary") ? true : false;
 		k3d::mesh::indices_t companions;
 		k3d::mesh::bools_t boundary_edges;
 		k3d::mesh::bools_t boundary_faces;
 		if (!interpolateboundary)
 		{
-			k3d::polyhedron::create_edge_adjacency_lookup(*Mesh.polyhedra->edge_points, *Mesh.polyhedra->clockwise_edges, boundary_edges, companions);
-			k3d::polyhedron::create_boundary_face_lookup(*Mesh.polyhedra->face_first_loops, *Mesh.polyhedra->face_loop_counts, *Mesh.polyhedra->loop_first_edges, *Mesh.polyhedra->clockwise_edges, boundary_edges, companions, boundary_faces);
+			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, boundary_edges, companions);
+			k3d::polyhedron::create_boundary_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, boundary_edges, companions, boundary_faces);
 		}
 		
-		face_visitor visitor(Cache.point_count(), Cache.edge_count(), Mesh.polyhedra->face_first_loops->size());
-		Cache.visit_surface(m_levels.pipeline_value(), visitor);
+		face_visitor visitor(Cache.point_count(), Cache.edge_count(&Primitive), polyhedron->face_first_loops.size());
+		Cache.visit_surface(&Primitive, m_levels.pipeline_value(), visitor);
 		
 		k3d::uint_t face_count = visitor.face_starts.size();
-		const selection_records_t& face_selection_records = Selection.records();
+		const selection_records_t& face_selection_records = Selection.records(&Primitive);
 		glBegin(GL_QUADS);
 		if (interpolateboundary)
 		{
@@ -208,7 +208,7 @@ protected:
 			{
 				if (boundary_faces[face])
 					continue;
-				const color_t& face_color = Mesh.polyhedra->face_selection->at(face) ? selected_color : color;
+				const color_t& face_color = polyhedron->face_selections[face] ? selected_color : color;
 				k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, k3d::color(face_color.red, face_color.green, face_color.blue), face_color.alpha);
 				k3d::uint_t start_index = visitor.face_starts[face];
 				k3d::uint_t end_index = face == (visitor.face_starts.size()-1) ? visitor.indices.size() : visitor.face_starts[face+1]; 
@@ -222,9 +222,13 @@ protected:
 		}
 		glEnd();
 	}
-	virtual void select(const k3d::mesh& Mesh, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
+	virtual void select(const k3d::mesh::primitive& Primitive, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if (!SelectionState.select_faces)
+			return;
+		
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Primitive));
+		if(!polyhedron.get() || !k3d::polyhedron::is_sds(*polyhedron))
 			return;
 		
 		k3d::gl::store_attributes attributes;
@@ -237,8 +241,8 @@ protected:
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		
-		face_visitor visitor(Cache.point_count(), Cache.edge_count(), Mesh.polyhedra->face_first_loops->size());
-		Cache.visit_surface(m_levels.pipeline_value(), visitor);
+		face_visitor visitor(Cache.point_count(), Cache.edge_count(&Primitive), polyhedron->face_first_loops.size());
+		Cache.visit_surface(&Primitive, m_levels.pipeline_value(), visitor);
 		
 		for (k3d::uint_t face = 0; face != visitor.face_starts.size(); ++face)
 		{
@@ -293,11 +297,14 @@ public:
 	}
 	
 private:
-	virtual void draw(const k3d::mesh& Mesh, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
+	virtual void draw(const k3d::mesh::primitive& Primitive, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
 	{
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Primitive));
+		if(!polyhedron.get() || !k3d::polyhedron::is_sds(*polyhedron))
+			return;
 		glDisable(GL_LIGHTING);
-		edge_visitor visitor(Mesh.polyhedra->edge_points->size());
-		Cache.visit_boundary(Mesh, m_levels.pipeline_value(), visitor);
+		edge_visitor visitor(polyhedron->edge_points.size());
+		Cache.visit_boundary(&Primitive, m_levels.pipeline_value(), visitor);
 		
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_DOUBLE, 0, &visitor.points_array[0]);
@@ -308,7 +315,7 @@ private:
 		k3d::uint_t edge_count = visitor.edge_starts.size();
 		
 		glBegin(GL_LINES);
-		const selection_records_t& edge_selection_records = Selection.records();
+		const selection_records_t& edge_selection_records = Selection.records(&Primitive);
 		if (!edge_selection_records.empty())
 		{
 			for (selection_records_t::const_iterator record = edge_selection_records.begin(); record != edge_selection_records.end() && record->begin < edge_count; ++record)
@@ -336,14 +343,18 @@ private:
 		glEnd();
 	}
 	
-	virtual void select(const k3d::mesh& Mesh, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
+	virtual void select(const k3d::mesh::primitive& Primitive, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if (!SelectionState.select_split_edges)
 			return;
 		
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Primitive));
+		if(!polyhedron.get() || !k3d::polyhedron::is_sds(*polyhedron))
+			return;
+		
 		glDisable(GL_LIGHTING);
-		edge_visitor visitor(Mesh.polyhedra->edge_points->size());
-		Cache.visit_boundary(Mesh, m_levels.pipeline_value(), visitor);
+		edge_visitor visitor(polyhedron->edge_points.size());
+		Cache.visit_boundary(&Primitive, m_levels.pipeline_value(), visitor);
 		
 		k3d::uint_t edge_count = visitor.edge_starts.size();
 		
@@ -404,13 +415,16 @@ public:
 	}
 	
 private:
-	virtual void draw(const k3d::mesh& Mesh, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
+	virtual void draw(const k3d::mesh::primitive& Primitive, sds_cache& Cache, selection_t& Selection, const k3d::gl::painter_render_state& RenderState)
 	{
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Primitive));
+		if(!polyhedron.get() || !k3d::polyhedron::is_sds(*polyhedron))
+			return;
 		glDisable(GL_LIGHTING);
 		point_visitor visitor;
-		Cache.visit_corners(m_levels.pipeline_value(), visitor);
+		Cache.visit_corners(&Primitive, m_levels.pipeline_value(), visitor);
 		
-		k3d::uint_t point_count = Mesh.points->size();
+		k3d::uint_t point_count = Cache.point_count();
 		
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
@@ -442,15 +456,18 @@ private:
 		glEnd();
 	}
 	
-	virtual void select(const k3d::mesh& Mesh, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
+	virtual void select(const k3d::mesh::primitive& Primitive, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
 		if (!SelectionState.select_points)
 			return;
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Primitive));
+		if(!polyhedron.get() || !k3d::polyhedron::is_sds(*polyhedron))
+			return;
 		glDisable(GL_LIGHTING);
 		point_visitor visitor;
-		Cache.visit_corners(m_levels.pipeline_value(), visitor);
+		Cache.visit_corners(&Primitive, m_levels.pipeline_value(), visitor);
 		
-		k3d::uint_t point_count = Mesh.points->size();
+		k3d::uint_t point_count = Cache.point_count();
 		
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_DOUBLE, 0, &visitor.points_array[0]);
