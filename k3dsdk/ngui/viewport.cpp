@@ -1275,8 +1275,8 @@ const k3d::selection::records control::get_selection(const k3d::gl::selection_st
 	}
 
 k3d::log() << debug << "get_selection(): \n";
-std::copy(selection.begin(), selection.end(), std::ostream_iterator<k3d::selection::record>(k3d::log(), "\n"));
-k3d::log() << std::endl;
+for(k3d::selection::records::const_iterator record = selection.begin(); record != selection.end(); ++record)
+	k3d::log() << debug << "  " << *record << std::endl; 
 
 	return selection;
 }
