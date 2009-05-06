@@ -56,7 +56,7 @@ public:
 
 protected:
 	imetadata() {}
-	imetadata(const imetadata&) {}
+	imetadata(const imetadata& Other) : iunknown(Other) {}
 	imetadata& operator = (const imetadata&) { return *this; }
 	virtual ~imetadata() {}
 };

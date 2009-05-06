@@ -71,7 +71,7 @@ public:
 
 protected:
 	idocument() {}
-	idocument(const idocument&) {}
+	idocument(const idocument& Other) : iunknown(Other) {}
 	idocument& operator=(const idocument&) { return *this; }
 	virtual ~idocument() {}
 };

@@ -57,14 +57,14 @@ public:
 	/// Returns a human-readable label for the underlying data
 	virtual const Glib::ustring label() = 0;
 	/// Returns true iff the underlying data source is writable
-	virtual const k3d::bool_t writable() = 0;
+	virtual k3d::bool_t writable() = 0;
 	/// Called to return the underlying data value
-	virtual const k3d::double_t value() = 0;
+	virtual k3d::double_t value() = 0;
 	/// Called to set a new data value
 	virtual void set_value(const k3d::double_t Value) = 0;
 	/// Connects a slot to a signal that will be emitted if the underlying data changes
 	virtual sigc::connection connect_changed_signal(const sigc::slot<void>& Slot) = 0;
-	virtual const k3d::double_t step_increment() = 0;
+	virtual k3d::double_t step_increment() = 0;
 	virtual const std::type_info& units() = 0;
 
 protected:
@@ -97,12 +97,12 @@ public:
 		return m_label;
 	}
 
-	const k3d::bool_t writable()
+	k3d::bool_t writable()
 	{
 		return true;
 	}
 
-	const k3d::double_t value()
+	k3d::double_t value()
 	{
 		return m_data.internal_value();
 	}
@@ -117,7 +117,7 @@ public:
 		return m_data.changed_signal().connect(sigc::hide(Slot));
 	}
 
-	const k3d::double_t step_increment()
+	k3d::double_t step_increment()
 	{
 		return m_step_increment;
 	}

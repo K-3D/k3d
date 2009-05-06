@@ -2078,7 +2078,7 @@ class no_signal
 {
 protected:
 	template<typename init_t>
-	no_signal(const init_t& Init)
+	no_signal(const init_t&)
 	{
 	}
 
@@ -2159,11 +2159,11 @@ public:
 
 protected:
 	template<typename init_t>
-	explicit_change_signal(const init_t& Init)
+	explicit_change_signal(const init_t&)
 	{
 	}
 
-	void start_recording(k3d::istate_recorder& StateRecorder)
+	void start_recording(k3d::istate_recorder&)
 	{
 	}
 

@@ -18,7 +18,7 @@ public:
 
 protected:
 	ihint() {}
-	ihint(const ihint&) {}
+	ihint(const ihint& Other) : iunknown(Other) {}
 	ihint& operator=(const ihint&) { return *this; }
 };
 

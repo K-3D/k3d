@@ -43,7 +43,7 @@ public:
 
 protected:
 	iselectable() {}
-	iselectable(const iselectable&) {}
+	iselectable(const iselectable& Other) : iunknown(Other) {}
 	iselectable& operator=(const iselectable&) { return *this; }
 	virtual ~iselectable() {}
 };

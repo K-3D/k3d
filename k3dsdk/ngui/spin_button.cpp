@@ -90,12 +90,12 @@ public:
 		return result;
 	}
 
-	const k3d::bool_t writable()
+	k3d::bool_t writable()
 	{
 		return m_writable_data ? true : false;
 	}
 
-	const k3d::double_t value()
+	k3d::double_t value()
 	{
 		const std::type_info& type = m_readable_data.property_type();
 
@@ -136,7 +136,7 @@ public:
 		return m_readable_data.property_changed_signal().connect(sigc::hide(Slot));
 	}
 
-	const k3d::double_t step_increment()
+	k3d::double_t step_increment()
 	{
 		if(k3d::imeasurement_property* const measurement_property = dynamic_cast<k3d::imeasurement_property*>(&m_readable_data))
 			return measurement_property->property_step_increment();

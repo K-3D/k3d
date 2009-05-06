@@ -73,19 +73,19 @@ public:
 struct null_property_collection :
 	public iproperty_collection
 {
-	void register_property(iproperty& Property)
+	void register_property(iproperty&)
 	{
 	}
 
-	void register_properties(const properties_t& Properties)
+	void register_properties(const properties_t&)
 	{
 	}
 
-	void unregister_property(iproperty& Property)
+	void unregister_property(iproperty&)
 	{
 	}
 
-	void unregister_properties(const properties_t& Properties)
+	void unregister_properties(const properties_t&)
 	{
 	}
 
@@ -95,7 +95,7 @@ struct null_property_collection :
 		return properties;
 	}
 
-	sigc::connection connect_properties_changed_signal(const sigc::slot<void, ihint*>& Slot)
+	sigc::connection connect_properties_changed_signal(const sigc::slot<void, ihint*>&)
 	{
 		return sigc::connection();
 	}
@@ -114,7 +114,7 @@ class user_serialization :
 	BOOST_STATIC_ASSERT((!boost::is_pointer<value_t>::value));
 
 public:
-	void save(xml::element& Element, const ipersistent::save_context& Context)
+	void save(xml::element& Element, const ipersistent::save_context&)
 	{
 		xml::element xml_storage(
 			"property",
@@ -128,7 +128,7 @@ public:
 		Element.append(xml_storage);
 	}
 
-	void load(xml::element& Element, const ipersistent::load_context& Context)
+	void load(xml::element& Element, const ipersistent::load_context&)
 	{
 		string_t value = Element.text;
 		property_policy_t::set_value(from_string(value, property_policy_t::internal_value()), 0);
@@ -156,7 +156,7 @@ class user_mesh_serialization :
 	BOOST_STATIC_ASSERT((boost::is_pointer<value_t>::value));
 
 public:
-	void save(xml::element& Element, const ipersistent::save_context& Context)
+	void save(xml::element& Element, const ipersistent::save_context&)
 	{
 		// User mesh properties should always be empty ...
 		assert_error(0 == property_policy_t::internal_value());
@@ -173,7 +173,7 @@ public:
 		Element.append(xml_storage);
 	}
 
-	void load(xml::element& Element, const ipersistent::load_context& Context)
+	void load(xml::element&, const ipersistent::load_context&)
 	{
 		// User mesh properties should always be empty ...
 	}
@@ -410,7 +410,7 @@ public:
 	{
 	}
 
-	const char* const parameter_list_name() const
+	const char* parameter_list_name() const
 	{
 		return m_name;
 	}
@@ -673,7 +673,7 @@ class renderman_attribute_serialization :
 	BOOST_STATIC_ASSERT((!boost::is_pointer<value_t>::value));
 
 public:
-	void save(xml::element& Element, const ipersistent::save_context& Context)
+	void save(xml::element& Element, const ipersistent::save_context&)
 	{
 		xml::element xml_storage(
 			"property",
@@ -689,7 +689,7 @@ public:
 		Element.append(xml_storage);
 	}
 
-	void load(xml::element& Element, const ipersistent::load_context& Context)
+	void load(xml::element& Element, const ipersistent::load_context&)
 	{
 		string_t value = Element.text;
 		property_policy_t::set_value(from_string(value, property_policy_t::internal_value()));
@@ -717,7 +717,7 @@ class renderman_option_serialization :
 	BOOST_STATIC_ASSERT((!boost::is_pointer<value_t>::value));
 
 public:
-	void save(xml::element& Element, const ipersistent::save_context& Context)
+	void save(xml::element& Element, const ipersistent::save_context&)
 	{
 		xml::element xml_storage(
 			"property",
@@ -733,7 +733,7 @@ public:
 		Element.append(xml_storage);
 	}
 
-	void load(xml::element& Element, const ipersistent::load_context& Context)
+	void load(xml::element& Element, const ipersistent::load_context&)
 	{
 		string_t value = Element.text;
 		property_policy_t::set_value(from_string(value, property_policy_t::internal_value()));

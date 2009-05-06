@@ -41,7 +41,7 @@ public:
 
 protected:
 	iwritable_property() {}
-	iwritable_property(const iwritable_property&) {}
+	iwritable_property(const iwritable_property& Other) : iunknown(Other) {}
 	iwritable_property& operator = (const iwritable_property&) { return *this; }
 	virtual ~iwritable_property() {}
 };

@@ -62,7 +62,7 @@ public:
 
 protected:
 	inode_collection() {}
-	inode_collection(const inode_collection&) {}
+	inode_collection(const inode_collection& Other) : iunknown(Other) {}
 	inode_collection& operator = (const inode_collection&) { return *this; }
 	virtual ~inode_collection() {}
 };

@@ -127,12 +127,12 @@ public:
 		return "";
 	}
 
-	const k3d::bool_t writable()
+	k3d::bool_t writable()
 	{
 		return m_data.writable();
 	}
 
-	const k3d::double_t value()
+	k3d::double_t value()
 	{
 		return m_data.value()[m_index];
 	}
@@ -149,7 +149,7 @@ public:
 		return m_data.changed_signal().connect(sigc::hide(Slot));
 	}
 
-	const k3d::double_t step_increment()
+	k3d::double_t step_increment()
 	{
 		return 0.1;
 	}

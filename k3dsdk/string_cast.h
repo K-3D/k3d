@@ -61,7 +61,7 @@ inline const string_t string_cast<boost::format>(const boost::format& RHS)
 
 /// Converts a string into any serializeable type
 template<typename type>
-const type from_string(const string_t& Value, const type& Default)
+type from_string(const string_t& Value, const type& Default)
 {
 	type result = Default;
 	std::istringstream stream(Value.c_str());
@@ -72,7 +72,7 @@ const type from_string(const string_t& Value, const type& Default)
 
 /// Specialization of from_string for type bool_t
 template<>
-inline const bool_t from_string(const string_t& Value, const bool_t& Default)
+inline bool_t from_string(const string_t& Value, const bool_t& Default)
 {
 	bool_t result = Default;
 
@@ -86,14 +86,14 @@ inline const bool_t from_string(const string_t& Value, const bool_t& Default)
 
 /// Specialization of from_string for strings
 template<>
-inline const string_t from_string(const string_t& Value, const string_t&)
+inline string_t from_string(const string_t& Value, const string_t&)
 {
 	return Value;
 }
 
 /// Specialization of from_string for filesystem::path
 template<>
-inline const filesystem::path from_string(const string_t& Value, const filesystem::path&)
+inline filesystem::path from_string(const string_t& Value, const filesystem::path&)
 {
 	return filesystem::native_path(ustring::from_utf8(Value));
 }

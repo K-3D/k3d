@@ -202,7 +202,7 @@ parameter::parameter(const string& Name, const storage_class_t StorageClass, con
 {
 }
 
-parameter::parameter(const string& Name, const storage_class_t StorageClass, const unsigned_integer TupleSize, const boost::any& Value) :
+parameter::parameter(const string& Name, const storage_class_t StorageClass, const unsigned_integer TupleSize, const boost::any&) :
 	name(Name),
 	storage_class(StorageClass),
 	tuple_size(TupleSize)

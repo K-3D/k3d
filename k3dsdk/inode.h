@@ -67,7 +67,7 @@ public:
 
 protected:
 	inode() {}
-	inode(const inode&) {}
+	inode(const inode& Other) : iunknown(Other) {}
 	inode& operator=(const inode&) { return *this; }
 };
 

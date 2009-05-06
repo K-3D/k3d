@@ -31,10 +31,10 @@ namespace k3d
 {
 
 /// Returns true iff the given type is registered
-const bool_t type_registered(const std::type_info& Info);
+bool_t type_registered(const std::type_info& Info);
 /// Returns true iff the given type if registered
 template<typename T>
-const bool_t type_registered()
+bool_t type_registered()
 {
 	return type_registered(typeid(T));
 }

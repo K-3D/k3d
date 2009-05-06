@@ -161,7 +161,7 @@ public:
 		return buffer.c_str();
 	}
 
-	void parse(xml::element& Root, std::istream& InputStream, const std::string& StreamName, progress& Progress)
+	void parse(xml::element& Root, std::istream& InputStream, const std::string&, progress& Progress)
 	{
 		root = &Root;
 
@@ -202,7 +202,7 @@ private:
 		}
 	}
 
-	void end_element_handler(const XML_Char* Name)
+	void end_element_handler(const XML_Char*)
 	{
 		if(!element_stack.empty())
 		{
@@ -440,7 +440,7 @@ std::ostream& operator<<(std::ostream& Stream, const single_line& RHS)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // declaration
 
-std::ostream& operator<<(std::ostream& Stream, const declaration& RHS)
+std::ostream& operator<<(std::ostream& Stream, const declaration&)
 {
 	Stream << "<?xml version=\"1.0\" ?>" << detail::eol;
 	return Stream;

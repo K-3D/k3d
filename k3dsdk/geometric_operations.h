@@ -25,6 +25,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "types.h"
+
 namespace k3d
 {
 
@@ -36,9 +38,9 @@ class point3;
 class vector3;
 
 /// Returns the (minimum) distance between a point and a line in two dimensions
-const double distance(const point2& Point, const line2& Line);
+double_t distance(const point2& Point, const line2& Line);
 /// Calculates the intersection of a plane with a line, returns false if the line and plane are parallel
-bool intersect(const plane& Plane, const line3& Line, point3& Intersection);
+bool_t intersect(const plane& Plane, const line3& Line, point3& Intersection);
 
 /** Find the point at which two infinite lines intersect. The algorithm generates a plane from one of the lines and finds the intersection point between this plane and the other line.
 	\param P1 A point that lies on the first line
@@ -49,7 +51,7 @@ bool intersect(const plane& Plane, const line3& Line, point3& Intersection);
 	\result Returns true iff the lines intersect, false if they are parallel
 	\note Code originally from Aqsis, http://www.aqsis.com
 */
-bool intersect_lines(const point3& P1, const vector3& T1, const point3& P2, const vector3& T2, point3& Result);
+bool_t intersect_lines(const point3& P1, const vector3& T1, const point3& P2, const vector3& T2, point3& Result);
 
 } // namespace k3d
 

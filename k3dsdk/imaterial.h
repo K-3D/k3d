@@ -32,11 +32,11 @@ namespace k3d
 
 /// Abstract interface implemented by objects that can act as geometric surface materials
 class imaterial :
-	public virtual k3d::iunknown
+	public virtual iunknown
 {
 protected:
 	imaterial() {}
-	imaterial(const imaterial&) {}
+	imaterial(const imaterial& Other) : iunknown(Other) {}
 	imaterial& operator=(const imaterial&) { return *this; }
 	virtual ~imaterial() {}
 };

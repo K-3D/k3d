@@ -102,12 +102,12 @@ public:
 		return "";
 	}
 
-	const k3d::bool_t writable()
+	k3d::bool_t writable()
 	{
 		return true;
 	}
 
-	const k3d::double_t value()
+	k3d::double_t value()
 	{
 		k3d::quaternion quat(m_data.value());
 		return k3d::euler_angles(quat, k3d::euler_angles::XYZstatic)[m_index];
@@ -126,7 +126,7 @@ public:
 		return m_data.changed_signal().connect(sigc::hide(Slot));
 	}
 
-	const k3d::double_t step_increment()
+	k3d::double_t step_increment()
 	{
 		return k3d::radians(1.0);
 	}

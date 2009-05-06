@@ -39,17 +39,17 @@ namespace k3d
 /////////////////////////////////////////////////////////////////////////////
 // intersect
 
-bool intersect(const plane& Plane, const line3& Line, point3& Intersection)
+bool_t intersect(const plane& Plane, const line3& Line, point3& Intersection)
 {
 	// Calculate the angle (dot product) between line and plane ...
-	const double theta = Plane.normal * Line.direction;
+	const double_t theta = Plane.normal * Line.direction;
 
 	// Make sure the line & plane aren't parallel ...
 	if(0.0 == theta)
 		return false;
 
-	const double v0 = -(Plane.normal * to_vector(Line.point) + Plane.distance);
-	const double t = v0 / theta;
+	const double_t v0 = -(Plane.normal * to_vector(Line.point) + Plane.distance);
+	const double_t t = v0 / theta;
 
 	Intersection = Line.point + (t * Line.direction);
 	return true;
@@ -58,30 +58,30 @@ bool intersect(const plane& Plane, const line3& Line, point3& Intersection)
 /////////////////////////////////////////////////////////////////////////////
 // distance
 
-const double distance(const point2& Point, const line2& Line)
+double_t distance(const point2& Point, const line2& Line)
 {
-	const double x0 = Point[0];
-	const double y0 = Point[1];
-	const double x1 = Line.point[0];
-	const double y1 = Line.point[1];
-	const double x2 = x1 + Line.direction[0];
-	const double y2 = y1 + Line.direction[1];
+	const double_t x0 = Point[0];
+	const double_t y0 = Point[1];
+	const double_t x1 = Line.point[0];
+	const double_t y1 = Line.point[1];
+	const double_t x2 = x1 + Line.direction[0];
+	const double_t y2 = y1 + Line.direction[1];
 
-	const double denominator = sqrt((x2-x1) * (x2-x1) + (y2-y1) * (y2-y1));
+	const double_t denominator = sqrt((x2-x1) * (x2-x1) + (y2-y1) * (y2-y1));
 	return_val_if_fail(denominator, 0.0); // Happens if the line direction is undefined
 
-	const double numerator = fabs((x2-x1) * (y1-y0) - (x1-x0) * (y2-y1));
+	const double_t numerator = fabs((x2-x1) * (y1-y0) - (x1-x0) * (y2-y1));
 	return numerator / denominator;
 }
 
-bool intersect_lines(const point3& P1, const vector3& T1, const point3& P2, const vector3& T2, point3& Result)
+bool_t intersect_lines(const point3& P1, const vector3& T1, const point3& P2, const vector3& T2, point3& Result)
 {
 	// Code originally from Aqsis, http://www.aqsis.com
 	vector3 px = T1 ^ to_vector( P1 - T2 );
 	vector3 v = px ^ T1;
 
-	double t = (P1 - P2) * v;
-	double vw = v * T2;
+	double_t t = (P1 - P2) * v;
+	double_t vw = v * T2;
 	if ( ( vw * vw ) < 1.0e-07 )
 		return false;
 
