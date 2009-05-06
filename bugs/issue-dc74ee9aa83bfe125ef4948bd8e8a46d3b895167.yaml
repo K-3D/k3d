@@ -1,0 +1,42 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "closed tutorial window, created nurb sphere, app crashed - ID: 2761553"
+desc: |-
+  Contact: youngpj@tesco.net
+  Summary: closed tutorial window, created nurb sphere, app crashed
+  Report Generated: 2009-Apr-14 10:13:55 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i386-redhat-linux-gnu
+  Compiler: 4.3.0 20080326 (Red Hat 4.3.0-5)
+  Build Time: Apr 1 2008 17:35:02 local
+  Description of problem:the prog keeps crashing!
+  that's about as descriptive as it gets, sorry
+  
+  Steps to reproduce problem: see summary
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 03:52:10.368356 Z
+references: []
+
+id: dc74ee9aa83bfe125ef4948bd8e8a46d3b895167
+log_events: 
+- - 2009-05-06 03:52:16.024324 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

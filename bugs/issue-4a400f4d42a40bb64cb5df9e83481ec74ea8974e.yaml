@@ -1,0 +1,46 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "assertion `WIDGET_REALIZED_FOR_EVENT (widget, event)' failed "
+desc: |-
+  I typed in "shadowdistant" in the shader path string space, and then
+  pressed the "Relative"
+  pulldown menu, and then pressed it really fast, again. The error I get is:
+  
+  ERROR Gtk: gtk_widget_event: assertion `WIDGET_REALIZED_FOR_EVENT (widget,
+  event)' failed
+  
+  K3D is still going, and when I highlight something with my cursor(like
+  "Shader Path"), it
+  shows a tooltip. I am not able to exit using the "X" in the upperright
+  corner of K3D. I had to "Ctrl+C" K3D in the console I ran it from.
+  
+  Unfortunatly, I am not able to reproduce this bug on purpose, only on
+  accident. But I know
+  for a positive, 100% fact that it has to do with the "Relative, Absolute,
+  Inline" pulldown menu.
+  
+  I hope this was descriptive enough. I've had a lot of problems with this in
+  the past 2 days of working with K3D, and think it's a pretty big bug.
+  
+  System specs:
+  PCLinuxOS 2007
+  GTK 2.12.2-4pclos2007
+  K3D 0.6.7.0
+  
+  K3D is nice, btw. I hope it "grows up" more.
+  
+  email: leiget at gmail . com
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 04:07:21.056584 Z
+references: []
+
+id: 4a400f4d42a40bb64cb5df9e83481ec74ea8974e
+log_events: 
+- - 2009-05-06 04:07:22.384467 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

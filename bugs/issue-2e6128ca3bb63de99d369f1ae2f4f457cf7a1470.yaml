@@ -1,0 +1,44 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: viewport doesn't work
+desc: |-
+  Contact: 4d3l.jarrah@gmail.com
+  Summary: viewport doesn't work
+  Report Generated: 2009-Apr-07 22:33:06 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i486-pc-linux-gnu
+  Compiler: 4.2.3 (Ubuntu 4.2.3-2ubuntu1)
+  Build Time: Feb 27 2008 23:29:50 local
+  Description of problem:
+  When i chose the viewport tab from any window the viewport keeps on
+  disappearing
+  giving me a blank screen, i can only see the objects when i move the
+  objects
+  Steps to reproduce problem:
+  At startup always.
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  Since i first installed k-3d til now
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 03:53:31.136389 Z
+references: []
+
+id: 2e6128ca3bb63de99d369f1ae2f4f457cf7a1470
+log_events: 
+- - 2009-05-06 03:53:33.160309 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

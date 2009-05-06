@@ -1,0 +1,31 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: 5 Components move via typeng wont be saved
+desc: |-
+  Details:
+  
+  Steps to reproduce it.
+  
+  1- create an object
+  2- Select one or more vertexes
+  3- Select a transformation tool
+  3- Type a transformation from the Tool properties panel
+  4- Save the document
+  5- Open it again
+  6- You won't see any transformation on points.
+  
+  Ubuntu 8.10
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 04:08:15.024350 Z
+references: []
+
+id: cfefcca75810ec3b784ee014ff12c2b345d0e37d
+log_events: 
+- - 2009-05-06 04:08:16.496431 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

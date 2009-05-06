@@ -1,0 +1,52 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: The Tutorial Crashed
+desc: |-
+  Contact: deskr@comcast.net
+  Summary: The tutorial crashed.
+  Report Generated: 2009-Jan-12 11:02:53 UTC
+  Package: k3d
+  Version: 0.7.6.0
+  Platform: Windows-5.1;x86
+  Compiler: 3.4.5 (mingw special)
+  Build Time: Jun 23 2008 19:34:18 local
+  Description of problem:
+  During the Panel Basics Tutorial, I clicked the green button that advances
+  to the next step, and I recieved an 'Error executing script' message with
+  an OK button. I clicked OK, and it closed the tutorial. I attempted to run
+  the tutorial again, and the same event ocurred at the same point.
+  
+  Steps to reproduce problem:
+  
+  1. Help -> Tutorials and Examples -> Panel Basics
+  2. Run through tutorial.
+  
+  Expected results:
+  
+  The tutorial runs...
+  
+  Actual results:
+  
+  After the step "The Tool Properties Panel is used to Display Tool-specific
+  options (and resembles the Node Properties Panel) ...," pressing the green
+  button to advance instead brings up the "Error executing script" window.
+  
+  How often does this happen?
+  
+  Every time i have tried running the tutorial.
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 04:05:57.848472 Z
+references: []
+
+id: acffc0b1158b9235a406f1e988c574800e4cd368
+log_events: 
+- - 2009-05-06 04:05:58.720443 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

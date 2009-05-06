@@ -1,0 +1,31 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: build error
+desc: "In file included from\n\
+  /home/7eggert/l/k3d-source-0.7.10.0/k3dsdk/python/const_typed_array_python.\n\
+  cpp:27:\n\
+  /home/7eggert/l/k3d-source-0.7.10.0/k3dsdk/python/utility_python.h: In\n\
+  function \xE2\x80\x98void k3d::python::utility::copy(const boost::python::list&,\n\
+  target_t&)\xE2\x80\x99:\n\
+  /home/7eggert/l/k3d-source-0.7.10.0/k3dsdk/python/utility_python.h:102:\n\
+  error: \xE2\x80\x98len\xE2\x80\x99 is not a member of \xE2\x80\x98boost::python\xE2\x80\x99\n\
+  make[2]: ***\n\
+  [k3dsdk/python/CMakeFiles/k3dsdk-python-const-arrays.dir/const_typed_array_\n\
+  python.o] Error 1\n\
+  make[1]: *** [k3dsdk/python/CMakeFiles/k3dsdk-python-const-arrays.dir/all]\n\
+  Error 2\n\
+  make: *** [all] Error 2"
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 03:57:46.656158 Z
+references: []
+
+id: 52654f9476391c6612de54e91d54e4dcda7bb847
+log_events: 
+- - 2009-05-06 03:57:48.248324 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

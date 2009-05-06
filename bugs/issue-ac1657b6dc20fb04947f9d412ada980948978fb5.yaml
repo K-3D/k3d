@@ -1,0 +1,42 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: the screens gone crazy, just a mess of colors, fresh install, could be driver issue.
+desc: |-
+  Contact: oliclarke@hotmail.com
+  Summary: the screens gone crazy, just a mess of colors, fresh install,
+  could be driver issue.
+  Report Generated: 2009-Jan-22 21:21:16 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i486-pc-linux-gnu
+  Compiler: 4.3.1
+  Build Time: Aug 26 2008 08:33:39 local
+  Description of problem:
+  
+  Steps to reproduce problem:
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 04:05:16.296456 Z
+references: []
+
+id: ac1657b6dc20fb04947f9d412ada980948978fb5
+log_events: 
+- - 2009-05-06 04:05:17.040390 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

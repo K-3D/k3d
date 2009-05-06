@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Polygon meshes and NURBS meshes don't snap when translated.
+desc: |-
+  Polygon meshes and NURBS meshes don't snap when translated. That's pretty
+  much all I need to say, I believe.
+  
+  -leiget
+  leiget at gmail
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 04:06:43.128689 Z
+references: []
+
+id: 162c9fd22b62e2228b4963639d7cd652b4af2e5d
+log_events: 
+- - 2009-05-06 04:06:44.424268 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

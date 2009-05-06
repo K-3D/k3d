@@ -1,0 +1,44 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "hings keep freezing and images stay up even after they've been exited out of "
+desc: |-
+  Contact: Junin_Ninja@yahoo.com
+  Summary: Things keep freezing and images stay up even after they've been
+  exited out of
+  Report Generated: 2009-Jan-25 01:52:18 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 23 2007 09:37:14 local
+  Description of problem: Whenever I start up the program it shows a block of
+  my desktop picture. Also after tutorial windows are exited out of the image
+  still remains.
+  
+  Steps to reproduce problem:open program
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 04:04:37.984268 Z
+references: []
+
+id: 12ac6cbd6ff111c686796d107c8a9b8338158e8f
+log_events: 
+- - 2009-05-06 04:04:38.847914 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

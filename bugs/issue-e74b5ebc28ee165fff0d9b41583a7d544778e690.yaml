@@ -1,0 +1,41 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: lenguaje
+desc: |-
+  Contact: ghago16_@hotmail.com
+  Summary: lenguaje
+  Report Generated: 2009-Feb-13 15:28:05 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 23 2007 09:37:14 local
+  Description of problem:
+  
+  Steps to reproduce problem:
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 03:58:28.288416 Z
+references: []
+
+id: e74b5ebc28ee165fff0d9b41583a7d544778e690
+log_events: 
+- - 2009-05-06 03:58:29.040312 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

@@ -1,0 +1,41 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: My view port is blank. does not show coordinates.
+desc: |-
+  Contact: justshonuff@yahoo.com
+  Summary: My view port is blank. does not show coordinates.
+  Report Generated: 2008-Nov-05 11:58:32 UTC
+  Package: k3d
+  Version: 0.5.14.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jul 9 2006 10:24:48 local
+  Description of problem:
+  my viewport has been blank since i installed the software. please help
+  Steps to reproduce problem:
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 04:12:57.304498 Z
+references: []
+
+id: 361aa608201ea4f1ec2fd204a7c62df2ebfeb1b8
+log_events: 
+- - 2009-05-06 04:12:58.232230 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

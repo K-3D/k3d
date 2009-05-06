@@ -1,0 +1,25 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: CMakeCache.txt have wrong path
+desc: |-
+  CMakeCache.txt have your own path, wrong on any other pcs:
+  
+  CMake Error: The current CMakeCache.txt directory
+  /home/anubis/Desktop/k3d-source-0.7.11.0/CMakeCache.txt is different than
+  the directory /home/bartj/d/3d/k3d-release where CMackeCache.txt was
+  created. This may result in binaries being created in the wrong place. If
+  you are not sure, reedit the CMakeCache.txt
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 03:54:28.096410 Z
+references: []
+
+id: f70081ac577a3f841537885c3d1d3af7f23f5aef
+log_events: 
+- - 2009-05-06 03:54:32.488316 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

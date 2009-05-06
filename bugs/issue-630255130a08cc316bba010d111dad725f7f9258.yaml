@@ -1,0 +1,27 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Doesn't work with Windows 7
+desc: |-
+  This program isn't work with Windows 7 (Vienna). It gave about 55% of CPU
+  and do nothing.
+  
+  version 0.6.7.0 os Windows 7 Ultimate build 7000
+  I've installed full of package downloaded from
+  http://switch.dl.sourceforge.net/sourceforge/k3d/k3d-all-in-one-setup-0.6.7
+  .0.exe
+  
+  What about this reason?
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 03:48:51.680121 Z
+references: []
+
+id: 630255130a08cc316bba010d111dad725f7f9258
+log_events: 
+- - 2009-05-06 03:48:56.640234 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""

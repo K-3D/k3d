@@ -1,0 +1,41 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: when doing "unparent", the software crashes.
+desc: |-
+  Contact: ingirafn@this.is
+  Summary: when doing "unparent", the software crashes.
+  Report Generated: 2009-Mar-29 22:47:16 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i486-pc-linux-gnu
+  Compiler: 4.3.1
+  Build Time: Jun 22 2008 18:41:27 local
+  Description of problem:
+  
+  Steps to reproduce problem:
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  everytime
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-06 03:55:34.072363 Z
+references: []
+
+id: 28d83330170a35565ca1ada32317f34b2daf37a2
+log_events: 
+- - 2009-05-06 03:55:36.184301 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""
