@@ -1,0 +1,44 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: " Fatal error \"Caught unknown exception\""
+desc: |-
+  Contact: itsikbe@gmail.com
+  Summary: Fatal error "Caught unknown exception"
+  Report Generated: 2008-Aug-26 22:22:26 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 23 2007 09:37:14 local
+  Description of problem: I've installed k3d all-in-one, then I've launched
+  the fix for the PATH and reLogged in
+  but when I've tried to start k3d.exe I've got:
+  
+  "K - 3D Fatal Error" (title)
+  "Caught unknown exception"
+  
+  Steps to reproduce problem:
+  
+  1. Run k3d.exe
+  
+  Expected results: Run the program
+  
+  Actual results:Fatal Error: Caught unknown exception
+  
+  How often does this happen? each time when I run it
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-07 04:09:21.477649 Z
+references: []
+
+id: ad7ebb0ae83ac37ee352a9775b601e181d460e3d
+log_events: 
+- - 2009-05-07 04:09:22.301550 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

@@ -1,0 +1,49 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: 5 The viewport does not update
+desc: |-
+  Contact: wil.lemmelliw@gmail.com
+  Summary: The viewport does not update
+  Report Generated: 2008-Jun-17 02:45:04 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 23 2007 09:37:14 local
+  Description of problem:
+  I installed k3d-all-in-one-setup-0.6.7.0.exe on a Vista buisiness AsusG2
+  laptop
+  with Nvidia geforce_8600M (1440x900)
+  The viewport does not update or show at all
+  I cannot rotate the view even if the grid shows.
+  I have seen a reported framerate of 1000 or maybe even 4000 (can't repeat
+  it right now)
+  
+  Steps to reproduce problem:
+  Run the k3d-all-in-one-setup-0.6.7.0.exe installer on my system.
+  Note:
+  I did intall the components all in 1 directory on my D drive.
+  
+  How often does this happen?
+  From the first run on.
+  
+  Additional information:
+  I'm willing to test any (alpha) code that might solve this problem
+  or can help to identify the bug.
+  
+  Cheers
+  Willem.
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-07 04:14:59.604742 Z
+references: []
+
+id: 734d997c30a2208e4cc49cfc83071a6e8c446203
+log_events: 
+- - 2009-05-07 04:15:00.717527 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

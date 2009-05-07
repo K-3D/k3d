@@ -1,0 +1,42 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "5 the viewport is black and i can't see anything thats on it,,, and every window i open leaves a print on the screen like it won't go away "
+desc: |-
+  Contact: lordofthedrum@yahoo.com
+  Summary: the viewport is black and i can't see anything thats on it,,, and
+  every window i open leaves a print on the screen like it won't go away
+  Report Generated: 2008-Sep-18 01:55:36 UTC
+  Package: k3d
+  Version: 0.7.9.0
+  Platform: Windows-5.1;x86
+  Compiler: 3.4.5 (mingw special)
+  Build Time: Aug 13 2008 17:13:57 local
+  Description of problem:
+  
+  Steps to reproduce problem:
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-07 04:06:40.213645 Z
+references: []
+
+id: 9340867dbd5c408b4505e0a5aac01dfd7cf13531
+log_events: 
+- - 2009-05-07 04:06:41.213557 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

@@ -1,0 +1,41 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: program freezing
+desc: |-
+  Contact: db_silvis@yahoo.com
+  Summary: program freezing
+  Report Generated: 2008-Oct-21 22:42:24 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 23 2007 09:37:14 local
+  Description of problem:
+  
+  Steps to reproduce problem:
+  
+  1.as soon as I start the program
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-07 04:04:40.125460 Z
+references: []
+
+id: 1af4c139c1c4fe06ca2e3fbe31f1237cf963a20e
+log_events: 
+- - 2009-05-07 04:04:42.333757 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

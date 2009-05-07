@@ -1,0 +1,34 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "5 Das Tutorial Skript Nr. 5 st\xC3\xBCrzt ab"
+desc: "Contact: hans.frericks@web.de\n\
+  Summary: Das Tutorial Skript Nr. 5 st\xC3\xBCrzt ab\n\
+  Report Generated: 2008-Oct-12 09:57:46 UTC\n\
+  Package: k3d\n\
+  Version: 0.6.7.0\n\
+  Platform: i486-pc-linux-gnu\n\
+  Compiler: 4.2.3 (Ubuntu 4.2.3-2ubuntu1)\n\
+  Build Time: Feb 27 2008 23:29:50 local\n\
+  Description of problem:\n\n\
+  Steps to reproduce problem:\n\n\
+  1. Help - Tutorial - GTS Boolean (Advanced) --> Programmabsturz\n\
+  2.\n\
+  3.\n\n\
+  Expected results:\n\n\
+  Actual results:\n\n\
+  How often does this happen?\n\n\
+  Additional information:"
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-07 04:05:21.149679 Z
+references: []
+
+id: 6aedc6869efacb25e643f2bb3d447338cc7307e5
+log_events: 
+- - 2009-05-07 04:05:22.205545 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

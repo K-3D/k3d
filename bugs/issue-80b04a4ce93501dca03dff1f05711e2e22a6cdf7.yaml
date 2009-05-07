@@ -1,0 +1,48 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "5  Tutorial and Examples - Panel Basics - Timeline short description - continue - Error executing script "
+desc: |-
+  Contact: matachuk@gmail.com
+  Summary: Tutorial and Examples - Panel Basics - Timeline short description
+  - continue - Error executing script
+  Report Generated: 2008-Aug-17 10:54:40 UTC
+  Package: k3d
+  Version: 0.7.6.0
+  Platform: Windows-5.1;x86
+  Compiler: 3.4.5 (mingw special)
+  Build Time: Jun 23 2008 19:34:18 local
+  Description of problem:
+  I watched tutorial and after some steps the tutorial stops unexpectedly.
+  
+  Steps to reproduce problem:
+  
+  1. Start Help->Tutorial and Examples and choose Panel Basics, ckick on the
+  Continue Tutorial
+  2. continue with the tutorial
+  3. after Time Line is being mentioned, click on the Continue Tutorial and
+  then the dialog 'Error executing script' will popup
+  
+  Expected results:
+  Tutorial should continue with lessons
+  
+  Actual results:
+  Tutorial is stopped and tutorial tool bar disapears
+  
+  How often does this happen?
+  Every time you try to go to the step after Time Line explanation
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-07 04:11:35.805630 Z
+references: []
+
+id: 80b04a4ce93501dca03dff1f05711e2e22a6cdf7
+log_events: 
+- - 2009-05-07 04:11:36.485562 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

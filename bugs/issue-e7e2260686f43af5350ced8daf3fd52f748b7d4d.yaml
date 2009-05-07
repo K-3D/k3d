@@ -1,0 +1,41 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: programs not starting
+desc: |-
+  Contact: darius_persaud@yahoo.com
+  Summary: programs not starting
+  Report Generated: 2008-Oct-01 00:59:35 UTC
+  Package: k3d
+  Version: 0.7.9.0
+  Platform: Windows-5.1;x86
+  Compiler: 3.4.5 (mingw special)
+  Build Time: Aug 13 2008 17:13:57 local
+  Description of problem:
+  
+  Steps to reproduce problem:
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-07 04:05:59.285456 Z
+references: []
+
+id: e7e2260686f43af5350ced8daf3fd52f748b7d4d
+log_events: 
+- - 2009-05-07 04:06:00.693561 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

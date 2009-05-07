@@ -1,0 +1,29 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "5  Array out of bounds in point painter "
+desc: |-
+  I'm not sure how to reproduce this, since it actually happened when my cat
+  jumped up on the keyboard. :)
+  
+  Either way, in point_vbo::on_execute, an array range check failed on line
+  114:
+  glBufferData(GL_ARRAY_BUFFER, sizeof(points[0]) * points.size(),
+  &points[0], GL_STATIC_DRAW);
+  
+  It seems like the "points" array is empty, which means the points[0] will
+  fail. Not sure if it's even supposed to get there if point size is zero,
+  which is why someone who knows about it should have a look.
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-07 04:13:10.997672 Z
+references: []
+
+id: e86ef362f926037001e1c60a9fedea2822620595
+log_events: 
+- - 2009-05-07 04:13:11.981614 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

@@ -1,0 +1,44 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: White Screen on startup
+desc: |-
+  Contact: whitejediguy@gmail.com
+  Summary: White Screen on startup
+  Report Generated: 2008-Jul-20 04:07:04 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 23 2007 09:37:14 local
+  Description of problem:Just open in updated VistaWhere it should be black
+  when I open the program, it is white.. If I minimize then maximize, it will
+  be black. Cannot see anything I have made previously.. This is windows
+  vista
+  
+  Steps to reproduce problem
+  
+  1. :Just open in updated Vista
+  2. try adding anything to the viewport and nothing happens
+  3.
+  
+  Expected results:
+  should work normally as before
+  Actual results:
+  white screen, cannot do anything
+  How often does this happen?
+  everytime now
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-07 04:14:21.541544 Z
+references: []
+
+id: f20b5cc0c3904cfa8ec18ee3c7753e4bbff69d4e
+log_events: 
+- - 2009-05-07 04:14:22.662315 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""
