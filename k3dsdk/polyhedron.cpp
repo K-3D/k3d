@@ -21,10 +21,14 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
+#include "metadata_keys.h"
 #include "parallel/blocked_range.h"
 #include "parallel/parallel_for.h"
 #include "parallel/threads.h"
 #include "polyhedron.h"
+#include "primitive_detail.h"
+#include "selection.h"
+#include "string_cast.h"
 
 #include <functional>
 #include <iterator>
@@ -147,9 +151,9 @@ primitive* create(mesh& Mesh)
 		generic_primitive.structure.create<mesh::indices_t>("edge_points"),
 		generic_primitive.structure.create<mesh::indices_t>("clockwise_edges"),
 		generic_primitive.structure.create<mesh::selection_t>("edge_selections"),
-		generic_primitive.attributes["constant_data"],
-		generic_primitive.attributes["uniform_data"],
-		generic_primitive.attributes["face_varying_data"]
+		generic_primitive.attributes["constant"],
+		generic_primitive.attributes["uniform"],
+		generic_primitive.attributes["face_varying"]
 		);
 
 	return result;
@@ -387,122 +391,168 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-/*
-const bool_t legacy_validate_polyhedra(const mesh& Mesh)
-{
-	if(!Mesh.polyhedra)
-		return false;
-
-	return_val_if_fail(Mesh.polyhedra->first_faces, false);
-	return_val_if_fail(Mesh.polyhedra->face_counts, false);
-	return_val_if_fail(Mesh.polyhedra->types, false);
-	return_val_if_fail(Mesh.polyhedra->face_first_loops, false);
-	return_val_if_fail(Mesh.polyhedra->face_loop_counts, false);
-	return_val_if_fail(Mesh.polyhedra->face_selection, false);
-	return_val_if_fail(Mesh.polyhedra->face_materials, false);
-	return_val_if_fail(Mesh.polyhedra->loop_first_edges, false);
-	return_val_if_fail(Mesh.polyhedra->edge_points, false);
-	return_val_if_fail(Mesh.polyhedra->clockwise_edges, false);
-	return_val_if_fail(Mesh.polyhedra->edge_selection, false);
-
-	return_val_if_fail(Mesh.polyhedra->first_faces->size() == Mesh.polyhedra->face_counts->size(), false);
-	return_val_if_fail(Mesh.polyhedra->first_faces->size() == Mesh.polyhedra->types->size(), false);
-
-	return_val_if_fail(Mesh.polyhedra->face_first_loops->size() == Mesh.polyhedra->face_loop_counts->size(), false);
-	return_val_if_fail(Mesh.polyhedra->face_first_loops->size() == Mesh.polyhedra->face_selection->size(), false);
-	return_val_if_fail(Mesh.polyhedra->face_first_loops->size() == Mesh.polyhedra->face_materials->size(), false);
-
-	return_val_if_fail(Mesh.polyhedra->edge_points->size() == Mesh.polyhedra->clockwise_edges->size(), false);
-	return_val_if_fail(Mesh.polyhedra->edge_points->size() == Mesh.polyhedra->edge_selection->size(), false);
-
-	// Check for infinite loops
-	// TODO:  Catch segmentation faults
-	const mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-	const mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-	const mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-
-	const uint_t loop_begin = 0;
-	const uint_t loop_end = loop_begin + loop_first_edges.size();
-	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
-	{
-		const uint_t first_edge = loop_first_edges[loop];
-		uint_t edge_slow = first_edge;
-		uint_t edge_fast = first_edge;
-		uint_t cycle_count = 0;
-		while(true)
-		{
-			edge_slow = clockwise_edges[edge_slow];
-			edge_fast = clockwise_edges[clockwise_edges[edge_fast]];
-
-			if(edge_slow == edge_fast)
-				++cycle_count;
-
-			if(cycle_count > 2)
-			{
-				log() << error << "infinite loop at loop index " << loop << std::endl;
-				return false;
-			}
-
-			if(edge_slow == first_edge)
-				break;
-		}
-	}
-	return true;
-}
-*/
-
 const_primitive* validate(const mesh::primitive& Primitive)
 {
-  assert_not_implemented();
-  return 0;
-/*
-	if(!legacy_validate_polyhedra(Mesh))
+	if(Primitive.type != "polyhedron")
 		return 0;
 
-	return new const_primitive(
-		*Mesh.polyhedra->first_faces,
-		*Mesh.polyhedra->face_counts,
-		*Mesh.polyhedra->types,
-		*Mesh.polyhedra->face_first_loops,
-		*Mesh.polyhedra->face_loop_counts,
-		*Mesh.polyhedra->face_selection,
-		*Mesh.polyhedra->face_materials,
-		*Mesh.polyhedra->loop_first_edges,
-		*Mesh.polyhedra->edge_points,
-		*Mesh.polyhedra->clockwise_edges,
-		*Mesh.polyhedra->edge_selection,
-		Mesh.polyhedra->constant_data,
-		Mesh.polyhedra->uniform_data,
-		Mesh.polyhedra->face_varying_data);
-*/
+	try
+	{
+		const mesh::indices_t& shell_first_faces = require_const_array<mesh::indices_t>(Primitive, "shell_first_faces");
+		const mesh::counts_t& shell_face_counts = require_const_array<mesh::counts_t>(Primitive, "shell_face_counts");
+		const typed_array<int32_t>& shell_types = require_const_array<typed_array<int32_t> >(Primitive, "shell_types");
+		const mesh::indices_t& face_first_loops = require_const_array<mesh::indices_t>(Primitive, "face_first_loops");
+		const mesh::counts_t& face_loop_counts = require_const_array<mesh::counts_t>(Primitive, "face_loop_counts");
+		const mesh::selection_t& face_selections = require_const_array<mesh::selection_t>(Primitive, "face_selections");
+		const mesh::materials_t& face_materials = require_const_array<mesh::materials_t>(Primitive, "face_materials");
+		const mesh::indices_t& loop_first_edges = require_const_array<mesh::indices_t>(Primitive, "loop_first_edges");
+		const mesh::indices_t& edge_points = require_const_array<mesh::indices_t>(Primitive, "edge_points");
+		const mesh::indices_t& clockwise_edges = require_const_array<mesh::indices_t>(Primitive, "clockwise_edges");
+		const mesh::selection_t& edge_selections = require_const_array<mesh::selection_t>(Primitive, "edge_selections");
+
+		const mesh::attribute_arrays_t& constant_data = require_const_attribute_arrays(Primitive, "constant");
+		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
+		const mesh::attribute_arrays_t& face_varying_data = require_const_attribute_arrays(Primitive, "face_varying");
+
+		require_metadata(Primitive, face_selections, "face_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, edge_points, "edge_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::selection_component(), string_cast(selection::SPLIT_EDGE));
+
+		require_array_size(Primitive, shell_face_counts, "shell_face_counts", shell_first_faces.size());
+		require_array_size(Primitive, shell_types, "shell_types", shell_first_faces.size());
+
+		require_array_size(Primitive, face_first_loops, "face_first_loops", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
+		require_array_size(Primitive, face_loop_counts, "face_loop_counts", face_first_loops.size());
+		require_array_size(Primitive, face_selections, "face_selections", face_first_loops.size());
+		require_array_size(Primitive, face_materials, "face_materials", face_first_loops.size());
+
+		require_array_size(Primitive, loop_first_edges, "loop_first_edges", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
+
+		require_array_size(Primitive, clockwise_edges, "clockwise_edges", edge_points.size());
+		require_array_size(Primitive, edge_selections, "edge_selections", edge_points.size());
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", shell_first_faces.size());
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", face_first_loops.size());
+//		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+
+		// Check for infinite loops in our edge lists ...
+		const uint_t loop_begin = 0;
+		const uint_t loop_end = loop_begin + loop_first_edges.size();
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			const uint_t first_edge = loop_first_edges[loop];
+			uint_t edge_slow = first_edge;
+			uint_t edge_fast = first_edge;
+			uint_t cycle_count = 0;
+			while(true)
+			{
+				edge_slow = clockwise_edges[edge_slow];
+				edge_fast = clockwise_edges[clockwise_edges[edge_fast]];
+
+				if(edge_slow == edge_fast)
+					++cycle_count;
+
+				if(cycle_count > 2)
+				{
+					log() << error << "infinite loop at loop index " << loop << std::endl;
+					return 0;
+				}
+
+				if(edge_slow == first_edge)
+					break;
+			}
+		}
+
+		return new const_primitive(shell_first_faces, shell_face_counts, shell_types, face_first_loops, face_loop_counts, face_selections, face_materials, loop_first_edges, edge_points, clockwise_edges, edge_selections, constant_data, uniform_data, face_varying_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
+	}
+
+	return 0;
 }
 
 primitive* validate(mesh::primitive& Primitive)
 {
-  assert_not_implemented();
-  return 0;
-/*
-	if(!legacy_validate_polyhedra(Mesh))
+	if(Primitive.type != "polyhedron")
 		return 0;
 
-	mesh::polyhedra_t& polyhedron = Mesh.polyhedra.writable();
+	try
+	{
+		mesh::indices_t& shell_first_faces = require_array<mesh::indices_t>(Primitive, "shell_first_faces");
+		mesh::counts_t& shell_face_counts = require_array<mesh::counts_t>(Primitive, "shell_face_counts");
+		typed_array<int32_t>& shell_types = require_array<typed_array<int32_t> >(Primitive, "shell_types");
+		mesh::indices_t& face_first_loops = require_array<mesh::indices_t>(Primitive, "face_first_loops");
+		mesh::counts_t& face_loop_counts = require_array<mesh::counts_t>(Primitive, "face_loop_counts");
+		mesh::selection_t& face_selections = require_array<mesh::selection_t>(Primitive, "face_selections");
+		mesh::materials_t& face_materials = require_array<mesh::materials_t>(Primitive, "face_materials");
+		mesh::indices_t& loop_first_edges = require_array<mesh::indices_t>(Primitive, "loop_first_edges");
+		mesh::indices_t& edge_points = require_array<mesh::indices_t>(Primitive, "edge_points");
+		mesh::indices_t& clockwise_edges = require_array<mesh::indices_t>(Primitive, "clockwise_edges");
+		mesh::selection_t& edge_selections = require_array<mesh::selection_t>(Primitive, "edge_selections");
 
-	return new primitive(
-		polyhedron.first_faces.writable(),
-		polyhedron.face_counts.writable(),
-		polyhedron.types.writable(),
-		polyhedron.face_first_loops.writable(),
-		polyhedron.face_loop_counts.writable(),
-		polyhedron.face_selection.writable(),
-		polyhedron.face_materials.writable(),
-		polyhedron.loop_first_edges.writable(),
-		polyhedron.edge_points.writable(),
-		polyhedron.clockwise_edges.writable(),
-		polyhedron.edge_selection.writable(),
-		polyhedron.constant_data,
-		polyhedron.uniform_data,
-		polyhedron.face_varying_data);
-*/
+		mesh::attribute_arrays_t& constant_data = require_attribute_arrays(Primitive, "constant");
+		mesh::attribute_arrays_t& uniform_data = require_attribute_arrays(Primitive, "uniform");
+		mesh::attribute_arrays_t& face_varying_data = require_attribute_arrays(Primitive, "face_varying");
+
+		require_metadata(Primitive, face_selections, "face_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, edge_points, "edge_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::selection_component(), string_cast(selection::SPLIT_EDGE));
+
+		require_array_size(Primitive, shell_face_counts, "shell_face_counts", shell_first_faces.size());
+		require_array_size(Primitive, shell_types, "shell_types", shell_first_faces.size());
+
+		require_array_size(Primitive, face_first_loops, "face_first_loops", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
+		require_array_size(Primitive, face_loop_counts, "face_loop_counts", face_first_loops.size());
+		require_array_size(Primitive, face_selections, "face_selections", face_first_loops.size());
+		require_array_size(Primitive, face_materials, "face_materials", face_first_loops.size());
+
+		require_array_size(Primitive, loop_first_edges, "loop_first_edges", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
+
+		require_array_size(Primitive, clockwise_edges, "clockwise_edges", edge_points.size());
+		require_array_size(Primitive, edge_selections, "edge_selections", edge_points.size());
+
+		require_attribute_arrays_size(Primitive, constant_data, "constant", shell_first_faces.size());
+		require_attribute_arrays_size(Primitive, uniform_data, "uniform", face_first_loops.size());
+//		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+
+		// Check for infinite loops in our edge lists ...
+		const uint_t loop_begin = 0;
+		const uint_t loop_end = loop_begin + loop_first_edges.size();
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			const uint_t first_edge = loop_first_edges[loop];
+			uint_t edge_slow = first_edge;
+			uint_t edge_fast = first_edge;
+			uint_t cycle_count = 0;
+			while(true)
+			{
+				edge_slow = clockwise_edges[edge_slow];
+				edge_fast = clockwise_edges[clockwise_edges[edge_fast]];
+
+				if(edge_slow == edge_fast)
+					++cycle_count;
+
+				if(cycle_count > 2)
+				{
+					log() << error << "infinite loop at loop index " << loop << std::endl;
+					return 0;
+				}
+
+				if(edge_slow == first_edge)
+					break;
+			}
+		}
+
+		return new primitive(shell_first_faces, shell_face_counts, shell_types, face_first_loops, face_loop_counts, face_selections, face_materials, loop_first_edges, edge_points, clockwise_edges, edge_selections, constant_data, uniform_data, face_varying_data);
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
+	}
+
+	return 0;
 }
 
 primitive* validate(pipeline_data<mesh::primitive>& Primitive)
