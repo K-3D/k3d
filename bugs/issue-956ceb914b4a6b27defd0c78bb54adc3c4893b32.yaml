@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Create a test to validate copyright notices.
+desc: ""
+type: :task
+component: K-3D
+release: 
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-08 21:50:27.127712 Z
+references: []
+
+id: 956ceb914b4a6b27defd0c78bb54adc3c4893b32
+log_events: 
+- - 2009-05-08 21:50:28.887157 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""
