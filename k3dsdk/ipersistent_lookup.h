@@ -45,7 +45,7 @@ public:
 
 protected:
 	ipersistent_lookup() {}
-	ipersistent_lookup(const ipersistent_lookup&) {}
+	ipersistent_lookup(const ipersistent_lookup& Other) : iunknown(Other) {}
 	ipersistent_lookup& operator=(const ipersistent_lookup&) { return *this; }
 	virtual ~ipersistent_lookup() {}
 };

@@ -43,7 +43,7 @@ public:
 
 protected:
 	inode_property() {}
-	inode_property(const inode_property&) {}
+	inode_property(const inode_property& Other) : iunknown(Other) {}
 	inode_property& operator = (const inode_property&) { return *this; }
 	virtual ~inode_property() {}
 };

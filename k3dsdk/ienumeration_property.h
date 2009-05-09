@@ -64,7 +64,7 @@ public:
 
 protected:
 	ienumeration_property() {}
-	ienumeration_property(const ienumeration_property&) {}
+	ienumeration_property(const ienumeration_property& Other) : iunknown(Other) {}
 	ienumeration_property& operator = (const ienumeration_property&) { return *this; }
 	virtual ~ienumeration_property() {}
 };

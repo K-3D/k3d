@@ -45,7 +45,7 @@ public:
 
 	/// Parse an expression, returning true on success, otherwise false.
 	/// If parsing fails, Error will contain a human-readable string describing the reason.
-	const bool_t parse(const std::string& Function, const std::string& Variables);
+	bool_t parse(const std::string& Function, const std::string& Variables);
 	/// Returns a human-readable string describing the most recent parse error
 	const std::string last_parse_error();
 

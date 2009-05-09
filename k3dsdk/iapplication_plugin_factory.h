@@ -43,7 +43,7 @@ public:
 
 protected:
 	iapplication_plugin_factory() {}
-	iapplication_plugin_factory(const iapplication_plugin_factory&) {}
+	iapplication_plugin_factory(const iapplication_plugin_factory& Other) : iunknown(Other) {}
 	iapplication_plugin_factory& operator=(const iapplication_plugin_factory&) { return *this; }
 	virtual ~iapplication_plugin_factory() {}
 };

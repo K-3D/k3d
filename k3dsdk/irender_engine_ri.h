@@ -52,7 +52,7 @@ public:
 
 protected:
 	irender_engine() {}
-	irender_engine(const irender_engine& ) {}
+	irender_engine(const irender_engine& Other) : iunknown(Other) {}
 	irender_engine& operator=(const irender_engine& ) { return *this; }
 };
 } // namespace ri

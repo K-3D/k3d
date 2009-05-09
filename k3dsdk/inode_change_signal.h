@@ -42,7 +42,7 @@ public:
 
 protected:
 	inode_change_signal() {}
-	inode_change_signal(const inode_change_signal&) {}
+	inode_change_signal(const inode_change_signal& Other) : iunknown(Other) {}
 	inode_change_signal& operator = (const inode_change_signal&) { return *this; }
 	virtual ~inode_change_signal() {}
 };

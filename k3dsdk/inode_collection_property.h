@@ -43,7 +43,7 @@ public:
 
 protected:
 	inode_collection_property() {}
-	inode_collection_property(const inode_collection_property&) {}
+	inode_collection_property(const inode_collection_property& Other) : iunknown(Other) {}
 	inode_collection_property& operator = (const inode_collection_property&) { return *this; }
 	virtual ~inode_collection_property() {}
 };

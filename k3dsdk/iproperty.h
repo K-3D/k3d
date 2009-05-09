@@ -70,7 +70,7 @@ public:
 
 protected:
 	iproperty() {}
-	iproperty(const iproperty&) {}
+	iproperty(const iproperty& Other) : iunknown(Other) {}
 	iproperty& operator = (const iproperty&) { return *this; }
 };
 

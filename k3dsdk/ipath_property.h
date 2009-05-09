@@ -92,7 +92,7 @@ public:
 	
 protected:
 	ipath_property() {}
-	ipath_property(const ipath_property&) {}
+	ipath_property(const ipath_property& Other) : iunknown(Other) {}
 	ipath_property& operator=(const ipath_property&) { return *this; }
 	virtual ~ipath_property() {}
 };

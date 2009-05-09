@@ -42,7 +42,7 @@ public:
 
 protected:
 	iattribute_property() {}
-	iattribute_property(const iattribute_property&) {}
+	iattribute_property(const iattribute_property& Other) : iunknown(Other) {}
 	iattribute_property& operator = (const iattribute_property&) { return *this; }
 	virtual ~iattribute_property() {}
 };

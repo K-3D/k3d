@@ -42,7 +42,7 @@ public:
 
 protected:
 	i3d_2d_mapping() {}
-	i3d_2d_mapping(const i3d_2d_mapping&) {}
+	i3d_2d_mapping(const i3d_2d_mapping& Other) : iunknown(Other) {}
 	i3d_2d_mapping& operator = (const i3d_2d_mapping&) { return *this; }
 	virtual ~i3d_2d_mapping() {}
 };

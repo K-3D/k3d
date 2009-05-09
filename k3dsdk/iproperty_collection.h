@@ -60,7 +60,7 @@ public:
 
 protected:
 	iproperty_collection() {}
-	iproperty_collection(const iproperty_collection&) {}
+	iproperty_collection(const iproperty_collection& Other) : iunknown(Other) {}
 	iproperty_collection& operator=(const iproperty_collection&) { return *this; }
 	virtual ~iproperty_collection() {}
 };

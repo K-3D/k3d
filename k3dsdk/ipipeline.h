@@ -60,7 +60,7 @@ public:
 
 protected:
 	ipipeline() {}
-	ipipeline(const ipipeline&) {}
+	ipipeline(const ipipeline& Other) : iunknown(Other) {}
 	ipipeline& operator=(const ipipeline&) { return *this; }
 	virtual ~ipipeline() {}
 };

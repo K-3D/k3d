@@ -76,7 +76,7 @@ public:
 
 protected:
 	iplugin_factory() {}
-	iplugin_factory(const iplugin_factory&) {}
+	iplugin_factory(const iplugin_factory& Other) : iunknown(Other) {}
 	iplugin_factory& operator = (const iplugin_factory&) { return *this; }
 	virtual ~iplugin_factory() {}
 };

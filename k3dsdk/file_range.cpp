@@ -40,7 +40,7 @@ file_range::file_range() :
 {
 }
 
-const size_t file_range::max_file_count() const
+size_t file_range::max_file_count() const
 {
 	return static_cast<size_t>(std::pow(10.0, static_cast<double>(digits)));
 }

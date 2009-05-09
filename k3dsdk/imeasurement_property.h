@@ -21,8 +21,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares imeasurement_property, an abstract interface for discovering information about a property that uses real-world units-of-measure
-		\author Tim Shead (tshead@k-3d.com)
+	\brief Declares imeasurement_property, an abstract interface for discovering information about a property that uses real-world units-of-measure
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -47,7 +47,7 @@ public:
 
 protected:
 	imeasurement_property() {}
-	imeasurement_property(const imeasurement_property&) {}
+	imeasurement_property(const imeasurement_property& Other) : iunknown(Other) {}
 	imeasurement_property& operator = (const imeasurement_property&) { return *this; }
 	virtual ~imeasurement_property() {}
 };

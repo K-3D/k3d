@@ -97,7 +97,7 @@ public:
 
 protected:
 	ipersistent() {}
-	ipersistent(const ipersistent&) {}
+	ipersistent(const ipersistent& Other) : iunknown(Other) {}
 	ipersistent& operator=(const ipersistent&) { return *this; }
 	virtual ~ipersistent() {}
 };

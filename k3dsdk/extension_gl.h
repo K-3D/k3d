@@ -44,10 +44,10 @@ void enable(const k3d::string_t& Extension);
 const std::set<k3d::string_t> list();
 
 /// Returns true iff the requested OpenGL extension is available
-const bool query(const k3d::string_t& Extension);
+bool_t query(const k3d::string_t& Extension);
 
 /// Convenience function that returns true iff the VBO extension is supported
-bool query_vbo();
+bool_t query_vbo();
 
 } // namespace extension
 

@@ -40,7 +40,7 @@ public:
 	file_range();
 
 	/// Returns the maximum number of files that can be represented by this range
-	const size_t max_file_count() const;
+	size_t max_file_count() const;
 	/// Returns the full path to the Nth file (N does *not* have to be within the valid range)
 	const filesystem::path file(const size_t N) const;
 

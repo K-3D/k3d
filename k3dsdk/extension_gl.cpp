@@ -111,7 +111,7 @@ void enable(const k3d::string_t& Extension)
 	detail::enabled().insert(Extension);
 }
 
-const bool query(const k3d::string_t& Extension)
+bool_t query(const k3d::string_t& Extension)
 {
 	if(detail::disabled().count(Extension))
 		return false;
@@ -122,7 +122,7 @@ const bool query(const k3d::string_t& Extension)
 	return detail::extensions().count(Extension) ? true : false;
 }
 
-bool query_vbo()
+bool_t query_vbo()
 {
 	return query("GL_ARB_vertex_buffer_object");
 }

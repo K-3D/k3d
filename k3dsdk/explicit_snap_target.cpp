@@ -64,13 +64,13 @@ const isnap_target::groups_t explicit_snap_target::groups()
 	return m_groups;
 }
 
-bool explicit_snap_target::target_position(const point3& Position, point3& TargetPosition)
+bool explicit_snap_target::target_position(const point3&, point3& TargetPosition)
 {
 	TargetPosition = m_position;
 	return true;
 }
 
-bool explicit_snap_target::target_orientation(const point3& Position, vector3& TargetLook, vector3& TargetUp)
+bool explicit_snap_target::target_orientation(const point3&, vector3& TargetLook, vector3& TargetUp)
 {
 	if(m_look.get() && m_up.get())
 	{

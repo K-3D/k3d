@@ -54,7 +54,7 @@ void basic_parser::add_function(const std::string& Name, FunctionPtr Function, u
 	return_if_fail(m_implementation->basic_parser.AddFunction(Name, Function, ParameterCount));
 }
 
-const bool_t basic_parser::parse(const std::string& Function, const std::string& Variables)
+bool_t basic_parser::parse(const std::string& Function, const std::string& Variables)
 {
 	return m_implementation->basic_parser.Parse(Function, Variables) <= -1;
 }

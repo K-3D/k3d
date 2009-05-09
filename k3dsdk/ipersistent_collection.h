@@ -48,7 +48,7 @@ public:
 
 protected:
 	ipersistent_collection() {}
-	ipersistent_collection(const ipersistent_collection&) {}
+	ipersistent_collection(const ipersistent_collection& Other) : iunknown(Other) {}
 	ipersistent_collection& operator=(const ipersistent_collection&) { return *this; }
 	virtual ~ipersistent_collection() {}
 };

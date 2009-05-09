@@ -70,7 +70,7 @@ public:
 
 protected:
 	inode_selection() {}
-	inode_selection(const inode_selection&) {}
+	inode_selection(const inode_selection& Other) : iunknown(Other) {}
 	inode_selection& operator=(const inode_selection&) { return *this; }
 	virtual ~inode_selection() {}
 };

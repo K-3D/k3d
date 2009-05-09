@@ -72,7 +72,7 @@ public:
 
 protected:
 	iapplication() {}
-	iapplication(const iapplication&) {}
+	iapplication(const iapplication& Other) : iunknown(Other) {}
 	iapplication& operator = (const iapplication&) { return *this; }
 	virtual ~iapplication() {}
 };

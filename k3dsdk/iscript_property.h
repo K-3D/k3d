@@ -38,7 +38,7 @@ public:
 
 protected:
 	iscript_property() {}
-	iscript_property(const iscript_property&) {}
+	iscript_property(const iscript_property& Other) : iunknown(Other) {}
 	iscript_property& operator = (const iscript_property&) { return *this; }
 	virtual ~iscript_property() {}
 };
