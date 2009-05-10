@@ -156,6 +156,10 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["face_varying"]
 		);
 
+	result->face_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->edge_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+	result->edge_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::SPLIT_EDGE));
+
 	return result;
 }
 
