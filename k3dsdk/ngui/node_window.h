@@ -26,6 +26,8 @@
 
 #include "ui_component.h"
 
+#include <k3dsdk/types.h>
+
 #include <gtkmm/window.h>
 
 namespace k3d { class inode; }

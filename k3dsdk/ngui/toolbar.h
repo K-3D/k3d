@@ -47,7 +47,7 @@ class control :
 	typedef Gtk::VBox base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name);
+	control();
 
 	Gtk::HBox& row(const unsigned int Row);
 

@@ -23,7 +23,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/ngui/application_state.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/button.h>
@@ -53,14 +52,13 @@ namespace assign_hotkeys
 // dialog
 
 class dialog :
-	public application_window
+	public application_window,
+	public k3d::iunknown
 {
 	typedef application_window base;
 public:
 	dialog()
 	{
-		k3d::command_tree().add(*this, "assign_hotkeys");
-
 		is_open = true;
 
 		set_title(_("Assign Hotkeys:"));
@@ -69,7 +67,7 @@ public:
 
 		Gtk::HButtonBox* const box2 = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
 		box2->pack_start(*Gtk::manage(
-			new button::control(*this, "close", Gtk::Stock::CLOSE)
+			new button::control(Gtk::Stock::CLOSE)
 			<< connect_button(sigc::mem_fun(*this, &dialog::close))
 			), Gtk::PACK_SHRINK);
 

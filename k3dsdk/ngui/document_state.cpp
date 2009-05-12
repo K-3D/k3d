@@ -48,11 +48,9 @@
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/iapplication.h>
-#include <k3dsdk/icommand_tree.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_sink.h>
 #include <k3dsdk/imesh_selection_sink.h>
@@ -1131,8 +1129,6 @@ public:
 		m_context_menu(0),
 		m_node_selection(0)
 	{
-		k3d::command_tree().add(m_context_menu_node, "context_menu", dynamic_cast<k3d::icommand_node*>(&Document));
-
 		m_selection_mode.connect_explicit_change_signal(sigc::mem_fun(*this, &implementation::on_selection_mode_changed));
 
 		// Process remove_nodes_signal
@@ -1162,48 +1158,6 @@ public:
 	{
 		return m_document;
 	}
-
-	/** \todo Restore UI serialization */
-/*
-	void save(k3d::xml::element& Element, const k3d::ipersistent::save_context& Context)
-	{
-		save_command_node(dynamic_cast<k3d::icommand_node&>(m_document), Element.append(k3d::xml::element("nodes")), Context);
-	}
-
-	void save_command_node(k3d::icommand_node& Node, k3d::xml::element& Element, const k3d::ipersistent::save_context& Context)
-	{
-		if(k3d::ipersistent* const persistent = dynamic_cast<k3d::ipersistent*>(&Node))
-			persistent->save(Element.append(k3d::xml::element("node", k3d::xml::attribute("path", k3d::command_node::path(Node)))), Context);
-
-		const k3d::icommand_tree::nodes_t children = k3d::command_tree().children(&Node);
-		for(k3d::icommand_tree::nodes_t::const_iterator child = children.begin(); child != children.end(); ++child)
-			save_command_node(**child, Element, Context);
-	}
-
-	void load(k3d::xml::element& Element, const k3d::ipersistent::load_context& Context)
-	{
-		k3d::xml::element* const xml_nodes = k3d::xml::find_element(Element, "nodes");
-		if(!xml_nodes)
-			return;
-
-		for(k3d::xml::element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
-		{
-			if(xml_node->name != "node")
-				continue;
-
-			const std::string path = k3d::xml::attribute_text(*xml_node, "path");
-			k3d::icommand_node* const node = k3d::command_node::lookup(path);
-			if(!node)
-			{
-				k3d::log() << error << "Could not find command node [" << path << "]" << std::endl;
-				continue;
-			}
-
-			if(k3d::ipersistent* const persistent = dynamic_cast<k3d::ipersistent*>(node))
-				persistent->load(*xml_node, Context);
-		}
-	}
-*/
 
 #if defined K3D_API_DARWIN
 
@@ -1944,8 +1898,6 @@ public:
 	/// Store plugin tools
 	std::map<k3d::string_t, tool*> m_tools;
 
-	/// Placeholder that "groups" context menu command nodes together
-	k3d::command_node m_context_menu_node;
 	/// Document wide context menu
 	Gtk::Menu* m_context_menu;
 
@@ -2019,7 +1971,7 @@ document_state::document_state(k3d::idocument& Document) :
 	m_implementation->m_active_tool->activate();
 
 	m_implementation->m_context_menu =
-		create_context_menu(*this, m_implementation->m_context_menu_node);
+		create_context_menu(*this);
 }
 
 document_state::~document_state()
@@ -2144,9 +2096,6 @@ tool* document_state::get_tool(const k3d::string_t& Name)
 		return_val_if_fail(new_tool, new_tool);
 
 		new_tool->initialize(*this);
-
-		if(k3d::icommand_node* const command_node = dynamic_cast<k3d::icommand_node*>(new_tool))
-			k3d::command_tree().add(*command_node, Name, dynamic_cast<k3d::icommand_node*>(&document()));
 
 		m_implementation->m_tools.insert(std::make_pair(Name, new_tool));
 

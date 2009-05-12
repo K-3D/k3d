@@ -24,7 +24,6 @@
 #include "toggle_button.h"
 #include "utility.h"
 
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/state_change_set.h>
 
@@ -88,23 +87,19 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
+control::control(imodel* const Model, k3d::istate_recorder* const StateRecorder) :
 	m_model(Model),
 	m_state_recorder(StateRecorder)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	set_name("k3d-toggle-button");
 	attach();
 }
 
-control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder, const Glib::ustring& label, bool mnemonic) :
+control::control(imodel* const Model, k3d::istate_recorder* const StateRecorder, const Glib::ustring& label, bool mnemonic) :
 	base(label, mnemonic),
 	m_model(Model),
 	m_state_recorder(StateRecorder)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	set_name("k3d-toggle-button");
 	attach();
 }

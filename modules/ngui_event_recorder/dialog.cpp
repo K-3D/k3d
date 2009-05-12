@@ -65,7 +65,8 @@ std::ostream& operator<<(std::ostream& Stream, const GdkEventKey& RHS)
 }
 
 class dialog :
-	public application_window
+	public application_window,
+	public k3d::iunknown
 {
 	typedef application_window base;
 

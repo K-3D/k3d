@@ -27,7 +27,6 @@
 #include "utility.h"
 #include "widget_manip.h"
 
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/types_ri.h>
 #include <k3dsdk/state_change_set.h>
@@ -60,11 +59,9 @@ class color_selection_dialog:
 	typedef application_window base;
 
 public:
-	color_selection_dialog(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+	color_selection_dialog(std::auto_ptr<idata_proxy> Data) :
 		m_data(Data)
 	{
-		k3d::command_tree().add(*this, Name, &Parent);
-
 		Gtk::VBox* const vbox = new Gtk::VBox(false);
 		add(*manage(vbox));
 
@@ -77,7 +74,7 @@ public:
 		vbox->pack_start(*Gtk::manage(bbox));
 
 		bbox->pack_start(*Gtk::manage(
-			new button::control(*this, "close", Gtk::Stock::CLOSE) <<
+			new button::control(Gtk::Stock::CLOSE) <<
 			connect_button(sigc::mem_fun(*this, &color_selection_dialog::close))));
 
 		on_data_changed(0);
@@ -193,12 +190,10 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+control::control(std::auto_ptr<idata_proxy> Data) :
 	m_area(new Gtk::DrawingArea()),
 	m_data(Data)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	m_area->signal_expose_event().connect(sigc::hide(sigc::mem_fun(*this, &control::on_redraw)));
 	add(*manage(m_area));
 
@@ -231,7 +226,7 @@ void control::on_clicked()
 {
 	return_if_fail(m_data.get());
 
-	detail::color_selection_dialog* const color_selection = new detail::color_selection_dialog(*this, "selection", m_data->clone());
+	detail::color_selection_dialog* const color_selection = new detail::color_selection_dialog(m_data->clone());
 	m_deleted_signal.connect(sigc::mem_fun(*color_selection, &detail::color_selection_dialog::close));
 	color_selection->show();
 

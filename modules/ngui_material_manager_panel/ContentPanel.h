@@ -24,7 +24,6 @@
 //
 
 #include <k3dsdk/types.h>
-#include <k3dsdk/icommand_node.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/metadata.h>
 #include <k3dsdk/nodes.h>
@@ -74,10 +73,9 @@ class ContentPanel
   typedef k3d::inode lightShader_t;
   typedef k3d::inode geo_t;
 
-  ContentPanel(Gtk::HPaned *_m_hpane, k3d::icommand_node *_m_parent, 
+  ContentPanel(Gtk::HPaned *_m_hpane,  
                document_state *_documentState)
     :m_hpane(_m_hpane), 
-    m_parent(_m_parent), 
     m_document_state(_documentState),
     m_pview_size(200), m_single_imgfile("singlePreviewRender"),
     m_multi_imgfile("multiPreviewRender")    
@@ -154,7 +152,6 @@ class ContentPanel
     sigc::connection 		m_timer_connection;
 
     //Document Info
-    k3d::icommand_node 		*m_parent;
     document_state 			*m_document_state;
    
     //Initial Preview File Name ( + unique val + ext)

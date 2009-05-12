@@ -23,8 +23,6 @@
 
 #include "menu_item.h"
 
-#include <k3dsdk/command_tree.h>
-
 #include <gtkmm/menu.h>
 
 #include <iostream>
@@ -41,27 +39,21 @@ namespace menu_item
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name) :
+control::control() :
 	base()
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	set_name("k3d-menu-item");
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, Gtk::Widget& Widget) :
+control::control(Gtk::Widget& Widget) :
 	base(Widget)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	set_name("k3d-menu-item");
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, const Glib::ustring& label, bool mnemonic) :
+control::control(const Glib::ustring& label, bool mnemonic) :
 	base(label, mnemonic)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	set_name("k3d-menu-item");
 }
 

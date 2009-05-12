@@ -152,7 +152,7 @@ class control :
 	typedef Gtk::Table base;
 
 public:
-	control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder);
+	control(imodel* const Model, k3d::istate_recorder* const StateRecorder);
 	~control();
 
 	/// Sets the step increment between values when the user clicks on the up or down arrows

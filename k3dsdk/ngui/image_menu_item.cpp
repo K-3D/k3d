@@ -24,7 +24,6 @@
 #include "image_menu_item.h"
 #include "utility.h"
 
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/log.h>
 
 #include <gtkmm/menu.h>
@@ -45,28 +44,24 @@ namespace image_menu_item
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name) :
+control::control() :
 	base()
 {
-	k3d::command_tree().add(*this, Name, &Parent);
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, Gtk::Widget& image, const Glib::ustring& label, bool mnemonic) :
+control::control(Gtk::Widget& image, const Glib::ustring& label, bool mnemonic) :
 	base(image, label, mnemonic)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, const Glib::ustring& label, bool mnemonic) :
+control::control(const Glib::ustring& label, bool mnemonic) :
 	base(label, mnemonic)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, const Gtk::StockID& stock_id) :
+control::control(const Gtk::StockID& stock_id) :
 	base(stock_id)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
 }
 
 Gtk::Label* control::get_label()

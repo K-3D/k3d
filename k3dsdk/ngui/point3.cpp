@@ -27,7 +27,6 @@
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/iwritable_property.h>
@@ -166,16 +165,14 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+control::control(std::auto_ptr<idata_proxy> Data) :
 	base(3, 3, false),
 	m_data(Data),
 	m_reset_button(0)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
-	spin_button::control* const x = new spin_button::control(*this, "x", new spin_button_model(*m_data, 0), m_data->state_recorder);
-	spin_button::control* const y = new spin_button::control(*this, "y", new spin_button_model(*m_data, 1), m_data->state_recorder);
-	spin_button::control* const z = new spin_button::control(*this, "z", new spin_button_model(*m_data, 2), m_data->state_recorder);
+	spin_button::control* const x = new spin_button::control(new spin_button_model(*m_data, 0), m_data->state_recorder);
+	spin_button::control* const y = new spin_button::control(new spin_button_model(*m_data, 1), m_data->state_recorder);
+	spin_button::control* const z = new spin_button::control(new spin_button_model(*m_data, 2), m_data->state_recorder);
 
 	attach(*Gtk::manage(new Gtk::Label(_("X"))), 0, 1, 0, 1);
 	attach(*Gtk::manage(x), 1, 2, 0, 1);

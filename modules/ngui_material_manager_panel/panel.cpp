@@ -43,7 +43,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/icamera.h>
@@ -271,10 +270,9 @@ void Model::clearModel()
 class Implementation : public k3d::ngui::asynchronous_update
 {
 public:
-  Implementation(document_state& DocumentState, k3d::icommand_node& Parent) 
+  Implementation(document_state& DocumentState) 
     :m_document_state(DocumentState),
      m_model(new Model),
-     m_parent(&Parent),
      m_current_mat_node(0),
      m_init(false),
      add_group("Add"),
@@ -323,8 +321,6 @@ public:
   bool getGroup(MaterialObj *matobj, Gtk::TreeIter& Row);
 	
 private:
-
-  k3d::icommand_node 			*m_parent;
 
   //Property Signal connection
   sigc::connection 				m_pConnection;
@@ -638,7 +634,7 @@ void Implementation::buildContentPanel(Gtk::TreeModel::Row row, bool m_col_ismg)
         = std::auto_ptr<ContentPanel>
         (new GroupContentPanel(&m_main_hpaned, 
                                row->get_value(m_columns.m_col_mgptr), 
-                               m_parent, &m_document_state));
+                               &m_document_state));
 
       //Initialise GroupContentPanel
       m_rpane_content->init();
@@ -651,7 +647,7 @@ void Implementation::buildContentPanel(Gtk::TreeModel::Row row, bool m_col_ismg)
         = std::auto_ptr<ContentPanel>
         (new MaterialContentPanel(&m_main_hpaned, 
                                   row->get_value(m_columns.m_col_moptr), 
-                                  m_parent, &m_document_state));
+                                  &m_document_state));
 
       //Initialise MaterialContentPanel
       m_rpane_content->init();
@@ -1072,9 +1068,10 @@ void Implementation::propertySignalRender(k3d::iunknown* t)
 // [Panel]************************************************************************************
      
 class Panel :
-  public k3d::ngui::panel::control,
-  public k3d::ngui::ui_component,
-  public Gtk::VBox
+	public k3d::ngui::panel::control,
+	public k3d::ngui::ui_component,
+	public k3d::iunknown,
+	public Gtk::VBox
 {
   //baseContainer is the preview & ctrl container
   typedef Gtk::VBox base_cont_t;
@@ -1091,12 +1088,10 @@ public:
     delete m_implementation;
   }
 
-  void initialize(document_state& _document_sate, k3d::icommand_node& _parent)
+  void initialize(document_state& _document_sate)
   {
-    k3d::command_tree().add(*this, "material_manager", &_parent);
-
     //Create New Implementation Object
-    m_implementation = new mechanics::Implementation(_document_sate, _parent);
+    m_implementation = new mechanics::Implementation(_document_sate);
     m_implementation->init();
 
     //Pack Implementation Into This Panel

@@ -188,7 +188,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const string_t& Name) :
+control::control() :
 	base(),
 	m_implementation(new implementation())
 {

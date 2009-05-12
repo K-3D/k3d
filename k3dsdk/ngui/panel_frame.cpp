@@ -39,7 +39,6 @@
 #include "widget_manip.h"
 
 #include <k3dsdk/application.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/inode_collection.h>
@@ -77,13 +76,12 @@ public:
 	floating_window(document_state& Document) :
 		base(Document)
 	{
-		k3d::command_tree().add(*this, "floating_window", dynamic_cast<k3d::icommand_node*>(&Document.document()));
 	}
 };
 
 } // namespace detail
 
-control::control(document_state& DocumentState, k3d::icommand_node& Parent, panel_focus_signal_t& PanelFocusSignal) :
+control::control(document_state& DocumentState, panel_focus_signal_t& PanelFocusSignal) :
 	base(),
 	k3d::property_collection(),
 	pinned(init_name("pinned") + init_label(_("Pinned Panel")) + init_description(_("Works with 'Hide Unpinned Panels' action")) + init_value(false)),
@@ -92,18 +90,15 @@ control::control(document_state& DocumentState, k3d::icommand_node& Parent, pane
 	m_decorations(false, 0),
 	m_document_state(DocumentState),
 	m_panel_focus_signal(PanelFocusSignal),
-	m_panel_focus(false),
-	m_parent(Parent)
+	m_panel_focus(false)
 {
-	k3d::command_tree().add(*this, "panel", &Parent);
-
 	m_panel_focus_changed_connection = m_panel_focus_signal.connect(sigc::mem_fun(*this, &control::on_panel_focus_changed));
 
 	// Don't set it to NORMAL else the focus color won't show
 	set_shadow_type(Gtk::SHADOW_ETCHED_IN);
 
 	image_toggle_button::control* const pinned_control =
-		new image_toggle_button::control(*this, "pinned",
+		new image_toggle_button::control(
 			image_toggle_button::model(pinned), 0, load_icon("pinned", Gtk::ICON_SIZE_BUTTON),
 			load_icon("unpinned", Gtk::ICON_SIZE_BUTTON)) <<
 		set_tooltip(_("Pin Panel"));
@@ -200,7 +195,7 @@ void control::mount_panel(const k3d::string_t& Type, bool RequestCamera)
 
 		if(glengine1 && camera)
 		{
-			viewport::control* const control = new viewport::control(m_document_state, m_parent);
+			viewport::control* const control = new viewport::control(m_document_state);
 			control->set_camera(camera);
 			control->set_gl_engine(glengine1);
 
@@ -218,7 +213,7 @@ void control::mount_panel(const k3d::string_t& Type, bool RequestCamera)
 		panel::control* const panel = k3d::plugin::create<panel::control>(*plugin);
 		return_if_fail(panel);
 
-		panel->initialize(m_document_state, m_parent);
+		panel->initialize(m_document_state);
 
 		Gtk::manage(dynamic_cast<Gtk::Widget*>(panel));
 		mount_panel(*panel, Type);

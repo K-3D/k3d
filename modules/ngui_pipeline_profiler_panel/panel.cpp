@@ -29,7 +29,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/module.h>
@@ -58,6 +57,7 @@ class panel :
 	public k3d::ngui::panel::control,
 	public k3d::ngui::ui_component,
 	public k3d::ngui::asynchronous_update,
+	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -99,10 +99,8 @@ public:
 		show_all();
 	}
 
-	void initialize(k3d::ngui::document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(k3d::ngui::document_state& DocumentState)
 	{
-		k3d::command_tree().add(*this, "pipeline_profiler", &Parent);
-
 		DocumentState.document().pipeline_profiler().connect_node_execution_signal(sigc::mem_fun(*this, &panel::on_node_execution));
 		DocumentState.document().nodes().rename_node_signal().connect(sigc::mem_fun(*this, &panel::on_node_renamed));
 		

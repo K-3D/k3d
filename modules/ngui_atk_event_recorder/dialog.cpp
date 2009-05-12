@@ -23,7 +23,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
@@ -47,15 +46,14 @@ namespace atk_event_recorder
 {
 
 class dialog :
-	public k3d::ngui::application_window
+	public k3d::ngui::application_window,
+	public k3d::iunknown
 {
 	typedef k3d::ngui::application_window base;
 
 public:
 	dialog()
 	{
-		k3d::command_tree().add(*this, "atk_event_recorder");
-
 		set_title(_("ATK Event Recorder"));
 		set_role("event_recorder");
 		set_border_width(10);

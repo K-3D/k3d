@@ -93,7 +93,7 @@ class control :
 	typedef Gtk::HBox base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
+	control(std::auto_ptr<idata_proxy> Data);
 
 private:
 	/// Called when the user wants to explicitly select everything

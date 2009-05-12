@@ -67,12 +67,12 @@ const std::string plugin_factory_markup(k3d::iplugin_factory& Factory)
 
 } // namespace detail
 
-image_menu_item::control* create_menu_item(k3d::icommand_node& Parent, const std::string& NamePrefix, k3d::iplugin_factory& Factory)
+image_menu_item::control* create_menu_item(k3d::iplugin_factory& Factory)
 {
 	Gtk::Image* const image = new Gtk::Image(quiet_load_icon(Factory.name(), Gtk::ICON_SIZE_MENU));
 
 	image_menu_item::control* const menu_item =
-		new image_menu_item::control(Parent, NamePrefix + Factory.name(),
+		new image_menu_item::control(
 			*Gtk::manage(image),
 			"",
 			true)

@@ -25,7 +25,10 @@
 */
 
 #include "ui_component.h"
+
 #include <k3dsdk/signal_system.h>
+#include <k3dsdk/types.h>
+
 #include <gtkmm/frame.h>
 
 namespace Gtk { class TextTag; }
@@ -49,7 +52,7 @@ class control :
 	typedef Gtk::Frame base;
 
 public:
-	control(k3d::icommand_node& Parent, const string_t& Name);
+	control();
 	~control();
 
 	/// Clears the contents of the console.

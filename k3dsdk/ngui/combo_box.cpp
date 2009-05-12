@@ -25,7 +25,6 @@
 #include "combo_box.h"
 #include "utility.h"
 
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/state_change_set.h>
 
@@ -88,11 +87,9 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+control::control(std::auto_ptr<idata_proxy> Data) :
 	m_data(Data)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	if(m_data.get())
 		m_data->changed_signal().connect(sigc::mem_fun(*this, &control::data_changed));
 

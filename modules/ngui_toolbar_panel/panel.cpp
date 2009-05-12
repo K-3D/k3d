@@ -23,7 +23,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/ipath_property.h>
 #include <k3dsdk/iselectable.h>
@@ -147,13 +146,13 @@ private:
 
 struct implementation
 {
-	implementation(document_state& DocumentState, k3d::icommand_node& Parent) :
+	implementation(document_state& DocumentState) :
 		m_document_state(DocumentState),
 		m_toolbox(false, 0)
 	{
-		k3d::ngui::toolbar::control* const main_toolbar = new k3d::ngui::toolbar::control(Parent, "main");
+		k3d::ngui::toolbar::control* const main_toolbar = new k3d::ngui::toolbar::control();
 		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "select",
+			new image_toggle_button::control(
 				new detail::active_tool_proxy(m_document_state, m_document_state.selection_tool()), 0,
 				load_icon("select_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select"))
@@ -161,7 +160,7 @@ struct implementation
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "move",
+			new image_toggle_button::control(
 				new detail::active_tool_proxy(m_document_state, m_document_state.move_tool()), 0,
 				load_icon("move_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Move"))
@@ -169,7 +168,7 @@ struct implementation
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "rotate",
+			new image_toggle_button::control(
 				new detail::active_tool_proxy(m_document_state, m_document_state.rotate_tool()), 0,
 				load_icon("rotate_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Rotate"))
@@ -177,7 +176,7 @@ struct implementation
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "scale",
+			new image_toggle_button::control(
 				new detail::active_tool_proxy(m_document_state, m_document_state.scale_tool()), 0,
 				load_icon("scale_tool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Scale"))
@@ -187,7 +186,7 @@ struct implementation
 		if(k3d::plugin::factory::lookup("NGUISnapTool"))
 		{
 			main_toolbar->row(0).pack_start(*Gtk::manage(
-				new image_toggle_button::control(*main_toolbar, "NGUISnapTool",
+				new image_toggle_button::control(
 					new detail::plugin_tool_proxy(m_document_state, "NGUISnapTool"), 0,
 					load_icon("NGUISnapTool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 				<< set_tooltip(_("Snap"))
@@ -198,7 +197,7 @@ struct implementation
 		if(k3d::plugin::factory::lookup("NGUIParentTool"))
 		{
 			main_toolbar->row(0).pack_start(*Gtk::manage(
-				new image_toggle_button::control(*main_toolbar, "NGUIParentTool",
+				new image_toggle_button::control(
 					new detail::plugin_tool_proxy(m_document_state, "NGUIParentTool"), 0,
 					load_icon("NGUIParentTool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 				<< set_tooltip(_("Parent"))
@@ -207,7 +206,7 @@ struct implementation
 		}
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new button::control(*main_toolbar, "unparent",
+			new button::control(
 				*Gtk::manage(new Gtk::Image(load_icon("unparent", Gtk::ICON_SIZE_SMALL_TOOLBAR))))
 			<< connect_button(sigc::mem_fun(*this, &implementation::on_unparent))
 			<< set_tooltip(_("Unparent"))
@@ -217,7 +216,7 @@ struct implementation
 		if(k3d::plugin::factory::lookup("NGUIRenderRegionTool"))
 		{
 			main_toolbar->row(0).pack_start(*Gtk::manage(
-				new image_toggle_button::control(*main_toolbar, "NGUIRenderRegionTool",
+				new image_toggle_button::control(
 					new detail::plugin_tool_proxy(m_document_state, "NGUIRenderRegionTool"), 0,
 					load_icon("NGUIRenderRegionTool", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 				<< set_tooltip(_("Render Region"))
@@ -225,14 +224,14 @@ struct implementation
 		}
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new button::control(*main_toolbar, "render_preview",
+			new button::control(
 				*Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_SMALL_TOOLBAR))))
 			<< connect_button(sigc::mem_fun(*this, &implementation::on_render_preview))
 			<< set_tooltip(_("Render Preview"))
 			<< make_toolbar_button()), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "select_nodes",
+			new image_toggle_button::control(
 				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_NODES, _("Select Nodes mode")),
 				&m_document_state.document().state_recorder(),
 				load_icon("node", Gtk::ICON_SIZE_SMALL_TOOLBAR))
@@ -241,7 +240,7 @@ struct implementation
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "select_points",
+			new image_toggle_button::control(
 				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_POINTS, _("Select Points mode")),
 				&m_document_state.document().state_recorder(),
 				load_icon("vertex", Gtk::ICON_SIZE_SMALL_TOOLBAR))
@@ -250,7 +249,7 @@ struct implementation
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "select_edges",
+			new image_toggle_button::control(
 				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_SPLIT_EDGES, _("Select Lines mode")),
 				&m_document_state.document().state_recorder(),
 				load_icon("edge", Gtk::ICON_SIZE_SMALL_TOOLBAR))
@@ -259,7 +258,7 @@ struct implementation
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
-			new image_toggle_button::control(*main_toolbar, "select_faces",
+			new image_toggle_button::control(
 				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_UNIFORM, _("Select Faces mode")),
 				&m_document_state.document().state_recorder(),
 				load_icon("face", Gtk::ICON_SIZE_SMALL_TOOLBAR))
@@ -296,7 +295,7 @@ struct implementation
 			const std::string toolbar_label = k3d::xml::attribute_text(*xml_toolbar, "label");
 			const std::string toolbar_description = k3d::xml::attribute_text(*xml_toolbar, "description");
 
-			k3d::ngui::toolbar::control* const toolbar_widget = new k3d::ngui::toolbar::control(Parent, toolbar_name);
+			k3d::ngui::toolbar::control* const toolbar_widget = new k3d::ngui::toolbar::control();
 
 			for(k3d::xml::element::elements_t::const_iterator xml_button = xml_toolbar->children.begin(); xml_button != xml_toolbar->children.end(); ++xml_button)
 			{
@@ -311,7 +310,7 @@ struct implementation
 					Gtk::Image* const image = new Gtk::Image(load_icon(plugin_factory->name(), Gtk::ICON_SIZE_SMALL_TOOLBAR));
 
 					button::control* const button =
-						new button::control(*toolbar_widget, node_name, *manage(image))
+						new button::control(*manage(image))
 						<< set_tooltip(plugin_factory->short_description())
 						<< make_toolbar_button()
 						<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_create_node), plugin_factory))
@@ -334,7 +333,7 @@ struct implementation
 								const k3d::filesystem::path absolute_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::xml::attribute_text(*xml_button, "absolute_path")));
 
 								button::control* const button =
-									new button::control(*toolbar_widget, name, label)
+									new button::control(label)
 									<< set_tooltip(description)
 									<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_run_external_script), absolute_path))
 									<< make_toolbar_button()
@@ -362,7 +361,7 @@ struct implementation
 								const k3d::filesystem::path absolute_path = root_path / k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::xml::attribute_text(*xml_button, "relative_path")));
 
 								button::control* const button =
-									new button::control(*toolbar_widget, name, label)
+									new button::control(label)
 									<< set_tooltip(description)
 									<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_run_external_script), absolute_path))
 									<< make_toolbar_button()
@@ -383,7 +382,7 @@ struct implementation
 									throw std::runtime_error("Toolbar script inline encoding must be text/plain");
 
 								button::control* const button =
-									new button::control(*toolbar_widget, name, label)
+									new button::control(label)
 									<< set_tooltip(description)
 									<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_run_inline_script), xml_button->text))
 									<< make_toolbar_button()
@@ -487,6 +486,7 @@ struct implementation
 class panel :
 	public k3d::ngui::panel::control,
 	public k3d::ngui::ui_component,
+	public k3d::iunknown,
         public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -503,11 +503,9 @@ public:
 		delete m_implementation;
 	}
 
-	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(document_state& DocumentState)
 	{
-		k3d::command_tree().add(*this, "toolbar", &Parent);
-
-		m_implementation = new detail::implementation(DocumentState, *this);
+		m_implementation = new detail::implementation(DocumentState);
 		
 		pack_start(m_implementation->m_toolbox, Gtk::PACK_SHRINK);
 		show_all();

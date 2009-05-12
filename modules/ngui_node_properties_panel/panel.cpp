@@ -20,7 +20,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iplugin_factory_collection.h>
@@ -66,11 +65,10 @@ class implementation :
 	public asynchronous_update
 {
 public:
-	implementation(document_state& DocumentState, k3d::icommand_node& Parent) :
+	implementation(document_state& DocumentState) :
 		m_document_state(DocumentState),
-		m_parent(Parent),
-		m_auto_toolbar(DocumentState, Parent, "toolbar"),
-		m_auto_properties(DocumentState, Parent)
+		m_auto_toolbar(DocumentState),
+		m_auto_properties(DocumentState)
 	{
 		// Setup the panel label (always visible) ...
 		m_label.set_alignment(Gtk::ALIGN_LEFT);
@@ -193,7 +191,7 @@ public:
 			if(m_custom_page)
 			{
 				m_auto_page.hide();
-				m_main_widget.pack_start(m_custom_page->get_widget(m_document_state, m_parent, *m_nodes[0]), Gtk::PACK_EXPAND_WIDGET);
+				m_main_widget.pack_start(m_custom_page->get_widget(m_document_state, *m_nodes[0]), Gtk::PACK_EXPAND_WIDGET);
 				m_main_widget.show();
 				return;
 			}
@@ -280,7 +278,6 @@ public:
 
 	/// Stores a reference to the owning document
 	document_state& m_document_state;
-	k3d::icommand_node& m_parent;
 	/// Stores the current set of nodes to be displayed (if any)
 	k3d::nodes_t m_nodes;
 	/// Stores the current set of connections to node signals (if any)
@@ -313,6 +310,7 @@ public:
 class panel :
 	public k3d::ngui::panel::control,
 	public k3d::ngui::ui_component,
+	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -328,11 +326,9 @@ public:
 		delete m_implementation;
 	}
 
-	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(document_state& DocumentState)
 	{
-		k3d::command_tree().add(*this, "node_properties", &Parent);
-
-		m_implementation = new detail::implementation(DocumentState, *this);
+		m_implementation = new detail::implementation(DocumentState);
 
 		pack_start(m_implementation->m_main_widget, Gtk::PACK_EXPAND_WIDGET);
 		show_all();

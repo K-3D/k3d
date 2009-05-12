@@ -50,7 +50,7 @@ class control :
 	typedef property_widget::control base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<property_widget::idata_proxy> Data);
+	control(std::auto_ptr<property_widget::idata_proxy> Data);
 
 private:
 	/// Called whenever the state of the underlying data has changed

@@ -23,7 +23,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/log_control.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
@@ -49,16 +48,15 @@ namespace log
 
 /// Provides a window for viewing the contents of the K-3D log
 class dialog :
-	public k3d::ngui::application_window
+	public k3d::ngui::application_window,
+	public k3d::iunknown
 {
 	typedef k3d::ngui::application_window base;
 
 public:
 	dialog() :
-		console(Gtk::manage(new k3d::ngui::console::control(*this, "console")))
+		console(Gtk::manage(new k3d::ngui::console::control()))
 	{
-		k3d::command_tree().add(*this, "log_window");
-
 		critical_tag = Gtk::TextTag::create("critical");
 		critical_tag->property_foreground() = "#ff0000";
 		critical_tag->property_weight() = Pango::WEIGHT_BOLD;

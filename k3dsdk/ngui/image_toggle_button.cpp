@@ -37,8 +37,8 @@ namespace image_toggle_button
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder, Glib::RefPtr<Gdk::Pixbuf> Image) :
-	base(Parent, Name, Model, StateRecorder),
+control::control(imodel* const Model, k3d::istate_recorder* const StateRecorder, Glib::RefPtr<Gdk::Pixbuf> Image) :
+	base(Model, StateRecorder),
 	m_image(new Gtk::Image()),
 	m_active_image(Image),
 	m_inactive_image(Image)
@@ -47,8 +47,8 @@ control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* 
 	on_update();
 }
 
-control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder, Glib::RefPtr<Gdk::Pixbuf> ActiveImage, Glib::RefPtr<Gdk::Pixbuf> InactiveImage) :
-	base(Parent, Name, Model, StateRecorder),
+control::control(imodel* const Model, k3d::istate_recorder* const StateRecorder, Glib::RefPtr<Gdk::Pixbuf> ActiveImage, Glib::RefPtr<Gdk::Pixbuf> InactiveImage) :
+	base(Model, StateRecorder),
 	m_image(new Gtk::Image()),
 	m_active_image(ActiveImage),
 	m_inactive_image(InactiveImage)

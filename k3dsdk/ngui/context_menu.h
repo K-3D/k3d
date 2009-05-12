@@ -24,8 +24,6 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-// Forward declarations
-namespace k3d { class icommand_node; }
 namespace Gtk { class Menu; }
 
 namespace k3d
@@ -34,11 +32,10 @@ namespace k3d
 namespace ngui
 {
 
-// Forward declarations
 class document_state;
 
 /// Returns a menu suitable for use as a context-sensitive menu for the given object
-Gtk::Menu* create_context_menu(document_state& DocumentState, k3d::icommand_node& Parent);
+Gtk::Menu* create_context_menu(document_state& DocumentState);
 
 } // namespace ngui
 

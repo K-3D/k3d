@@ -514,9 +514,6 @@ k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh&
 	void transform_tool::mesh_target::end_drag_motion()
 	{
 		m_drag_mutex = false;
-		// notify modifier we are ending a dragging motion
-		if (k3d::icommand_node* command_node = dynamic_cast<k3d::icommand_node*>(modifier))
-			assert_warning(command_node->execute_command("stop_drag", "") == k3d::icommand_node::RESULT_CONTINUE);
 	}
 
 	void transform_tool::mesh_target::create_mesh_modifier(const std::string& Name)

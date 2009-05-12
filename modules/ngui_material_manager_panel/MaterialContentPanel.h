@@ -47,21 +47,21 @@ class MaterialContentPanel : public ContentPanel
   public:
 
     MaterialContentPanel(Gtk::HPaned *_m_hpane, MaterialObj *_m_materialobj, 
-                         k3d::icommand_node *_m_parent, document_state *_documentState)
-      :ContentPanel(_m_hpane, _m_parent, _documentState), 
+                         document_state *_documentState)
+      :ContentPanel(_m_hpane, _documentState), 
       m_materialobj(_m_materialobj),
       m_pview_frame("Preview Render:"), 
       m_artnotes_frame("Artist's Notes:"), 
       m_toolbox_frame("Toolbox:"),
-      m_name_entry(*_m_parent, k3d::string_t("so_name_field"), 
+      m_name_entry(
                    entry::model(_m_materialobj->m_name), 0),
-      m_type_entry(*_m_parent, k3d::string_t("so_type_field"), 
+      m_type_entry(
                    entry::model(_m_materialobj->m_type), 0),
-      m_datemod_entry(*_m_parent, k3d::string_t("so_datestamp_field"), 
+      m_datemod_entry(
                       entry::model(_m_materialobj->m_datestamp), 0),
-      m_artistname_entry(*_m_parent, k3d::string_t("so_artistname_field"), 
+      m_artistname_entry(
                          entry::model(_m_materialobj->m_artistname), 0),
-      m_artistnotes_mltext(*_m_parent, k3d::string_t("so_artistnotes_mltxt"), 
+      m_artistnotes_mltext(
                            text::model(_m_materialobj->m_artistnotes), 0)
 
         {

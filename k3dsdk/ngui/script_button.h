@@ -89,7 +89,7 @@ class control :
 	typedef Gtk::HBox base;
 
 public:
-	control(icommand_node& Parent, const string_t& Name, imodel* const Model, istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage);
+	control(imodel* const Model, istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage);
 	~control();
 
 private:

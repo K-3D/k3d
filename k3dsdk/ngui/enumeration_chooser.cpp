@@ -27,7 +27,6 @@
 #include "utility.h"
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/state_change_set.h>
@@ -161,11 +160,9 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
+control::control(imodel* const Model, k3d::istate_recorder* const StateRecorder) :
 	m_implementation(new implementation(Model, StateRecorder))
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	if(Model)
 	{
 		Model->connect_changed(sigc::mem_fun(*this, &control::on_data_changed));
@@ -235,8 +232,6 @@ void control::on_list_changed()
 
 	Gtk::TreeRow row = *active;
 	const k3d::string_t value = row[m_implementation->m_columns.value];
-
-	k3d::command_tree().command_signal().emit(*this, k3d::icommand_node::COMMAND_INTERACTIVE, "value", value);
 
 	return_if_fail(m_implementation->m_model.get());
 

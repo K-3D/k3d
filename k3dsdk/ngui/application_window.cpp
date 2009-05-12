@@ -26,7 +26,6 @@
 
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/application.h>
-#include <k3dsdk/command_tree.h>
 
 #include <gdk/gdkkeysyms.h>
 

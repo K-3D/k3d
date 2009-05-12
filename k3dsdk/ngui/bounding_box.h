@@ -94,7 +94,7 @@ class control :
 	typedef Gtk::Table base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
+	control(std::auto_ptr<idata_proxy> Data);
 
 private:
 	/// Stores a reference to the underlying data object

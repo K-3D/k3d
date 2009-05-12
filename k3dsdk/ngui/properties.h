@@ -27,7 +27,6 @@
 namespace k3d
 {
 
-class icommand_node;
 class inode;
 
 namespace ngui
@@ -37,7 +36,7 @@ namespace property
 {
 
 /// Displays a dialog for adding new properties to a node
-void create(inode& Node, icommand_node& Parent);
+void create(inode& Node);
 
 } // namespace property
 

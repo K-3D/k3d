@@ -23,8 +23,6 @@
 namespace Glib { class ustring; }
 namespace Gtk { class Tooltips; }
 
-#include <k3dsdk/icommand_node.h>
-
 namespace k3d
 {
 
@@ -35,8 +33,7 @@ namespace ngui
 // ui_component
 
 /// Base-class for user interface components that makes them command-nodes and provides other, standard behavior
-class ui_component :
-	public icommand_node
+class ui_component
 {
 public:
 	ui_component();
@@ -46,8 +43,6 @@ public:
 	static Gtk::Tooltips& tooltips();
 	/// Convenience function for setting a tooltip
 	void set_tip(const Glib::ustring& Tooltip);
-
-	const icommand_node::result execute_command(const string_t&, const string_t&);
 };
 
 } // namespace ngui

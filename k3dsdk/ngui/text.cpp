@@ -26,7 +26,6 @@
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/istate_recorder.h>
@@ -150,11 +149,9 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
+control::control(imodel* const Model, k3d::istate_recorder* const StateRecorder) :
 	m_implementation(new implementation(Model, StateRecorder))
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	set_name("k3d-text");
 
 	Gtk::ScrolledWindow* const scrolled_window = new Gtk::ScrolledWindow();
@@ -167,12 +164,12 @@ control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* 
 		m_implementation->m_text_view.set_editable(true);
 
 		button::control* const apply_button =
-			new button::control(Parent, "apply", _("Apply"))
+			new button::control(_("Apply"))
 				<< connect_button(sigc::mem_fun(*this, &control::on_apply))
 				<< set_tooltip(_("Apply modifications."));
 
 		button::control* const reset_button =
-			new button::control(Parent, "reset", _("Reset"))
+			new button::control(_("Reset"))
 				<< connect_button(sigc::mem_fun(*this, &control::on_reset))
 				<< set_tooltip(_("Reset modifications."));
 

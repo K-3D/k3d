@@ -65,7 +65,7 @@ class control :
 public:
 	typedef sigc::signal<void, control*> panel_focus_signal_t;
 
-	control(document_state& Document, k3d::icommand_node& Parent, panel_focus_signal_t& PanelFocusSignal);
+	control(document_state& Document, panel_focus_signal_t& PanelFocusSignal);
 	~control();
 
 	/// Assigns the frame the panel focus
@@ -162,8 +162,6 @@ private:
 	sigc::connection m_panel_focus_changed_connection;
 	/// Set to true iff this panel has the focus
 	bool m_panel_focus;
-	/// Store the parent node (the document window) for setting panel parent
-	k3d::icommand_node& m_parent;
 };
 
 /// Defines a collection of panel frames

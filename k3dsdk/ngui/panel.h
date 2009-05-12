@@ -27,8 +27,6 @@
 #include <k3dsdk/signal_system.h>
 #include <k3dsdk/types.h>
 
-namespace k3d { class icommand_node; }
-
 namespace k3d
 {
 
@@ -45,7 +43,7 @@ class control
 {
 public:
 	/// Set the document and parent command node for this panel - this is ugly, but application plugins don't take ctor arguments
-	virtual void initialize(document_state& DocumentState, k3d::icommand_node& Parent) = 0;
+	virtual void initialize(document_state& DocumentState) = 0;
 	/// Returns a unique string identifying the panel type - panel frames use this to coordinate tutorial recording / layout serialization
 	virtual const k3d::string_t panel_type() = 0;
 	/// Connects a slot to a signel that should be emitted whenever the panel receives the keyboard focus

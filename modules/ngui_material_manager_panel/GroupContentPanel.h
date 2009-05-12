@@ -48,8 +48,8 @@ class GroupContentPanel : public ContentPanel
 {
  public:
   GroupContentPanel(Gtk::HPaned *_m_hpane, MaterialGroup *_m_materialgrp, 
-                    k3d::icommand_node *_m_parent, document_state *_documentState)
-    :ContentPanel(_m_hpane, _m_parent, _documentState), m_materialgrp(_m_materialgrp)
+                    document_state *_documentState)
+    :ContentPanel(_m_hpane, _documentState), m_materialgrp(_m_materialgrp)
     {
     }
 

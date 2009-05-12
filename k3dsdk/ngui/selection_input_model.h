@@ -25,7 +25,6 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/icommand_node.h>
 #include <k3dsdk/signal_system.h>
 
 namespace k3d

@@ -24,7 +24,6 @@
 #include "asynchronous_update.h"
 #include "node_window.h"
 
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/inode.h>
 
 #include <gdk/gdkkeysyms.h>

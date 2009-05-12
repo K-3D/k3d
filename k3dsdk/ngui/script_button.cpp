@@ -28,7 +28,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/iproperty_sink.h>
@@ -106,7 +105,7 @@ imodel* const model(iproperty& Property)
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(icommand_node& Parent, const string_t& Name, imodel* const Model, istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
+control::control(imodel* const Model, istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
 	base(false, 0),
 	m_load(_("Load")),
 	m_save(_("Save")),
@@ -115,8 +114,6 @@ control::control(icommand_node& Parent, const string_t& Name, imodel* const Mode
 	m_state_recorder(StateRecorder),
 	m_change_message(ChangeMessage)
 {
-	command_tree().add(*this, Name, &Parent);
-
 	m_load.signal_clicked().connect(sigc::mem_fun(*this, &control::on_load));
 	m_save.signal_clicked().connect(sigc::mem_fun(*this, &control::on_save));
 	m_edit.signal_clicked().connect(sigc::mem_fun(*this, &control::on_edit));

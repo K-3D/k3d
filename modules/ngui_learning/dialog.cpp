@@ -19,7 +19,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/mime_types.h>
@@ -66,7 +65,8 @@ namespace learning
 
 /// Provides a menu of demonstration documents
 class dialog :
-	public k3d::ngui::application_window
+	public k3d::ngui::application_window,
+	public k3d::iunknown
 {
 	typedef k3d::ngui::application_window base;
 
@@ -74,8 +74,6 @@ public:
 	dialog() :
 		m_show_at_startup(_("Show examples at startup"))
 	{
-		k3d::command_tree().add(*this, "learning_menu");
-
 		load_examples();
 
 		set_title(_("K-3D Tutorials and Examples"));
@@ -86,7 +84,7 @@ public:
 
 		Gtk::HButtonBox* const box2 = Gtk::manage(new Gtk::HButtonBox(Gtk::BUTTONBOX_END));
 		box2->pack_start(*Gtk::manage(
-			new button::control(*this, "close", Gtk::Stock::CLOSE) <<
+			new button::control(Gtk::Stock::CLOSE) <<
 			connect_button(sigc::mem_fun(*this, &dialog::close))));
 
 		Gtk::TreeView* const example_list = Gtk::manage(new Gtk::TreeView(m_example_store));

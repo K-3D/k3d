@@ -27,7 +27,6 @@
 
 #include <k3dsdk/application.h>
 #include <k3dsdk/batch_mode.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/iapplication.h>
 
 #include <gtkmm/dialog.h>

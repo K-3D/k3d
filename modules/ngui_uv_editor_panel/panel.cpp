@@ -30,7 +30,6 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
@@ -183,6 +182,7 @@ private:
 class panel :
 	public k3d::ngui::panel::control,
 	public k3d::ngui::ui_component,
+	public k3d::iunknown,
 	public Gtk::VBox
 {
 public:
@@ -193,11 +193,9 @@ public:
 	{
 	}
 
-	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(document_state& DocumentState)
 	{
 		m_document_state = &DocumentState;
-
-		k3d::command_tree().add(*this, "uveditor", &Parent);
 
 		//enumeration_chooser::proxy(property, state_recorder, property_name)
 		m_uv_set_model = new detail::uv_set_model( DocumentState );
@@ -492,17 +490,16 @@ public:
 	}
 
 private:
-    sigc::signal<void> m_focus_signal;
+	sigc::signal<void> m_focus_signal;
 
-    /// Keep track of glew initialisation
-    GLEWContext* m_glew_context;
+	/// Keep track of glew initialisation
+	GLEWContext* m_glew_context;
 
-    Gtk::DrawingArea* m_drawing_area;
-    enumeration_chooser::control* m_set_chooser;
-    detail::uv_set_model* m_uv_set_model;
-	
-    document_state* m_document_state;
-    k3d::icommand_node* m_parent;
+	Gtk::DrawingArea* m_drawing_area;
+	enumeration_chooser::control* m_set_chooser;
+	detail::uv_set_model* m_uv_set_model;
+
+	document_state* m_document_state;
 
 	k3d::double_t m_zoom_factor;
 	k3d::point2 m_origin;

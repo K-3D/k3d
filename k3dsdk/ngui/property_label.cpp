@@ -56,8 +56,8 @@ namespace property_label
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<property_widget::idata_proxy> Data) :
-	base(Parent, Name, Data)
+control::control(std::auto_ptr<property_widget::idata_proxy> Data) :
+	base(Data)
 {
 	set_name("k3d-property-label");
 

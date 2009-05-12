@@ -29,7 +29,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/color.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/graph.h>
 #include <k3dsdk/idocument.h>
@@ -103,6 +102,7 @@ private:
 class panel :
 	public k3d::ngui::panel::control,
 	public k3d::ngui::ui_component,
+	public k3d::iunknown,
 	public Gtk::VBox
 {
 public:
@@ -154,9 +154,8 @@ public:
 		m_drawing_area.signal_scroll_event().connect(sigc::bind_return(sigc::mem_fun(m_input_model, &basic_input_model::scroll_event), true));
 	}
 
-	void initialize(k3d::ngui::document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(k3d::ngui::document_state& DocumentState)
 	{
-		k3d::command_tree().add(*this, "pipeline", &Parent);
 		m_document_state = &DocumentState;
 	
 		m_create_graph.reset(new document_to_graph(DocumentState.document()));

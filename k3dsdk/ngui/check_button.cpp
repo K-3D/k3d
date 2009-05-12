@@ -24,7 +24,6 @@
 #include "check_button.h"
 #include "utility.h"
 
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/state_change_set.h>
 
@@ -91,23 +90,19 @@ std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* con
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+control::control(std::auto_ptr<idata_proxy> Data) :
 	m_data(Data)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	set_name("k3d-check-button");
 	attach();
 
 	set_sensitive(m_data.get() && m_data->writable());
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data, const Glib::ustring& label, bool mnemonic) :
+control::control(std::auto_ptr<idata_proxy> Data, const Glib::ustring& label, bool mnemonic) :
 	base(label, mnemonic),
 	m_data(Data)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	set_name("k3d-check-button");
 	attach();
 

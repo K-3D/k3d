@@ -90,7 +90,7 @@ class control :
 	typedef Gtk::ComboBox base;
 
 public:
-	control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder = 0);
+	control(imodel* const Model, k3d::istate_recorder* const StateRecorder = 0);
 	~control();
 
 private:

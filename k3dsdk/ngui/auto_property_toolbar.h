@@ -31,7 +31,6 @@ namespace Gtk { class Widget; }
 namespace k3d
 {
 
-class icommand_node;
 class iunknown;
 
 namespace ngui
@@ -46,7 +45,7 @@ namespace auto_property_toolbar
 class control
 {
 public:
-	control(document_state& DocumentState, icommand_node& Parent, const string_t& Name);
+	control(document_state& DocumentState);
 	~control();
 
 	/// Called to set the toolbar contents based on the given object

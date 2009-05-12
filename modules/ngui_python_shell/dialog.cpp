@@ -23,7 +23,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/idocument_sink.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/log.h>
@@ -66,11 +65,9 @@ public:
 		engine(k3d::plugin::create<k3d::iscript_engine>("Python")),
 		stdout_slot(sigc::mem_fun(*this, &dialog::print_stdout)),
 		stderr_slot(sigc::mem_fun(*this, &dialog::print_stderr)),
-		console(Gtk::manage(new k3d::ngui::console::control(*this, "console"))),
+		console(Gtk::manage(new k3d::ngui::console::control())),
 		document(0)
 	{
-		k3d::command_tree().add(*this, "python_shell_window");
-
 		prompt_tag = Gtk::TextTag::create("prompt");
 		prompt_tag->property_foreground() = "#888888";
 		prompt_tag->property_family() = "monospace";

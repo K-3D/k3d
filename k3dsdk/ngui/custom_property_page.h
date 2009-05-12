@@ -31,7 +31,6 @@ namespace Gtk { class Widget; }
 namespace k3d
 {
 
-class icommand_node;
 class inode;
 
 namespace ngui
@@ -48,7 +47,7 @@ class control
 public:
 	virtual ~control() {}
 
-	virtual Gtk::Widget& get_widget(document_state& DocumentState, icommand_node& Parent, inode& Node) = 0;
+	virtual Gtk::Widget& get_widget(document_state& DocumentState, inode& Node) = 0;
 
 protected:
 	control() {}

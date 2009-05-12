@@ -27,7 +27,6 @@
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/iwritable_property.h>
@@ -140,18 +139,16 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data) :
+control::control(std::auto_ptr<idata_proxy> Data) :
 	base(3, 3, false),
 	m_data(Data)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
-	spin_button::control* const nx = new spin_button::control(*this, "nx", new spin_button_model(*m_data, &k3d::bounding_box3::nx), m_data->state_recorder);
-	spin_button::control* const px = new spin_button::control(*this, "px", new spin_button_model(*m_data, &k3d::bounding_box3::px), m_data->state_recorder);
-	spin_button::control* const ny = new spin_button::control(*this, "ny", new spin_button_model(*m_data, &k3d::bounding_box3::ny), m_data->state_recorder);
-	spin_button::control* const py = new spin_button::control(*this, "py", new spin_button_model(*m_data, &k3d::bounding_box3::py), m_data->state_recorder);
-	spin_button::control* const nz = new spin_button::control(*this, "nz", new spin_button_model(*m_data, &k3d::bounding_box3::nz), m_data->state_recorder);
-	spin_button::control* const pz = new spin_button::control(*this, "pz", new spin_button_model(*m_data, &k3d::bounding_box3::pz), m_data->state_recorder);
+	spin_button::control* const nx = new spin_button::control(new spin_button_model(*m_data, &k3d::bounding_box3::nx), m_data->state_recorder);
+	spin_button::control* const px = new spin_button::control(new spin_button_model(*m_data, &k3d::bounding_box3::px), m_data->state_recorder);
+	spin_button::control* const ny = new spin_button::control(new spin_button_model(*m_data, &k3d::bounding_box3::ny), m_data->state_recorder);
+	spin_button::control* const py = new spin_button::control(new spin_button_model(*m_data, &k3d::bounding_box3::py), m_data->state_recorder);
+	spin_button::control* const nz = new spin_button::control(new spin_button_model(*m_data, &k3d::bounding_box3::nz), m_data->state_recorder);
+	spin_button::control* const pz = new spin_button::control(new spin_button_model(*m_data, &k3d::bounding_box3::pz), m_data->state_recorder);
 
 	attach(*Gtk::manage(new Gtk::Label(_("X"))), 0, 1, 0, 1);
 	attach(*Gtk::manage(nx), 0, 1, 1, 2);

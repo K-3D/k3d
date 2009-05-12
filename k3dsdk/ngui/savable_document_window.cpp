@@ -27,7 +27,6 @@
 #include "document_state.h"
 
 #include <k3dsdk/batch_mode.h>
-#include <k3dsdk/command_tree.h>
 
 #include <gtkmm/dialog.h>
 #include <gdk/gdkkeysyms.h>

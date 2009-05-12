@@ -24,7 +24,6 @@
 //
 
 #include <k3dsdk/types.h>
-#include <k3dsdk/icommand_node.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/metadata.h>
 #include <k3dsdk/nodes.h>

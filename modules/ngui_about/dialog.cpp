@@ -21,7 +21,6 @@
 #include <k3d-version-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/contributors.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/button.h>
@@ -58,15 +57,14 @@ namespace about
 
 /// Creates an "about" box that displays program version and copyright
 class dialog :
-	public k3d::ngui::application_window
+	public k3d::ngui::application_window,
+	public k3d::iunknown
 {
 	typedef k3d::ngui::application_window base;
 
 public:
 	dialog()
 	{
-		k3d::command_tree().add(*this, "about_box");
-
 		set_title(_("About K-3D"));
 		set_role("about_box");
 		set_position(Gtk::WIN_POS_CENTER);
@@ -483,7 +481,7 @@ public:
 
 		Gtk::HButtonBox* const button_box = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
 		button_box->pack_start(*Gtk::manage(
-			new button::control(*this, "close", Gtk::Stock::CLOSE) << connect_button(sigc::mem_fun(*this, &dialog::close))
+			new button::control(Gtk::Stock::CLOSE) << connect_button(sigc::mem_fun(*this, &dialog::close))
 			), Gtk::PACK_SHRINK);
 
 		Gtk::VBox* const box = new Gtk::VBox(false, 5);

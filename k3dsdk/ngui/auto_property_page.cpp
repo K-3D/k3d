@@ -82,9 +82,8 @@ namespace auto_property_page
 class control::implementation
 {
 public:
-	implementation(document_state& DocumentState, icommand_node& Parent) :
-		m_document_state(DocumentState),
-		m_parent(Parent)
+	implementation(document_state& DocumentState) :
+		m_document_state(DocumentState)
 	{
 	}
 
@@ -198,12 +197,12 @@ public:
 				
 				// Provide a property button for the property ...
 				table->attach(*Gtk::manage(
-					new property_button::control(m_parent, property_name + "_property", property_widget::proxy(m_document_state,property))),
+					new property_button::control(property_widget::proxy(m_document_state,property))),
 					prop_button_begin, prop_button_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
 
 				// Provide a label for the property ...
 				table->attach(*Gtk::manage(
-					new property_label::control(m_parent, property_name + "_label", property_widget::proxy(m_document_state, property))),
+					new property_label::control(property_widget::proxy(m_document_state, property))),
 					prop_label_begin, prop_label_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 
 				// Keep track of the control that's created (if any) ...
@@ -231,7 +230,7 @@ public:
 						{
 							if(control = dynamic_cast<Gtk::Widget*>(custom_control))
 							{
-								custom_control->initialize(m_document_state, m_parent, property);
+								custom_control->initialize(m_document_state, property);
 							}
 							else
 							{
@@ -253,32 +252,32 @@ public:
 					// Boolean properties ...
 					if(property_type == typeid(bool_t))
 					{
-						control = new check_button::control(m_parent, property_name, check_button::proxy(property, state_recorder, property_name));
+						control = new check_button::control(check_button::proxy(property, state_recorder, property_name));
 					}
 					// Scalar properties ...
 					else if(property_type == typeid(int32_t) || property_type == typeid(uint32_t) || property_type == typeid(float_t) || property_type == typeid(double_t))
 					{
-						control = new spin_button::control(m_parent, property_name, spin_button::model(property), state_recorder);
+						control = new spin_button::control(spin_button::model(property), state_recorder);
 					}
 					// Color properties ...
 					else if(property_type == typeid(color))
 					{
-						control = new color_chooser::control(m_parent, property_name, color_chooser::proxy(property, state_recorder, property_name));
+						control = new color_chooser::control(color_chooser::proxy(property, state_recorder, property_name));
 					}
 					// String properties ...
 					else if(property_type == typeid(string_t))
 					{
 						if(dynamic_cast<ienumeration_property*>(&property))
 						{
-							control = new enumeration_chooser::control(m_parent, property_name, enumeration_chooser::model(property), state_recorder);
+							control = new enumeration_chooser::control(enumeration_chooser::model(property), state_recorder);
 						}
 						else if(dynamic_cast<iscript_property*>(&property))
 						{
-							control = new script_button::control(m_parent, property_name, script_button::model(property), state_recorder, property_name);
+							control = new script_button::control(script_button::model(property), state_recorder, property_name);
 						}
 						else if(ilist_property<string_t>* const list_property = dynamic_cast<ilist_property<string_t>*>(&property))
 						{
-							combo_box::control* const combo_box = new combo_box::control(m_parent, property_name, combo_box::proxy(property, state_recorder, property_name));
+							combo_box::control* const combo_box = new combo_box::control(combo_box::proxy(property, state_recorder, property_name));
 							combo_box->set_values(list_property->property_values());
 							control = combo_box;
 						}
@@ -289,49 +288,49 @@ public:
 								imetadata::metadata_t property_metadata = metadata->get_metadata();
 								if(property_metadata["k3d:property-type"] == "k3d:multi-line-text")
 								{
-									control = new text::control(m_parent, property_name, text::model(property), state_recorder);
+									control = new text::control(text::model(property), state_recorder);
 								}
 							}
 
 							if(!control)
 							{
-								control = new entry::control(m_parent, property_name, entry::model(property), state_recorder);
+								control = new entry::control(entry::model(property), state_recorder);
 							}
 						}
 					}
 					// inode* properties ...
 					else if(property_type == typeid(inode*))
 					{
-						control = new node_chooser::control(m_parent, property_name, node_chooser::proxy(m_document_state, property, state_recorder, property_name), node_chooser::filter(property));
+						control = new node_chooser::control(node_chooser::proxy(m_document_state, property, state_recorder, property_name), node_chooser::filter(property));
 					}
 					else if(property_type == typeid(inode_collection_property::nodes_t))
 					{
-						control = new node_collection_chooser::control(m_parent, property_name, node_collection_chooser::model(property), state_recorder);
+						control = new node_collection_chooser::control(node_collection_chooser::model(property), state_recorder);
 					}
 					// Bitmap properties ...
 					else if(property_type == type_id_k3d_bitmap_ptr())
 					{
-						control = new bitmap_preview::control(m_parent, property_name, bitmap_preview::proxy(property));
+						control = new bitmap_preview::control(bitmap_preview::proxy(property));
 					}
 					// Filesystem-path properties ...
 					else if(property_type == typeid(filesystem::path))
 					{
-						control = new path_chooser::control(m_parent, property_name, path_chooser::proxy(property, state_recorder, property_name));
+						control = new path_chooser::control(path_chooser::proxy(property, state_recorder, property_name));
 					}
 					// bounding_box3 properties ...
 					else if(property_type == typeid(bounding_box3))
 					{
-						control = new bounding_box::control(m_parent, property_name, bounding_box::proxy(property));
+						control = new bounding_box::control(bounding_box::proxy(property));
 					}
 					// point3 properties ...
 					else if(property_type == typeid(point3) || property_type == typeid(vector3) || property_type == typeid(normal3))
 					{
-						control = new point::control(m_parent, property_name, point::proxy(property));
+						control = new point::control(point::proxy(property));
 					}
 					// angle_axis properties ...
 					else if(property_type == typeid(k3d::angle_axis))
 					{
-						control = new k3d::ngui::angle_axis::control(m_parent, property_name, k3d::ngui::angle_axis::proxy(property, state_recorder, property_name));
+						control = new k3d::ngui::angle_axis::control(k3d::ngui::angle_axis::proxy(property, state_recorder, property_name));
 					}
 					// Transformation properties ...
 					else if(property_type == typeid(matrix4))
@@ -355,7 +354,7 @@ public:
 					// Mesh Selection properties ...
 					else if(property_type == typeid(mesh_selection))
 					{
-						control = new selection_button::control(m_parent, property_name, selection_button::proxy(property, state_recorder, property_name));
+						control = new selection_button::control(selection_button::proxy(property, state_recorder, property_name));
 					}
 					else
 					{
@@ -376,7 +375,7 @@ public:
 					iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(property.property_node());
 
 					button::control* const control =
-						new button::control(m_parent, property_name + "_delete", *Gtk::manage(new Gtk::Image(Gtk::Stock::DELETE, Gtk::ICON_SIZE_BUTTON)))
+						new button::control(*Gtk::manage(new Gtk::Image(Gtk::Stock::DELETE, Gtk::ICON_SIZE_BUTTON)))
 						<< connect_button(sigc::bind(sigc::bind(sigc::mem_fun(*this, &implementation::on_delete_user_property), &property), property_collection))
 						<< set_tooltip(_("Delete user property (no undo)"));
 
@@ -417,7 +416,6 @@ public:
 	}
 
 	document_state& m_document_state;
-	icommand_node& m_parent;
 	/// Stores the collection of property controls
 	Gtk::VBox m_vbox;
 	/// Groups collapsible frames together
@@ -427,8 +425,8 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(document_state& DocumentState, icommand_node& Parent) :
-	m_implementation(new implementation(DocumentState, Parent))
+control::control(document_state& DocumentState) :
+	m_implementation(new implementation(DocumentState))
 {
 }
 

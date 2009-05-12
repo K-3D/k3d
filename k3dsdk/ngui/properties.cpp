@@ -30,7 +30,6 @@
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ipersistent_collection.h>
@@ -73,7 +72,7 @@ class create_dialog :
 	typedef node_window base;
 
 public:
-	create_dialog(k3d::inode& Node, k3d::icommand_node& Parent) :
+	create_dialog(k3d::inode& Node) :
 		base(Node),
 		m_property_type(init_owner(*this) + init_name("property_type") + init_label("") + init_description("") + init_value(string_t("generic_property")) + init_enumeration(property_type_values())),
 		m_name(init_value(string_t(""))),
@@ -97,8 +96,6 @@ public:
 		m_name_control(0),
 		m_renderman_name_control(0)
 	{
-		k3d::command_tree().add(*this, "add_user_property", &Parent);
-
 		set_title(_("Add User Property:"));
 		set_role("add_user_property");
 		set_position(Gtk::WIN_POS_CENTER);
@@ -107,40 +104,40 @@ public:
 		table->set_col_spacings(4);
 		
 		table->attach(*Gtk::manage(new Gtk::Label(_("Property Type"))), 0, 1, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-		table->attach(*Gtk::manage(new enumeration_chooser::control(*this, "property_type", enumeration_chooser::model(m_property_type))), 1, 2, 0, 1);
+		table->attach(*Gtk::manage(new enumeration_chooser::control(enumeration_chooser::model(m_property_type))), 1, 2, 0, 1);
 
 		m_generic_type_label = new Gtk::Label(_("Data Type"));
-		m_generic_type_control = new enumeration_chooser::control(*this, "generic_type", enumeration_chooser::model(m_generic_type));
+		m_generic_type_control = new enumeration_chooser::control(enumeration_chooser::model(m_generic_type));
 		table->attach(*Gtk::manage(m_generic_type_label), 0, 1, 1, 2, Gtk::SHRINK, Gtk::SHRINK);
 		table->attach(*Gtk::manage(m_generic_type_control), 1, 2, 1, 2);
 	
 		m_renderman_type_label = new Gtk::Label(_("Data Type"));
-		m_renderman_type_control = new enumeration_chooser::control(*this, "renderman_type", enumeration_chooser::model(m_renderman_type));
+		m_renderman_type_control = new enumeration_chooser::control(enumeration_chooser::model(m_renderman_type));
 		table->attach(*Gtk::manage(m_renderman_type_label), 0, 1, 2, 3, Gtk::SHRINK, Gtk::SHRINK);
 		table->attach(*Gtk::manage(m_renderman_type_control), 1, 2, 2, 3);
 
 		m_renderman_name_label = new Gtk::Label(_("Attribute Name"));
-		m_renderman_name_control = new entry::control(*this, "renderman_name", entry::model(m_renderman_name), 0);
+		m_renderman_name_control = new entry::control(entry::model(m_renderman_name), 0);
 		table->attach(*Gtk::manage(m_renderman_name_label), 0, 1, 4, 5, Gtk::SHRINK, Gtk::SHRINK);
 		table->attach(*Gtk::manage(m_renderman_name_control), 1, 2, 4, 5);
 
-		m_name_control = new entry::control(*this, "name", entry::model(m_name), 0)
+		m_name_control = new entry::control(entry::model(m_name), 0)
 			<< connect_signal_changed(sigc::mem_fun(*this, &create_dialog::on_name_changed));
 
 		table->attach(*Gtk::manage(new Gtk::Label(_("Name"))), 0, 1, 5, 6, Gtk::SHRINK, Gtk::SHRINK);
 		table->attach(*Gtk::manage(m_name_control), 1, 2, 5, 6);
 
 		table->attach(*Gtk::manage(new Gtk::Label(_("Label"))), 0, 1, 6, 7, Gtk::SHRINK, Gtk::SHRINK);
-		table->attach(*Gtk::manage(new entry::control(*this, "label", entry::model(m_label), 0)
+		table->attach(*Gtk::manage(new entry::control(entry::model(m_label), 0)
 			<< connect_signal_changed(sigc::mem_fun(*this, &create_dialog::on_label_changed))), 1, 2, 6, 7);
 
 		table->attach(*Gtk::manage(new Gtk::Label(_("Description"))), 0, 1, 7, 8, Gtk::SHRINK, Gtk::SHRINK);
-		table->attach(*Gtk::manage(new entry::control(*this, "description", entry::model(m_description), 0)), 1, 2, 7, 8);
+		table->attach(*Gtk::manage(new entry::control(entry::model(m_description), 0)), 1, 2, 7, 8);
 
 		Gtk::HButtonBox* const button_box = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
-		button_box->pack_start(*Gtk::manage(new button::control(*this, "cancel", _("Cancel"), Gtk::Stock::CANCEL)
+		button_box->pack_start(*Gtk::manage(new button::control(_("Cancel"), Gtk::Stock::CANCEL)
 			<< connect_button(sigc::mem_fun(*this, &create_dialog::close))));
-		button_box->pack_start(*Gtk::manage(new button::control(*this, "add", _("Add"), Gtk::Stock::ADD)
+		button_box->pack_start(*Gtk::manage(new button::control(_("Add"), Gtk::Stock::ADD)
 			<< connect_button(sigc::mem_fun(*this, &create_dialog::on_add))));
 
 		Gtk::VBox* const vbox = Gtk::manage(new Gtk::VBox(false, 10));
@@ -380,9 +377,9 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////
 // create
 
-void create(inode& Node, icommand_node& Parent)
+void create(inode& Node)
 {
-	new create_dialog(Node, Parent);
+	new create_dialog(Node);
 }
 
 } // namespace property

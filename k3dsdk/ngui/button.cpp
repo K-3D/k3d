@@ -24,7 +24,6 @@
 #include "button.h"
 #include "utility.h"
 
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/log.h>
 
 #include <gtkmm/alignment.h>
@@ -47,31 +46,27 @@ namespace button
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name) :
+control::control() :
 	base()
 {
-	k3d::command_tree().add(*this, Name, &Parent);
 	set_name("k3d-button");
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, const Glib::ustring& label, bool mnemonic) :
+control::control(const Glib::ustring& label, bool mnemonic) :
 	base(label, mnemonic)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
 	set_name("k3d-button");
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, const Gtk::StockID& stock_id) :
+control::control(const Gtk::StockID& stock_id) :
 	base(stock_id)
 {
-	k3d::command_tree().add(*this, Name, &Parent);
 	set_name("k3d-button");
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, const Glib::ustring& label, const Gtk::StockID& stock_id) :
+control::control(const Glib::ustring& label, const Gtk::StockID& stock_id) :
 	base()
 {
-	k3d::command_tree().add(*this, Name, &Parent);
 	set_name("k3d-button");
 
 	Gtk::Image* const image = new Gtk::Image();
@@ -91,10 +86,9 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, const Glib
 	alignment->show_all();
 }
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, Gtk::Widget& widget) :
+control::control(Gtk::Widget& widget) :
 	base()
 {
-	k3d::command_tree().add(*this, Name, &Parent);
 	set_name("k3d-button");
 
 	add(widget);

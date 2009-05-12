@@ -26,7 +26,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iproperty_collection.h>
@@ -351,6 +350,7 @@ public:
 class panel :
 	public k3d::ngui::panel::control,
 	public k3d::ngui::ui_component,
+	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -367,10 +367,8 @@ public:
 		delete m_implementation;
 	}
 
-	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(document_state& DocumentState)
 	{
-		k3d::command_tree().add(*this, "node_history", &Parent);
-
 		m_implementation = new detail::implementation(DocumentState);
 
 		m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);

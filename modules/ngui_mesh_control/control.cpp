@@ -111,7 +111,7 @@ public:
 	{
 	}
 
-	void initialize(document_state& DocumentState, k3d::icommand_node& Parent, k3d::iproperty& Property)
+	void initialize(document_state& DocumentState, k3d::iproperty& Property)
 	{
 		Gtk::Button* const menu_button = new Gtk::Button(_("Mesh Options"));
 		menu_button->signal_clicked().connect(sigc::bind(sigc::mem_fun(*this, &control::on_choose), &Property));

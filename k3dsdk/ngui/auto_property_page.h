@@ -33,7 +33,6 @@ namespace Gtk { class Widget; }
 namespace k3d
 {
 
-class icommand_node;
 class iproperty;
 class iunknown;
 
@@ -49,7 +48,7 @@ namespace auto_property_page
 class control
 {
 public:
-	control(document_state& DocumentState, icommand_node& Parent);
+	control(document_state& DocumentState);
 	~control();
 
 	/// Auto-generate controls for a single object of arbitrary type.

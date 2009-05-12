@@ -20,7 +20,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>
@@ -75,17 +74,16 @@ class implementation :
 	typedef Gtk::VBox base;
 
 public:
-	implementation(document_state& DocumentState, k3d::icommand_node& Parent) :
+	implementation(document_state& DocumentState) :
 		base(false, 0),
 		m_document_state(DocumentState),
-		m_parent(Parent),
 		m_undo_button(0),
 		m_redo_button(0)
 	{
-		toolbar::control* const toolbar = new toolbar::control(m_parent, "toolbar");
+		toolbar::control* const toolbar = new toolbar::control();
 
-		m_undo_button = new button::control(*toolbar, "undo");
-		m_redo_button = new button::control(*toolbar, "redo");
+		m_undo_button = new button::control();
+		m_redo_button = new button::control();
 
 		m_undo_button->add(*Gtk::manage(new Gtk::Image(Gtk::Stock::UNDO, Gtk::ICON_SIZE_SMALL_TOOLBAR)));
 		m_redo_button->add(*Gtk::manage(new Gtk::Image(Gtk::Stock::REDO, Gtk::ICON_SIZE_SMALL_TOOLBAR)));
@@ -405,7 +403,6 @@ public:
 
 	/// Stores a reference to the owning document
 	document_state& m_document_state;
-	k3d::icommand_node& m_parent;
 
 	/// Declares columns for the TreeView data model
 	class columns :
@@ -451,6 +448,7 @@ public:
 class panel :
 	public Gtk::VBox,
 	public k3d::ngui::panel::control,
+	public k3d::iunknown,
 	public ui_component
 {
 	typedef Gtk::VBox base;
@@ -467,11 +465,9 @@ public:
 		delete m_implementation;
 	}
 
-	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(document_state& DocumentState)
 	{
-		k3d::command_tree().add(*this, "undo_tree", &Parent);
-
-		m_implementation = new detail::implementation(DocumentState, *this);
+		m_implementation = new detail::implementation(DocumentState);
 
 		m_implementation->m_undo_button->signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 		m_implementation->m_redo_button->signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);

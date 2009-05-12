@@ -116,9 +116,9 @@ private:
 class control::implementation
 {
 public:
-	implementation(document_state& DocumentState, icommand_node& Parent, const string_t& Name) :
+	implementation(document_state& DocumentState) :
 		m_document_state(DocumentState),
-		m_toolbar(Parent, Name)
+		m_toolbar()
 	{
 	}
 
@@ -134,7 +134,7 @@ public:
 			const string_t uri = "http://www.k-3d.org/wiki/" + node->factory().name();
 
 			button::control* const control =
-				new button::control(m_toolbar, "online_help", Gtk::Stock::HELP)
+				new button::control(Gtk::Stock::HELP)
 					<< connect_button(sigc::bind(sigc::ptr_fun(&k3d::ngui::uri::open), uri))
 					<< set_tooltip(_("Display online help."));
 
@@ -145,7 +145,7 @@ public:
 		if(inode* const node = dynamic_cast<inode*>(Object))
 		{
 			button::control* const control =
-				new button::control(m_toolbar, "add_user_property", *Gtk::manage(new Gtk::Image(Gtk::Stock::ADD, Gtk::ICON_SIZE_BUTTON)))
+				new button::control(*Gtk::manage(new Gtk::Image(Gtk::Stock::ADD, Gtk::ICON_SIZE_BUTTON)))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_add_user_property), node))
 					<< set_tooltip(_("Add a user property."));
 
@@ -156,17 +156,17 @@ public:
 		if(icamera* const camera = dynamic_cast<icamera*>(Object))
 		{
 			button::control* const camera_preview =
-				new button::control(m_toolbar, "render_camera_preview", *Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_BUTTON))))
+				new button::control(*Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_BUTTON))))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_render_camera_camera_preview), camera))
 					<< set_tooltip(_("Render Preview"));
 
 			button::control* const camera_frame =
-				new button::control(m_toolbar, "render_camera_frame", *Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_BUTTON))))
+				new button::control(*Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_BUTTON))))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_render_camera_camera_frame), camera))
 					<< set_tooltip(_("Render Frame"));
 
 			button::control* const camera_animation =
-				new button::control(m_toolbar, "render_camera_animation", *Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_BUTTON))))
+				new button::control(*Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_BUTTON))))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_render_camera_camera_animation), camera))
 					<< set_tooltip(_("Render Animation"));
 
@@ -179,7 +179,7 @@ public:
 		if(irender_camera_preview* const render_camera_preview = dynamic_cast<irender_camera_preview*>(Object))
 		{
 			button::control* const control =
-				new button::control(m_toolbar, "render_camera_preview", *Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_BUTTON))))
+				new button::control(*Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_BUTTON))))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_render_camera_preview), render_camera_preview))
 					<< set_tooltip(_("Render Preview"));
 
@@ -189,7 +189,7 @@ public:
 		if(irender_camera_frame* const render_camera_frame = dynamic_cast<irender_camera_frame*>(Object))
 		{
 			button::control* const control =
-				new button::control(m_toolbar, "render_camera_frame", *Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_BUTTON))))
+				new button::control(*Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_BUTTON))))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_render_camera_frame), render_camera_frame))
 					<< set_tooltip(_("Render Frame"));
 
@@ -199,7 +199,7 @@ public:
 		if(irender_camera_animation* const render_camera_animation = dynamic_cast<irender_camera_animation*>(Object))
 		{
 			button::control* const control =
-				new button::control(m_toolbar, "render_camera_animation", *Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_BUTTON))))
+				new button::control(*Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_BUTTON))))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_render_camera_animation), render_camera_animation))
 					<< set_tooltip(_("Render Animation"));
 
@@ -210,7 +210,7 @@ public:
 		if(irender_preview* const render_preview = dynamic_cast<irender_preview*>(Object))
 		{
 			button::control* const control =
-				new button::control(m_toolbar, "render_preview", *Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_BUTTON))))
+				new button::control(*Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_BUTTON))))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_render_preview), render_preview))
 					<< set_tooltip(_("Render Preview"));
 
@@ -220,7 +220,7 @@ public:
 		if(irender_frame* const render_frame = dynamic_cast<irender_frame*>(Object))
 		{
 			button::control* const control =
-				new button::control(m_toolbar, "render_frame", *Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_BUTTON))))
+				new button::control(*Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_BUTTON))))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_render_frame), render_frame))
 					<< set_tooltip(_("Render Frame"));
 
@@ -230,7 +230,7 @@ public:
 		if(irender_animation* const render_animation = dynamic_cast<irender_animation*>(Object))
 		{
 			button::control* const control =
-				new button::control(m_toolbar, "render_animation", *Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_BUTTON))))
+				new button::control(*Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_BUTTON))))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_render_animation), render_animation))
 					<< set_tooltip(_("Render Animation"));
 
@@ -241,7 +241,7 @@ public:
 		if(imesh_storage* const mesh_storage = dynamic_cast<imesh_storage*>(Object))
 		{
 			button::control* const control =
-				new button::control(m_toolbar, "reset_mesh", _("Reset Mesh"))
+				new button::control(_("Reset Mesh"))
 					<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_reset_mesh), mesh_storage))
 					<< set_tooltip(_("Reset / Reload Mesh"));
 
@@ -259,8 +259,6 @@ public:
 
 				toggle_button::control* const control =
 					new toggle_button::control(
-						m_toolbar,
-						"disable_mesh_modifier",
 						new bypass_property_proxy(m_document_state, bypass_input, bypass_output),
 						&m_document_state.document().state_recorder(),
 						_("Disable"))
@@ -294,8 +292,6 @@ public:
 				{
 					toggle_button::control* const control =
 						new toggle_button::control(
-							m_toolbar,
-							"disable_mesh_modifier",
 							new bypass_property_proxy(m_document_state, *bypass_input, bypass_output),
 							&m_document_state.document().state_recorder(),
 							_("Disable"))
@@ -311,7 +307,7 @@ public:
 
 	void on_add_user_property(inode* Node)
 	{
-		k3d::ngui::property::create(*Node, m_toolbar);
+		k3d::ngui::property::create(*Node);
 	}
 	
 	void on_render_camera_camera_preview(icamera* Camera)
@@ -395,8 +391,8 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(document_state& DocumentState, icommand_node& Parent, const string_t& Name) :
-	m_implementation(new implementation(DocumentState, Parent, Name))
+control::control(document_state& DocumentState) :
+	m_implementation(new implementation(DocumentState))
 {
 }
 

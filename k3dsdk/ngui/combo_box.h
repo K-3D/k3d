@@ -93,7 +93,7 @@ class control :
 	typedef Gtk::ComboBoxEntry base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
+	control(std::auto_ptr<idata_proxy> Data);
 
 	/// Defines a predefined (but not exclusive) list of values that should be available to the user
 	typedef std::vector<std::string> values_t;

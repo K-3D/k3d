@@ -27,7 +27,6 @@
 #include "tool.h"
 #include "viewport.h"
 
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/utility_gl.h>
@@ -49,7 +48,6 @@ tool::tool() :
 tool::tool(document_state& DocumentState, const k3d::string_t& Name) :
 	m_document_state(&DocumentState)
 {
-	k3d::command_tree().add(*this, Name, dynamic_cast<k3d::icommand_node*>(&DocumentState.document()));
 }
 
 tool::~tool()

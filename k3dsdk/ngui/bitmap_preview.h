@@ -77,7 +77,7 @@ class control :
 	typedef Gtk::HButtonBox base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
+	control(std::auto_ptr<idata_proxy> Data);
 
 private:
 	/// Called whenever the underlying data changes

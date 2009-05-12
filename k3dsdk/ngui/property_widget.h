@@ -86,7 +86,7 @@ class control :
 	public ui_component
 {
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
+	control(std::auto_ptr<idata_proxy> Data);
 	virtual ~control();
 
 	bool button_press_event(GdkEventButton* Event);

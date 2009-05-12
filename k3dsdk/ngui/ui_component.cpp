@@ -55,12 +55,6 @@ void ui_component::set_tip(const Glib::ustring& Tooltip)
 	tooltips().set_tip(*widget, Tooltip);
 }
 
-const icommand_node::result ui_component::execute_command(const string_t&, const string_t&)
-{
-	assert_not_reached();
-	return icommand_node::RESULT_ERROR;
-}
-
 } // namespace ngui
 
 } // namespace k3d

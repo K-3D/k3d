@@ -31,7 +31,6 @@ namespace Gtk { class Widget; }
 namespace k3d
 {
 
-class icommand_node;
 class iproperty;
 
 namespace ngui
@@ -50,7 +49,7 @@ public:
 	virtual ~control() {}
 
 	/// Called once at startup to initialize the control (this is necessary because plugins can't take constructor arguments).
-	virtual void initialize(document_state& DocumentState, icommand_node& Parent, iproperty& Property) = 0;
+	virtual void initialize(document_state& DocumentState, iproperty& Property) = 0;
 
 protected:
 	control() {}

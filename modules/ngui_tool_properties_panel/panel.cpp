@@ -19,7 +19,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
 #include <k3dsdk/ngui/auto_property_page.h>
@@ -59,10 +58,10 @@ class implementation :
 	public asynchronous_update
 {
 public:
-	implementation(document_state& DocumentState, k3d::icommand_node& Parent) :
+	implementation(document_state& DocumentState) :
 		m_document_state(DocumentState),
 		m_tool(0),
-		m_object_properties(DocumentState, Parent)
+		m_object_properties(DocumentState)
 	{
 		m_label.set_alignment(Gtk::ALIGN_LEFT);
 		m_label.set_padding(5, 5);
@@ -89,11 +88,12 @@ public:
 
 	void on_update()
 	{
+/*
 		if(m_tool)
 			m_label.set_text(k3d::string_cast(boost::format(_("%1% Properties")) % k3d::command_tree().name(*m_tool)));
 		else
 			m_label.set_text("");
-
+*/
 		m_object_properties.set_properties(m_tool ? m_tool->properties() : 0);
 
 		m_vbox.show();
@@ -127,6 +127,7 @@ public:
 class panel :
 	public k3d::ngui::panel::control,
 	public k3d::ngui::ui_component,
+	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -142,11 +143,9 @@ public:
 		delete m_implementation;
 	}
 
-	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(document_state& DocumentState)
 	{
-		k3d::command_tree().add(*this, "tool_properties", &Parent);
-
-		m_implementation = new detail::implementation(DocumentState, *this);
+		m_implementation = new detail::implementation(DocumentState);
 
 		m_implementation->m_scrolled_window.signal_button_press_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 		

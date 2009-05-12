@@ -82,7 +82,7 @@ class control :
 	typedef Gtk::HBox base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name, imodel* const Model, k3d::istate_recorder* StateRecorder);
+	control(imodel* const Model, k3d::istate_recorder* StateRecorder);
 	~control();
 
 private:

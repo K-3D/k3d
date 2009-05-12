@@ -36,7 +36,6 @@
 
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/basic_math.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/module.h>
@@ -435,17 +434,17 @@ class implementation :
 	public k3d::property_collection
 {
 public:
-	implementation(document_state& DocumentState, k3d::icommand_node& Parent) :
+	implementation(document_state& DocumentState) :
 		k3d::property_collection(),
 		m_document_state(DocumentState),
 		m_no_track("Select Track..."),
-		m_rewind(Parent, "rewind", *Gtk::manage(new Gtk::Image(load_icon("rewind", Gtk::ICON_SIZE_BUTTON)))),
-		m_loop_reverse_play(Parent, "reverse_play_loop", *Gtk::manage(new Gtk::Image(load_icon("reverse_play_loop", Gtk::ICON_SIZE_BUTTON)))),
-		m_reverse_play(Parent, "reverse_play", *Gtk::manage(new Gtk::Image(load_icon("reverse_play", Gtk::ICON_SIZE_BUTTON)))),
-		m_stop(Parent, "stop", *Gtk::manage(new Gtk::Image(load_icon("stop", Gtk::ICON_SIZE_BUTTON)))),
-		m_play(Parent, "play", *Gtk::manage(new Gtk::Image(load_icon("play", Gtk::ICON_SIZE_BUTTON)))),
-		m_loop_play(Parent, "play_loop", *Gtk::manage(new Gtk::Image(load_icon("play_loop", Gtk::ICON_SIZE_BUTTON)))),
-		m_fast_forward(Parent, "fast_forward", *Gtk::manage(new Gtk::Image(load_icon("fast_forward", Gtk::ICON_SIZE_BUTTON)))),
+		m_rewind(*Gtk::manage(new Gtk::Image(load_icon("rewind", Gtk::ICON_SIZE_BUTTON)))),
+		m_loop_reverse_play(*Gtk::manage(new Gtk::Image(load_icon("reverse_play_loop", Gtk::ICON_SIZE_BUTTON)))),
+		m_reverse_play(*Gtk::manage(new Gtk::Image(load_icon("reverse_play", Gtk::ICON_SIZE_BUTTON)))),
+		m_stop(*Gtk::manage(new Gtk::Image(load_icon("stop", Gtk::ICON_SIZE_BUTTON)))),
+		m_play(*Gtk::manage(new Gtk::Image(load_icon("play", Gtk::ICON_SIZE_BUTTON)))),
+		m_loop_play(*Gtk::manage(new Gtk::Image(load_icon("play_loop", Gtk::ICON_SIZE_BUTTON)))),
+		m_fast_forward(*Gtk::manage(new Gtk::Image(load_icon("fast_forward", Gtk::ICON_SIZE_BUTTON)))),
 		m_playback_mode(init_name("playback_mode") + init_label(_("Playback Mode")) + init_description(_("When on, plays animation")) + init_value(STOP))
 	{
 		m_frame_label.set_editable(false);
@@ -501,11 +500,6 @@ public:
 	{
 		reset_time_properties();
 		update_track_list();
-	}
-
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		return k3d::icommand_node::RESULT_CONTINUE;
 	}
 
 	void on_update()
@@ -888,7 +882,8 @@ public:
 class panel :
 	public k3d::ngui::panel::control,
 	public k3d::ngui::ui_component,
-	public Gtk::VBox
+	public Gtk::VBox,
+	public k3d::iunknown
 {
 	typedef Gtk::VBox base;
 
@@ -904,11 +899,9 @@ public:
 		delete m_implementation;
 	}
 
-	void initialize(document_state& DocumentState, k3d::icommand_node& Parent)
+	void initialize(document_state& DocumentState)
 	{
-		k3d::command_tree().add(*this, "timeline", &Parent);
-
-		m_implementation = new detail::implementation(DocumentState, Parent);
+		m_implementation = new detail::implementation(DocumentState);
 		
 		pack_start(m_implementation->m_container, Gtk::PACK_EXPAND_WIDGET);
 		show_all();
@@ -924,15 +917,6 @@ public:
 		return sigc::connection();
 	}
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		const k3d::icommand_node::result result = m_implementation->execute_command(Command, Arguments);
-		if(result != RESULT_UNKNOWN_COMMAND)
-			return result;
-
-		return ui_component::execute_command(Command, Arguments);
-	}
-	
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<panel> factory(

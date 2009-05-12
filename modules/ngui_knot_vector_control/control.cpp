@@ -132,9 +132,9 @@ public:
 		k3d::iwritable_property* const m_writable_data;
 	};
 
-	void initialize(document_state& DocumentState, k3d::icommand_node& Parent, k3d::iproperty& Property)
+	void initialize(document_state& DocumentState, k3d::iproperty& Property)
 	{
-		entry::control* const control = new entry::control(Parent, "knot_vector", new knot_vector_model(Property), &DocumentState.document().state_recorder());
+		entry::control* const control = new entry::control(new knot_vector_model(Property), &DocumentState.document().state_recorder());
 		pack_start(*Gtk::manage(control), Gtk::PACK_EXPAND_WIDGET);
 	}
 

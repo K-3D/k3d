@@ -35,7 +35,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/imeasurement_property.h>
 #include <k3dsdk/inode.h>
@@ -229,12 +228,10 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder) :
+control::control(imodel* const Model, k3d::istate_recorder* const StateRecorder) :
 	base(2, 8, true),
 	m_implementation(new implementation(Model, StateRecorder))
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	set_name("k3d-spin-button");
 
 	m_implementation->m_entry->set_name("entry");

@@ -125,7 +125,7 @@ class control :
 	typedef hotkey_entry base;
 
 public:
-	control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder);
+	control(imodel* const Model, k3d::istate_recorder* const StateRecorder);
 	~control();
 
 private:

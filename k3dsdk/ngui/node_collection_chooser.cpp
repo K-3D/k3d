@@ -36,7 +36,6 @@
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/inode_collection.h>
@@ -69,14 +68,12 @@ class list_window :
 	public asynchronous_update
 {
 public:
-	list_window(k3d::icommand_node* const Parent, const k3d::string_t& Name, const boost::shared_ptr<imodel>& Model, k3d::istate_recorder* StateRecorder) :
+	list_window(const boost::shared_ptr<imodel>& Model, k3d::istate_recorder* StateRecorder) :
 		m_model(Model),
 		m_state_recorder(StateRecorder),
 		m_block_update(false),
 		m_block_toggle(false)
 	{
-		k3d::command_tree().add(*this, Name, Parent);
-
 		set_title(m_model->label());
 		set_role("node_collection_chooser");
 		resize(400, 400);
@@ -102,15 +99,15 @@ public:
 
 		Gtk::HButtonBox* const hbox = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
 		hbox->pack_start(*Gtk::manage(
-			new button::control(*this, "select_all", _("Select All"))
+			new button::control(_("Select All"))
 				<< connect_button(sigc::mem_fun(*this, &list_window::on_select_all))
 				), Gtk::PACK_SHRINK);
 		hbox->pack_start(*Gtk::manage(
-			new button::control(*this, "deselect_all", _("Deselect All"))
+			new button::control(_("Deselect All"))
 				<< connect_button(sigc::mem_fun(*this, &list_window::on_deselect_all))
 				), Gtk::PACK_SHRINK);
 		hbox->pack_start(*Gtk::manage(
-			new button::control(*this, "toggle_selected", _("Toggle Selected"))
+			new button::control(_("Toggle Selected"))
 				<< connect_button(sigc::mem_fun(*this, &list_window::on_toggle_selected))
 				), Gtk::PACK_SHRINK);
 
@@ -357,12 +354,10 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(k3d::icommand_node& Parent, const std::string& Name, imodel* const Model, k3d::istate_recorder* StateRecorder) :
+control::control(imodel* const Model, k3d::istate_recorder* StateRecorder) :
 	base(false, 0),
 	m_implementation(new implementation(Model, StateRecorder))
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	Gtk::Button* const edit_button = new Gtk::Button(_("Edit"));
 	edit_button->signal_clicked().connect(sigc::mem_fun(*this, &control::on_edit));
 	pack_start(*manage(edit_button), Gtk::PACK_SHRINK);
@@ -377,7 +372,7 @@ void control::on_edit()
 {
 	return_if_fail(m_implementation->m_model.get());
 
-	list_window* const window = new list_window(this, "edit", m_implementation->m_model, m_implementation->m_state_recorder);
+	list_window* const window = new list_window(m_implementation->m_model, m_implementation->m_state_recorder);
 	m_implementation->m_delete_signal.connect(sigc::mem_fun(*window, &list_window::close));
 	window->show_all();
 }

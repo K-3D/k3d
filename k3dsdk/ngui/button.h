@@ -48,11 +48,11 @@ class control :
 	typedef Gtk::Button base;
 
 public:
-	control(k3d::icommand_node& Parent, const std::string& Name);
-	control(k3d::icommand_node& Parent, const std::string& Name, const Glib::ustring& label, bool mnemonic = false);
-	control(k3d::icommand_node& Parent, const std::string& Name, const Gtk::StockID& stock_id);
-	control(k3d::icommand_node& Parent, const std::string& Name, const Glib::ustring& label, const Gtk::StockID& stock_id);
-	control(k3d::icommand_node& Parent, const std::string& Name, Gtk::Widget& widget);
+	control();
+	control(const Glib::ustring& label, bool mnemonic = false);
+	control(const Gtk::StockID& stock_id);
+	control(const Glib::ustring& label, const Gtk::StockID& stock_id);
+	control(Gtk::Widget& widget);
 
 	void on_clicked();
 };

@@ -35,10 +35,8 @@
 #include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/basic_viewport_input_model.h>
-#include <k3dsdk/ngui/command_arguments.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
-#include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/keyboard.h>
 #include <k3dsdk/ngui/modifiers.h>
 #include <k3dsdk/ngui/navigation_input_model.h>
@@ -322,10 +320,6 @@ struct implementation :
 		const k3d::point2 coordinates(Event.x, Event.y);
 
 		lbutton_click(Viewport, coordinates);
-
-		// Record the command for tutorials
-		assert_not_implemented();
-//		m_tool.record_command("selection_click", command_arguments(Viewport, widget_to_ndc(Viewport, coordinates), convert(Event.state)));
 	}
 
 	void on_rbutton_click(viewport::control& Viewport, const GdkEventButton& Event)
@@ -336,30 +330,6 @@ struct implementation :
 
 		// Record the command for tutorials
 		assert_not_implemented();
-	}
-
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		try
-		{
-			if(Command == "selection_click")
-			{
-				command_arguments arguments(Arguments);
-
-				interactive::move_pointer(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
-
-				//lbutton_down(arguments.get_viewport(), arguments.get_viewport_point2("mouse"), arguments.key_modifiers());
-				//lbutton_click(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << k3d_file_reference << ": caught exception: " << e.what() << std::endl;
-		}
-
-		return k3d::icommand_node::RESULT_ERROR;
 	}
 
 	k3d::iunknown* interactive_target(viewport::control& Viewport)
@@ -373,14 +343,14 @@ struct implementation :
 		{
 			// Shift key adds a point within the clicked face
 			m_start_selection = k3d::selection::record();
-			m_start_selection = Viewport.pick_face(NDC, m_document_state.pick_backfacing());
+			m_start_selection = Viewport.pick_uniform(NDC, m_document_state.pick_backfacing());
 			m_pick_mode = SELECT_FACES;
 		}
 		else
 		{
 			// Find an edge under the mouse cursor
 			m_start_selection = k3d::selection::record();
-			m_start_selection = Viewport.pick_line(NDC, m_document_state.pick_backfacing());
+			m_start_selection = Viewport.pick_split_edge(NDC, m_document_state.pick_backfacing());
 			m_pick_mode = SELECT_LINES;
 		}
 	}
@@ -587,11 +557,6 @@ public:
 	const k3d::string_t tool_type()
 	{
 		return get_factory().name();
-	}
-
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		return m_implementation->execute_command(Command, Arguments);
 	}
 
 	static k3d::iplugin_factory& get_factory()
