@@ -42,7 +42,7 @@ public:
 
 protected:
 	imesh_selection_sink() {}
-	imesh_selection_sink(const imesh_selection_sink&) {}
+	imesh_selection_sink(const imesh_selection_sink& Other) : iunknown(Other) {}
 	imesh_selection_sink& operator=(const imesh_selection_sink&) { return *this; }
 	virtual ~imesh_selection_sink() {}
 };

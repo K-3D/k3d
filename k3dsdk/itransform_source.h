@@ -42,7 +42,7 @@ public:
 
 protected:
 	itransform_source() {}
-	itransform_source(const itransform_source&) {}
+	itransform_source(const itransform_source& Other) : iunknown(Other) {}
 	itransform_source& operator=(const itransform_source&) { return *this; }
 	virtual ~itransform_source() {}
 };

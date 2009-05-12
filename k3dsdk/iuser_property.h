@@ -37,7 +37,7 @@ public:
 
 protected:
 	iuser_property() {}
-	iuser_property(const iuser_property&) {}
+	iuser_property(const iuser_property& Other) : iunknown(Other) {}
 	iuser_property& operator=(const iuser_property&) { return *this; }
 	virtual ~iuser_property() {}
 };

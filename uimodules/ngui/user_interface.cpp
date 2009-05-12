@@ -519,7 +519,7 @@ public:
 		get_file_notification()->unwatch_path(WatchID);
 	}
 
-	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
+	k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 	{
 		if(Command == "tutorial_message")
 			return tutorial_message(Arguments) ? RESULT_CONTINUE : RESULT_STOP;

@@ -56,12 +56,12 @@ public:
 	{
 	}
 
-	const k3d::bool_t installed()
+	k3d::bool_t installed()
 	{
 		return true;
 	}
 
-	const k3d::bool_t compile_shader(const k3d::filesystem::path& Shader)
+	k3d::bool_t compile_shader(const k3d::filesystem::path& Shader)
 	{
 		// Compute some paths that will be used by the compiler ...
 		const k3d::filesystem::path shader_source_path = Shader;
@@ -83,7 +83,7 @@ public:
 		return true;
 	}
 
-	const k3d::bool_t render(k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& RIB)
+	k3d::bool_t render(k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& RIB)
 	{
 		k3d::inetwork_render_frame::environment environment;
 

@@ -77,7 +77,7 @@ public:
 
 protected:
 	ipipeline_profiler() {}
-	ipipeline_profiler(const ipipeline_profiler&) {}
+	ipipeline_profiler(const ipipeline_profiler& Other) : iunknown(Other) {}
 	ipipeline_profiler& operator=(const ipipeline_profiler&) { return *this; }
 	virtual ~ipipeline_profiler() {}
 };

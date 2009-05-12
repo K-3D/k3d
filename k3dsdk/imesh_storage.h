@@ -42,7 +42,7 @@ public:
 
 protected:
 	imesh_storage() {}
-	imesh_storage(const imesh_storage&) {}
+	imesh_storage(const imesh_storage& Other) : iunknown(Other) {}
 	imesh_storage& operator=(const imesh_storage&) { return *this; }
 	virtual ~imesh_storage() {}
 };

@@ -42,7 +42,7 @@ public:
 
 protected:
 	itransform_sink() {}
-	itransform_sink(const itransform_sink&) {}
+	itransform_sink(const itransform_sink& Other) : iunknown(Other) {}
 	itransform_sink& operator=(const itransform_sink&) { return *this; }
 	virtual ~itransform_sink() {}
 };

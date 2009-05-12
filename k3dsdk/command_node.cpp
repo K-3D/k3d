@@ -119,7 +119,7 @@ command_node::~command_node()
 	command_tree().remove(*this);
 }
 
-const icommand_node::result command_node::execute_command(const string_t& Command, const string_t& Arguments)
+icommand_node::result command_node::execute_command(const string_t& Command, const string_t& Arguments)
 {
 	log() << error << "Command node ["
 		<< k3d::command_tree().name(*this)

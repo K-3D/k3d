@@ -54,7 +54,7 @@ public:
 
 protected:
 	iprojection() {}
-	iprojection(const iprojection&) {}
+	iprojection(const iprojection& Other) : iunknown(Other) {}
 	iprojection& operator=(const iprojection&) { return *this; }
 	virtual ~iprojection() {}
 };
@@ -73,7 +73,7 @@ public:
 
 protected:
 	iperspective() {}
-	iperspective(const iperspective&) {}
+	iperspective(const iperspective& Other) : iunknown(Other) {}
 	iperspective& operator=(const iperspective&) { return *this; }
 	virtual ~iperspective() {}
 };
@@ -92,7 +92,7 @@ public:
 
 protected:
 	iorthographic() {}
-	iorthographic(const iorthographic&) {}
+	iorthographic(const iorthographic& Other) : iunknown(Other) {}
 	iorthographic& operator=(const iorthographic&) { return *this; }
 	virtual ~iorthographic() {}
 };

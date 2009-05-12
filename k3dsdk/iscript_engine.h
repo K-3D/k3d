@@ -103,7 +103,7 @@ public:
 
 protected:
 	iscript_engine() {}
-	iscript_engine(const iscript_engine&) {}
+	iscript_engine(const iscript_engine& Other) : iunknown(Other) {}
 	iscript_engine& operator = (const iscript_engine&) { return *this; }
 };
 

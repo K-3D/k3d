@@ -41,7 +41,7 @@ public:
 
 protected:
 	irender_camera_frame() {}
-	irender_camera_frame(const irender_camera_frame&) {}
+	irender_camera_frame(const irender_camera_frame& Other) : iunknown(Other) {}
 	irender_camera_frame& operator = (const irender_camera_frame&) { return *this; }
 	virtual ~irender_camera_frame() {}
 };

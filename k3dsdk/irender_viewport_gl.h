@@ -78,7 +78,7 @@ public:
 
 protected:
 	irender_viewport() {}
-	irender_viewport(const irender_viewport&) {}
+	irender_viewport(const irender_viewport& Other) : iunknown(Other) {}
 	irender_viewport& operator=(const irender_viewport&) { return *this; }
 	virtual ~irender_viewport() {}
 };

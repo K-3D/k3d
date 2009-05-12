@@ -44,7 +44,7 @@ public:
 	{
 	}
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
+	k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
 	{
 		if(Command == "shuffle")
 		{

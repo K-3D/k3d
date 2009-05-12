@@ -42,7 +42,7 @@ public:
 
 protected:
 	imesh_sink() {}
-	imesh_sink(const imesh_sink&) {}
+	imesh_sink(const imesh_sink& Other) : iunknown(Other) {}
 	imesh_sink& operator=(const imesh_sink&) { return *this; }
 	virtual ~imesh_sink() {}
 };

@@ -53,7 +53,7 @@ public:
 
 protected:
 	icamera() {}
-	icamera(const icamera&) {}
+	icamera(const icamera& Other) : iunknown(Other) {}
 	icamera& operator=(const icamera&) { return *this; }
 	virtual ~icamera() {}
 };

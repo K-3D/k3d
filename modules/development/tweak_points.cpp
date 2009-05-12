@@ -177,7 +177,7 @@ public:
 	}
 		
 	/// k3d::comand_node implementation
-	const result execute_command(const std::string& Command, const std::string& Arguments)
+	result execute_command(const std::string& Command, const std::string& Arguments)
 	{
 		// Handle errors
 		if (Command != "stop_drag")

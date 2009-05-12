@@ -37,7 +37,7 @@ class imulti_mesh_sink :
 
 protected:
 	imulti_mesh_sink() {}
-	imulti_mesh_sink(const imulti_mesh_sink&) {}
+	imulti_mesh_sink(const imulti_mesh_sink& Other) : iunknown(Other) {}
 	imulti_mesh_sink& operator=(const imulti_mesh_sink&) { return *this; }
 	virtual ~imulti_mesh_sink() {}
 };

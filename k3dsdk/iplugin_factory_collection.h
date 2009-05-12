@@ -45,7 +45,7 @@ public:
 
 protected:
 	iplugin_factory_collection() {}
-	iplugin_factory_collection(const iplugin_factory_collection&) {}
+	iplugin_factory_collection(const iplugin_factory_collection& Other) : iunknown(Other) {}
 	iplugin_factory_collection& operator=(const iplugin_factory_collection&) { return *this; }
 	virtual ~iplugin_factory_collection() {}
 };

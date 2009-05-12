@@ -230,7 +230,6 @@ modules/ngui_about/dialog.cpp
 modules/ngui_animation_timeline_panel/panel.cpp
 modules/ngui_assign_hotkeys/dialog.cpp
 modules/ngui_atk_event_recorder/dialog.cpp
-modules/ngui_command_node_inspector/dialog.cpp
 modules/ngui_event_recorder/dialog.cpp
 modules/ngui_knife_tool/tool.cpp
 modules/ngui_knot_vector_control/control.cpp
@@ -251,12 +250,10 @@ modules/ngui_python_shell/dialog.cpp
 modules/ngui_render_region_tool/tool.cpp
 modules/ngui_snap_tool/snap_tool_detail.h
 modules/ngui_snap_tool/tool.cpp
-modules/ngui_test_case_recorder/dialog.cpp
 modules/ngui_text_editor/dialog.cpp
 modules/ngui_timeline_panel/panel.cpp
 modules/ngui_tool_properties_panel/panel.cpp
 modules/ngui_toolbar_panel/panel.cpp
-modules/ngui_tutorial_recorder/dialog.cpp
 modules/ngui_undo_tree_panel/panel.cpp
 modules/ngui_uv_editor_panel/panel.cpp
 modules/nurbs/add_trim_curve.cpp

@@ -43,7 +43,7 @@ public:
 
 protected:
 	idependencies() {}
-	idependencies(const idependencies&) {}
+	idependencies(const idependencies& Other) : iunknown(Other) {}
 	idependencies& operator=(const idependencies&) { return *this; }
 	virtual ~idependencies() {}
 };

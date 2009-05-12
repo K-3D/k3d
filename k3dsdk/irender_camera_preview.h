@@ -40,7 +40,7 @@ public:
 
 protected:
 	irender_camera_preview() {}
-	irender_camera_preview(const irender_camera_preview&) {}
+	irender_camera_preview(const irender_camera_preview& Other) : iunknown(Other) {}
 	irender_camera_preview& operator = (const irender_camera_preview&) { return *this; }
 	virtual ~irender_camera_preview() {}
 };

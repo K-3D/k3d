@@ -44,11 +44,11 @@ public:
 	virtual ~irender_engine() {}
 
 	/// Returns true iff the underlying RenderMan engine is installed and usable
-	virtual const bool_t installed() = 0;
+	virtual bool_t installed() = 0;
 	/// Compiles the given shader source code, placing the results into the global shader cache
-	virtual const bool_t compile_shader(const filesystem::path& Shader) = 0;
+	virtual bool_t compile_shader(const filesystem::path& Shader) = 0;
 	/// Renders the given RIB file
-	virtual const bool_t render(inetwork_render_frame& Frame, const filesystem::path& RIB) = 0;
+	virtual bool_t render(inetwork_render_frame& Frame, const filesystem::path& RIB) = 0;
 
 protected:
 	irender_engine() {}

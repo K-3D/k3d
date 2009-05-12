@@ -45,7 +45,7 @@ public:
 
 protected:
 	imesh_source() {}
-	imesh_source(const imesh_source&) {}
+	imesh_source(const imesh_source& Other) : iunknown(Other) {}
 	imesh_source& operator=(const imesh_source&) { return *this; }
 	virtual ~imesh_source() {}
 };

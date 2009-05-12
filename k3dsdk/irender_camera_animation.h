@@ -42,7 +42,7 @@ public:
 
 protected:
 	irender_camera_animation() {}
-	irender_camera_animation(const irender_camera_animation&) {}
+	irender_camera_animation(const irender_camera_animation& Other) : iunknown(Other) {}
 	irender_camera_animation& operator = (const irender_camera_animation&) { return *this; }
 	virtual ~irender_camera_animation() {}
 };

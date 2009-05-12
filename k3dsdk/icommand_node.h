@@ -57,11 +57,11 @@ public:
 	} result;
 	
 	/// Executes a command, returning the command result
-	virtual const result execute_command(const string_t& Command, const string_t& Arguments) = 0;
+	virtual result execute_command(const string_t& Command, const string_t& Arguments) = 0;
 
 protected:
 	icommand_node() {}
-	icommand_node(const icommand_node&) {}
+	icommand_node(const icommand_node& Other) : iunknown(Other) {}
 	icommand_node& operator=(const icommand_node&) { return *this; }
 	virtual ~icommand_node() {}
 };

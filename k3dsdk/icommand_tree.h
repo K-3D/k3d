@@ -61,7 +61,7 @@ public:
 
 protected:
 	icommand_tree() {}
-	icommand_tree(const icommand_tree&) {}
+	icommand_tree(const icommand_tree& Other) : iunknown(Other) {}
 	icommand_tree& operator=(const icommand_tree&) { return *this; }
 	virtual ~icommand_tree() {}
 };

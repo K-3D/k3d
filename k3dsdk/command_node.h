@@ -36,7 +36,7 @@ class command_node :
 public:
 	virtual ~command_node();
 
-	const result execute_command(const string_t& Command, const string_t& Arguments);
+	result execute_command(const string_t& Command, const string_t& Arguments);
 
 	/// Returns the location of a command node within the command tree as a filesystem-like absolute path
 	static const string_t path(icommand_node& Node);

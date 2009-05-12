@@ -44,7 +44,7 @@ public:
 
 protected:
 	idocument_plugin_factory() {}
-	idocument_plugin_factory(const idocument_plugin_factory&) {}
+	idocument_plugin_factory(const idocument_plugin_factory& Other) : iunknown(Other) {}
 	idocument_plugin_factory& operator=(const idocument_plugin_factory&) { return *this; }
 	virtual ~idocument_plugin_factory() {}
 };
