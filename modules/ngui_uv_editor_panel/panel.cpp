@@ -45,7 +45,6 @@
 #include <k3dsdk/ngui/basic_input_model.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/enumeration_chooser.h>
-#include <k3dsdk/ngui/menubar.h>
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/properties.h>

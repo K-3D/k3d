@@ -47,7 +47,6 @@
 #include <k3dsdk/application.h>
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/command_node.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/iapplication.h>

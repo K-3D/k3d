@@ -89,9 +89,6 @@ void control::show_menu(const bool UserAction)
 	m_show_connected = 0;
 	m_menu.reset(new Gtk::Menu());
 
-	// Build node path for tutorial recording
-	const std::string node_name = m_data->property().property_name();
-
 	// If the property's connected ...
 	k3d::iproperty* const dependency = m_data->document().document().pipeline().dependency(m_data->property());
 	if(dependency)

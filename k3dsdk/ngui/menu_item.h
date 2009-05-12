@@ -40,7 +40,7 @@ namespace menu_item
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-/// Provides a standard button control that is interactive (can participate in tutorials and macros)
+/// Provides a standard menu item control
 class control :
         public Gtk::MenuItem,
 	public ui_component

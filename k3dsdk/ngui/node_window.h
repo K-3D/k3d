@@ -41,7 +41,7 @@ namespace ngui
 ///////////////////////////////////////////////////////////////////////////////
 // node_window
 
-/// Provides a standard node-level window that is interactive (can participate in tutorials and macros)
+/// Provides a standard node-level window
 class node_window :
         public Gtk::Window,
 	public ui_component

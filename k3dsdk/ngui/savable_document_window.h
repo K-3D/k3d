@@ -42,7 +42,7 @@ class document_state;
 ///////////////////////////////////////////////////////////////////////////////
 // savable_document_window
 
-/// Provides a standard document-level window that is interactive (can participate in tutorials and macros)
+/// Provides a standard document-level window
 class savable_document_window :
         public Gtk::Window,
 	public ui_component,

@@ -34,7 +34,6 @@
 #include "image_toggle_button.h"
 #include "main_document_window.h"
 #include "menu_item.h"
-#include "menubar.h"
 #include "menus.h"
 #include "merge_nodes.h"
 #include "messages.h"
@@ -43,7 +42,6 @@
 #include "render.h"
 #include "savable_document_window.h"
 #include "scripting.h"
-#include "statusbar.h"
 #include "target.h"
 #include "toolbar.h"
 #include "transform.h"
@@ -109,10 +107,12 @@
 #include <gtkmm/frame.h>
 #include <gtkmm/handlebox.h>
 #include <gtkmm/menu.h>
+#include <gtkmm/menubar.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/paned.h>
 #include <gtkmm/separatortoolitem.h>
 #include <gtkmm/scrolledwindow.h>
+#include <gtkmm/statusbar.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/textview.h>
 #include <gtkmm/treeview.h>
@@ -212,7 +212,6 @@ class main_document_window :
 public:
 	main_document_window(document_state& DocumentState) :
 		k3d::property_collection(),
-		m_statusbar(),
 		m_maximize_panel(init_name("maximize_panel") + init_label(_("Maximize active panel")) + init_description(_("Maximize active panel (make it the only visible one)")) + init_value(false)),
 		m_hide_unpinned_panels(init_name("hide_unpinned_panels") + init_label(_("Hide unpinned panels")) + init_description(_("Hide/show unpinned panels in main document window")) + init_value(false)),
 		m_fullscreen(init_name("fullscreen") + init_label(_("Fullscreen")) + init_description(_("Fullscreen mode for main document window")) + init_value(false)),
@@ -244,7 +243,7 @@ public:
 		m_document_state.push_status_message_signal().connect(sigc::mem_fun(*this, &main_document_window::on_push_status_message));
 		m_document_state.pop_status_message_signal().connect(sigc::mem_fun(*this, &main_document_window::on_pop_status_message));
 
-		menubar::control* const menubar = new menubar::control();
+		Gtk::MenuBar* const menubar = new Gtk::MenuBar();
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), *manage(create_file_menu())));
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Edit"), *manage(create_edit_menu())));
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Select"), *manage(create_select_menu())));
@@ -2864,7 +2863,7 @@ private:
 	/// Stores the Edit > Redo All menu item
 	std::auto_ptr<image_menu_item::control> m_redo_all_menu_item;
 	/// Main status bar for the window
-	statusbar::control m_statusbar;
+	Gtk::Statusbar m_statusbar;
 	/// Set to true iff current panel was maximized
 	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) m_maximize_panel;
 	/// Set to true iff unpinned panels are hidden

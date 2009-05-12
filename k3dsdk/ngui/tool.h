@@ -24,7 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/command_node.h>
 #include <k3dsdk/vectors.h>
 
 #include <gdk/gdkevents.h>
@@ -47,11 +46,8 @@ namespace viewport { class control; }
 // tool
 
 /// Abstract base class for Tools - objects that generate state changes based on user interaction with viewports
-class tool :
-	public k3d::command_node
+class tool
 {
-	typedef k3d::command_node base;
-
 public:
 	virtual ~tool();
 

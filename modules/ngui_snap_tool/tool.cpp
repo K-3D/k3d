@@ -70,7 +70,8 @@ namespace snap
 
 /// Interactive tool that provides "snappable" transformations for objects
 class tool :
-	public k3d::ngui::tool
+	public k3d::ngui::tool,
+	public k3d::iunknown
 {
 public:
 	tool();

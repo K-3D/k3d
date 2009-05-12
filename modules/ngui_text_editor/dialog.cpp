@@ -40,7 +40,6 @@
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/ngui/image_menu_item.h>
 #include <k3dsdk/ngui/menu_item.h>
-#include <k3dsdk/ngui/menubar.h>
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/scripting.h>
 #include <k3dsdk/ngui/toolbar.h>

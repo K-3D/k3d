@@ -18,8 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Implements functions and helpers for simulating user input and driving interactive tutorials
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "collapsible_frame.h"
@@ -42,7 +41,6 @@
 #include <gtkmm/combobox.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/menu.h>
-#include <gtkmm/menubar.h>
 #include <gtkmm/menuitem.h>
 #include <gtkmm/menushell.h>
 #include <gtkmm/notebook.h>

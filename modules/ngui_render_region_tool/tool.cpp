@@ -191,7 +191,8 @@ public:
 
 /// User-interface tool that provides interactive controls for cropped rendering
 class tool :
-	public k3d::ngui::tool
+	public k3d::ngui::tool,
+	public k3d::iunknown
 {
 public:
 	tool() :

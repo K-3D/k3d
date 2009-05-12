@@ -39,7 +39,7 @@ namespace toolbar
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-/// Provides a standard toolbar control that is interactive (can participate in tutorials and macros)
+/// Provides a standard toolbar control
 class control :
         public Gtk::VBox,
 	public ui_component

@@ -201,7 +201,8 @@ struct implementation
 
 /// User-interface tool that provides interactive node parenting
 class tool :
-	public k3d::ngui::tool
+	public k3d::ngui::tool,
+	public k3d::iunknown
 {
 public:
 	tool() :

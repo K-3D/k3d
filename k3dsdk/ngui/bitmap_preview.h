@@ -21,8 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares the bitmap_preview control, which provides a standard MVC UI for bitmap data that supports tutorials, undo/redo, etc.
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "ui_component.h"
