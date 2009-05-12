@@ -31,7 +31,6 @@
 #include "document_window.h"
 #include "icons.h"
 #include "image_toggle_button.h"
-#include "interactive.h"
 #include "panel.h"
 #include "panel_frame.h"
 #include "render.h"
@@ -231,7 +230,6 @@ void control::mount_panel(const k3d::string_t& Type, bool RequestCamera)
 
 void control::on_mount_panel(const k3d::string_t& Type)
 {
-	record_command("mount", Type);
 	mount_panel(Type);
 }
 
@@ -389,23 +387,6 @@ const unsigned long control::index(const k3d::string_t& PanelType)
 
 	k3d::log() << error << k3d_file_reference << ": error looking-up panel [" << PanelType << "]" << std::endl;
 	return 0;
-}
-
-const k3d::icommand_node::result control::execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
-{
-	if(Command == "float")
-	{
-		float_panel();
-		return RESULT_CONTINUE;
-	}
-
-	if(Command == "mount")
-	{
-		interactive::select_row(m_panel_type, m_model->get_iter(Gtk::TreePath(k3d::string_cast(index(Arguments)))));
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
 }
 
 } // namespace panel_frame

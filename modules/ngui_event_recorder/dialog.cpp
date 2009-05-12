@@ -23,8 +23,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_tree.h>
-#include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/result.h>
@@ -75,9 +73,7 @@ public:
 	dialog() :
 		m_stream(k3d::log())
 	{
-		k3d::command_tree().add(*this, "event_recorder");
-
-		Gtk::Label* const label = new Gtk::Label(_("Recording GTK+ events and K-3D commands to stderr ...\nClose window to cancel recording"));
+		Gtk::Label* const label = new Gtk::Label(_("Recording GTK+ events to stderr ...\nClose window to cancel recording"));
 		add(*Gtk::manage(label));
 
 		set_border_width(10);
@@ -85,21 +81,12 @@ public:
 		set_role("event_recorder");
 		show_all();
 
-		k3d::command_tree().command_signal().connect(sigc::mem_fun(*this, &dialog::on_command));
 		gdk_event_handler_set(raw_on_gdk_event, this, NULL);
 	}
 
 	~dialog()
 	{
 		gdk_event_handler_set(GdkEventFunc(gtk_main_do_event), NULL, NULL);
-	}
-
-	void on_command(k3d::icommand_node& Node, const k3d::icommand_node::type Type, const std::string& Command, const std::string& Arguments)
-	{
-		// Sanity checks ...
-		return_if_fail(Command.size());
-
-		m_stream << "command: " << k3d::command_node::path(Node) << " " << Command << " " << Arguments << std::endl;
 	}
 
 	void on_gdk_event(const GdkEvent& Event)

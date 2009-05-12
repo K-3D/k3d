@@ -22,7 +22,6 @@
 */
 
 #include "entry.h"
-#include "interactive.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/command_tree.h>
@@ -156,19 +155,6 @@ control::~control()
 	delete m_implementation;
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "set_value")
-	{
-		interactive::set_text(*this, Arguments);
-		select_region(0, 0);
-		on_set_value();
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 bool control::on_focus_out_event(GdkEventFocus* Event)
 {
 	on_set_value();
@@ -187,9 +173,6 @@ void control::on_set_value()
 	const k3d::string_t new_value = get_text();
 	if(new_value == m_implementation->m_model->value())
 		return;
-
-	// Record the command for posterity (tutorials) ...
-	record_command("set_value", new_value);
 
 	// Turn this into an undo/redo -able event ...
 	if(m_implementation->m_state_recorder)

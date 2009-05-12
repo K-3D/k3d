@@ -29,10 +29,8 @@
 #include <gtkmm/targetlist.h>
 #include <gtk/gtkmain.h>
 
-#include "command_arguments.h"
 #include "document_state.h"
 #include "icons.h"
-#include "interactive.h"
 #include "messages.h"
 #include "property_widget.h"
 #include "utility.h"
@@ -73,66 +71,6 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 
 control::~control()
 {
-}
-
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	try
-	{
-		Gtk::Widget* const widget = dynamic_cast<Gtk::Widget*>(this);
-		return_val_if_fail(widget, RESULT_ERROR);
-
-		if(Command == "show_connected")
-		{
-			interactive::move_pointer(*widget);
-			show_menu(false);
-
-			return_val_if_fail(m_show_connected, RESULT_ERROR);
-			interactive::activate(*m_show_connected);
-
-			return RESULT_CONTINUE;
-		}
-		else if(Command == "connect_to")
-		{
-			command_arguments arguments(Arguments);
-			k3d::inode* const to_node = arguments.get_node(m_data->document().document(), "node");
-			return_val_if_fail(to_node, RESULT_ERROR);
-
-			const std::string property_name = arguments.get_string("property");
-			k3d::iproperty* const to_property = k3d::property::get(*to_node, property_name);
-			if(!to_property)
-			{
-				k3d::log() << error << "node [" << to_node->name() << "] has no property [" << property_name << "]" << std::endl;
-				return RESULT_ERROR;
-			}
-
-			interactive::move_pointer(*widget);
-			show_menu(false);
-
-			Gtk::MenuItem* const menu_item = m_menu_items[to_property];
-			return_val_if_fail(menu_item, RESULT_ERROR);
-			interactive::activate(*menu_item);
-
-			return RESULT_CONTINUE;
-		}
-		else if(Command == "disconnect")
-		{
-			interactive::move_pointer(*widget);
-			show_menu(false);
-
-			return_val_if_fail(m_disconnect, RESULT_ERROR);
-			interactive::activate(*m_disconnect);
-
-			return RESULT_CONTINUE;
-		}
-	}
-	catch(std::exception& e)
-	{
-		k3d::log() << error << e.what() << std::endl;
-		return RESULT_ERROR;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
 }
 
 bool control::button_press_event(GdkEventButton* Event)
@@ -239,7 +177,6 @@ bool control::button_release_event(GdkEventButton* Event)
 
 void control::on_show_connected(k3d::inode* Node)
 {
-	record_command("show_connected");
 	show_connected(Node);
 }
 
@@ -251,11 +188,6 @@ void control::show_connected(k3d::inode* Node)
 
 void control::on_connect_to(k3d::iproperty* Property)
 {
-	command_arguments arguments;
-	arguments.append("node", Property->property_node());
-	arguments.append("property", Property->property_name());
-	record_command("connect_to", arguments);
-
 	k3d::record_state_change_set changeset(m_data->document().document(), _("Connect Properties"), K3D_CHANGE_SET_CONTEXT);
 	connect_to(Property);
 }
@@ -280,8 +212,6 @@ void control::connect_to(k3d::iproperty* Property)
 
 void control::on_disconnect(k3d::inode* Node)
 {
-	record_command("disconnect");
-
 	k3d::record_state_change_set changeset(m_data->document().document(), m_data->change_message + " Disconnect", K3D_CHANGE_SET_CONTEXT);
 	disconnect(Node);
 }

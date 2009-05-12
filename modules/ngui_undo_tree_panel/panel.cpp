@@ -473,8 +473,6 @@ public:
 
 		m_implementation = new detail::implementation(DocumentState, *this);
 
-		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
-		
 		m_implementation->m_undo_button->signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 		m_implementation->m_redo_button->signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 		m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);

@@ -85,10 +85,6 @@ public:
 	control(k3d::icommand_node& Parent, const std::string& Name, imodel* const Model, k3d::istate_recorder* StateRecorder);
 	~control();
 
-/*
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-*/
-
 private:
 	/// Called to modify the current set of nodes
 	void on_edit();

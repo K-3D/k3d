@@ -22,7 +22,6 @@
 */
 
 #include "file_chooser_dialog.h"
-#include "interactive.h"
 #include "script_button.h"
 #include "utility.h"
 #include "widget_manip.h"
@@ -212,11 +211,6 @@ void control::on_edit()
 		if(Gtk::Window* const top_level = dynamic_cast<Gtk::Window*>(get_toplevel()))
 			window->set_transient_for(*top_level);
 	}
-}
-
-const icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	return ui_component::execute_command(Command, Arguments);
 }
 
 } // namespace script_button

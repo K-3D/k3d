@@ -23,7 +23,6 @@
 
 #include "angle_axis.h"
 #include "button.h"
-#include "interactive.h"
 #include "spin_button.h"
 #include "widget_manip.h"
 
@@ -149,8 +148,6 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	m_data(Data),
 	m_reset_button(new Gtk::Button(_("Reset")))
 {
-	k3d::command_tree().add(*this, Name, &Parent);
-
 	spin_button::control* const x = new spin_button::control(*this, "x", new spin_button_model(*m_data, 0), m_data->state_recorder);
 	spin_button::control* const y = new spin_button::control(*this, "y", new spin_button_model(*m_data, 1), m_data->state_recorder);
 	spin_button::control* const z = new spin_button::control(*this, "z", new spin_button_model(*m_data, 2), m_data->state_recorder);
@@ -167,22 +164,9 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	attach(*Gtk::manage(m_reset_button << connect_button(sigc::mem_fun(*this, &control::on_reset))), 2, 3, 1, 2);
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "reset")
-	{
-		interactive::activate(*m_reset_button);
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 void control::on_reset()
 {
 	return_if_fail(m_data.get());
-
-	record_command("reset");
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)

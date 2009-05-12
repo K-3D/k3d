@@ -96,8 +96,6 @@ class control :
 public:
 	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-
 private:
 	/// Stores a reference to the underlying data object
 	std::auto_ptr<idata_proxy> m_data;

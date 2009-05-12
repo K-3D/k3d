@@ -93,8 +93,6 @@ public:
 	control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder = 0);
 	~control();
 
-	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments);
-
 private:
 	/// Called whenever the underlying data changes
 	void on_data_changed(k3d::iunknown*);

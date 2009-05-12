@@ -21,7 +21,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "interactive.h"
 #include "toggle_button.h"
 #include "utility.h"
 
@@ -110,20 +109,6 @@ control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* 
 	attach();
 }
 
-const k3d::icommand_node::result control::execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
-{
-	if(Command == "value")
-	{
-		const k3d::bool_t new_value = Arguments == "true" ? true : false;
-		if(new_value != get_active())
-			interactive::activate(*this);
-
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 void control::attach()
 {
 	// Update the display ...
@@ -160,9 +145,6 @@ void control::on_toggled()
 		// If the value hasn't changed, we're done ...
 		if(new_value != m_model->value())
 		{
-			// Record the command for posterity (tutorials) ...
-			record_command("value", new_value ? "true" : "false");
-
 			// Turn this into an undo/redo -able event ...
 			if(m_state_recorder)
 				m_state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);

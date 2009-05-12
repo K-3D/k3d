@@ -111,8 +111,6 @@ class control :
 public:
 	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-
 private:
 	/// Called when the control loses the keyboard focus
 	bool on_focus_out_event(GdkEventFocus* Event);

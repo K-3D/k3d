@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <string>
@@ -34,11 +34,6 @@ namespace ngui
 
 namespace options
 {
-
-/// Returns the user's tutorial speed
-const double tutorial_speed();
-/// Sets the user's tutorial speed
-void set_tutorial_speed(const double Speed);
 
 /// Returns true iff the given nag message is enabled
 const bool nag(const std::string& Type);

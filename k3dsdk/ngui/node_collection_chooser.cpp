@@ -373,38 +373,8 @@ control::~control()
 	delete m_implementation;
 }
 
-/*
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "select")
-	{
-		interactive::activate(*m_menu_button);
-		handle_pending_events();
-		return_val_if_fail(m_menu_item_select.count(Arguments), RESULT_ERROR);
-		interactive::activate(*m_menu_item_select[Arguments]);
-		return RESULT_CONTINUE;
-	}
-	else if(Command == "create")
-	{
-		interactive::activate(*m_menu_button);
-		handle_pending_events();
-		return_val_if_fail(m_menu_item_create.count(Arguments), RESULT_ERROR);
-		interactive::activate(*m_menu_item_create[Arguments]);
-		return RESULT_CONTINUE;
-	}
-	else if(Command == "edit")
-	{
-		interactive::activate(*m_edit_button);
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-*/
-
 void control::on_edit()
 {
-	record_command("edit");
 	return_if_fail(m_implementation->m_model.get());
 
 	list_window* const window = new list_window(this, "edit", m_implementation->m_model, m_implementation->m_state_recorder);

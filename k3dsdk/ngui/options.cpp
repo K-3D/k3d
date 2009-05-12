@@ -44,18 +44,6 @@ k3d::xml::element& ngui_element()
 	return k3d::options::tree().safe_element("ngui");
 }
 
-k3d::xml::element& tutorials_element()
-{
-	return ngui_element().safe_element("tutorials");
-}
-
-k3d::xml::element& tutorial_speed_element()
-{
-	const k3d::xml::element match("speed");
-	const k3d::xml::element prototype("speed", "1.0");
-	return tutorials_element().safe_element(match, prototype);
-}
-
 k3d::xml::element& nags_element()
 {
 	return ngui_element().safe_element("nags");
@@ -69,16 +57,6 @@ k3d::xml::element& nag_element(const std::string& Type)
 }
 
 } // namespace detail
-
-const double tutorial_speed()
-{
-	return k3d::from_string<double>(detail::tutorial_speed_element().text, 1.0);
-}
-
-void set_tutorial_speed(const double Speed)
-{
-	detail::tutorial_speed_element().text = k3d::string_cast(Speed);
-}
 
 const bool nag(const std::string& Type)
 {

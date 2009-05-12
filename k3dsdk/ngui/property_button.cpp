@@ -30,7 +30,6 @@
 
 #include "document_state.h"
 #include "icons.h"
-#include "interactive.h"
 #include "menu_item.h"
 #include "messages.h"
 #include "property_button.h"
@@ -71,17 +70,6 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 
 	signal_button_press_event().connect(sigc::mem_fun(*this, &base::button_press_event));
 	signal_button_release_event().connect(sigc::mem_fun(*this, &base::button_release_event));
-}
-
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "activate")
-	{
-		interactive::activate(*this);
-		return RESULT_CONTINUE;
-	}
-
-	return base::execute_command(Command, Arguments);
 }
 
 void control::data_changed()

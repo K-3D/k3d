@@ -148,8 +148,6 @@ public:
 
 		m_implementation = new detail::implementation(DocumentState, *this);
 
-		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
-
 		m_implementation->m_scrolled_window.signal_button_press_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 		
 		pack_start(m_implementation->m_vbox, Gtk::PACK_EXPAND_WIDGET);

@@ -46,7 +46,6 @@
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/keyboard.h>
 #include <k3dsdk/ngui/modifiers.h>
-#include <k3dsdk/ngui/tutorial_message.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/properties.h>
@@ -511,7 +510,6 @@ void snap_tool_detail::lbutton_down(viewport::control& Viewport, const k3d::poin
 void snap_tool_detail::lmb_down_add()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_add";
 
 	m_mouse_down_content = SELECTION_ADD;
 }
@@ -519,7 +517,6 @@ void snap_tool_detail::lmb_down_add()
 void snap_tool_detail::lmb_down_subtract()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_subtract";
 
 	m_mouse_down_content = SELECTION_SUBTRACT;
 }
@@ -527,7 +524,6 @@ void snap_tool_detail::lmb_down_subtract()
 void snap_tool_detail::lmb_down_manipulator(const std::string& ManipulatorName)
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_manipulator_" + ManipulatorName;
 
 	m_abstract_tool.set_manipulator(ManipulatorName);
 	set_motion(MOTION_DRAG);
@@ -538,7 +534,6 @@ void snap_tool_detail::lmb_down_manipulator(const std::string& ManipulatorName)
 void snap_tool_detail::lmb_down_selected()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_selected";
 
 	m_mouse_down_content = SELECTED_OBJECT;
 }
@@ -546,7 +541,6 @@ void snap_tool_detail::lmb_down_selected()
 void snap_tool_detail::lmb_down_deselected()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_deselected";
 
 	m_mouse_down_content = DESELECTED_OBJECT;
 
@@ -559,7 +553,6 @@ void snap_tool_detail::lmb_down_deselected()
 void snap_tool_detail::lmb_down_nothing()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_nothing";
 
 	m_mouse_down_content = NOTHING;
 }
@@ -598,7 +591,6 @@ void snap_tool_detail::lbutton_click(const viewport::control& Viewport, const k3
 // LMB click actions
 void snap_tool_detail::lmb_click_add()
 {
-	m_tutorial_action = "lmb_click_add";
 
 	// Shift key modifier always adds to the selection
 	if(k3d::selection::get_node(m_mouse_down_selection))
@@ -611,7 +603,6 @@ void snap_tool_detail::lmb_click_add()
 
 void snap_tool_detail::lmb_click_subtract()
 {
-	m_tutorial_action = "lmb_click_subtract";
 
 	// Control key modifier always adds to the selection
 	if(k3d::selection::get_node(m_mouse_down_selection))
@@ -624,7 +615,6 @@ void snap_tool_detail::lmb_click_subtract()
 
 void snap_tool_detail::lmb_click_replace()
 {
-	m_tutorial_action = "lmb_click_replace";
 
 	// Replace selection
 	m_document_state.deselect_all();
@@ -638,7 +628,6 @@ void snap_tool_detail::lmb_click_replace()
 
 void snap_tool_detail::lmb_click_start_motion(const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_click_start_motion";
 
 	disconnect_navigation_input_model();
 
@@ -650,7 +639,6 @@ void snap_tool_detail::lmb_click_start_motion(const k3d::point2& Coordinates)
 
 void snap_tool_detail::lmb_click_stop_motion()
 {
-	m_tutorial_action = "lmb_click_stop_motion";
 
 	const std::string label = complete_mouse_move();
 	k3d::finish_state_change_set(m_document, label, K3D_CHANGE_SET_CONTEXT);
@@ -662,7 +650,6 @@ void snap_tool_detail::lmb_click_stop_motion()
 
 void snap_tool_detail::lmb_click_deselect_all()
 {
-	m_tutorial_action = "lmb_click_deselect_all";
 
 	// Deselect all
 	m_document_state.deselect_all();
@@ -695,7 +682,6 @@ void snap_tool_detail::lbutton_start_drag(viewport::control& Viewport, const k3d
 // LMB start drag actions
 void snap_tool_detail::lmb_start_drag_start_motion(const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_start_drag_start_motion";
 
 	m_off_screen_offset = k3d::point2(0, 0);
 
@@ -705,7 +691,6 @@ void snap_tool_detail::lmb_start_drag_start_motion(const k3d::point2& Coordinate
 
 void snap_tool_detail::lmb_start_drag_box_select(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_start_drag_box_select";
 
 	set_motion(MOTION_BOX_SELECT);
 	m_box_selection = k3d::rectangle(Coordinates[0], Coordinates[0], Coordinates[1], Coordinates[1]);
@@ -714,7 +699,6 @@ void snap_tool_detail::lmb_start_drag_box_select(viewport::control& Viewport, co
 
 void snap_tool_detail::lmb_drag_box_select(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_drag_box_select";
 
 	on_box_select_motion(Viewport, Coordinates);
 }
@@ -732,7 +716,6 @@ void snap_tool_detail::lbutton_end_drag(viewport::control& Viewport, const k3d::
 // LMB end drag actions
 void snap_tool_detail::lmb_end_drag_stop_motion()
 {
-	m_tutorial_action = "lmb_end_drag_stop_motion";
 
 	const std::string label = complete_mouse_move();
 	k3d::finish_state_change_set(m_document, label, K3D_CHANGE_SET_CONTEXT);
@@ -742,7 +725,6 @@ void snap_tool_detail::lmb_end_drag_stop_motion()
 
 void snap_tool_detail::lmb_end_drag_box_select(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_end_drag_box_select";
 
 	draw_rubber_band(Viewport);
 
@@ -782,7 +764,6 @@ void snap_tool_detail::mbutton_click(viewport::control& Viewport, const k3d::poi
 
 void snap_tool_detail::mmb_click_toggle_manipulators_visibility()
 {
-	m_tutorial_action = "mmb_click_toggle_manipulators_visibility";
 
 	// Toggle the visible state of the manipulators
 	m_visible_manipulators.set_value(!m_visible_manipulators.internal_value());
@@ -792,7 +773,6 @@ void snap_tool_detail::mmb_click_toggle_manipulators_visibility()
 
 void snap_tool_detail::mmb_click_manipulators_next_selection()
 {
-	m_tutorial_action = "mmb_click_manipulators_next_selection";
 
 	// Show manipulators on the next selection
 	m_current_target = m_targets.size() ? (m_current_target + 1) % m_targets.size() : 0;
@@ -802,7 +782,6 @@ void snap_tool_detail::mmb_click_manipulators_next_selection()
 
 void snap_tool_detail::mmb_click_switch_coordinate_system()
 {
-	m_tutorial_action = "mmb_click_switch_coordinate_system";
 
 	// Switch coordinate system between global and local modes
 	switch(m_coordinate_system.internal_value())
@@ -822,7 +801,6 @@ void snap_tool_detail::mmb_click_switch_coordinate_system()
 
 void snap_tool_detail::mmb_click_next_constraint(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "mmb_click_next_constraint";
 
 	// Set next constraint
 	m_abstract_tool.update_constraint(Viewport, Coordinates);
@@ -864,7 +842,6 @@ void snap_tool_detail::rbutton_click(const viewport::control& Viewport, const k3
 void snap_tool_detail::rmb_click_selection_tool()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "rmb_click_selection_tool";
 
 	m_document_state.set_active_tool(m_document_state.selection_tool());
 
@@ -875,7 +852,6 @@ void snap_tool_detail::rmb_click_selection_tool()
 
 void snap_tool_detail::rmb_click_cancel_move()
 {
-	m_tutorial_action = "rmb_click_cancel_move";
 
 	cancel_mouse_move();
 

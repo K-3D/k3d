@@ -51,8 +51,8 @@
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/ilight_ri.h>
 #include <k3dsdk/ilight_shader_ri.h>
-#include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_gl.h>
+#include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_ri.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iproperty.h>
@@ -65,7 +65,6 @@
 #include <k3dsdk/metadata.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
-#include <k3dsdk/ngui/command_arguments.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/entry.h>
 #include <k3dsdk/ngui/hotkey_cell_renderer_text.h>

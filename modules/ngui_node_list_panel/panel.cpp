@@ -43,7 +43,6 @@
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
-#include <k3dsdk/ngui/command_arguments.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
 #include <k3dsdk/ngui/icons.h>
@@ -375,131 +374,6 @@ public:
 		schedule_update();
 	}
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		try
-		{
-			if(Command == "rename")
-			{
-				command_arguments arguments(Arguments);
-
-				k3d::inode* const node = arguments.get_node(m_document_state.document(), "node");
-				return_val_if_fail(node, k3d::icommand_node::RESULT_ERROR);
-				const std::string new_name = arguments.get_string("newname");
-
-				Gtk::TreeIter row;
-				return_val_if_fail(get_row(node, row), k3d::icommand_node::RESULT_ERROR);
-
-				interactive::set_text(m_view, *m_view.get_column(1), *m_view.get_column_cell_renderer(1), row, new_name);
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "select")
-			{
-				command_arguments arguments(Arguments);
-
-				const k3d::xml::element selection = arguments.get_element("selection");
-				k3d::inode* const context_menu_node = arguments.get_node(m_document_state.document(), "context_menu");
-
-				std::set<k3d::inode*> new_selection;
-				for(size_t i = 0; i != selection.children.size(); ++i)
-				{
-					if(selection.children[i].name != "node")
-						continue;
-
-					const std::string name = selection.children[i].text;
-
-					new_selection.insert(m_document_state.document().unique_node_names().node(name));
-				}
-
-				// Special-case selection of a single node when displaying the context menu
-				if(1 == new_selection.size() && *new_selection.begin() == context_menu_node)
-				{
-					Gtk::TreeIter row;
-					return_val_if_fail(get_row(*new_selection.begin(), row), k3d::icommand_node::RESULT_ERROR);
-
-					interactive::move_pointer(m_view, *m_view.get_column(1), row);
-					m_view.get_selection()->unselect_all();
-					m_view.get_selection()->select(row);
-
-					m_document_state.popup_context_menu();
-				}
-				// Special-case selection of a single node without the context menu
-				else if(1 == new_selection.size())
-				{
-					Gtk::TreeIter row;
-					return_val_if_fail(get_row(*new_selection.begin(), row), k3d::icommand_node::RESULT_ERROR);
-
-					interactive::move_pointer(m_view, *m_view.get_column(1), row);
-					m_view.get_selection()->unselect_all();
-					m_view.get_selection()->select(row);
-				}
-				else
-				{
-					const Gtk::TreeNodeChildren rows = m_model->children();
-
-					// Deselect nodes that shouldn't be selected but are ...
-					for(Gtk::TreeIter row = rows.begin(); row != rows.end(); ++row)
-					{
-						k3d::inode* const row_node = get_node(row);
-						if(row_node == context_menu_node)
-							continue;
-
-						if(!new_selection.count(row_node) && m_view.get_selection()->is_selected(row))
-						{
-							interactive::move_pointer(m_view, *m_view.get_column(1), row);
-							m_view.get_selection()->unselect(row);
-						}
-					}
-
-					// Deselect nodes that should be selected but aren't ...
-					for(Gtk::TreeIter row = rows.begin(); row != rows.end(); ++row)
-					{
-						k3d::inode* const row_node = get_node(row);
-						if(row_node == context_menu_node)
-							continue;
-
-						if(new_selection.count(row_node) && !m_view.get_selection()->is_selected(row))
-						{
-							interactive::move_pointer(m_view, *m_view.get_column(1), row);
-							m_view.get_selection()->select(row);
-						}
-					}
-
-					// Handle the context menu row last (whether selected or deselected) ...
-					if(context_menu_node)
-					{
-						Gtk::TreeIter row;
-						return_val_if_fail(get_row(context_menu_node, row), k3d::icommand_node::RESULT_ERROR);
-
-						interactive::move_pointer(m_view, *m_view.get_column(1), row);
-
-						if(new_selection.count(context_menu_node) && !m_view.get_selection()->is_selected(row))
-							m_view.get_selection()->select(row);
-						else if(!new_selection.count(context_menu_node) && m_view.get_selection()->is_selected(row))
-							m_view.get_selection()->unselect(row);
-
-						m_document_state.popup_context_menu();
-					}
-				}
-
-				// Give the UI a chance to catch-up (in particular, ensure that other panels are completely synchronized before we return)
-				handle_pending_events();
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << error << e.what() << std::endl;
-			return k3d::icommand_node::RESULT_ERROR;
-		}
-
-		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
-	}
-
-	typedef sigc::signal<void, const std::string&, const std::string&> command_signal_t;
-	command_signal_t m_command_signal;
-
 	Gtk::ScrolledWindow m_scrolled_window;
 
 	/// Called by the signal system anytime new nodes are added to the document
@@ -618,11 +492,6 @@ public:
 		if(node->name() == NewText)
 			return;
 
-		command_arguments arguments;
-		arguments.append("node", node);
-		arguments.append("newname", NewText);
-		m_command_signal.emit("rename", arguments);
-
 		k3d::record_state_change_set change_set(m_document_state.document(), k3d::string_cast(boost::format(_("Rename node %1%")) % NewText), K3D_CHANGE_SET_CONTEXT);
 		node->set_name(NewText);
 	}
@@ -737,11 +606,6 @@ public:
 				selection.children.push_back(k3d::xml::element("node", m_document_state.document().unique_node_names().name(*node)));
 		}
 
-		command_arguments arguments;
-		arguments.append(selection);
-		arguments.append("context_menu", get_node(m_context_menu_path));
-		m_command_signal.emit("select", arguments);
-
 		if(!m_context_menu_path.empty())
 			m_document_state.popup_context_menu();
 
@@ -850,8 +714,6 @@ public:
 
 		m_implementation = new detail::implementation(DocumentState);
 
-		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
-
 		m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 
 		pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
@@ -876,15 +738,6 @@ public:
 	void set_layout_policy(detail::layout_policy* const Policy)
 	{
 		m_implementation->set_layout_policy(Policy);
-	}
-
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		const k3d::icommand_node::result result = m_implementation->execute_command(Command, Arguments);
-		if(result != RESULT_UNKNOWN_COMMAND)
-			return result;
-
-		return ui_component::execute_command(Command, Arguments);
 	}
 
 	static k3d::iplugin_factory& get_factory()

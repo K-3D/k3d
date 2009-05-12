@@ -95,7 +95,6 @@ public:
 	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
 	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data, const Glib::ustring& label, bool mnemonic = false);
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
 	void on_toggled();
 
 private:

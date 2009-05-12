@@ -55,8 +55,6 @@ public:
 	control(k3d::icommand_node& Parent, const std::string& Name, Gtk::Widget& widget);
 
 	void on_clicked();
-
-	const result execute_command(const std::string& Command, const std::string& Arguments);
 };
 
 } // namespace button

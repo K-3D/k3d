@@ -24,7 +24,6 @@
 #include "application_window.h"
 #include "button.h"
 #include "color_chooser.h"
-#include "interactive.h"
 #include "utility.h"
 #include "widget_manip.h"
 
@@ -89,20 +88,6 @@ public:
 		show_all();
 	}
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		if(Command == "set_value")
-		{
-			interactive::show(m_color_selection);
-			interactive::move_pointer(m_color_selection);
-			m_color_selection.set_current_color(convert(k3d::from_string<k3d::color>(Arguments, k3d::color(1.0, 1.0, 1.0))));
-
-			return RESULT_CONTINUE;
-		}
-
-		return base::execute_command(Command, Arguments);
-	}
-
 private:
 	void on_color_changed()
 	{
@@ -111,8 +96,6 @@ private:
 		const k3d::color color = convert(m_color_selection.get_current_color());
 		if(color == m_data->value())
 			return;
-
-		record_command("set_value", k3d::string_cast(color));
 
 		if(m_data->state_recorder)
 			m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
@@ -230,17 +213,6 @@ control::~control()
 	m_deleted_signal.emit();
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "activate")
-	{
-		interactive::activate(*this);
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 bool control::on_redraw()
 {
 	return_val_if_fail(m_data.get(), false);
@@ -257,8 +229,6 @@ bool control::on_redraw()
 
 void control::on_clicked()
 {
-	record_command("activate");
-
 	return_if_fail(m_data.get());
 
 	detail::color_selection_dialog* const color_selection = new detail::color_selection_dialog(*this, "selection", m_data->clone());

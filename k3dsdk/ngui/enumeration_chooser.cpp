@@ -23,7 +23,6 @@
 */
 
 #include "enumeration_chooser.h"
-#include "interactive.h"
 #include "options.h"
 #include "utility.h"
 
@@ -183,42 +182,6 @@ control::control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* 
 	on_data_changed(0);
 
 	signal_changed().connect(sigc::mem_fun(*this, &control::on_list_changed));
-}
-
-const k3d::icommand_node::result control::execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
-{
-	/** \todo Improve the tutorial interactivity of this thing */
-	if(Command == "value")
-	{
-		const double speed = options::tutorial_speed();
-		return_val_if_fail(speed, RESULT_ERROR);
-
-		interactive::show(*this);
-		interactive::move_pointer(*this);
-
-		popup();
-
-		const Gtk::TreeNodeChildren children = m_implementation->m_list_model->children();
-		for(Gtk::TreeNodeChildren::const_iterator child = children.begin(); child != children.end(); ++child)
-		{
-			const k3d::string_t child_value = (*child)[m_implementation->m_columns.value];
-
-			if(Arguments == child_value)
-			{
-				set_active(child);
-
-				non_blocking_sleep(0.5 / speed);
-				popdown();
-
-				return RESULT_CONTINUE;
-			}
-		}
-
-		k3d::log() << error << "Enumeration value [" << Arguments << "] does not match any allowed values" << std::endl;
-		return RESULT_ERROR;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
 }
 
 control::~control()

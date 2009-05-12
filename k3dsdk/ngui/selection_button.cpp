@@ -23,7 +23,6 @@
 */
 
 #include "selection_button.h"
-#include "interactive.h"
 #include "utility.h"
 
 #include <k3d-i18n-config.h>
@@ -117,32 +116,8 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 		m_data->changed_signal().connect(sigc::mem_fun(*this, &control::update));
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "select_all")
-	{
-		interactive::activate(*m_select_all_button);
-		return RESULT_CONTINUE;
-	}
-	else if(Command == "deselect_all")
-	{
-		interactive::activate(*m_deselect_all_button);
-		return RESULT_CONTINUE;
-	}
-	else if(Command == "select_null")
-	{
-		interactive::activate(*m_select_null_button);
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 void control::on_select_all()
 {
-	// Record the command for posterity (tutorials) ...
-	record_command("select_all");
-
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
 		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
@@ -157,9 +132,6 @@ void control::on_select_all()
 
 void control::on_deselect_all()
 {
-	// Record the command for posterity (tutorials) ...
-	record_command("deselect_all");
-
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
 		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
@@ -174,9 +146,6 @@ void control::on_deselect_all()
 
 void control::on_select_null()
 {
-	// Record the command for posterity (tutorials) ...
-	record_command("select_null");
-
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
 		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);

@@ -842,7 +842,6 @@ public:
 	}
 
 	Gtk::HBox m_container;
-	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
 	
 	document_state& m_document_state;
 	timeline m_timeline;
@@ -911,8 +910,6 @@ public:
 
 		m_implementation = new detail::implementation(DocumentState, Parent);
 		
-		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
-
 		pack_start(m_implementation->m_container, Gtk::PACK_EXPAND_WIDGET);
 		show_all();
 	}

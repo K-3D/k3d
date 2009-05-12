@@ -25,15 +25,12 @@
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
-#include "command_arguments.h"
 #include "document_state.h"
 #include "icons.h"
-#include "interactive.h"
 #include "keyboard.h"
 #include "rubber_band.h"
 #include "selection.h"
 #include "selection_input_model.h"
-#include "tutorial_message.h"
 #include "utility.h"
 #include "viewport.h"
 
@@ -137,11 +134,6 @@ struct selection_input_model::implementation :
 
 			case SELECT:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("selection", m_start_selection);
-				m_command_signal.emit("pick_select", arguments);
-
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Select"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.select(m_start_selection);
 				break;
@@ -149,11 +141,6 @@ struct selection_input_model::implementation :
 
 			case DESELECT:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("selection", m_start_selection);
-				m_command_signal.emit("pick_deselect", arguments);
-
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect(m_start_selection);
 				break;
@@ -161,11 +148,6 @@ struct selection_input_model::implementation :
 
 			case REPLACE:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("selection", m_start_selection);
-				m_command_signal.emit("pick_replace", arguments);
-
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Replace"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect_all();
 				m_document_state.select(m_start_selection);
@@ -183,10 +165,6 @@ struct selection_input_model::implementation :
 		{
 			case SELECT_NODES:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("deselect_all", arguments);
-
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect All"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect_all();
 				break;
@@ -194,10 +172,6 @@ struct selection_input_model::implementation :
 
 			default:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("node_selection", arguments);
-
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Node Selection"), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.set_selection_mode(SELECT_NODES);
 				break;
@@ -247,11 +221,6 @@ struct selection_input_model::implementation :
 
 			case MOTION_PAINT_SELECT:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("selection", m_start_selection);
-				m_command_signal.emit("start_paint_select", arguments);
-
 				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.select(m_start_selection);
 
@@ -260,11 +229,6 @@ struct selection_input_model::implementation :
 
 			case MOTION_PAINT_DESELECT:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("selection", m_start_selection);
-				m_command_signal.emit("start_paint_deselect", arguments);
-
 				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
 				m_document_state.deselect(m_start_selection);
 
@@ -276,11 +240,6 @@ struct selection_input_model::implementation :
 				m_rubber_band.box = k3d::rectangle(Event.x, Event.x, Event.y, Event.y);
 				m_rubber_band.draw(Viewport);
 
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("box", m_rubber_band.box);
-				m_command_signal.emit("start_rubber_band_replace", arguments);
-
 				break;
 			}
 
@@ -289,11 +248,6 @@ struct selection_input_model::implementation :
 				m_rubber_band.box = k3d::rectangle(Event.x, Event.x, Event.y, Event.y);
 				m_rubber_band.draw(Viewport);
 
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append_viewport_coordinates("box", Viewport, m_rubber_band.box);
-				m_command_signal.emit("start_rubber_band_select", arguments);
-
 				break;
 			}
 
@@ -301,11 +255,6 @@ struct selection_input_model::implementation :
 			{
 				m_rubber_band.box = k3d::rectangle(Event.x, Event.x, Event.y, Event.y);
 				m_rubber_band.draw(Viewport);
-
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("box", m_rubber_band.box);
-				m_command_signal.emit("start_rubber_band_deselect", arguments);
 
 				break;
 			}
@@ -327,20 +276,10 @@ struct selection_input_model::implementation :
 				const k3d::selection::record selection = Viewport.pick_object(coordinates, m_paint_backfacing);
 				if(!m_document_state.is_selected(selection))
 				{
-					command_arguments arguments;
-					arguments.append_viewport_coordinates("mouse", Viewport, Event);
-					arguments.append("timestamp", m_timer.elapsed());
-					arguments.append("selection", selection);
-					m_command_signal.emit("paint_select", arguments);
-
 					m_document_state.select(selection);
 				}
 				else
 				{
-					command_arguments arguments;
-					arguments.append_viewport_coordinates("mouse", Viewport, Event);
-					arguments.append("timestamp", m_timer.elapsed());
-					m_command_signal.emit("paint_motion", arguments);
 				}
 				break;
 			}
@@ -350,20 +289,10 @@ struct selection_input_model::implementation :
 				const k3d::selection::record selection = Viewport.pick_object(coordinates, m_paint_backfacing);
 				if(m_document_state.is_selected(selection))
 				{
-					command_arguments arguments;
-					arguments.append_viewport_coordinates("mouse", Viewport, Event);
-					arguments.append("timestamp", m_timer.elapsed());
-					arguments.append("selection", selection);
-					m_command_signal.emit("paint_deselect", arguments);
-
 					m_document_state.deselect(selection);
 				}
 				else
 				{
-					command_arguments arguments;
-					arguments.append_viewport_coordinates("mouse", Viewport, Event);
-					arguments.append("timestamp", m_timer.elapsed());
-					m_command_signal.emit("paint_motion", arguments);
 				}
 				break;
 			}
@@ -377,11 +306,6 @@ struct selection_input_model::implementation :
 				m_rubber_band.box.bottom = Event.y;
 				m_rubber_band.draw(Viewport);
 
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("timestamp", m_timer.elapsed());
-				arguments.append_viewport_coordinates("box", Viewport, m_rubber_band.box);
-				m_command_signal.emit("rubber_band_motion", arguments);
 				break;
 			}
 		}
@@ -396,18 +320,12 @@ struct selection_input_model::implementation :
 
 			case MOTION_PAINT_SELECT:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("end_paint_select", arguments);
 				k3d::finish_state_change_set(m_document_state.document(), _("Paint Select"), K3D_CHANGE_SET_CONTEXT);
 				break;
 			}
 
 			case MOTION_PAINT_DESELECT:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("end_paint_deselect", arguments);
 				k3d::finish_state_change_set(m_document_state.document(), _("Paint Deselect"), K3D_CHANGE_SET_CONTEXT);
 				break;
 			}
@@ -415,11 +333,6 @@ struct selection_input_model::implementation :
 			case MOTION_RUBBER_BAND_REPLACE:
 			{
 				const k3d::selection::records selection = Viewport.get_object_selectables(m_rubber_band.box, m_rubber_band_backfacing);
-
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("selection", selection);
-				m_command_signal.emit("end_rubber_band_replace", arguments);
 
 				m_rubber_band.draw(Viewport);
 
@@ -433,11 +346,6 @@ struct selection_input_model::implementation :
 			{
 				const k3d::selection::records selection = Viewport.get_object_selectables(m_rubber_band.box, m_rubber_band_backfacing);
 
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("selection", selection);
-				m_command_signal.emit("end_rubber_band_select", arguments);
-
 				m_rubber_band.draw(Viewport);
 
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), K3D_CHANGE_SET_CONTEXT);
@@ -449,11 +357,6 @@ struct selection_input_model::implementation :
 			{
 				const k3d::selection::records selection = Viewport.get_object_selectables(m_rubber_band.box, m_rubber_band_backfacing);
 
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				arguments.append("selection", selection);
-				m_command_signal.emit("end_rubber_band_deselect", arguments);
-
 				m_rubber_band.draw(Viewport);
 
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Deselect"), K3D_CHANGE_SET_CONTEXT);
@@ -462,308 +365,6 @@ struct selection_input_model::implementation :
 			}
 		}
 		m_motion_type = MOTION_NONE;
-	}
-
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		try
-		{
-			if(Command == "pick_select")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::selection::record selection = arguments.get_selection_record(m_document_state.document(), "selection");
-
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Select"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.select(selection);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "pick_deselect")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::selection::record selection = arguments.get_selection_record(m_document_state.document(), "selection");
-
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect(selection);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "pick_replace")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::selection::record selection = arguments.get_selection_record(m_document_state.document(), "selection");
-
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Replace Selection"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect_all();
-				m_document_state.select(selection);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "deselect_all")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect All"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect_all();
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "node_selection")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Node Selection"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.set_selection_mode(SELECT_NODES);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "start_paint_select")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::selection::record selection = arguments.get_selection_record(m_document_state.document(), "selection");
-
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.select(selection);
-
-				m_timer.restart();
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "start_paint_deselect")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::selection::record selection = arguments.get_selection_record(m_document_state.document(), "selection");
-
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect(selection);
-
-				m_timer.restart();
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "paint_motion")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const double timestamp = arguments.get_double("timestamp");
-
-				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "paint_select")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const double timestamp = arguments.get_double("timestamp");
-				const k3d::selection::record selection = arguments.get_selection_record(m_document_state.document(), "selection");
-
-				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
-
-				m_document_state.select(selection);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "paint_deselect")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const double timestamp = arguments.get_double("timestamp");
-				const k3d::selection::record selection = arguments.get_selection_record(m_document_state.document(), "selection");
-
-				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
-
-				m_document_state.deselect(selection);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "end_paint_select")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				interactive::warp_pointer(viewport, mouse);
-
-				k3d::finish_state_change_set(m_document_state.document(), _("Paint Select"), K3D_CHANGE_SET_CONTEXT);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "end_paint_deselect")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				interactive::warp_pointer(viewport, mouse);
-
-				k3d::finish_state_change_set(m_document_state.document(), _("Paint Deselect"), K3D_CHANGE_SET_CONTEXT);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "start_rubber_band_replace")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::rectangle box = arguments.get_viewport_rectangle("box");
-
-				interactive::move_pointer(viewport, mouse);
-				m_rubber_band.box = box;
-				m_rubber_band.draw(viewport);
-
-				m_timer.restart();
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "start_rubber_band_select")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::rectangle box = arguments.get_viewport_rectangle("box");
-
-				interactive::move_pointer(viewport, mouse);
-				m_rubber_band.box = box;
-				m_rubber_band.draw(viewport);
-
-				m_timer.restart();
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "start_rubber_band_deselect")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::rectangle box = arguments.get_viewport_rectangle("box");
-
-				interactive::move_pointer(viewport, mouse);
-				m_rubber_band.box = box;
-				m_rubber_band.draw(viewport);
-
-				m_timer.restart();
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "rubber_band_motion")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const double timestamp = arguments.get_double("timestamp");
-				const k3d::rectangle box = arguments.get_viewport_rectangle("box");
-
-				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
-				m_rubber_band.draw(viewport);
-				m_rubber_band.box = box;
-				m_rubber_band.draw(viewport);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "end_rubber_band_replace")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::selection::records selection = arguments.get_selection_records(m_document_state.document(), "selection");
-
-				interactive::warp_pointer(viewport, mouse);
-				m_rubber_band.draw(viewport);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect_all();
-				m_document_state.select(selection);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "end_rubber_band_select")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::selection::records selection = arguments.get_selection_records(m_document_state.document(), "selection");
-
-				interactive::warp_pointer(viewport, mouse);
-				m_rubber_band.draw(viewport);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.select(selection);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "end_rubber_band_deselect")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::selection::records selection = arguments.get_selection_records(m_document_state.document(), "selection");
-
-				interactive::warp_pointer(viewport, mouse);
-				m_rubber_band.draw(viewport);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Deselect"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect(selection);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << k3d_file_reference << ": caught exception: " << e.what() << std::endl;
-			return k3d::icommand_node::RESULT_ERROR;
-		}
-
-		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
 	}
 
 	/// Stores a reference to the owning document
@@ -781,8 +382,6 @@ struct selection_input_model::implementation :
 		MOTION_RUBBER_BAND_SELECT,
 		MOTION_RUBBER_BAND_DESELECT,
 	} m_motion_type;
-
-	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
 
 	bool m_extended_mode;
 	bool m_extended_component_mode;
@@ -871,16 +470,6 @@ void selection_input_model::on_button_drag(viewport::control& Viewport, const Gd
 void selection_input_model::on_button_end_drag(viewport::control& Viewport, const GdkEventButton& Event)
 {
 	m_implementation->on_button_end_drag(Viewport, Event);
-}
-
-sigc::connection selection_input_model::connect_command_signal(const sigc::slot<void, const std::string&, const std::string&>&Slot)
-{
-	return m_implementation->m_command_signal.connect(Slot);
-}
-
-const k3d::icommand_node::result selection_input_model::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	return m_implementation->execute_command(Command, Arguments);
 }
 
 } // namespace ngui

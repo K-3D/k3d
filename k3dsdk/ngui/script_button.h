@@ -92,8 +92,6 @@ public:
 	control(icommand_node& Parent, const string_t& Name, imodel* const Model, istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage);
 	~control();
 
-	const icommand_node::result execute_command(const string_t& Command, const string_t& Arguments);
-
 private:
 	Gtk::Button m_load;
 	Gtk::Button m_save;

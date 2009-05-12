@@ -22,7 +22,6 @@
 */
 
 #include "button.h"
-#include "interactive.h"
 #include "utility.h"
 
 #include <k3dsdk/command_tree.h>
@@ -103,19 +102,7 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, Gtk::Widge
 
 void control::on_clicked()
 {
-	record_command("activate");
 	base::on_clicked();
-}
-
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "activate")
-	{
-		interactive::activate(*this);
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
 }
 
 } // namespace button

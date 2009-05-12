@@ -31,7 +31,6 @@
 #include <gtk/gtkmain.h>
 
 #include "document_state.h"
-#include "interactive.h"
 #include "node_chooser.h"
 #include "utility.h"
 
@@ -137,33 +136,6 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	}
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "select")
-	{
-		interactive::activate(*m_menu_button);
-		handle_pending_events();
-		return_val_if_fail(m_menu_item_select.count(Arguments), RESULT_ERROR);
-		interactive::activate(*m_menu_item_select[Arguments]);
-		return RESULT_CONTINUE;
-	}
-	else if(Command == "create")
-	{
-		interactive::activate(*m_menu_button);
-		handle_pending_events();
-		return_val_if_fail(m_menu_item_create.count(Arguments), RESULT_ERROR);
-		interactive::activate(*m_menu_item_create[Arguments]);
-		return RESULT_CONTINUE;
-	}
-	else if(Command == "edit")
-	{
-		interactive::activate(*m_edit_button);
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 void control::on_nodes_added(const k3d::inode_collection::nodes_t&)
 {
 	reset_menu();
@@ -250,8 +222,6 @@ void control::on_choose()
 
 void control::on_select_none()
 {
-	record_command("select");
-
 	return_if_fail(m_data.get());
 
 	if(m_data->state_recorder)
@@ -266,8 +236,6 @@ void control::on_select_none()
 void control::on_create_node(k3d::iplugin_factory* const Factory)
 {
 	return_if_fail(Factory);
-
-	record_command("create", Factory->name());
 
 	return_if_fail(m_data.get());
 
@@ -290,8 +258,6 @@ void control::on_select_node(k3d::inode* const Object)
 {
 	return_if_fail(Object);
 
-	record_command("select", Object->name());
-
 	return_if_fail(m_data.get());
 
 	if(m_data->state_recorder)
@@ -305,7 +271,6 @@ void control::on_select_node(k3d::inode* const Object)
 
 void control::on_edit()
 {
-	record_command("edit");
 	return_if_fail(m_data.get());
 
 	if(!m_data->node())

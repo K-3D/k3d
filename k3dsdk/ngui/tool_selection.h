@@ -105,8 +105,6 @@ protected:
 	k3d::rectangle m_box_selection;
 	/// Saves clicked selection
 	k3d::selection::record m_mouse_down_selection;
-	/// Save action name for tutorials
-	std::string m_tutorial_action;
 
 	void pick_selectables(k3d::selection::records& PickedSelectables, viewport::control& Viewport, const k3d::point2& Coordinates)
 	{

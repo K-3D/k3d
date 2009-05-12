@@ -21,7 +21,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "interactive.h"
 #include "menu_item.h"
 
 #include <k3dsdk/command_tree.h>
@@ -66,20 +65,8 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, const Glib
 	set_name("k3d-menu-item");
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "activate")
-	{
-		interactive::activate(*this);
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 void control::on_activate()
 {
-	record_command("activate");
 	base::on_activate();
 }
 

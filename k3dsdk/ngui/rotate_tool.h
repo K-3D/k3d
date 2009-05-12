@@ -51,8 +51,6 @@ public:
 
 	const k3d::string_t tool_type() { return "rotate_tool"; }
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-	
 protected:
 	k3d::point3 world_position();
 
@@ -66,19 +64,12 @@ private:
 	k3d::iproperty_collection* get_property_collection();
 	viewport_input_model& get_input_model();
 
-	// input_model implementation
-	void record_command(viewport::control& Viewport, const GdkEventButton& Event, const bool Move);
-	void record_transform(viewport::control& Viewport, const GdkEventMotion& Event, const k3d::angle_axis& Rotation);
-
 	void on_lbutton_down(viewport::control& Viewport, const GdkEventButton& Event)
 	{
 		const k3d::point2 coordinates(Event.x, Event.y);
 		const k3d::key_modifiers modifiers = convert(Event.state);
 
 		lbutton_down(Viewport, coordinates, modifiers);
-
-		// Record command for tutorials
-		record_command(Viewport, Event, true);
 	}
 
 	void on_lbutton_click(viewport::control& Viewport, const GdkEventButton& Event)
@@ -86,9 +77,6 @@ private:
 		const k3d::point2 coordinates(Event.x, Event.y);
 
 		lbutton_click(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_command(Viewport, Event, false);
 	}
 
 	void on_lbutton_start_drag(viewport::control& Viewport, const GdkEventMotion& Event)
@@ -96,9 +84,6 @@ private:
 		const k3d::point2 coordinates(Event.x, Event.y);
 
 		lbutton_start_drag(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_transform(Viewport, Event, k3d::angle_axis(0, 1, 0, 0));
 	}
 
 	void on_lbutton_drag(viewport::control& Viewport, const GdkEventMotion& Event)
@@ -109,9 +94,6 @@ private:
 		off_screen_warp(Viewport, coordinates);
 
 		const k3d::angle_axis rotation = lbutton_drag(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_transform(Viewport, Event, rotation);
 	}
 
 	void on_lbutton_end_drag(viewport::control& Viewport, const GdkEventButton& Event)
@@ -119,9 +101,6 @@ private:
 		const k3d::point2 coordinates(Event.x, Event.y);
 
 		lbutton_end_drag(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_command(Viewport, Event, false);
 	}
 
 	void on_mbutton_click(viewport::control& Viewport, const GdkEventButton& Event)
@@ -130,9 +109,6 @@ private:
 		const k3d::key_modifiers modifiers = convert(Event.state);
 
 		mbutton_click(Viewport, coordinates, modifiers);
-
-		// Record command for tutorials
-		record_command(Viewport, Event, true);
 	}
 
 	void on_rbutton_click(viewport::control& Viewport, const GdkEventButton& Event)
@@ -140,9 +116,6 @@ private:
 		const k3d::point2 coordinates(Event.x, Event.y);
 
 		rbutton_click(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_command(Viewport, Event, true);
 	}
 
 	void on_mouse_move(viewport::control& Viewport, const GdkEventMotion& Event)
@@ -156,9 +129,6 @@ private:
 		off_screen_warp(Viewport, coordinates);
 
 		const k3d::angle_axis rotation = mouse_move_action(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_transform(Viewport, Event, rotation);
 	}
 
 	// Manipulator functions

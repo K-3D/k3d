@@ -17,11 +17,8 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "interactive.h"
 #include "ui_component.h"
 
-#include <k3dsdk/command_tree.h>
-#include <k3dsdk/icommand_tree.h>
 #include <k3dsdk/result.h>
 
 #include <gtkmm/tooltips.h>
@@ -36,31 +33,12 @@ namespace ngui
 ////////////////////////////////////////////////////////////////////////////////////////
 // ui_component
 
-ui_component::ui_component() :
-	m_enable_recording(true)
+ui_component::ui_component()
 {
 }
 
 ui_component::~ui_component()
 {
-}
-
-void ui_component::record_command(const std::string& Command, const std::string& Arguments)
-{
-	return_if_fail(Command.size());
-
-	if(m_enable_recording)
-		k3d::command_tree().command_signal().emit(*this, k3d::icommand_node::COMMAND_INTERACTIVE, Command, Arguments);
-}
-
-void ui_component::enable_recording(bool Enable)
-{
-	m_enable_recording = Enable;
-}
-
-bool ui_component::recording_enabled()
-{
-	return m_enable_recording;
 }
 
 Gtk::Tooltips& ui_component::tooltips()
@@ -77,19 +55,10 @@ void ui_component::set_tip(const Glib::ustring& Tooltip)
 	tooltips().set_tip(*widget, Tooltip);
 }
 
-const k3d::icommand_node::result ui_component::execute_command(const std::string& Command, const std::string& Arguments)
+const icommand_node::result ui_component::execute_command(const string_t&, const string_t&)
 {
-	if(Command == "highlight")
-	{
-		Gtk::Widget* const widget = dynamic_cast<Gtk::Widget*>(this);
-		return_val_if_fail(widget, RESULT_ERROR);
-		return_val_if_fail(widget->is_visible(), RESULT_ERROR);
-
-		interactive::highlight(*widget);
-		return RESULT_CONTINUE;
-	}
-
-	return base::execute_command(Command, Arguments);
+	assert_not_reached();
+	return icommand_node::RESULT_ERROR;
 }
 
 } // namespace ngui

@@ -267,21 +267,6 @@ T* operator<<(T* LHS, const enable_dynamic_accelerators& RHS)
 	return LHS;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// disable_recording
-
-struct disable_recording
-{
-};
-
-template<typename T>
-T* operator<<(T* LHS, const disable_recording& RHS)
-{
-	return_val_if_fail(LHS, LHS);
-	LHS->enable_recording(false);
-	return LHS;
-}
-
 } // namespace ngui
 
 } // namespace k3d

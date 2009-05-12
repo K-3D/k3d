@@ -166,11 +166,6 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	attach(*Gtk::manage(pz), 2, 3, 2, 3);
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	return ui_component::execute_command(Command, Arguments);
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // proxy
 

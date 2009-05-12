@@ -50,8 +50,6 @@ public:
 
 	const k3d::string_t tool_type() { return "selection_tool"; }
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-	
 	/// True if the selection is converted when switching modes
 	bool convert_selection();
 	

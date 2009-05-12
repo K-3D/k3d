@@ -22,10 +22,8 @@
 */
 
 #include "button.h"
-#include "command_arguments.h"
 #include "file_chooser_dialog.h"
 #include "hotkey_entry.h"
-#include "interactive.h"
 #include "path_chooser.h"
 
 #include <k3d-i18n-config.h>
@@ -205,53 +203,6 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	show_all();
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	try
-	{
-		if(Command == "browse" || Command == "set_value")
-		{
-			command_arguments arguments(Arguments);
-
-			switch(k3d::from_string<k3d::ipath_property::reference_t>(arguments.get_string("reference"), k3d::ipath_property::ABSOLUTE_REFERENCE))
-			{
-				case k3d::ipath_property::RELATIVE_REFERENCE:
-				{
-					std::string root_path_string = arguments.get_string("root");
-					std::string relative_path_string = arguments.get_string("relative_path");
-
-					k3d::filesystem::path root_path;
-					if(root_path_string == "$K3D_SHARE_PATH")
-						root_path = k3d::share_path();
-					else
-						root_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(root_path_string));
-
-					const k3d::filesystem::path path = root_path / k3d::filesystem::native_path(k3d::ustring::from_utf8(arguments.get_string("relative_path")));
-
-					interactive::set_text(*m_entry, path.native_utf8_string().raw());
-					return RESULT_CONTINUE;
-				}
-				case k3d::ipath_property::ABSOLUTE_REFERENCE:
-				{
-					std::string absolute_path = arguments.get_string("absolute_path");
-					interactive::set_text(*m_entry, absolute_path);
-					return RESULT_CONTINUE;
-				}
-				default:
-					k3d::log() << error << "Unknown reference type" << std::endl;
-					return RESULT_ERROR;
-			}
-		}
-	}
-	catch(std::exception& e)
-	{
-		k3d::log() << error << e.what() << std::endl;
-		return RESULT_ERROR;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 bool control::on_focus_out_event(GdkEventFocus* Event)
 {
 	set_value();
@@ -280,22 +231,6 @@ void control::on_browse()
 		if(!dialog.get_file_path(new_value))
 			return;
 	}
-
-	// Record the command for posterity (tutorials) ...
-	command_arguments arguments;
-	if(0 == new_value.generic_utf8_string().find(k3d::share_path().generic_utf8_string()))
-	{
-		const k3d::filesystem::path relative_path = k3d::filesystem::make_relative_path(new_value, k3d::share_path());
-		arguments.append("reference", k3d::string_cast(k3d::ipath_property::RELATIVE_REFERENCE));
-		arguments.append("relative_path", relative_path.native_utf8_string().raw());
-		arguments.append("root", "$K3D_SHARE_PATH");
-	}
-	else
-	{
-		arguments.append("reference", k3d::string_cast(k3d::ipath_property::ABSOLUTE_REFERENCE));
-		arguments.append("absolute_path", new_value.native_utf8_string().raw());
-	}
-	record_command("browse", arguments);
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
@@ -354,22 +289,6 @@ void control::set_value()
 		m_disable_set_value = false;
 		return;
 	}
-
-	// Record the command for posterity (tutorials) ...
-	command_arguments arguments;
-	if(0 == new_value.generic_utf8_string().find(k3d::share_path().generic_utf8_string()))
-	{
-		const k3d::filesystem::path relative_path = k3d::filesystem::make_relative_path(new_value, k3d::share_path());
-		arguments.append("reference", k3d::string_cast(k3d::ipath_property::RELATIVE_REFERENCE));
-		arguments.append("relative_path", relative_path.native_utf8_string().raw());
-		arguments.append("root", "$K3D_SHARE_PATH");
-	}
-	else
-	{
-		arguments.append("reference", k3d::string_cast(k3d::ipath_property::ABSOLUTE_REFERENCE));
-		arguments.append("absolute_path", new_value.native_utf8_string().raw());
-	}
-	record_command("set_value", arguments);
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)

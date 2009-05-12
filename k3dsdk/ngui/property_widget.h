@@ -89,8 +89,6 @@ public:
 	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
 	virtual ~control();
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-
 	bool button_press_event(GdkEventButton* Event);
 	bool button_release_event(GdkEventButton* Event);
 

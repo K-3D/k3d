@@ -25,11 +25,9 @@
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
-#include "command_arguments.h"
 #include "document_state.h"
 #include "modifiers.h"
 #include "icons.h"
-#include "interactive.h"
 #include "keyboard.h"
 #include "scale_tool.h"
 #include "transform_tool.h"
@@ -655,7 +653,6 @@ scale_tool::scale_tool(document_state& DocumentState, const std::string& Name) :
 	m_center(init_owner(*this) + init_name("center") + init_label(_("Center")) + init_description(_("Center")) + init_value(k3d::point3(0, 0, 0))),
 	m_auto_center(init_owner(*this) + init_name("auto_center") + init_label(_("Auto Center")) + init_description(_("Center")) + init_value(true))
 {
-	//navigation_model().connect_command_signal(sigc::mem_fun(*this, &scale_tool::record_command));
 	m_scaling.connect_explicit_change_signal(sigc::mem_fun(*this, &scale_tool::on_scale));
 	m_center.connect_explicit_change_signal(sigc::mem_fun(*this, &scale_tool::on_scale));
 	m_auto_center.connect_explicit_change_signal(sigc::mem_fun(*this, &scale_tool::on_scale));
@@ -675,144 +672,6 @@ scale_tool::scale_tool(document_state& DocumentState, const std::string& Name) :
 scale_tool::~scale_tool()
 {
 	delete m_manipulators;
-}
-
-const k3d::icommand_node::result scale_tool::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	const k3d::icommand_node::result result = navigation_model().execute_command(Command, Arguments);
-	if(result != RESULT_UNKNOWN_COMMAND)
-		return result;
-
-	try
-	{
-		command_arguments arguments(Arguments);
-
-		if(Command == "mouse_move")
-		{
-			interactive::move_pointer(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
-		}
-		else if(Command == "mouse_warp")
-		{
-			interactive::warp_pointer(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
-		}
-		else if(Command == "lmb_down_add")
-		{
-			lmb_down_add();
-		}
-		else if(Command == "lmb_down_subtract")
-		{
-			lmb_down_subtract();
-		}
-		else if(Command.substr(0, std::min(static_cast<size_t>(21), Command.size())) == "lmb_down_manipulator_")
-		{
-			lmb_down_manipulator(Command.substr(21));
-		}
-		else if(Command == "lmb_down_selected")
-		{
-			lmb_down_selected();
-		}
-		else if(Command == "lmb_down_deselected")
-		{
-			lmb_down_deselected();
-		}
-		else if(Command == "lmb_down_nothing")
-		{
-			lmb_down_nothing();
-		}
-		else if(Command == "lmb_click_add")
-		{
-			lmb_click_add(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
-		}
-		else if(Command == "lmb_click_replace")
-		{
-			lmb_click_replace(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
-		}
-		else if(Command == "lmb_click_subtract")
-		{
-			lmb_click_subtract(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
-		}
-		else if(Command == "lmb_click_start_motion")
-		{
-			lmb_click_start_motion(arguments.get_viewport_point2("mouse"));
-		}
-		else if(Command == "lmb_click_stop_motion")
-		{
-			lmb_click_stop_motion();
-		}
-		else if(Command == "lmb_click_deselect_all")
-		{
-			lmb_click_deselect_all();
-		}
-		else if(Command == "lmb_start_drag_start_motion")
-		{
-			lmb_start_drag_start_motion(arguments.get_viewport_point2("mouse"));
-		}
-		else if(Command == "lmb_start_drag_box_select")
-		{
-			lmb_start_drag_box_select(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
-		}
-		else if(Command == "lmb_drag_move")
-		{
-			scale_selection(arguments.get_point3("scaling"));
-			k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::SYNCHRONOUS);
-		}
-		else if(Command == "lmb_drag_box_select")
-		{
-			lmb_drag_box_select(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
-		}
-		else if(Command == "lmb_end_drag_stop_motion")
-		{
-			lmb_end_drag_stop_motion();
-		}
-		else if(Command == "lmb_end_drag_box_select")
-		{
-			lmb_end_drag_box_select(arguments.get_viewport(), arguments.get_viewport_point2("mouse"));
-		}
-		else if(Command == "mmb_click_toggle_manipulators_visibility")
-		{
-			mmb_click_toggle_manipulators_visibility();
-		}
-		else if(Command == "mmb_click_manipulators_next_selection")
-		{
-			// TODO : show SHIFT key for tutorials
-			mmb_click_manipulators_next_selection();
-		}
-		else if(Command == "mmb_click_switch_coordinate_system")
-		{
-			// TODO : show CONTROL key for tutorials
-			mmb_click_switch_coordinate_system();
-		}
-		else if(Command == "mmb_click_next_constraint")
-		{
-			mmb_click_next_constraint(arguments.get_viewport(), arguments.get_viewport_point2());
-		}
-		else if(Command == "rmb_click_selection_tool")
-		{
-			rmb_click_selection_tool();
-		}
-		else if(Command == "rmb_click_cancel_move")
-		{
-			rmb_click_cancel_move();
-		}
-		else if(Command == "mouse_drag_move")
-		{
-			scale_selection(arguments.get_point3("scaling"));
-			k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::SYNCHRONOUS);
-		}
-		else
-		{
-			return transform_tool::execute_command(Command, Arguments);
-		}
-
-		return RESULT_CONTINUE;
-	}
-	catch(std::exception& e)
-	{
-		k3d::log() << k3d_file_reference << ": caught exception: " << e.what() << std::endl;
-		return RESULT_ERROR;
-	}
-
-	return RESULT_UNKNOWN_COMMAND;
 }
 
 void scale_tool::on_activate()
@@ -872,30 +731,6 @@ viewport_input_model& scale_tool::get_input_model()
 	return input_model();
 }
 
-void scale_tool::record_command(viewport::control& Viewport, const GdkEventButton& Event, const bool Move)
-{
-	command_arguments arguments;
-	arguments.append_viewport_coordinates("mouse", Viewport, Event);
-
-	if(Move)
-		transform_tool::record_command("mouse_move", arguments);
-
-	transform_tool::record_command(m_tutorial_action, arguments);
-	m_tutorial_action = "";
-}
-
-void scale_tool::record_transform(viewport::control& Viewport, const GdkEventMotion& Event, const k3d::point3& Scaling)
-{
-	command_arguments arguments;
-	arguments.append_viewport_coordinates("mouse", Viewport, Event);
-
-	transform_tool::record_command("mouse_warp", arguments);
-
-	arguments.append("scaling", Scaling);
-	transform_tool::record_command(m_tutorial_action, arguments);
-	m_tutorial_action = "";
-}
-
 // LMB drag/move actions
 k3d::point3 scale_tool::mouse_move_to_3d(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
@@ -911,8 +746,6 @@ k3d::point3 scale_tool::lbutton_drag(viewport::control& Viewport, const k3d::poi
 {
 	if(MOTION_DRAG == m_current_motion)
 	{
-		m_tutorial_action = "lmb_drag_move";
-
 		const k3d::point3 scaling = mouse_move_to_3d(Viewport, Coordinates);
 		scale_selection(scaling);
 
@@ -929,8 +762,6 @@ k3d::point3 scale_tool::mouse_move_action(viewport::control& Viewport, const k3d
 {
 	if(MOTION_CLICK_DRAG == m_current_motion)
 	{
-		m_tutorial_action = "mouse_drag_move";
-
 		const k3d::point3 scaling = mouse_move_to_3d(Viewport, Coordinates);
 		scale_selection(scaling);
 

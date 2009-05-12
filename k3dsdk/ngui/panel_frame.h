@@ -85,8 +85,6 @@ public:
 	/// Restores normal background
 	void unset_bg_color();
 
-	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments);
-
 	/// Returns the mounted panel, if any (could return NULL)
 	panel::control* const mounted_panel();
 

@@ -22,7 +22,6 @@
 */
 
 #include "button.h"
-#include "interactive.h"
 #include "point3.h"
 #include "spin_button.h"
 #include "widget_manip.h"
@@ -194,23 +193,9 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	}
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "reset")
-	{
-		return_val_if_fail(m_reset_button, RESULT_ERROR);
-		interactive::activate(*m_reset_button);
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 void control::on_reset()
 {
 	return_if_fail(m_data.get());
-
-	record_command("reset");
 
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)

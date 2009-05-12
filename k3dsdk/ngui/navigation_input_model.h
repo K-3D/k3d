@@ -57,12 +57,6 @@ public:
 
 	void on_scroll(viewport::control& Viewport, const GdkEventScroll& Event);
 
-	/// Connects to a signal that will emit command-node commands
-	sigc::connection connect_command_signal(const sigc::slot<void, const std::string&, const std::string&>& Slot);
-	
-	/// Called to execute a command-node command, returns true iff the command executed successfully
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-
 private:
 	struct implementation;
 	implementation* const m_implementation;

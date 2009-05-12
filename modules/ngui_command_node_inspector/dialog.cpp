@@ -91,7 +91,6 @@ public:
 		Gtk::HButtonBox* const box2 = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
 		box2->pack_start(*Gtk::manage(
 			new button::control(*this, "close", Gtk::Stock::CLOSE)
-			<< disable_recording()
 			<< connect_button(sigc::mem_fun(*this, &dialog::close))));
 
 		Gtk::VBox* const box1 = new Gtk::VBox(false, 10);

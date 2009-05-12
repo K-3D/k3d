@@ -128,8 +128,6 @@ public:
 	control(k3d::icommand_node& Parent, const k3d::string_t& Name, imodel* const Model, k3d::istate_recorder* const StateRecorder);
 	~control();
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-
 private:
 	/// Called when the control loses the keyboard focus
 	bool on_focus_out_event(GdkEventFocus* Event);

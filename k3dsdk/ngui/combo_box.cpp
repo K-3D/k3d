@@ -23,7 +23,6 @@
 */
 
 #include "combo_box.h"
-#include "interactive.h"
 #include "utility.h"
 
 #include <k3dsdk/command_tree.h>
@@ -107,27 +106,6 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, std::auto_
 	entry->signal_focus_in_event().connect(sigc::mem_fun(*this, &control::on_entry_focus_in_event));
 	entry->signal_focus_out_event().connect(sigc::mem_fun(*this, &control::on_entry_focus_out_event));
 	entry->signal_activate().connect(sigc::mem_fun(*this, &control::on_entry_activate));
-}
-
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	/** \todo Improve the tutorial interactivity of this thing */
-	if(Command == "value")
-	{
-		return_val_if_fail(m_data.get(), RESULT_ERROR);
-
-		// If the value hasn't changed, we're done ...
-		if(Arguments == m_data->value())
-			return RESULT_CONTINUE;
-
-		Gtk::Entry* const entry = dynamic_cast<Gtk::Entry*>(get_child());
-		return_val_if_fail(entry, RESULT_ERROR);
-
-		interactive::set_text(*entry, Arguments);
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
 }
 
 void control::set_values(const values_t& Values)
@@ -216,8 +194,6 @@ void control::set_new_value()
 	add_impromptu_value(value);
 	if(value == m_data->value())
 		return;
-
-	record_command("value", value);
 
 	k3d::istate_recorder* const state_recorder = m_data->state_recorder;
 	const Glib::ustring change_message = m_data->change_message;

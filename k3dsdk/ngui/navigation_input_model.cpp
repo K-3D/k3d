@@ -23,7 +23,6 @@
 
 #include <gdkmm/display.h>
 
-#include "command_arguments.h"
 #include "context_menu.h"
 #include "document_state.h"
 #include "interactive.h"
@@ -103,16 +102,10 @@ struct navigation_input_model::implementation
 		{
 			case MOTION_ZOOM:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("start_zoom", arguments);
 				break;
 			}
 			case MOTION_PAN_TILT:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("start_pan_tilt", arguments);
 				break;
 			}
 			case MOTION_TRACK:
@@ -144,9 +137,6 @@ struct navigation_input_model::implementation
 					m_track_sensitivity *= tan_fov;
 				}
 
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("start_track", arguments);
 				break;
 			}
 			default:
@@ -182,23 +172,14 @@ struct navigation_input_model::implementation
 			{
 				const double target_distance = k3d::distance(k3d::position(Viewport.get_view_matrix()), Viewport.get_target());
 				m_dolly_sensitivity = target_distance ? target_distance : 0.001;
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("start_dolly", arguments);
 				break;
 			}
 			case MOTION_ROLL:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("start_roll", arguments);
 				break;
 			}
 			case MOTION_ORBIT:
 			{
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("start_orbit", arguments);
 				break;
 			}
 			default:
@@ -243,27 +224,21 @@ struct navigation_input_model::implementation
 		{
 			case MOTION_TRACK:
 				k3d::finish_state_change_set(m_document_state.document(), _("Track Viewport"), K3D_CHANGE_SET_CONTEXT);
-				m_command_signal.emit("finish_track", "");
 				break;
 			case MOTION_DOLLY:
 				k3d::finish_state_change_set(m_document_state.document(), _("Dolly Viewport"), K3D_CHANGE_SET_CONTEXT);
-				m_command_signal.emit("finish_dolly", "");
 				break;
 			case MOTION_ZOOM:
 				k3d::finish_state_change_set(m_document_state.document(), _("Zoom Viewport"), K3D_CHANGE_SET_CONTEXT);
-				m_command_signal.emit("finish_zoom", "");
 				break;
 			case MOTION_PAN_TILT:
 				k3d::finish_state_change_set(m_document_state.document(), _("Pan & Tilt Viewport"), K3D_CHANGE_SET_CONTEXT);
-				m_command_signal.emit("finish_pan_tilt", "");
 				break;
 			case MOTION_ORBIT:
 				k3d::finish_state_change_set(m_document_state.document(), _("Orbit Viewport"), K3D_CHANGE_SET_CONTEXT);
-				m_command_signal.emit("finish_orbit", "");
 				break;
 			case MOTION_ROLL:
 				k3d::finish_state_change_set(m_document_state.document(), _("Roll Viewport"), K3D_CHANGE_SET_CONTEXT);
-				m_command_signal.emit("finish_roll", "");
 				break;
 		}
 	}
@@ -296,14 +271,6 @@ struct navigation_input_model::implementation
 		Viewport.set_view_matrix(new_view_matrix);
 		Viewport.set_target(new_target);
 
-		command_arguments arguments;
-		arguments.append_viewport(Viewport);
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		arguments.append("timestamp", m_timer.elapsed());
-		arguments.append("new_view_matrix", new_view_matrix);
-		arguments.append("new_target", new_target);
-		m_command_signal.emit("track_motion", arguments);
-
 		m_last_mouse = current_mouse;
 		wrap_mouse_pointer(Viewport);
 	}
@@ -323,13 +290,6 @@ struct navigation_input_model::implementation
 		const k3d::matrix4 new_view_matrix = k3d::view_matrix(look_vector, up_vector, new_position);
 
 		Viewport.set_view_matrix(new_view_matrix);
-
-		command_arguments arguments;
-		arguments.append_viewport(Viewport);
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		arguments.append("timestamp", m_timer.elapsed());
-		arguments.append("new_view_matrix", new_view_matrix);
-		m_command_signal.emit("dolly_motion", arguments);
 
 		m_last_mouse = current_mouse;
 		wrap_mouse_pointer(Viewport);
@@ -360,16 +320,6 @@ struct navigation_input_model::implementation
 			k3d::property::set_internal_value(perspective->top(), top);
 			k3d::property::set_internal_value(perspective->bottom(), bottom);
 
-			command_arguments arguments;
-			arguments.append_viewport(Viewport);
-			arguments.append_viewport_coordinates("mouse", Viewport, Event);
-			arguments.append("timestamp", m_timer.elapsed());
-			arguments.append("left", left);
-			arguments.append("right", right);
-			arguments.append("top", top);
-			arguments.append("bottom", bottom);
-			m_command_signal.emit("zoom_motion", arguments);
-
 			m_last_mouse = current_mouse;
 			wrap_mouse_pointer(Viewport);
 			return;
@@ -386,15 +336,6 @@ struct navigation_input_model::implementation
 			k3d::property::set_internal_value(orthographic->right(), right);
 			k3d::property::set_internal_value(orthographic->top(), top);
 			k3d::property::set_internal_value(orthographic->bottom(), bottom);
-
-			command_arguments arguments;
-			arguments.append_viewport_coordinates("mouse", Viewport, Event);
-			arguments.append("timestamp", m_timer.elapsed());
-			arguments.append("left", left);
-			arguments.append("right", right);
-			arguments.append("top", top);
-			arguments.append("bottom", bottom);
-			m_command_signal.emit("zoom_motion", arguments);
 
 			m_last_mouse = current_mouse;
 			wrap_mouse_pointer(Viewport);
@@ -460,12 +401,6 @@ struct navigation_input_model::implementation
 
 		Viewport.set_view_matrix(new_view_matrix);
 
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		arguments.append("timestamp", m_timer.elapsed());
-		arguments.append("new_view_matrix", new_view_matrix);
-		m_command_signal.emit("orbit_motion", arguments);
-
 		m_last_mouse = current_mouse;
 		wrap_mouse_pointer(Viewport);
 	}
@@ -499,13 +434,6 @@ struct navigation_input_model::implementation
 		Viewport.set_view_matrix(new_view_matrix);
 		Viewport.set_target(new_target);
 
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		arguments.append("timestamp", m_timer.elapsed());
-		arguments.append("new_view_matrix", new_view_matrix);
-		arguments.append("new_target", new_target);
-		m_command_signal.emit("pan_tilt_motion", arguments);
-
 		m_last_mouse = current_mouse;
 		wrap_mouse_pointer(Viewport);
 	}
@@ -531,12 +459,6 @@ struct navigation_input_model::implementation
 		const k3d::matrix4 new_view_matrix = k3d::view_matrix(look_vector, new_up_vector, position);
 
 		Viewport.set_view_matrix(new_view_matrix);
-
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		arguments.append("timestamp", m_timer.elapsed());
-		arguments.append("new_view_matrix", new_view_matrix);
-		m_command_signal.emit("roll_motion", arguments);
 
 		m_last_mouse = current_mouse;
 	}
@@ -581,13 +503,6 @@ struct navigation_input_model::implementation
 
 		k3d::record_state_change_set change_set(m_document_state.document(), change_set_label, K3D_CHANGE_SET_CONTEXT);
 		Viewport.set_view_matrix(new_view_matrix);
-
-		command_arguments arguments;
-		arguments.append_viewport(Viewport);
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		arguments.append("direction", direction_label);
-		arguments.append("new_view_matrix", new_view_matrix);
-		m_command_signal.emit("scroll_dolly", arguments);
 	}
 
 	void on_button1_click(viewport::control& Viewport, const GdkEventButton& Event)
@@ -613,22 +528,12 @@ struct navigation_input_model::implementation
 
 			const k3d::matrix4 new_view_matrix = k3d::view_matrix(new_look_vector, new_up_vector, position);
 
-			command_arguments arguments;
-			arguments.append_viewport_coordinates("mouse", Viewport, Event);
-			arguments.append("new_view_matrix", new_view_matrix);
-			arguments.append("new_target", new_target);
-			m_command_signal.emit("pick_target", arguments);
-
 			k3d::record_state_change_set change_set(m_document_state.document(), _("Pick Target"), K3D_CHANGE_SET_CONTEXT);
 			Viewport.set_view_matrix(new_view_matrix);
 			Viewport.set_target(new_target);
 		}
 		else
 		{
-			command_arguments arguments;
-			arguments.append_viewport_coordinates("mouse", Viewport, Event);
-			m_command_signal.emit("aim_selection", arguments);
-
 			k3d::record_state_change_set change_set(m_document_state.document(), _("Aim Selection"), K3D_CHANGE_SET_CONTEXT);
 			aim_selection(m_document_state, Viewport);
 		}
@@ -636,319 +541,7 @@ struct navigation_input_model::implementation
 
 	void on_context_menu(viewport::control& Viewport, const GdkEventButton& Event)
 	{
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		m_command_signal.emit("context_menu", arguments);
-
 		m_document_state.popup_context_menu();
-	}
-
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		try
-		{
-			if(Command == "start_track")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				m_timer.restart();
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "track_motion")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const double timestamp = arguments.get_double("timestamp");
-				const k3d::matrix4 new_view_matrix = arguments.get_matrix4("new_view_matrix");
-				const k3d::point3 new_target = arguments.get_point3("new_target");
-
-				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
-
-				viewport.set_view_matrix(new_view_matrix);
-				viewport.set_target(new_target);
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "finish_track")
-			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Track Viewport"), K3D_CHANGE_SET_CONTEXT);
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "start_zoom")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				m_timer.restart();
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "zoom_motion")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const double timestamp = arguments.get_double("timestamp");
-				const double left = arguments.get_double("left");
-				const double right = arguments.get_double("right");
-				const double top = arguments.get_double("top");
-				const double bottom = arguments.get_double("bottom");
-
-				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
-
-				k3d::iprojection* const projection = viewport.camera() ? &viewport.camera()->projection() : 0;
-				return_val_if_fail(projection, k3d::icommand_node::RESULT_ERROR);
-
-				if(k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(projection))
-				{
-					k3d::property::set_internal_value(perspective->left(), left);
-					k3d::property::set_internal_value(perspective->right(), right);
-					k3d::property::set_internal_value(perspective->top(), top);
-					k3d::property::set_internal_value(perspective->bottom(), bottom);
-					k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
-
-					return k3d::icommand_node::RESULT_CONTINUE;
-				}
-
-				if(k3d::iorthographic* const orthographic = dynamic_cast<k3d::iorthographic*>(projection))
-				{
-					k3d::property::set_internal_value(orthographic->left(), left);
-					k3d::property::set_internal_value(orthographic->right(), right);
-					k3d::property::set_internal_value(orthographic->top(), top);
-					k3d::property::set_internal_value(orthographic->bottom(), bottom);
-					k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
-
-					return k3d::icommand_node::RESULT_CONTINUE;
-				}
-
-				k3d::log() << error << "Unknown projection type" << std::endl;
-				return k3d::icommand_node::RESULT_ERROR;
-			}
-			else if(Command == "finish_zoom")
-			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Zoom Viewport"), K3D_CHANGE_SET_CONTEXT);
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "start_pan_tilt")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				m_timer.restart();
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "pan_tilt_motion")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const double timestamp = arguments.get_double("timestamp");
-				const k3d::matrix4 new_view_matrix = arguments.get_matrix4("new_view_matrix");
-				const k3d::point3 new_target = arguments.get_point3("new_target");
-
-				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
-
-				viewport.set_view_matrix(new_view_matrix);
-				viewport.set_target(new_target);
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "finish_pan_tilt")
-			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Pan & Tilt Viewport"), K3D_CHANGE_SET_CONTEXT);
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "start_dolly")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				m_timer.restart();
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "dolly_motion")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const double timestamp = arguments.get_double("timestamp");
-				const k3d::matrix4 new_view_matrix = arguments.get_matrix4("new_view_matrix");
-
-				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
-
-				viewport.set_view_matrix(new_view_matrix);
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "finish_dolly")
-			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Dolly Viewport"), K3D_CHANGE_SET_CONTEXT);
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "start_roll")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				m_timer.restart();
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "roll_motion")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const double timestamp = arguments.get_double("timestamp");
-				const k3d::matrix4 new_view_matrix = arguments.get_matrix4("new_view_matrix");
-
-				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
-
-				viewport.set_view_matrix(new_view_matrix);
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "finish_roll")
-			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Roll Viewport"), K3D_CHANGE_SET_CONTEXT);
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "start_orbit")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				m_timer.restart();
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "orbit_motion")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const double timestamp = arguments.get_double("timestamp");
-				const k3d::matrix4 new_view_matrix = arguments.get_matrix4("new_view_matrix");
-
-				interactive::warp_pointer(viewport, mouse, timestamp, m_timer);
-
-				viewport.set_view_matrix(new_view_matrix);
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "finish_orbit")
-			{
-				k3d::finish_state_change_set(m_document_state.document(), _("Orbit Viewport"), K3D_CHANGE_SET_CONTEXT);
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "context_menu")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				interactive::move_pointer(viewport, mouse);
-
-				m_document_state.popup_context_menu(false);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "pick_target")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::matrix4 new_view_matrix = arguments.get_matrix4("new_view_matrix");
-				const k3d::point3 new_target = arguments.get_point3("new_target");
-
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Pick Target"), K3D_CHANGE_SET_CONTEXT);
-				viewport.set_view_matrix(new_view_matrix);
-				viewport.set_target(new_target);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "aim_selection")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				interactive::move_pointer(viewport, mouse);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Aim Selection"), K3D_CHANGE_SET_CONTEXT);
-				aim_selection(m_document_state, viewport);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "scroll_dolly")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const std::string direction = arguments.get_string("direction");
-				const k3d::matrix4 new_view_matrix = arguments.get_matrix4("new_view_matrix");
-
-//				interactive::warp_pointer(viewport, mouse);
-				
-				std::string change_set_label;
-				if(direction == "forward")
-					change_set_label = _("Dolly Forward");
-				else if(direction == "backward")
-					change_set_label = _("Dolly Backward");
-
-				k3d::record_state_change_set change_set(m_document_state.document(), change_set_label, K3D_CHANGE_SET_CONTEXT);
-				viewport.set_view_matrix(new_view_matrix);
-
-				k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::SYNCHRONOUS);
-
-				non_blocking_sleep(0.2);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << k3d_file_reference << ": caught exception: " << e.what() << std::endl;
-			return k3d::icommand_node::RESULT_ERROR;
-		}
-
-		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
 	}
 
 	void wrap_mouse_pointer(viewport::control& Viewport)
@@ -1047,9 +640,6 @@ struct navigation_input_model::implementation
 	/// Context menu
 	std::auto_ptr<Gtk::Menu> m_context_menu;
 
-	/// Signal that will be emitted to record command-node commands
-	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
-
 	k3d::timer m_timer;
 };
 
@@ -1109,16 +699,6 @@ void navigation_input_model::on_button2_end_drag(viewport::control& Viewport, co
 void navigation_input_model::on_scroll(viewport::control& Viewport, const GdkEventScroll& Event)
 {
 	m_implementation->on_scroll(Viewport, Event);
-}
-
-sigc::connection navigation_input_model::connect_command_signal(const sigc::slot<void, const std::string&, const std::string&>& Slot)
-{
-	return m_implementation->m_command_signal.connect(Slot);
-}
-
-const k3d::icommand_node::result navigation_input_model::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	return m_implementation->execute_command(Command, Arguments);
 }
 
 } // namespace ngui

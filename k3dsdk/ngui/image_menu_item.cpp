@@ -22,7 +22,6 @@
 */
 
 #include "image_menu_item.h"
-#include "interactive.h"
 #include "utility.h"
 
 #include <k3dsdk/command_tree.h>
@@ -70,17 +69,6 @@ control::control(k3d::icommand_node& Parent, const std::string& Name, const Gtk:
 	k3d::command_tree().add(*this, Name, &Parent);
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "activate")
-	{
-		interactive::activate(*this);
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 Gtk::Label* control::get_label()
 {
 	return dynamic_cast<Gtk::Label*>(get_child());
@@ -88,7 +76,6 @@ Gtk::Label* control::get_label()
 
 void control::on_activate()
 {
-	record_command("activate");
 	base::on_activate();
 }
 

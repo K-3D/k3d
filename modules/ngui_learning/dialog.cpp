@@ -30,8 +30,6 @@
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/options.h>
 #include <k3dsdk/ngui/scripting.h>
-#include <k3dsdk/ngui/tutorial_message.h>
-#include <k3dsdk/ngui/tutorials.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/options.h>
@@ -66,7 +64,7 @@ namespace learning
 /////////////////////////////////////////////////////////////////////////////
 // dialog
 
-/// Provides a menu of interactive tutorials and demonstration documents
+/// Provides a menu of demonstration documents
 class dialog :
 	public k3d::ngui::application_window
 {
@@ -74,11 +72,10 @@ class dialog :
 
 public:
 	dialog() :
-		m_show_at_startup(_("Show tutorials and examples at startup"))
+		m_show_at_startup(_("Show examples at startup"))
 	{
 		k3d::command_tree().add(*this, "learning_menu");
 
-		load_tutorials();
 		load_examples();
 
 		set_title(_("K-3D Tutorials and Examples"));
@@ -91,14 +88,6 @@ public:
 		box2->pack_start(*Gtk::manage(
 			new button::control(*this, "close", Gtk::Stock::CLOSE) <<
 			connect_button(sigc::mem_fun(*this, &dialog::close))));
-
-		Gtk::TreeView* const tutorial_list = Gtk::manage(new Gtk::TreeView(m_tutorial_store));
-		tutorial_list->set_headers_visible(false);
-		tutorial_list->append_column("Interactive Tutorials", m_columns.label);
-		tutorial_list->signal_row_activated().connect(sigc::mem_fun(*this, &dialog::on_play_tutorial));
-		Gtk::ScrolledWindow* const tutorial_window = Gtk::manage(new Gtk::ScrolledWindow());
-		tutorial_window->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-		tutorial_window->add(*tutorial_list);
 
 		Gtk::TreeView* const example_list = Gtk::manage(new Gtk::TreeView(m_example_store));
 		example_list->set_headers_visible(false);
@@ -113,9 +102,7 @@ public:
 
 		Gtk::VBox* const box1 = Gtk::manage(new Gtk::VBox(false, 10));
 		box1->pack_start(*Gtk::manage(new Gtk::Label() << set_markup(_("<big><b>Welcome to K-3D!</b></big>"))), Gtk::PACK_SHRINK);
-		box1->pack_start(*Gtk::manage(new Gtk::Label(_("Below are interactive tutorials and example documents you can\nuse to become familiar with K-3D.\n\nIf this is the first time you've used the program, we recommend\nyou begin with the \"Getting Started\" tutorial."))), Gtk::PACK_SHRINK);
-		box1->pack_start(*Gtk::manage(new Gtk::Label(_("Double-click to play a tutorial:"))), Gtk::PACK_SHRINK);
-		box1->pack_start(*tutorial_window, Gtk::PACK_EXPAND_WIDGET);
+		box1->pack_start(*Gtk::manage(new Gtk::Label(_("Below are example documents you can\nuse to become familiar with K-3D."))), Gtk::PACK_SHRINK);
 		box1->pack_start(*Gtk::manage(new Gtk::Label(_("Double-click to open an example document:"))), Gtk::PACK_SHRINK);
 		box1->pack_start(*example_window, Gtk::PACK_EXPAND_WIDGET);
 		box1->pack_start(m_show_at_startup, Gtk::PACK_SHRINK);
@@ -195,36 +182,6 @@ public:
 		}
 	}
 
-	class test_tutorials
-	{
-	public:
-		const bool operator()(const k3d::filesystem::path& Path) const
-		{
-			const k3d::mime::type mime_type = k3d::mime::type::lookup(Path);
-			if(mime_type.empty())
-			{
-				k3d::log() << error << "Tutorial [" << Path.native_console_string() << "] does not match a known MIME type" << std::endl;
-				return false;
-			}
-
-			k3d::script::language language(mime_type);
-			if(!language.factory())
-			{
-				k3d::log() << error << "No script engine available for tutorial [" << Path.native_console_string() << "] with MIME type [" << mime_type.str() << "]" << std::endl;
-				return false;
-			}
-
-			boost::scoped_ptr<k3d::iscript_engine> engine(k3d::plugin::create<k3d::iscript_engine>(*language.factory()));
-			if(!engine)
-			{
-				k3d::log() << error << "Error creating script engine for tutorial [" << Path.native_console_string() << "] with MIME type [" << mime_type.str() << "]" << std::endl;
-				return false;
-			}
-
-			return true;
-		}
-	};
-
 	class test_examples
 	{
 	public:
@@ -248,39 +205,9 @@ public:
 		}
 	};
 
-	void load_tutorials()
-	{
-		load_resources(m_tutorial_store, k3d::share_path() / k3d::filesystem::generic_path("tutorials"), "tutorials", "tutorial", test_tutorials());
-	}
-
 	void load_examples()
 	{
 		load_resources(m_example_store, k3d::share_path() / k3d::filesystem::generic_path("documents"), "examples", "example", test_examples());
-	}
-
-	void on_play_tutorial(const Gtk::TreePath& Path, Gtk::TreeViewColumn* Column)
-	{
-		// Get the row that was activated ...
-		Gtk::TreeRow row = *m_tutorial_store->get_iter(Path);
-
-		// Look-up the path to the actual tutorial implementation ...
-		const k3d::filesystem::path tutorial_path = row[m_columns.path];
-
-		const k3d::string_t tutorial_name = tutorial_path.native_utf8_string().raw();
-		k3d::filesystem::igzstream tutorial_file(tutorial_path);
-		k3d::script::code tutorial_code(tutorial_file);
-		k3d::script::language tutorial_language(tutorial_path);
-		k3d::iscript_engine::context_t tutorial_context;
-
-		hide();
-		close();
-		handle_pending_events();
-
-		k3d::ngui::tutorial::playback_started();
-		execute_script(tutorial_code, tutorial_name, tutorial_context, tutorial_language);
-		k3d::ngui::tutorial::playback_finished();
-
-		tutorial_message::instance().hide_messages();
 	}
 
 	void on_open_example(const Gtk::TreePath& Path, Gtk::TreeViewColumn* Column)
@@ -340,7 +267,6 @@ public:
 	};
 
 	resource_columns m_columns;
-	Glib::RefPtr<Gtk::ListStore> m_tutorial_store;
 	Glib::RefPtr<Gtk::ListStore> m_example_store;
 	Gtk::CheckButton m_show_at_startup;
 
@@ -349,7 +275,7 @@ public:
 		static k3d::application_plugin_factory<dialog> factory(
 			k3d::uuid(0xd7d79750, 0x344aa731, 0xbeb2a198, 0x739e0cfe),
 			"NGUILearningDialog",
-			_("Displays a menu containing interactive tutorials and sample documents"),
+			_("Displays a menu containing sample documents"),
 			"NGUI Dialog",
 			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "dialog"));

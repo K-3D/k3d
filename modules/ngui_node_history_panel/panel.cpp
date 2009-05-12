@@ -32,11 +32,9 @@
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/asynchronous_update.h>
-#include <k3dsdk/ngui/command_arguments.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
 #include <k3dsdk/ngui/icons.h>
-#include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/nodes.h>
@@ -139,58 +137,6 @@ public:
 		return false;
 	}
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		try
-		{
-			if(Command == "rename")
-			{
-				std::stringstream buffer(Arguments);
-				k3d::xml::element arguments;
-				buffer >> arguments;
-
-				return_val_if_fail(arguments.name == "arguments", k3d::icommand_node::RESULT_ERROR);
-				const std::string old_name = k3d::xml::element_text(arguments, "oldname");
-				const std::string new_name = k3d::xml::element_text(arguments, "newname");
-				return_val_if_fail(!old_name.empty(), k3d::icommand_node::RESULT_ERROR);
-				return_val_if_fail(!new_name.empty(), k3d::icommand_node::RESULT_ERROR);
-
-				k3d::inode* const node = k3d::find_node(m_document_state.document().nodes(), old_name);
-				return_val_if_fail(node, k3d::icommand_node::RESULT_ERROR);
-
-				Gtk::TreeIter row;
-				return_val_if_fail(get_row(node, m_model->children(), row), k3d::icommand_node::RESULT_ERROR);
-
-				interactive::set_text(m_view, *m_view.get_column(0), *m_view.get_column_cell_renderer(0), row, new_name);
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "select")
-			{
-				command_arguments arguments(Arguments);
-				k3d::inode* const node = arguments.get_node(m_document_state.document(), "node");
-				return_val_if_fail(node, k3d::icommand_node::RESULT_ERROR);
-
-				Gtk::TreeIter row;
-				return_val_if_fail(get_row(node, m_model->children(), row), k3d::icommand_node::RESULT_ERROR);
-
-				interactive::select_row(m_view, *m_view.get_column(0), row);
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-			else if(Command == "context_menu")
-			{
-				m_document_state.popup_context_menu();
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << error << e.what() << std::endl;
-			return k3d::icommand_node::RESULT_ERROR;
-		}
-
-		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
-	}
-
 	void on_button_press_event(GdkEventButton* Event)
 	{
 		if(Event->button != 3)
@@ -237,7 +183,6 @@ public:
 		arguments.append(k3d::xml::element("newname", NewText));
 		std::stringstream buffer;
 		buffer << k3d::xml::single_line() << arguments;
-		m_command_signal.emit("rename", buffer.str());
 
 		k3d::record_state_change_set change_set(m_document_state.document(), k3d::string_cast(boost::format(_("Rename node %1%")) % NewText), K3D_CHANGE_SET_CONTEXT);
 		node->set_name(NewText);
@@ -358,10 +303,6 @@ public:
 		m_document_state.deselect_all();
 		m_document_state.select(*node);
 
-		command_arguments arguments;
-		arguments.append("node", node);
-		m_command_signal.emit("select", arguments);
-
 		// Request that (somebody somewhere) show node details ...
 		m_document_state.view_node_properties_signal().emit(node);
 	}
@@ -398,8 +339,6 @@ public:
 	tree_view m_view;
 	std::auto_ptr<Gtk::Menu> m_context_menu;
 
-	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
-
 	/// Signal that will be emitted whenever this control should grab the panel focus
 	sigc::signal<void> m_panel_grab_signal;
 };
@@ -434,8 +373,6 @@ public:
 
 		m_implementation = new detail::implementation(DocumentState);
 
-		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
-
 		m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 		
 		pack_start(m_implementation->m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
@@ -450,15 +387,6 @@ public:
 	sigc::connection connect_focus_signal(const sigc::slot<void>& Slot)
 	{
 		return m_implementation->m_panel_grab_signal.connect(Slot);
-	}
-
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		const k3d::icommand_node::result result = m_implementation->execute_command(Command, Arguments);
-		if(result != RESULT_UNKNOWN_COMMAND)
-			return result;
-
-		return ui_component::execute_command(Command, Arguments);
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -62,28 +62,6 @@ void warp_pointer(Gtk::Widget& Widget, const k3d::point2& Coords);
 void warp_pointer(Gtk::Widget& Widget, const k3d::point2& Coords, const double Timestamp, const k3d::timer& Timer);
 /// Instantaneously warps the pointer from its current location to the center of a widget
 void warp_pointer(Gtk::Widget& Widget);
-/// Moves the pointer from its current location to the center of a widget
-void move_pointer(Gtk::Widget& Widget);
-/// Moves the pointer from its current location to the given widget coordinates
-void move_pointer(Gtk::Widget& Widget, const k3d::point2& Coords);
-/// Moves the pointer from its current location to the given cell in a TreeView
-void move_pointer(Gtk::TreeView& TreeView, Gtk::TreeViewColumn& Column, const Gtk::TreeIter& Row);
-/// Does whatever is required (raises windows, changes notebook pages, walks menus, etc.) to make a widget visible
-void show(Gtk::Widget& Widget);
-/// Overlays graphics on the screen to draw attention to a widget
-void highlight(Gtk::Widget& Widget);
-/// Enters text into an editable control, simulating user input
-void set_text(Gtk::Entry& Entry, const std::string& Text);
-/// Activates a button
-void activate(Gtk::Button& Button);
-/// Activates a menu item
-void activate(Gtk::MenuItem& MenuItem);
-/// Selects a cell in a treeview
-void select_row(Gtk::TreeView& TreeView, Gtk::TreeViewColumn& Column, const Gtk::TreeIter& Row);
-/// Enters text into a treeview cell, simulating user input
-void set_text(Gtk::TreeView& TreeView, Gtk::TreeViewColumn& Column, Gtk::CellRenderer& Cell, const Gtk::TreeIter& Row, const std::string& Text);
-/// Selects a row in a combo box
-void select_row(Gtk::ComboBox& ComboBox, const Gtk::TreeIter& Row);
 
 } // namespace interactive
 

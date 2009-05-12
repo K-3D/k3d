@@ -40,7 +40,6 @@
 #include <k3dsdk/line2.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/ngui/command_arguments.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/interactive.h>
@@ -78,7 +77,6 @@ public:
 	~tool();
 
 	const k3d::string_t tool_type();
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
 	k3d::iproperty_collection* get_property_collection();
 	viewport_input_model& get_input_model();
 	static k3d::iplugin_factory& get_factory();
@@ -294,39 +292,12 @@ struct tool::implementation :
 		reset();
 	}
 
-	void record_command(viewport::control& Viewport, const GdkEventButton& Event, const bool Move)
-	{
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-
-		if(Move)
-			m_snap_tool.record_command("mouse_move", arguments);
-
-		m_snap_tool.record_command(m_tutorial_action, arguments);
-		m_tutorial_action = "";
-	}
-
-	void record_transform(viewport::control& Viewport, const GdkEventMotion& Event, const k3d::vector3& Move)
-	{
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-
-		m_snap_tool.record_command("mouse_warp", arguments);
-
-		arguments.append("move", Move);
-		m_snap_tool.record_command(m_tutorial_action, arguments);
-		m_tutorial_action = "";
-	}
-
 	void on_lbutton_down(viewport::control& Viewport, const GdkEventButton& Event)
 	{
 		const k3d::point2 coordinates(Event.x, Event.y);
 		const k3d::key_modifiers modifiers = convert(Event.state);
 
 		lbutton_down(Viewport, coordinates, modifiers);
-
-		// Record command for tutorials
-		record_command(Viewport, Event, true);
 	}
 
 	void on_lbutton_click(viewport::control& Viewport, const GdkEventButton& Event)
@@ -334,9 +305,6 @@ struct tool::implementation :
 		const k3d::point2 coordinates(Event.x, Event.y);
 
 		lbutton_click(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_command(Viewport, Event, false);
 	}
 
 	void on_lbutton_start_drag(viewport::control& Viewport, const GdkEventMotion& Event)
@@ -344,9 +312,6 @@ struct tool::implementation :
 		const k3d::point2 coordinates(Event.x, Event.y);
 
 		lbutton_start_drag(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_transform(Viewport, Event, k3d::vector3(0, 0, 0));
 	}
 
 	void on_lbutton_drag(viewport::control& Viewport, const GdkEventMotion& Event)
@@ -357,9 +322,6 @@ struct tool::implementation :
 		off_screen_warp(Viewport, coordinates);
 
 		const k3d::vector3 move = lbutton_drag(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_transform(Viewport, Event, move);
 	}
 
 	void on_lbutton_end_drag(viewport::control& Viewport, const GdkEventButton& Event)
@@ -367,9 +329,6 @@ struct tool::implementation :
 		const k3d::point2 coordinates(Event.x, Event.y);
 
 		lbutton_end_drag(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_command(Viewport, Event, false);
 	}
 
 	void on_mbutton_click(viewport::control& Viewport, const GdkEventButton& Event)
@@ -378,9 +337,6 @@ struct tool::implementation :
 		const k3d::key_modifiers modifiers = convert(Event.state);
 
 		mbutton_click(Viewport, coordinates, modifiers);
-
-		// Record command for tutorials
-		record_command(Viewport, Event, true);
 	}
 
 	void on_rbutton_click(viewport::control& Viewport, const GdkEventButton& Event)
@@ -388,9 +344,6 @@ struct tool::implementation :
 		const k3d::point2 coordinates(Event.x, Event.y);
 
 		rbutton_click(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_command(Viewport, Event, true);
 	}
 
 	void on_mouse_move(viewport::control& Viewport, const GdkEventMotion& Event)
@@ -404,9 +357,6 @@ struct tool::implementation :
 		off_screen_warp(Viewport, coordinates);
 
 		const k3d::vector3 move = mouse_move_action(Viewport, coordinates);
-
-		// Record command for tutorials
-		record_transform(Viewport, Event, move);
 	}
 
 	void on_redraw(viewport::control& Viewport)
@@ -585,138 +535,6 @@ struct tool::implementation :
 
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
-	}
-
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		try
-		{
-			command_arguments arguments(Arguments);
-
-			if(Command == "mouse_move")
-			{
-				interactive::move_pointer(arguments.get_viewport(), arguments.get_viewport_point2());
-			}
-			else if(Command == "mouse_warp")
-			{
-				interactive::warp_pointer(arguments.get_viewport(), arguments.get_viewport_point2());
-			}
-			else if(Command == "lmb_down_add")
-			{
-				// TODO : show SHIFT key for tutorials
-				lmb_down_add();
-			}
-			else if(Command == "lmb_down_subtract")
-			{
-				// TODO : show CONTROL key for tutorials
-				lmb_down_subtract();
-			}
-			else if(Command.substr(0, std::min(static_cast<size_t>(21), Command.size())) == "lmb_down_manipulator_")
-			{
-				lmb_down_manipulator(Command.substr(21));
-			}
-			else if(Command == "lmb_down_selected")
-			{
-				lmb_down_selected();
-			}
-			else if(Command == "lmb_down_deselected")
-			{
-				lmb_down_deselected();
-			}
-			else if(Command == "lmb_down_nothing")
-			{
-				lmb_down_nothing();
-			}
-			else if(Command == "lmb_click_add")
-			{
-				lmb_click_add();
-			}
-			else if(Command == "lmb_click_subtract")
-			{
-				lmb_click_subtract();
-			}
-			else if(Command == "lmb_click_start_motion")
-			{
-				lmb_click_start_motion(arguments.get_viewport_point2());
-			}
-			else if(Command == "lmb_click_stop_motion")
-			{
-				lmb_click_stop_motion();
-			}
-			else if(Command == "lmb_click_deselect_all")
-			{
-				lmb_click_deselect_all();
-			}
-			else if(Command == "lmb_start_drag_start_motion")
-			{
-				lmb_start_drag_start_motion(arguments.get_viewport_point2());
-			}
-			else if(Command == "lmb_start_drag_box_select")
-			{
-				lmb_start_drag_box_select(arguments.get_viewport(), arguments.get_viewport_point2());
-			}
-			else if(Command == "lmb_drag_move")
-			{
-				move_selection(arguments.get_vector3("move"));
-				k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::SYNCHRONOUS);
-			}
-			else if(Command == "lmb_drag_box_select")
-			{
-				lmb_drag_box_select(arguments.get_viewport(), arguments.get_viewport_point2());
-			}
-			else if(Command == "lmb_end_drag_stop_motion")
-			{
-				lmb_end_drag_stop_motion();
-			}
-			else if(Command == "lmb_end_drag_box_select")
-			{
-				lmb_end_drag_box_select(arguments.get_viewport(), arguments.get_viewport_point2());
-			}
-			else if(Command == "mmb_click_toggle_manipulators_visibility")
-			{
-				mmb_click_toggle_manipulators_visibility();
-			}
-			else if(Command == "mmb_click_manipulators_next_selection")
-			{
-				// TODO : show SHIFT key for tutorials
-				mmb_click_manipulators_next_selection();
-			}
-			else if(Command == "mmb_click_switch_coordinate_system")
-			{
-				// TODO : show CONTROL key for tutorials
-				mmb_click_switch_coordinate_system();
-			}
-			else if(Command == "mmb_click_next_constraint")
-			{
-				mmb_click_next_constraint(arguments.get_viewport(), arguments.get_viewport_point2());
-			}
-			else if(Command == "rmb_click_selection_tool")
-			{
-				rmb_click_selection_tool();
-			}
-			else if(Command == "rmb_click_cancel_move")
-			{
-				rmb_click_cancel_move();
-			}
-			else if(Command == "mouse_drag_move")
-			{
-				move_selection(arguments.get_vector3("move"));
-				k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::SYNCHRONOUS);
-			}
-			else
-			{
-				return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
-			}
-
-			return k3d::icommand_node::RESULT_CONTINUE;
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << k3d_file_reference << ": caught exception: " << e.what() << std::endl;
-			return k3d::icommand_node::RESULT_ERROR;
-		}
-
-		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
 	}
 
 private:
@@ -1003,8 +821,6 @@ private:
 	{
 		if(MOTION_DRAG == m_current_motion)
 		{
-			m_tutorial_action = "lmb_drag_move";
-
 			const k3d::vector3 delta = mouse_move_to_3d(Viewport, Coordinates);
 			move_selection(delta);
 
@@ -1021,8 +837,6 @@ private:
 	{
 		if(MOTION_CLICK_DRAG == m_current_motion)
 		{
-			m_tutorial_action = "mouse_drag_move";
-
 			const k3d::vector3 delta = mouse_move_to_3d(Viewport, Coordinates);
 			move_selection(delta);
 
@@ -1127,19 +941,6 @@ const k3d::string_t tool::tool_type()
 	return get_factory().name();
 }
 
-const k3d::icommand_node::result tool::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	k3d::icommand_node::result result = m_implementation->navigation_model().execute_command(Command, Arguments);
-	if(result != RESULT_UNKNOWN_COMMAND)
-		return result;
-
-	result = m_implementation->execute_command(Command, Arguments);
-	if(result != RESULT_UNKNOWN_COMMAND)
-		return result;
-
-	return k3d::ngui::tool::execute_command(Command, Arguments);
-}
-
 k3d::iproperty_collection* tool::get_property_collection()
 {
 	return dynamic_cast<k3d::iproperty_collection*>(m_implementation);
@@ -1166,7 +967,6 @@ k3d::iplugin_factory& tool::get_factory()
 void tool::on_initialize(document_state& DocumentState)
 {
 	m_implementation = new implementation(DocumentState.document(), DocumentState, *this);
-	m_implementation->navigation_model().connect_command_signal(sigc::mem_fun(*this, &tool::record_command));
 }
 
 void tool::on_activate()

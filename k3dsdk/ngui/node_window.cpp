@@ -74,7 +74,6 @@ k3d::bool_t node_window::on_key_press_event(GdkEventKey* event)
 {
 	if(event->keyval == GDK_Escape)
 	{
-		record_command("close_window");
 		safe_close();
 		return true;
 	}
@@ -84,7 +83,6 @@ k3d::bool_t node_window::on_key_press_event(GdkEventKey* event)
 
 k3d::bool_t node_window::on_delete_event(GdkEventAny* event)
 {
-	record_command("close_window");
 	safe_close();
 	return true;
 }
@@ -118,17 +116,6 @@ k3d::bool_t node_window::on_safe_to_close()
 
 void node_window::on_close()
 {
-}
-
-const k3d::icommand_node::result node_window::execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
-{
-	if(Command == "close_window")
-	{
-		safe_close();
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
 }
 
 } // namespace ngui

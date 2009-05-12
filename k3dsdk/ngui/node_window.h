@@ -62,8 +62,6 @@ public:
 	/// Closes the window
 	void close();
 
-	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments);
-
 private:
 	/// Override in derived classes to determine whether it is safe to close the window
 	virtual k3d::bool_t on_safe_to_close();

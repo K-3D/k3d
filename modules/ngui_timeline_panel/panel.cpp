@@ -517,8 +517,6 @@ public:
 
 		m_implementation = new detail::implementation(DocumentState, Parent);
 		
-		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &panel::record_command));
-
 		pack_start(m_implementation->m_container, Gtk::PACK_SHRINK);
 		show_all();
 	}

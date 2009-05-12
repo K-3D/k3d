@@ -98,8 +98,6 @@ public:
 	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data);
 	~control();
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-
 private:
 	/// Called to refresh the drawing area that displays the current color
 	bool on_redraw();

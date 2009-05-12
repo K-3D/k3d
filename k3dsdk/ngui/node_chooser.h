@@ -125,8 +125,6 @@ class control :
 public:
 	control(k3d::icommand_node& Parent, const std::string& Name, std::auto_ptr<idata_proxy> Data, std::auto_ptr<iselection_filter> Filter);
 
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
-
 private:
 	/// Called when new nodes are added to the document
 	void on_nodes_added(const k3d::inode_collection::nodes_t&);

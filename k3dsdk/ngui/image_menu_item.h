@@ -58,7 +58,6 @@ public:
 	Gtk::Label* get_label();
 
 	void on_activate();
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments);
 };
 
 } // namespace image_menu_item

@@ -35,7 +35,6 @@
 #include <k3dsdk/ngui/main_document_window.h>
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/options.h>
-#include <k3dsdk/ngui/tutorial_message.h>
 #include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/utility.h>
 
@@ -483,8 +482,7 @@ public:
 
 	bool tutorial_message(const k3d::string_t& Message)
 	{
-		k3d::command_tree().command_signal().emit(*this, k3d::icommand_node::COMMAND_INTERACTIVE, "tutorial_message", Message);
-		return tutorial_message::instance().show_message(Message);
+		return false;
 	}
 
 	bool get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)

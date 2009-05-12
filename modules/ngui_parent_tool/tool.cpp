@@ -37,7 +37,6 @@
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/basic_viewport_input_model.h>
-#include <k3dsdk/ngui/command_arguments.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/interactive.h>
@@ -45,7 +44,6 @@
 #include <k3dsdk/ngui/navigation_input_model.h>
 #include <k3dsdk/ngui/tool.h>
 #include <k3dsdk/ngui/transform.h>
-#include <k3dsdk/ngui/tutorial_message.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/state_change_set.h>
@@ -97,10 +95,6 @@ struct implementation
 
 	void on_rbutton_click(viewport::control& Viewport, const GdkEventButton& Event)
 	{
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		m_command_signal.emit("selection_tool", arguments);
-
 		m_set_parent = false;
 
 		m_document_state.set_active_tool(m_document_state.selection_tool());
@@ -170,10 +164,6 @@ struct implementation
 
 		set_parent(Viewport, *node);
 
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		arguments.append("selection", selection);
-		m_command_signal.emit("set_parent", arguments);
 	}
 
 	void on_pick(viewport::control& Viewport, const GdkEventButton& Event)
@@ -187,97 +177,13 @@ struct implementation
 
 		if(m_document_state.is_selected(node))
 		{
-			command_arguments arguments;
-			arguments.append_viewport_coordinates("mouse", Viewport, Event);
-			m_command_signal.emit("child_selection_complete", arguments);
-
 			m_set_parent = true;
 			m_document_state.set_cursor_signal().emit(load_icon("parent_cursor", Gtk::ICON_SIZE_BUTTON));
 		}
 		else
 		{
-			command_arguments arguments;
-			arguments.append_viewport_coordinates("mouse", Viewport, Event);
-			arguments.append("selection", selection);
-			m_command_signal.emit("select_node", arguments);
-
 			m_document_state.select(selection);
 		}
-	}
-
-	const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		try
-		{
-			if(Command == "selection_tool")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				interactive::move_pointer(viewport, mouse);
-
-				m_set_parent = false;
-
-				m_document_state.clear_cursor_signal().emit();
-				m_document_state.set_active_tool(m_document_state.selection_tool());
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "select_node")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::selection::record selection = arguments.get_selection_record(m_document_state.document(), "selection");
-
-				interactive::move_pointer(viewport, mouse);
-
-				m_document_state.select(selection);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "child_selection_complete")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-
-				interactive::move_pointer(viewport, mouse);
-
-				m_set_parent = true;
-
-				m_document_state.set_cursor_signal().emit(load_icon("parent_cursor", Gtk::ICON_SIZE_BUTTON));
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-
-			if(Command == "set_parent")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 mouse = arguments.get_viewport_point2("mouse");
-				const k3d::selection::record selection = arguments.get_selection_record(m_document_state.document(), "selection");
-			
-				k3d::inode* const node = k3d::selection::get_node(selection);
-				return_val_if_fail(node, k3d::icommand_node::RESULT_ERROR);
-
-				interactive::move_pointer(viewport, mouse);
-				
-				set_parent(viewport, *node);
-
-				return k3d::icommand_node::RESULT_CONTINUE;
-			}
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << error << k3d_file_reference << ": caught exception: " << e.what() << std::endl;
-			return k3d::icommand_node::RESULT_ERROR;
-		}
-
-		return k3d::icommand_node::RESULT_UNKNOWN_COMMAND;
 	}
 
 	/// Stores a reference to the owning document
@@ -288,8 +194,6 @@ struct implementation
 	navigation_input_model m_navigation_model;
 	/// Dispatches incoming user input events
 	basic_viewport_input_model m_input_model;
-	/// Emitted to record a command-node command
-	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -315,11 +219,6 @@ public:
 		return get_factory().name();
 	}
 
-	virtual const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		return m_implementation->execute_command(Command, Arguments);
-	}
-
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<tool> factory(
@@ -337,8 +236,6 @@ private:
 	virtual void on_initialize(document_state& DocumentState)
 	{
 		m_implementation = new parent::implementation(DocumentState);
-		m_implementation->m_navigation_model.connect_command_signal(sigc::mem_fun(*this, &tool::record_command));
-		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &tool::record_command));
 	}
 
 	virtual void on_deactivate()

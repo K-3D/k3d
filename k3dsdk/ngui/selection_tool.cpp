@@ -182,43 +182,11 @@ selection_tool::selection_tool(document_state& DocumentState, const std::string&
 	base(DocumentState, Name),
 	m_implementation(new implementation(DocumentState))
 {
-	m_implementation->m_navigation_model.connect_command_signal(sigc::mem_fun(*this, &selection_tool::record_command));
-	m_implementation->m_selection_model.connect_command_signal(sigc::mem_fun(*this, &selection_tool::record_command));
 }
 
 selection_tool::~selection_tool()
 {
 	delete m_implementation;
-}
-
-const k3d::icommand_node::result selection_tool::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	k3d::icommand_node::result result = m_implementation->m_selection_model.execute_command(Command, Arguments);
-	if(result != RESULT_UNKNOWN_COMMAND)
-		return result;
-
-	result = m_implementation->m_navigation_model.execute_command(Command, Arguments);
-	if(result != RESULT_UNKNOWN_COMMAND)
-		return result;
-	
-	// Allow access to selection options
-	if (Command == "toggle_pick_backfacing")
-	{
-		detail::toggle_property(m_implementation->m_pick_backfacing);
-		return RESULT_CONTINUE;
-	}
-	if (Command == "toggle_paint_backfacing")
-	{
-		detail::toggle_property(m_implementation->m_paint_backfacing);
-		return RESULT_CONTINUE;
-	}
-	if (Command == "toggle_rubber_band_backfacing")
-	{
-		detail::toggle_property(m_implementation->m_rubber_band_backfacing);
-		return RESULT_CONTINUE;
-	}
-	
-	return RESULT_UNKNOWN_COMMAND;
 }
 
 bool selection_tool::convert_selection()

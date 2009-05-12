@@ -23,7 +23,6 @@
 
 #include "button.h"
 #include "text.h"
-#include "interactive.h"
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
@@ -204,23 +203,6 @@ control::~control()
 	delete m_implementation;
 }
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "set_value")
-	{
-		assert_not_implemented();
-		return RESULT_ERROR;
-/*
-		interactive::set_text(*this, Arguments);
-		select_region(0, 0);
-		on_set_value();
-		return RESULT_CONTINUE;
-*/
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 bool control::on_focus_in_event(GdkEventFocus* Event)
 {
 	// Disable accelerators for this window
@@ -251,9 +233,6 @@ void control::on_apply()
 	const k3d::string_t new_value = m_implementation->m_text_view.get_buffer()->get_text();
 	if(new_value == m_implementation->m_model->value())
 		return;
-
-	// Record the command for posterity (tutorials) ...
-	record_command("set_value", new_value);
 
 	// Turn this into an undo/redo -able event ...
 	if(m_implementation->m_state_recorder)

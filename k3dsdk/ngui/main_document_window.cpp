@@ -32,7 +32,6 @@
 #include "icons.h"
 #include "image_menu_item.h"
 #include "image_toggle_button.h"
-#include "interactive.h"
 #include "main_document_window.h"
 #include "menu_item.h"
 #include "menubar.h"
@@ -48,8 +47,6 @@
 #include "target.h"
 #include "toolbar.h"
 #include "transform.h"
-#include "tutorial_message.h"
-#include "tutorials.h"
 #include "undo_utility.h"
 #include "uri.h"
 #include "utility.h"
@@ -201,175 +198,6 @@ const k3d::filesystem::path ui_layout_path()
 	return k3d::system::get_home_directory() / k3d::filesystem::generic_path(".k3d/ui_layout");
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// tutorial_panel
-
-class tutorial_panel :
-	public Gtk::HBox,
-	public ui_component
-{
-public:
-	tutorial_panel(icommand_node& Parent) :
-		m_close(*this, "close", *Gtk::manage(new Gtk::Image(Gtk::Stock::CLOSE, Gtk::ICON_SIZE_BUTTON))),
-		m_stop(*this, "stop", *Gtk::manage(new Gtk::Image(Gtk::Stock::STOP, Gtk::ICON_SIZE_BUTTON))),
-		m_continue(*this, "continue", *Gtk::manage(new Gtk::Image(Gtk::Stock::YES, Gtk::ICON_SIZE_BUTTON)))
-	{
-		k3d::command_tree().add(*this, "tutorial_panel", &Parent);
-
-		m_continue.set_flags(Gtk::CAN_DEFAULT | Gtk::CAN_FOCUS);
-
-		m_close.set_tip(_("Close"));
-		m_stop.set_tip(_("Cancel Tutorial"));
-		m_continue.set_tip(_("Continue Tutorial"));
-
-		m_close.enable_recording(false);
-		m_stop.enable_recording(false);
-		m_continue.enable_recording(false);
-
-		m_message.set_wrap_mode(Gtk::WRAP_WORD);
-		m_message.set_editable(false);
-		m_message.set_justification(Gtk::JUSTIFY_LEFT);
-
-		m_url_tag = Gtk::TextBuffer::Tag::create("url");
-		m_url_tag->property_foreground() = "blue";
-		m_url_tag->property_underline() = Pango::UNDERLINE_SINGLE;
-		m_url_tag->signal_event().connect(sigc::mem_fun(*this, &tutorial_panel::on_url_event));
-		m_message.get_buffer()->get_tag_table()->add(m_url_tag);
-
-		Gtk::HBox* const hbox = new Gtk::HBox();
-		hbox->pack_start(m_close, Gtk::PACK_SHRINK);
-		hbox->pack_start(m_stop, Gtk::PACK_SHRINK);
-		hbox->pack_start(m_continue, Gtk::PACK_SHRINK);
-
-		Gtk::VBox* const vbox = new Gtk::VBox();
-		vbox->pack_start(*Gtk::manage(hbox), Gtk::PACK_SHRINK);
-
-		pack_start(*Gtk::manage(vbox), Gtk::PACK_SHRINK);
-		pack_start(m_message, Gtk::PACK_EXPAND_WIDGET);
-
-		tutorial_message::instance().connect_show_message_signal(sigc::mem_fun(*this, &tutorial_panel::on_tutorial_message));
-		tutorial_message::instance().connect_move_pointer_signal(sigc::mem_fun(*this, &tutorial_panel::on_move_pointer));
-		tutorial_message::instance().connect_wait_signal(sigc::mem_fun(*this, &tutorial_panel::on_wait));
-		tutorial_message::instance().connect_acknowledge_signal(sigc::mem_fun(*this, &tutorial_panel::on_acknowledge));
-		tutorial_message::instance().connect_hide_messages_signal(sigc::mem_fun(*this, &tutorial_panel::on_hide_messages));
-
-		m_close.signal_clicked().connect(sigc::mem_fun(tutorial_message::instance(), &tutorial_message::hide_messages));
-		m_stop.signal_clicked().connect(sigc::mem_fun(tutorial_message::instance(), &tutorial_message::cancel_message));
-		m_continue.signal_clicked().connect(sigc::mem_fun(tutorial_message::instance(), &tutorial_message::continue_message));
-
-		m_stop.set_sensitive(false);
-		m_continue.set_sensitive(false);
-
-		hide_all();
-	}
-
-private:
-	void on_tutorial_message(const std::string& Message)
-	{
-		m_message.get_buffer()->set_text(Message);
-		apply_tag(Message, "http://[^[:space:]]*", m_url_tag);
-
-		show_all();
-		handle_pending_events();
-
-		Gtk::TextBuffer::iterator i = m_message.get_buffer()->begin();
-		m_message.scroll_to_iter(i, 0.0);
-	}
-
-	void on_move_pointer()
-	{
-		interactive::show(m_continue);
-		interactive::move_pointer(m_continue);
-
-		/** \todo Get rid of this ugly, ugly workaround ... see http://bugzilla.gnome.org/attachment.cgi?id=51436 */
-		m_continue.gobj()->in_button = true;
-
-		// If we are in batch mode, keep things moving along ...
-		if(k3d::batch_mode())
-		{
-			interactive::activate(m_continue);
-		}
-	}
-
-	bool on_key_press_event(GdkEventKey* event)
-	{
-		if(event->keyval == GDK_Page_Down)
-		{
-			tutorial_message::instance().continue_message();
-			return true;
-		}
-
-		return Gtk::HBox::on_key_press_event(event);
-	}
-
-	void on_wait()
-	{
-		m_stop.set_sensitive(true);
-		m_continue.set_sensitive(true);
-
-		m_continue.grab_default();
-		m_continue.grab_focus();
-	}
-
-	void on_acknowledge()
-	{
-		m_stop.set_sensitive(false);
-		m_continue.set_sensitive(false);
-	}
-
-	void on_hide_messages()
-	{
-		hide_all();
-	}
-
-	void apply_tag(const std::string& Message, const std::string& RegularExpression, const Glib::RefPtr<Gtk::TextBuffer::Tag>& Tag)
-	{
-		std::string::const_iterator begin = Message.begin();
-		std::string::const_iterator end = Message.end();
-		boost::regex regex(RegularExpression);
-		boost::match_results<std::string::const_iterator> match;
-		while(boost::regex_search(begin, end, match, regex))
-		{
-			m_message.get_buffer()->apply_tag(
-				Tag,
-				m_message.get_buffer()->get_iter_at_offset(std::distance(begin, match[0].first)),
-				m_message.get_buffer()->get_iter_at_offset(std::distance(begin, match[0].second)));
-
-			begin = match[0].second;
-		}
-	}
-
-	bool on_url_event(const Glib::RefPtr<Glib::Object>& EventObject, GdkEvent* Event, const Gtk::TextIter& Begin)
-	{
-		switch(Event->type)
-		{
-			case GDK_BUTTON_PRESS:
-			{
-				Gtk::TextIter begin = Begin;
-				if(!begin.begins_tag(m_url_tag))
-					begin.backward_to_tag_toggle(m_url_tag);
-
-				Gtk::TextIter end = Begin;
-				end.forward_to_tag_toggle(m_url_tag);
-
-				k3d::ngui::uri::open(begin.get_text(end));
-				break;
-			}
-			default:
-				break;
-		}
-
-		return false;
-	}
-
-	Gtk::TextView m_message;
-	Glib::RefPtr<Gtk::TextBuffer::Tag> m_url_tag;
-
-	button::control m_close;
-	button::control m_stop;
-	button::control m_continue;
-};
-
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
@@ -385,7 +213,6 @@ class main_document_window :
 public:
 	main_document_window(document_state& DocumentState) :
 		k3d::property_collection(),
-		m_tutorial_panel(*this),
 		m_statusbar(*this, "statusbar"),
 		m_maximize_panel(init_name("maximize_panel") + init_label(_("Maximize active panel")) + init_description(_("Maximize active panel (make it the only visible one)")) + init_value(false)),
 		m_hide_unpinned_panels(init_name("hide_unpinned_panels") + init_label(_("Hide unpinned panels")) + init_description(_("Hide/show unpinned panels in main document window")) + init_value(false)),
@@ -438,7 +265,6 @@ public:
 
 		// Setup main box with menubar, panel frame and status bar
 		Gtk::VBox* const vbox1 = new Gtk::VBox(false);
-		vbox1->pack_start(m_tutorial_panel, Gtk::PACK_SHRINK);
 		vbox1->pack_start(*Gtk::manage(menubar), Gtk::PACK_SHRINK);
 		vbox1->pack_start(m_panel_frame, Gtk::PACK_EXPAND_WIDGET);
 //		vbox1->pack_start(*Gtk::manage(hbox1), Gtk::PACK_SHRINK);
@@ -1257,22 +1083,6 @@ private:
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
-		if(k3d::plugin::factory::lookup("NGUITutorialRecorderDialog"))
-		{
-			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(Parent, "scripting_record_tutorial", _("_Record Tutorial..."), true)
-				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_tutorial_recorder))
-				<< set_accelerator_path("<k3d-document>/actions/scripting/record_tutorial", get_accel_group())));
-		}
-
-		if(k3d::plugin::factory::lookup("NGUITestCaseRecorderDialog"))
-		{
-			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(Parent, "scripting_record_test_case", _("Record _Test Case..."), true)
-				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_test_case_recorder))
-				<< set_accelerator_path("<k3d-document>/actions/scripting/record_test_case", get_accel_group())));
-		}
-
 		// Create menu items for (optional) scripted actions ...
 		Gtk::Menu* actions_menu = 0;
 
@@ -1334,7 +1144,7 @@ private:
 		if(k3d::plugin::factory::lookup("NGUILearningDialog"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(Parent, "help_tutorials", _("_Tutorials and Examples ..."), true)
+				new menu_item::control(Parent, "help_tutorials", _("Example documents ..."), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_learning_menu))
 				<< set_accelerator_path("<k3d-document>/actions/help/learning_menu", get_accel_group())));
 		}
@@ -2483,21 +2293,6 @@ private:
 		}
 	}
 
-	void on_scripting_tutorial_recorder()
-	{
-		Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUITutorialRecorderDialog");
-		return_if_fail(window);
-
-		window->set_transient_for(*this);
-	}
-
-	void on_scripting_test_case_recorder()
-	{
-		// Plugin creation may return NULL if the user cancels the operation, so this isn't an error
-		if(Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUITestCaseRecorderDialog"))
-			window->set_transient_for(*this);
-	}
-
 	void on_scripting_action(k3d::iplugin_factory* Factory)
 	{
 		boost::scoped_ptr<k3d::iunknown> plugin(k3d::plugin::create(*Factory));
@@ -2807,7 +2602,7 @@ private:
 
 	bool load_ui_layout()
 	{
-		if(!application_state::instance().custom_layouts() || k3d::ngui::tutorial::recording() || k3d::ngui::tutorial::playing())
+		if(!application_state::instance().custom_layouts())
 			return false;
 
 		const k3d::filesystem::path layout_path = detail::ui_layout_path();
@@ -3080,8 +2875,6 @@ private:
 	std::auto_ptr<image_menu_item::control> m_redo_menu_item;
 	/// Stores the Edit > Redo All menu item
 	std::auto_ptr<image_menu_item::control> m_redo_all_menu_item;
-	/// Tutorial message panel for the window
-	detail::tutorial_panel m_tutorial_panel;
 	/// Main status bar for the window
 	statusbar::control m_statusbar;
 	/// Set to true iff current panel was maximized

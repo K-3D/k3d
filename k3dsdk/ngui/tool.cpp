@@ -105,12 +105,6 @@ void tool::redraw_all()
 	k3d::gl::redraw_all(m_document_state->document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 }
 
-void tool::record_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
-{
-	return_if_fail(Command.size());
-	k3d::command_tree().command_signal().emit(*this, k3d::icommand_node::COMMAND_INTERACTIVE, Command, Arguments);
-}
-
 void tool::on_initialize(document_state&)
 {
 }

@@ -33,7 +33,6 @@
 #include "interactive.h"
 #include "keyboard.h"
 #include "transform_tool.h"
-#include "tutorial_message.h"
 #include "utility.h"
 #include "viewport.h"
 
@@ -633,23 +632,18 @@ void transform_tool::lbutton_down(viewport::control& Viewport, const k3d::point2
 void transform_tool::lmb_down_add()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_add";
-
 	m_mouse_down_content = SELECTION_ADD;
 }
 
 void transform_tool::lmb_down_subtract()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_subtract";
-
 	m_mouse_down_content = SELECTION_SUBTRACT;
 }
 
 void transform_tool::lmb_down_manipulator(const std::string& ManipulatorName)
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_manipulator_" + ManipulatorName;
 
 	set_manipulator(ManipulatorName);
 	set_motion(MOTION_DRAG);
@@ -660,16 +654,12 @@ void transform_tool::lmb_down_manipulator(const std::string& ManipulatorName)
 void transform_tool::lmb_down_selected()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_selected";
-
 	m_mouse_down_content = SELECTED_OBJECT;
 }
 
 void transform_tool::lmb_down_deselected()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_deselected";
-
 	m_mouse_down_content = DESELECTED_OBJECT;
 
 	// Deselect all
@@ -681,8 +671,6 @@ void transform_tool::lmb_down_deselected()
 void transform_tool::lmb_down_nothing()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "lmb_down_nothing";
-
 	m_mouse_down_content = NOTHING;
 }
 
@@ -720,10 +708,8 @@ void transform_tool::lbutton_click(viewport::control& Viewport, const k3d::point
 // LMB click actions
 void transform_tool::lmb_click_add(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_click_add";
-
 	// Shift key modifier always adds to the selection
-	interactive::move_pointer(Viewport, Coordinates);
+//	interactive::move_pointer(Viewport, Coordinates);
 	m_document_state.select(Viewport.pick_object(Coordinates, m_document_state.pick_backfacing()));
 
 	k3d::finish_state_change_set(m_document, "Selection add", K3D_CHANGE_SET_CONTEXT);
@@ -733,10 +719,8 @@ void transform_tool::lmb_click_add(viewport::control& Viewport, const k3d::point
 
 void transform_tool::lmb_click_subtract(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_click_subtract";
-
 	// Control key modifier always adds to the selection
-	interactive::move_pointer(Viewport, Coordinates);
+//	interactive::move_pointer(Viewport, Coordinates);
 	m_document_state.deselect(Viewport.pick_object(Coordinates, m_document_state.pick_backfacing()));
 
 	k3d::finish_state_change_set(m_document, "Selection subtract", K3D_CHANGE_SET_CONTEXT);
@@ -746,9 +730,7 @@ void transform_tool::lmb_click_subtract(viewport::control& Viewport, const k3d::
 
 void transform_tool::lmb_click_replace(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_click_replace";
-
-	interactive::move_pointer(Viewport, Coordinates);
+//	interactive::move_pointer(Viewport, Coordinates);
 	m_document_state.select(Viewport.pick_object(Coordinates, m_document_state.pick_backfacing()));
 
 	k3d::finish_state_change_set(m_document, "Selection replace", K3D_CHANGE_SET_CONTEXT);
@@ -758,8 +740,6 @@ void transform_tool::lmb_click_replace(viewport::control& Viewport, const k3d::p
 
 void transform_tool::lmb_click_start_motion(const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_click_start_motion";
-
 	disconnect_navigation_input_model();
 
 	set_motion(MOTION_CLICK_DRAG);
@@ -770,8 +750,6 @@ void transform_tool::lmb_click_start_motion(const k3d::point2& Coordinates)
 
 void transform_tool::lmb_click_stop_motion()
 {
-	m_tutorial_action = "lmb_click_stop_motion";
-
 	end_drag_motion();
 	
 	const std::string label = complete_mouse_move();
@@ -784,8 +762,6 @@ void transform_tool::lmb_click_stop_motion()
 
 void transform_tool::lmb_click_deselect_all()
 {
-	m_tutorial_action = "lmb_click_deselect_all";
-
 	// Deselect all
 	m_document_state.deselect_all();
 
@@ -817,8 +793,6 @@ void transform_tool::lbutton_start_drag(viewport::control& Viewport, const k3d::
 // LMB start drag actions
 void transform_tool::lmb_start_drag_start_motion(const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_start_drag_start_motion";
-
 	m_off_screen_offset = k3d::point2(0, 0);
 
 	set_motion(MOTION_DRAG);
@@ -827,8 +801,6 @@ void transform_tool::lmb_start_drag_start_motion(const k3d::point2& Coordinates)
 
 void transform_tool::lmb_start_drag_box_select(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_start_drag_box_select";
-
 	set_motion(MOTION_BOX_SELECT);
 	m_box_selection = k3d::rectangle(Coordinates[0], Coordinates[0], Coordinates[1], Coordinates[1]);
 	draw_rubber_band(Viewport);
@@ -836,8 +808,6 @@ void transform_tool::lmb_start_drag_box_select(viewport::control& Viewport, cons
 
 void transform_tool::lmb_drag_box_select(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_drag_box_select";
-
 	on_box_select_motion(Viewport, Coordinates);
 }
 
@@ -854,8 +824,6 @@ void transform_tool::lbutton_end_drag(viewport::control& Viewport, const k3d::po
 // LMB end drag actions
 void transform_tool::lmb_end_drag_stop_motion()
 {
-	m_tutorial_action = "lmb_end_drag_stop_motion";
-
 	end_drag_motion();
 	
 	const std::string label = complete_mouse_move();
@@ -866,8 +834,6 @@ void transform_tool::lmb_end_drag_stop_motion()
 
 void transform_tool::lmb_end_drag_box_select(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "lmb_end_drag_box_select";
-
 	draw_rubber_band(Viewport);
 
 	on_box_select_objects(Viewport, Coordinates, m_box_selection);
@@ -906,8 +872,6 @@ void transform_tool::mbutton_click(viewport::control& Viewport, const k3d::point
 
 void transform_tool::mmb_click_toggle_manipulators_visibility()
 {
-	m_tutorial_action = "mmb_click_toggle_manipulators_visibility";
-
 	// Toggle the visible state of the manipulators
 	m_visible_manipulators.set_value(!m_visible_manipulators.internal_value());
 
@@ -916,8 +880,6 @@ void transform_tool::mmb_click_toggle_manipulators_visibility()
 
 void transform_tool::mmb_click_manipulators_next_selection()
 {
-	m_tutorial_action = "mmb_click_manipulators_next_selection";
-
 	// Show manipulators on the next selection
 	m_current_target = m_targets.size() ? (m_current_target + 1) % m_targets.size() : 0;
 
@@ -926,8 +888,6 @@ void transform_tool::mmb_click_manipulators_next_selection()
 
 void transform_tool::mmb_click_switch_coordinate_system()
 {
-	m_tutorial_action = "mmb_click_switch_coordinate_system";
-
 	// Switch coordinate system between global and local modes
 	switch(m_coordinate_system.internal_value())
 	{
@@ -946,8 +906,6 @@ void transform_tool::mmb_click_switch_coordinate_system()
 
 void transform_tool::mmb_click_next_constraint(viewport::control& Viewport, const k3d::point2& Coordinates)
 {
-	m_tutorial_action = "mmb_click_next_constraint";
-
 	// Set next constraint
 	update_constraint(Viewport, Coordinates);
 
@@ -988,7 +946,6 @@ void transform_tool::rbutton_click(const viewport::control& Viewport, const k3d:
 void transform_tool::rmb_click_selection_tool()
 {
 	k3d::start_state_change_set(m_document, K3D_CHANGE_SET_CONTEXT);
-	m_tutorial_action = "rmb_click_selection_tool";
 
 	m_document_state.set_active_tool(m_document_state.selection_tool());
 
@@ -999,8 +956,6 @@ void transform_tool::rmb_click_selection_tool()
 
 void transform_tool::rmb_click_cancel_move()
 {
-	m_tutorial_action = "rmb_click_cancel_move";
-
 	cancel_mouse_move();
 
 	tool_selection::redraw_all();

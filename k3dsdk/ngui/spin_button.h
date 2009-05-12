@@ -160,8 +160,6 @@ public:
 	/// Sets the physical unit-of-measure that should be used to display values
 	void set_units(const std::type_info& Units);
 
-	const k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments);
-
 private:
 	/// Creates up or down button
 	void setup_arrow_button(Gtk::Button* Button, const Gtk::ArrowType ArrowType, const bool Up);

@@ -76,8 +76,6 @@ public:
 
 	/// Convenience function that schedules a screen update for all viewports
 	void redraw_all();
-	/// Records an interactive tutorial event
-	void record_command(const k3d::string_t& Command, const k3d::string_t& Arguments = "");
 
 protected:
 	tool();

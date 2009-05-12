@@ -21,7 +21,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "interactive.h"
 #include "check_menu_item.h"
 #include "utility.h"
 
@@ -118,20 +117,6 @@ void control::attach()
 }
 
 
-const k3d::icommand_node::result control::execute_command(const std::string& Command, const std::string& Arguments)
-{
-	if(Command == "value")
-	{
-		const bool new_value = Arguments == "true" ? true : false;
-		if(new_value != m_data->value())
-			interactive::activate(*this);
-
-		return RESULT_CONTINUE;
-	}
-
-	return ui_component::execute_command(Command, Arguments);
-}
-
 void control::update(k3d::ihint*)
 {
 	if(!m_data.get())
@@ -152,9 +137,6 @@ void control::on_toggled()
 		// If the value hasn't changed, we're done ...
 		if(new_value != m_data->value())
 		{
-			// Record the command for posterity (tutorials) ...
-			record_command("value", new_value ? "true" : "false");
-
 			// Turn this into an undo/redo -able event ...
 			if(m_data->state_recorder)
 				m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);

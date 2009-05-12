@@ -33,7 +33,6 @@
 #include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/basic_viewport_input_model.h>
-#include <k3dsdk/ngui/command_arguments.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/interactive.h>
@@ -107,10 +106,6 @@ public:
 				k3d::property::set_internal_value(crop_window->crop_top(), 0.0);
 				k3d::property::set_internal_value(crop_window->crop_bottom(), 1.0);
 
-				command_arguments arguments;
-				arguments.append_viewport_coordinates("mouse", Viewport, Event);
-				m_command_signal.emit("reset_region", arguments);
-
 				return;
 			}
 		}
@@ -132,21 +127,12 @@ public:
 		Viewport.set_camera_preview_engine(render_engine);
 
 		render(*camera, *render_engine);
-		
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		m_command_signal.emit("render_preview", arguments);
 	}
 
 	void on_lbutton_start_drag(viewport::control& Viewport, const GdkEventMotion& Event)
 	{
 		m_rubber_band.box = k3d::rectangle(Event.x, Event.x, Event.y, Event.y);
 		m_rubber_band.draw(Viewport);
-
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		arguments.append_viewport_coordinates("box", Viewport, m_rubber_band.box);
-		m_command_signal.emit("start_region", arguments);
 
 		m_timer.restart();
 	}
@@ -157,12 +143,6 @@ public:
 		m_rubber_band.box.right = Event.x;
 		m_rubber_band.box.bottom = Event.y;
 		m_rubber_band.draw(Viewport);
-
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		arguments.append_viewport_coordinates("box", Viewport, m_rubber_band.box);
-		arguments.append("timestamp", m_timer.elapsed());
-		m_command_signal.emit("region_motion", arguments);
 	}
 
 	void on_lbutton_end_drag(viewport::control& Viewport, const GdkEventButton& Event)
@@ -187,136 +167,11 @@ public:
 		k3d::property::set_internal_value(crop_window->crop_right(), right);
 		k3d::property::set_internal_value(crop_window->crop_top(), top);
 		k3d::property::set_internal_value(crop_window->crop_bottom(), bottom);
-
-		command_arguments arguments;
-		arguments.append_viewport_coordinates("mouse", Viewport, Event);
-		arguments.append("left", left);
-		arguments.append("right", right);
-		arguments.append("top", top);
-		arguments.append("bottom", bottom);
-		m_command_signal.emit("finish_region", arguments);
 	}
 
 	void on_rbutton_click(viewport::control& Viewport, const GdkEventButton& Event)
 	{
 		m_document_state.set_active_tool(m_document_state.selection_tool());
-	}
-
-	bool execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		try
-		{
-			if(Command == "start_region")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 viewport_coordinates = arguments.get_viewport_point2("mouse");
-				const k3d::rectangle box = arguments.get_viewport_rectangle("box");
-
-				interactive::move_pointer(viewport, viewport_coordinates);
-				
-				m_rubber_band.box = box;
-				m_rubber_band.draw(viewport);
-			
-				m_timer.restart();
-				
-				return true;
-			}
-			else if(Command == "region_motion")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 viewport_coordinates = arguments.get_viewport_point2("mouse");
-				const k3d::rectangle box = arguments.get_viewport_rectangle("box");
-				const double timestamp = arguments.get_double("timestamp");
-
-				interactive::warp_pointer(viewport, viewport_coordinates, timestamp, m_timer);
-
-				m_rubber_band.draw(viewport);
-				m_rubber_band.box = box;
-				m_rubber_band.draw(viewport);
-				
-				return true;
-			}
-			else if(Command == "finish_region")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 viewport_coordinates = arguments.get_viewport_point2("mouse");
-				const double left = arguments.get_double("left");
-				const double right = arguments.get_double("right");
-				const double top = arguments.get_double("top");
-				const double bottom = arguments.get_double("bottom");
-
-				interactive::warp_pointer(viewport, viewport_coordinates);
-
-				m_rubber_band.draw(viewport);
-
-				k3d::icrop_window* const crop_window = dynamic_cast<k3d::icrop_window*>(viewport.camera());
-				return_val_if_fail(crop_window, false);
-		
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Set Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
-		
-				k3d::property::set_internal_value(crop_window->crop_left(), left);
-				k3d::property::set_internal_value(crop_window->crop_right(), right);
-				k3d::property::set_internal_value(crop_window->crop_top(), top);
-				k3d::property::set_internal_value(crop_window->crop_bottom(), bottom);
-				
-				return true;
-			}
-			else if(Command == "render_preview")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 viewport_coordinates = arguments.get_viewport_point2("mouse");
-
-				interactive::move_pointer(viewport, viewport_coordinates);
-				
-				k3d::icamera* camera = viewport.camera();
-				if(!camera)
-					camera = pick_camera(m_document_state);
-				if(!camera)
-					return false;
-
-				k3d::irender_camera_preview* render_engine = viewport.camera_preview_engine();
-				if(!render_engine)
-					render_engine = pick_camera_preview_render_engine(m_document_state);
-				if(!render_engine)
-					return false;
-
-				
-				viewport.set_camera(camera);
-				viewport.set_camera_preview_engine(render_engine);
-
-				render(*camera, *render_engine);
-				return true;
-			}
-			else if(Command == "reset_region")
-			{
-				command_arguments arguments(Arguments);
-				viewport::control& viewport = arguments.get_viewport();
-				const k3d::point2 viewport_coordinates = arguments.get_viewport_point2("mouse");
-
-				interactive::move_pointer(viewport, viewport_coordinates);
-				
-				k3d::icrop_window* const crop_window = dynamic_cast<k3d::icrop_window*>(viewport.camera());
-				return_val_if_fail(crop_window, false);
-
-				k3d::record_state_change_set change_set(m_document_state.document(), _("Reset Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
-				k3d::property::set_internal_value(crop_window->crop_left(), 0.0);
-				k3d::property::set_internal_value(crop_window->crop_right(), 1.0);
-				k3d::property::set_internal_value(crop_window->crop_top(), 0.0);
-				k3d::property::set_internal_value(crop_window->crop_bottom(), 1.0);
-
-				return true;
-			}
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << k3d_file_reference << ": caught exception: " << e.what() << std::endl;
-		}
-
-		return false;
 	}
 
 	/// Stores the owning document
@@ -327,8 +182,6 @@ public:
 	navigation_input_model m_navigation_model;
 	/// Dispatches incoming user input events
 	basic_viewport_input_model m_input_model;
-	/// Emitted to record command-node commands
-	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
 
 	k3d::timer m_timer;
 };
@@ -356,17 +209,6 @@ public:
 		return get_factory().name();
 	}
 
-	virtual const k3d::icommand_node::result execute_command(const std::string& Command, const std::string& Arguments)
-	{
-		if(m_implementation->execute_command(Command, Arguments))
-			return RESULT_CONTINUE;
-
-		if(m_implementation->m_navigation_model.execute_command(Command, Arguments))
-			return RESULT_CONTINUE;
-
-		return RESULT_ERROR;
-	}
-
 	virtual k3d::ngui::viewport_input_model& get_input_model()
 	{
 		return m_implementation->m_input_model;
@@ -389,8 +231,6 @@ private:
 	virtual void on_initialize(document_state& DocumentState)
 	{
 		m_implementation = new render_region::implementation(DocumentState);
-		m_implementation->m_navigation_model.connect_command_signal(sigc::mem_fun(*this, &tool::record_command));
-		m_implementation->m_command_signal.connect(sigc::mem_fun(*this, &tool::record_command));
 	}
 
 	render_region::implementation* m_implementation;
