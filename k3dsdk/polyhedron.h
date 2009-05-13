@@ -121,6 +121,10 @@ public:
 
 /// Creates a new polyhedron mesh primitive, returning references to its member arrays.
 /// The caller is responsible for the lifetime of the returned object.
+primitive* create(mesh::primitive& GenericPrimitive);
+
+/// Creates a new polyhedron mesh primitive, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
 primitive* create(mesh& Mesh);
 
 /// Creates a new polyhedron mesh primitive from a list of vertices and face indices, returning references to its member arrays.

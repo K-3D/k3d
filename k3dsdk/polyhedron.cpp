@@ -135,25 +135,27 @@ primitive::primitive(
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create
 
-primitive* create(mesh& Mesh)
+primitive* create(mesh::primitive& GenericPrimitive)
 {
-	mesh::primitive& generic_primitive = Mesh.primitives.create("polyhedron");
+	GenericPrimitive.type = "polyhedron";
+	GenericPrimitive.structure.clear();
+	GenericPrimitive.attributes.clear();
 
 	primitive* const result = new primitive(
-		generic_primitive.structure.create<mesh::indices_t>("shell_first_faces"),
-		generic_primitive.structure.create<mesh::counts_t>("shell_face_counts"),
-		generic_primitive.structure.create<typed_array<int32_t> >("shell_types"),
-		generic_primitive.structure.create<mesh::indices_t>("face_first_loops"),
-		generic_primitive.structure.create<mesh::counts_t>("face_loop_counts"),
-		generic_primitive.structure.create<mesh::selection_t>("face_selections"),
-		generic_primitive.structure.create<mesh::materials_t>("face_materials"),
-		generic_primitive.structure.create<mesh::indices_t>("loop_first_edges"),
-		generic_primitive.structure.create<mesh::indices_t>("edge_points"),
-		generic_primitive.structure.create<mesh::indices_t>("clockwise_edges"),
-		generic_primitive.structure.create<mesh::selection_t>("edge_selections"),
-		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["uniform"],
-		generic_primitive.attributes["face_varying"]
+		GenericPrimitive.structure.create<mesh::indices_t>("shell_first_faces"),
+		GenericPrimitive.structure.create<mesh::counts_t>("shell_face_counts"),
+		GenericPrimitive.structure.create<typed_array<int32_t> >("shell_types"),
+		GenericPrimitive.structure.create<mesh::indices_t>("face_first_loops"),
+		GenericPrimitive.structure.create<mesh::counts_t>("face_loop_counts"),
+		GenericPrimitive.structure.create<mesh::selection_t>("face_selections"),
+		GenericPrimitive.structure.create<mesh::materials_t>("face_materials"),
+		GenericPrimitive.structure.create<mesh::indices_t>("loop_first_edges"),
+		GenericPrimitive.structure.create<mesh::indices_t>("edge_points"),
+		GenericPrimitive.structure.create<mesh::indices_t>("clockwise_edges"),
+		GenericPrimitive.structure.create<mesh::selection_t>("edge_selections"),
+		GenericPrimitive.attributes["constant"],
+		GenericPrimitive.attributes["uniform"],
+		GenericPrimitive.attributes["face_varying"]
 		);
 
 	result->face_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
@@ -161,6 +163,12 @@ primitive* create(mesh& Mesh)
 	result->edge_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::SPLIT_EDGE));
 
 	return result;
+}
+
+primitive* create(mesh& Mesh)
+{
+	mesh::primitive& generic_primitive = Mesh.primitives.create("polyhedron");
+	return create(generic_primitive);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
