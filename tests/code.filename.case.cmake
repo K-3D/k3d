@@ -7,6 +7,7 @@ SET(SKIP_FILES
 	"^cmake/modules/K3D.*$"
 	"^COPYING$"
 	"^CTestConfig.cmake$"
+	"^CTestCustom.cmake.in$"
 	"^distribution/osx/bundle/Info.plist.in$"
 	"^docs/doxygen/Doxyfile.in$"
 	"^INSTALL$"
