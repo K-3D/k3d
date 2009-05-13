@@ -38,11 +38,8 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
-#include <k3dsdk/ngui/image_menu_item.h>
-#include <k3dsdk/ngui/menu_item.h>
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/scripting.h>
-#include <k3dsdk/ngui/toolbar.h>
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/properties.h>

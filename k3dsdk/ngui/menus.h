@@ -26,6 +26,7 @@
 #include <string>
 
 namespace k3d { class iplugin_factory; }
+namespace Gtk { class ImageMenuItem; }
 
 namespace k3d
 {
@@ -33,11 +34,8 @@ namespace k3d
 namespace ngui
 {
 
-// Forward declarations
-namespace image_menu_item { class control; }
-
-/// Creates a menu item object based on a plugin type
-image_menu_item::control* create_menu_item(k3d::iplugin_factory& Factory);
+/// Creates a menu item based on a plugin type
+Gtk::ImageMenuItem* create_menu_item(k3d::iplugin_factory& Factory);
 
 } // namespace ngui
 

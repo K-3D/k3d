@@ -32,6 +32,8 @@
 #include <gtkmm/tooltips.h>
 #include <glibmm/ustring.h>
 
+namespace Gtk { class ImageMenuItem; }
+
 namespace k3d
 {
 
@@ -52,7 +54,7 @@ template<typename T>
 T* operator<<(T* LHS, const set_tooltip& RHS)
 {
 	return_val_if_fail(LHS, LHS);
-	LHS->tooltips().set_tip(*LHS, RHS.tooltip);
+	LHS->set_tooltip_text(RHS.tooltip);
 	return LHS;
 }
 
@@ -266,6 +268,12 @@ T* operator<<(T* LHS, const enable_dynamic_accelerators& RHS)
 	enable_dynamic_accelerators_impl(LHS);
 	return LHS;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// get_label
+
+/// Returns the text label associated with an image label widget
+Gtk::Label* get_label(Gtk::ImageMenuItem& widget);
 
 } // namespace ngui
 

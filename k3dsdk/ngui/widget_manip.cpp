@@ -25,6 +25,7 @@
 #include "widget_manip.h"
 
 #include <gtkmm/accelmap.h>
+#include <gtkmm/imagemenuitem.h>
 #include <gtkmm/menuitem.h>
 
 namespace k3d
@@ -101,6 +102,11 @@ void enable_dynamic_accelerators_impl(Gtk::Widget* const Widget)
 
 	Widget->signal_enter_notify_event().connect(sigc::bind(sigc::ptr_fun(detail::dynamic_accelerator_on_enter_notify_event), Widget));
 	Widget->signal_key_press_event().connect(sigc::bind(sigc::ptr_fun(detail::dynamic_accelerator_on_key_press_event), Widget));
+}
+
+Gtk::Label* get_label(Gtk::ImageMenuItem& widget)
+{
+	return dynamic_cast<Gtk::Label*>(widget.get_child());
 }
 
 } // namespace ngui

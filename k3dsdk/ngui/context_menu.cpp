@@ -24,7 +24,9 @@
 */
 
 #include <gtkmm/image.h>
+#include <gtkmm/imagemenuitem.h>
 #include <gtkmm/menu.h>
+#include <gtkmm/menuitem.h>
 #include <gtkmm/stock.h>
 
 #include "check_menu_item.h"
@@ -33,8 +35,6 @@
 #include "document_state.h"
 #include "file_chooser_dialog.h"
 #include "icons.h"
-#include "image_menu_item.h"
-#include "menu_item.h"
 #include "menus.h"
 #include "messages.h"
 #include "modifiers.h"
@@ -97,19 +97,19 @@ public:
 		Gtk::Menu* const render_submenu = new Gtk::Menu();
 
 		render_submenu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 			*Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_MENU))),
 			_("Render Preview")) <<
 				connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_render_preview))));
 
 		render_submenu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 			*Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_MENU))),
 			_("Render Image")) <<
 				connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_render_frame))));
 
 		render_submenu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 			*Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_MENU))),
 			_("Render Animation")) <<
 				connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_render_animation))));
@@ -117,26 +117,26 @@ public:
 		items().push_back(Gtk::Menu_Helpers::MenuElem(_("Render"), *Gtk::manage(render_submenu)));
 
 		items().push_back(*Gtk::manage(
-			new menu_item::control(_("Set Camera ...")) <<
+			new Gtk::MenuItem(_("Set Camera ...")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_set_viewport_camera))));
 
 		// Set render engines
 		Gtk::Menu* const engines_submenu = new Gtk::Menu();
 
 		engines_submenu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Set Preview Engine ...")) <<
+			new Gtk::MenuItem(_("Set Preview Engine ...")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_set_viewport_preview_engine))));
 
 		engines_submenu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Set Still Engine ...")) <<
+			new Gtk::MenuItem(_("Set Still Engine ...")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_set_viewport_still_engine))));
 
 		engines_submenu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Set Animation Engine ...")) <<
+			new Gtk::MenuItem(_("Set Animation Engine ...")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_set_viewport_animation_engine))));
 
 		engines_submenu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Set OpenGL Engine ...")) <<
+			new Gtk::MenuItem(_("Set OpenGL Engine ...")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_set_viewport_gl_engine))));
 
 		items().push_back(Gtk::Menu_Helpers::MenuElem(_("Render Engine"), *Gtk::manage(engines_submenu)));
@@ -145,7 +145,7 @@ public:
 		items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		// Functionality common to all nodes ...
-		m_delete_nodes = new menu_item::control(_("Delete")) <<
+		m_delete_nodes = new Gtk::MenuItem(_("Delete")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_delete));
 		items().push_back(*Gtk::manage(m_delete_nodes));
 
@@ -154,12 +154,12 @@ public:
 		{
 			items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 			items().push_back(*Gtk::manage(
-				new image_menu_item::control(
+				new Gtk::ImageMenuItem(
 					*Gtk::manage(new Gtk::Image(Gtk::Stock::SAVE, Gtk::ICON_SIZE_MENU)),
 					_("Save Object")) <<
 				connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_save_node))));
 			items().push_back(*Gtk::manage(
-				new image_menu_item::control(
+				new Gtk::ImageMenuItem(
 					*Gtk::manage(new Gtk::Image(Gtk::Stock::OPEN, Gtk::ICON_SIZE_MENU)),
 					_("Load Object")) <<
 				connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_load_node))));
@@ -167,15 +167,15 @@ public:
 */
 
 		// Mesh-specific functionality ...
-		m_instantiate_meshes = new menu_item::control(_("Instantiate")) <<
+		m_instantiate_meshes = new Gtk::MenuItem(_("Instantiate")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_instantiate));
 		items().push_back(*Gtk::manage(m_instantiate_meshes));
 
-		m_duplicate_meshes = new menu_item::control(_("Duplicate")) <<
+		m_duplicate_meshes = new Gtk::MenuItem(_("Duplicate")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_duplicate));
 		items().push_back(*Gtk::manage(m_duplicate_meshes));
 		
-		m_animate_transformation = new menu_item::control(_("Animate Transformation")) <<
+		m_animate_transformation = new Gtk::MenuItem(_("Animate Transformation")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_animate_transformation));
 		items().push_back(*Gtk::manage(m_animate_transformation));
 
@@ -217,19 +217,19 @@ public:
 		items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		items().push_back(*Gtk::manage(
-			new menu_item::control(_("Hide Selection")) <<
+			new Gtk::MenuItem(_("Hide Selection")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_hide_selection))));
 
 		items().push_back(*Gtk::manage(
-			new menu_item::control(_("Show Selection")) <<
+			new Gtk::MenuItem(_("Show Selection")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_show_selection))));
 
 		items().push_back(*Gtk::manage(
-			new menu_item::control(_("Hide Unselected")) <<
+			new Gtk::MenuItem(_("Hide Unselected")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_hide_unselected))));
 
 		items().push_back(*Gtk::manage(
-			new menu_item::control(_("Show All")) <<
+			new Gtk::MenuItem(_("Show All")) <<
 			connect_menu_item(sigc::mem_fun(*this, &node_context_menu::on_show_all))));
 
 		show_all();
@@ -630,10 +630,10 @@ private:
 	Gtk::MenuItem* m_viewport1;
 
 	// Mesh functionality
-	menu_item::control* m_delete_nodes;
-	menu_item::control* m_instantiate_meshes;
-	menu_item::control* m_duplicate_meshes;
-	menu_item::control* m_animate_transformation;
+	Gtk::MenuItem* m_delete_nodes;
+	Gtk::MenuItem* m_instantiate_meshes;
+	Gtk::MenuItem* m_duplicate_meshes;
+	Gtk::MenuItem* m_animate_transformation;
 	Gtk::Menu* m_mesh_modifiers;
 	Gtk::Menu* m_transform_modifiers;
 

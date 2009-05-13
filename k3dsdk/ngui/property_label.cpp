@@ -30,7 +30,6 @@
 
 #include "document_state.h"
 #include "icons.h"
-#include "menu_item.h"
 #include "messages.h"
 #include "property_label.h"
 #include "utility.h"

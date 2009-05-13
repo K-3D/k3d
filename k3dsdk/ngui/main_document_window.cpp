@@ -30,10 +30,8 @@
 #include "document_state.h"
 #include "file_chooser_dialog.h"
 #include "icons.h"
-#include "image_menu_item.h"
 #include "image_toggle_button.h"
 #include "main_document_window.h"
-#include "menu_item.h"
 #include "menus.h"
 #include "merge_nodes.h"
 #include "messages.h"
@@ -105,8 +103,10 @@
 #include <gtkmm/eventbox.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/frame.h>
+#include <gtkmm/imagemenuitem.h>
 #include <gtkmm/handlebox.h>
 #include <gtkmm/menu.h>
+#include <gtkmm/menuitem.h>
 #include <gtkmm/menubar.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/paned.h>
@@ -424,21 +424,21 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::NEW, Gtk::ICON_SIZE_MENU)),
 				_("_New"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_file_new))
 			<< set_accelerator_path("<k3d-document>/actions/file/new", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::OPEN, Gtk::ICON_SIZE_MENU)),
 				_("_Open..."), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_file_open))
 			<< set_accelerator_path("<k3d-document>/actions/file/open", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::OPEN, Gtk::ICON_SIZE_MENU)),
 				_("_Merge Nodes..."), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_file_merge_nodes))
@@ -447,14 +447,14 @@ private:
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::SAVE, Gtk::ICON_SIZE_MENU)),
 				_("_Save"), true)
 			<< connect_menu_item(sigc::hide_return(sigc::mem_fun(*this, &main_document_window::on_file_save)))
 			<< set_accelerator_path("<k3d-document>/actions/file/save", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::SAVE_AS, Gtk::ICON_SIZE_MENU)),
 				_("Save _As..."), true)
 			<< connect_menu_item(sigc::hide_return(sigc::mem_fun(*this, &main_document_window::on_file_save_as)))
@@ -463,7 +463,7 @@ private:
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::REVERT_TO_SAVED, Gtk::ICON_SIZE_MENU)),
 				_("_Revert"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_file_revert))
@@ -472,26 +472,26 @@ private:
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Import ..."), true)
+			new Gtk::MenuItem(_("_Import ..."), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_file_import))
 			<< set_accelerator_path("<k3d-document>/actions/file/import", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Export ..."), true)
+			new Gtk::MenuItem(_("_Export ..."), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_file_export))
 			<< set_accelerator_path("<k3d-document>/actions/file/export", get_accel_group())));
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::CLOSE, Gtk::ICON_SIZE_MENU)),
 				_("_Close"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_file_close))
 			<< set_accelerator_path("<k3d-document>/actions/file/close", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::QUIT, Gtk::ICON_SIZE_MENU)),
 				_("_Quit"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_file_quit))
@@ -506,42 +506,42 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Select"), true)
+			new Gtk::MenuItem(_("_Select"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_selection_tool))
 			<< set_accelerator_path("<k3d-document>/actions/edit/tools/select_tool", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Move"), true)
+			new Gtk::MenuItem(_("_Move"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_move_tool))
 			<< set_accelerator_path("<k3d-document>/actions/edit/tools/move_tool", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Rotate"), true)
+			new Gtk::MenuItem(_("_Rotate"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_rotate_tool))
 			<< set_accelerator_path("<k3d-document>/actions/edit/tools/rotate_tool", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Scale"), true)
+			new Gtk::MenuItem(_("_Scale"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scale_tool))
 			<< set_accelerator_path("<k3d-document>/actions/edit/tools/scale_tool", get_accel_group())));
 
 		if(k3d::plugin::factory::lookup("NGUIParentTool"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(_("_Parent"), true)
+				new Gtk::MenuItem(_("_Parent"), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_parent_tool))
 				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIParentTool", get_accel_group())));
 		}
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Unparent"), true)
+			new Gtk::MenuItem(_("_Unparent"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_unparent))
 			<< set_accelerator_path("<k3d-document>/actions/edit/tools/unparent", get_accel_group())));
 
 		if(k3d::plugin::factory::lookup("NGUIRenderRegionTool"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control( _("Render R_egion"), true)
+				new Gtk::MenuItem( _("Render R_egion"), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_region_tool))
 				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIRenderRegionTool", get_accel_group())));
 		}
@@ -549,7 +549,7 @@ private:
 		if(k3d::plugin::factory::lookup("NGUIKnifeTool"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(_("_Knife Tool"), true)
+				new Gtk::MenuItem(_("_Knife Tool"), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_knife_tool))
 				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIKnifeTool", get_accel_group())));
 		}
@@ -557,7 +557,7 @@ private:
 		if(k3d::plugin::factory::lookup("NGUISnapTool"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(_("S_nap Tool"), true)
+				new Gtk::MenuItem(_("S_nap Tool"), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_snap_tool))
 				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUISnapTool", get_accel_group())));
 		}
@@ -571,28 +571,28 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		m_undo_menu_item.reset(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::UNDO, Gtk::ICON_SIZE_MENU)),
 				_("_Undo"), true)
 			<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_edit_undo), false))
 			<< set_accelerator_path("<k3d-document>/actions/edit/undo", get_accel_group()));
 
 		m_undo_all_menu_item.reset(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::UNDO, Gtk::ICON_SIZE_MENU)),
 				_("Undo All"))
 			<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_edit_undo), true))
 			<< set_accelerator_path("<k3d-document>/actions/edit/undo_all", get_accel_group()));
 
 		m_redo_menu_item.reset(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::REDO, Gtk::ICON_SIZE_MENU)),
 				_("_Redo"), true)
 			<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_edit_redo), false))
 			<< set_accelerator_path("<k3d-document>/actions/edit/redo", get_accel_group()));
 
 		m_redo_all_menu_item.reset(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::REDO, Gtk::ICON_SIZE_MENU)),
 				_("Redo All"))
 			<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_edit_redo), true))
@@ -612,19 +612,19 @@ private:
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Instantiate"), true)
+			new Gtk::MenuItem(_("_Instantiate"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_instantiate))
 			<< set_accelerator_path("<k3d-document>/actions/edit/instantiate", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("D_uplicate"), true)
+			new Gtk::MenuItem(_("D_uplicate"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_duplicate))
 			<< set_accelerator_path("<k3d-document>/actions/edit/duplicate", get_accel_group())));
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Delete"), true)
+			new Gtk::MenuItem(_("_Delete"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_delete))
 			<< set_accelerator_path("<k3d-document>/actions/edit/delete", get_accel_group())));
 
@@ -633,7 +633,7 @@ private:
 		if(k3d::plugin::factory::lookup("NGUIAssignHotkeysDialog"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(_("Assign _Hotkeys"), true)
+				new Gtk::MenuItem(_("Assign _Hotkeys"), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_assign_hotkeys))
 				<< set_accelerator_path("<k3d-document>/actions/view/assign_hotkeys", get_accel_group())));
 		}
@@ -647,56 +647,56 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_All"), true)
+			new Gtk::MenuItem(_("_All"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_all))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_all", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_None"), true)
+			new Gtk::MenuItem(_("_None"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_none))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_none", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Invert"), true)
+			new Gtk::MenuItem(_("_Invert"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_invert))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_invert", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Parent"), true)
+			new Gtk::MenuItem(_("_Parent"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_parent))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_parent", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Child"), true)
+			new Gtk::MenuItem(_("_Child"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_child))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_child", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Sibling"), true)
+			new Gtk::MenuItem(_("_Sibling"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_sibling))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_sibling", get_accel_group())));
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("N_odes"), true)
+			new Gtk::MenuItem(_("N_odes"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_nodes))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_nodes", get_accel_group())));
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Poin_ts"), true)
+			new Gtk::MenuItem(_("Poin_ts"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_vertices))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_points", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Lines"), true)
+			new Gtk::MenuItem(_("_Lines"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_edges))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_lines", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Faces"), true)
+			new Gtk::MenuItem(_("_Faces"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_faces))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_faces", get_accel_group())));
 		
@@ -718,31 +718,31 @@ private:
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_layout_hide_show_unpinned))
 			<< set_accelerator_path("<k3d-document>/actions/layout/hide_unpinned", get_accel_group());
 
-		m_layout_pin_all = new menu_item::control(_("_Pin All Panels"), true)
+		m_layout_pin_all = new Gtk::MenuItem(_("_Pin All Panels"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_layout_pin_all))
 			<< set_accelerator_path("<k3d-document>/actions/layout/pin_all_panels", get_accel_group());
 
-		m_layout_unpin_all = new menu_item::control(_("_Unpin All Panels"), true)
+		m_layout_unpin_all = new Gtk::MenuItem(_("_Unpin All Panels"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_layout_unpin_all))
 			<< set_accelerator_path("<k3d-document>/actions/layout/unpin_all", get_accel_group());
 
-		m_layout_decorate_panel = new menu_item::control(_("_Decorate Selected Panel"), true)
+		m_layout_decorate_panel = new Gtk::MenuItem(_("_Decorate Selected Panel"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_layout_decorate_panel))
 			<< set_accelerator_path("<k3d-document>/actions/layout/decorate_panel", get_accel_group());
 
-		m_layout_undecorate_panel = new menu_item::control(_("U_ndecorate Selected Panel"), true)
+		m_layout_undecorate_panel = new Gtk::MenuItem(_("U_ndecorate Selected Panel"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_layout_undecorate_panel))
 			<< set_accelerator_path("<k3d-document>/actions/layout/undecorate_panel", get_accel_group());
 
-		m_layout_split_horizontal = new menu_item::control(_("Split Panel _Horizontally"), true)
+		m_layout_split_horizontal = new Gtk::MenuItem(_("Split Panel _Horizontally"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_layout_split_horizontal))
 			<< set_accelerator_path("<k3d-document>/actions/layout/split_horizontal", get_accel_group());
 
-		m_layout_split_vertical = new menu_item::control(_("Split Panel _Vertically"), true)
+		m_layout_split_vertical = new Gtk::MenuItem(_("Split Panel _Vertically"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_layout_split_vertical))
 			<< set_accelerator_path("<k3d-document>/actions/layout/split_vertical", get_accel_group());
 
-		m_layout_kill_panel = new menu_item::control(_("_Kill Panel"), true)
+		m_layout_kill_panel = new Gtk::MenuItem(_("_Kill Panel"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_layout_kill_panel))
 			<< set_accelerator_path("<k3d-document>/actions/layout/kill_panel", get_accel_group());
 
@@ -772,12 +772,12 @@ private:
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Save layout"), true)
+			new Gtk::MenuItem(_("_Save layout"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_layout_save))
 			<< set_accelerator_path("<k3d-document>/actions/layout/save_layout", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Reset layout"), true)
+			new Gtk::MenuItem(_("_Reset layout"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_layout_reset))
 			<< set_accelerator_path("<k3d-document>/actions/layout/reset_layout", get_accel_group())));
 
@@ -790,32 +790,32 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("+_X view"), true)
+			new Gtk::MenuItem(_("+_X view"), true)
 			<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_view_set_view), k3d::PX))
 			<< set_accelerator_path("<k3d-document>/actions/view/set_view/px_view", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("-X view"))
+			new Gtk::MenuItem(_("-X view"))
 			<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_view_set_view), k3d::NX))
 			<< set_accelerator_path("<k3d-document>/actions/view/set_view/nx_view", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("+_Y view"), true)
+			new Gtk::MenuItem(_("+_Y view"), true)
 			<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_view_set_view), k3d::PY))
 			<< set_accelerator_path("<k3d-document>/actions/view/set_view/py_view", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("-Y view"))
+			new Gtk::MenuItem(_("-Y view"))
 			<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_view_set_view), k3d::NY))
 			<< set_accelerator_path("<k3d-document>/actions/view/set_view/ny_view", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("+_Z view"), true)
+			new Gtk::MenuItem(_("+_Z view"), true)
 			<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_view_set_view), k3d::PZ))
 			<< set_accelerator_path("<k3d-document>/actions/view/set_view/pz_view", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("-Z view"))
+			new Gtk::MenuItem(_("-Z view"))
 			<< connect_menu_item(sigc::bind(sigc::mem_fun(*this, &main_document_window::on_view_set_view), k3d::NZ))
 			<< set_accelerator_path("<k3d-document>/actions/view/set_view/nz_view", get_accel_group())));
 
@@ -828,48 +828,48 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Hide Selection"), true)
+			new Gtk::MenuItem(_("_Hide Selection"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_view_hide_selection))
 			<< set_accelerator_path("<k3d-document>/actions/view/hide_selection", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Show Selection"), true)
+			new Gtk::MenuItem(_("_Show Selection"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_view_show_selection))
 			<< set_accelerator_path("<k3d-document>/actions/view/show_selection", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Hide _Unselected"), true)
+			new Gtk::MenuItem(_("Hide _Unselected"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_view_hide_unselected))
 			<< set_accelerator_path("<k3d-document>/actions/view/hide_unselected", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Show _All"), true)
+			new Gtk::MenuItem(_("Show _All"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_view_show_all))
 			<< set_accelerator_path("<k3d-document>/actions/view/show_all", get_accel_group())));
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Aim Selection"))
+			new Gtk::MenuItem(_("Aim Selection"))
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_view_aim_selection))
 			<< set_accelerator_path("<k3d-document>/actions/view/aim_selection", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Frame Selection"), true)
+			new Gtk::MenuItem(_("_Frame Selection"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_view_frame_selection))
 			<< set_accelerator_path("<k3d-document>/actions/view/frame_selection", get_accel_group())));
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Set _Camera ..."), true)
+			new Gtk::MenuItem(_("Set _Camera ..."), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_view_set_camera))
 			<< set_accelerator_path("<k3d-document>/actions/view/set_camera", get_accel_group())));
 
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Orthographic toggle"), true)
+			new Gtk::MenuItem(_("_Orthographic toggle"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_view_toggle_projection))
 			<< set_accelerator_path("<k3d-document>/actions/view/toggle_projection", get_accel_group())));
 
@@ -982,7 +982,7 @@ private:
 		if(k3d::plugin::factory::lookup("NGUIRenderRegionTool"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new image_menu_item::control(
+				new Gtk::ImageMenuItem(
 					*Gtk::manage(new Gtk::Image(load_icon("NGUIRenderRegionTool", Gtk::ICON_SIZE_MENU))), _("_Region"), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_region_tool))
 				<< set_accelerator_path("<k3d-document>/actions/render/render_region", get_accel_group())));
@@ -991,19 +991,19 @@ private:
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_MENU))), _("_Preview"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_preview))
 			<< set_accelerator_path("<k3d-document>/actions/render/render_preview", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_MENU))), _("_Frame"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_frame))
 			<< set_accelerator_path("<k3d-document>/actions/render/render_frame", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_MENU))), _("_Animation"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_animation))
 			<< set_accelerator_path("<k3d-document>/actions/render/render_animation", get_accel_group())));
@@ -1011,13 +1011,13 @@ private:
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(load_icon("render_frame", Gtk::ICON_SIZE_MENU))), _("_Viewport Frame"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_viewport_frame))
 			<< set_accelerator_path("<k3d-document>/actions/render/render_viewport_frame", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(load_icon("render_animation", Gtk::ICON_SIZE_MENU))), _("Viewport A_nimation"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_viewport_animation))
 			<< set_accelerator_path("<k3d-document>/actions/render/render_viewport_animation", get_accel_group())));
@@ -1025,17 +1025,17 @@ private:
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Set Preview Engine ..."))
+			new Gtk::MenuItem(_("Set Preview Engine ..."))
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_set_viewport_preview_engine))
 			<< set_accelerator_path("<k3d-document>/actions/render/set_preview_engine", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Set Still Engine ..."))
+			new Gtk::MenuItem(_("Set Still Engine ..."))
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_set_viewport_still_engine))
 			<< set_accelerator_path("<k3d-document>/actions/render/set_still_engine", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("Set Animation Engine ..."))
+			new Gtk::MenuItem(_("Set Animation Engine ..."))
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_render_set_viewport_animation_engine))
 			<< set_accelerator_path("<k3d-document>/actions/render/set_animation_engine", get_accel_group())));
 
@@ -1048,14 +1048,14 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Play ..."), true)
+			new Gtk::MenuItem(_("_Play ..."), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_play))
 			<< set_accelerator_path("<k3d-document>/actions/scripting/play_script", get_accel_group())));
 
 		if(k3d::plugin::factory::lookup("NGUITextEditorDialog"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(_("_Editor ..."), true)
+				new Gtk::MenuItem(_("_Editor ..."), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_script_editor))
 				<< set_accelerator_path("<k3d-document>/actions/scripting/script_editor", get_accel_group())));
 		}
@@ -1063,7 +1063,7 @@ private:
 		if(k3d::plugin::factory::lookup("NGUIPythonShellDialog"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(_("Python _Shell ..."), true)
+				new Gtk::MenuItem(_("Python _Shell ..."), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_scripting_python_shell))
 				<< set_accelerator_path("<k3d-document>/actions/scripting/python_shell", get_accel_group())));
 		}
@@ -1131,20 +1131,20 @@ private:
 		if(k3d::plugin::factory::lookup("NGUILearningDialog"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(_("Example documents ..."), true)
+				new Gtk::MenuItem(_("Example documents ..."), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_learning_menu))
 				<< set_accelerator_path("<k3d-document>/actions/help/learning_menu", get_accel_group())));
 		}
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("File _Bug Report ..."), true)
+			new Gtk::MenuItem(_("File _Bug Report ..."), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_file_bug_report))
 			<< set_accelerator_path("<k3d-document>/actions/help/file_bug_report", get_accel_group())));
 
 		if(k3d::plugin::factory::lookup("NGUILogDialog"))
 		{
 			menu->items().push_back(*Gtk::manage(
-			    new menu_item::control(_("Open _Log Window ..."), true)
+			    new Gtk::MenuItem(_("Open _Log Window ..."), true)
 			    << connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_open_log_window))
 			    << set_accelerator_path("<k3d-document>/actions/help/open_log_window", get_accel_group())));
 		}
@@ -1152,19 +1152,19 @@ private:
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
 		menu->items().push_back(*Gtk::manage(
-			new image_menu_item::control(
+			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::HELP, Gtk::ICON_SIZE_MENU)),
 				_("_Manual"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_manual))
 			<< set_accelerator_path("<k3d-document>/actions/help/manual", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("_Release Notes"), true)
+			new Gtk::MenuItem(_("_Release Notes"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_release_notes))
 			<< set_accelerator_path("<k3d-document>/actions/help/release_notes", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new menu_item::control(_("K-3D _Online"), true)
+			new Gtk::MenuItem(_("K-3D _Online"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_online))
 			<< set_accelerator_path("<k3d-document>/actions/help/online", get_accel_group())));
 
@@ -1173,7 +1173,7 @@ private:
 		if(k3d::plugin::factory::lookup("NGUIAboutDialog"))
 		{
 			menu->items().push_back(*Gtk::manage(
-				new menu_item::control(_("_About K-3D ..."), true)
+				new Gtk::MenuItem(_("_About K-3D ..."), true)
 				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_about))
 				<< set_accelerator_path("<k3d-document>/actions/help/about", get_accel_group())));
 		}
@@ -2768,40 +2768,40 @@ private:
 		// Setup the undo menu item ...
 		if(current_node)
 		{
-			m_undo_menu_item->get_label()->set_text(k3d::string_cast(boost::format(_("Undo %1%")) % current_node->label));
+			get_label(*m_undo_menu_item)->set_text(k3d::string_cast(boost::format(_("Undo %1%")) % current_node->label));
 			m_undo_menu_item->set_sensitive(true);
 		}
 		else
 		{
-			m_undo_menu_item->get_label()->set_text(_("Can't undo"));
+			get_label(*m_undo_menu_item)->set_text(_("Can't undo"));
 			m_undo_menu_item->set_sensitive(false);
 		}
 
 		// Setup the undo-all menu item
 		if(current_node && current_node->parent && (current_node->label == current_node->parent->label))
 		{
-			m_undo_all_menu_item->get_label()->set_text(k3d::string_cast(boost::format(_("Undo all %1%")) % current_node->label));
+			get_label(*m_undo_all_menu_item)->set_text(k3d::string_cast(boost::format(_("Undo all %1%")) % current_node->label));
 			m_undo_all_menu_item->set_sensitive(true);
 		}
 		else
 		{
-			m_undo_all_menu_item->get_label()->set_text(_("Can't undo all"));
+			get_label(*m_undo_all_menu_item)->set_text(_("Can't undo all"));
 			m_undo_all_menu_item->set_sensitive(false);
 		}
 
 		// Setup the redo menu items ...
 		if(redo_node)
 		{
-			m_redo_menu_item->get_label()->set_text(k3d::string_cast(boost::format(_("Redo %1%")) % redo_node->label));
+			get_label(*m_redo_menu_item)->set_text(k3d::string_cast(boost::format(_("Redo %1%")) % redo_node->label));
 			m_redo_menu_item->set_sensitive(true);
-			m_redo_all_menu_item->get_label()->set_text(k3d::string_cast(boost::format(_("Redo all %1%")) % redo_node->label));
+			get_label(*m_redo_all_menu_item)->set_text(k3d::string_cast(boost::format(_("Redo all %1%")) % redo_node->label));
 			m_redo_all_menu_item->set_sensitive(true);
 		}
 		else
 		{
-			m_redo_menu_item->get_label()->set_text(_("Can't redo"));
+			get_label(*m_redo_menu_item)->set_text(_("Can't redo"));
 			m_redo_menu_item->set_sensitive(false);
-			m_redo_all_menu_item->get_label()->set_text(_("Can't redo all"));
+			get_label(*m_redo_all_menu_item)->set_text(_("Can't redo all"));
 			m_redo_all_menu_item->set_sensitive(false);
 		}
 	}
@@ -2855,13 +2855,13 @@ private:
 	static unsigned long m_count;
 
 	/// Stores the Edit > Undo menu item
-	std::auto_ptr<image_menu_item::control> m_undo_menu_item;
+	std::auto_ptr<Gtk::ImageMenuItem> m_undo_menu_item;
 	/// Stores the Edit > Undo All menu item
-	std::auto_ptr<image_menu_item::control> m_undo_all_menu_item;
+	std::auto_ptr<Gtk::ImageMenuItem> m_undo_all_menu_item;
 	/// Stores the Edit > Redo menu item
-	std::auto_ptr<image_menu_item::control> m_redo_menu_item;
+	std::auto_ptr<Gtk::ImageMenuItem> m_redo_menu_item;
 	/// Stores the Edit > Redo All menu item
-	std::auto_ptr<image_menu_item::control> m_redo_all_menu_item;
+	std::auto_ptr<Gtk::ImageMenuItem> m_redo_all_menu_item;
 	/// Main status bar for the window
 	Gtk::Statusbar m_statusbar;
 	/// Set to true iff current panel was maximized
@@ -2881,13 +2881,13 @@ private:
 
 	check_menu_item::control* m_layout_maximize_panel;
 	check_menu_item::control* m_layout_hide_unpinned;
-	menu_item::control* m_layout_pin_all;
-	menu_item::control* m_layout_unpin_all;
-	menu_item::control* m_layout_decorate_panel;
-	menu_item::control* m_layout_undecorate_panel;
-	menu_item::control* m_layout_split_horizontal;
-	menu_item::control* m_layout_split_vertical;
-	menu_item::control* m_layout_kill_panel;
+	Gtk::MenuItem* m_layout_pin_all;
+	Gtk::MenuItem* m_layout_unpin_all;
+	Gtk::MenuItem* m_layout_decorate_panel;
+	Gtk::MenuItem* m_layout_undecorate_panel;
+	Gtk::MenuItem* m_layout_split_horizontal;
+	Gtk::MenuItem* m_layout_split_vertical;
+	Gtk::MenuItem* m_layout_kill_panel;
 
 	/// Stores document-wide state to be shared with the rest of the UI
 	document_state& m_document_state;
