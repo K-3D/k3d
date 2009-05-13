@@ -1,5 +1,0 @@
-#k3dscript
-
-<command node="/document/window/menus/file_new" command="activate" arguments=""/>
-<command node="/document/window/menus/file_close" command="activate" arguments=""/>
-

@@ -1,5 +1,0 @@
-#k3dscript
-
-<command node="/document/selection_tool" command="pick_replace" arguments="&lt;arguments&gt;&lt;viewport&gt;/document/window/viewport&lt;/viewport&gt;&lt;mouse&gt;0.185501 0.0764037&lt;/mouse&gt;&lt;selection&gt;0 0 0&lt;/selection&gt;&lt;/arguments&gt;"/>
-<command node="/document/window/menus/layout_split_horizontal" command="activate" arguments=""/>
-<command node="/document/window/menus/file_quit" command="activate" arguments=""/>

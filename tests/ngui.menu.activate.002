@@ -1,5 +1,0 @@
-#k3dscript
-
-<command node="/document/window/toolbar/create/create_NurbsCone" command="activate" arguments=""/>
-<command node="/document/window/node_properties/material" command="create" arguments="MultiMaterial"/>
-
