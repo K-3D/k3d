@@ -24,6 +24,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
@@ -36,7 +37,7 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 class triangulate_faces :
@@ -48,11 +49,23 @@ public:
 	triangulate_faces(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 	
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		create_triangles().process(Input, m_mesh_selection.pipeline_value(), Output);
+		Output = Input;
+		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron)
+				continue;
+	
+			primitive->create(create_triangles().process(Input, *polyhedron, Output));
+		}
 	}
 	
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -78,16 +91,16 @@ private:
 		typedef k3d::triangulator base;
 
 	public:
-		void process(const k3d::mesh& Input, const k3d::mesh_selection& Selection, k3d::mesh& Output)
+		k3d::mesh::primitive* process(const k3d::mesh& Input, const k3d::polyhedron::const_primitive& Polyhedron, k3d::mesh& Output)
 		{
-			input_polyhedron.reset(k3d::polyhedron::validate(Input));
-			if(!input_polyhedron)
-				return;
-
 			// Allocate new data structures for our output ...
+			input_polyhedron = &Polyhedron;
+
+			k3d::mesh::primitive* const result = new k3d::mesh::primitive();
+			output_polyhedron.reset(k3d::polyhedron::create(*result));
+
 			output_points = &Output.points.create(new k3d::mesh::points_t(*Input.points));
 			output_point_selection = &Output.point_selection.create(new k3d::mesh::selection_t(Input.points->size(), 0.0));
-			output_polyhedron.reset(k3d::polyhedron::create(Output));
 
 			// Setup copying of attribute arrays ...
 			output_polyhedron->constant_data = input_polyhedron->constant_data;
@@ -101,23 +114,20 @@ private:
 			Output.vertex_data = Input.vertex_data.clone();
 			vertex_data_copier.reset(new k3d::attribute_array_copier(Input.vertex_data, Output.vertex_data));
 
-			// Setup the output mesh ...
-			k3d::mesh::selection_t input_face_selection(input_polyhedron->face_selections);
-			k3d::mesh_selection::merge(Selection.faces, input_face_selection);
-
+			// Create the output polyhedron ...
 			const k3d::uint_t face_begin = 0;
-			const k3d::uint_t face_end = face_begin + input_polyhedron->face_first_loops.size();
+			const k3d::uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				if(input_face_selection[face])
+				if(Polyhedron.face_selections[face])
 				{
 					base::process(
 						*Input.points,
-						input_polyhedron->face_first_loops,
-						input_polyhedron->face_loop_counts,
-						input_polyhedron->loop_first_edges,
-						input_polyhedron->edge_points,
-						input_polyhedron->clockwise_edges,
+						Polyhedron.face_first_loops,
+						Polyhedron.face_loop_counts,
+						Polyhedron.loop_first_edges,
+						Polyhedron.edge_points,
+						Polyhedron.clockwise_edges,
 						face);
 				}
 				else
@@ -128,7 +138,9 @@ private:
 
 			output_polyhedron->shell_first_faces.push_back(0);
 			output_polyhedron->shell_face_counts.push_back(output_polyhedron->face_first_loops.size());
-			output_polyhedron->shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+			output_polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
+
+			return result;
 		}
 
 	private:
@@ -209,7 +221,7 @@ private:
 			}
 		}
 
-		boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron;
+		const k3d::polyhedron::const_primitive* input_polyhedron;
 
 		k3d::mesh::points_t* output_points;
 		k3d::mesh::selection_t* output_point_selection;
@@ -249,7 +261,7 @@ k3d::iplugin_factory& triangulate_faces_factory()
 	return triangulate_faces::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 

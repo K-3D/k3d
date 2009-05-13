@@ -60,7 +60,6 @@ extern k3d::iplugin_factory& show_component_numbering_factory();
 extern k3d::iplugin_factory& show_face_orientations_factory();
 extern k3d::iplugin_factory& subdivide_edges_factory();
 extern k3d::iplugin_factory& subdivide_faces_factory();
-extern k3d::iplugin_factory& triangulate_faces_factory();
 extern k3d::iplugin_factory& weld_factory();
 
 } // namespace mesh
@@ -96,7 +95,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh::set_material_factory());
 	Registry.register_factory(module::mesh::subdivide_edges_factory());
 	Registry.register_factory(module::mesh::subdivide_faces_factory());
-	Registry.register_factory(module::mesh::triangulate_faces_factory());
 	Registry.register_factory(module::mesh::weld_factory());
 K3D_MODULE_END
 

@@ -31,6 +31,7 @@ namespace polyhedron
 
 extern k3d::iplugin_factory& bevel_points_factory();
 extern k3d::iplugin_factory& extrude_faces_factory();
+extern k3d::iplugin_factory& triangulate_faces_factory();
 
 } // namespace polyhedron
 
@@ -39,5 +40,6 @@ extern k3d::iplugin_factory& extrude_faces_factory();
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::polyhedron::bevel_points_factory());
 	Registry.register_factory(module::polyhedron::extrude_faces_factory());
+	Registry.register_factory(module::polyhedron::triangulate_faces_factory());
 K3D_MODULE_END
 
