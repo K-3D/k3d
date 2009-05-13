@@ -23,7 +23,6 @@
 */
 
 #include "application_state.h"
-#include "button.h"
 #include "check_menu_item.h"
 #include "detail.h"
 #include "document.h"

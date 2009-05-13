@@ -24,8 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/ienumeration_property.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iwritable_property.h>
@@ -84,8 +82,7 @@ imodel* const model(k3d::iproperty& Property);
 
 /// Provides a UI for manipulating enumerated quantities (i.e. the view and the controller from model-view-controller)
 class control :
-	public Gtk::ComboBox,
-	public ui_component
+	public Gtk::ComboBox
 {
 	typedef Gtk::ComboBox base;
 

@@ -24,7 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
 #include "unsaved_document.h"
 
 #include <gtkmm/window.h>
@@ -41,7 +40,6 @@ namespace ngui
 /// Provides a standard top-level window for application-level documents that can be saved
 class savable_application_window :
         public Gtk::Window,
-	public ui_component,
 	public k3d::ngui::unsaved_document
 {
 	typedef Gtk::Window base;

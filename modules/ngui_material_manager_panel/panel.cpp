@@ -71,7 +71,6 @@
 #include <k3dsdk/ngui/image_toggle_button.h>
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/text.h>
-#include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/path.h>
@@ -1069,7 +1068,6 @@ void Implementation::propertySignalRender(k3d::iunknown* t)
      
 class Panel :
 	public k3d::ngui::panel::control,
-	public k3d::ngui::ui_component,
 	public k3d::iunknown,
 	public Gtk::VBox
 {

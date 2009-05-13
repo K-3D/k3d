@@ -22,7 +22,6 @@
 */
 
 #include "application_window.h"
-#include "button.h"
 #include "color_chooser.h"
 #include "utility.h"
 #include "widget_manip.h"
@@ -74,7 +73,7 @@ public:
 		vbox->pack_start(*Gtk::manage(bbox));
 
 		bbox->pack_start(*Gtk::manage(
-			new button::control(Gtk::Stock::CLOSE) <<
+			new Gtk::Button(Gtk::Stock::CLOSE) <<
 			connect_button(sigc::mem_fun(*this, &color_selection_dialog::close))));
 
 		on_data_changed(0);

@@ -24,8 +24,6 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <gtkmm/window.h>
 
 namespace k3d
@@ -39,8 +37,7 @@ namespace ngui
 
 /// Provides a standard top-level window that will be closed automatically if the application is closed
 class application_window :
-        public Gtk::Window,
-	public ui_component
+        public Gtk::Window
 {
 	typedef Gtk::Window base;
 

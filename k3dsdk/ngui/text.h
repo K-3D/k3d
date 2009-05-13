@@ -24,8 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/types.h>
 
 #include <gtkmm/box.h>
@@ -127,8 +125,7 @@ imodel* model(data_t& Data, const Glib::ustring& Label = "")
 
 /// Provides a standard UI control for manipulating text fields (i.e. the view and the controller from model-view-controller)
 class control :
-	public Gtk::VBox,
-	public ui_component
+	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
 

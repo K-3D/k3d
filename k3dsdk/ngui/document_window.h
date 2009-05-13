@@ -24,8 +24,6 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <gtkmm/window.h>
 
 namespace k3d { class idocument; }
@@ -43,8 +41,7 @@ class document_state;
 
 /// Provides a standard document-level window
 class document_window :
-        public Gtk::Window,
-	public ui_component
+        public Gtk::Window
 {
 	typedef Gtk::Window base;
 

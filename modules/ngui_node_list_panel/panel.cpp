@@ -48,7 +48,6 @@
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/keyboard.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
@@ -690,7 +689,6 @@ public:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::ngui::ui_component,
 	public k3d::iunknown,
 	public Gtk::VBox
 {

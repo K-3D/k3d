@@ -30,7 +30,6 @@
 
 #include "application_window.h"
 #include "asynchronous_update.h"
-#include "button.h"
 #include "icons.h"
 #include "node_collection_chooser.h"
 #include "widget_manip.h"
@@ -99,15 +98,15 @@ public:
 
 		Gtk::HButtonBox* const hbox = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
 		hbox->pack_start(*Gtk::manage(
-			new button::control(_("Select All"))
+			new Gtk::Button(_("Select All"))
 				<< connect_button(sigc::mem_fun(*this, &list_window::on_select_all))
 				), Gtk::PACK_SHRINK);
 		hbox->pack_start(*Gtk::manage(
-			new button::control(_("Deselect All"))
+			new Gtk::Button(_("Deselect All"))
 				<< connect_button(sigc::mem_fun(*this, &list_window::on_deselect_all))
 				), Gtk::PACK_SHRINK);
 		hbox->pack_start(*Gtk::manage(
-			new button::control(_("Toggle Selected"))
+			new Gtk::Button(_("Toggle Selected"))
 				<< connect_button(sigc::mem_fun(*this, &list_window::on_toggle_selected))
 				), Gtk::PACK_SHRINK);
 

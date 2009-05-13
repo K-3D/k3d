@@ -24,8 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/data.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/property_collection.h>
@@ -57,8 +55,7 @@ namespace panel_frame
 /// Provides a "panel frame" control that can "mount" a panel control
 class control :
         public Gtk::Frame,
-	public ui_component,
-	public k3d::property_collection
+  public k3d::property_collection
 {
 	typedef Gtk::Frame base;
 

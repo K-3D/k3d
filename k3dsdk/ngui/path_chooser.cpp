@@ -21,7 +21,6 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "button.h"
 #include "file_chooser_dialog.h"
 #include "hotkey_entry.h"
 #include "path_chooser.h"
@@ -158,7 +157,7 @@ control::control(std::auto_ptr<idata_proxy> Data) :
 	m_entry->signal_focus_out_event().connect(sigc::mem_fun(*this, &control::on_focus_out_event));
 	m_entry->signal_activate().connect(sigc::mem_fun(*this, &control::on_activate));
 
-	tooltips().set_tip(*m_button, _("Browse for a file ..."));
+	m_button->set_tooltip_text(_("Browse for a file ..."));
 	m_button->signal_clicked().connect(sigc::mem_fun(*this, &control::on_browse));
 
 	Glib::RefPtr<Gtk::ListStore> model = Gtk::ListStore::create(m_columns);
@@ -175,7 +174,7 @@ control::control(std::auto_ptr<idata_proxy> Data) :
 
 	m_combo->set_model(model);
 	m_combo->pack_start(m_columns.label);
-	tooltips().set_tip(*m_combo, _("Choose whether to store absolute or relative filepaths"));
+	m_combo->set_tooltip_text(_("Choose whether to store absolute or relative filepaths"));
 
 	m_combo->signal_changed().connect(sigc::mem_fun(*this, &control::on_pick_reference_type));
 
@@ -188,7 +187,7 @@ control::control(std::auto_ptr<idata_proxy> Data) :
 		m_toggle_button = new Gtk::ToggleButton(_("Watch"), true);
 		m_toggle_button->set_active(true);
 		m_toggle_button->signal_toggled().connect(sigc::mem_fun(*this, &control::on_watch_toggle));
-		tooltips().set_tip(*m_toggle_button, _("Watch/unwatch file for changes"));
+		m_toggle_button->set_tooltip_text(_("Watch/unwatch file for changes"));
 		pack_start(*manage(m_toggle_button), Gtk::PACK_SHRINK);
 	}
 
@@ -306,7 +305,7 @@ void control::data_changed(k3d::ihint* Hint)
 	return_if_fail(m_data.get());
 
 	m_entry->set_text(m_data->value().leaf().raw());
-	tooltips().set_tip(*m_entry, m_data->value().native_utf8_string().raw());
+	m_entry->set_tooltip_text(m_data->value().native_utf8_string().raw());
 
 	m_combo->set_active(m_data->reference());
 	if(m_toggle_button)

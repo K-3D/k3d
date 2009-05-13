@@ -24,7 +24,6 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
 #include <gtkmm/box.h>
 
 namespace k3d
@@ -41,8 +40,7 @@ namespace toolbar
 
 /// Provides a standard toolbar control
 class control :
-        public Gtk::VBox,
-	public ui_component
+        public Gtk::VBox
 {
 	typedef Gtk::VBox base;
 

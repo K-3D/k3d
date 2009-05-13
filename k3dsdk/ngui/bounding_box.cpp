@@ -22,7 +22,6 @@
 */
 
 #include "bounding_box.h"
-#include "button.h"
 #include "spin_button.h"
 #include "widget_manip.h"
 

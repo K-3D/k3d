@@ -24,8 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/bitmap.h>
 
 #include <gtkmm/buttonbox.h>
@@ -70,8 +68,7 @@ protected:
 
 /// Provides a UI for previewing bitmap images (i.e. the view and the controller from model-view-controller)
 class control :
-	public Gtk::HButtonBox,
-	public ui_component
+	public Gtk::HButtonBox
 {
 	typedef Gtk::HButtonBox base;
 

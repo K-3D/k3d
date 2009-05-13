@@ -44,59 +44,36 @@ namespace button
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// control
+// create
 
-control::control() :
-	base()
+Gtk::Button* create(const Glib::ustring& label_text, const Gtk::StockID& stock_id)
 {
-	set_name("k3d-button");
-}
-
-control::control(const Glib::ustring& label, bool mnemonic) :
-	base(label, mnemonic)
-{
-	set_name("k3d-button");
-}
-
-control::control(const Gtk::StockID& stock_id) :
-	base(stock_id)
-{
-	set_name("k3d-button");
-}
-
-control::control(const Glib::ustring& label, const Gtk::StockID& stock_id) :
-	base()
-{
-	set_name("k3d-button");
+	Gtk::Label* const label = new Gtk::Label(label_text, true);
 
 	Gtk::Image* const image = new Gtk::Image();
 	Gtk::Stock::lookup(stock_id, Gtk::ICON_SIZE_BUTTON, *image);
 
-	Gtk::Label* const label1 = new Gtk::Label(label, true);
-
 	Gtk::HBox* const hbox = new Gtk::HBox(false, 2);
 	hbox->pack_start(*manage(image), false, false, 0);
-	hbox->pack_start(*manage(label1), false, false, 0);
+	hbox->pack_start(*manage(label), false, false, 0);
 
 	Gtk::Alignment* const alignment = new Gtk::Alignment(0.5, 0.5, 0.0, 0.0);
 	alignment->add(*manage(hbox));
 
-	add(*manage(alignment));
+  Gtk::Button* const button = new Gtk::Button();
+	button->add(*manage(alignment));
 
 	alignment->show_all();
+
+  return button;
 }
 
-control::control(Gtk::Widget& widget) :
-	base()
+Gtk::Button* create(Gtk::Widget& widget)
 {
-	set_name("k3d-button");
+  Gtk::Button* const button = new Gtk::Button();
+	button->add(widget);
 
-	add(widget);
-}
-
-void control::on_clicked()
-{
-	base::on_clicked();
+  return button;
 }
 
 } // namespace button

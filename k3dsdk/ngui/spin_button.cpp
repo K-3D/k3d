@@ -250,9 +250,9 @@ control::control(imodel* const Model, k3d::istate_recorder* const StateRecorder)
 		attach(*manage(m_implementation->m_up_button), 6, 7, 0, 1);
 		attach(*manage(m_implementation->m_down_button), 6, 7, 1, 2);
 
-		tooltips().set_tip(*m_implementation->m_entry, _("Enter a new value.  Real-world units and simple math expressions are allowed."));
-		tooltips().set_tip(*m_implementation->m_up_button, _("LMB-Drag to modify, LMB-Click to step, Tap Shift and Control while dragging to change sensitivity."));
-		tooltips().set_tip(*m_implementation->m_down_button, _("LMB-Drag to modify, LMB-Click to step, Tap Shift and Control while dragging to change sensitivity."));
+		m_implementation->m_entry->set_tooltip_text(_("Enter a new value.  Real-world units and simple math expressions are allowed."));
+		m_implementation->m_up_button->set_tooltip_text(_("LMB-Drag to modify, LMB-Click to step, Tap Shift and Control while dragging to change sensitivity."));
+		m_implementation->m_down_button->set_tooltip_text(_("LMB-Drag to modify, LMB-Click to step, Tap Shift and Control while dragging to change sensitivity."));
 
 		// Make sure buttons can't get the focus (makes tabbing difficult)
 		m_implementation->m_up_button->unset_flags(Gtk::CAN_FOCUS);

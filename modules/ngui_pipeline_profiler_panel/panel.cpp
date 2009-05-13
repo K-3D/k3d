@@ -37,7 +37,6 @@
 #include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/ui_component.h>
 
 #include <boost/assign/list_of.hpp>
 
@@ -55,7 +54,6 @@ namespace pipeline_profiler
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::ngui::ui_component,
 	public k3d::ngui::asynchronous_update,
 	public k3d::iunknown,
 	public Gtk::VBox

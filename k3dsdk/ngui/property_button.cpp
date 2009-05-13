@@ -60,7 +60,7 @@ control::control(std::auto_ptr<property_widget::idata_proxy> Data) :
 	m_image(new Gtk::Image())
 {
 	set_name("k3d-property-button");
-	set_tip(_("LMB-Click to make connections with other properties. RMB-Click for context menu."));
+	set_tooltip_text(_("LMB-Click to make connections with other properties. RMB-Click for context menu."));
 
 	add(*manage(m_image));
 

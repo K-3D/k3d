@@ -24,8 +24,6 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/signal_system.h>
 #include <k3dsdk/bounding_box3.h>
 
@@ -88,8 +86,7 @@ private:
 
 /// Provides a UI for modifying the bounding_box of an object
 class control :
-	public Gtk::Table,
-	public ui_component
+	public Gtk::Table
 {
 	typedef Gtk::Table base;
 

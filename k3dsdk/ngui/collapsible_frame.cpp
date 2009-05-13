@@ -19,7 +19,6 @@
 
 #include "collapsible_frame.h"
 #include "event_button.h"
-#include "ui_component.h"
 #include "widget_manip.h"
 
 #include <k3d-i18n-config.h>
@@ -97,8 +96,7 @@ public:
 		button.set_relief(Gtk::RELIEF_NONE);
 		button.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_toggle));
 		button.signal_button_press_event().connect(sigc::mem_fun(*this, &implementation::on_button_press_event));
-
-		ui_component::tooltips().set_tip(button, _("LMB-Click to expand/collapse.  RMB-Click for other options."));
+		button.set_tooltip_text(_("LMB-Click to expand/collapse.  RMB-Click for other options."));
 
 		frame.set_label_widget(button);
 		frame.set_shadow_type(Gtk::SHADOW_NONE);

@@ -67,7 +67,7 @@ public:
 
 		Gtk::HButtonBox* const box2 = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
 		box2->pack_start(*Gtk::manage(
-			new button::control(Gtk::Stock::CLOSE)
+			new Gtk::Button(Gtk::Stock::CLOSE)
 			<< connect_button(sigc::mem_fun(*this, &dialog::close))
 			), Gtk::PACK_SHRINK);
 

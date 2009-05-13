@@ -24,8 +24,6 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/signal_system.h>
 
@@ -87,8 +85,7 @@ private:
 
 /// Provides a UI for modifying the orientation of an object
 class control :
-	public Gtk::Table,
-	public ui_component
+	public Gtk::Table
 {
 	typedef Gtk::Table base;
 

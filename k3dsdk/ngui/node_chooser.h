@@ -24,8 +24,6 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/inode.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iplugin_factory.h>
@@ -117,8 +115,7 @@ protected:
 
 /// Provides a UI for choosing nodes (either existing, or newly-created) (i.e. the view and the controller from model-view-controller)
 class control :
-	public Gtk::HBox,
-	public ui_component
+	public Gtk::HBox
 {
 	typedef Gtk::HBox base;
 

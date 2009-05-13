@@ -21,7 +21,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "button.h"
 #include "text.h"
 #include "widget_manip.h"
 
@@ -163,13 +162,13 @@ control::control(imodel* const Model, k3d::istate_recorder* const StateRecorder)
 	{
 		m_implementation->m_text_view.set_editable(true);
 
-		button::control* const apply_button =
-			new button::control(_("Apply"))
+		Gtk::Button* const apply_button =
+			new Gtk::Button(_("Apply"))
 				<< connect_button(sigc::mem_fun(*this, &control::on_apply))
 				<< set_tooltip(_("Apply modifications."));
 
-		button::control* const reset_button =
-			new button::control(_("Reset"))
+		Gtk::Button* const reset_button =
+			new Gtk::Button(_("Reset"))
 				<< connect_button(sigc::mem_fun(*this, &control::on_reset))
 				<< set_tooltip(_("Reset modifications."));
 

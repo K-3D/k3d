@@ -46,7 +46,6 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/enumeration_chooser.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/rectangle.h>
@@ -180,7 +179,6 @@ private:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::ngui::ui_component,
 	public k3d::iunknown,
 	public Gtk::VBox
 {

@@ -22,7 +22,6 @@
 */
 
 #include "angle_axis.h"
-#include "button.h"
 #include "spin_button.h"
 #include "widget_manip.h"
 
@@ -33,6 +32,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/state_change_set.h>
 
+#include <gtkmm/button.h>
 #include <gtkmm/label.h>
 
 namespace k3d

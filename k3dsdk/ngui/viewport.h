@@ -27,7 +27,6 @@
 #include <gtkmm/drawingarea.h>
 
 #include "panel.h"
-#include "ui_component.h"
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/idocument.h>
@@ -58,7 +57,6 @@ namespace viewport
 
 class control :
         public Gtk::DrawingArea,
-	public ui_component,
 	public k3d::property_collection,
 	public k3d::irender_camera_frame,
 	public k3d::irender_camera_animation,

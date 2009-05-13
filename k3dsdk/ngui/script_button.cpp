@@ -122,9 +122,9 @@ control::control(imodel* const Model, istate_recorder* const StateRecorder, cons
 	pack_start(m_save, Gtk::PACK_SHRINK);
 	pack_start(m_edit, Gtk::PACK_EXPAND_WIDGET);
 
-	tooltips().set_tip(m_load, _("Load a script from disk, replacing the current script"));
-	tooltips().set_tip(m_save, _("Save the current script to disk"));
-	tooltips().set_tip(m_edit, _("Open the current script for editing"));
+	m_load.set_tooltip_text(_("Load a script from disk, replacing the current script"));
+	m_save.set_tooltip_text(_("Save the current script to disk"));
+	m_edit.set_tooltip_text(_("Open the current script for editing"));
 
 	set_name("k3d-script-button");
 

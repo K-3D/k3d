@@ -135,9 +135,9 @@ public:
 		table->attach(*Gtk::manage(new entry::control(entry::model(m_description), 0)), 1, 2, 7, 8);
 
 		Gtk::HButtonBox* const button_box = new Gtk::HButtonBox(Gtk::BUTTONBOX_END);
-		button_box->pack_start(*Gtk::manage(new button::control(_("Cancel"), Gtk::Stock::CANCEL)
+		button_box->pack_start(*Gtk::manage(button::create(_("Cancel"), Gtk::Stock::CANCEL)
 			<< connect_button(sigc::mem_fun(*this, &create_dialog::close))));
-		button_box->pack_start(*Gtk::manage(new button::control(_("Add"), Gtk::Stock::ADD)
+		button_box->pack_start(*Gtk::manage(button::create(_("Add"), Gtk::Stock::ADD)
 			<< connect_button(sigc::mem_fun(*this, &create_dialog::on_add))));
 
 		Gtk::VBox* const vbox = Gtk::manage(new Gtk::VBox(false, 10));

@@ -24,7 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
 #include <k3dsdk/inode_collection_property.h>
 #include <gtkmm/box.h>
 
@@ -76,8 +75,7 @@ imodel* const model(k3d::iproperty& Property);
 
 /// Provides a UI for selecting a set of nodes
 class control :
-	public Gtk::HBox,
-	public ui_component
+	public Gtk::HBox
 {
 	typedef Gtk::HBox base;
 

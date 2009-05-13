@@ -206,7 +206,7 @@ struct implementation
 		}
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new button::control(
+			button::create(
 				*Gtk::manage(new Gtk::Image(load_icon("unparent", Gtk::ICON_SIZE_SMALL_TOOLBAR))))
 			<< connect_button(sigc::mem_fun(*this, &implementation::on_unparent))
 			<< set_tooltip(_("Unparent"))
@@ -224,7 +224,7 @@ struct implementation
 		}
 
 		main_toolbar->row(0).pack_start(*Gtk::manage(
-			new button::control(
+			button::create(
 				*Gtk::manage(new Gtk::Image(load_icon("render_preview", Gtk::ICON_SIZE_SMALL_TOOLBAR))))
 			<< connect_button(sigc::mem_fun(*this, &implementation::on_render_preview))
 			<< set_tooltip(_("Render Preview"))
@@ -309,8 +309,8 @@ struct implementation
 					const std::string node_name = "create_" + plugin_factory->name();
 					Gtk::Image* const image = new Gtk::Image(load_icon(plugin_factory->name(), Gtk::ICON_SIZE_SMALL_TOOLBAR));
 
-					button::control* const button =
-						new button::control(*manage(image))
+					Gtk::Button* const button =
+						button::create(*manage(image))
 						<< set_tooltip(plugin_factory->short_description())
 						<< make_toolbar_button()
 						<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_create_node), plugin_factory))
@@ -332,8 +332,8 @@ struct implementation
 							{
 								const k3d::filesystem::path absolute_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::xml::attribute_text(*xml_button, "absolute_path")));
 
-								button::control* const button =
-									new button::control(label)
+								Gtk::Button* const button =
+									new Gtk::Button(label)
 									<< set_tooltip(description)
 									<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_run_external_script), absolute_path))
 									<< make_toolbar_button()
@@ -360,8 +360,8 @@ struct implementation
 
 								const k3d::filesystem::path absolute_path = root_path / k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::xml::attribute_text(*xml_button, "relative_path")));
 
-								button::control* const button =
-									new button::control(label)
+								Gtk::Button* const button =
+									new Gtk::Button(label)
 									<< set_tooltip(description)
 									<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_run_external_script), absolute_path))
 									<< make_toolbar_button()
@@ -381,8 +381,8 @@ struct implementation
 								if(encoding != "text/plain")
 									throw std::runtime_error("Toolbar script inline encoding must be text/plain");
 
-								button::control* const button =
-									new button::control(label)
+								Gtk::Button* const button =
+									new Gtk::Button(label)
 									<< set_tooltip(description)
 									<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_run_inline_script), xml_button->text))
 									<< make_toolbar_button()
@@ -485,7 +485,6 @@ struct implementation
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::ngui::ui_component,
 	public k3d::iunknown,
         public Gtk::VBox
 {

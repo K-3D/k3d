@@ -21,7 +21,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "button.h"
 #include "point3.h"
 #include "spin_button.h"
 #include "widget_manip.h"
@@ -35,6 +34,7 @@
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/vectors.h>
 
+#include <gtkmm/button.h>
 #include <gtkmm/label.h>
 
 namespace k3d

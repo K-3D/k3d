@@ -374,8 +374,8 @@ public:
 				{
 					iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(property.property_node());
 
-					button::control* const control =
-						new button::control(*Gtk::manage(new Gtk::Image(Gtk::Stock::DELETE, Gtk::ICON_SIZE_BUTTON)))
+					Gtk::Button* const control =
+						button::create(*Gtk::manage(new Gtk::Image(Gtk::Stock::DELETE, Gtk::ICON_SIZE_BUTTON)))
 						<< connect_button(sigc::bind(sigc::bind(sigc::mem_fun(*this, &implementation::on_delete_user_property), &property), property_collection))
 						<< set_tooltip(_("Delete user property (no undo)"));
 

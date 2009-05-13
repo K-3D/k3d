@@ -26,8 +26,6 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/ipipeline.h>
 
 namespace Gtk { class Menu; }
@@ -82,8 +80,7 @@ private:
 // control
 
 /// Provides a UI for manipulating properties (i.e. the view and the controller from model-view-controller)
-class control :
-	public ui_component
+class control
 {
 public:
 	control(std::auto_ptr<idata_proxy> Data);

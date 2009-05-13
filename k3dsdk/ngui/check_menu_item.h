@@ -24,8 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iwritable_property.h>
 
@@ -85,8 +83,7 @@ private:
 
 /// Provides a UI for manipulating boolean quantities (i.e. the view and the controller from model-view-controller)
 class control :
-	public Gtk::CheckMenuItem,
-	public ui_component
+	public Gtk::CheckMenuItem
 {
 	typedef Gtk::CheckMenuItem base;
 

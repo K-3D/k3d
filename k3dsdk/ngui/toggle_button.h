@@ -24,8 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/types.h>
 
 #include <gtkmm/togglebutton.h>
@@ -162,8 +160,7 @@ imodel* radio_model(data_t& Data, const choice_t& Choice, const Glib::ustring& L
 
 /// Provides a UI for manipulating boolean quantities (i.e. the view and the controller from model-view-controller)
 class control :
-	public Gtk::ToggleButton,
-	public ui_component
+	public Gtk::ToggleButton
 {
 	typedef Gtk::ToggleButton base;
 

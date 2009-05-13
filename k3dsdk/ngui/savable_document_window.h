@@ -24,7 +24,6 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
 #include "unsaved_document.h"
 
 #include <gtkmm/window.h>
@@ -45,7 +44,6 @@ class document_state;
 /// Provides a standard document-level window
 class savable_document_window :
         public Gtk::Window,
-	public ui_component,
 	public k3d::ngui::unsaved_document
 {
 	typedef Gtk::Window base;

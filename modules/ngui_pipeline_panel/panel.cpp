@@ -38,7 +38,6 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/pipeline.h>
@@ -101,7 +100,6 @@ private:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::ngui::ui_component,
 	public k3d::iunknown,
 	public Gtk::VBox
 {

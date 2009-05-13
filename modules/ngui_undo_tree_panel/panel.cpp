@@ -32,7 +32,6 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/toolbar.h>
-#include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/ngui/undo_utility.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
@@ -82,8 +81,8 @@ public:
 	{
 		toolbar::control* const toolbar = new toolbar::control();
 
-		m_undo_button = new button::control();
-		m_redo_button = new button::control();
+		m_undo_button = new Gtk::Button();
+		m_redo_button = new Gtk::Button();
 
 		m_undo_button->add(*Gtk::manage(new Gtk::Image(Gtk::Stock::UNDO, Gtk::ICON_SIZE_SMALL_TOOLBAR)));
 		m_redo_button->add(*Gtk::manage(new Gtk::Image(Gtk::Stock::REDO, Gtk::ICON_SIZE_SMALL_TOOLBAR)));
@@ -180,7 +179,7 @@ public:
 			m_undo_button->set_sensitive(true);
 
 			const std::string label = k3d::string_cast(boost::format(_("Undo %1%")) % current_node->label);
-			m_undo_button->set_tip(label);
+			m_undo_button->set_tooltip_text(label);
 //				m_undo_button->set_label(label);
 		}
 		else
@@ -188,7 +187,7 @@ public:
 			m_undo_button->set_sensitive(false);
 
 			const std::string label = _("Can't Undo");
-			m_undo_button->set_tip(label);
+			m_undo_button->set_tooltip_text(label);
 //				m_undo_button->set_label(label);
 		}
 
@@ -198,7 +197,7 @@ public:
 			m_redo_button->set_sensitive(true);
 
 			const std::string label = k3d::string_cast(boost::format(_("Redo %1%")) % redo_node->label);
-			m_redo_button->set_tip(label);
+			m_redo_button->set_tooltip_text(label);
 //				m_redo_button->set_label(label);
 		}
 		else
@@ -206,7 +205,7 @@ public:
 			m_redo_button->set_sensitive(false);
 
 			const std::string label = _("Can't Redo");
-			m_redo_button->set_tip(label);
+			m_redo_button->set_tooltip_text(label);
 //				m_redo_button->set_label(label);
 		}
 	}
@@ -430,8 +429,8 @@ public:
 	/// Provides storage for the TreeView
 	Glib::RefPtr<Gtk::TreeStore> m_model;
 
-	button::control* m_undo_button;
-	button::control* m_redo_button;
+	Gtk::Button* m_undo_button;
+	Gtk::Button* m_redo_button;
 	Gtk::TreeView m_view;
 
 	sigc::signal<void, const std::string&, const std::string&> m_command_signal;
@@ -448,8 +447,7 @@ public:
 class panel :
 	public Gtk::VBox,
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
-	public ui_component
+	public k3d::iunknown
 {
 	typedef Gtk::VBox base;
 

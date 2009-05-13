@@ -126,7 +126,6 @@ public:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::ngui::ui_component,
 	public k3d::iunknown,
 	public Gtk::VBox
 {

@@ -28,7 +28,6 @@
 #include <k3d-version-config.h>
 #include <k3dsdk/ngui/application_state.h>
 #include <k3dsdk/ngui/application_window.h>
-#include <k3dsdk/ngui/button.h>
 #include <k3dsdk/ngui/document.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>

@@ -184,9 +184,9 @@ void control::update(k3d::ihint*)
 		buffer << _("Partial selection");
 	}
 
-	tooltips().set_tip(*m_select_all_button, buffer.str());
-	tooltips().set_tip(*m_deselect_all_button, buffer.str());
-	tooltips().set_tip(*m_select_null_button, buffer.str());
+	m_select_all_button->set_tooltip_text(buffer.str());
+	m_deselect_all_button->set_tooltip_text(buffer.str());
+	m_select_null_button->set_tooltip_text(buffer.str());
 }
 
 } // namespace selection_button

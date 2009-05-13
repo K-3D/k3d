@@ -68,7 +68,7 @@ control::control(std::auto_ptr<property_widget::idata_proxy> Data) :
 	add(*Gtk::manage(gtk_label));
 
 	if(!description.empty())
-		set_tip(description);
+		set_tooltip_text(description);
 
 	data_changed();
 	m_data->document().document().pipeline().dependency_signal().connect(sigc::mem_fun(*this, &control::on_dependencies_changed));

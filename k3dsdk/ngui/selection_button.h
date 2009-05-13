@@ -24,8 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/mesh_selection.h>
@@ -86,8 +84,7 @@ private:
 
 /// Provides a UI for manipulating boolean quantities (i.e. the view and the controller from model-view-controller)
 class control :
-	public Gtk::HBox,
-	public ui_component
+	public Gtk::HBox
 {
 	typedef Gtk::HBox base;
 

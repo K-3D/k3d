@@ -26,8 +26,6 @@
 		\author Dan Erikson <derikson@montana.com>
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/types.h>
 
@@ -146,8 +144,7 @@ imodel* model(data_t& Data, const Glib::ustring& Label = "", const value_t StepI
 
 /// Provides a UI for manipulating scalar quantities (i.e. the view and the controller from model-view-controller)
 class control :
-	public Gtk::Table,
-	public ui_component
+	public Gtk::Table
 {
 	typedef Gtk::Table base;
 

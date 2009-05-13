@@ -25,7 +25,6 @@
 */
 
 #include "hotkey_entry.h"
-#include "ui_component.h"
 
 #include <k3dsdk/types.h>
 
@@ -119,8 +118,7 @@ imodel* model(data_t& Data, const Glib::ustring& Label = "")
 
 /// Provides a standard UI control for manipulating text fields (i.e. the view and the controller from model-view-controller)
 class control :
-	public hotkey_entry,
-	public ui_component
+	public hotkey_entry
 {
 	typedef hotkey_entry base;
 

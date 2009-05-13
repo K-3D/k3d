@@ -213,8 +213,8 @@ public:
 		// First add a manual keyframe button
 		if (keyframer)
 		{
-			button::control* const control =
-						new button::control(m_parent, "set_keyframe_button", "Set Keyframe")
+			Gtk::Button* const control =
+						new Gtk::Button(m_parent, "set_keyframe_button", "Set Keyframe")
 						<< connect_button(sigc::bind(sigc::mem_fun(*this, &implementation::on_manual_keyframe), keyframer))
 						<< set_tooltip("Manually set keyframe");
 						
@@ -236,15 +236,15 @@ public:
 					{
 						++row;
 						std::string keynumber = property_name.substr(10, property_name.size() - 9);
-						button::control* const control =
-						new button::control(m_parent, "delete_key_" + keynumber, "Delete Key " + keynumber)
+						Gtk::Button* const control =
+						new Gtk::Button(m_parent, "delete_key_" + keynumber, "Delete Key " + keynumber)
 							<< connect_button(sigc::bind(sigc::bind(sigc::mem_fun(*this, &implementation::on_key_delete), last_time_property), keyframer))
 							<< set_tooltip("Delete Key " + keynumber);
 							
 						table->attach(*manage(control), prop_label_begin, prop_label_end, row, row + 1, Gtk::SHRINK, Gtk::SHRINK);
 						
-						button::control* const zoomcontrol =
-						new button::control(m_parent, "zoom_key_" + keynumber, "Zoom to Key " + keynumber)
+						Gtk::Button* const zoomcontrol =
+						new Gtk::Button(m_parent, "zoom_key_" + keynumber, "Zoom to Key " + keynumber)
 							<< connect_button(sigc::bind(sigc::bind(sigc::mem_fun(*this, &implementation::on_key_zoom), last_time_property), keyframer))
 							<< set_tooltip("Sets the time to the time associated with " + keynumber);
 							
@@ -309,7 +309,6 @@ public:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::ngui::ui_component,
 	public k3d::iunknown,
 	public Gtk::VBox
 {

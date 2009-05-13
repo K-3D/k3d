@@ -24,8 +24,6 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-#include <k3dsdk/signal_system.h>
 #include <gtkmm/button.h>
 
 namespace k3d
@@ -38,24 +36,12 @@ namespace button
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// control
+// create
 
-/// Provides a standard button control
-class control :
-        public Gtk::Button,
-	public ui_component
-{
-	typedef Gtk::Button base;
-
-public:
-	control();
-	control(const Glib::ustring& label, bool mnemonic = false);
-	control(const Gtk::StockID& stock_id);
-	control(const Glib::ustring& label, const Gtk::StockID& stock_id);
-	control(Gtk::Widget& widget);
-
-	void on_clicked();
-};
+/// Factory function for creating a button with a stock icon but a custom label.
+Gtk::Button* create(const Glib::ustring& label, const Gtk::StockID& stock_id);
+/// Factory function for creating a button containing some other widget, typically used with Gtk::Image.
+Gtk::Button* create(Gtk::Widget& widget);
 
 } // namespace button
 

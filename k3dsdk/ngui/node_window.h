@@ -24,8 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ui_component.h"
-
 #include <k3dsdk/types.h>
 
 #include <gtkmm/window.h>
@@ -43,8 +41,7 @@ namespace ngui
 
 /// Provides a standard node-level window
 class node_window :
-        public Gtk::Window,
-	public ui_component
+        public Gtk::Window
 {
 	typedef Gtk::Window base;
 

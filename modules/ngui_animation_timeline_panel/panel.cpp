@@ -31,7 +31,6 @@
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/ui_component.h>
 #include <k3dsdk/ngui/utility.h>
 
 #include <k3dsdk/application_plugin_factory.h>
@@ -438,13 +437,13 @@ public:
 		k3d::property_collection(),
 		m_document_state(DocumentState),
 		m_no_track("Select Track..."),
-		m_rewind(*Gtk::manage(new Gtk::Image(load_icon("rewind", Gtk::ICON_SIZE_BUTTON)))),
-		m_loop_reverse_play(*Gtk::manage(new Gtk::Image(load_icon("reverse_play_loop", Gtk::ICON_SIZE_BUTTON)))),
-		m_reverse_play(*Gtk::manage(new Gtk::Image(load_icon("reverse_play", Gtk::ICON_SIZE_BUTTON)))),
-		m_stop(*Gtk::manage(new Gtk::Image(load_icon("stop", Gtk::ICON_SIZE_BUTTON)))),
-		m_play(*Gtk::manage(new Gtk::Image(load_icon("play", Gtk::ICON_SIZE_BUTTON)))),
-		m_loop_play(*Gtk::manage(new Gtk::Image(load_icon("play_loop", Gtk::ICON_SIZE_BUTTON)))),
-		m_fast_forward(*Gtk::manage(new Gtk::Image(load_icon("fast_forward", Gtk::ICON_SIZE_BUTTON)))),
+		m_rewind(button::create(*Gtk::manage(new Gtk::Image(load_icon("rewind", Gtk::ICON_SIZE_BUTTON))))),
+		m_loop_reverse_play(button::create(*Gtk::manage(new Gtk::Image(load_icon("reverse_play_loop", Gtk::ICON_SIZE_BUTTON))))),
+		m_reverse_play(button::create(*Gtk::manage(new Gtk::Image(load_icon("reverse_play", Gtk::ICON_SIZE_BUTTON))))),
+		m_stop(button::create(*Gtk::manage(new Gtk::Image(load_icon("stop", Gtk::ICON_SIZE_BUTTON))))),
+		m_play(button::create(*Gtk::manage(new Gtk::Image(load_icon("play", Gtk::ICON_SIZE_BUTTON))))),
+		m_loop_play(button::create(*Gtk::manage(new Gtk::Image(load_icon("play_loop", Gtk::ICON_SIZE_BUTTON))))),
+		m_fast_forward(button::create(*Gtk::manage(new Gtk::Image(load_icon("fast_forward", Gtk::ICON_SIZE_BUTTON))))),
 		m_playback_mode(init_name("playback_mode") + init_label(_("Playback Mode")) + init_description(_("When on, plays animation")) + init_value(STOP))
 	{
 		m_frame_label.set_editable(false);
@@ -453,13 +452,13 @@ public:
 		m_container.pack_start(m_track_selector, Gtk::PACK_SHRINK);
 		m_container.pack_start(m_timeline, Gtk::PACK_EXPAND_WIDGET);
 		m_container.pack_start(m_frame_label, Gtk::PACK_SHRINK);
-		m_container.pack_start(m_rewind, Gtk::PACK_SHRINK);
-		m_container.pack_start(m_loop_reverse_play, Gtk::PACK_SHRINK);
-		m_container.pack_start(m_reverse_play, Gtk::PACK_SHRINK);
-		m_container.pack_start(m_stop, Gtk::PACK_SHRINK);
-		m_container.pack_start(m_play, Gtk::PACK_SHRINK);
-		m_container.pack_start(m_loop_play, Gtk::PACK_SHRINK);
-		m_container.pack_start(m_fast_forward, Gtk::PACK_SHRINK);
+		m_container.pack_start(*Gtk::manage(m_rewind), Gtk::PACK_SHRINK);
+		m_container.pack_start(*Gtk::manage(m_loop_reverse_play), Gtk::PACK_SHRINK);
+		m_container.pack_start(*Gtk::manage(m_reverse_play), Gtk::PACK_SHRINK);
+		m_container.pack_start(*Gtk::manage(m_stop), Gtk::PACK_SHRINK);
+		m_container.pack_start(*Gtk::manage(m_play), Gtk::PACK_SHRINK);
+		m_container.pack_start(*Gtk::manage(m_loop_play), Gtk::PACK_SHRINK);
+		m_container.pack_start(*Gtk::manage(m_fast_forward), Gtk::PACK_SHRINK);
 		m_container.show_all();
 		
 		m_document_state.document().nodes().add_nodes_signal().connect(sigc::mem_fun(*this, &implementation::on_nodes_added));
@@ -470,13 +469,13 @@ public:
 		
 		m_track_selector.signal_changed().connect(sigc::mem_fun(*this, &implementation::update_keys));
 		
-		m_rewind.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_rewind));
-		m_loop_reverse_play.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_loop_reverse_play));
-		m_reverse_play.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_reverse_play));
-		m_stop.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_stop));
-		m_play.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_play));
-		m_loop_play.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_loop_play));
-		m_fast_forward.signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_fast_forward));
+		m_rewind->signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_rewind));
+		m_loop_reverse_play->signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_loop_reverse_play));
+		m_reverse_play->signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_reverse_play));
+		m_stop->signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_stop));
+		m_play->signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_play));
+		m_loop_play->signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_loop_play));
+		m_fast_forward->signal_clicked().connect(sigc::mem_fun(*this, &implementation::on_fast_forward));
 
 		m_playback_mode.changed_signal().connect(sigc::mem_fun(*this, &implementation::on_playback_mode_changed));
 		
@@ -586,13 +585,13 @@ public:
 		
 		const bool enabled = m_start_time && m_end_time && m_frame_rate && m_time && m_writable_time;
 		
-		m_rewind.set_sensitive(enabled);
-		m_loop_reverse_play.set_sensitive(enabled);
-		m_reverse_play.set_sensitive(enabled);
-		m_stop.set_sensitive(enabled);
-		m_play.set_sensitive(enabled);
-		m_loop_play.set_sensitive(enabled);
-		m_fast_forward.set_sensitive(enabled);
+		m_rewind->set_sensitive(enabled);
+		m_loop_reverse_play->set_sensitive(enabled);
+		m_reverse_play->set_sensitive(enabled);
+		m_stop->set_sensitive(enabled);
+		m_play->set_sensitive(enabled);
+		m_loop_play->set_sensitive(enabled);
+		m_fast_forward->set_sensitive(enabled);
 	}
 	
 	typedef std::map<std::string, k3d::ikeyframer*> tracks_t;
@@ -862,13 +861,13 @@ public:
 	sigc::connection m_keys_changed_connection;
 
 	Gtk::Entry m_frame_label;
-	button::control m_rewind;
-	button::control m_loop_reverse_play;
-	button::control m_reverse_play;
-	button::control m_stop;
-	button::control m_play;
-	button::control m_loop_play;
-	button::control m_fast_forward;
+	Gtk::Button* const m_rewind;
+	Gtk::Button* const m_loop_reverse_play;
+	Gtk::Button* const m_reverse_play;
+	Gtk::Button* const m_stop;
+	Gtk::Button* const m_play;
+	Gtk::Button* const m_loop_play;
+	Gtk::Button* const m_fast_forward;
 	
 	k3d_data(playback_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) m_playback_mode;
 	sigc::connection m_playback_connection;
@@ -881,7 +880,6 @@ public:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::ngui::ui_component,
 	public Gtk::VBox,
 	public k3d::iunknown
 {
