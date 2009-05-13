@@ -639,6 +639,10 @@ void mesh::delete_unused_points(mesh& Mesh)
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::primitive
 
+mesh::primitive::primitive()
+{
+}
+
 mesh::primitive::primitive(const string_t& Type) :
 	type(Type)
 {

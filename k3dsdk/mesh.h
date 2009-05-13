@@ -91,6 +91,7 @@ public:
 	class primitive
 	{
 	public:
+		primitive();
 		primitive(const string_t& Type);
 
 		/// Stores the primitive type ("point_groups", "polyhedra", "teapot", etc.)
