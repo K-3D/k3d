@@ -50,20 +50,18 @@ std::set<k3d::string_t>& extensions()
 	if(!initialized)
 	{
 		const char* const extension_c_string = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
-		
-		if (!extension_c_string)
+		if(!extension_c_string)
 		{
 			k3d::log() << warning << "GL extension query executed before context creation" << std::endl;
 			return results;
 		}
-		
 		const k3d::string_t extension_string = extension_c_string;
-		
-		initialized = true;
 
 		boost::char_separator<char> separator(" ");
 		boost::tokenizer<boost::char_separator<char> > tokenizer(extension_string, separator);
 		std::copy(tokenizer.begin(), tokenizer.end(), std::inserter(results, results.end()));
+
+		initialized = true;
 	}
 
 	return results;
@@ -77,9 +75,12 @@ std::set<k3d::string_t>& disabled()
 
 	if(!initialized)
 	{
+		// We are temporarily disabling VBOs by default, to simplify
+		// troubleshooting during the transition to generic polyhedron
+		// primitives - TMS
+		results.insert("GL_ARB_vertex_buffer_object");
+
 		initialized = true;
-		// add default list of disabled extensions here
-		//results.insert("GL_ARB_vertex_buffer_object");
 	}
 
 	return results;
@@ -101,8 +102,8 @@ const std::set<k3d::string_t> list()
 
 void disable(const k3d::string_t& Extension)
 {
-	detail::disabled().insert(Extension);
 	detail::enabled().erase(Extension);
+	detail::disabled().insert(Extension);
 }
 
 void enable(const k3d::string_t& Extension)
