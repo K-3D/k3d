@@ -50,7 +50,7 @@ public:
 		base(Factory, Document)
 	{
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reset_mesh_slot()));
 	}
 	
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
