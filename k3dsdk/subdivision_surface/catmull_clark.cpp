@@ -1076,6 +1076,7 @@ public:
 			}
 			output_polyhedron.shell_face_counts.push_back(topology_data.face_subface_counts.back() - output_polyhedron.shell_first_faces.back());
 			subdivide_topology_time += timer.elapsed();
+			output_polyhedron.shell_types = input_polyhedron.shell_types;
 			
 			// Update selection arrays
 			output_polyhedron.edge_selections.assign(output_polyhedron.edge_points.size(), 0.0);
@@ -1408,21 +1409,28 @@ private:
 				Polyhedron.face_varying_data);
 	}
 	
+	template<typename ArrayT>
+	void copy_array(const ArrayT& Source, ArrayT& Destination)
+	{
+		Destination.resize(Source.size());
+		std::copy(Source.begin(), Source.end(), Destination.begin());
+	}
+	
 	void copy_output_polyhedron(const polyhedron& Input, k3d::polyhedron::primitive& Output, const k3d::uint_t PointOffset)
 	{
-		Output.shell_first_faces = Input.shell_first_faces;
-		Output.shell_face_counts = Input.shell_face_counts;
-		Output.shell_types = Input.shell_types;
-		Output.face_first_loops = Input.face_first_loops;
-		Output.face_loop_counts = Input.face_loop_counts;
-		Output.face_selections = Input.face_selections;
-		Output.face_materials = Input.face_materials;
-		Output.loop_first_edges = Input.loop_first_edges;
-		Output.edge_points = Input.edge_points;
+		copy_array(Input.shell_first_faces, Output.shell_first_faces);
+		copy_array(Input.shell_face_counts, Output.shell_face_counts);
+		copy_array(Input.shell_types, Output.shell_types);
+		copy_array(Input.face_first_loops, Output.face_first_loops);
+		copy_array(Input.face_loop_counts, Output.face_loop_counts);
+		copy_array(Input.face_selections, Output.face_selections);
+		copy_array(Input.face_materials, Output.face_materials);
+		copy_array(Input.loop_first_edges, Output.loop_first_edges);
+		Output.edge_points.resize(Input.edge_points.size());
 		for(k3d::uint_t i = 0; i != Input.edge_points.size(); ++i)
-			Output.edge_points[i] = Input.edge_points[i] + PointOffset;
-		Output.clockwise_edges = Input.clockwise_edges;
-		Output.edge_selections = Input.edge_selections;
+			Output.edge_points[i] = (Input.edge_points[i] + PointOffset);
+		copy_array(Input.clockwise_edges, Output.clockwise_edges);
+		copy_array(Input.edge_selections, Output.edge_selections);
 		Output.constant_data = Input.constant_data;
 		Output.uniform_data = Input.uniform_data;
 		Output.face_varying_data = Input.face_varying_data;
