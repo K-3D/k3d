@@ -112,14 +112,14 @@ public:
 					!backfacing(points[polyhedron->edge_points[edge]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(polyhedron->edge_points[edge]))
 											&& !backfacing(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(polyhedron->edge_points[polyhedron->clockwise_edges[edge]]))))
 				{
-					k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
+					k3d::gl::push_selection_token(k3d::selection::SPLIT_EDGE, edge);
 		
 					glBegin(GL_LINES);
 					k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
 					k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
 					glEnd();
 		
-					k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
+					k3d::gl::pop_selection_token(); // SPLIT_EDGE
 				}
 			}
 		}

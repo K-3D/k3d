@@ -126,6 +126,9 @@ public:
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
+		if(!SelectionState.select_faces)
+			return;
+	
 		k3d::uint_t face_offset = 0;
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
@@ -133,12 +136,9 @@ public:
 			if(!polyhedron.get())
 				continue;
 			
-			if (k3d::polyhedron::is_sds(*polyhedron))
+			if(k3d::polyhedron::is_sds(*polyhedron))
 				continue;
 				
-			if (!SelectionState.select_faces)
-				continue;
-	
 			k3d::gl::store_attributes attributes;
 			
 			glDisable(GL_LIGHTING);
@@ -161,7 +161,7 @@ public:
 			k3d::uint_t face_count = polyhedron->face_first_loops.size();
 			for(k3d::uint_t face = 0; face != face_count; ++face)
 			{
-				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
+				k3d::gl::push_selection_token(k3d::selection::UNIFORM, face);
 	
 				k3d::uint_t startindex = face_starts[face+face_offset];
 				k3d::uint_t endindex = face+face_offset+1 == (face_starts.size()) ? indices.size() : face_starts[face+face_offset+1];
@@ -170,7 +170,7 @@ public:
 					k3d::gl::vertex3d(points[indices[corner]]);
 				glEnd();
 	
-				k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+				k3d::gl::pop_selection_token(); // UNIFORM
 			}
 			face_offset += face_count;
 		}

@@ -216,13 +216,13 @@ protected:
 		
 		for (k3d::uint_t face = 0; face != Cache.face_starts.size(); ++face)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
+			k3d::gl::push_selection_token(k3d::selection::UNIFORM, face);
 			
 			k3d::uint_t start_index = Cache.face_starts[face];
 			k3d::uint_t end_index = face == (Cache.face_starts.size()-1) ? Cache.index_size : Cache.face_starts[face+1]; 
 			glDrawElements(GL_QUADS, end_index-start_index, GL_UNSIGNED_INT, static_cast<GLuint*>(0) + start_index);
 			
-			k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+			k3d::gl::pop_selection_token(); // UNIFORM
 		}
 	}
 };
@@ -305,13 +305,13 @@ private:
 		
 		for (k3d::uint_t edge = 0; edge != edge_count; ++edge)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
+			k3d::gl::push_selection_token(k3d::selection::SPLIT_EDGE, edge);
 			
 			k3d::uint_t start_index = Cache.edge_starts[edge];
 			k3d::uint_t end_index = edge == (edge_count-1) ? Cache.index_size : Cache.edge_starts[edge+1];
 			glDrawArrays(GL_LINES, start_index, end_index-start_index);
 			
-			k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
+			k3d::gl::pop_selection_token(); // SPLIT_EDGE
 		}
 	}
 };

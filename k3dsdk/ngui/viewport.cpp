@@ -1133,6 +1133,8 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	for(k3d::selection::record::tokens_t::const_iterator token = record.tokens.begin(); token != record.tokens.end(); ++token)
 		tokens.insert(std::make_pair(token->type, token->id));
 
+  assert_not_implemented();
+/*
 	if(tokens.count(k3d::selection::ABSOLUTE_SPLIT_EDGE))
 	{
 		return record;
@@ -1141,8 +1143,6 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	double distance = std::numeric_limits<double>::max();
 	k3d::selection::id selected_edge;
 
-  assert_not_implemented();
-/*
 	if(tokens.count(k3d::selection::ABSOLUTE_FACE))
 	{
 		if(mesh->polyhedra && mesh->polyhedra->face_first_loops && mesh->polyhedra->face_loop_counts && mesh->polyhedra->loop_first_edges && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
@@ -1176,7 +1176,6 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 			}
 		}
 	}
-*/
 
 	if(distance < std::numeric_limits<double>::max())
 	{
@@ -1187,6 +1186,7 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 		return record;
 	}
 
+*/
 	return k3d::selection::record::empty_record();
 }
 
@@ -1208,7 +1208,6 @@ k3d::selection::record control::pick_uniform(const k3d::point2& Coordinates, k3d
 		{
 			switch(token->type)
 			{
-				case k3d::selection::ABSOLUTE_FACE:
 				case k3d::selection::UNIFORM:
 					return *record;
 			}

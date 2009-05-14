@@ -161,7 +161,7 @@ public:
 			for(k3d::uint_t poly_face = 0; poly_face != face_count; ++poly_face)
 			{
 				const k3d::uint_t face = poly_face + face_offset;
-				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
+				k3d::gl::push_selection_token(k3d::selection::UNIFORM, face);
 	
 				k3d::uint_t startindex = face_starts[face];
 				k3d::uint_t endindex = face+1 == (face_starts.size()) ? indices.size() : face_starts[face+1];
@@ -170,7 +170,7 @@ public:
 					k3d::gl::vertex3d(points[indices[corner]]);
 				glEnd();
 	
-				k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+				k3d::gl::pop_selection_token(); // UNIFORM
 			}
 			face_offset += face_count;
 		}

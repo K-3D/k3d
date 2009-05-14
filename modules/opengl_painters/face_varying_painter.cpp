@@ -164,13 +164,13 @@ public:
 					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
 					for(k3d::uint_t edge = first_edge; ;)
 					{
-						k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_SPLIT_EDGE, edge);
+						k3d::gl::push_selection_token(k3d::selection::SPLIT_EDGE, edge);
 	
 						glBegin(GL_POINTS);
 						k3d::gl::vertex3d(detail::get_offset_point(polyhedron->edge_points, polyhedron->clockwise_edges, points, edge, offset));
 						glEnd();
 	
-						k3d::gl::pop_selection_token(); // ABSOLUTE_SPLIT_EDGE
+						k3d::gl::pop_selection_token(); // SPLIT_EDGE
 	
 						edge = polyhedron->clockwise_edges[edge];
 						if(edge == first_edge)

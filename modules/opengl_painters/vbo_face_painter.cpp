@@ -169,12 +169,12 @@ public:
 			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
 			for(k3d::uint_t poly_face = 0; poly_face != face_count; ++poly_face)
 			{
-				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, poly_face);
+				k3d::gl::push_selection_token(k3d::selection::UNIFORM, poly_face);
 	
 				const k3d::uint_t face = poly_face + face_offset;
 				vbos.draw_range(face, face+1, this);
 	
-				k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+				k3d::gl::pop_selection_token(); // UNIFORM
 			}
 			face_offset += face_count;
 		}

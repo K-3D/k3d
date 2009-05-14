@@ -146,7 +146,7 @@ public:
 	
 			for(k3d::uint_t face = 0; face != face_count; ++face)
 			{
-				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_FACE, face);
+				k3d::gl::push_selection_token(k3d::selection::UNIFORM, face);
 	
 				glBegin(GL_POLYGON);
 				const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
@@ -159,7 +159,7 @@ public:
 				}
 				glEnd();
 	
-				k3d::gl::pop_selection_token(); // ABSOLUTE_FACE
+				k3d::gl::pop_selection_token(); // UNIFORM
 			}
 		}
 	}
