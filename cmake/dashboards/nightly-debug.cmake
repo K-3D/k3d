@@ -12,10 +12,11 @@ K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE:BOOL=OFF
 
 ")
 
-SET(CTEST_ENVIRONMENT
-  "CFLAGS=-g -O0 -Wall -W"
-  "CXXFLAGS=-g -O0 -Wall -W"
-)
+# Uncomment this to enable ruthless compiler warnings
+#SET(CTEST_ENVIRONMENT
+#  "CFLAGS=-g -O0 -Wall -W"
+#  "CXXFLAGS=-g -O0 -Wall -W"
+#)
 
 # Allow the caller to override test variables ... note that the caller MUST specify CTEST_BINARY_DIRECTORY at-a-minimum.
 SET(VARIABLE)
