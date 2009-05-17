@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Update regression tests to use CMake labels
+desc: Recent versions of CMake allow assignment of user-defined labels to tests, and filtering of tests based on those labels.  Update the current tests to use labels for categorization so we don't have to rely on test names for running categories of tests.
+type: :task
+component: K-3D
+release: 
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-17 06:02:44.983929 Z
+references: []
+
+id: 9c495b89016c7cceebed30b1c37286a935f9a2eb
+log_events: 
+- - 2009-05-17 06:02:46.135798 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
