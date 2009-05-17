@@ -58,13 +58,13 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
 	{
-		const k3d::mesh::points_t& points = *Mesh.points;
-		
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
 			if(!polyhedron.get())
 				continue;
+		
+			const k3d::mesh::points_t& points = *Mesh.points;
 		
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);
@@ -93,14 +93,14 @@ public:
 		if(!SelectionState.select_split_edges)
 			return;
 
-		const k3d::mesh::points_t& points = *Mesh.points;
-
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
 			if(!polyhedron.get())
 				continue;
 		
+			const k3d::mesh::points_t& points = *Mesh.points;
+
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);
 	
