@@ -29,8 +29,6 @@ void load_pipeline(idocument& Document, element& XML, const ipersistent::load_co
 void save(const mesh& Mesh, element& Container, const ipersistent::save_context& Context);
 /// Loads a mesh from XML 
 void load(mesh& Mesh, element& Container, const ipersistent::load_context& Context);
-/// Loads a legacy mesh from XML. Needed to parse documents with old FrozenMesh nodes.
-void load(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Context);
 
 /// Serializes a document node to XML
 void save(inode& Node, element& XML, const ipersistent::save_context& Context);

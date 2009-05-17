@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -26,7 +26,6 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_storage.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
@@ -106,15 +105,6 @@ public:
 		if(xml_mesh)
 		{
 			k3d::xml::load(*mesh, *xml_mesh, Context);
-		}
-		else
-		{ // try the legacy mesh loader
-			xml_mesh = k3d::xml::find_element(Element, "mesh");
-			if(!xml_mesh)
-				return;
-			k3d::legacy::mesh legacy_mesh;
-			k3d::xml::load(legacy_mesh, *xml_mesh, Context);
-			*mesh = legacy_mesh;
 		}
 	}
 

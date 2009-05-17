@@ -2175,10 +2175,13 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		}
 	}
 
+/** \todo Remove this block of code no later than version 1.0
+
+This code has been left in-place in-case we ever need to load a K-3D file that contains pre-generic-primitive data.
+Assuming that that never happens, it should be safe to remove this code entirely for version 1.0.
+
 	if(element* const container = find_element(Container, "point_groups"))
 	{
-		assert_not_implemented();
-/*
 		mesh::point_groups_t* const point_groups = &Mesh.point_groups.create();
 		detail::load_array(*container, "first_points", point_groups->first_points, Context);
 		detail::load_array(*container, "point_counts", point_groups->point_counts, Context);
@@ -2186,13 +2189,10 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_arrays(*container, "constant_data", point_groups->constant_data, Context);
 		detail::load_array(*container, "points", point_groups->points, Context);
 		detail::load_arrays(*container, "varying_data", point_groups->varying_data, Context);
-*/
 	}
 
 	if(element* const container = find_element(Container, "linear_curve_groups"))
 	{
-		assert_not_implemented();
-/*
 		mesh::linear_curve_groups_t* const linear_curve_groups = &Mesh.linear_curve_groups.create();
 		detail::load_array(*container, "first_curves", linear_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", linear_curve_groups->curve_counts, Context);
@@ -2204,13 +2204,10 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_array(*container, "curve_selection", linear_curve_groups->curve_selection, Context);
 		detail::load_arrays(*container, "uniform_data", linear_curve_groups->uniform_data, Context);
 		detail::load_array(*container, "curve_points", linear_curve_groups->curve_points, Context);
-*/
 	}
 
 	if(element* const container = find_element(Container, "cubic_curve_groups"))
 	{
-		assert_not_implemented();
-/*
 		mesh::cubic_curve_groups_t* const cubic_curve_groups = &Mesh.cubic_curve_groups.create();
 		detail::load_array(*container, "first_curves", cubic_curve_groups->first_curves, Context);
 		detail::load_array(*container, "curve_counts", cubic_curve_groups->curve_counts, Context);
@@ -2222,13 +2219,10 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_array(*container, "curve_selection", cubic_curve_groups->curve_selection, Context);
 		detail::load_arrays(*container, "uniform_data", cubic_curve_groups->uniform_data, Context);
 		detail::load_array(*container, "curve_points", cubic_curve_groups->curve_points, Context);
-*/
 	}
 
 	if(element* const container = find_element(Container, "nurbs_curve_groups"))
 	{
-		assert_not_implemented();
-/*
 		boost::scoped_ptr<nurbs_curve::primitive> nurbs_curves(nurbs_curve::create(Mesh));
 
 		detail::load_array(*container, "materials", nurbs_curves->material, Context);
@@ -2242,14 +2236,10 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_array(*container, "curve_points", nurbs_curves->curve_points, Context);
 		detail::load_array(*container, "curve_point_weights", nurbs_curves->curve_point_weights, Context);
 		detail::load_array(*container, "curve_knots", nurbs_curves->curve_knots, Context);
-*/
 	}
 
 	if(element* const container = find_element(Container, "bilinear_patches"))
 	{
-		assert_not_implemented();
-
-/*
 		mesh::bilinear_patches_t* const bilinear_patches = &Mesh.bilinear_patches.create();
 		detail::load_array(*container, "patch_selection", bilinear_patches->patch_selection, Context);
 		detail::load_array(*container, "patch_materials", bilinear_patches->patch_materials, Context);
@@ -2257,14 +2247,10 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_arrays(*container, "uniform_data", bilinear_patches->uniform_data, Context);
 		detail::load_array(*container, "patch_points", bilinear_patches->patch_points, Context);
 		detail::load_arrays(*container, "varying_data", bilinear_patches->varying_data, Context);
-*/
 	}
 
 	if(element* const container = find_element(Container, "bicubic_patches"))
 	{
-		assert_not_implemented();
-
-/*
 		mesh::bicubic_patches_t* const bicubic_patches = &Mesh.bicubic_patches.create();
 		detail::load_array(*container, "patch_selection", bicubic_patches->patch_selection, Context);
 		detail::load_array(*container, "patch_materials", bicubic_patches->patch_materials, Context);
@@ -2272,13 +2258,10 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_arrays(*container, "uniform_data", bicubic_patches->uniform_data, Context);
 		detail::load_array(*container, "patch_points", bicubic_patches->patch_points, Context);
 		detail::load_arrays(*container, "varying_data", bicubic_patches->varying_data, Context);
-*/
 	}
 
 	if(element* const container = find_element(Container, "nurbs_patches"))
 	{
-		assert_not_implemented();
-/*		
 		boost::scoped_ptr<nurbs_patch::primitive> nurbs_patches(nurbs_patch::create(Mesh));
 		
 		detail::load_array(*container, "patch_first_points", nurbs_patches->patch_first_points, Context);
@@ -2312,13 +2295,10 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_array(*container, "trim_curve_points", nurbs_patches->curve_points, Context);
 		detail::load_array(*container, "trim_curve_point_weights", nurbs_patches->curve_point_weights, Context);
 		detail::load_array(*container, "trim_curve_knots", nurbs_patches->curve_knots, Context);
-*/
 	}
 
 	if(element* const container = find_element(Container, "polyhedra"))
 	{
-		assert_not_implemented();
-/*		
 		mesh::polyhedra_t* const polyhedra = &Mesh.polyhedra.create();
 		detail::load_array(*container, "first_faces", polyhedra->first_faces, Context);
 		detail::load_array(*container, "face_counts", polyhedra->face_counts, Context);
@@ -2334,10 +2314,8 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 		detail::load_array(*container, "clockwise_edges", polyhedra->clockwise_edges, Context);
 		detail::load_array(*container, "edge_selection", polyhedra->edge_selection, Context);
 		detail::load_arrays(*container, "face_varying_data", polyhedra->face_varying_data, Context);
-*/
 	}
 
-/*
 	if(element* const container = find_element(Container, "blobbies"))
 	{
 		mesh::blobbies_t* const blobbies = &Mesh.blobbies.create();
@@ -2494,12 +2472,17 @@ void load_varying_parameters(const element& Element, ContainerT& Parameters, con
 	}
 }
 
+} // namespace detail
+
+/** \todo Remove this block of code no later than version 1.0
+
+This code has been left in-place in-case we ever need to load a K-3D file that contains pre-array data
+into a legacy mesh.  Assuming that that never happens, it should be safe to remove this code entirely for version 1.0.
+
 void load_tags(const element& Element, legacy::parameters_t& Parameters)
 {
 	load_parameters(Element, "tag", Parameters);
 }
-
-} // namespace detail
 
 void load(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Context)
 {
@@ -2520,8 +2503,6 @@ void load(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Con
 	// Load point groups ...
 	if(element* const xml_point_groups = find_element(XML, "pointgroups"))
 	{
-		assert_not_implemented();
-/*
 		for(element::elements_t::iterator xml_group = xml_point_groups->children.begin(); xml_group != xml_point_groups->children.end(); ++xml_group)
 		{
 			if(xml_group->name != "group")
@@ -2545,7 +2526,6 @@ void load(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Con
 
 			detail::load_parameters(*xml_group, ri::CONSTANT, group->constant_data);
 		}
-*/
 	}
 
 	// Load polyhedra ...
@@ -2894,8 +2874,8 @@ void load(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Con
 		}
 	}
 }
+*/
 
-// end of legacy stuff
 ///////////////////////////////////////////////////////////////////////////////////
 
 void save(const mesh_selection& Selection, element& XML, const ipersistent::save_context& Context)
