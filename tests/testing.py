@@ -361,13 +361,6 @@ def mesh_volume_comparison(calculated_volume, expected_volume):
 		print """<DartMeasurement name="Expected Volume" type="numeric/float">""" + str(expected_volume) + """</DartMeasurement>"""
 		raise Exception("incorrect mesh volume")
 
-def assert_contains_solid_polyhedron(mesh):
-	polyhedron = k3d.polyhedron.validate(mesh)
-	if not polyhedron:
-		raise Exception("mesh does not contain a polyhedron")
-	if not k3d.polyhedron.is_solid(polyhedron):
-		raise Exception("polyhedron is not solid")
-
 def bitmap_perceptual_difference(document, input_image1, input_image2, threshold=1e-8):
 	difference = document.new_node("BitmapPerceptualDifference")
 	difference.field_of_view = 10.0
