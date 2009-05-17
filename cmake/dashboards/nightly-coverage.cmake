@@ -8,13 +8,19 @@ SET(CTEST_INITIAL_CACHE "
 
 BUILD_TESTING:BOOL=ON
 CMAKE_BUILD_TYPE:STRING=Debug
+K3D_BUILD_MESH_MODULE:BOOL=OFF
 K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE:BOOL=OFF
 
 ")
 
+#SET(CTEST_ENVIRONMENT
+#  "CFLAGS=-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
+#  "CXXFLAGS=-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
+#  "LDFLAGS=-fprofile-arcs -ftest-coverage"
+#)
 SET(CTEST_ENVIRONMENT
-  "CFLAGS=-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
-  "CXXFLAGS=-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
+  "CFLAGS=-g -O0 -fprofile-arcs -ftest-coverage"
+  "CXXFLAGS=-g -O0 -fprofile-arcs -ftest-coverage"
   "LDFLAGS=-fprofile-arcs -ftest-coverage"
 )
 
