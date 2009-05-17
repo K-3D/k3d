@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Replace 'mesh' with 'geometry' in all classes / tests / documentation
+desc: As discussed at length on the mailing list, the term 'mesh' has strong associations with polygonal meshes, causing confusion for many potential developers.  We have agreed that we will change all related source and documentation to use the more generic term 'geometry' in place of 'mesh'.
+type: :task
+component: K-3D
+release: 
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-17 04:16:39.648417 Z
+references: []
+
+id: a30d997fb6cf859f56794c2ba693d986d109a143
+log_events: 
+- - 2009-05-17 04:16:40.872238 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
