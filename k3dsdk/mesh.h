@@ -40,92 +40,121 @@ namespace legacy { class mesh; }
 ////////////////////////////////////////////////////////////////////////////////
 // mesh
 
-/// Encapsulates a hetereogenous collection of geometric primitives
+/// Encapsulates a hetereogenous collection of geometric primitives.
 class mesh
 {
 public:
 	mesh();
 
-	/// Defines storage for a collection of indices
+	/// Defines storage for a collection of indices.
 	typedef uint_t_array indices_t;
-	/// Defines storage for a collection of counts
+	/// Defines storage for a collection of counts.
 	typedef uint_t_array counts_t;
-	/// Defines storage for a collection of orders
+	/// Defines storage for a collection of orders.
 	typedef uint_t_array orders_t;
-	/// Defines storage for a collection of weights
+	/// Defines storage for a collection of weights.
 	typedef typed_array<double_t> weights_t;
-	/// Defines storage for a collection of knot vectors
+	/// Defines storage for a collection of knot vectors.
 	typedef typed_array<double_t> knots_t;
-	/// Defines storage for gprim selection state
+	/// Defines storage for gprim selection state.
 	typedef typed_array<double_t> selection_t;
-	/// Defines storage for gprim materials
+	/// Defines storage for gprim materials.
 	typedef typed_array<imaterial*> materials_t;
-	/// Defines storage for a generic collection of boolean values
+	/// Defines storage for a generic collection of boolean values.
 	typedef typed_array<bool_t> bools_t;
-	/// Defines storage for a generic collection of colors
+	/// Defines storage for a generic collection of colors.
 	typedef typed_array<color> colors_t;
-	/// Defines storage for a generic collection of floating-point values
+	/// Defines storage for a generic collection of floating-point values.
 	typedef typed_array<double_t> doubles_t;
-	/// Defines storage for a generic collection of 4x4 matrices
+	/// Defines storage for a generic collection of 4x4 matrices.
 	typedef typed_array<matrix4> matrices_t;
-	/// Defines storage for a generic collection of 3D normals
+	/// Defines storage for a generic collection of 3D normals.
 	typedef typed_array<normal3> normals_t;
-	/// Defines storage for a generic collection of 2D points
+	/// Defines storage for a generic collection of 2D points.
 	typedef typed_array<point2> points_2d_t;
-	/// Defines storage for a generic collection of 3D points
+	/// Defines storage for a generic collection of 3D points.
 	typedef typed_array<point3> points_t;
-	/// Defines storage for a generic collection of strings
+	/// Defines storage for a generic collection of strings.
 	typedef typed_array<string_t> strings_t;
-	/// Defines storage for a generic collection of 3D texture coordinates
+	/// Defines storage for a generic collection of 3D texture coordinates.
 	typedef typed_array<texture3> texture_coordinates_t;
-	/// Defines storage for a generic collection of 3D vectors
+	/// Defines storage for a generic collection of 3D vectors.
 	typedef typed_array<vector3> vectors_t;
-	/// Defines a heterogeneous collection of named, shared arrays with varying lengths
+	/// Defines a heterogeneous collection of named, shared arrays with varying lengths.
 	typedef k3d::named_arrays named_arrays_t;
-	/// Defines a heterogeneous collection of named, shared arrays with identical length
+	/// Defines a heterogeneous collection of named, shared arrays with identical length.
 	typedef k3d::attribute_arrays attribute_arrays_t;
-	/// Defines a named collection of attribute arrays
+	/// Defines a named collection of attribute arrays.
 	typedef k3d::named_attribute_arrays named_attribute_arrays_t;
 
-	/// Defines storage for a generic mesh primitive
+	/// Defines storage for a generic mesh primitive.
 	class primitive
 	{
 	public:
 		primitive();
 		primitive(const string_t& Type);
 
-		/// Stores the primitive type ("point_groups", "polyhedra", "teapot", etc.)
+		/// Stores the primitive type ("point_groups", "polyhedra", "teapot", etc).
 		string_t type;
-		/// Stores array data that defines the primitive's structure (topology and geometry)
+		/// Stores array data that defines the primitive's structure (topology and geometry).
 		named_arrays_t structure;
-		/// Stores array data that defines the primitive's attributes
+		/// Stores array data that defines the primitive's attributes.
 		named_attribute_arrays_t attributes;
 
-		/// Compares two primitives for equality using the fuzzy semantics of almost_equal
+		/// Compares two primitives for equality using the fuzzy semantics of almost_equal.
 		bool_t almost_equal(const primitive& Other, const uint64_t Threshold) const;
 	};
 
-	/// Defines storage for a collection of primitives
+	/// Defines storage for a collection of primitives.
 	class primitives_t :
 		public std::vector<pipeline_data<primitive> >
 	{
 	public:
+		/// Create a new primitive, appending it to the collection.
 		primitive& create(const string_t& Type);
 	};
 
-	/// Stores the set of mesh points
+	/// Defines storage for a generic mesh selection.
+	class selection
+	{
+	public:
+		selection();
+		selection(const string_t& Type);
+
+		/// Stores the selection type ("point", "component", "parameter", etc).
+		string_t type;
+		/// Stores array data that defines the selection.
+		named_arrays_t structure;
+
+		/// Compares two selections for equality using the fuzzy semantics of almost_equal.
+		bool_t almost_equal(const selection& Other, const uint64_t Threshold) const;
+	};
+
+	/// Defines storage for a set of selections.
+	class selection_set :
+		public std::vector<pipeline_data<selection> >
+	{
+	public:
+		/// Create a new selection, appending it to the collection.
+		selection& create(const string_t& Type);
+
+		/// Compares two selection sets for equality using the fuzzy semantics of almost_equal.
+		bool_t almost_equal(const selection_set& Other, const uint64_t Threshold) const;
+	};
+
+	/// Stores the set of mesh points.
 	pipeline_data<points_t> points;
-	/// Stores per-point selection state
+	/// Stores per-point selection state.
 	pipeline_data<selection_t> point_selection;
-	/// Stores user-defined per-point data (maps to RenderMan vertex data)
+	/// Stores user-defined per-point data (maps to RenderMan vertex data).
 	attribute_arrays_t vertex_data;
-	/// Stores mesh primitives
+	/// Stores mesh primitives.
 	primitives_t primitives;
 
-	/// Compares two meshes for equality using the fuzzy semantics of almost_equal
+	/// Compares two meshes for equality using the fuzzy semantics of almost_equal.
 	bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;
 
-	/// Conversion from a legacy mesh to a new mesh
+	/// Conversion from a legacy mesh to a new mesh.
 	mesh& operator=(const k3d::legacy::mesh& RHS);
 
 	/// Returns a bounding-box containing every point in the given mesh.
@@ -186,6 +215,10 @@ public:
 
 /// Stream serialization
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS);
+/// Stream serialization
+std::ostream& operator<<(std::ostream& Stream, const mesh::selection& RHS);
+/// Stream serialization
+std::ostream& operator<<(std::ostream& Stream, const mesh::selection_set& RHS);
 
 /// Specialization of almost_equal that tests k3d::mesh for equality
 template<>
@@ -212,6 +245,46 @@ template<>
 class almost_equal<mesh::primitive>
 {
 	typedef mesh::primitive T;
+
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline bool_t operator()(const T& A, const T& B) const
+	{
+		return A.almost_equal(B, threshold);
+	}
+
+	const uint64_t threshold;
+};
+
+/// Specialization of almost_equal that tests k3d::mesh::selection for equality
+template<>
+class almost_equal<mesh::selection>
+{
+	typedef mesh::selection T;
+
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline bool_t operator()(const T& A, const T& B) const
+	{
+		return A.almost_equal(B, threshold);
+	}
+
+	const uint64_t threshold;
+};
+
+/// Specialization of almost_equal that tests k3d::mesh::selection_set for equality
+template<>
+class almost_equal<mesh::selection_set>
+{
+	typedef mesh::selection_set T;
 
 public:
 	almost_equal(const uint64_t Threshold) :

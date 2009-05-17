@@ -233,6 +233,40 @@ static object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const st
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// mesh::selection 
+
+static const string_t mesh_selection_get_type(mesh_selection_wrapper& Self)
+{
+	return Self.wrapped().type;
+}
+
+static object mesh_selection_get_structure(mesh_selection_wrapper& Self)
+{
+	return wrap(Self.wrapped().structure);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// mesh::selection_set
+
+static int mesh_selection_set_len(k3d::mesh::selection_set& Self)
+{
+	return Self.size();
+}
+
+static object mesh_selection_set_get_item(k3d::mesh::selection_set& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.size())
+		throw std::out_of_range("index out-of-range");
+
+	return wrap(Self[Item]);
+}
+
+static object mesh_selection_set_create(k3d::mesh::selection_set& Self, const string_t& Type)
+{
+	return wrap(Self.create(Type));
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // define_class_mesh 
 
 void define_class_mesh()
@@ -283,6 +317,18 @@ void define_class_mesh()
 		.def("__len__", &utility::wrapped_len<mesh_primitives_t_wrapper>)
 		.def("__getitem__", &mesh_primitives_t_get_item)
 		.def("create", &mesh_primitives_t_create)
+		;
+
+	class_<mesh_selection_wrapper>("selection", no_init)
+		.def("type", &mesh_selection_get_type)
+		.def("structure", &mesh_selection_get_structure)
+		;
+
+	class_<k3d::mesh::selection_set>("selection_set")
+		.def("__len__", &mesh_selection_set_len)
+		.def("__getitem__", &mesh_selection_set_get_item)
+		.def("create", &mesh_selection_set_create)
+		.def(self_ns::str(self))
 		;
 }
 

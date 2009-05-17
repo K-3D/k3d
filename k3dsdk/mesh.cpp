@@ -665,135 +665,52 @@ mesh::primitive& mesh::primitives_t::create(const string_t& Type)
 	return back().create(new mesh::primitive(Type));
 }
 
-/*
 ////////////////////////////////////////////////////////////////////////////////////
-// serialization
+// mesh::selection
 
-std::ostream& operator<<(std::ostream& Stream, const mesh::polyhedra_t::polyhedron_type& RHS)
+mesh::selection::selection()
 {
-	switch(RHS)
+}
+
+mesh::selection::selection(const string_t& Type) :
+	type(Type)
+{
+}
+
+bool_t mesh::selection::almost_equal(const selection& Other, const uint64_t Threshold) const
+{
+	return
+		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&
+		k3d::almost_equal<named_arrays_t>(Threshold)(structure, Other.structure)
+		;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// mesh::selection_set
+
+mesh::selection& mesh::selection_set::create(const string_t& Type)
+{
+	push_back(pipeline_data<mesh::selection>());
+	return back().create(new mesh::selection(Type));
+}
+
+bool_t mesh::selection_set::almost_equal(const selection_set& Other, const uint64_t Threshold) const
+{
+	if(size() != Other.size())
+		return false;
+
+	const selection_set& self = *this;
+	for(uint_t i = 0; i != self.size(); ++i)
 	{
-		case mesh::polyhedra_t::POLYGONS:
-			Stream << "polygons";
-			break;
-		case mesh::polyhedra_t::CATMULL_CLARK:
-			Stream << "catmull_clark";
-			break;
+		if(!k3d::almost_equal<selection_set>(Threshold)(*this, Other))
+			return false;
 	}
 
-	return Stream;
+	return true;
 }
 
-std::istream& operator>>(std::istream& Stream, mesh::polyhedra_t::polyhedron_type& RHS)
-{
-	string_t buffer;
-	Stream >> buffer;
-
-	if(buffer == "polygons")
-		RHS = mesh::polyhedra_t::POLYGONS;
-	else if(buffer == "catmull_clark")
-		RHS = mesh::polyhedra_t::CATMULL_CLARK;
-	else if(!buffer.empty())
-		log() << error << "Unknown polyhedron type [" << buffer << "]" << std::endl;
-
-	return Stream;
-}
-
-std::ostream& operator<<(std::ostream& Stream, const mesh::blobbies_t::primitive_type& RHS)
-{
-	switch(RHS)
-	{
-		case mesh::blobbies_t::CONSTANT:
-			Stream << "constant";
-			break;
-		case mesh::blobbies_t::ELLIPSOID:
-			Stream << "ellipsoid";
-			break;
-		case mesh::blobbies_t::SEGMENT:
-			Stream << "segment";
-			break;
-	}
-
-	return Stream;
-}
-
-std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::primitive_type& RHS)
-{
-	string_t buffer;
-	Stream >> buffer;
-
-	if(buffer == "constant")
-		RHS = mesh::blobbies_t::CONSTANT;
-	else if(buffer == "ellipsoid")
-		RHS = mesh::blobbies_t::ELLIPSOID;
-	else if(buffer == "segment")
-		RHS = mesh::blobbies_t::SEGMENT;
-	else
-		log() << error << "Unknown primitive type [" << buffer << "]" << std::endl;
-
-	return Stream;
-}
-
-std::ostream& operator<<(std::ostream& Stream, const mesh::blobbies_t::operator_type& RHS)
-{
-	switch(RHS)
-	{
-		case mesh::blobbies_t::ADD:
-			Stream << "add";
-			break;
-		case mesh::blobbies_t::MULTIPLY:
-			Stream << "multiply";
-			break;
-		case mesh::blobbies_t::MAXIMUM:
-			Stream << "maximum";
-			break;
-		case mesh::blobbies_t::MINIMUM:
-			Stream << "minimum";
-			break;
-		case mesh::blobbies_t::DIVIDE:
-			Stream << "divide";
-			break;
-		case mesh::blobbies_t::SUBTRACT:
-			Stream << "subtract";
-			break;
-		case mesh::blobbies_t::NEGATE:
-			Stream << "negate";
-			break;
-		case mesh::blobbies_t::IDENTITY:
-			Stream << "identity";
-			break;
-	}
-
-	return Stream;
-}
-
-std::istream& operator>>(std::istream& Stream, mesh::blobbies_t::operator_type& RHS)
-{
-	string_t buffer;
-	Stream >> buffer;
-
-	if(buffer == "add")
-		RHS = mesh::blobbies_t::ADD;
-	else if(buffer == "multiply")
-		RHS = mesh::blobbies_t::MULTIPLY;
-	else if(buffer == "maximum")
-		RHS = mesh::blobbies_t::MAXIMUM;
-	else if(buffer == "minimum")
-		RHS = mesh::blobbies_t::MINIMUM;
-	else if(buffer == "divide")
-		RHS = mesh::blobbies_t::DIVIDE;
-	else if(buffer == "subtract")
-		RHS = mesh::blobbies_t::SUBTRACT;
-	else if(buffer == "negate")
-		RHS = mesh::blobbies_t::NEGATE;
-	else if(buffer == "identity")
-		RHS = mesh::blobbies_t::IDENTITY;
-	else
-		log() << error << "Unknown operator type [" << buffer << "]" << std::endl;
-
-	return Stream;
-}
-*/
+////////////////////////////////////////////////////////////////////////////////////
+// operator<<
 
 /** \todo Print materials */
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
@@ -813,6 +730,26 @@ std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 		Stream << pop_indent;
 	}
 	Stream << pop_indent;
+	Stream << pop_indent;
+
+	return Stream;
+}
+
+std::ostream& operator<<(std::ostream& Stream, const mesh::selection& RHS)
+{
+	Stream << detail::indentation << "mesh::selection:\n" << push_indent;
+	Stream << detail::indentation << "type: " << RHS.type << "\n";
+	detail::print(Stream, "structure", RHS.structure);
+	Stream << pop_indent;
+
+	return Stream;
+}
+
+std::ostream& operator<<(std::ostream& Stream, const mesh::selection_set& RHS)
+{
+	Stream << detail::indentation << "mesh::selection_set:\n" << push_indent;
+	for(mesh::selection_set::const_iterator selection = RHS.begin(); selection != RHS.end(); ++selection)
+		Stream << **selection << "\n";
 	Stream << pop_indent;
 
 	return Stream;
