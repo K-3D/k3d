@@ -4,23 +4,41 @@
 		<points>0 0 5 4.3301270189221928 0 2.5000000000000009 1.4433756729740632 4.0824829046386295 2.5000000000000009 -4.3301270189221928 -2.7755575615628914e-16 2.5000000000000009 -1.443375672974063 -4.0824829046386304 2.5000000000000009 4.3301270189221928 1.6653345369377348e-15 -2.4999999999999991 2.8867513459481282 -4.0824829046386295 -1.1073905280721712e-16 -2.88675134594813 4.0824829046386295 2.2204460492503131e-15 1.4433756729740637 4.0824829046386313 -2.4999999999999982 -4.3301270189221945 -2.4980018054066022e-15 -2.4999999999999991 -1.4433756729740659 -4.0824829046386304 -2.4999999999999978 -1.6653345369377348e-15 8.3266726846886741e-16 -4.9999999999999982</points>
 		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0</point_selection>
 		<vertex_data/>
-		<polyhedra>
-			<first_faces>0</first_faces>
-			<face_counts>14</face_counts>
-			<types>polygons</types>
-			<constant_data/>
-			<face_first_loops>0 1 2 3 4 5 6 7 8 9 10 11 12 13</face_first_loops>
-			<face_loop_counts>1 1 1 1 1 1 1 1 1 1 1 1 1 1</face_loop_counts>
-			<face_selection>0 0 0 0 0 0 0 0 0 0 0 0 0 0</face_selection>
-			<face_materials>0 0 0 0 0 0 0 0 0 0 0 0 0 0</face_materials>
-			<uniform_data>
-				<array name="Cs" type="k3d::color">1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0</array>
-			</uniform_data>
-			<loop_first_edges>0 3 7 10 14 17 21 24 27 31 34 38 41 45</loop_first_edges>
-			<edge_points>0 1 2 0 2 7 3 0 3 4 0 4 6 1 1 6 5 1 5 8 2 2 8 7 3 7 9 3 9 10 4 4 10 6 5 6 10 11 5 11 8 7 8 11 9 9 11 10</edge_points>
-			<clockwise_edges>1 2 0 4 5 6 3 8 9 7 11 12 13 10 15 16 14 18 19 20 17 22 23 21 25 26 24 28 29 30 27 32 33 31 35 36 37 34 39 40 38 42 43 44 41 46 47 45</clockwise_edges>
-			<edge_selection>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</edge_selection>
-			<face_varying_data/>
-		</polyhedra>
+		<primitives>
+			<primitive type="polyhedron">
+				<structure>
+					<array name="clockwise_edges" type="k3d::uint_t">1 2 0 4 5 6 3 8 9 7 11 12 13 10 15 16 14 18 19 20 17 22 23 21 25 26 24 28 29 30 27 32 33 31 35 36 37 34 39 40 38 42 43 44 41 46 47 45</array>
+					<array name="edge_points" type="k3d::uint_t">0 1 2 0 2 7 3 0 3 4 0 4 6 1 1 6 5 1 5 8 2 2 8 7 3 7 9 3 9 10 4 4 10 6 5 6 10 11 5 11 8 7 8 11 9 9 11 10
+						<metadata>
+							<pair name="k3d:domain">/points/indices()</pair>
+						</metadata>
+					</array>
+					<array name="edge_selections" type="k3d::double_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+						<metadata>
+							<pair name="k3d:selection-component">split_edge</pair>
+						</metadata>
+					</array>
+					<array name="face_first_loops" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13</array>
+					<array name="face_loop_counts" type="k3d::uint_t">1 1 1 1 1 1 1 1 1 1 1 1 1 1</array>
+					<array name="face_materials" type="k3d::imaterial*">0 0 0 0 0 0 0 0 0 0 0 0 0 0</array>
+					<array name="face_selections" type="k3d::double_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
+					<array name="loop_first_edges" type="k3d::uint_t">0 3 7 10 14 17 21 24 27 31 34 38 41 45</array>
+					<array name="shell_face_counts" type="k3d::uint_t">14</array>
+					<array name="shell_first_faces" type="k3d::uint_t">0</array>
+					<array name="shell_types" type="k3d::int32_t">0</array>
+				</structure>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="face_varying"/>
+					<arrays type="uniform">
+						<array name="Cs" type="k3d::color">1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 0</array>
+					</arrays>
+				</attributes>
+			</primitive>
+		</primitives>
 	</mesh_arrays>
 </k3dml>
