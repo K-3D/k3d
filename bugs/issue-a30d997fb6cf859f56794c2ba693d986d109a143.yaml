@@ -3,7 +3,7 @@ title: Replace 'mesh' with 'geometry' in all classes / tests / documentation
 desc: As discussed at length on the mailing list, the term 'mesh' has strong associations with polygonal meshes, causing confusion for many potential developers.  We have agreed that we will change all related source and documentation to use the more generic term 'geometry' in place of 'mesh'.
 type: :task
 component: K-3D
-release: 
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,8 @@ log_events:
 - - 2009-05-17 04:16:40.872238 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2009-05-17 06:17:33.916931 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from unassigned
   - ""
