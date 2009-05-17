@@ -318,8 +318,11 @@ def mesh_comparison_to_reference(document, input_mesh, reference_mesh_name, thre
 	difference_file.write(difflib.HtmlDiff().make_file(repr(input_mesh.pipeline_value()).splitlines(1), repr(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry"))
 	difference_file.close()
 
-	print repr(input_mesh.pipeline_value())
-	print repr(reference.output_mesh)
+	print "**** Test Mesh ****"
+	print input_mesh.pipeline_value()
+
+	print "**** Reference Mesh ****"
+	print reference.output_mesh
 
 	output_mesh_difference(input_mesh.pipeline_value(), reference.output_mesh, threshold)
 	raise Exception("output mesh differs from reference")
@@ -342,7 +345,7 @@ def get_mesh_difference(document, input_mesh, reference_mesh, threshold):
 """
 def output_mesh_difference(input_mesh, reference_mesh, threshold, name = "Mesh Difference"):
 	print """<DartMeasurement name="Mesh Difference" type="text/html"><![CDATA[\n"""
-	print difflib.HtmlDiff().make_file(repr(input_mesh).splitlines(1), repr(reference_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
+	print difflib.HtmlDiff().make_file(str(input_mesh).splitlines(1), str(reference_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
 	print """]]></DartMeasurement>\n"""
 	sys.stdout.flush()
 
