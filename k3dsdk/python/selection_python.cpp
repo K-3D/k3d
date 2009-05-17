@@ -17,8 +17,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "instance_wrapper_python.h"
 #include "selection_python.h"
 
+#include <k3dsdk/iomanip.h>
 #include <k3dsdk/selection.h>
 
 #include <boost/python.hpp>
@@ -31,10 +33,58 @@ namespace k3d
 namespace python
 {
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// selection 
+
 class selection
 {
 public:
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// storage 
+
+typedef instance_wrapper<k3d::selection::storage> selection_storage_wrapper;
+
+static const string_t selection_storage_get_type(selection_storage_wrapper& Self)
+{
+	return Self.wrapped().type;
+}
+
+static object selection_storage_get_structure(selection_storage_wrapper& Self)
+{
+	return wrap(Self.wrapped().structure);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// set
+
+static int selection_set_len(k3d::selection::set& Self)
+{
+	return Self.size();
+}
+
+static object selection_set_get_item(k3d::selection::set& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.size())
+		throw std::out_of_range("index out-of-range");
+
+	return wrap(Self[Item]);
+}
+
+static string_t selection_set_str(k3d::selection::set& Self)
+{
+	std::ostringstream buffer;
+	buffer << "set: (" << Self.size() << ")\n";
+	buffer << push_indent << Self << pop_indent;
+
+	return buffer.str();
+}
+
+static object selection_set_create(k3d::selection::set& Self, const string_t& Type)
+{
+	return wrap(Self.create(Type));
+}
 
 void define_namespace_selection()
 {
@@ -53,6 +103,18 @@ void define_namespace_selection()
 		.value("SPLIT_EDGE", k3d::selection::SPLIT_EDGE)
 		.value("POINT", k3d::selection::POINT)
 		.attr("__module__") = "k3d";
+
+	class_<selection_storage_wrapper>("storage", no_init)
+		.def("type", &selection_storage_get_type)
+		.def("structure", &selection_storage_get_structure)
+		;
+
+	class_<k3d::selection::set>("set")
+		.def("__len__", &selection_set_len)
+		.def("__getitem__", &selection_set_get_item)
+		.def("__str__", &selection_set_str)
+		.def("create", &selection_set_create)
+		;
 }
 
 } // namespace python

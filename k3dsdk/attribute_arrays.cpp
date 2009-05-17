@@ -19,6 +19,9 @@
 
 #include "array.h"
 #include "attribute_arrays.h"
+#include "iomanip.h"
+#include "log.h"
+#include "type_registry.h"
 
 namespace k3d
 {
@@ -141,6 +144,20 @@ bool_t attribute_arrays::match_size(const uint_t Size) const
 	}
 	
 	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// operator<<
+
+std::ostream& operator<<(std::ostream& Stream, const attribute_arrays& RHS)
+{
+	for(attribute_arrays::const_iterator array_iterator = RHS.begin(); array_iterator != RHS.end(); ++array_iterator)
+	{
+		Stream << standard_indent << "\"" << array_iterator->first << "\" [" << array_iterator->second->type_string() << "] (" << array_iterator->second->size() << "):\n";
+		Stream << push_indent << start_block() << *array_iterator->second << finish_block << pop_indent << "\n";
+	}
+
+	return Stream;
 }
 
 } // namespace k3d

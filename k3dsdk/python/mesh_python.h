@@ -38,7 +38,6 @@ namespace python
 typedef instance_wrapper<k3d::mesh> mesh_wrapper;
 typedef instance_wrapper<k3d::mesh::primitive> mesh_primitive_wrapper;
 typedef instance_wrapper<const k3d::mesh::primitive> const_mesh_primitive_wrapper;
-typedef instance_wrapper<k3d::mesh::selection> mesh_selection_wrapper;
 
 class mesh :
 	public instance_wrapper<k3d::mesh>

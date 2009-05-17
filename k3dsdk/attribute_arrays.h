@@ -91,6 +91,9 @@ public:
 	bool_t match_size(const uint_t Size) const;
 };
 
+/// Serialization
+std::ostream& operator<<(std::ostream& Stream, const attribute_arrays& RHS);
+
 /// Specialization of almost_equal that tests attribute_arrays for equality
 template<>
 class almost_equal<attribute_arrays>

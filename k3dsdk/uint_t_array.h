@@ -66,6 +66,18 @@ public:
 	{
 	}
 
+	const string_t type_string() const
+	{
+		// We have to hard-code our result here.
+		return "k3d::uint_t";
+	}
+
+	void print(std::ostream& Stream) const
+	{
+		for(base_type::const_iterator i = base_type::begin(); i != base_type::end(); ++i)
+			Stream << block_delimiter << *i;
+	}
+
 	array* clone_type() const
 	{
 		this_type* const result = new this_type();

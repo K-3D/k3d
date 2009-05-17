@@ -40,6 +40,11 @@ public:
 	array(const metadata_t& Metadata);
 	virtual ~array();
 
+	/// Returns the string representation for the type stored by this array. 
+	virtual const string_t type_string() const = 0;
+	/// Prints the array contents to a stream.
+	virtual void print(std::ostream& Stream) const = 0;
+
 	/// Returns an empty array with the same concrete type as this array (a variation on virtual ctor)
 	virtual array* clone_type() const = 0;
 	/// Returns a copy of this array (virtual ctor)
@@ -72,6 +77,9 @@ protected:
 	/// Storage for array metadata
 	metadata_t metadata;
 };
+
+/// Serialization
+std::ostream& operator<<(std::ostream& Stream, const array& RHS);
 
 /// Specialization of almost_equal that tests k3d::array for equality
 template<>

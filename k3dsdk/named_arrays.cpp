@@ -18,7 +18,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "array.h"
+#include "iomanip.h"
+#include "log.h"
 #include "named_arrays.h"
+#include "type_registry.h"
 
 namespace k3d
 {
@@ -87,6 +90,20 @@ bool_t named_arrays::almost_equal(const named_arrays& Other, const uint64_t Thre
 	}
 
 	return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+// operator<<
+
+std::ostream& operator<<(std::ostream& Stream, const named_arrays& RHS)
+{
+	for(named_arrays::const_iterator array_iterator = RHS.begin(); array_iterator != RHS.end(); ++array_iterator)
+	{
+		Stream << standard_indent << "\"" << array_iterator->first << "\" [" << array_iterator->second->type_string() << "] (" << array_iterator->second->size() << "):\n";
+		Stream << push_indent << start_block() << *array_iterator->second << finish_block << pop_indent << "\n";
+	}
+	
+	return Stream;
 }
 
 } // namespace k3d

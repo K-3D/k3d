@@ -17,6 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "iomanip.h"
 #include "named_attribute_arrays.h"
 
 namespace k3d
@@ -61,6 +62,17 @@ bool_t named_attribute_arrays::almost_equal(const named_attribute_arrays& Other,
 		return false;
 
 	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+// operator<<
+
+std::ostream& operator<<(std::ostream& Stream, const named_attribute_arrays& RHS)
+{
+	for(named_attribute_arrays::const_iterator attributes = RHS.begin(); attributes != RHS.end(); ++attributes)
+		Stream << standard_indent << "attributes \"" << attributes->first << "\"" << attributes->second << "\n";
+
+	return Stream;
 }
 
 } // namespace k3d

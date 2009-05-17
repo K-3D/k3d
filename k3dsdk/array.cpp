@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "array.h"
+#include "iomanip.h"
 
 namespace k3d
 {
@@ -64,6 +65,20 @@ const string_t array::get_metadata_value(const string_t& Name) const
 void array::erase_metadata_value(const string_t& Name)
 {
 	metadata.erase(Name);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// operator<<
+
+std::ostream& operator<<(std::ostream& Stream, const array& RHS)
+{
+	const array::metadata_t metadata = RHS.get_metadata();
+	for(array::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
+		Stream << standard_indent << "metadata: " << pair->first << " = " << pair->second << "\n";
+
+	RHS.print(Stream);
+
+	return Stream;
 }
 
 } // namespace k3d

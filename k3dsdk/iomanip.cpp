@@ -29,11 +29,17 @@
 namespace k3d
 {
 
+////////////////////////////////////////////////////////////////////////////////////////////
+// current_indent
+
 long& current_indent(std::ios& Stream)
 {
 	static const int index = std::ios::xalloc();
 	return Stream.iword(index);
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// push_indent
 
 std::ostream& push_indent(std::ostream& Stream)
 {
@@ -41,11 +47,94 @@ std::ostream& push_indent(std::ostream& Stream)
 	return Stream;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+// pop_indent
+
 std::ostream& pop_indent(std::ostream& Stream)
 {
 	if(current_indent(Stream) != 0)
 		current_indent(Stream)--;
 
+	return Stream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// standard_indent
+
+std::ostream& standard_indent(std::ostream& Stream)
+{
+	Stream << std::string(2 * current_indent(Stream), ' '); 
+	return Stream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// block_size
+
+static long& block_size(std::ios& Stream)
+{
+	static const int index = std::ios::xalloc();
+	return Stream.iword(index);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// block_index
+
+static long& block_index(std::ios& Stream)
+{
+	static const int index = std::ios::xalloc();
+	return Stream.iword(index);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// start_block
+
+start_block::start_block(const uint_t BlockSize) :
+	block_size(BlockSize)
+{
+}
+
+std::ostream& operator<<(std::ostream& Stream, const start_block& RHS)
+{
+	block_size(Stream) = RHS.block_size;
+	block_index(Stream) = 0;
+	return Stream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// block_delimiter
+
+std::ostream& block_delimiter(std::ostream& Stream)
+{
+	if(block_size(Stream))
+	{
+		if(0 == (block_index(Stream) % block_size(Stream)))
+		{
+			if(block_index(Stream))
+				Stream << "\n";
+
+			Stream << standard_indent;
+		}
+		else
+		{
+			Stream << " ";
+		}
+
+		block_index(Stream) += 1;
+	}
+	else
+	{
+		Stream << " ";
+	}
+
+	return Stream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// finish_block
+
+std::ostream& finish_block(std::ostream& Stream)
+{
+	block_size(Stream) = 0;
 	return Stream;
 }
 

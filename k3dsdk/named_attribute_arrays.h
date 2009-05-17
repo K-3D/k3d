@@ -39,6 +39,9 @@ public:
 	bool_t almost_equal(const named_attribute_arrays& Other, const uint64_t Threshold) const;
 };
 
+/// Serialization
+std::ostream& operator<<(std::ostream& Stream, const named_attribute_arrays& RHS);
+
 /// Specialization of almost_equal that tests named_attribute_arrays for equality
 template<>
 class almost_equal<named_attribute_arrays>

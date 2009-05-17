@@ -19,6 +19,7 @@
 
 #include "imesh_source.h"
 #include "inode.h"
+#include "iomanip.h"
 #include "iproperty.h"
 #include "legacy_mesh.h"
 #include "persistent_lookup.h"
@@ -549,6 +550,72 @@ void pop_selection_token()
 }
 
 } // namespace gl
+
+namespace selection
+{
+
+////////////////////////////////////////////////////////////////////////////////////
+// storage
+
+storage::storage()
+{
+}
+
+storage::storage(const string_t& Type) :
+	type(Type)
+{
+}
+
+bool_t storage::almost_equal(const storage& Other, const uint64_t Threshold) const
+{
+	return
+		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&
+		k3d::almost_equal<named_arrays>(Threshold)(structure, Other.structure)
+		;
+}
+
+std::ostream& operator<<(std::ostream& Stream, const storage& RHS)
+{
+	Stream << standard_indent << "type: " << RHS.type << "\n";
+	Stream << standard_indent << "structure (" << RHS.structure.size() << "):\n";
+	Stream << push_indent << RHS.structure << pop_indent;
+
+	return Stream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// set
+
+storage& set::create(const string_t& Type)
+{
+	push_back(pipeline_data<storage>());
+	return back().create(new storage(Type));
+}
+
+bool_t set::almost_equal(const set& Other, const uint64_t Threshold) const
+{
+	if(size() != Other.size())
+		return false;
+
+	const set& self = *this;
+	for(uint_t i = 0; i != self.size(); ++i)
+	{
+		if(!k3d::almost_equal<storage>(Threshold)(*self[i], *Other[i]))
+			return false;
+	}
+
+	return true;
+}
+
+std::ostream& operator<<(std::ostream& Stream, const set& RHS)
+{
+	for(set::const_iterator storage = RHS.begin(); storage != RHS.end(); ++storage)
+		Stream << standard_indent << "storage:\n" << push_indent << **storage << "\n" << pop_indent;
+
+	return Stream;
+}
+
+} // namespace selection
 
 } // namespace k3d
 

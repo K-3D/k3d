@@ -22,6 +22,8 @@
 
 #include "almost_equal.h"
 #include "array.h"
+#include "iomanip.h"
+#include "type_registry.h"
 
 #include <algorithm>
 #include <vector>
@@ -64,6 +66,17 @@ public:
 	typed_array(const IteratorT first, const IteratorT last) :
 		std::vector<T>(first, last)
 	{
+	}
+
+	const string_t type_string() const
+	{
+		return k3d::type_string<T>();
+	}
+
+	void print(std::ostream& Stream) const
+	{
+		for(typename base_type::const_iterator i = base_type::begin(); i != base_type::end(); ++i)
+			Stream << block_delimiter << *i;
 	}
 
 	array* clone_type() const

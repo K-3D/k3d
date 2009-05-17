@@ -1,6 +1,3 @@
-#ifndef K3DSDK_IOMANIP_H
-#define K3DSDK_IOMANIP_H
-
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
 //
@@ -20,36 +17,15 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file
-	\author Tim Shead (tshead@k-3d.com)
-*/
-
-#include "types.h"
-#include <iosfwd>
+#include "geometry.h"
 
 namespace k3d
 {
 
-/// Returns the current indentation for a stream
-long& current_indent(std::ios& Stream);
-/// Increments a stream's indentation
-std::ostream& push_indent(std::ostream& Stream);
-/// Decrements a stream's indentation
-std::ostream& pop_indent(std::ostream& Stream);
-/// Inserts whitespace into a stream, proportional to its indentation level
-std::ostream& standard_indent(std::ostream& Stream);
-
-struct start_block
+namespace geometry
 {
-	start_block(const uint_t BlockSize = 8);
-	uint_t block_size;
-};
 
-std::ostream& operator<<(std::ostream& Stream, const start_block& RHS);
-std::ostream& block_delimiter(std::ostream& Stream);
-std::ostream& finish_block(std::ostream& Stream);
+} // namespace geometry
 
 } // namespace k3d
-
-#endif // !K3DSDK_IOMANIP_H
 

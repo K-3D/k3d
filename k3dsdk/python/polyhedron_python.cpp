@@ -153,7 +153,7 @@ void define_namespace_polyhedron()
 		.staticmethod("is_solid")
 		;
 
-	enum_<k3d::polyhedron::polyhedron_type>("polyhedron_type")
+	enum_<k3d::polyhedron::polyhedron_type>("shell_type")
 		.value("POLYGONS", k3d::polyhedron::POLYGONS)
 		.value("CATMULL_CLARK", k3d::polyhedron::CATMULL_CLARK)
 		.attr("__module__") = "k3d";

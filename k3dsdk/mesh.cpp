@@ -36,86 +36,7 @@ namespace k3d
 namespace detail
 {
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// indentation
-
-/// Inserts whitespace into a stream, proportional to its indentation level
-std::ostream& indentation(std::ostream& Stream)
-{
-	Stream << std::string(2 * current_indent(Stream), ' '); 
-	return Stream;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// block_output
-
-template<typename output_type, typename iterator_type>
-void block_output(iterator_type Begin, iterator_type End, std::ostream& Stream, const string_t& Delimiter, const uint_t BlockSize = 8)
-{
-	if(Begin == End)
-		return;
-
-	uint_t count = 0;
-	for(; Begin != End; ++count, ++Begin)
-	{
-		if(0 == count % BlockSize)
-			Stream << indentation;
-
-		Stream << static_cast<output_type>(*Begin) << Delimiter;
-
-		if(BlockSize - 1 == count % BlockSize)
-			Stream << "\n";
-	}
-
-	if(count % BlockSize)
-		Stream << "\n";
-};
-
-template<typename iterator_type>
-void string_block_output(iterator_type Begin, iterator_type End, std::ostream& Stream, const string_t& Delimiter, const uint_t BlockSize = 8)
-{
-	if(Begin == End)
-		return;
-
-	uint_t count = 0;
-	for(; Begin != End; ++count, ++Begin)
-	{
-		if(0 == count % BlockSize)
-			Stream << indentation;
-
-		Stream << "\"" << *Begin << "\"" << Delimiter;
-
-		if(BlockSize - 1 == count % BlockSize)
-			Stream << "\n";
-	}
-
-	if(count % BlockSize)
-		Stream << "\n";
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// print
-
-template<typename pointer_type>
-void print(std::ostream& Stream, const string_t& Label, const pointer_type& Pointer)
-{
-	if(Pointer)
-	{
-		typedef typename pointer_type::element_type array_type;
-		typedef typename array_type::value_type value_type;
-
-		Stream << indentation << Label;
-		if(type_registered<value_type>())
-			Stream << " [" << type_string<value_type>() <<  "]";
-		Stream << " (" << Pointer->size() <<  "):\n";
-		Stream << push_indent;
-
-		block_output<typename pointer_type::element_type::value_type>(Pointer->begin(), Pointer->end(), Stream, " ");
-
-		Stream << pop_indent;
-	}
-}
-
+/*
 ////////////////////////////////////////////////////////////////////////////////////////////
 // print_array
 
@@ -132,7 +53,7 @@ public:
 		if(const uint_t_array* const array = dynamic_cast<const uint_t_array*>(&m_array))
 		{
 			m_printed = true;
-			m_stream << indentation << "array \"" << m_array_name << "\" [k3d::uint_t] (" << m_array.size() << "):\n";
+			m_stream << standard_indent << "array \"" << m_array_name << "\" [k3d::uint_t] (" << m_array.size() << "):\n";
 			m_stream << push_indent;
 			
 			block_output<uint_t>(array->begin(), array->end(), m_stream, " ");
@@ -151,7 +72,7 @@ public:
 		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
 		{
 			m_printed = true;
-			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
+			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
 			m_stream << push_indent;
 
 			block_output<T>(array->begin(), array->end(), m_stream, " ");
@@ -172,7 +93,7 @@ public:
 		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
 		{
 			m_printed = true;
-			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
+			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
 			m_stream << push_indent;
 
 			block_output<int16_t>(array->begin(), array->end(), m_stream, " ");
@@ -193,7 +114,7 @@ public:
 		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
 		{
 			m_printed = true;
-			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
+			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
 			m_stream << push_indent;
 
 			block_output<uint16_t>(array->begin(), array->end(), m_stream, " ");
@@ -214,7 +135,7 @@ public:
 		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
 		{
 			m_printed = true;
-			m_stream << indentation << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
+			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
 			m_stream << push_indent;
 
 			string_block_output(array->begin(), array->end(), m_stream, " ");
@@ -229,7 +150,7 @@ private:
 	{
 		const array::metadata_t metadata = m_array.get_metadata();
 		for(array::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
-			m_stream << indentation << "metadata: " << pair->first << " = " << pair->second << "\n";
+			m_stream << standard_indent << "metadata: " << pair->first << " = " << pair->second << "\n";
 	}
 
 	std::ostream& m_stream;
@@ -237,49 +158,7 @@ private:
 	const array& m_array;
 	bool_t& m_printed;
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// print
-
-void print(std::ostream& Stream, const string_t& Label, const mesh::named_arrays_t& Arrays)
-{
-	Stream << indentation << Label << " (" << Arrays.size() << "):\n" << push_indent;
-	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
-	{
-		bool_t printed = false;
-		boost::mpl::for_each<named_array_types>(print_array(Stream, array_iterator->first, *array_iterator->second, printed));
-		if(!printed)
-			log() << error << k3d_file_reference << ": array [" << array_iterator->first << "] with unknown type [" << demangle(typeid(*array_iterator->second)) << "] will not be printed" << std::endl;
-	}
-	Stream << pop_indent;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// print
-
-void print(std::ostream& Stream, const string_t& Label, const mesh::attribute_arrays_t& Arrays)
-{
-	Stream << indentation << Label << " (" << Arrays.size() << "):\n" << push_indent;
-	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
-	{
-		bool_t printed = false;
-		boost::mpl::for_each<named_array_types>(print_array(Stream, array_iterator->first, *array_iterator->second, printed));
-		if(!printed)
-			log() << error << k3d_file_reference << ": array [" << array_iterator->first << "] with unknown type [" << demangle(typeid(*array_iterator->second)) << "] will not be printed" << std::endl;
-	}
-	Stream << pop_indent;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// print
-
-void print(std::ostream& Stream, const string_t& Label, const mesh::named_attribute_arrays_t& Attributes)
-{
-	Stream << indentation << Label << " (" << Attributes.size() << "):\n" << push_indent;
-	for(mesh::named_attribute_arrays_t::const_iterator attributes = Attributes.begin(); attributes != Attributes.end(); ++attributes)
-		print(Stream, "attributes \"" + attributes->first + "\"", attributes->second);
-	Stream << pop_indent;
-}
+*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // almost_equal
@@ -666,90 +545,35 @@ mesh::primitive& mesh::primitives_t::create(const string_t& Type)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-// mesh::selection
-
-mesh::selection::selection()
-{
-}
-
-mesh::selection::selection(const string_t& Type) :
-	type(Type)
-{
-}
-
-bool_t mesh::selection::almost_equal(const selection& Other, const uint64_t Threshold) const
-{
-	return
-		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&
-		k3d::almost_equal<named_arrays_t>(Threshold)(structure, Other.structure)
-		;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-// mesh::selection_set
-
-mesh::selection& mesh::selection_set::create(const string_t& Type)
-{
-	push_back(pipeline_data<mesh::selection>());
-	return back().create(new mesh::selection(Type));
-}
-
-bool_t mesh::selection_set::almost_equal(const selection_set& Other, const uint64_t Threshold) const
-{
-	if(size() != Other.size())
-		return false;
-
-	const selection_set& self = *this;
-	for(uint_t i = 0; i != self.size(); ++i)
-	{
-		if(!k3d::almost_equal<selection_set>(Threshold)(*this, Other))
-			return false;
-	}
-
-	return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
 // operator<<
 
-/** \todo Print materials */
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 {
-	Stream << detail::indentation << "mesh:\n" << push_indent;
+	if(RHS.points)
+	{
+		Stream << standard_indent << "points (" << RHS.points->size() << "):\n";
+		Stream << push_indent << start_block() << *RHS.points << finish_block << pop_indent << "\n";
+	}
 
-	detail::print(Stream, "points", RHS.points);
-	detail::print(Stream, "point_selection", RHS.point_selection);
-	detail::print(Stream, "vertex_data", RHS.vertex_data);
+	if(RHS.point_selection)
+	{
+		Stream << standard_indent << "point_selection (" << RHS.point_selection->size() << "):\n";
+		Stream << push_indent << start_block() << *RHS.point_selection << finish_block << pop_indent << "\n";
+	}
 
-	Stream << detail::indentation << "primitives (" << RHS.primitives.size() << "):\n" << push_indent;
+	Stream << standard_indent << "vertex_data (" << RHS.vertex_data.size() << "):\n";
+	Stream << push_indent << RHS.vertex_data << pop_indent;
+
+	Stream << standard_indent << "primitives (" << RHS.primitives.size() << "):\n" << push_indent;
 	for(mesh::primitives_t::const_iterator primitive = RHS.primitives.begin(); primitive != RHS.primitives.end(); ++primitive)
 	{
-		Stream << detail::indentation << "primitive \"" << (*primitive)->type << "\"\n" << push_indent;
-		detail::print(Stream, "structure", (*primitive)->structure);
-		detail::print(Stream, "attributes", (*primitive)->attributes);
+		Stream << standard_indent << "primitive \"" << (*primitive)->type << "\"\n" << push_indent;
+		Stream << standard_indent << "structure (" << (*primitive)->structure.size() << "):\n";
+		Stream << push_indent << (*primitive)->structure << pop_indent;
+		Stream << standard_indent << "attributes (" << (*primitive)->attributes.size() << "):\n";
+		Stream << push_indent << (*primitive)->attributes << pop_indent;
 		Stream << pop_indent;
 	}
-	Stream << pop_indent;
-	Stream << pop_indent;
-
-	return Stream;
-}
-
-std::ostream& operator<<(std::ostream& Stream, const mesh::selection& RHS)
-{
-	Stream << detail::indentation << "mesh::selection:\n" << push_indent;
-	Stream << detail::indentation << "type: " << RHS.type << "\n";
-	detail::print(Stream, "structure", RHS.structure);
-	Stream << pop_indent;
-
-	return Stream;
-}
-
-std::ostream& operator<<(std::ostream& Stream, const mesh::selection_set& RHS)
-{
-	Stream << detail::indentation << "mesh::selection_set:\n" << push_indent;
-	for(mesh::selection_set::const_iterator selection = RHS.begin(); selection != RHS.end(); ++selection)
-		Stream << **selection << "\n";
 	Stream << pop_indent;
 
 	return Stream;

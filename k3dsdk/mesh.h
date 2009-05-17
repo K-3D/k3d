@@ -114,34 +114,6 @@ public:
 		primitive& create(const string_t& Type);
 	};
 
-	/// Defines storage for a generic mesh selection.
-	class selection
-	{
-	public:
-		selection();
-		selection(const string_t& Type);
-
-		/// Stores the selection type ("point", "component", "parameter", etc).
-		string_t type;
-		/// Stores array data that defines the selection.
-		named_arrays_t structure;
-
-		/// Compares two selections for equality using the fuzzy semantics of almost_equal.
-		bool_t almost_equal(const selection& Other, const uint64_t Threshold) const;
-	};
-
-	/// Defines storage for a set of selections.
-	class selection_set :
-		public std::vector<pipeline_data<selection> >
-	{
-	public:
-		/// Create a new selection, appending it to the collection.
-		selection& create(const string_t& Type);
-
-		/// Compares two selection sets for equality using the fuzzy semantics of almost_equal.
-		bool_t almost_equal(const selection_set& Other, const uint64_t Threshold) const;
-	};
-
 	/// Stores the set of mesh points.
 	pipeline_data<points_t> points;
 	/// Stores per-point selection state.
@@ -215,10 +187,6 @@ public:
 
 /// Stream serialization
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS);
-/// Stream serialization
-std::ostream& operator<<(std::ostream& Stream, const mesh::selection& RHS);
-/// Stream serialization
-std::ostream& operator<<(std::ostream& Stream, const mesh::selection_set& RHS);
 
 /// Specialization of almost_equal that tests k3d::mesh for equality
 template<>
@@ -245,46 +213,6 @@ template<>
 class almost_equal<mesh::primitive>
 {
 	typedef mesh::primitive T;
-
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
-
-/// Specialization of almost_equal that tests k3d::mesh::selection for equality
-template<>
-class almost_equal<mesh::selection>
-{
-	typedef mesh::selection T;
-
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
-
-/// Specialization of almost_equal that tests k3d::mesh::selection_set for equality
-template<>
-class almost_equal<mesh::selection_set>
-{
-	typedef mesh::selection_set T;
 
 public:
 	almost_equal(const uint64_t Threshold) :

@@ -24,6 +24,7 @@
 #include "inode_collection.h"
 #include "inode_selection.h"
 #include "iselectable.h"
+#include "named_arrays.h"
 #include "nodes.h"
 #include <vector>
 
@@ -33,7 +34,6 @@ namespace k3d
 class inode;
 
 class mesh;
-namespace legacy { class mesh; }
 
 /// Functor object for deciding whether an object is selected (i.e. has a non-zero selection weight)
 struct is_selected
@@ -195,6 +195,85 @@ void push_selection_token(const selection::type, const selection::id);
 void pop_selection_token();
 
 } // namespace gl
+
+namespace selection
+{
+
+/// Defines storage for a generic selection.
+class storage
+{
+public:
+	storage();
+	storage(const string_t& Type);
+
+	/// Stores the selection type ("point", "component", "parameter", etc).
+	string_t type;
+	/// Stores array data that defines the selection.
+	named_arrays structure;
+
+	/// Compares two selections for equality using the fuzzy semantics of almost_equal.
+	bool_t almost_equal(const storage& Other, const uint64_t Threshold) const;
+};
+
+/// Stream serialization
+std::ostream& operator<<(std::ostream& Stream, const storage& RHS);
+
+/// Defines a container of selection::storage objects
+class set :
+	public std::vector<pipeline_data<storage> >
+{
+public:
+	/// Create a new selection, appending it to the collection.
+	storage& create(const string_t& Type);
+
+	/// Compares two selection sets for equality using the fuzzy semantics of almost_equal.
+	bool_t almost_equal(const set& Other, const uint64_t Threshold) const;
+};
+
+/// Stream serialization
+std::ostream& operator<<(std::ostream& Stream, const set& RHS);
+
+} // namespace selection
+
+/// Specialization of almost_equal that tests k3d::mesh::selection for equality
+template<>
+class almost_equal<selection::storage>
+{
+	typedef selection::storage T;
+
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline bool_t operator()(const T& A, const T& B) const
+	{
+		return A.almost_equal(B, threshold);
+	}
+
+	const uint64_t threshold;
+};
+
+/// Specialization of almost_equal that tests k3d::mesh::selection_set for equality
+template<>
+class almost_equal<selection::set>
+{
+	typedef selection::set T;
+
+public:
+	almost_equal(const uint64_t Threshold) :
+		threshold(Threshold)
+	{
+	}
+
+	inline bool_t operator()(const T& A, const T& B) const
+	{
+		return A.almost_equal(B, threshold);
+	}
+
+	const uint64_t threshold;
+};
 
 } // namespace k3d
 
