@@ -3,18 +3,40 @@
 	<mesh_arrays>
 		<points>5 5 0 -5 5 0 5 -5 -0 -5 -5 0</points>
 		<point_selection>0 0 0 0</point_selection>
-		<polyhedra>
-			<first_faces>0</first_faces>
-			<face_counts>2</face_counts>
-			<types>polygons</types>
-			<face_first_loops>0 1</face_first_loops>
-			<face_loop_counts>1 1</face_loop_counts>
-			<face_selection>1 1</face_selection>
-			<face_materials>0 0</face_materials>
-			<loop_first_edges>0 3</loop_first_edges>
-			<edge_points>0 1 3 0 3 2</edge_points>
-			<clockwise_edges>1 2 0 4 5 3</clockwise_edges>
-			<edge_selection>0 0 0 0 0 0</edge_selection>
-		</polyhedra>
+		<vertex_data/>
+		<primitives>
+			<primitive type="polyhedron">
+				<structure>
+					<array name="clockwise_edges" type="k3d::uint_t">1 2 0 4 5 3</array>
+					<array name="edge_points" type="k3d::uint_t">0 1 3 0 3 2
+						<metadata>
+							<pair name="k3d:domain">/points/indices()</pair>
+						</metadata>
+					</array>
+					<array name="edge_selections" type="k3d::double_t">0 0 0 0 0 0
+						<metadata>
+							<pair name="k3d:selection-component">split_edge</pair>
+						</metadata>
+					</array>
+					<array name="face_first_loops" type="k3d::uint_t">0 1</array>
+					<array name="face_loop_counts" type="k3d::uint_t">1 1</array>
+					<array name="face_materials" type="k3d::imaterial*">0 0</array>
+					<array name="face_selections" type="k3d::double_t">1 1
+						<metadata>
+							<pair name="k3d:selection-component">uniform</pair>
+						</metadata>
+					</array>
+					<array name="loop_first_edges" type="k3d::uint_t">0 3</array>
+					<array name="shell_face_counts" type="k3d::uint_t">2</array>
+					<array name="shell_first_faces" type="k3d::uint_t">0</array>
+					<array name="shell_types" type="k3d::int32_t">0</array>
+				</structure>
+				<attributes>
+					<arrays type="constant"/>
+					<arrays type="face_varying"/>
+					<arrays type="uniform"/>
+				</attributes>
+			</primitive>
+		</primitives>
 	</mesh_arrays>
 </k3dml>
