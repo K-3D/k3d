@@ -157,7 +157,7 @@ K3D_ADD_TEST(bitmap.source.BitmapSolid.py PYTHON REQUIRES K3D_BUILD_TIFF_IO_MODU
 K3D_ADD_TEST(core.FrozenTransformation.py PYTHON REQUIRES K3D_BUILD_CORE_MODULE)
 
 K3D_ADD_TEST(test.mesh.solid.py PYTHON)
-K3D_ADD_TEST(test.mesh.solid.failure.py PYTHON XFAIL)
+K3D_ADD_TEST(test.mesh.solid.failure.py PYTHON)
 
 K3D_ADD_TEST(mesh.serialization.py PYTHON)
 
