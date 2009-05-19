@@ -2,6 +2,7 @@
 
 SET(ERROR_COUNT 0)
 SET(SKIP_FILES
+	"^[.]hg"
 	"[.]svn"
 	"[.]cu$"
 	"[.]po$"
