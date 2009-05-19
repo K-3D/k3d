@@ -4,6 +4,7 @@ SET(ERROR_COUNT 0)
 SET(MAX_LENGTH 90)
 SET(SKIP_FILES
 	"^[.]hg/.*$"
+  "^.*[.]svn/.*$"
 	)
 
 FILE(GLOB_RECURSE SOURCE_FILES *)
