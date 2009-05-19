@@ -1,0 +1,43 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Script with NURBS
+desc: |-
+  mpetion1@gmail.com writes
+  
+  This attached script is for importing a bv file, which is used here at the
+  Univerisity for research purposes. Initially the script was written in
+  version .6.7 the current script imports a polyhedron type mesh
+  
+  ###########################
+  sample bv file of a cube where 1 denotes the file type (polyhedron)and 8
+  represents the # of vertices, 6 the # of faces
+  1
+  8 6
+  1.0 1.0 -1.0 #points that describe the cube
+  1.0 -1.0 -1.0
+  -1.0 -1.0 -1.0
+  -1.0 1.0 -1.0
+  1.0 0.999999 1.0
+  0.999999 -1.000001 1.0
+  -1.0 -1.0 1.0
+  -1.0 1.0 1.0
+  4 0 1 2 3 #gives the connecting points
+  4 4 7 6 5
+  4 0 4 5 1
+  4 1 5 6 2
+  4 2 6 7 3
+  4 4 0 3 7
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:27:38.616463 Z
+references: []
+
+id: 880751463fbb518318275de1613945c253d371d4
+log_events: 
+- - 2009-05-19 03:27:39.296825 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

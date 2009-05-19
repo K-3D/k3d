@@ -1,0 +1,41 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: will not let me use polygons
+desc: |-
+  Contact: SeamonkeyC1@AOL.com
+  Summary: will not let me use polygons
+  Report Generated: 2008-May-03 05:47:56 UTC
+  Package: k3d
+  Version: 0.7.3.0
+  Platform: Windows-5.1;x86
+  Compiler: 3.4.5 (mingw special)
+  Build Time: Apr 19 2008 21:46:44 local
+  Description of problem:
+  
+  Steps to reproduce problem:
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:23:33.224471 Z
+references: []
+
+id: e4ab51a81942250ae3e8a0ecff44c1e0b329859e
+log_events: 
+- - 2009-05-19 03:23:34.097240 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

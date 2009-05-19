@@ -1,0 +1,72 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: compilation errors
+desc: |-
+  hi, i have compilation errors... version 0.7.9.0
+  
+  [ 26%] Building CXX object
+  k3dsdk/ngui/CMakeFiles/k3dsdk-ngui.dir/widget_manip.o
+  In file included from
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/inode.h:28,
+  from /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/data.h:28,
+  from
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/ngui/application_state.h:
+  27,
+  from
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/ngui/widget_manip.cpp:24:
+  
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/almost_equal.h: In member
+  function 'const bool k3d::almost_equal<double>::operator()(k3d::double_t,
+  k3d::double_t) const':
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/almost_equal.h:149:
+  warning: comparison between signed and unsigned integer expressions
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/almost_equal.h:149:
+  warning: comparison between signed and unsigned integer expressions
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/almost_equal.h: In static
+  member function 'static const k3d::int64_t
+  k3d::almost_equal<double>::to_integer(k3d::double_t)':
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/almost_equal.h:156:
+  warning: dereferencing type-punned pointer will break strict-aliasing
+  rules
+  Linking CXX shared library ../../lib/libk3dsdk-ngui.so
+  [ 26%] Built target k3dsdk-ngui
+  Scanning dependencies of target k3dsdk-python-types
+  [ 26%] Building CXX object
+  k3dsdk/k3dhok3dsdk/k3dhok3dsdk/k3dhok3dsdk/k3dhok3dsdk/k3dhok3dsdk/k3dhok3dsdk/k3dhok3frok3dsdk/k3dhok3dsdk/k3dhok3dsdk/k3dhok3dsdk/k3dhok3dsdk/k3dhok3dsdk/k3dhok3r/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/algebra.h:30,
+  from
+  /usr/src/p/usr/src/p/usr/src/p/rce-0.7.9.0/k3dsdk/python/angle_axis_python.
+  h:27,
+  from
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/python/angle_axis_python.
+  cpp:24:
+  cpp:24:
+  /packages/BUILD/k3d-source-0.7.9.0/k3dsdk/python/angle_axis_ m/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/python/angle_axis_ m/pac3d/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/python/angle_axis_ m/packages/BU9.0/k3dsdk/almost_equal.h:149:
+  warning: comparison between signed and unsigned integer expressions
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/almost_equal.h:149:
+  warning: comparison between signed and unsigned integer expressions
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/almost_equal.h/usr/src/packages/BUILD/k3d-sota/usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/to_integer(k3d::double_t)':
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/almost_equal.h:156:
+  warning: dereferencing type-punned pointer will break strict-aliasing
+  rules
+  In file included from /usr/include/boost/python/class.hpp:29,
+  from /usr/includefroost/python.hpp:18,
+  from
+  /usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/pyth/usrngle_ax/usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/pyth/usrngle_ax/usr/src/ba/usr/se:/usr/sin/usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/pyth/usrngle_ax/usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/pyth/usrngle_ax/usr/src/ba/usr/se:/usr/sin/usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/pyth/usrngle_ax/usr/src/pa::/usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/pyth/usrngle_ax/t_/usr/src/packages/BUILD/k3d-source-0.7.9.0/k3dsdk/pyth/usrngle_ax/us >::result_type
+  boost::python::detail::def_helper<T1, T2, T3, T4>::keyboost::python::detail::def_helper<T1, T2, T3, T4>::keyboost::python::detail::def_helper<T1, T2, T3, T4>::keyboost::python::detail::def_helper<T1, T2, T3, T4>::keyboost::pyt/Cboost::python::detail::def_helper<T1, T2, T3, T4>::keyboost::python:1]boost::python::detail::def_helper<T1, T2, T3, T4>::keyboost::python:
+  mmmmm *** [all] Error 2
+  
+  can i fix it?
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:21:42.809002 Z
+references: []
+
+id: 4523543999b211ff2977debc785b31e70964ea2b
+log_events: 
+- - 2009-05-19 03:21:44.305029 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

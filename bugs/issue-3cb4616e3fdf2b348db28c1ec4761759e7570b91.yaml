@@ -1,0 +1,192 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Segmentation fault on startup (Linux/PPC)
+desc: |-
+  Hi,
+  I'm running Debian etch (gcc-4.2, libstdc++.so.6.0.9, libc-2.5.so, let me
+  know whatever else you need) on a powerpc (G4). I compiled a 0.6.6 tree and
+  everything went fine:
+  
+  $ ./configure
+  $ make
+  (sleep a couple of hours)
+  $ make install
+  
+  Unfortunately when I launch
+  
+  $ /usr/local/k3d/bin/k3d
+  
+  I get for a while the splash screen and a sudden
+  
+  /usr/local/k3d/bin/k3d: line 180: 23586 Segmentation fault
+  /usr/local/k3d/bin/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  /usr/local/k3d/lib/k3d --shadercache /home/alex/.k3d/shadercache --share
+  /usr/local/k3d/share/k3d --tutorials /usr/local/k3d/share/k3d/tutorials
+  --ui /usr/local/k3d/lib/libk3dngui.so
+  
+  Just to keep doing something, I tried
+  
+  $ make check
+  
+  in the tree top directory; I attach the last part of the output:
+  
+  make check-TESTS
+  make[3]: Entering directory `/home/alex/install/k3d-0.6.6.0/tests'
+  ../application/k3d: line 180: 29954 Segmentation fault
+  ../application/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /ho../alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../nui/.libs/libk3dnui.so --batch --color --log-level warning --no-splash
+  --shaders ../share/shaders --show-process --exit
+  FAIL: testharness.startFAIL: testharness.startFAIcriptrecognition.null.001
+  ../application/k3d: line 180: 30003 Segmentation fault
+  ../application/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../nui/.libs/libk3dnui.so --batch --color --log-level warning --no-splash
+  --shad--shad--shad--shad--shad--shad--shad--s--shad--shad--shad--shad--shad--shadipt--shad--sha.k3--shad--shad--shad--shad--shad--shad--shad--s--shad--shad--shadult--shad--shad--s/k--shad--shad--shad--shad--shad--shad--shad--s--shad--shad--shad--gi--shad--shad--shad--shad--shad--shad--shad--s--shad--../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../nui/.libs/libk3dnui.so --batch --color --log-level warning --no-splash
+  --shaders ..--shaders ..--shaders ..--shaders ..--shaders ..--IL: testharness.scriptrecognition.python.001
+  PASS: testharness.scriptfailure.k3dscript.001
+  PASS: testharness.scriptfailure.pyPASS: testharness.scriptfailure.pyPASS: testharness.scriptfailure.pyPASS: 4PASS: testharness.scriptfailure.pyPASS: testharness.snsPASS: testharness.scriptfailure.pyPASS: testharness.scriptfailure.pyPhoPASS: testharness.scriptfailure.pyPASS: testharness.scriptfailure.pyPASSre/k3d/tutorials --ui
+  ../nui/.libs/libk3dnui.so --batch --color --log-level warning --no-splash
+  --shaders ../share/shaders --sho--shaders ../share/shaders --sho--shaders ../share/shaders --sho--shaders ../share/shaders --sho--shaders ../share/shaders --sho--shaders ../share/shaders --sho--shaders ../share/shaders --sho--shaders ../share/shaders --sho--shaders ../share/shaders --sho--shaders ../share/shaders --sho--shaders ../share/s--ui
+  ../nui/.libs/libk3dnui.so --batch --color --log-l../nui/.libs/libk3dnui.so --batch --color --log-l../nui/.libs/libk3dnui.ip../nui/.libs/libk3dnui.so --batch --color --log-l../nui/.libs/libk3dnui.so --batch --color --log-l../nui/lication/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../nui/.libs/libk3dnui.so --batch --color --log-level warning --no-splash
+  --shaders ../share/shaders --show-process --script - --exit
+  FAIL: document.stress_test.001
+  ../application/k3d: l../application/k3d: l../application/k3d: l../application/k3d: l../applical../application/k3d: l../application/k3d: l../application/k3d: l../application/k3d: l../applical../application/k3d: l../application/k3d: l../application/k3d: l../application/k3d: l../applical../application/k3d: l../application/k3d: l../application/k3d: l../application/k3d: l../applical../application/k3d: l../application/k3d: l../application/kne../application/k3d: l../application/k3d: l../application/k3d: l../application/k3d: l../applical../application/k3d: l../application/k3d: l../application/k3d: l../application/k3d: l../applical../application/k3d: l../application/k3d: l../application/k3d: l../application/k3d: l../applical../appno../application/k3d: l../application/k3d: l../application/k3d: l../applic: ../application/k3d: l../application/k3d: l../appli0: 4961 Segmentation fault
+  ../application/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../s../bin/plugins --shadercache /home/alex/.k3d/shadercacui../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../se/ns.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.menu.activate.001
+  ../application/k3d: line 180: 5101 Segmentation fault
+  ../application/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.menu.activate.002
+  ../application/k3d: line 180: 5124 Segmentation fault
+  ../application/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.add_viewport.001
+  ../application/k3d: line 180: 51../application/k3d: line 180: 51../application/k3d: line 180: 51../applipt../application/kns../application/k3d: line 18he../application/k3d: line 180: 51../application/k3d: rials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so../ngui/.libs/libk3dngui.so../ngui/.libs/libk3dngui.so../ngui/.libs/libkhaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.assign_hotkeys.001
+  ../application/k3d: line 180: 5172 Segmentation fault
+  ../application/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --sh--no-custom-layouts --no-splash --sh--no-custom-la-e--no-custom-layouts --no-splash --sh--no-custom-layouts --no-s19--no-custom-layouts --no-splash --sh--no-custom-layouts --no-splash --shtions.k3d --plugins
+  --no-custom-layouts --no-she /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.bitmaps.color_monochrome.001
+  ../application/k3d: line 180: 5222 Segmentation fault
+  ../application/k3d-bin --options /home/al../application/kk3d --plugins
+  ../bin/plugins --s../bin/plugins --s../bin/plugins --s../bin/plugins -ar../bin/plugins --s../bin/plugins --s../bin/plugins --s../bin/plugins ibk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.bitmaps.gamma.001
+  ../application/k3d: li../application/k3d: li../application/k3d: li../application/k3d: li../application/k3d: li../application/k3d: li../application/k3d: li../application/k3d: li../application/k3d: li../application/k3d: li../application/k3d: li../application/k3d: li/l../application/k3d: li../application/k3d: li../application/k3d: li../appo-../application/k3d: li../application/k3d: li../app-script - --exit
+  FAIL: ngui.bitmaps.matte_colordiff.001
+  ../applica../applica../applica../applica../applica../applica../applica../applica..ions /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --../bin/plugins --../bin/plugins --../bin/plugins --.ha../bin/plugins --../bin/plugins --../bin/plugins --../bin/plugins --.libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.bitmaps.multiply.001
+  ../application/k3d: line 180: 5291 Segmentation fault
+  ../application/k3d-bin --options /home../application/kns../application/k3d-bin --opns --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.bitmaps.subtract.001
+  ../application/k3d: line 180: 5315 Segmentation fault
+  ../application/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.bitmaps.threshold.001
+  ../application/k3d: line 180: 5338 Segmentation fault
+  ../application/k3d-bin --options /home/al../application/kk3../application/k3d-bin --optioha../application/k3d-bin --options /home/al../applicate
+  ../application/k3d-bin --options /home/al../application/kk3../application/k3d-bin --optioha../application/k3d-bin --options /home/al../applicatlash --shaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.shaders.undo_selection.001
+  ../application/k3d: line 180: 5362 Segmentation fault
+  ../application/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script - --exit
+  FAIL: ngui.tools.unparent.001
+  ../application/k3../application/k3../application/k3../application/k3../application/k3../aome/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --../bin/plugins --../bin/plugins --../bin/plugins --.hare
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-s--no-custom-layouts --no-s--no-custom-layouts --no-s--no-custom-layouts --no-s--no-custom-layouts --no-s--no-custom-layouts --no-s--no-custom-layouts --no-s--no-custom-layouts --no-s--no-cions /home/alex/.k3d--no-custom-layouts --no-s--no-custos --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no--no-custom-layouts --no--no-custom-layouts --no----script ../share/tutorials/getting_started.k3dscript --exit
+  FAIL: ngui.tutorials.getting_started.001
+  ../application/k3d: line 180: 5431 Segmentation fault
+  ../application/k3d-bin --options../application/k3d-bin --options../application/k3d-bin --options../application/k3d-bin --options../application/k3d-bin --ops ../application/k3d-bin --options../application/k3d-bin --options../applitc../application/k3d-bin --options../application/k3d--../application/k3d-bin --options../application/k3d-bin --optio./share/tutorials/panel_basics.k3dscript --exit
+  FAIL: ngui.tutorials.panel_basics.001
+  ../application/k3d: line 180: 5455 Segmentation fault
+  ../application/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials ---tutorials /usr/local/k3d/share/k3d/tutorials ---log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script ../share/tutorials/navigation.k3dscript --exit
+  FAIL: ngui.tutorials.navigation.001
+  ../application/k3../application/k3../application/k3../ap/a../application/k3../application/k3../application/k3..k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shadercache --share ../share
+  --tutorials /usr/local/k3d/share/k3d/tutorials --ui
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script ../share/tutorials/basic_selection.k3dscript --exit
+  FAIL: ngui.tutorials.basic_selection.001
+  ../application../application../application../appliult
+  ../application/k3d-bin --options /home/alex/.k3d/options.k3d --plugins
+  ../bin/plugins --shadercache /home/alex/.k3d/shaderc../bin/plugins --shadercache /home/alex/.k3d/shaderc../bin/plugins --shai
+  ../ngui/.libs/libk3dngui.so --batch --color --log-level warning
+  --no-custom-layouts --no-splash --shaders ../share/shaders --show-process
+  --script ../share/tutorials/gts_boolean.py --exit
+  FAIL: ngui.tutorials.gts_boolean.001
+  ====================================================================================================================================================================================[c========================================================================6.0/tests'
+  make[1]: *** [check-recursive] Error 1
+  makemakemakemakemakemakemakemakemakemakemakemakemakemakemakemakemamake: *** [check-recursive] Error 1
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:47:18.127477 Z
+references: []
+
+id: 3cb4616e3fdf2b348db28c1ec4761759e7570b91
+log_events: 
+- - 2009-05-19 03:47:18.928081 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

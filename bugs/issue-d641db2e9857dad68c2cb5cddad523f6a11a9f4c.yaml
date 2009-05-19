@@ -1,0 +1,50 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Problems with rendering
+desc: |-
+  Contact: shashank.araokar@gmail.com
+  Summary: Problems with rendering
+  Report Generated: 2007-Aug-14 20:26:51 UTC
+  Package: k3d
+  Version: 0.6.6.0
+  Platform: i486-pc-linux-gnu
+  Compiler: 4.1.2 20070106 (prerelease) (Ubuntu 4.1.1-21ubuntu7)
+  Build Time: Jan 16 2007 15:55:06 local
+  Description of problem:
+  The program often simply crashes when F12 is pressed. Changing the preview
+  engine is often
+  not reflected. Trying to create a preview simply does nothing.
+  
+  Steps to reproduce problem:
+  
+  1. Add a cone in the viewport
+  2. Press F12 and try the same with engines (the program said I did not have
+  any installed)
+  
+  Expected results:
+  Either a result or an error
+  
+  Actual results:
+  Program crashes or does absolutely nothing
+  
+  How often does this happen?
+  Always
+  
+  Additional information:
+  The program simply says that some engine executable is missing (only once
+  in the runtime).
+  Thereafter neither an error nor a result is seen.
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:42:35.864548 Z
+references: []
+
+id: d641db2e9857dad68c2cb5cddad523f6a11a9f4c
+log_events: 
+- - 2009-05-19 03:42:36.631966 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

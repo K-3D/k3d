@@ -1,0 +1,41 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: 5  Nothing showing in the view port
+desc: |-
+  Contact: vnhg@yahoo.com
+  Summary: Nothing showing in the view port
+  Report Generated: 2008-Jan-28 03:37:34 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 23 2007 09:37:14 local
+  Description of problem:
+  
+  Steps to reproduce problem:
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:33:18.128479 Z
+references: []
+
+id: 72b9eb7ea6f2ee49a1aa6de0f9bdda95fd8226af
+log_events: 
+- - 2009-05-19 03:33:20.192201 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

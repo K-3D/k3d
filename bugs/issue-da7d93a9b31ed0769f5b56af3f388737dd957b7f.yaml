@@ -1,0 +1,31 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Normals flipped when extruding 0 m
+desc: |-
+  Summary: Normals are flipped (point inwards) when extruding a face 0m and
+  moving the face afterwards via the move tool.
+  
+  Steps to reproduce:
+  
+  1. Create a cube (or whatever)
+  2. Go into face mode and select a face
+  3. Use the "Modify|Mesh|Extrude Faces" command
+  4. Go into the Node Properties panel and change the distance value to "0
+  m"
+  5. Go into move mode (press w) and move the face manually. Than you will
+  see that the normals of the newly created polygons of the extrusion point
+  inwards.
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:28:11.072707 Z
+references: []
+
+id: da7d93a9b31ed0769f5b56af3f388737dd957b7f
+log_events: 
+- - 2009-05-19 03:28:12.272543 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

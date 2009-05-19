@@ -1,0 +1,21 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "5  K-3D crashes on pipeline panel "
+desc: |-
+  On k3d 0.7 on linux ubuntu
+  while selecting a object if the user makes several undos and the pipeline
+  panel is open the system crashes
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:25:18.866223 Z
+references: []
+
+id: e345f325aab4099f88dfc47616a86d4ddea54db3
+log_events: 
+- - 2009-05-19 03:25:19.664928 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

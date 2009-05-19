@@ -1,0 +1,43 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Viewport Display Not functioning
+desc: |-
+  Contact: truswellj@gmail.com
+  Summary: Viewport Display Not functioning
+  Report Generated: 2008-Mar-17 19:29:32 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i486-pc-linux-gnu
+  Compiler: 4.1.3 20070831 (prerelease) (Ubuntu 4.1.2-16ubuntu1)
+  Build Time: Sep 13 2007 03:47:14 local
+  Description of problem: Upon opening the program, the viewport area is
+  black. I can get it to show the display but as soon as I click anyway, the
+  display changes to completely gray.
+  
+  Steps to reproduce problem:
+  
+  1. Open K-3D
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:31:42.280743 Z
+references: []
+
+id: 5f88eac8fa3003c363a0364ee8827a438bcda2ca
+log_events: 
+- - 2009-05-19 03:31:42.880562 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

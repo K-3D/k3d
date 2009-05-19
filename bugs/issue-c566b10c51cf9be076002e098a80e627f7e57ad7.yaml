@@ -1,0 +1,28 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "5 \"Duplicated\" nodes after importing a .k3d "
+desc: "Steps\n\
+  1- Run the script from\n\
+  http://k-3d.org/wiki/User:JoaquinDuo/Freeze_Script\n\
+  with the \"new\" mode\n\
+  2- This will create a document containing only the freezed objects.\n\
+  3- Save it\n\
+  4- New document -> import the last file\n\
+  5- Try to set the default GL painter for the object\n\
+  6- Displays Duplicated GL default painter node\n\n\
+  Saludos!\n\
+  Joaqu\xC3\xADn"
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:38:57.032547 Z
+references: []
+
+id: c566b10c51cf9be076002e098a80e627f7e57ad7
+log_events: 
+- - 2009-05-19 03:38:57.799861 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

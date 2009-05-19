@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: 5 shifted gizmo
+desc: |-
+  I created 3x3 cube, turned it to SDS, then selected a face; the
+  transform/rotate/etc. gizmo is shifted, there is offset between the
+  selected face and the gizmo. (See screenshots.)
+  
+  [K-3D .7.3 on Vista 64b, K-3D started with desktop composition disabled]
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:26:56.312764 Z
+references: []
+
+id: 1850897e4259a756faf449a72ea07ac863d83cd0
+log_events: 
+- - 2009-05-19 03:26:57.120619 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

@@ -1,0 +1,59 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Prog quits loading in same place each attempt (see log). Veiwport not active. Pop-up menus, windows,etc won't close ( stay visible in viewport area ) after requested action completes.
+desc: |-
+  Contact: vorpman@yahoo.com
+  Summary: Prog quits loading in same place each attempt (see log). Veiwport
+  not active. Pop-up menus, windows,etc won't close ( stay visible in
+  viewport area ) after requested action completes.
+  Report Generated: 2008-Jan-05 16:10:23 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 23 2007 09:37:14 local
+  Description of problem:See above.
+  
+  Steps to reproduce problem: Launch K3d on XP SP2
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen? Each attempt to launch.
+  
+  Additional information: Most tools respond in some fashion. Veiwport never
+  created.
+  Always stops loading when Tutorial window opens. Log window shows where
+  loading
+  stops each time. Paste from Log window follows:
+  
+  01/05/2008 10:59:35 INFO: Starting user interface
+  01/05/2008 10:59:35 INFO: Loading hotkeys from C:\Documents and
+  Settings\Fred\Application Data\.k3d\hotkeys
+  01/05/2008 10:59:35 INFO: Loading icons from C:\k3d\share\ngui\rasterized
+  01/05/2008 10:59:35 INFO: Loading icons from C:\k3d\share\ngui\pixmap
+  01/05/2008 10:59:36 INFO: Loading toolbar layout from
+  C:\k3d\share\ngui\toolbar_layout.k3d
+  01/05/2008 10:01/05/2008 10:01/05/2008 10:01/05/2008 10:01/05/].01/05/2008 10:01/05/2008 10:01/05/2008 10t_01/05/2008 em01/05/2008 10:0tt01/05/2008 10:01/05/2008ewport::control&, const GdkEventBu01/05/2008 10:01/05/2008 10:01/05/200ode. If that works, could it poossibly be
+  interferance from some other process?
+  Is thisIa Inown bug? Any patch? The FAQ on your site does not seem to
+  address this issue.
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:35:21.320424 Z
+references: []
+
+id: b56196fba885cf00f611139e6b09a9135d465338
+log_events: 
+- - 2009-05-19 03:35:22.112314 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

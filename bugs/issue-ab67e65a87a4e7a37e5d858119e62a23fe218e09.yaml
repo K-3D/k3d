@@ -1,0 +1,42 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: " selecting viewport after exiting tutorial "
+desc: |-
+  Contact: mikeh@gopettibone.com
+  Summary: selecting viewport after exiting tutorial
+  Report Generated: 2007-Dec-12 17:16:57 UTC
+  Package: k3d
+  Version: 0.6.6.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 6 2007 13:08:21 local
+  Description of problem:consistent error when selecting within viewport
+  after exiting tutorial
+  
+  Steps to reproduce problem:close tutorial then click LMB in viewport
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:36:16.744345 Z
+references: []
+
+id: ab67e65a87a4e7a37e5d858119e62a23fe218e09
+log_events: 
+- - 2009-05-19 03:36:17.424219 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

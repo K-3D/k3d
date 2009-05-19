@@ -1,0 +1,44 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Tried to render
+desc: |-
+  Contact: jfmotion@gmail.com
+  Summary: Tried to render
+  Report Generated: 2007-Jul-25 07:03:36 UTC
+  Package: k3d
+  Version: 0.6.6.0
+  Platform: i486-pc-linux-gnu
+  Compiler: 4.1.2 20070106 (prerelease) (Ubuntu 4.1.1-21ubuntu7)
+  Build Time: Jan 16 2007 15:55:06 local
+  Description of problem:
+  Without it, RIB files cannot be rendered. Check to ensure that you have
+  Aqsis installed, and that the PATH envrionment variable points to the Aqsis
+  binary installation directory.
+  
+  Steps to reproduce problem:
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:44:08.808584 Z
+references: []
+
+id: 2c158e15ef869a5b8ec01db38e4ed19a507b0bc2
+log_events: 
+- - 2009-05-19 03:44:09.503967 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

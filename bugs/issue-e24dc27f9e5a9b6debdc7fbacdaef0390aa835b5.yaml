@@ -1,0 +1,28 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: 5 Rotate manipulator works wrong on multiple viewports
+desc: "Having multiples viewports makes the rotate manipulator work wrong.\n\n\
+  Steps:\n\
+  1-Create several viewports\n\
+  2-Try to manipulate an object on one viewport other that the \"main\"\n\
+  viewport\n\
+  3-The selected manipulator is chosen as if the user were clicking on the\n\
+  \"main\" viewport (using the current user coordinates to select the\n\
+  manipulator on the \"main\" viewport coordinates).\n\n\
+  I guess this should also happen to the move and rotate manipulator.\n\n\
+  Cheers!\n\
+  Joaqu\xC3\xADn"
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:37:50.096255 Z
+references: []
+
+id: e24dc27f9e5a9b6debdc7fbacdaef0390aa835b5
+log_events: 
+- - 2009-05-19 03:37:51.168218 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

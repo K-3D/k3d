@@ -1,0 +1,25 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: 5 .7.3 crashes (SelectEdgeLoops Undo)
+desc: |-
+  0: Start K-3D,
+  1: create a PolyCone (or make your choice),
+  2: use ";" to SelectEdgeLoops,
+  3: Undo the last operation
+  4: Start K-3D again ;)
+  
+  Vista 64bit
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:26:22.464921 Z
+references: []
+
+id: 49b3bc440ae6da65fec9979da016681ccdd7df24
+log_events: 
+- - 2009-05-19 03:26:23.576851 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

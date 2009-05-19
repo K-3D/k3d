@@ -1,0 +1,30 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "User properties Order and NullOutputScript "
+desc: |-
+  On 0.7 rev 899, ubuntu feisty fawn
+  
+  When user properties are created via script, when the file is reloaded,
+  they are reordered missing it's original order. (this doesn't happen on
+  manually created user properties)
+  
+  NullOutputScript
+  When opening a file it evaluates its script before its user properties are
+  created.
+  I guess is has to do with /scripting/null_output_script.cpp
+  line 51: connect_script_changed_signal(sigc::mem_fun(*this,
+  &null_output_script::on_execute));
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:24:08.601156 Z
+references: []
+
+id: 71abd763037b718e574529c33c58a458f05af48c
+log_events: 
+- - 2009-05-19 03:24:09.880832 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

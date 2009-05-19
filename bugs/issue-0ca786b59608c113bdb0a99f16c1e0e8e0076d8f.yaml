@@ -1,0 +1,31 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "5 Cannot correctly Undo a \"Delete All\" from a script "
+desc: "1-Run the following code on the script editor\n\n\
+  #python\n\n\
+  import k3d\n\
+  doc = Document\n\
+  doc.start_change_set()\n\
+  for i in doc.nodes():\n\
+  doc.delete_node(i)\n\
+  doc.finish_change_set(\"Delete All\")\n\n\
+  2- Undo the script\n\
+  3- The viewport stays grayed\n\
+  Users need to change the viewport to another panel then back to viewport\n\n\
+  not a big deal :D\n\n\
+  Saludos!\n\
+  Joaqu\xC3\xADn"
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:39:30.848536 Z
+references: []
+
+id: 0ca786b59608c113bdb0a99f16c1e0e8e0076d8f
+log_events: 
+- - 2009-05-19 03:39:31.639851 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

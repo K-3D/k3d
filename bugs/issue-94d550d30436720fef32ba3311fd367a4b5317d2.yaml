@@ -1,0 +1,42 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: The last Tutorial cannot be loaded , because of the wrong language
+desc: |-
+  Contact: SuperMarc1301@gmx.de
+  Summary: The last Tutorial cannot be loaded , because of the wrong
+  language
+  Report Generated: 2008-May-01 19:23:05 UTC
+  Package: k3d
+  Version: 0.6.6.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 6 2007 13:08:21 local
+  Description of problem:
+  
+  Steps to reproduce problem:
+  
+  1. klick on help --> Tutorials
+  2. klick the last tutorial
+  3. an error occured.
+  
+  Expected results: That the last tut opens
+  
+  Actual results: an error occured
+  
+  How often does this happen? every time
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:24:44.858168 Z
+references: []
+
+id: 94d550d30436720fef32ba3311fd367a4b5317d2
+log_events: 
+- - 2009-05-19 03:24:45.608982 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

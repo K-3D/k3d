@@ -1,0 +1,25 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Rotate and Scale Tools don't work around correct center
+desc: |-
+  When using the scale or rotate tools on component selections such as faces,
+  the tools don't rotate around the center of the selected geometry.
+  
+  In much earlier versions of k3d this used to work correctly. Something has
+  changed.
+  
+  Tested in SVN from 2007 Nov 27th on Ubuntu Gnu/Linux 7.10 Gutsy.
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:38:26.040406 Z
+references: []
+
+id: 9e5b6f8facf5da51725b10a558ac3560e03d651d
+log_events: 
+- - 2009-05-19 03:38:26.983623 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

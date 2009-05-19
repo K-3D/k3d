@@ -1,0 +1,31 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: 5 Mouse jumps to right screen border with manipulators
+desc: |-
+  My mouse cursor jumps to the right border of my primary screen (note: I
+  have a dual screen setup, my primary is on the right). This happens
+  whenever you have nothing selected and select something while you either
+  use the move, rotate or scale tool (those with manipulators). I used an svn
+  build of today (30.03.08) which is build via mingw on windows xp.
+  
+  Steps to reproduce:
+  
+  1. Open K3D
+  2. Create a poly cube
+  3. Press space to deselect it
+  4. go into either move, rotate or scale mode (w,e,r)
+  5. Click on the cube and the mouse jumps to the right border of your screen
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:28:41.368708 Z
+references: []
+
+id: fd6e33c28fa0b3d7a02b1c4972bc5577b61d8838
+log_events: 
+- - 2009-05-19 03:28:42.240542 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

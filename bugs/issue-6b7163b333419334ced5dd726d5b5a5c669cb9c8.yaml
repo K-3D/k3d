@@ -1,0 +1,45 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: 5 Rendering of files does not work
+desc: |-
+  Contact: shashank.araokar@gmail.com
+  Summary: Rendering of files does not work
+  Report Generated: 2007-Aug-14 20:21:32 UTC
+  Package: k3d
+  Version: 0.6.6.0
+  Platform: i486-pc-linux-gnu
+  Compiler: 4.1.2 20070106 (prerelease) (Ubuntu 4.1.1-21ubuntu7)
+  Build Time: Jan 16 2007 15:55:06 local
+  Description of problem:
+  
+  Steps to reproduce problem:
+  
+  1. Create any simple model
+  2. Say render (either press F12 or render frame)
+  3. Save the file as needed (if needed)
+  
+  Expected results:
+  Anything sensible (say a preview or something)
+  
+  Actual results:
+  Nothing happens. File is not saved. No error is reported. No warnings, no
+  results
+  
+  How often does this happen?
+  Each time
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:43:08.584443 Z
+references: []
+
+id: 6b7163b333419334ced5dd726d5b5a5c669cb9c8
+log_events: 
+- - 2009-05-19 03:43:09.280302 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

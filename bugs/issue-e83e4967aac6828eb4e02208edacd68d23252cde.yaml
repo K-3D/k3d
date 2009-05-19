@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: 5 Animation rendering code can't handle negative time values
+desc: |-
+  The main animation loops in the RenderMan and Yafray engines convert the
+  start and end times to unsigned integers, then loop over them to create
+  frames. This won't work for ranges of negative time - we need to be
+  smarter about how we map the range of times to be rendered to frame
+  names.
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:49:47.991804 Z
+references: []
+
+id: e83e4967aac6828eb4e02208edacd68d23252cde
+log_events: 
+- - 2009-05-19 03:49:48.527694 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

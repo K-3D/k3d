@@ -1,0 +1,42 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: 5 The viewport does not display anything.
+desc: |-
+  Contact: matts-address@hotmail.com
+  Summary: The viewport does not display anything.
+  Report Generated: 2007-Dec-12 23:28:38 UTC
+  Package: k3d
+  Version: 0.6.6.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 6 2007 13:08:21 local
+  Description of problem: Upon opening, the viewport does not display
+  anything, unless a shape has just been inserted. I'm running Vista.
+  
+  Steps to reproduce problem: Open up K-3D
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen? All the time.
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:35:47.936321 Z
+references: []
+
+id: 432f8b1d7711eb5d22d6046d20bc006c18d5090b
+log_events: 
+- - 2009-05-19 03:35:48.712753 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

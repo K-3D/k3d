@@ -1,0 +1,54 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Make SUSE 10.2, make install, try to run and go boom.. LOL
+desc: |-
+  Contact: prh@cemtach.com
+  Summary: Make SUSE 10.2, make install, try to run and go boom.. LOL
+  Report Generated: 2007-Apr-21 07:32:24 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-linux-gnu
+  Compiler: 4.1.2 20061115 (prerelease) (SUSE Linux)
+  Build Time: Apr 20 2007 15:29:04 local
+  Description of problem:
+  
+  Did standard install with internal boost library and it dies upon starting.
+  The initial screens come up (with the little guy), but dies shortly after
+  that..
+  
+  hayes/src> /usr/local/k3d/bin/k3d
+  
+  (k3d:22286): GdkGLExt-WARNING **: cannot load PangoFont
+  /usr/local/k3d/bin/k3d: line 180: 22286 Segmentation fault
+  /usr/local/k3d/bin/k3d-bin --options /home/hayes/.k3d/options.k3d --plugins
+  /usr/local/k3d/lib/k3d --shadercache /home/hayes/.k3d/shadercache --share
+  /usr/local/k3d/share/k3d --tutorials /usr/local/k3d/share/k3d/tutorials
+  --ui /usr/local/k3d/lib/libk3dngui.so
+  
+  Steps to reproduce problem:
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:48:19.199766 Z
+references: []
+
+id: caa327a1b446cc943f4f8563d11862bb9a323006
+log_events: 
+- - 2009-05-19 03:48:19.903752 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

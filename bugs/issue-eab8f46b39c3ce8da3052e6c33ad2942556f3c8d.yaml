@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: " BevelFaces only works on one face at a time? "
+desc: |-
+  I am trying to bevel faces. SO i select the faces and apply bevel from
+  create-polygons-bevel faces. It does not do anything. But if i use right
+  click mesh modifier-bevel, it works. Problem with that one is that it does
+  not work with multiple face selection, it only applies to one of the
+  selected faces
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:50:42.743748 Z
+references: []
+
+id: eab8f46b39c3ce8da3052e6c33ad2942556f3c8d
+log_events: 
+- - 2009-05-19 03:50:43.407681 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

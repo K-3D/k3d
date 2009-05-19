@@ -1,0 +1,31 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "5  Python Script: bug on Document.delete_node() "
+desc: "Steps:\n\n\
+  1- Select a node (A) property on connect it to another's node property\n\
+  (B).\n\
+  2- Delete node B from the python engine.\n\
+  3- Node A property is still connected to node B property although B doesn't\n\
+  exist anymore.\n\n\
+  I attach an example file.\n\
+  1- Open test_doc.k3d\n\
+  2- select polycube instance (the cube on the right)\n\
+  3- run the delete_selected_instance.py\n\n\
+  Go and see the input_mesh property of MeshInstance node.\n\
+  It can't be disconnected unless you connect it first to other node.\n\n\
+  Cheers!\n\
+  Joaqu\xC3\xADn"
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:40:06.207476 Z
+references: []
+
+id: 1e7b3a952423fcf332c8f369ee0646873cafb877
+log_events: 
+- - 2009-05-19 03:40:06.904099 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

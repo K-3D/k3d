@@ -1,0 +1,50 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "5 Didn't do much of anything exept mess with a tube, and import another tube, tried to render, no preview, no frame render, no nothing, messed with the render settings, tried to make a new one, nothing, saved, quit K3d reloded K3d loaded the file, still can't render. "
+desc: |-
+  Contact: mayapaladin@gmail.com
+  Summary: Didn't do much of anything exept mess with a tube, and import
+  another tube, tried to render, no preview, no frame render, no nothing,
+  messed with the render settings, tried to make a new one, nothing, saved,
+  quit K3d reloded K3d loaded the file, still can't render.
+  Report Generated: 2007-Aug-23 16:44:44 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 23 2007 09:37:14 local
+  Description of problem:No rendering
+  
+  Steps to reproduce problem:
+  
+  1.create poly tube
+  2.rotate 90` save as 90` tube
+  3. save as 90` tube
+  4.mess with the faces, extruding and undoing a few times.
+  5.import 90`tube file
+  6.resise new tube
+  7.try and render while inside the objects
+  8.it doesn't work so zoom out.
+  9.no render
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:42:05.504249 Z
+references: []
+
+id: ebaf6c348e0fa045023a7a486ea7c70969f96dde
+log_events: 
+- - 2009-05-19 03:42:06.176001 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

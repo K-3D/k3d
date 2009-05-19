@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: " We need edge bevelling"
+desc: We need edge bevelling
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:50:17.799652 Z
+references: []
+
+id: dbc9bdf294e3af3096d5b7b0777fbd501dbec183
+log_events: 
+- - 2009-05-19 03:50:18.519703 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

@@ -1,0 +1,43 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "It can't read the 5th tutorial. "
+desc: |-
+  Contact: daniel.craven@hotmail.com
+  Summary: It can't read the 5th tutorial.
+  Report Generated: 2008-Mar-29 12:46:53 UTC
+  Package: k3d
+  Version: 0.6.7.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 23 2007 09:37:14 local
+  Description of problem: A box appears which sais that it can't read the 5th
+  chapter of the tutorials, because it has a different scripting language.
+  
+  Steps to reproduce problem: Open menu Help, open submenu Tutorials, open
+  chapter 5. GTS Boolean (Advanced).
+  
+  1.
+  2.
+  3.
+  
+  Expected results:
+  
+  Actual results:
+  
+  How often does this happen?
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:29:10.912901 Z
+references: []
+
+id: e7da3769c8568a8dd24b895d954ce0f2afb278fb
+log_events: 
+- - 2009-05-19 03:29:11.584033 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: ConnectVertices problem with concave polys
+desc: See attached.
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:52:05.479968 Z
+references: []
+
+id: dbddd7fdc90195a94e62d0ae6440ac9d90308f40
+log_events: 
+- - 2009-05-19 03:52:06.151593 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

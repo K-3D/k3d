@@ -1,0 +1,41 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: shortcuts assignment is wacky
+desc: |-
+  Contact: kartalgoz@bluebottle.com
+  Summary: shortcuts assignment is wacky
+  Report Generated: 2007-Jan-15 14:32:04 UTC
+  Package: k3d
+  Version: 0.6.6.0
+  Platform: i686-pc-mingw32
+  Compiler: 3.4.4 (mingw special)
+  Build Time: Jan 6 2007 13:08:21 local
+  Description of problem:i cannot assign keys like "a" to any function
+  
+  Steps to reproduce problem:
+  
+  1. start shortcut mode by pressing insert
+  2. goto face from select menu
+  3. press "aa
+  
+  Expected results:using a as shortcut
+  
+  Actual results: does not happen
+  
+  How often does this happen?everytime
+  
+  Additional information:
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:51:09.376554 Z
+references: []
+
+id: e695dc7181caa53d244666975fcb9416d23456d6
+log_events: 
+- - 2009-05-19 03:51:10.047953 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

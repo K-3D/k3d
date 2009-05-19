@@ -1,0 +1,25 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Segfault connecting an output property to an input property
+desc: "Steps:\n\
+  1- create a cube\n\
+  2- go to the instance node\n\
+  3- connect the input_mesh property to the output_mesh property of the same\n\
+  node\n\
+  4- crashes\n\n\
+  Cheers!\n\
+  Joaqu\xC3\xADn"
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:40:35.960222 Z
+references: []
+
+id: efc598f7db94d366529406ccc835541ed77da749
+log_events: 
+- - 2009-05-19 03:40:36.736067 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

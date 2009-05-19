@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: " Orthographic Toggle doesn't work inside a Tutorial "
+desc: "1-Run the mug tutorial\n\
+  2-When it tries to toggle to Orthographic mode nothing happens. It seems\n\
+  that the focus on the current viewport is lost.\n\
+  Same thing for View->Set View menu.\n\n\
+  Cheers!\n\
+  Joaqu\xC3\xADn"
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:41:31.160261 Z
+references: []
+
+id: 7bc390041917f4dad49790f8eaf5b365add00512
+log_events: 
+- - 2009-05-19 03:41:31.839724 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

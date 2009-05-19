@@ -1,0 +1,52 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Modifiers break per-face attributes (among others)
+desc: |-
+  The way things work in RenderMan, you have a lot of
+  flexibility
+  to "tag" geometry with attributes of various types -
+  colors, scalars,
+  strings, normals, matrices, etc. You do this tagging
+  at many levels:
+  per-face, per-vertex, per-edge, etc. However, you do
+  have to be
+  consistent: if you provide (in this case) per-face
+  colors for some
+  faces, you must provide them for *all* faces.
+  Polyhedron is doing that
+  fine, but what's happening is that the subsequent
+  ExtrudeFaces modifiers
+  aren't assigning per-face colors for the new faces they
+  create. So the
+  RIB output produced by K-3D isn't valid in this case.
+  
+  The short-term workaround is to use the TagColors
+  modifier with the "tag
+  faces" property enabled, to assign colors to all the faces.
+  
+  I will add some sanity checking in our RIB output to
+  catch this scenario
+  and correct it.
+  
+  Longer-term, it's going to be a bear to fix all of the
+  modifiers that
+  aren't generating tags ... doh! But it'll have to be
+  done. I will
+  postpone it to after 0.6 because there are some other
+  performance-related changes to k3d::mesh that will have
+  an impact on the
+  work.
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:51:38.407653 Z
+references: []
+
+id: afe8a5c7a2db5849096010a7e4e37ffd246fc5de
+log_events: 
+- - 2009-05-19 03:51:39.103767 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""

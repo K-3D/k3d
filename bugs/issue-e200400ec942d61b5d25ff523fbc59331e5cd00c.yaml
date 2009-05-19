@@ -1,0 +1,29 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: bug report for scripting issue
+desc: |-
+  http://sourceforge.net/forum/forum.php?thread_id=1772963&forum_id=34831
+  
+  keeping in mind that I'm a total newbie to this and I should probably just
+  learn how to create before I tackle scripting; that said Ive tried
+  opening/playing any and all scripts that I have. Basically ones that came
+  with the program upon installation. There's a file extention of py and pyc
+  for each file. I tried editing a file and adding #python on the 1st line
+  but that didnt work. Ive attached a file for you.
+  
+  hope this helps a bit. lemme know if you need any more info.
+  thanks
+type: :bugfix
+component: K-3D
+release: 
+reporter: Beverly L. Shead <bshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-19 03:45:02.880102 Z
+references: []
+
+id: e200400ec942d61b5d25ff523fbc59331e5cd00c
+log_events: 
+- - 2009-05-19 03:45:03.599829 Z
+  - Beverly L. Shead <bshead@k-3d.com>
+  - created
+  - ""
