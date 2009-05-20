@@ -2323,7 +2323,7 @@ private:
 
 	void on_help_file_bug_report()
 	{
-		k3d::ngui::uri::open("http://sourceforge.net/tracker/?func=add&group_id=11113&atid=111113");
+		k3d::ngui::uri::open("http://www.k-3d.org/wiki/Reporting_Bugs");
 	}
 
 	void on_help_open_log_window()
