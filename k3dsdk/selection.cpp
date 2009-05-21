@@ -610,7 +610,10 @@ bool_t set::almost_equal(const set& Other, const uint64_t Threshold) const
 std::ostream& operator<<(std::ostream& Stream, const set& RHS)
 {
 	for(set::const_iterator storage = RHS.begin(); storage != RHS.end(); ++storage)
-		Stream << standard_indent << "storage:\n" << push_indent << **storage << "\n" << pop_indent;
+	{
+		Stream << standard_indent << "storage:\n";
+		Stream << push_indent << **storage << pop_indent;
+	}
 
 	return Stream;
 }
