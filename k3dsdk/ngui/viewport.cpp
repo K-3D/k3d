@@ -867,7 +867,7 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	for(k3d::selection::record::tokens_t::const_iterator token = record.tokens.begin(); token != record.tokens.end(); ++token)
 		tokens.insert(std::make_pair(token->type, token->id));
 
-	if(tokens.count(k3d::selection::ABSOLUTE_POINT))
+	if(tokens.count(k3d::selection::POINT))
 	{
 		return record;
 	}
@@ -1084,7 +1084,7 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 		k3d::selection::record record = k3d::selection::record::empty_record();
 		record.tokens.push_back(k3d::selection::token(NODE, tokens[NODE]));
 		record.tokens.push_back(k3d::selection::token(MESH, tokens[MESH]));
-		record.tokens.push_back(k3d::selection::token(ABSOLUTE_POINT, selected_point));
+		record.tokens.push_back(k3d::selection::token(POINT, selected_point));
 		return record;
 	}
 

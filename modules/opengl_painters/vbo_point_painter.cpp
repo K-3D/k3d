@@ -134,13 +134,13 @@ public:
 					(!SelectionState.select_backfacing && 
 							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
 			{
-				k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
+				k3d::gl::push_selection_token(k3d::selection::POINT, point);
 	
 				glBegin(GL_POINTS);
 				glArrayElement(point);
 				glEnd();
 	
-				k3d::gl::pop_selection_token();
+				k3d::gl::pop_selection_token(); // k3d::selection::POINT
 			}
 		}
 

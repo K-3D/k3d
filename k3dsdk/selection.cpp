@@ -51,9 +51,6 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case MESH:
 			Stream << "mesh";
 			break;
-		case ABSOLUTE_POINT:
-			Stream << "absolute_point";
-			break;
 		case USER1:
 			Stream << "user1";
 			break;
@@ -97,9 +94,9 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = NODE;
 	else if(buffer == "mesh")
 		RHS = MESH;
+/*
 	else if(buffer == "absolute_point")
 		RHS = ABSOLUTE_POINT;
-/*
 	else if(buffer == "absolute_face")
 		RHS = ABSOLUTE_FACE;
 	else if(buffer == "absolute_split_edge")

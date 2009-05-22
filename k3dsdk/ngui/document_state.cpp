@@ -109,7 +109,7 @@ const bool is_point_selected(const k3d::selection::record& Record)
 
 	if(mesh->point_selection)
 	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_POINT);
+		const k3d::selection::id id = Record.get_id(k3d::selection::POINT);
 		if(id < mesh->point_selection->size())
 			return (*mesh->point_selection)[id];
 	}
@@ -201,7 +201,7 @@ struct select_points
 		{
 			switch(token->type)
 			{
-				case k3d::selection::ABSOLUTE_POINT:
+				case k3d::selection::POINT:
 					Selection.points.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
 				default:

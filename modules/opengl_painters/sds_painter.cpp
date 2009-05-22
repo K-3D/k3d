@@ -474,7 +474,7 @@ private:
 		
 		for (k3d::uint_t point = 0; point != point_count; ++point)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
+			k3d::gl::push_selection_token(k3d::selection::POINT, point);
 			glBegin(GL_POINTS);
 			k3d::gl::vertex3d(visitor.points_array[point]);
 			glEnd();

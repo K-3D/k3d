@@ -394,7 +394,7 @@ private:
 		
 		for (k3d::uint_t point = 0; point != point_count; ++point)
 		{
-			k3d::gl::push_selection_token(k3d::selection::ABSOLUTE_POINT, point);
+			k3d::gl::push_selection_token(k3d::selection::POINT, point);
 			glDrawArrays(GL_POINTS, point, 1);
 			k3d::gl::pop_selection_token();
 		}
