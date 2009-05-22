@@ -1426,47 +1426,6 @@ void upgrade_document(element& XMLDocument)
 	detail::upgrade_delete_components_nodes(XMLDocument);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// save_pipeline
-
-void save_pipeline(idocument& Document, element& XML, const ipersistent::save_context& Context)
-{
-	// Create a mapping of properties to objects ...
-	detail::save_dependencies::map_t object_map;
-	const inode_collection::nodes_t& objects = Document.nodes().collection();
-	for(inode_collection::nodes_t::const_iterator object = objects.begin(); object != objects.end(); ++object)
-	{
-		iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(*object);
-		if(!property_collection)
-			continue;
-
-		const iproperty_collection::properties_t properties(property_collection->properties());
-		for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-			object_map[*property] = *object;
-	}
-
-	// Save all dependencies
-	element& xml_dependencies = XML.append(element("dependencies"));
-	std::for_each(Document.pipeline().dependencies().begin(), Document.pipeline().dependencies().end(), detail::save_dependencies(object_map, xml_dependencies, Context));
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// load_pipeline
-
-void load_pipeline(idocument& Document, element& XML, const ipersistent::load_context& Context)
-{
-	// If we don't have any DAG information, we're done ...
-	element* xml_dependencies = find_element(XML, "dependencies");
-
-	if(!xml_dependencies)
-		return;
-
-	// Load data and update the DAG ...
-	ipipeline::dependencies_t dependencies;
-	std::for_each(xml_dependencies->children.begin(), xml_dependencies->children.end(), detail::load_dependencies(dependencies, Context));
-	Document.pipeline().set_dependencies(dependencies);
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // save
 
@@ -1520,6 +1479,47 @@ void load(inode& Node, element& XML, const ipersistent::load_context& Context)
 	// Allow the node to load the rest of its internal state ...
 	if(ipersistent* const persistent = dynamic_cast<ipersistent*>(&Node))
 		persistent->load(XML, Context);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// save_pipeline
+
+void save_pipeline(idocument& Document, element& XML, const ipersistent::save_context& Context)
+{
+	// Create a mapping of properties to objects ...
+	detail::save_dependencies::map_t object_map;
+	const inode_collection::nodes_t& objects = Document.nodes().collection();
+	for(inode_collection::nodes_t::const_iterator object = objects.begin(); object != objects.end(); ++object)
+	{
+		iproperty_collection* const property_collection = dynamic_cast<iproperty_collection*>(*object);
+		if(!property_collection)
+			continue;
+
+		const iproperty_collection::properties_t properties(property_collection->properties());
+		for(iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+			object_map[*property] = *object;
+	}
+
+	// Save all dependencies
+	element& xml_dependencies = XML.append(element("dependencies"));
+	std::for_each(Document.pipeline().dependencies().begin(), Document.pipeline().dependencies().end(), detail::save_dependencies(object_map, xml_dependencies, Context));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// load_pipeline
+
+void load_pipeline(idocument& Document, element& XML, const ipersistent::load_context& Context)
+{
+	// If we don't have any DAG information, we're done ...
+	element* xml_dependencies = find_element(XML, "dependencies");
+
+	if(!xml_dependencies)
+		return;
+
+	// Load data and update the DAG ...
+	ipipeline::dependencies_t dependencies;
+	std::for_each(xml_dependencies->children.begin(), xml_dependencies->children.end(), detail::load_dependencies(dependencies, Context));
+	Document.pipeline().set_dependencies(dependencies);
 }
 
 namespace detail
@@ -2105,6 +2105,7 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 	detail::save_array(Container, element("point_selection"), Mesh.point_selection, Context);
 	detail::save_arrays(Container, element("vertex_data"), Mesh.vertex_data, Context);
 
+	// Save primitives ...
 	if(Mesh.primitives.size())
 	{
 		element& xml_primitives = Container.append(element("primitives"));
@@ -2340,8 +2341,49 @@ Assuming that that never happens, it should be safe to remove this code entirely
 */
 }
 
-////////////////////////////////////////////////////
-// load_legacy_mesh and associated detail namespace
+/////////////////////////////////////////////////////////////////////////////
+// save
+
+void save(const selection::set& Selection, element& Container, const ipersistent::save_context& Context)
+{
+	element& xml_set = Container.append(element("set"));
+	for(selection::set::const_iterator storage = Selection.begin(); storage != Selection.end(); ++storage)
+	{
+		if(!storage->get())
+			continue;
+
+		element& xml_storage = xml_set.append(element("storage", attribute("type", (*storage)->type)));
+
+		if((*storage)->structure.size())
+		{
+			detail::save_arrays(xml_storage, element("structure"), (*storage)->structure, Context);
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// load
+
+void load(selection::set& Selection, element& Container, const ipersistent::load_context& Context)
+{
+	if(const element* const xml_set = find_element(Container, "set"))
+	{
+		for(element::elements_t::const_iterator xml_storage = xml_set->children.begin(); xml_storage != xml_set->children.end(); ++xml_storage)
+		{
+			if(xml_storage->name != "storage")
+				continue;
+
+			selection::storage& storage = Selection.create(attribute_text(*xml_storage, "type"));
+			if(const element* const xml_structure = find_element(*xml_storage, "structure"))
+				detail::load_arrays(*xml_structure, storage.structure, Context);
+		}
+	}
+}
+
+/** \todo Remove this block of code no later than version 1.0
+
+This code has been left in-place in-case we ever need to load a K-3D file that contains pre-array data
+into a legacy mesh.  Assuming that that never happens, it should be safe to remove this code entirely for version 1.0.
 
 namespace detail
 {
@@ -2355,7 +2397,7 @@ bool load_parameter(const string_t& XMLType, const string_t& Name, const string_
 	Parameters[Name] = from_string<data_t>(Value, data_t());
 	return true;
 }
-	
+
 void load_parameters(const element& Element, legacy::parameters_t& Parameters)
 {
 	for(element::elements_t::const_iterator xml_parameter = Element.children.begin(); xml_parameter != Element.children.end(); ++xml_parameter)
@@ -2473,11 +2515,6 @@ void load_varying_parameters(const element& Element, ContainerT& Parameters, con
 }
 
 } // namespace detail
-
-/** \todo Remove this block of code no later than version 1.0
-
-This code has been left in-place in-case we ever need to load a K-3D file that contains pre-array data
-into a legacy mesh.  Assuming that that never happens, it should be safe to remove this code entirely for version 1.0.
 
 void load_tags(const element& Element, legacy::parameters_t& Parameters)
 {

@@ -56,6 +56,9 @@ ADD_TEST(k3dsdk.path.relative.001 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "
 ADD_TEST(k3dsdk.path.relative.002 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/home/bubba" "k3d/test.k3d")
 ADD_TEST(k3dsdk.path.relative.003 ${EXECUTABLE_OUTPUT_PATH}/test-path-relative "/home/bubba/k3d/test.k3d" "/var/documents" "../../home/bubba/k3d/test.k3d")
 
+ADD_EXECUTABLE(test-selection-serialization selection_serialization.cpp)
+ADD_TEST(k3dsdk.selection-serialization ${EXECUTABLE_OUTPUT_PATH}/test-selection-serialization)
+
 ADD_EXECUTABLE(test-xml-sanity-checks xml_sanity_checks.cpp)
 ADD_TEST(k3dsdk.xml-sanity-checks ${EXECUTABLE_OUTPUT_PATH}/test-xml-sanity-checks)
 
