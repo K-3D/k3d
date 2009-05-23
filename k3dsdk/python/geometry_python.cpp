@@ -19,6 +19,7 @@
 
 #include "instance_wrapper_python.h"
 #include "geometry_python.h"
+#include "owned_instance_wrapper_python.h"
 #include "selection_python.h"
 
 #include <k3dsdk/iomanip.h>
@@ -43,9 +44,24 @@ public:
 	class point_selection
 	{
 	public:
+		class storage
+		{
+		public:
+			typedef owned_instance_wrapper<k3d::geometry::point_selection::storage> wrapper;
+
+			static object index_begin(wrapper& Self) { return wrap(Self.wrapped().index_begin); }
+			static object index_end(wrapper& Self) { return wrap(Self.wrapped().index_end); }
+			static object value(wrapper& Self) { return wrap(Self.wrapped().value); }
+		};
+
 		static object create(k3d::selection::set& Set)
 		{
-			return wrap(k3d::geometry::point_selection::create(Set));
+			return wrap_owned(k3d::geometry::point_selection::create(Set));
+		}
+
+		static object validate(selection_storage_wrapper& Storage)
+		{
+			return wrap_owned(k3d::geometry::point_selection::validate(Storage.wrapped()));
 		}
 	};
 
@@ -64,10 +80,20 @@ void define_namespace_geometry()
 	scope outer = class_<geometry>("geometry", no_init)
 		;
 
-	class_<geometry::point_selection>("point_selection", no_init)
-		.def("create", &geometry::point_selection::create)
-		.staticmethod("create")
-		;
+	{
+		scope inner = class_<geometry::point_selection>("point_selection", no_init)
+			.def("create", &geometry::point_selection::create)
+			.staticmethod("create")
+			.def("validate", &geometry::point_selection::validate)
+			.staticmethod("validate")
+			;
+
+		class_<geometry::point_selection::storage::wrapper>("storage", no_init)
+			.def("index_begin", &geometry::point_selection::storage::index_begin)
+			.def("index_end", &geometry::point_selection::storage::index_end)
+			.def("value", &geometry::point_selection::storage::value)
+			;
+	}
 
 	class_<geometry::primitive_selection>("primitive_selection", no_init)
 		.def("create", &geometry::primitive_selection::create)

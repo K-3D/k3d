@@ -20,6 +20,8 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "mesh.h"
+
 namespace k3d
 {
 
@@ -32,7 +34,22 @@ namespace geometry
 namespace point_selection
 {
 
-k3d::selection::storage& create(k3d::selection::set& Set);
+class storage
+{
+public:
+	storage(
+		mesh::indices_t& IndexBegin,
+		mesh::indices_t& IndexEnd,
+		mesh::selection_t& Value
+		);
+
+	mesh::indices_t& index_begin;
+	mesh::indices_t& index_end;
+	mesh::selection_t& value;
+};
+
+storage* create(k3d::selection::set& Set);
+storage* validate(k3d::selection::storage& GenericStorage);
 
 } // namespace point_selection
 
