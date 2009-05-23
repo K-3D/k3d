@@ -36,6 +36,13 @@ k3d::selection::storage& create(k3d::selection::set& Set);
 
 } // namespace point_selection
 
+namespace primitive_selection
+{
+
+k3d::selection::storage& create(k3d::selection::set& Set);
+
+} // namespace primitive_selection
+
 } // namespace geometry
 
 } // namespace k3d

@@ -34,14 +34,34 @@ namespace point_selection
 k3d::selection::storage& create(k3d::selection::set& Set)
 {
 	k3d::selection::storage& storage = Set.create("point");
-	k3d::uint_t_array& begin = storage.structure.create<k3d::uint_t_array>("begin");
-	k3d::uint_t_array& end = storage.structure.create<k3d::uint_t_array>("end");
+	k3d::uint_t_array& index_begin = storage.structure.create<k3d::uint_t_array>("index_begin");
+	k3d::uint_t_array& index_end = storage.structure.create<k3d::uint_t_array>("index_end");
 	k3d::typed_array<k3d::double_t>& value = storage.structure.create<k3d::typed_array<k3d::double_t> >("value");
 
 	return storage;
 }
 
 } // namespace point_selection
+
+namespace primitive_selection
+{
+
+k3d::selection::storage& create(k3d::selection::set& Set)
+{
+	k3d::selection::storage& storage = Set.create("primitive");
+	k3d::uint_t_array& primitive_begin = storage.structure.create<k3d::uint_t_array>("primitive_begin");
+	k3d::uint_t_array& primitive_end = storage.structure.create<k3d::uint_t_array>("primitive_end");
+	k3d::typed_array<k3d::int32_t>& selection_type = storage.structure.create<k3d::typed_array<k3d::int32_t> >("primitive_selection_type");
+	k3d::uint_t_array& primitive_first_range = storage.structure.create<k3d::uint_t_array>("primitive_first_range");
+	k3d::uint_t_array& primitive_range_count = storage.structure.create<k3d::uint_t_array>("primitive_range_count");
+	k3d::uint_t_array& index_begin = storage.structure.create<k3d::uint_t_array>("index_begin");
+	k3d::uint_t_array& index_end = storage.structure.create<k3d::uint_t_array>("index_end");
+	k3d::typed_array<k3d::double_t>& value = storage.structure.create<k3d::typed_array<k3d::double_t> >("value");
+
+	return storage;
+}
+
+} // namespace primitive_selection
 
 } // namespace geometry
 

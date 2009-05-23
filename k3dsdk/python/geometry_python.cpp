@@ -48,6 +48,15 @@ public:
 			return wrap(k3d::geometry::point_selection::create(Set));
 		}
 	};
+
+	class primitive_selection
+	{
+	public:
+		static object create(k3d::selection::set& Set)
+		{
+			return wrap(k3d::geometry::primitive_selection::create(Set));
+		}
+	};
 };
 
 void define_namespace_geometry()
@@ -57,6 +66,11 @@ void define_namespace_geometry()
 
 	class_<geometry::point_selection>("point_selection", no_init)
 		.def("create", &geometry::point_selection::create)
+		.staticmethod("create")
+		;
+
+	class_<geometry::primitive_selection>("primitive_selection", no_init)
+		.def("create", &geometry::primitive_selection::create)
 		.staticmethod("create")
 		;
 }
