@@ -50,6 +50,7 @@ public:
 
 storage* create(k3d::selection::set& Set);
 storage* validate(k3d::selection::storage& GenericStorage);
+void merge(const storage& Storage, mesh& Mesh);
 
 } // namespace point_selection
 

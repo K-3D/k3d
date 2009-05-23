@@ -87,6 +87,30 @@ storage* validate(k3d::selection::storage& Storage)
 	return 0;
 }
 
+//////////////////////////////////////////////////////////////////////
+// merge
+
+void merge(const storage& Storage, mesh& Mesh)
+{
+	return_if_fail(Mesh.point_selection);
+
+	mesh::selection_t& point_selection = Mesh.point_selection.writable();
+	const uint_t point_selection_count = point_selection.size();
+
+	const uint_t record_count = Storage.index_begin.size();
+	for(uint_t record = 0; record != record_count; ++record)
+	{
+		const uint_t index_begin = Storage.index_begin[record];
+		const uint_t index_end = std::max(index_begin, Storage.index_end[record]);
+		const double_t value = Storage.value[record];
+
+		const mesh::selection_t::iterator begin = point_selection.begin() + std::min(point_selection_count, index_begin);
+		const mesh::selection_t::iterator end = point_selection.begin() + std::min(point_selection_count, index_end);
+
+		std::fill(begin, end, value);
+	}
+}
+
 } // namespace point_selection
 
 namespace primitive_selection

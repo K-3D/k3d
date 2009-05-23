@@ -19,6 +19,7 @@
 
 #include "instance_wrapper_python.h"
 #include "geometry_python.h"
+#include "mesh_python.h"
 #include "owned_instance_wrapper_python.h"
 #include "selection_python.h"
 
@@ -63,6 +64,11 @@ public:
 		{
 			return wrap_owned(k3d::geometry::point_selection::validate(Storage.wrapped()));
 		}
+
+		static void merge(storage::wrapper& Storage, python::mesh& Mesh)
+		{
+			k3d::geometry::point_selection::merge(Storage.wrapped(), Mesh.wrapped());
+		}
 	};
 
 	class primitive_selection
@@ -86,6 +92,8 @@ void define_namespace_geometry()
 			.staticmethod("create")
 			.def("validate", &geometry::point_selection::validate)
 			.staticmethod("validate")
+			.def("merge", &geometry::point_selection::merge)
+			.staticmethod("merge")
 			;
 
 		class_<geometry::point_selection::storage::wrapper>("storage", no_init)
