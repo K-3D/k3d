@@ -573,7 +573,7 @@ bool_t storage::almost_equal(const storage& Other, const uint64_t Threshold) con
 
 std::ostream& operator<<(std::ostream& Stream, const storage& RHS)
 {
-	Stream << standard_indent << "type: " << RHS.type << "\n";
+	Stream << standard_indent << "type: \"" << RHS.type << "\"\n";
 	Stream << standard_indent << "structure (" << RHS.structure.size() << "):\n";
 	Stream << push_indent << RHS.structure << pop_indent;
 
