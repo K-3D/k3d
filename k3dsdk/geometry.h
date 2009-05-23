@@ -23,9 +23,18 @@
 namespace k3d
 {
 
+namespace selection { class set; }
+namespace selection { class storage; }
+
 namespace geometry
 {
 
+namespace point_selection
+{
+
+k3d::selection::storage& create(k3d::selection::set& Set);
+
+} // namespace point_selection
 
 } // namespace geometry
 

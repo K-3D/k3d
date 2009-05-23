@@ -1,5 +1,8 @@
+#ifndef K3DSDK_PYTHON_GEOMETRY_PYTHON_H
+#define K3DSDK_PYTHON_GEOMETRY_PYTHON_H
+
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,33 +20,21 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "geometry.h"
-#include "selection.h"
-#include "typed_array.h"
-#include "uint_t_array.h"
+/** \file
+	\author Timothy M. Shead (tshead@k-3d.com)
+*/
 
 namespace k3d
 {
 
-namespace geometry
+namespace python
 {
 
-namespace point_selection
-{
+void define_namespace_geometry();
 
-k3d::selection::storage& create(k3d::selection::set& Set)
-{
-	k3d::selection::storage& storage = Set.create("point");
-	k3d::uint_t_array& begin = storage.structure.create<k3d::uint_t_array>("begin");
-	k3d::uint_t_array& end = storage.structure.create<k3d::uint_t_array>("end");
-	k3d::typed_array<k3d::double_t>& value = storage.structure.create<k3d::typed_array<k3d::double_t> >("value");
-
-	return storage;
-}
-
-} // namespace point_selection
-
-} // namespace geometry
+} // namespace python
 
 } // namespace k3d
+
+#endif // !K3DSDK_PYTHON_GEOMETRY_PYTHON_H
 

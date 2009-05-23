@@ -44,6 +44,7 @@
 #include "euler_python.h"
 #include "filesystem_python.h"
 #include "file_signal_python.h"
+#include "geometry_python.h"
 #include "hyperboloid_python.h"
 #include "idocument_python.h"
 #include "ifile_change_notifier_python.h"
@@ -373,6 +374,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_disk();
 	define_namespace_euler();
 	define_namespace_filesystem();
+	define_namespace_geometry();
 	define_namespace_hyperboloid();
 	define_namespace_linear_curve();
 	define_namespace_log();

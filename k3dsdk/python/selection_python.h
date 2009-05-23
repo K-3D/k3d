@@ -24,11 +24,16 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include "instance_wrapper_python.h"
+#include <k3dsdk/selection.h>
+
 namespace k3d
 {
 
 namespace python
 {
+
+typedef instance_wrapper<k3d::selection::storage> selection_storage_wrapper;
 
 void define_namespace_selection();
 

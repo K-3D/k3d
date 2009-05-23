@@ -17,33 +17,51 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "geometry.h"
-#include "selection.h"
-#include "typed_array.h"
-#include "uint_t_array.h"
+#include "instance_wrapper_python.h"
+#include "geometry_python.h"
+#include "selection_python.h"
+
+#include <k3dsdk/iomanip.h>
+#include <k3dsdk/geometry.h>
+
+#include <boost/python.hpp>
+#include <boost/python/detail/api_placeholder.hpp>
+using namespace boost::python;
 
 namespace k3d
 {
 
-namespace geometry
+namespace python
 {
 
-namespace point_selection
-{
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// geometry 
 
-k3d::selection::storage& create(k3d::selection::set& Set)
+class geometry
 {
-	k3d::selection::storage& storage = Set.create("point");
-	k3d::uint_t_array& begin = storage.structure.create<k3d::uint_t_array>("begin");
-	k3d::uint_t_array& end = storage.structure.create<k3d::uint_t_array>("end");
-	k3d::typed_array<k3d::double_t>& value = storage.structure.create<k3d::typed_array<k3d::double_t> >("value");
+public:
+	class point_selection
+	{
+	public:
+		static object create(k3d::selection::set& Set)
+		{
+			return wrap(k3d::geometry::point_selection::create(Set));
+		}
+	};
+};
 
-	return storage;
+void define_namespace_geometry()
+{
+	scope outer = class_<geometry>("geometry", no_init)
+		;
+
+	class_<geometry::point_selection>("point_selection", no_init)
+		.def("create", &geometry::point_selection::create)
+		.staticmethod("create")
+		;
 }
 
-} // namespace point_selection
-
-} // namespace geometry
+} // namespace python
 
 } // namespace k3d
 

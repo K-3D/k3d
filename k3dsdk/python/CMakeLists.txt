@@ -129,6 +129,8 @@ ADD_LIBRARY(k3dsdk-python-b SHARED
 	const_named_attribute_arrays_python.h
 	euler_python.cpp
 	euler_python.h
+	geometry_python.cpp
+	geometry_python.h
 	log_python.cpp
 	log_python.h
 	mesh_selection_python.cpp
