@@ -40,12 +40,12 @@ public:
 	storage(
 		mesh::indices_t& IndexBegin,
 		mesh::indices_t& IndexEnd,
-		mesh::selection_t& Value
+		mesh::selection_t& Weight
 		);
 
 	mesh::indices_t& index_begin;
 	mesh::indices_t& index_end;
-	mesh::selection_t& value;
+	mesh::selection_t& weight;
 };
 
 storage* create(k3d::selection::set& Set);
@@ -57,7 +57,33 @@ void merge(const storage& Storage, mesh& Mesh);
 namespace primitive_selection
 {
 
-k3d::selection::storage& create(k3d::selection::set& Set);
+class storage
+{
+public:
+	storage(
+		mesh::indices_t& PrimitiveBegin,
+		mesh::indices_t& PrimitiveEnd,
+		typed_array<k3d::int32_t>& PrimitiveSelectionType,
+		mesh::indices_t& PrimitiveFirstRange,
+		mesh::counts_t& PrimitiveRangeCount,
+		mesh::indices_t& IndexBegin,
+		mesh::indices_t& IndexEnd,
+		mesh::selection_t& Weight
+		);
+
+	mesh::indices_t& primitive_begin;
+	mesh::indices_t& primitive_end;
+	typed_array<k3d::int32_t>& primitive_selection_type;
+	mesh::indices_t& primitive_first_range;
+	mesh::counts_t& primitive_range_count;
+	mesh::indices_t& index_begin;
+	mesh::indices_t& index_end;
+	mesh::selection_t& weight;
+};
+
+storage* create(k3d::selection::set& Set);
+storage* validate(k3d::selection::storage& GenericStorage);
+void merge(const storage& Storage, mesh& Mesh);
 
 } // namespace primitive_selection
 
