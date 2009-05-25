@@ -19,7 +19,7 @@
 
 #include "metadata_keys.h"
 #include "point_group.h"
-#include "primitive_detail.h"
+#include "primitive_validation.h"
 
 #include <numeric>
 

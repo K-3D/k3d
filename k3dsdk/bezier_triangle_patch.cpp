@@ -23,7 +23,7 @@
 
 #include "bezier_triangle_patch.h"
 #include "metadata_keys.h"
-#include "primitive_detail.h"
+#include "primitive_validation.h"
 #include "selection.h"
 #include "string_cast.h"
 

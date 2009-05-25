@@ -21,7 +21,7 @@
 #include "geometric_operations.h"
 #include "metadata_keys.h"
 #include "nurbs_curve.h"
-#include "primitive_detail.h"
+#include "primitive_validation.h"
 #include "selection.h"
 #include "string_cast.h"
 

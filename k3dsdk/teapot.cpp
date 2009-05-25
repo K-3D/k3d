@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "metadata_keys.h"
-#include "primitive_detail.h"
+#include "primitive_validation.h"
 #include "selection.h"
 #include "string_cast.h"
 #include "teapot.h"

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_PRIMITIVE_DETAIL_H
-#define K3DSDK_PRIMITIVE_DETAIL_H
+#ifndef K3DSDK_PRIMITIVE_VALIDATION_H
+#define K3DSDK_PRIMITIVE_VALIDATION_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -84,5 +84,5 @@ void require_metadata(const mesh::primitive& Primitive, const array& Array, cons
 
 } // namespace k3d
 
-#endif // !K3DSDK_PRIMITIVE_DETAIL_H
+#endif // !K3DSDK_PRIMITIVE_VALIDATION_H
 
