@@ -45,6 +45,16 @@ public:
 	class point_selection
 	{
 	public:
+		class const_storage
+		{
+		public:
+			typedef owned_instance_wrapper<k3d::geometry::point_selection::const_storage> wrapper;
+
+			static object index_begin(wrapper& Self) { return wrap(Self.wrapped().index_begin); }
+			static object index_end(wrapper& Self) { return wrap(Self.wrapped().index_end); }
+			static object weight(wrapper& Self) { return wrap(Self.wrapped().weight); }
+		};
+
 		class storage
 		{
 		public:
@@ -65,7 +75,7 @@ public:
 			return wrap_owned(k3d::geometry::point_selection::validate(Storage.wrapped()));
 		}
 
-		static void merge(storage::wrapper& Storage, python::mesh& Mesh)
+		static void merge(const_storage::wrapper& Storage, python::mesh& Mesh)
 		{
 			k3d::geometry::point_selection::merge(Storage.wrapped(), Mesh.wrapped());
 		}
@@ -74,6 +84,21 @@ public:
 	class primitive_selection
 	{
 	public:
+		class const_storage
+		{
+		public:
+			typedef owned_instance_wrapper<k3d::geometry::primitive_selection::const_storage> wrapper;
+
+			static object primitive_begin(wrapper& Self) { return wrap(Self.wrapped().primitive_begin); }
+			static object primitive_end(wrapper& Self) { return wrap(Self.wrapped().primitive_end); }
+			static object primitive_selection_type(wrapper& Self) { return wrap(Self.wrapped().primitive_selection_type); }
+			static object primitive_first_range(wrapper& Self) { return wrap(Self.wrapped().primitive_first_range); }
+			static object primitive_range_count(wrapper& Self) { return wrap(Self.wrapped().primitive_range_count); }
+			static object index_begin(wrapper& Self) { return wrap(Self.wrapped().index_begin); }
+			static object index_end(wrapper& Self) { return wrap(Self.wrapped().index_end); }
+			static object weight(wrapper& Self) { return wrap(Self.wrapped().weight); }
+		};
+
 		class storage
 		{
 		public:
@@ -99,7 +124,7 @@ public:
 			return wrap_owned(k3d::geometry::primitive_selection::validate(Storage.wrapped()));
 		}
 
-		static void merge(storage::wrapper& Storage, python::mesh& Mesh)
+		static void merge(const_storage::wrapper& Storage, python::mesh& Mesh)
 		{
 			k3d::geometry::primitive_selection::merge(Storage.wrapped(), Mesh.wrapped());
 		}
@@ -121,6 +146,12 @@ void define_namespace_geometry()
 			.staticmethod("merge")
 			;
 
+		class_<geometry::point_selection::const_storage::wrapper>("const_storage", no_init)
+			.def("index_begin", &geometry::point_selection::const_storage::index_begin)
+			.def("index_end", &geometry::point_selection::const_storage::index_end)
+			.def("weight", &geometry::point_selection::const_storage::weight)
+			;
+
 		class_<geometry::point_selection::storage::wrapper>("storage", no_init)
 			.def("index_begin", &geometry::point_selection::storage::index_begin)
 			.def("index_end", &geometry::point_selection::storage::index_end)
@@ -136,6 +167,17 @@ void define_namespace_geometry()
 			.staticmethod("validate")
 			.def("merge", &geometry::primitive_selection::merge)
 			.staticmethod("merge")
+			;
+
+		class_<geometry::primitive_selection::const_storage::wrapper>("const_storage", no_init)
+			.def("primitive_begin", &geometry::primitive_selection::const_storage::primitive_begin)
+			.def("primitive_end", &geometry::primitive_selection::const_storage::primitive_end)
+			.def("primitive_selection_type", &geometry::primitive_selection::const_storage::primitive_selection_type)
+			.def("primitive_first_range", &geometry::primitive_selection::const_storage::primitive_first_range)
+			.def("primitive_range_count", &geometry::primitive_selection::const_storage::primitive_range_count)
+			.def("index_begin", &geometry::primitive_selection::const_storage::index_begin)
+			.def("index_end", &geometry::primitive_selection::const_storage::index_end)
+			.def("weight", &geometry::primitive_selection::const_storage::weight)
 			;
 
 		class_<geometry::primitive_selection::storage::wrapper>("storage", no_init)

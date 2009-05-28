@@ -23,6 +23,8 @@
 #include "selection.h"
 #include "string_cast.h"
 
+#include <boost/scoped_ptr.hpp>
+
 namespace k3d
 {
 
@@ -31,6 +33,20 @@ namespace geometry
 
 namespace point_selection
 {
+
+//////////////////////////////////////////////////////////////////////
+// const_storage
+
+const_storage::const_storage(
+	const mesh::indices_t& IndexBegin,
+	const mesh::indices_t& IndexEnd,
+	const mesh::selection_t& Weight
+		) :
+	index_begin(IndexBegin),
+	index_end(IndexEnd),
+	weight(Weight)
+{
+}
 
 //////////////////////////////////////////////////////////////////////
 // storage
@@ -65,6 +81,15 @@ storage* create(k3d::selection::set& Set)
 //////////////////////////////////////////////////////////////////////
 // validate
 
+const_storage* validate(const k3d::selection::storage& Storage)
+{
+	assert_not_implemented();
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////
+// validate
+
 storage* validate(k3d::selection::storage& Storage)
 {
 	if(Storage.type != "point")
@@ -92,7 +117,7 @@ storage* validate(k3d::selection::storage& Storage)
 //////////////////////////////////////////////////////////////////////
 // merge
 
-void merge(const storage& Storage, mesh& Mesh)
+void merge(const_storage& Storage, mesh& Mesh)
 {
 	return_if_fail(Mesh.point_selection);
 
@@ -117,6 +142,30 @@ void merge(const storage& Storage, mesh& Mesh)
 
 namespace primitive_selection
 {
+
+//////////////////////////////////////////////////////////////////////
+// const_storage
+
+const_storage::const_storage(
+	const mesh::indices_t& PrimitiveBegin,
+	const mesh::indices_t& PrimitiveEnd,
+	const typed_array<k3d::int32_t>& PrimitiveSelectionType,
+	const mesh::indices_t& PrimitiveFirstRange,
+	const mesh::counts_t& PrimitiveRangeCount,
+	const mesh::indices_t& IndexBegin,
+	const mesh::indices_t& IndexEnd,
+	const mesh::selection_t& Weight
+		) :
+	primitive_begin(PrimitiveBegin),
+	primitive_end(PrimitiveEnd),
+	primitive_selection_type(PrimitiveSelectionType),
+	primitive_first_range(PrimitiveFirstRange),
+	primitive_range_count(PrimitiveRangeCount),
+	index_begin(IndexBegin),
+	index_end(IndexEnd),
+	weight(Weight)
+{
+}
 
 //////////////////////////////////////////////////////////////////////
 // storage
@@ -166,6 +215,15 @@ storage* create(k3d::selection::set& Set)
 //////////////////////////////////////////////////////////////////////
 // validate
 
+const_storage* validate(const k3d::selection::storage& Storage)
+{
+	assert_not_implemented();
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////
+// validate
+
 storage* validate(k3d::selection::storage& Storage)
 {
 	if(Storage.type != "primitive")
@@ -205,7 +263,7 @@ storage* validate(k3d::selection::storage& Storage)
 class merge_primitive_selection
 {
 public:
-	merge_primitive_selection(const uint_t Primitive, const storage& Storage) :
+	merge_primitive_selection(const uint_t Primitive, const_storage& Storage) :
 		m_primitive(Primitive),
 		m_storage(Storage),
 		m_selection_type(string_cast(Storage.primitive_selection_type[Primitive]))
@@ -237,11 +295,11 @@ public:
 
 private:
 	const uint_t m_primitive;
-	const storage& m_storage;
+	const_storage& m_storage;
 	const string_t m_selection_type;
 };
 
-void merge(const storage& Storage, mesh& Mesh)
+void merge(const_storage& Storage, mesh& Mesh)
 {
 	const uint_t mesh_primitive_count = static_cast<uint_t>(Mesh.primitives.size());
 	const uint_t component_count = Storage.primitive_begin.size();
@@ -257,6 +315,26 @@ void merge(const storage& Storage, mesh& Mesh)
 }
 
 } // namespace primitive_selection
+
+void merge_selection(const k3d::selection::set& Set, mesh& Mesh)
+{
+	for(k3d::selection::set::const_iterator storage = Set.begin(); storage != Set.end(); ++storage)
+	{
+		boost::scoped_ptr<point_selection::const_storage> point_selection_storage(point_selection::validate(**storage));
+		if(point_selection_storage)
+		{
+			point_selection::merge(*point_selection_storage, Mesh);
+			continue;
+		}
+
+		boost::scoped_ptr<primitive_selection::const_storage> primitive_selection_storage(primitive_selection::validate(**storage));
+		if(primitive_selection_storage)
+		{
+			primitive_selection::merge(*primitive_selection_storage, Mesh);
+			continue;
+		}
+	}
+}
 
 } // namespace geometry
 
