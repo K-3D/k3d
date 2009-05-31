@@ -62,7 +62,7 @@ public:
 	{
 		m_polyhedron.shell_first_faces.push_back(0);
 		m_polyhedron.shell_face_counts.push_back(0);
-		m_polyhedron.shell_types.push_back(k3d::mesh::polyhedra_t::POLYGONS);
+		m_polyhedron.shell_types.push_back(k3d::polyhedron::POLYGONS);
 	}
 	
 	void visit(Halffacet_const_handle OppositeFacet)
@@ -174,13 +174,13 @@ void to_mesh(nef_t& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* const Materi
  * so part is (c) the authors of that file.
  */
 template<typename nef_t>
-boost::shared_ptr<nef_t> to_nef(const k3d::mesh& Mesh)
+boost::shared_ptr<nef_t> to_nef(const k3d::mesh::points_t Points, const k3d::polyhedron::const_primitive& Polyhedron)
 {
 	typedef typename nef_t::SNC_structure SNC_structure;
 	SNC_structure snc;
 	try
 	{
-		k3d_to_nef<nef_t>(Mesh, snc);
+		k3d_to_nef<nef_t>(Points, Polyhedron, snc);
 	}
 	catch(std::exception& E)
 	{

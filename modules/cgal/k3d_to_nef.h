@@ -96,24 +96,19 @@ class face_plane
 	typedef typename kernel_t::Plane_3 Plane_3;
 	typedef std::vector<Point_3> points_t;
 public:
-	face_plane(const k3d::mesh& Mesh, points_t& Points) : m_mesh(Mesh), m_points(Points) {}
+	face_plane(const k3d::polyhedron::const_primitive& Polyhedron, const points_t& Points) : m_polyhedron(Polyhedron), m_points(Points) {}
 	
-  typename kernel_t::Plane_3 operator()(size_t FirstLoop) {     
-    const k3d::mesh::indices_t& face_first_loops = *m_mesh.polyhedra->face_first_loops;
-		const k3d::mesh::counts_t& face_loop_counts = *m_mesh.polyhedra->face_loop_counts;
-		const k3d::mesh::indices_t& loop_first_edges = *m_mesh.polyhedra->loop_first_edges;
-		const k3d::mesh::indices_t& edge_points = *m_mesh.polyhedra->edge_points;
-		const k3d::mesh::indices_t& clockwise_edges = *m_mesh.polyhedra->clockwise_edges;
+  typename kernel_t::Plane_3 operator()(size_t FirstLoop) {
 		
 		std::vector<size_t> corners;
 		points_t corner_points;
-		size_t first_edge = loop_first_edges[FirstLoop];
+		size_t first_edge = m_polyhedron.loop_first_edges[FirstLoop];
 		for(size_t edge = first_edge; ; )
 		{
-			size_t point = edge_points[edge];
+			size_t point = m_polyhedron.edge_points[edge];
 			corner_points.push_back(m_points[point]);
 			
-			edge = clockwise_edges[edge];
+			edge = m_polyhedron.clockwise_edges[edge];
 			if(edge == first_edge)
 				break;
 		}
@@ -136,12 +131,12 @@ public:
     return plane;
   }
   
-  const k3d::mesh& m_mesh;
-  points_t& m_points;
+  const k3d::polyhedron::const_primitive& m_polyhedron;
+  const points_t& m_points;
 };
 
 template<typename nef_t>
-void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S)
+void k3d_to_nef(const k3d::mesh::points_t& Points, const k3d::polyhedron::const_primitive& Polyhedron, typename nef_t::SNC_structure& S)
 {
 	typedef typename nef_t::Kernel Kernel;
 	typedef typename nef_t::Plane_3 Plane_3;
@@ -160,45 +155,38 @@ void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S)
   typedef typename SNC_structure::Sphere_segment     Sphere_segment;
   typedef typename SNC_structure::Sphere_circle      Sphere_circle;
   typedef std::vector<SHalfedge_handle> 		indices_t;
-		
-	const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-	const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-	const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
-	const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-	const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-	const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-	const k3d::mesh::points_t& k3d_points = *Mesh.points;
+
 	points_t points;
 	
 	point_converter<Kernel> converter;
 	
 	// Convert to Point_3 representation
-	for (size_t point = 0; point != k3d_points.size(); ++point)
+	for (size_t point = 0; point != Points.size(); ++point)
 	{ 
-		points.push_back(converter(k3d_points[point]));
+		points.push_back(converter(Points[point]));
 	}
 	
-	std::vector<Plane_3> planes(face_first_loops.size());
+	std::vector<Plane_3> planes(Polyhedron.face_first_loops.size());
   
-	std::transform(face_first_loops.begin(), face_first_loops.end(),
-		planes.begin(), face_plane<Kernel>(Mesh, points));
+	std::transform(Polyhedron.face_first_loops.begin(), Polyhedron.face_first_loops.end(),
+		planes.begin(), face_plane<Kernel>(Polyhedron, points));
 	
 	// Calculate companions
 	k3d::mesh::indices_t companions;
 	k3d::mesh::bools_t boundary_edges;
-	k3d::polyhedron::create_edge_adjacency_lookup(edge_points, clockwise_edges, boundary_edges, companions);
+	k3d::polyhedron::create_edge_adjacency_lookup(Polyhedron.edge_points, Polyhedron.clockwise_edges, boundary_edges, companions);
 	
 	// Provide an edge-to-face link
 	k3d::mesh::indices_t face_for_edge;
-	k3d::polyhedron::create_edge_face_lookup(face_first_loops, face_loop_counts, loop_first_edges, clockwise_edges, face_for_edge);
+	k3d::polyhedron::create_edge_face_lookup(Polyhedron.face_first_loops, Polyhedron.face_loop_counts, Polyhedron.loop_first_edges, Polyhedron.clockwise_edges, face_for_edge);
 	
 	// Store an incoming edge for each point
 	k3d::mesh::indices_t first_in_edges(points.size());
-	size_t edge_count = edge_points.size();
+	size_t edge_count = Polyhedron.edge_points.size();
 	for (size_t edge = 0; edge != edge_count; ++edge)
-		first_in_edges[edge_points[clockwise_edges[edge]]] = edge;
+		first_in_edges[Polyhedron.edge_points[Polyhedron.clockwise_edges[edge]]] = edge;
 	
-	indices_t indices(edge_points.size()); // for indexed items
+	indices_t indices(Polyhedron.edge_points.size()); // for indexed items
   for (size_t point = 0; point != points.size(); ++point)
   {
 	  Vertex_handle nv = S.new_vertex();
@@ -210,17 +198,17 @@ void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S)
 		size_t prev_edge = first_in_edges[point];
 		size_t edge = prev_edge;
 		size_t first_edge = prev_edge;
-		Point_3 pe_target_0 = points[edge_points[first_edge]];
+		Point_3 pe_target_0 = points[Polyhedron.edge_points[first_edge]];
 		Point_3 sp_point_0(CGAL::ORIGIN+(pe_target_0-pvpoint));
 		Sphere_point sp_0(sp_point_0);
 		SVertex_handle sv_0 = SM.new_svertex(sp_0);
 		sv_0->mark() = true; 
-		edge = companions[clockwise_edges[edge]];
+		edge = companions[Polyhedron.clockwise_edges[edge]];
 
 		SVertex_handle sv_prev = sv_0;
 
     do {
-      Point_3 pe_target = points[edge_points[edge]]; 
+      Point_3 pe_target = points[Polyhedron.edge_points[edge]]; 
       Point_3 sp_point = CGAL::ORIGIN+(pe_target-pvpoint);
       Sphere_point sp(sp_point);
       SVertex_handle sv = SM.new_svertex(sp);
@@ -237,7 +225,7 @@ void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S)
   
       sv_prev = sv;
       prev_edge = edge;
-      edge = companions[clockwise_edges[edge]];
+      edge = companions[Polyhedron.clockwise_edges[edge]];
     }
     while(edge != first_edge);
 
@@ -264,12 +252,12 @@ void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S)
   }
   
   // resolve indices  
-  for (size_t face = 0; face != face_first_loops.size(); ++face)
+  for (size_t face = 0; face != Polyhedron.face_first_loops.size(); ++face)
 	{
   	int se, set;
-		for (size_t loop = 0; loop != face_loop_counts[face]; ++loop)
+		for (size_t loop = 0; loop != Polyhedron.face_loop_counts[face]; ++loop)
 		{
-			size_t first_edge = loop_first_edges[face_first_loops[face] + loop];
+			size_t first_edge = Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face] + loop];
 			if (loop == 0)
 			{
 				indices[first_edge]->set_index();
@@ -284,7 +272,7 @@ void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S)
 			}
 	    indices[first_edge]->twin()->source()->set_index();
 	    int sv  = indices[first_edge]->twin()->source()->get_index();
-			for(size_t edge = clockwise_edges[first_edge]; ; )
+			for(size_t edge = Polyhedron.clockwise_edges[first_edge]; ; )
 			{
 				indices[edge]->set_index(se);
 				indices[edge]->twin()->set_index(set);
@@ -292,7 +280,7 @@ void k3d_to_nef(const k3d::mesh& Mesh, typename nef_t::SNC_structure& S)
 				indices[edge]->twin()->source()->set_index();
 				sv = indices[edge]->twin()->source()->get_index();				
 
-				edge = clockwise_edges[edge];
+				edge = Polyhedron.clockwise_edges[edge];
 				if(edge == first_edge)
 					break;
 			}

@@ -30,7 +30,6 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/triangulator.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -64,7 +63,7 @@ public:
 			if(!polyhedron)
 				continue;
 	
-			primitive->create(create_triangles().process(Input, *polyhedron, Output));
+			primitive->create(k3d::polyhedron::triangulate(Input, *polyhedron, Output));
 		}
 	}
 	
@@ -83,174 +82,6 @@ public:
 
 		return factory;
 	}
-	
-private:
-	class create_triangles :
-		public k3d::triangulator
-	{
-		typedef k3d::triangulator base;
-
-	public:
-		k3d::mesh::primitive* process(const k3d::mesh& Input, const k3d::polyhedron::const_primitive& Polyhedron, k3d::mesh& Output)
-		{
-			// Allocate new data structures for our output ...
-			input_polyhedron = &Polyhedron;
-
-			k3d::mesh::primitive* const result = new k3d::mesh::primitive();
-			output_polyhedron.reset(k3d::polyhedron::create(*result));
-
-			output_points = &Output.points.create(new k3d::mesh::points_t(*Input.points));
-			output_point_selection = &Output.point_selection.create(new k3d::mesh::selection_t(Input.points->size(), 0.0));
-
-			// Setup copying of attribute arrays ...
-			output_polyhedron->constant_data = input_polyhedron->constant_data;
-
-			output_polyhedron->uniform_data = input_polyhedron->uniform_data.clone_types();
-			uniform_data_copier.reset(new k3d::attribute_array_copier(input_polyhedron->uniform_data, output_polyhedron->uniform_data));
-
-			output_polyhedron->face_varying_data = input_polyhedron->face_varying_data.clone_types();
-			face_varying_data_copier.reset(new k3d::attribute_array_copier(input_polyhedron->face_varying_data, output_polyhedron->face_varying_data));
-
-			Output.vertex_data = Input.vertex_data.clone();
-			vertex_data_copier.reset(new k3d::attribute_array_copier(Input.vertex_data, Output.vertex_data));
-
-			// Create the output polyhedron ...
-			const k3d::uint_t face_begin = 0;
-			const k3d::uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
-			for(k3d::uint_t face = face_begin; face != face_end; ++face)
-			{
-				if(Polyhedron.face_selections[face])
-				{
-					base::process(
-						*Input.points,
-						Polyhedron.face_first_loops,
-						Polyhedron.face_loop_counts,
-						Polyhedron.loop_first_edges,
-						Polyhedron.edge_points,
-						Polyhedron.clockwise_edges,
-						face);
-				}
-				else
-				{
-					add_existing_face(face);
-				}
-			}
-
-			output_polyhedron->shell_first_faces.push_back(0);
-			output_polyhedron->shell_face_counts.push_back(output_polyhedron->face_first_loops.size());
-			output_polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-
-			return result;
-		}
-
-	private:
-		void start_face(const k3d::uint_t Face)
-		{
-			current_face = Face;
-		}
-
-		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], double Weights[4], k3d::uint_t& NewVertex)
-		{
-			NewVertex = output_points->size();
-
-			output_points->push_back(Coordinates);
-			output_point_selection->push_back(0.0);
-
-			vertex_data_copier->push_back(4, Vertices, Weights);
-
-			new_face_varying_data[NewVertex] = new_face_varying_record(Edges, Weights);
-		}
-
-		void add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3])
-		{
-			output_polyhedron->face_first_loops.push_back(output_polyhedron->loop_first_edges.size());
-			output_polyhedron->face_loop_counts.push_back(1);
-			output_polyhedron->face_selections.push_back(1.0);
-			output_polyhedron->face_materials.push_back(input_polyhedron->face_materials[current_face]);
-
-			uniform_data_copier->push_back(current_face);
-
-			output_polyhedron->loop_first_edges.push_back(output_polyhedron->edge_points.size());
-			output_polyhedron->edge_points.push_back(Vertices[0]);
-			output_polyhedron->edge_points.push_back(Vertices[1]);
-			output_polyhedron->edge_points.push_back(Vertices[2]);
-			output_polyhedron->clockwise_edges.push_back(output_polyhedron->edge_points.size() - 2);
-			output_polyhedron->clockwise_edges.push_back(output_polyhedron->edge_points.size() - 1);
-			output_polyhedron->clockwise_edges.push_back(output_polyhedron->edge_points.size() - 3);
-			output_polyhedron->edge_selections.push_back(0.0);
-			output_polyhedron->edge_selections.push_back(0.0);
-			output_polyhedron->edge_selections.push_back(0.0);
-
-			for(k3d::uint_t i = 0; i != 3; ++i)
-			{
-				if(new_face_varying_data.count(Vertices[i]))
-					face_varying_data_copier->push_back(4, new_face_varying_data[Vertices[i]].edges, new_face_varying_data[Vertices[i]].weights);
-				else
-					face_varying_data_copier->push_back(Edges[i]);
-			}
-		}
-
-		void add_existing_face(const k3d::uint_t Face)
-		{
-			output_polyhedron->face_first_loops.push_back(output_polyhedron->loop_first_edges.size());
-			output_polyhedron->face_loop_counts.push_back(input_polyhedron->face_loop_counts[Face]);
-			output_polyhedron->face_selections.push_back(0.0);
-			output_polyhedron->face_materials.push_back(input_polyhedron->face_materials[Face]);
-
-			uniform_data_copier->push_back(Face);
-
-			const k3d::uint_t loop_begin = input_polyhedron->face_first_loops[Face];
-			const k3d::uint_t loop_end = loop_begin + input_polyhedron->face_loop_counts[Face];
-			for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-			{
-				output_polyhedron->loop_first_edges.push_back(output_polyhedron->edge_points.size());
-
-				const k3d::uint_t first_edge = input_polyhedron->loop_first_edges[loop];
-				const k3d::uint_t edge_offset = output_polyhedron->edge_points.size() - first_edge;
-				for(k3d::uint_t edge = first_edge; ;)
-				{
-					output_polyhedron->edge_points.push_back(input_polyhedron->edge_points[edge]);
-					output_polyhedron->clockwise_edges.push_back(input_polyhedron->clockwise_edges[edge] + edge_offset);
-					output_polyhedron->edge_selections.push_back(0.0);
-					face_varying_data_copier->push_back(edge);
-
-					edge = input_polyhedron->clockwise_edges[edge];
-					if(edge == first_edge)
-						break;
-				}
-			}
-		}
-
-		const k3d::polyhedron::const_primitive* input_polyhedron;
-
-		k3d::mesh::points_t* output_points;
-		k3d::mesh::selection_t* output_point_selection;
-		boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron;
-
-		boost::shared_ptr<k3d::attribute_array_copier> uniform_data_copier;
-		boost::shared_ptr<k3d::attribute_array_copier> face_varying_data_copier;
-		boost::shared_ptr<k3d::attribute_array_copier> vertex_data_copier;
-
-		k3d::uint_t current_face;
-
-		struct new_face_varying_record
-		{
-			new_face_varying_record()
-			{
-			}
-
-			new_face_varying_record(k3d::uint_t Edges[4], k3d::double_t Weights[4])
-			{
-				std::copy(Edges, Edges + 4, edges);
-				std::copy(Weights, Weights + 4, weights);
-			}
-
-			k3d::uint_t edges[4];
-			k3d::double_t weights[4];
-		};
-
-		std::map<k3d::uint_t, new_face_varying_record> new_face_varying_data;
-	};
 };
 
 /////////////////////////////////////////////////////////////////////////////

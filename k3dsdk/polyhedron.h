@@ -207,6 +207,9 @@ void mark_coplanar_edges(const mesh::indices_t& Companions,
 		mesh::indices_t& RedundantEdges,
 		const double_t Threshold = 1e-8);
 
+/// Triangulates the input polyhedron, storing the resulting primitive and storing point data in Output
+mesh::primitive* triangulate(const mesh& Input, const const_primitive& Polyhedron, mesh& Output);
+
 } // namespace polyhedron
 
 } // namespace k3d

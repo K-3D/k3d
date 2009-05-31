@@ -21,6 +21,7 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
+#include "attribute_array_copier.h"
 #include "metadata_keys.h"
 #include "parallel/blocked_range.h"
 #include "parallel/parallel_for.h"
@@ -29,6 +30,9 @@
 #include "primitive_validation.h"
 #include "selection.h"
 #include "string_cast.h"
+#include "triangulator.h"
+
+#include <boost/scoped_ptr.hpp>
 
 #include <functional>
 #include <iterator>
@@ -816,6 +820,176 @@ const bool_t is_collinear(const vector3& a, const vector3& b, const double_t Thr
 	return true;
 }
 
+///////////////////////////////////////////////////
+// create_triangles (taken from the triangulate_faces plugin, put here for sharing with CGAL module.
+
+class create_triangles :
+	public triangulator
+{
+	typedef triangulator base;
+
+public:
+	mesh::primitive* process(const mesh& Input, const const_primitive& Polyhedron, mesh& Output)
+	{
+		// Allocate new data structures for our output ...
+		input_polyhedron = &Polyhedron;
+
+		mesh::primitive* const result = new mesh::primitive();
+		output_polyhedron.reset(create(*result));
+
+		output_points = &Output.points.create(new mesh::points_t(*Input.points));
+		output_point_selection = &Output.point_selection.create(new mesh::selection_t(Input.points->size(), 0.0));
+
+		// Setup copying of attribute arrays ...
+		output_polyhedron->constant_data = input_polyhedron->constant_data;
+
+		output_polyhedron->uniform_data = input_polyhedron->uniform_data.clone_types();
+		uniform_data_copier.reset(new attribute_array_copier(input_polyhedron->uniform_data, output_polyhedron->uniform_data));
+
+		output_polyhedron->face_varying_data = input_polyhedron->face_varying_data.clone_types();
+		face_varying_data_copier.reset(new attribute_array_copier(input_polyhedron->face_varying_data, output_polyhedron->face_varying_data));
+
+		Output.vertex_data = Input.vertex_data.clone();
+		vertex_data_copier.reset(new attribute_array_copier(Input.vertex_data, Output.vertex_data));
+
+		// Create the output polyhedron ...
+		const uint_t face_begin = 0;
+		const uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
+		for(uint_t face = face_begin; face != face_end; ++face)
+		{
+			if(Polyhedron.face_selections[face])
+			{
+				base::process(
+					*Input.points,
+					Polyhedron.face_first_loops,
+					Polyhedron.face_loop_counts,
+					Polyhedron.loop_first_edges,
+					Polyhedron.edge_points,
+					Polyhedron.clockwise_edges,
+					face);
+			}
+			else
+			{
+				add_existing_face(face);
+			}
+		}
+
+		output_polyhedron->shell_first_faces.push_back(0);
+		output_polyhedron->shell_face_counts.push_back(output_polyhedron->face_first_loops.size());
+		output_polyhedron->shell_types.push_back(POLYGONS);
+
+		return result;
+	}
+	
+private:
+	void start_face(const uint_t Face)
+	{
+		current_face = Face;
+	}
+
+	void add_vertex(const point3& Coordinates, uint_t Vertices[4], uint_t Edges[4], double Weights[4], uint_t& NewVertex)
+	{
+		NewVertex = output_points->size();
+
+		output_points->push_back(Coordinates);
+		output_point_selection->push_back(0.0);
+
+		vertex_data_copier->push_back(4, Vertices, Weights);
+
+		new_face_varying_data[NewVertex] = new_face_varying_record(Edges, Weights);
+	}
+
+	void add_triangle(uint_t Vertices[3], uint_t Edges[3])
+	{
+		output_polyhedron->face_first_loops.push_back(output_polyhedron->loop_first_edges.size());
+		output_polyhedron->face_loop_counts.push_back(1);
+		output_polyhedron->face_selections.push_back(1.0);
+		output_polyhedron->face_materials.push_back(input_polyhedron->face_materials[current_face]);
+
+		uniform_data_copier->push_back(current_face);
+
+		output_polyhedron->loop_first_edges.push_back(output_polyhedron->edge_points.size());
+		output_polyhedron->edge_points.push_back(Vertices[0]);
+		output_polyhedron->edge_points.push_back(Vertices[1]);
+		output_polyhedron->edge_points.push_back(Vertices[2]);
+		output_polyhedron->clockwise_edges.push_back(output_polyhedron->edge_points.size() - 2);
+		output_polyhedron->clockwise_edges.push_back(output_polyhedron->edge_points.size() - 1);
+		output_polyhedron->clockwise_edges.push_back(output_polyhedron->edge_points.size() - 3);
+		output_polyhedron->edge_selections.push_back(0.0);
+		output_polyhedron->edge_selections.push_back(0.0);
+		output_polyhedron->edge_selections.push_back(0.0);
+
+		for(uint_t i = 0; i != 3; ++i)
+		{
+			if(new_face_varying_data.count(Vertices[i]))
+				face_varying_data_copier->push_back(4, new_face_varying_data[Vertices[i]].edges, new_face_varying_data[Vertices[i]].weights);
+			else
+				face_varying_data_copier->push_back(Edges[i]);
+		}
+	}
+
+	void add_existing_face(const uint_t Face)
+	{
+		output_polyhedron->face_first_loops.push_back(output_polyhedron->loop_first_edges.size());
+		output_polyhedron->face_loop_counts.push_back(input_polyhedron->face_loop_counts[Face]);
+		output_polyhedron->face_selections.push_back(0.0);
+		output_polyhedron->face_materials.push_back(input_polyhedron->face_materials[Face]);
+
+		uniform_data_copier->push_back(Face);
+
+		const uint_t loop_begin = input_polyhedron->face_first_loops[Face];
+		const uint_t loop_end = loop_begin + input_polyhedron->face_loop_counts[Face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			output_polyhedron->loop_first_edges.push_back(output_polyhedron->edge_points.size());
+
+			const uint_t first_edge = input_polyhedron->loop_first_edges[loop];
+			const uint_t edge_offset = output_polyhedron->edge_points.size() - first_edge;
+			for(uint_t edge = first_edge; ;)
+			{
+				output_polyhedron->edge_points.push_back(input_polyhedron->edge_points[edge]);
+				output_polyhedron->clockwise_edges.push_back(input_polyhedron->clockwise_edges[edge] + edge_offset);
+				output_polyhedron->edge_selections.push_back(0.0);
+				face_varying_data_copier->push_back(edge);
+
+				edge = input_polyhedron->clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+		}
+	}
+
+	const const_primitive* input_polyhedron;
+
+	mesh::points_t* output_points;
+	mesh::selection_t* output_point_selection;
+	boost::scoped_ptr<primitive> output_polyhedron;
+
+	boost::shared_ptr<attribute_array_copier> uniform_data_copier;
+	boost::shared_ptr<attribute_array_copier> face_varying_data_copier;
+	boost::shared_ptr<attribute_array_copier> vertex_data_copier;
+
+	uint_t current_face;
+
+	struct new_face_varying_record
+	{
+		new_face_varying_record()
+		{
+		}
+
+		new_face_varying_record(uint_t Edges[4], double_t Weights[4])
+		{
+			std::copy(Edges, Edges + 4, edges);
+			std::copy(Weights, Weights + 4, weights);
+		}
+
+		uint_t edges[4];
+		double_t weights[4];
+	};
+
+	std::map<uint_t, new_face_varying_record> new_face_varying_data;
+}; // class create_triangles
+
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -1025,6 +1199,14 @@ void mark_coplanar_edges(const mesh::indices_t& Companions,
 		if((!Normals[face].length()) || (std::abs((Normals[face] * Normals[companion_face]) - 1) < Threshold))
 			RedundantEdges.push_back(edge);
 	}
+}
+
+////////////////////////////////////////////
+// Triangulate
+
+mesh::primitive* triangulate(const mesh& Input, const const_primitive& Polyhedron, mesh& Output)
+{
+	return detail::create_triangles().process(Input, Polyhedron, Output);
 }
 
 } // namespace polyhedron
