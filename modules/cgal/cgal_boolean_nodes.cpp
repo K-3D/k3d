@@ -192,19 +192,22 @@ private:
 		{
 			if(Property->property_type() == typeid(k3d::mesh*))
 			{
-				const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(*Property));
-				return_if_fail(mesh);
-				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron;
-				for(k3d::mesh::primitives_t::const_iterator primitive = mesh->primitives.begin(); primitive != mesh->primitives.end(); ++primitive)
+				const k3d::mesh* const input_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(*Property));
+				return_if_fail(input_mesh);
+				// make a copy of the mesh, where we can alter the face selection so everything is selected
+				k3d::mesh mesh_all_faces_selected(*input_mesh);
+				boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron;
+				for(k3d::mesh::primitives_t::iterator primitive = mesh_all_faces_selected.primitives.begin(); primitive != mesh_all_faces_selected.primitives.end(); ++primitive)
 				{
 					// We only get the first polyhedron
-					polyhedron.reset(k3d::polyhedron::validate(**primitive));
+					polyhedron.reset(k3d::polyhedron::validate(primitive->writable()));
 					if(polyhedron.get())
 						break;
 				}
 				if(!polyhedron.get())
 					return;
 				return_if_fail(k3d::polyhedron::is_solid(*polyhedron));
+				polyhedron->face_selections.assign(polyhedron->face_selections.size(), 1.0);
 				
 				// First triangulate inputs
 				k3d::mesh triangulated_mesh;
@@ -213,7 +216,7 @@ private:
 				k3d::string_t sequence_string = k3d::string_cast(m_sequence++); 
 				
 				m_node.document().pipeline_profiler().start_execution(m_node, "Triangulate input " + sequence_string);
-				const k3d::mesh::primitive* triangulated_prim = k3d::polyhedron::triangulate(*mesh, *polyhedron, triangulated_mesh);
+				const k3d::mesh::primitive* triangulated_prim = k3d::polyhedron::triangulate(mesh_all_faces_selected, *polyhedron, triangulated_mesh);
 				boost::scoped_ptr<k3d::polyhedron::const_primitive> triangulated_polyhedron(k3d::polyhedron::validate(*triangulated_prim));
 				m_node.document().pipeline_profiler().finish_execution(m_node, "Triangulate input " + sequence_string);
 				
