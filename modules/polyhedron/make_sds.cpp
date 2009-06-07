@@ -32,7 +32,7 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ k3d::iplugin_factory& make_sds_factory()
 	return make_sds_implementation::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 

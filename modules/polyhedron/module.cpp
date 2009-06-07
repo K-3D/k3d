@@ -30,7 +30,11 @@ namespace polyhedron
 {
 
 extern k3d::iplugin_factory& bevel_points_factory();
+extern k3d::iplugin_factory& delete_components_factory();
 extern k3d::iplugin_factory& extrude_faces_factory();
+extern k3d::iplugin_factory& make_sds_factory();
+extern k3d::iplugin_factory& merge_collinear_edges_factory();
+extern k3d::iplugin_factory& merge_coplanar_faces_factory();
 extern k3d::iplugin_factory& triangulate_faces_factory();
 
 } // namespace polyhedron
@@ -39,7 +43,11 @@ extern k3d::iplugin_factory& triangulate_faces_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::polyhedron::bevel_points_factory());
+	Registry.register_factory(module::polyhedron::delete_components_factory());
 	Registry.register_factory(module::polyhedron::extrude_faces_factory());
+	Registry.register_factory(module::polyhedron::make_sds_factory());
+	Registry.register_factory(module::polyhedron::merge_collinear_edges_factory());
+	Registry.register_factory(module::polyhedron::merge_coplanar_faces_factory());
 	Registry.register_factory(module::polyhedron::triangulate_faces_factory());
 K3D_MODULE_END
 
