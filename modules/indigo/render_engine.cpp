@@ -21,6 +21,8 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
+#include "light.h"
+
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
 #include <k3dsdk/algebra.h>
@@ -279,20 +281,15 @@ private:
       stream << "</linear>\n";
       stream << "</tonemapping>\n";
 
-      // Setup a light
-      /** \todo Make this a separate light node */
-      stream <<
-        "<rectanglelight>"
-          "<pos>0.0 0 5</pos>"
-          "<width>1.0</width>"
-          "<height>1.0</height>"
-          "<spectrum>"
-            "<blackbody>"
-              "<temperature>6400</temperature>"
-              "<gain>0.0001</gain>"
-            "</blackbody>"
-          "</spectrum>"
-        "</rectanglelight>\n";
+      // Setup lights ...
+			const k3d::inode_collection_property::nodes_t enabled_lights = m_enabled_lights.pipeline_value();
+			for(k3d::inode_collection_property::nodes_t::const_iterator node = enabled_lights.begin(); node != enabled_lights.end(); ++node)
+			{
+				if(indigo::light* const light = dynamic_cast<indigo::light*>(*node))
+				{
+					light->setup(stream);
+				}
+			}
 
       // Setup a material
       /** \todo Make this a separate material node */
@@ -384,7 +381,7 @@ private:
 	public:
 		k3d::bool_t property_allow(k3d::inode& Node)
 		{
-			return true;
+			return dynamic_cast<indigo::light*>(&Node) ? true : false;
 		}
 
 	protected:

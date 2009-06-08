@@ -18,29 +18,28 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead <tshead@k-3d.com>
 */
 
-#include <k3dsdk/module.h>
+#include <iosfwd>
 
 namespace module
 {
 
-/// Namespace reserved for the indigo plugin module, to protect public symbols from name clashes with other modules
 namespace indigo
 {
 
-extern k3d::iplugin_factory& material_factory();
-extern k3d::iplugin_factory& rectangle_light_factory();
-extern k3d::iplugin_factory& render_engine_factory();
+/////////////////////////////////////////////////////////////////////////////
+// light
+
+/// Used to "flag" Indigo light objects
+class light
+{
+public:
+  virtual void setup(std::ostream& Stream) = 0;
+};
 
 } // namespace indigo
 
 } // namespace module
-
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::indigo::material_factory());
-	Registry.register_factory(module::indigo::rectangle_light_factory());
-	Registry.register_factory(module::indigo::render_engine_factory());
-K3D_MODULE_END
 
