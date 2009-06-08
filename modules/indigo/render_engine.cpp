@@ -91,7 +91,9 @@ public:
 		m_enabled_lights(init_owner(*this) + init_name("enabled_lights") + init_label(_("Enabled Lights")) + init_description(_("A list of light sources that will contribute to the rendered output.")) + init_value(std::vector<k3d::inode*>())),
 		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("Resolution")) + init_description(_("Choose a predefined image resolution")) + init_enumeration(k3d::resolution_values()) + init_value(k3d::string_t(""))),
 		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("pixel_width")) + init_description(_("The horizontal size in pixels of the rendered output image.")) + init_value(320) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
-		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("pixel_height")) + init_description(_("The vertical size in pixels of the rendered output image.")) + init_value(240) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1)))
+		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("pixel_height")) + init_description(_("The vertical size in pixels of the rendered output image.")) + init_value(240) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
+		m_halt_time(init_owner(*this) + init_name("halt_time") + init_label(_("Halt Time")) + init_description(_("Maximum rendering time in seconds.")) + init_value(30) + init_step_increment(1) + init_units(typeid(k3d::measurement::time))),
+		m_halt_samples(init_owner(*this) + init_name("halt_samples") + init_label(_("Halt Samples")) + init_description(_("Maximum number of samples-per-pixel.")) + init_value(100) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_resolution.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_resolution_changed));
 	}
@@ -370,7 +372,8 @@ private:
       stream << "<renderer_settings>\n";
       stream << "<width>" << pixel_width << "</width>\n";
       stream << "<height>" << pixel_height << "</height>\n";
-      stream << "<halt_time>" << "15" << "</halt_time>\n";
+      stream << "<halt_time>" << m_halt_time.pipeline_value() << "</halt_time>\n";
+      stream << "<halt_samples_per_pixel>" << m_halt_samples.pipeline_value() << "</halt_samples_per_pixel>\n";
       stream << "</renderer_settings>\n";
 
       // Setup the camera ...
@@ -526,6 +529,8 @@ private:
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_halt_time;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_halt_samples;
 };
 
 k3d::iplugin_factory& render_engine_factory()
