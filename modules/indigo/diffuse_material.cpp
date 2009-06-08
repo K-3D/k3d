@@ -21,6 +21,8 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
+#include "material.h"
+
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -37,24 +39,30 @@ namespace indigo
 /////////////////////////////////////////////////////////////////////////////
 // material
 
-class material :
+class diffuse_material :
 	public k3d::node ,
-	public k3d::imaterial
+  public indigo::material
 {
 	typedef k3d::node base;
 
 public:
-	material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	diffuse_material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Color")) + init_value(k3d::color(1, 1, 1))),
-		m_mass(init_owner(*this) + init_name("mass") + init_label(_("Mass")) + init_description(_("Mass")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::mass))),
-		m_r_value(init_owner(*this) + init_name("r_value") + init_label(_("R-Value")) + init_description(_("R-Value")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar)))
+		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Color")) + init_value(k3d::color(0.8, 0.8, 0.8)))
 	{
 	}
 
+  void setup(const k3d::string_t& Name, std::ostream& Stream)
+  {
+    Stream << "<material>\n";
+    Stream << "<name>" << Name << "</name>\n";
+    Stream << "<diffuse><colour>" << m_color.pipeline_value() << "</colour></diffuse>\n";
+    Stream << "</material>\n";
+  }
+
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<material,
+		static k3d::document_plugin_factory<diffuse_material,
 				k3d::interface_list<k3d::imaterial> > factory(
 			k3d::uuid(0x7fbdeb17, 0xce413e5d, 0x65f51688, 0xa789b421),
 			"IndigoMaterial",
@@ -67,13 +75,11 @@ public:
 
 private:
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_mass;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_r_value;
 };
 
-k3d::iplugin_factory& material_factory()
+k3d::iplugin_factory& diffuse_material_factory()
 {
-	return material::get_factory();
+	return diffuse_material::get_factory();
 }
 
 } // namespace indigo

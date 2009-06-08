@@ -1,3 +1,6 @@
+#ifndef MODULES_INDIGO_MATERIAL_H
+#define MODULES_INDIGO_MATERIAL_H
+
 // K-3D
 // Copyright (c) 1995-2009, Timothy M. Shead
 //
@@ -18,29 +21,34 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead <tshead@k-3d.com>
 */
 
-#include <k3dsdk/module.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/types.h>
+
+#include <iosfwd>
 
 namespace module
 {
 
-/// Namespace reserved for the indigo plugin module, to protect public symbols from name clashes with other modules
 namespace indigo
 {
 
-extern k3d::iplugin_factory& diffuse_material_factory();
-extern k3d::iplugin_factory& rectangle_light_factory();
-extern k3d::iplugin_factory& render_engine_factory();
+/////////////////////////////////////////////////////////////////////////////
+// material
+
+/// Used to "flag" Indigo material objects
+class material :
+  public k3d::imaterial
+{
+public:
+  virtual void setup(const k3d::string_t& Name, std::ostream& Stream) = 0;
+};
 
 } // namespace indigo
 
 } // namespace module
 
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::indigo::diffuse_material_factory());
-	Registry.register_factory(module::indigo::rectangle_light_factory());
-	Registry.register_factory(module::indigo::render_engine_factory());
-K3D_MODULE_END
+#endif // !MODULES_INDIGO_MATERIAL_H
 

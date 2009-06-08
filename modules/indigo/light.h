@@ -1,3 +1,6 @@
+#ifndef MODULES_INDIGO_LIGHT_H
+#define MODULES_INDIGO_LIGHT_H
+
 // K-3D
 // Copyright (c) 1995-2009, Timothy M. Shead
 //
@@ -43,3 +46,4 @@ public:
 
 } // namespace module
 
+#endif // !MODULES_INDIGO_LIGHT_H
