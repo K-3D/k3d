@@ -65,9 +65,9 @@ public:
 		static k3d::document_plugin_factory<diffuse_material,
 				k3d::interface_list<k3d::imaterial> > factory(
 			k3d::uuid(0x7fbdeb17, 0xce413e5d, 0x65f51688, 0xa789b421),
-			"IndigoMaterial",
-			_("Indigo Material"),
-			"Indigo Material",
+			"IndigoDiffuseMaterial",
+			_("Indigo Diffuse Material"),
+			"Indigo Diffuse Material",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

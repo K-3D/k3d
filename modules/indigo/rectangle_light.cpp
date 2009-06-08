@@ -121,8 +121,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<rectangle_light,
-				k3d::interface_list<k3d::imaterial> > factory(
+		static k3d::document_plugin_factory<rectangle_light> factory(
 			k3d::uuid(0xfe05aa8d, 0xcf485202, 0x82a460ba, 0xab3184a3),
 			"IndigoRectangleLight",
 			_("Indigo Rectangle Light"),
