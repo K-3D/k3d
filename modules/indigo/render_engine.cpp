@@ -125,7 +125,7 @@ public:
 		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
-		const k3d::filesystem::path output_image = frame.add_file("salida.tga");
+		const k3d::filesystem::path output_image = frame.add_file("output.png");
 
 		// Render it ...
 		return_val_if_fail(render(Camera, frame, output_image, true), false);
@@ -151,7 +151,7 @@ public:
 		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
-		const k3d::filesystem::path output_image = frame.add_file("salida.tga");
+		const k3d::filesystem::path output_image = frame.add_file("output.png");
 
 		// Render it ...
 		return_val_if_fail(render(Camera, frame, output_image, false), false);
@@ -190,7 +190,7 @@ public:
 			k3d::inetwork_render_frame& render_frame = job.create_frame(buffer.str());
 
 			// Create an output image path ...
-			const k3d::filesystem::path output_image = render_frame.add_file("salida.tga");
+			const k3d::filesystem::path output_image = render_frame.add_file("output.png");
 
 			// Render it (hidden rendering) ...
 			return_val_if_fail(render(Camera, render_frame, output_image, false), false);
@@ -233,14 +233,16 @@ private:
 			return_val_if_fail(!OutputImagePath.empty(), false);
 
 			// Start our indigo XML file ...
-			const k3d::filesystem::path filepath = Frame.add_file("world.igs");
-			k3d::filesystem::ofstream stream(filepath);
+			const k3d::filesystem::path scene_path = Frame.add_file("world.igs");
+			k3d::filesystem::ofstream stream(scene_path);
 			return_val_if_fail(stream.good(), false);
 
 			k3d::inetwork_render_frame::environment environment;
 
 			k3d::inetwork_render_frame::arguments arguments;
-			arguments.push_back(k3d::inetwork_render_frame::argument(filepath.native_filesystem_string()));
+			arguments.push_back(k3d::inetwork_render_frame::argument(scene_path.native_filesystem_string()));
+      arguments.push_back(k3d::inetwork_render_frame::argument("-o"));
+      arguments.push_back(k3d::inetwork_render_frame::argument(OutputImagePath.native_filesystem_string()));
 
 			Frame.add_exec_command("indigo_console", environment, arguments);
 
@@ -253,20 +255,20 @@ private:
       stream << "<renderer_settings>\n";
       stream << "<width>" << m_pixel_width.pipeline_value() << "</width>\n";
       stream << "<height>" << m_pixel_height.pipeline_value() << "</height>\n";
-      stream << "<halt_time>" << "5" << "</halt_time>\n";
+      stream << "<halt_time>" << "15" << "</halt_time>\n";
       stream << "</renderer_settings>\n";
 
       // Setup the camera ...
       stream << "<camera>\n";
       stream << "<pos>" << "0 -2 1" << "</pos>\n";
       stream << "<up>" << "0 0 1" << "</up>\n";
-      stream << "<forwards>" << "0 1 0" << "</forwards>\n";
-      stream << "<aperture_radius>" << "0.001" << "</aperture_radius>\n";
+      stream << "<forwards>" << "0 1 -0.2" << "</forwards>\n";
+      stream << "<aperture_radius>" << "0.0001" << "</aperture_radius>\n";
       stream << "<focus_distance>" << "3.0" << "</focus_distance>\n";
       stream << "<aspect_ratio>" << "1.33" << "</aspect_ratio>\n";
       stream << "<sensor_width>" << "0.036" << "</sensor_width>\n";
       stream << "<lens_sensor_dist>" << "0.02" << "</lens_sensor_dist>\n";
-      stream << "<white_balance>" << "E" << "</white_balance>\n";
+      stream << "<white_balance>" << "D65" << "</white_balance>\n";
       stream << "<autofocus/>\n";
       stream << "</camera>\n";
 
@@ -277,38 +279,60 @@ private:
       stream << "</linear>\n";
       stream << "</tonemapping>\n";
 
-      // Setup a skylight
+      // Setup a light
       /** \todo Make this a separate light node */
-      stream << "<skylight>\n";
-      stream << "<sundir>0 0.6 1</sundir>\n";
-      stream << "<turbidity>2</turbidity>\n"; 
-      stream << "</skylight>\n";
+      stream <<
+        "<rectanglelight>"
+          "<pos>0.0 0 5</pos>"
+          "<width>1.0</width>"
+          "<height>1.0</height>"
+          "<spectrum>"
+            "<blackbody>"
+              "<temperature>6400</temperature>"
+              "<gain>0.0001</gain>"
+            "</blackbody>"
+          "</spectrum>"
+        "</rectanglelight>\n";
 
       // Setup a material
       /** \todo Make this a separate material node */
-      stream << "<material>"
-      "<name>test_material</name>"
-      "<diffuse>"
-      "<base_emission>"
-      "<constant>"
-      "<rgb>"
-      "<rgb>"
-      "2000000000 2000000000 2000000000"
-      "</rgb>"
-      "<gamma>1</gamma>"
-      "</rgb>"
-      "</constant>"
-      "</base_emission>"
-      "</diffuse>"
-      "</material>\n";
+      stream <<
+        "<material>"
+          "<name>white</name>"
+          "<diffuse>"
+            "<colour>0.7 0.7 0.7</colour>"
+          "</diffuse>"
+        "</material>\n";
 
-      // Setup a sphere
+      // Setup a ground plane
       /** \todo Replace this with code to handle geometric primitives */
-      stream << "<sphere>\n";
-      stream << "<center>0 0 0</center>\n";
-      stream << "<radius>1</radius>\n";
-      stream << "<material_name>test_material</material_name>\n";
-      stream << "</sphere>\n";
+      stream <<
+        "<mesh>"
+          "<name>mesh1</name>"
+          "<normal_smoothing>false</normal_smoothing>"
+          "<embedded>"
+            "<expose_uv_set>"
+              "<index>0</index>"
+              "<name>albedo</name>"
+            "</expose_uv_set>"
+            "<vertex pos='-100 -100 0' normal='0 0 1' uv0='0 0' />"
+            "<vertex pos='-100 100 0' normal='0 0 1' uv0='0 10000' />"
+            "<vertex pos='100 100 0' normal='0 0 1' uv0='10000 10000' />"
+            "<vertex pos='100 -100 0' normal='0 0 1' uv0='10000 0' />"
+            "<triangle_set>"
+              "<material_name>white</material_name>"
+              "<tri>0 1 2</tri>"
+              "<tri>0 2 3</tri>"
+            "</triangle_set>"
+          "</embedded>"
+        "</mesh>\n";
+
+      stream <<
+        "<model>"
+          "<pos>0 0 0</pos>"
+          "<scale>1.0</scale>"
+          "<mesh_name>mesh1</mesh_name>"
+        "</model>\n";
 
 			// Finish the scene ...
 			stream << "</scene>\n";
