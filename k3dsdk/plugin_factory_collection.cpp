@@ -408,7 +408,10 @@ struct plugin_factory_collection::implementation
 
 				// Warn if we have duplicate names ...
 				if(std::count_if(m_factories.begin(), m_factories.end(), detail::same_name(factory_name)))
-					log() << warning << "Loading plugin with duplicate name " << factory_name << std::endl;
+				{
+					log() << error << "Plugin factory [" << plugin_factory_id << "] with duplicate name [" << factory_name << "] will not be loaded." << std::endl;
+					continue;
+				}
 
 				const std::string plugin_short_description = xml::element_text(*xml_plugin, "short_description");
 				const iplugin_factory::quality_t plugin_quality = xml::attribute_value<iplugin_factory::quality_t>(*xml_plugin, "quality", iplugin_factory::EXPERIMENTAL);
