@@ -163,11 +163,11 @@ void set_default_options(bool& Quit, bool& Error)
 	executable.resize(strlen(executable.c_str()));
 	const k3d::filesystem::path executable_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(executable)).branch_path();
 
-	g_default_ngui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/uiplugins/k3d-ngui.module");
-	g_default_nui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/uiplugins/k3d-nui.module");
+	g_default_ngui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-ngui.module");
+	g_default_nui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-nui.module");
 	g_default_plugin_paths = (executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins")).native_filesystem_string();
-	g_default_pyui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/uiplugins/k3d-pyui.module");
-	g_default_qtui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/uiplugins/k3d-qtui.module");
+	g_default_pyui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-pyui.module");
+	g_default_qtui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-qtui.module");
 	g_default_share_path = executable_path / k3d::filesystem::generic_path("../share/k3d");
 	g_default_user_interface_path = g_default_ngui_path;
 
@@ -176,11 +176,11 @@ void set_default_options(bool& Quit, bool& Error)
 
 #else // K3D_API_WIN32
 
-	g_default_ngui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("uiplugins/k3d-ngui.module");
-	g_default_nui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("uiplugins/k3d-nui.module");
+	g_default_ngui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins/k3d-ngui.module");
+	g_default_nui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins/k3d-nui.module");
 	g_default_plugin_paths = (k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins")).native_filesystem_string();
-	g_default_pyui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("uiplugins/k3d-pyui.module");
-	g_default_qtui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("uiplugins/k3d-qtui.module");
+	g_default_pyui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins/k3d-pyui.module");
+	g_default_qtui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins/k3d-qtui.module");
 	g_default_share_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGDATADIR));
 	g_default_user_interface_path = g_default_ngui_path;
 
