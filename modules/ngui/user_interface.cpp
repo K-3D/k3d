@@ -536,7 +536,7 @@ public:
 		static k3d::application_plugin_factory<user_interface,
 			k3d::interface_list<k3d::ievent_loop> > factory(
 				k3d::uuid(0x444fbabf, 0x08164c85, 0x879751e7, 0x2d6d05b5),
-				"NextGenerationUI",
+				"NGUI",
 				"Next Generation User Interface (NGUI)",
 				"Interface");
 

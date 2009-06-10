@@ -137,8 +137,8 @@ public:
 	{
 		static k3d::application_plugin_factory<user_interface,
 			k3d::interface_list<k3d::ievent_loop> > factory(
-			k3d::uuid(0x787f0380, 0x4aae4185, 0xb1611140, 0xaa1f5d79),
-			"NullUI",
+			k3d::uuid(0xe6ade3f1, 0x484ce7b1, 0x1c118cb2, 0x9a3da138),
+			"NUI",
 			"Null User Interface (NUI)",
 			"Interface");
 

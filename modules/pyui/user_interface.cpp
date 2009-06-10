@@ -168,8 +168,8 @@ public:
 		static k3d::application_plugin_factory<user_interface,
 			k3d::interface_list<k3d::ievent_loop> > factory(
 			k3d::uuid(0x337facd7, 0xbd1645b6, 0x86957382, 0xcb2d53cb),
-			"NullUI",
-			"Null User Interface (NUI)",
+			"PyUI",
+			"Python User Interface (PyUI)",
 			"Interface");
 
 		return factory;

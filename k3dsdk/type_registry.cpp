@@ -34,6 +34,7 @@
 #include "idocument_exporter.h"
 #include "idocument_importer.h"
 #include "idouble_source.h"
+#include "ievent_loop.h"
 #include "ifile_change_notifier.h"
 #include "iimager_shader_ri.h"
 #include "iint32_source.h"
@@ -180,6 +181,7 @@ void initialize_types()
 	register_type(typeid(k3d::idocument_exporter), "k3d::idocument_exporter");
 	register_type(typeid(k3d::idocument_importer), "k3d::idocument_importer");
 	register_type(typeid(k3d::idouble_source), "k3d::idouble_source");
+	register_type(typeid(k3d::ievent_loop), "k3d::ievent_loop");
 	register_type(typeid(k3d::ifile_change_notifier), "k3d::ifile_change_notifier");
 	register_type(typeid(k3d::iint32_source), "k3d::iint32_source");
 	register_type(typeid(k3d::ikeyframer), "k3d::ikeyframer");
