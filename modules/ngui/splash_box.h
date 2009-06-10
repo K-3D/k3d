@@ -1,5 +1,5 @@
-#ifndef UIMODULES_NGUI_SPLASH_BOX_H
-#define UIMODULES_NGUI_SPLASH_BOX_H
+#ifndef MODULES_NGUI_SPLASH_BOX_H
+#define MODULES_NGUI_SPLASH_BOX_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -57,5 +57,5 @@ private:
 
 } // namespace module
 
-#endif // !UIMODULES_NGUI_SPLASH_BOX_H
+#endif // !MODULES_NGUI_SPLASH_BOX_H
 
