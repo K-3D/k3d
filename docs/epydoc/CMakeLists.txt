@@ -1,6 +1,6 @@
 PROJECT(epydoc)
 
-SET(K3D_NUI_BINARY ${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/uiplugins/k3d-nui.module)
+SET(K3D_NUI_BINARY ${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-nui.module)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/make-epydoc-docs.py ${CMAKE_CURRENT_BINARY_DIR}/make-epydoc-docs.py)
 

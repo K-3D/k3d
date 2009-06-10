@@ -30,7 +30,7 @@ export "PANGO_RC_FILE=$K3D_PANGO_RC_FILE"
 export "PATH=$K3D_RESOURCES/bin:$PATH"
 
 #export
-exec "$K3D_RESOURCES/bin/k3d" "--log-level=debug" "--plugins=$K3D_RESOURCES/lib/k3d/plugins" "--share=$K3D_RESOURCES/share/k3d" "--ui=$K3D_RESOURCES/lib/k3d/uiplugins/k3d-ngui.module"
+exec "$K3D_RESOURCES/bin/k3d" "--log-level=debug" "--plugins=$K3D_RESOURCES/lib/k3d/plugins" "--share=$K3D_RESOURCES/share/k3d" "--ui=$K3D_RESOURCES/lib/k3d/plugins/k3d-ngui.module"
 
 echo "K-3D: Finishing $0"
 
