@@ -291,7 +291,7 @@ private:
 		k3d::uint_t m_current_face;
 	};
 
-	void render_mesh(std::map<k3d::imaterial*, k3d::string_t>& MaterialNames, const k3d::string_t& Name, const k3d::mesh& Mesh, std::ostream& Stream)
+	void render_mesh(std::map<k3d::imaterial*, k3d::string_t>& MaterialNames, const k3d::string_t& Name, k3d::inode& MeshInstance, const k3d::mesh& Mesh, std::ostream& Stream)
 	{
     Stream << "<mesh>\n";
     Stream << "<name>" << Name << "</name>\n";
@@ -316,8 +316,12 @@ private:
       create_triangles(polyhedron->face_materials, points, a_points, b_points, c_points, materials, used_materials).process(Mesh, *polyhedron);
     }
 
-    for(k3d::uint_t i = 0; i != points.size(); ++i)
-      Stream << "<vertex pos=\"" << -points[i][0] << " " << points[i][1] << " " << points[i][2] << "\"/>\n";
+    const k3d::matrix4 matrix = k3d::node_to_world_matrix(MeshInstance);
+    for(k3d::mesh::points_t::const_iterator point = points.begin(); point != points.end(); ++point)
+    {
+      const k3d::point3 pos = matrix * (*point);
+      Stream << "<vertex pos=\"" << -pos[0] << " " << pos[1] << " " << pos[2] << "\"/>\n";
+    }
 
     for(std::set<k3d::imaterial*>::const_iterator material = used_materials.begin(); material != used_materials.end(); ++material)
     {
@@ -337,6 +341,12 @@ private:
 
     Stream << "</embedded>\n";
     Stream << "</mesh>\n";
+
+    Stream << "<model>\n";
+    Stream << "<pos>" << "0 0 0" << "</pos>\n";
+    Stream << "<scale>" << "1" << "</scale>\n";
+    Stream << "<mesh_name>" << Name << "</mesh_name>\n";
+    Stream << "</model>\n";
 	}
 
 	k3d::bool_t render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath, const k3d::bool_t VisibleRender)
@@ -431,7 +441,7 @@ private:
         dynamic_cast<indigo::material*>(*material)->setup(material_name, stream);
         }
 
-      // Setup geometry ...
+      // Render geometry ...
       std::map<const k3d::mesh*, k3d::string_t> mesh_names;
 			const k3d::inode_collection_property::nodes_t visible_nodes = m_visible_nodes.pipeline_value();
 			for(k3d::inode_collection_property::nodes_t::const_iterator node = visible_nodes.begin(); node != visible_nodes.end(); ++node)
@@ -449,24 +459,7 @@ private:
 				const k3d::string_t mesh_name = "mesh_" + k3d::string_cast(mesh_names.size());
 				mesh_names.insert(std::make_pair(mesh, mesh_name));
 
-        render_mesh(material_names, mesh_name, *mesh, stream);
-			}
-
-      // Setup geometry instances ...
-			for(k3d::inode_collection_property::nodes_t::const_iterator node = visible_nodes.begin(); node != visible_nodes.end(); ++node)
-			{
-				if((*node)->factory().factory_id() != k3d::classes::MeshInstance())
-          continue;
-
-        const k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(**node, "output_mesh");
-        if(!mesh)
-          continue;
-
-        stream << "<model>\n";
-        stream << "<pos>" << k3d::world_position(**node) << "</pos>\n";
-        stream << "<scale>" << "1" << "</scale>\n";
-        stream << "<mesh_name>" << mesh_names[mesh] << "</mesh_name>\n";
-        stream << "</model>\n";
+        render_mesh(material_names, mesh_name, **node, *mesh, stream);
 			}
 
 			// Finish the scene ...
