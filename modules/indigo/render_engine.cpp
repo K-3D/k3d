@@ -83,7 +83,7 @@ class render_engine :
 	public k3d::irender_camera_animation
 {
 	typedef k3d::node base;
-
+// initialise properties
 public:
 	render_engine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
@@ -355,6 +355,7 @@ private:
 			k3d::inetwork_render_frame::environment environment;
 
 			k3d::inetwork_render_frame::arguments arguments;
+ //     arguments.push_back(k3d::inetwork_render_frame::argument("-n m"));
 			arguments.push_back(k3d::inetwork_render_frame::argument(scene_path.native_filesystem_string()));
       arguments.push_back(k3d::inetwork_render_frame::argument("-o"));
       arguments.push_back(k3d::inetwork_render_frame::argument(OutputImagePath.native_filesystem_string()));
@@ -389,7 +390,7 @@ private:
       stream << "<pos>" << -camera_pos[0] << " " << camera_pos[1] << " " << camera_pos[2] << "</pos>\n";
       stream << "<up>" << -camera_up[0] << " " << camera_up[1] << " " << camera_up[2] << "</up>\n";
       stream << "<forwards>" << -camera_forwards[0] << " " << camera_forwards[1] << " " << camera_forwards[2] << "</forwards>\n";
-      stream << "<aperture_radius>" << "0.0001" << "</aperture_radius>\n";
+      stream << "<aperture_radius>" << "0.001" << "</aperture_radius>\n";
       stream << "<focus_distance>" << "3.0" << "</focus_distance>\n";
       stream << "<aspect_ratio>" << static_cast<k3d::double_t>(pixel_width) / static_cast<k3d::double_t>(pixel_height) << "</aspect_ratio>\n";
       stream << "<sensor_width>" << camera_width << "</sensor_width>\n";
@@ -400,9 +401,14 @@ private:
 
       // Setup tonemapping ...
       stream << "<tonemapping>\n";
-      stream << "<linear>\n";
-      stream << "<scale>" << "1.0" << "</scale>\n";
-      stream << "</linear>\n";
+//      stream << "<linear>\n";
+//     stream << "<scale>" << "1.0" << "</scale>\n";
+//      stream << "</linear>\n";
+      stream << "<reinhard>\n";
+      stream << "<pre_scale>" << "6.0" << "</pre_scale>\n";
+      stream << "<post_scale>" << "1.0" << "</post_scale>\n";
+      stream << "<burn>" << "6.0" << "</burn>\n";
+      stream << "</reinhard>\n";
       stream << "</tonemapping>\n";
 
       // Setup lights ...
@@ -523,7 +529,7 @@ private:
 		{
 		}
 	};
-
+// define properties
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, indigo_visible_nodes_property, node_collection_serialization) m_visible_nodes;
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, indigo_enabled_lights_property, node_collection_serialization) m_enabled_lights;
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
