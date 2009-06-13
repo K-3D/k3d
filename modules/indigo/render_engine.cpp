@@ -242,21 +242,23 @@ private:
 
 	public:
 		create_triangles(
-      const k3d::mesh::materials_t& OriginalMaterials,
-      k3d::mesh::points_t& Points,
-      k3d::mesh::indices_t& APoints,
-      k3d::mesh::indices_t& BPoints,
-      k3d::mesh::indices_t& CPoints,
-      k3d::mesh::materials_t& Materials,
-      std::set<k3d::imaterial*>& UsedMaterials) :
-			m_original_materials(OriginalMaterials),
+			const k3d::mesh::materials_t& FaceMaterials,
+			k3d::mesh::points_t& Points,
+			k3d::mesh::indices_t& APoints,
+			k3d::mesh::indices_t& BPoints,
+			k3d::mesh::indices_t& CPoints,
+			std::vector<indigo::material*>& TriangleMaterials,
+			std::set<indigo::material*>& MaterialList) :
 			m_points(Points),
 			m_a_points(APoints),
 			m_b_points(BPoints),
 			m_c_points(CPoints),
-			m_materials(Materials),
-      m_used_materials(UsedMaterials)
+			m_triangle_materials(TriangleMaterials),
+			m_material_list(MaterialList)
 		{
+			m_face_materials.resize(FaceMaterials.size());
+			for(k3d::uint_t i = 0; i != FaceMaterials.size(); ++i)
+				m_face_materials[i] = k3d::material::lookup<indigo::material>(FaceMaterials[i]);
 		}
 
 	private:
@@ -276,86 +278,92 @@ private:
 			m_a_points.push_back(Vertices[0]);
 			m_b_points.push_back(Vertices[1]);
 			m_c_points.push_back(Vertices[2]);
-			m_materials.push_back(m_original_materials[m_current_face]);
-      m_used_materials.insert(m_original_materials[m_current_face]);
+			m_triangle_materials.push_back(m_face_materials[m_current_face]);
+			m_material_list.insert(m_face_materials[m_current_face]);
 		}
 
-		const k3d::mesh::materials_t& m_original_materials;
+		std::vector<indigo::material*> m_face_materials;
 		k3d::mesh::points_t& m_points;
 		k3d::mesh::indices_t& m_a_points;
 		k3d::mesh::indices_t& m_b_points;
 		k3d::mesh::indices_t& m_c_points;
-		k3d::mesh::materials_t& m_materials;
-    std::set<k3d::imaterial*>& m_used_materials;
+		std::vector<indigo::material*>& m_triangle_materials;
+		std::set<indigo::material*>& m_material_list;
 
 		k3d::uint_t m_current_face;
 	};
 
-	void render_mesh(std::map<k3d::imaterial*, k3d::string_t>& MaterialNames, const k3d::string_t& Name, k3d::inode& MeshInstance, const k3d::mesh& Mesh, std::ostream& Stream)
+	void render_mesh(std::map<indigo::material*, k3d::string_t>& MaterialNames, const k3d::string_t& Name, k3d::inode& MeshInstance, const k3d::mesh& Mesh, std::ostream& Stream)
 	{
-    Stream << "<mesh>\n";
-    Stream << "<name>" << Name << "</name>\n";
-    Stream << "<normal_smoothing>false</normal_smoothing>\n";
-    Stream << "<embedded>\n";
+		Stream << "<mesh>\n";
+		Stream << "<name>" << Name << "</name>\n";
+		Stream << "<normal_smoothing>false</normal_smoothing>\n";
+		Stream << "<embedded>\n";
 
-    std::set<k3d::imaterial*> used_materials;
+		std::set<indigo::material*> material_list;
 
-    k3d::mesh::points_t points(*Mesh.points);
-    k3d::mesh::materials_t materials;
-    k3d::mesh::indices_t a_points;
-    k3d::mesh::indices_t b_points;
-    k3d::mesh::indices_t c_points;
+		k3d::mesh::points_t points(*Mesh.points);
+		k3d::mesh::indices_t a_points;
+		k3d::mesh::indices_t b_points;
+		k3d::mesh::indices_t c_points;
+		std::vector<indigo::material*> triangle_materials;
 
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
-      if(!polyhedron)
-        continue;
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(!polyhedron)
+				continue;
 
-      // Triangulate the mesh faces ...
-      create_triangles(polyhedron->face_materials, points, a_points, b_points, c_points, materials, used_materials).process(Mesh, *polyhedron);
-    }
+			// Triangulate the mesh faces ...
+			create_triangles(polyhedron->face_materials, points, a_points, b_points, c_points, triangle_materials, material_list).process(Mesh, *polyhedron);
+		}
 
-    const k3d::matrix4 matrix = k3d::node_to_world_matrix(MeshInstance);
-    for(k3d::mesh::points_t::const_iterator point = points.begin(); point != points.end(); ++point)
-    {
-      const k3d::point3 pos = matrix * (*point);
-      Stream << "<vertex pos=\"" << -pos[0] << " " << pos[1] << " " << pos[2] << "\"/>\n";
-    }
+		const k3d::matrix4 matrix = k3d::node_to_world_matrix(MeshInstance);
+		for(k3d::mesh::points_t::const_iterator point = points.begin(); point != points.end(); ++point)
+		{
+			const k3d::point3 pos = matrix * (*point);
+			Stream << "<vertex pos=\"" << -pos[0] << " " << pos[1] << " " << pos[2] << "\"/>\n";
+		}
 
-    for(std::set<k3d::imaterial*>::const_iterator material = used_materials.begin(); material != used_materials.end(); ++material)
-    {
-      Stream << "<triangle_set>\n";
-      Stream << "<material_name>" << MaterialNames[*material] << "</material_name>\n";
-      const k3d::uint_t begin = 0;
-      const k3d::uint_t end = begin + materials.size();
-      for(k3d::uint_t i = begin; i != end; ++i)
-        {
-        if(materials[i] != *material)
-          continue;
+		for(std::set<indigo::material*>::const_iterator material = material_list.begin(); material != material_list.end(); ++material)
+		{
+			if(0 == *material)
+			{
+				k3d::log() << warning << "Geometry without an Indigo material will not be rendered." << std::endl;
+				continue;
+			}
+	
+			Stream << "<triangle_set>\n";
+			Stream << "<material_name>" << MaterialNames[*material] << "</material_name>\n";
+			const k3d::uint_t begin = 0;
+			const k3d::uint_t end = begin + triangle_materials.size();
+			for(k3d::uint_t i = begin; i != end; ++i)
+			{
+				if(triangle_materials[i] != *material)
+					continue;
 
-        Stream << "<tri>" << a_points[i] << " " << b_points[i] << " " << c_points[i] << "</tri>\n";
-        }
-      Stream << "</triangle_set>\n";
-    }
+				Stream << "<tri>" << a_points[i] << " " << b_points[i] << " " << c_points[i] << "</tri>\n";
+			}
+			Stream << "</triangle_set>\n";
+		}
 
-    Stream << "</embedded>\n";
-    Stream << "</mesh>\n";
+		Stream << "</embedded>\n";
+		Stream << "</mesh>\n";
 
-    Stream << "<model>\n";
-    Stream << "<pos>" << "0 0 0" << "</pos>\n";
-    Stream << "<scale>" << "1" << "</scale>\n";
-    Stream << "<mesh_name>" << Name << "</mesh_name>\n";
-    Stream << "</model>\n";
+		Stream << "<model>\n";
+		Stream << "<pos>" << "0 0 0" << "</pos>\n";
+		Stream << "<scale>" << "1" << "</scale>\n";
+		Stream << "<mesh_name>" << Name << "</mesh_name>\n";
+		Stream << "</model>\n";
 	}
 
 	k3d::bool_t render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath, const k3d::bool_t VisibleRender)
 	{
 		try
 		{
-      k3d::iperspective* const projection = dynamic_cast<k3d::iperspective*>(&Camera.projection());
-      if(!projection)
-        throw std::runtime_error("A perspective projection is required.");
+			k3d::iperspective* const projection = dynamic_cast<k3d::iperspective*>(&Camera.projection());
+			if(!projection)
+				throw std::runtime_error("A perspective projection is required.");
 
 			// Start our indigo XML file ...
 			const k3d::filesystem::path scene_path = Frame.add_file("world.igs");
@@ -365,63 +373,63 @@ private:
 			k3d::inetwork_render_frame::environment environment;
 
 			k3d::inetwork_render_frame::arguments arguments;
- //     arguments.push_back(k3d::inetwork_render_frame::argument("-n m"));
+			//     arguments.push_back(k3d::inetwork_render_frame::argument("-n m"));
 			arguments.push_back(k3d::inetwork_render_frame::argument(scene_path.native_filesystem_string()));
-      arguments.push_back(k3d::inetwork_render_frame::argument("-o"));
-      arguments.push_back(k3d::inetwork_render_frame::argument(OutputImagePath.native_filesystem_string()));
+			arguments.push_back(k3d::inetwork_render_frame::argument("-o"));
+			arguments.push_back(k3d::inetwork_render_frame::argument(OutputImagePath.native_filesystem_string()));
 
 			Frame.add_exec_command("indigo_console", environment, arguments);
 
 			// Setup the scene description ...
-      stream << k3d::xml::declaration();
+			stream << k3d::xml::declaration();
 			stream << "<!-- Indigo scene generated by K-3D Version " K3D_VERSION ", http://www.k-3d.org -->\n";
 			stream << "<scene>\n";
 
-      // Set renderer options ...
-      const k3d::int32_t pixel_width = m_pixel_width.pipeline_value();
-      const k3d::int32_t pixel_height = m_pixel_height.pipeline_value();
-      stream << "<renderer_settings>\n";
-      stream << "<width>" << pixel_width << "</width>\n";
-      stream << "<height>" << pixel_height << "</height>\n";
-      stream << "<halt_time>" << m_halt_time.pipeline_value() << "</halt_time>\n";
-      stream << "<halt_samples_per_pixel>" << m_halt_samples.pipeline_value() << "</halt_samples_per_pixel>\n";
-      stream << "</renderer_settings>\n";
+			// Set renderer options ...
+			const k3d::int32_t pixel_width = m_pixel_width.pipeline_value();
+			const k3d::int32_t pixel_height = m_pixel_height.pipeline_value();
+			stream << "<renderer_settings>\n";
+			stream << "<width>" << pixel_width << "</width>\n";
+			stream << "<height>" << pixel_height << "</height>\n";
+			stream << "<halt_time>" << m_halt_time.pipeline_value() << "</halt_time>\n";
+			stream << "<halt_samples_per_pixel>" << m_halt_samples.pipeline_value() << "</halt_samples_per_pixel>\n";
+			stream << "</renderer_settings>\n";
 
-      // Setup the camera ...
+			// Setup the camera ...
 			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output());
-      const k3d::point3 camera_pos = k3d::position(camera_matrix);
-      const k3d::vector3 camera_up = camera_matrix * k3d::vector3(0, 1, 0);
-      const k3d::vector3 camera_forwards = camera_matrix * k3d::vector3(0, 0, 1);
+			const k3d::point3 camera_pos = k3d::position(camera_matrix);
+			const k3d::vector3 camera_up = camera_matrix * k3d::vector3(0, 1, 0);
+			const k3d::vector3 camera_forwards = camera_matrix * k3d::vector3(0, 0, 1);
 
-      const k3d::double_t camera_near = k3d::property::pipeline_value<k3d::double_t>(projection->near());
-      const k3d::double_t camera_width = std::abs(k3d::property::pipeline_value<k3d::double_t>(projection->left()) - k3d::property::pipeline_value<k3d::double_t>(projection->right()));
+			const k3d::double_t camera_near = k3d::property::pipeline_value<k3d::double_t>(projection->near());
+			const k3d::double_t camera_width = std::abs(k3d::property::pipeline_value<k3d::double_t>(projection->left()) - k3d::property::pipeline_value<k3d::double_t>(projection->right()));
 
-      stream << "<camera>\n";
-      stream << "<pos>" << -camera_pos[0] << " " << camera_pos[1] << " " << camera_pos[2] << "</pos>\n";
-      stream << "<up>" << -camera_up[0] << " " << camera_up[1] << " " << camera_up[2] << "</up>\n";
-      stream << "<forwards>" << -camera_forwards[0] << " " << camera_forwards[1] << " " << camera_forwards[2] << "</forwards>\n";
-      stream << "<aperture_radius>" << "0.001" << "</aperture_radius>\n";
-      stream << "<focus_distance>" << "3.0" << "</focus_distance>\n";
-      stream << "<aspect_ratio>" << static_cast<k3d::double_t>(pixel_width) / static_cast<k3d::double_t>(pixel_height) << "</aspect_ratio>\n";
-      stream << "<sensor_width>" << camera_width << "</sensor_width>\n";
-      stream << "<lens_sensor_dist>" << camera_near << "</lens_sensor_dist>\n";
-      stream << "<white_balance>" << "D65" << "</white_balance>\n";
-      stream << "<autofocus/>\n";
-      stream << "</camera>\n";
+			stream << "<camera>\n";
+			stream << "<pos>" << -camera_pos[0] << " " << camera_pos[1] << " " << camera_pos[2] << "</pos>\n";
+			stream << "<up>" << -camera_up[0] << " " << camera_up[1] << " " << camera_up[2] << "</up>\n";
+			stream << "<forwards>" << -camera_forwards[0] << " " << camera_forwards[1] << " " << camera_forwards[2] << "</forwards>\n";
+			stream << "<aperture_radius>" << "0.001" << "</aperture_radius>\n";
+			stream << "<focus_distance>" << "3.0" << "</focus_distance>\n";
+			stream << "<aspect_ratio>" << static_cast<k3d::double_t>(pixel_width) / static_cast<k3d::double_t>(pixel_height) << "</aspect_ratio>\n";
+			stream << "<sensor_width>" << camera_width << "</sensor_width>\n";
+			stream << "<lens_sensor_dist>" << camera_near << "</lens_sensor_dist>\n";
+			stream << "<white_balance>" << "D65" << "</white_balance>\n";
+			stream << "<autofocus/>\n";
+			stream << "</camera>\n";
 
-      // Setup tonemapping ...
-      stream << "<tonemapping>\n";
-//      stream << "<linear>\n";
-//     stream << "<scale>" << "1.0" << "</scale>\n";
-//      stream << "</linear>\n";
-      stream << "<reinhard>\n";
-      stream << "<pre_scale>" << "6.0" << "</pre_scale>\n";
-      stream << "<post_scale>" << "1.0" << "</post_scale>\n";
-      stream << "<burn>" << "6.0" << "</burn>\n";
-      stream << "</reinhard>\n";
-      stream << "</tonemapping>\n";
+			// Setup tonemapping ...
+			stream << "<tonemapping>\n";
+			//      stream << "<linear>\n";
+			//     stream << "<scale>" << "1.0" << "</scale>\n";
+			//      stream << "</linear>\n";
+			stream << "<reinhard>\n";
+			stream << "<pre_scale>" << "6.0" << "</pre_scale>\n";
+			stream << "<post_scale>" << "1.0" << "</post_scale>\n";
+			stream << "<burn>" << "6.0" << "</burn>\n";
+			stream << "</reinhard>\n";
+			stream << "</tonemapping>\n";
 
-      // Setup lights ...
+			// Setup lights ...
 			const k3d::inode_collection_property::nodes_t enabled_lights = m_enabled_lights.pipeline_value();
 			for(k3d::inode_collection_property::nodes_t::const_iterator node = enabled_lights.begin(); node != enabled_lights.end(); ++node)
 			{
@@ -431,35 +439,31 @@ private:
 				}
 			}
 
-      // Setup materials, assigning unique names as-we-go ...
-      std::map<k3d::imaterial*, k3d::string_t> material_names;
-      const k3d::nodes_t materials = k3d::find_nodes<indigo::material>(document().nodes());
-      for(k3d::nodes_t::const_iterator material = materials.begin(); material != materials.end(); ++material)
-        {
-        const k3d::string_t material_name = "material_" + k3d::string_cast(material_names.size());
-        material_names.insert(std::make_pair(dynamic_cast<k3d::imaterial*>(*material), material_name));
-        dynamic_cast<indigo::material*>(*material)->setup(material_name, stream);
-        }
+			// Setup materials, assigning unique names as-we-go ...
+			std::map<indigo::material*, k3d::string_t> material_names;
+			const std::vector<indigo::material*> materials = k3d::node::lookup<indigo::material>(document());
+			for(k3d::uint_t i = 0; i != materials.size(); ++i)
+			{
+				const k3d::string_t material_name = "material_" + k3d::string_cast(material_names.size());
+				material_names.insert(std::make_pair(materials[i], material_name));
+				materials[i]->setup(material_name, stream);
+			}
 
-      // Render geometry ...
-      std::map<const k3d::mesh*, k3d::string_t> mesh_names;
+			// Render geometry ...
+			k3d::uint_t mesh_index = 0;
 			const k3d::inode_collection_property::nodes_t visible_nodes = m_visible_nodes.pipeline_value();
 			for(k3d::inode_collection_property::nodes_t::const_iterator node = visible_nodes.begin(); node != visible_nodes.end(); ++node)
 			{
 				if((*node)->factory().factory_id() != k3d::classes::MeshInstance())
-          continue;
+					continue;
 
-        const k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(**node, "output_mesh");
-        if(!mesh)
-          continue;
+				const k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(**node, "output_mesh");
+				if(!mesh)
+					continue;
 
-        if(mesh_names.count(mesh))
-          continue;
+				const k3d::string_t mesh_name = "mesh_" + k3d::string_cast(mesh_index++);
 
-				const k3d::string_t mesh_name = "mesh_" + k3d::string_cast(mesh_names.size());
-				mesh_names.insert(std::make_pair(mesh, mesh_name));
-
-        render_mesh(material_names, mesh_name, **node, *mesh, stream);
+				render_mesh(material_names, mesh_name, **node, *mesh, stream);
 			}
 
 			// Finish the scene ...
@@ -522,6 +526,7 @@ private:
 		{
 		}
 	};
+
 // define properties
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, indigo_visible_nodes_property, node_collection_serialization) m_visible_nodes;
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, indigo_enabled_lights_property, node_collection_serialization) m_enabled_lights;
