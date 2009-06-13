@@ -120,7 +120,7 @@ public:
 			k3d::uuid(0xfe05aa8d, 0xcf485202, 0x82a460ba, 0xab3184a3),
 			"IndigoRectangleLight",
 			_("Indigo Rectangle Light"),
-			"Indigo Rectangle Light",
+			"Indigo Light",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
