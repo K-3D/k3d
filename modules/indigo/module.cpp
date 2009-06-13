@@ -33,6 +33,7 @@ namespace indigo
 extern k3d::iplugin_factory& diffuse_material_factory();
 extern k3d::iplugin_factory& rectangle_light_factory();
 extern k3d::iplugin_factory& render_engine_factory();
+extern k3d::iplugin_factory& skylight_factory();
 
 } // namespace indigo
 
@@ -42,5 +43,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::indigo::diffuse_material_factory());
 	Registry.register_factory(module::indigo::rectangle_light_factory());
 	Registry.register_factory(module::indigo::render_engine_factory());
+	Registry.register_factory(module::indigo::skylight_factory());
 K3D_MODULE_END
 
