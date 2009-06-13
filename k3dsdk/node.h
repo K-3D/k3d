@@ -2,7 +2,7 @@
 #define K3DSDK_NODE_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -27,6 +27,7 @@
 #include "data.h"
 #include "idocument.h"
 #include "inode.h"
+#include "inode_collection.h"
 #include "ipersistent.h"
 #include "metadata.h"
 #include "persistent_property_collection.h"
@@ -62,6 +63,20 @@ public:
 	void save(xml::element& Element, const ipersistent::save_context& Context);
 	void load(xml::element& Element, const ipersistent::load_context& Context);
 
+	/// Returns the set of nodes that implement the requested interface type (could return an empty set).
+	template<typename interface_t>
+	static const std::vector<interface_t*> lookup(idocument& Document)
+	{
+		std::vector<interface_t*> result;
+		const inode_collection::nodes_t::const_iterator end(Document.nodes().collection().end());
+		for(inode_collection::nodes_t::const_iterator node = Document.nodes().collection().begin(); node != end; ++node)
+		{
+			if(interface_t* const requested = dynamic_cast<interface_t*>(*node))
+				result.push_back(requested);
+		}
+		return result;
+	}
+	
 private:
 	void on_deleted();
 

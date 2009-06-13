@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "uuid.h"
@@ -49,18 +49,23 @@ class inode_collection_sink;
 typedef inode_collection::nodes_t nodes_t;
 
 /// Returns the node that matches the given name (returns NULL if no node matches or if more-than-one node matches)
+/** \deprecated Use methods in k3d::node instead */
 inode* find_node(inode_collection& Nodes, const std::string& NodeName);
 
 /// Returns the node that owns the given property (could return NULL)
+/** \deprecated Use methods in k3d::node instead */
 inode* find_node(inode_collection& Nodes, iproperty& Property);
 
 /// Returns the set of nodes that match a specific uuid (could return empty set!)
+/** \deprecated Use methods in k3d::node instead */
 const nodes_t find_nodes(inode_collection& Nodes, const uuid ClassID);
 
 /// Returns the set of nodes that match the given name (be prepared to handle zero, one, or many results)
+/** \deprecated Use methods in k3d::node instead */
 const nodes_t find_nodes(inode_collection& Nodes, const std::string& NodeName);
 
 /// Returns the set of nodes that implement a specific interface type (could return empty set!)
+/** \deprecated Use methods in k3d::node instead */
 template<typename interface_t>
 const nodes_t find_nodes(inode_collection& Nodes)
 {
@@ -76,6 +81,7 @@ const nodes_t find_nodes(inode_collection& Nodes)
 	return nodes;
 }
 
+/** \deprecated Use methods in k3d::node instead */
 template<typename interface_t>
 const nodes_t find_nodes(inode_collection& Nodes, const string_t& MetaName, const string_t& MetaValue)
 {
