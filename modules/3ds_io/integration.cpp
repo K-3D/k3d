@@ -23,12 +23,12 @@ namespace f3ds
 namespace io
 {
 
-static void add_nodes(k3d::mesh& Mesh, Lib3dsFile* file, Lib3dsNode* node, k3d::uint_t &offset, k3d::polyhedron::primitive& polyhedron)
+static void add_nodes(k3d::mesh& Mesh, Lib3dsFile* file, Lib3dsNode* node, k3d::uint_t &offset, k3d::imaterial* const Material, k3d::polyhedron::primitive& polyhedron)
 {
 	if(node->type == LIB3DS_OBJECT_NODE)
 	{
 		for(Lib3dsNode* p = node->childs; p != 0; p = p->next)
-			add_nodes(Mesh, file, p, offset, polyhedron);
+			add_nodes(Mesh, file, p, offset, Material, polyhedron);
 
 		if(strcmp(node->name,"$$$DUMMY") == 0)
 			return;
@@ -49,7 +49,7 @@ static void add_nodes(k3d::mesh& Mesh, Lib3dsFile* file, Lib3dsNode* node, k3d::
 			polyhedron.face_first_loops.push_back(polyhedron.loop_first_edges.size());
 			polyhedron.face_loop_counts.push_back(1);
 			polyhedron.face_selections.push_back(0);
-			polyhedron.face_materials.push_back(0);
+			polyhedron.face_materials.push_back(Material);
 			polyhedron.loop_first_edges.push_back(polyhedron.edge_points.size());
 
 			for(int j = 0; j != 3; ++j)
@@ -73,7 +73,7 @@ static void add_nodes(k3d::mesh& Mesh, Lib3dsFile* file, Lib3dsNode* node, k3d::
 	}
 }
 
-f3dsParser::f3dsParser(const char *filename, k3d::mesh &Mesh)
+f3dsParser::f3dsParser(const char* filename, k3d::imaterial* const Material, k3d::mesh& Mesh)
 {
 	Lib3dsFile* const file = lib3ds_file_load(filename);
 	if(!file) 
@@ -106,7 +106,7 @@ f3dsParser::f3dsParser(const char *filename, k3d::mesh &Mesh)
 
 	k3d::uint_t offset = 0;
 	for(Lib3dsNode* p = file->nodes; p; p = p->next)
-		add_nodes(Mesh, file, p, offset, *polyhedron);
+		add_nodes(Mesh, file, p, offset, Material, *polyhedron);
 }
 
 } // namespace io

@@ -26,6 +26,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
 
@@ -42,20 +43,24 @@ namespace io
 // mesh_reader
 
 class mesh_reader :
-	public k3d::mesh_reader<k3d::node >
+	public k3d::material_sink<k3d::mesh_reader<k3d::node > >
 {
-	typedef k3d::mesh_reader<k3d::node > base;
+	typedef k3d::material_sink<k3d::mesh_reader<k3d::node > > base;
 
 public:
-	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) : base(Factory, Document)
+	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+    base(Factory, Document)
 	{
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reload_mesh_slot()));
 	}
 
 	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
 
-		f3dsParser f3ds_file(Path.native_console_string().c_str(), Output);
+		k3d::imaterial* const material = m_material.pipeline_value();
+		f3dsParser f3ds_file(Path.native_console_string().c_str(), material, Output);
 	}
 
 	static k3d::iplugin_factory& get_factory()

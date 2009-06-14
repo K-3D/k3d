@@ -39,7 +39,7 @@ namespace io
 class f3dsParser
 {
 public:
-	f3dsParser(const char *filename, k3d::mesh &Mesh);
+	f3dsParser(const char *filename, k3d::imaterial* const Material, k3d::mesh& Mesh);
 };
 
 } // namespace io
