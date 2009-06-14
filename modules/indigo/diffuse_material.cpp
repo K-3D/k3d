@@ -26,6 +26,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/iomanip.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
@@ -54,10 +55,12 @@ public:
 
   void setup(const k3d::string_t& Name, std::ostream& Stream)
   {
-    Stream << "<material>\n";
-    Stream << "<name>" << Name << "</name>\n";
-    Stream << "<diffuse><colour>" << m_color.pipeline_value() << "</colour></diffuse>\n";
-    Stream << "</material>\n";
+    Stream << k3d::standard_indent << "<material>\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "<name>" << Name << "</name>\n";
+    Stream << k3d::standard_indent << "<diffuse>\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "<colour>" << m_color.pipeline_value() << "</colour>\n";
+    Stream << k3d::pop_indent << k3d::standard_indent << "</diffuse>\n";
+    Stream << k3d::pop_indent << k3d::standard_indent << "</material>\n";
   }
 
 	static k3d::iplugin_factory& get_factory()
@@ -67,7 +70,7 @@ public:
 			k3d::uuid(0x7fbdeb17, 0xce413e5d, 0x65f51688, 0xa789b421),
 			"IndigoDiffuseMaterial",
 			_("Indigo Diffuse Material"),
-			"Indigo Diffuse Material",
+			"Indigo Material",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

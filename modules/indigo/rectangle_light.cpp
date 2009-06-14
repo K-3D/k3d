@@ -25,6 +25,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/iomanip.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/renderable_gl.h>
@@ -99,19 +100,21 @@ public:
   {
     const k3d::point3 pos = k3d::world_position(*this);
 
-    Stream << "<rectanglelight>\n";
-    Stream << "<pos>" << -pos[0] << " " << pos[1] << " " << pos[2] << "</pos>\n";
-    Stream << "<width>" << m_width.pipeline_value() << "</width>\n";
-    Stream << "<height>" << m_height.pipeline_value() << "</height>\n";
-    Stream << "<spectrum> <blackbody> \n";
-    Stream << "<temperature>" << m_blackbody_temperature.pipeline_value() << "</temperature>\n";
-    Stream << "<gain>" << m_blackbody_gain.pipeline_value() << "</gain>\n";
-    Stream << "</blackbody> </spectrum> \n";
-    Stream << "<efficacy_scale>\n";
-    Stream << "<power_drawn>" << m_power.pipeline_value() << "</power_drawn>\n";
-    Stream << "<overall_luminous_efficacy>" << m_luminous_efficacy.pipeline_value() << "</overall_luminous_efficacy>\n";
-    Stream << "</efficacy_scale>\n";
-    Stream << "</rectanglelight>\n";
+    Stream << k3d::standard_indent << "<rectanglelight>\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "<pos>" << -pos[0] << " " << pos[1] << " " << pos[2] << "</pos>\n";
+    Stream << k3d::standard_indent << "<width>" << m_width.pipeline_value() << "</width>\n";
+    Stream << k3d::standard_indent << "<height>" << m_height.pipeline_value() << "</height>\n";
+    Stream << k3d::standard_indent << "<spectrum>\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "<blackbody>\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "<temperature>" << m_blackbody_temperature.pipeline_value() << "</temperature>\n";
+    Stream << k3d::standard_indent << "<gain>" << m_blackbody_gain.pipeline_value() << "</gain>\n";
+    Stream << k3d::pop_indent << k3d::standard_indent << "</blackbody>\n";
+    Stream << k3d::pop_indent << k3d::standard_indent << "</spectrum> \n";
+    Stream << k3d::standard_indent << "<efficacy_scale>\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "<power_drawn>" << m_power.pipeline_value() << "</power_drawn>\n";
+    Stream << k3d::standard_indent << "<overall_luminous_efficacy>" << m_luminous_efficacy.pipeline_value() << "</overall_luminous_efficacy>\n";
+    Stream << k3d::pop_indent << k3d::standard_indent << "</efficacy_scale>\n";
+    Stream << k3d::pop_indent << k3d::standard_indent << "</rectanglelight>\n";
   }
 
 	static k3d::iplugin_factory& get_factory()

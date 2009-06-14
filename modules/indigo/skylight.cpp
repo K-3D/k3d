@@ -25,6 +25,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/iomanip.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/vector3.h>
 
@@ -56,11 +57,11 @@ public:
   {
     const k3d::vector3 sundir = m_direction.pipeline_value();
 
-    Stream << "<skylight>\n";
-    Stream << "<sundir>" << -sundir[0] << " " << sundir[1] << " " << sundir[2] << "</sundir>\n";
-    Stream << "<turbidity>" << m_turbidity.pipeline_value() << "</turbidity>\n";
-    Stream << "<extra_atmospheric>" << (m_extra_atmospheric.pipeline_value() ? "true" : "false") << "</extra_atmospheric>\n";
-    Stream << "</skylight>\n";
+    Stream << k3d::standard_indent << "<skylight>\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "<sundir>" << -sundir[0] << " " << sundir[1] << " " << sundir[2] << "</sundir>\n";
+    Stream << k3d::standard_indent << "<turbidity>" << m_turbidity.pipeline_value() << "</turbidity>\n";
+    Stream << k3d::standard_indent << "<extra_atmospheric>" << (m_extra_atmospheric.pipeline_value() ? "true" : "false") << "</extra_atmospheric>\n";
+    Stream << k3d::pop_indent << k3d::standard_indent << "</skylight>\n";
   }
 
 	static k3d::iplugin_factory& get_factory()
