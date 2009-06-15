@@ -118,8 +118,6 @@ struct store_attributes
 
 /// Convenience function for refreshing all OpenGL render engines
 void redraw_all(idocument& Document, const irender_viewport::redraw_type_t RedrawType);
-/// Convenience function for setting-up materials
-void setup_material(iunknown* const Material);
 /// Draws a 1x1 plane
 void draw(const plane& Plane);
 /// Draws a box

@@ -26,7 +26,6 @@
 #include "extension_gl.h"
 #include "idocument.h"
 #include "imaterial.h"
-#include "imaterial_gl.h"
 #include "inode.h"
 #include "inode_collection.h"
 #include "irender_viewport_gl.h"
@@ -66,64 +65,6 @@ public:
 protected:
 	const irender_viewport::redraw_type_t m_redraw_type;
 };
-
-const GLubyte g_stipple_halftone[] = {
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55,
-	0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55
-	};
-
-const GLfloat g_color_black[4] = { 0, 0, 0, 1 };
-
-const GLfloat g_color_white[4] = { 1, 1, 1, 1 };
-
-class null_material :
-	public gl::imaterial
-{
-public:
-	void setup_gl_material()
-	{
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, g_color_black);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, g_color_white);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, g_color_black);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, g_color_black);
-
-		glPolygonStipple(g_stipple_halftone);
-		glEnable(GL_POLYGON_STIPPLE);
-	}
-};
-
-null_material g_null_material;
-
-class default_material :
-	public gl::imaterial
-{
-public:
-	void setup_gl_material()
-	{
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, g_color_black);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, g_color_white);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, g_color_black);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, g_color_black);
-
-		glDisable(GL_POLYGON_STIPPLE);
-	}
-};
-
-default_material g_default_material;
 
 } // namespace detail
 
@@ -236,19 +177,6 @@ void draw_bounding_box(const bounding_box3& Box)
 void redraw_all(idocument& Document, const irender_viewport::redraw_type_t RedrawType)
 {
 	std::for_each(Document.nodes().collection().begin(), Document.nodes().collection().end(), detail::redraw(RedrawType));
-}
-
-void setup_material(iunknown* const Material)
-{
-	k3d::gl::imaterial* result = &detail::g_null_material;
-
-	if(Material)
-		result = &detail::g_default_material;
-
-	if(k3d::gl::imaterial* const material = k3d::material::lookup<k3d::gl::imaterial>(Material))
-		result = material;
-
-	result->setup_gl_material();
 }
 
 void tex_image_2d(const bitmap& Source)

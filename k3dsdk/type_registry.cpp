@@ -44,7 +44,6 @@
 #include "ilight_shader_ri.h"
 #include "ilight_yafray.h"
 #include "imaterial.h"
-#include "imaterial_gl.h"
 #include "imaterial_ri.h"
 #include "imaterial_yafray.h"
 #include "imesh_painter_gl.h"
@@ -167,7 +166,6 @@ void initialize_types()
 	register_type(typeid(k3d::filesystem::path), "k3d::filesystem::path");
 	register_type(typeid(k3d::float_t), "k3d::float_t");
 	register_type(typeid(k3d::gl::ilight), "k3d::gl::ilight");
-	register_type(typeid(k3d::gl::imaterial), "k3d::gl::imaterial");
 	register_type(typeid(k3d::gl::imesh_painter), "k3d::gl::imesh_painter");
 	register_type(typeid(k3d::gl::imesh_painter*), "k3d::gl::imesh_painter*");
 	register_type(typeid(k3d::half_t), "k3d::half_t");

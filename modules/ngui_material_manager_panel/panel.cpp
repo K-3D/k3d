@@ -50,7 +50,6 @@
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/ilight_ri.h>
 #include <k3dsdk/ilight_shader_ri.h>
-#include <k3dsdk/imaterial_gl.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_ri.h>
 #include <k3dsdk/inode_collection.h>
@@ -220,19 +219,6 @@ void Model::buildModel(document_state& DocumentState)
 
               //Add Material To Renderman Group
               m_rmangrp.addMaterial(renderman_matobj);
-            }
-
-          //Is It A OpenGL Material
-          else if((*nodeIter)->factory().implements(typeid(k3d::gl::imaterial)))
-            {
-              MaterialObj *gl_matobj 
-                = new MaterialObj(&m_glgrp, (*nodeIter), glMaterialStr);
-
-              //Initialize The Material Object
-              gl_matobj->init();
-
-              //Add Material To OpenGL Group
-              m_glgrp.addMaterial(gl_matobj);
             }
 
           //Must Be An Uncatagorized Material
@@ -687,12 +673,6 @@ void Implementation::onNodesAdded(const k3d::inode_collection::nodes_t& Nodes)
         if((*node_iter)->factory().implements(typeid(k3d::ri::imaterial))){
           typeStr = riMaterialStr;
           groupPtr = &(m_model->m_rmangrp);
-        }
-
-        //Place GL Material
-        else if((*node_iter)->factory().implements(typeid(k3d::gl::imaterial))){
-          typeStr = glMaterialStr;
-          groupPtr = &(m_model->m_glgrp);
         }
 
         //Place Other Material

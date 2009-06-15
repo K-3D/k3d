@@ -28,7 +28,6 @@
 #include <k3dsdk/data.h>
 #include <k3dsdk/metadata.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/imaterial_gl.h>
 #include <k3dsdk/imaterial_ri.h>
 
 #include "RenderedImage.h"
