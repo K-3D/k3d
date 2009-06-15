@@ -18,33 +18,33 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Tim Shead (tshead@k-3d.com)
+  \author Tim Shead <tshead@k-3d.com>
 */
 
-#include <k3dsdk/module.h>
+#include "spectrum.h"
+
+#include <k3dsdk/iomanip.h>
 
 namespace module
 {
 
-/// Namespace reserved for the indigo plugin module, to protect public symbols from name clashes with other modules
 namespace indigo
 {
 
-extern k3d::iplugin_factory& background_factory();
-extern k3d::iplugin_factory& diffuse_material_factory();
-extern k3d::iplugin_factory& rectangle_light_factory();
-extern k3d::iplugin_factory& render_engine_factory();
-extern k3d::iplugin_factory& skylight_factory();
+/////////////////////////////////////////////////////////////////////////////
+// spectrum
+
+void spectrum::setup(const k3d::string_t& ElementName, std::ostream& Stream)
+{
+  Stream << k3d::standard_indent << "<" << ElementName << ">\n" << k3d::push_indent;
+  Stream << k3d::standard_indent << "<blackbody>\n" << k3d::push_indent;
+  Stream << k3d::standard_indent << "<temperature>" << m_blackbody_temperature.pipeline_value() << "</temperature>\n";
+  Stream << k3d::standard_indent << "<gain>" << m_blackbody_gain.pipeline_value() << "</gain>\n";
+  Stream << k3d::pop_indent << k3d::standard_indent << "</blackbody>\n";
+  Stream << k3d::pop_indent << k3d::standard_indent << "</" << ElementName << ">\n";
+}
 
 } // namespace indigo
 
 } // namespace module
-
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::indigo::background_factory());
-	Registry.register_factory(module::indigo::diffuse_material_factory());
-	Registry.register_factory(module::indigo::rectangle_light_factory());
-	Registry.register_factory(module::indigo::render_engine_factory());
-	Registry.register_factory(module::indigo::skylight_factory());
-K3D_MODULE_END
 

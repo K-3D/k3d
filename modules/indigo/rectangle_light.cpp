@@ -22,6 +22,7 @@
 */
 
 #include "light.h"
+#include "spectrum.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -54,9 +55,8 @@ public:
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Width")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Height")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_power(init_owner(*this) + init_name("power") + init_label(_("Power")) + init_description(_("Power-drawn by the light source in Watts.")) + init_value(100.0)),
-		m_luminous_efficacy(init_owner(*this) + init_name("luminous_efficacy") + init_label(_("Luminous Efficacy")) + init_description(_("Luminous efficacy of the light source in luminous flux per Watt.")) + init_value(17.5)), 
-		m_blackbody_temperature(init_owner(*this) + init_name("blackbody_temperature") + init_label(_("Blackbody Temperature")) + init_description(_("Blackbody Temperature of the light source in degrees kelvin.")) + init_value(6500)), 
-		m_blackbody_gain(init_owner(*this) + init_name("blackbody_gain") + init_label(_("Blackbody Gain")) + init_description(_("Blackbody Temperature Gain, multiplier.")) + init_value(1.0))
+		m_luminous_efficacy(init_owner(*this) + init_name("luminous_efficacy") + init_label(_("Luminous Efficacy")) + init_description(_("Luminous efficacy of the light source in luminous flux per Watt.")) + init_value(17.5)),
+    m_spectrum(this)
 	{
 	}
 
@@ -104,12 +104,9 @@ public:
     Stream << k3d::standard_indent << "<pos>" << -pos[0] << " " << pos[1] << " " << pos[2] << "</pos>\n";
     Stream << k3d::standard_indent << "<width>" << m_width.pipeline_value() << "</width>\n";
     Stream << k3d::standard_indent << "<height>" << m_height.pipeline_value() << "</height>\n";
-    Stream << k3d::standard_indent << "<spectrum>\n" << k3d::push_indent;
-    Stream << k3d::standard_indent << "<blackbody>\n" << k3d::push_indent;
-    Stream << k3d::standard_indent << "<temperature>" << m_blackbody_temperature.pipeline_value() << "</temperature>\n";
-    Stream << k3d::standard_indent << "<gain>" << m_blackbody_gain.pipeline_value() << "</gain>\n";
-    Stream << k3d::pop_indent << k3d::standard_indent << "</blackbody>\n";
-    Stream << k3d::pop_indent << k3d::standard_indent << "</spectrum> \n";
+
+    m_spectrum.setup("spectrum", Stream);
+    
     Stream << k3d::standard_indent << "<efficacy_scale>\n" << k3d::push_indent;
     Stream << k3d::standard_indent << "<power_drawn>" << m_power.pipeline_value() << "</power_drawn>\n";
     Stream << k3d::standard_indent << "<overall_luminous_efficacy>" << m_luminous_efficacy.pipeline_value() << "</overall_luminous_efficacy>\n";
@@ -134,8 +131,7 @@ private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_power;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_luminous_efficacy;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_blackbody_temperature;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_blackbody_gain;
+  spectrum m_spectrum;
 };
 
 k3d::iplugin_factory& rectangle_light_factory()
