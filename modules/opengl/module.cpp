@@ -29,7 +29,6 @@ namespace module
 namespace opengl
 {
 
-extern k3d::iplugin_factory& material_factory();
 extern k3d::iplugin_factory& render_engine_factory();
 
 } // namespace opengl
@@ -37,7 +36,6 @@ extern k3d::iplugin_factory& render_engine_factory();
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::opengl::material_factory());
 	Registry.register_factory(module::opengl::render_engine_factory());
 K3D_MODULE_END
 
