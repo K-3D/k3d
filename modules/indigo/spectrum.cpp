@@ -31,17 +31,71 @@ namespace module
 namespace indigo
 {
 
+std::ostream& operator<<(std::ostream& Stream, const spectrum::type& Value)
+{
+  switch(Value)
+  {
+    case spectrum::BLACKBODY:
+      Stream << "blackbody";
+      break;
+    case spectrum::RGB:
+      Stream << "rgb";
+      break;
+  }
+  return Stream;
+}
+
+std::istream& operator>>(std::istream& Stream, spectrum::type& Value)
+{
+  std::string text;
+  Stream >> text;
+
+  if(text == "blackbody")
+    Value = spectrum::BLACKBODY;
+  else if(text == "rgb")
+    Value = spectrum::RGB;
+  else
+    k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]" << std::endl;
+
+  return Stream;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // spectrum
 
 void spectrum::setup(const k3d::string_t& ElementName, std::ostream& Stream)
 {
   Stream << k3d::standard_indent << "<" << ElementName << ">\n" << k3d::push_indent;
-  Stream << k3d::standard_indent << "<blackbody>\n" << k3d::push_indent;
-  Stream << k3d::standard_indent << "<temperature>" << m_blackbody_temperature.pipeline_value() << "</temperature>\n";
-  Stream << k3d::standard_indent << "<gain>" << m_blackbody_gain.pipeline_value() << "</gain>\n";
-  Stream << k3d::pop_indent << k3d::standard_indent << "</blackbody>\n";
+
+  switch(m_type.pipeline_value())
+  {
+  case BLACKBODY:
+    Stream << k3d::standard_indent << "<blackbody>\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "<temperature>" << m_blackbody_temperature.pipeline_value() << "</temperature>\n";
+    Stream << k3d::standard_indent << "<gain>" << m_blackbody_gain.pipeline_value() << "</gain>\n";
+    Stream << k3d::pop_indent << k3d::standard_indent << "</blackbody>\n";
+    break;
+  case RGB:
+    Stream << k3d::standard_indent << "<rgb>\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "<rgb>" << m_red.pipeline_value() << " " << m_green.pipeline_value() << " " << m_blue.pipeline_value() << "</rgb>\n";
+    Stream << k3d::standard_indent << "<gamma>" << m_gamma.pipeline_value() << "</gamma>\n";
+    Stream << k3d::pop_indent << k3d::standard_indent << "</rgb>\n";
+    break;
+  }
+  
   Stream << k3d::pop_indent << k3d::standard_indent << "</" << ElementName << ">\n";
+}
+
+const k3d::ienumeration_property::enumeration_values_t& spectrum::type_values()
+{
+  static k3d::ienumeration_property::enumeration_values_t values;
+  if(values.empty())
+  {
+    values.push_back(k3d::ienumeration_property::enumeration_value_t("Blackbody", "blackbody", "Generate a blackbody spectrum."));
+    values.push_back(k3d::ienumeration_property::enumeration_value_t("RGB", "rgb", "Generate an RGB spectrum."));
+  }
+
+  return values;
 }
 
 } // namespace indigo

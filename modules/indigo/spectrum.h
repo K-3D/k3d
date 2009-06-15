@@ -42,17 +42,36 @@ class spectrum
 public:
   template<typename OwnerT>
   spectrum(OwnerT* Owner) : 
+		m_type(init_owner(*Owner) + init_name("type") + init_label(_("Spectrum Type")) + init_description(_("Spectrum type.")) + init_value(RGB) + init_enumeration(type_values())),
     m_blackbody_temperature(init_owner(*Owner) + init_name("blackbody_temperature") + init_label(_("Blackbody Temperature")) + init_description(_("Blackbody Temperature of the light source in degrees kelvin.")) + init_value(6500)), 
-    m_blackbody_gain(init_owner(*Owner) + init_name("blackbody_gain") + init_label(_("Blackbody Gain")) + init_description(_("Blackbody Temperature Gain, multiplier.")) + init_value(1.0))
+    m_blackbody_gain(init_owner(*Owner) + init_name("blackbody_gain") + init_label(_("Blackbody Gain")) + init_description(_("Blackbody Temperature Gain, multiplier.")) + init_value(1.0)),
+    m_red(init_owner(*Owner) + init_name("red") + init_label(_("Red")) + init_description(_("Red")) + init_value(1.0) + init_constraint(k3d::data::constraint::minimum<k3d::double_t>(0.0))),
+    m_green(init_owner(*Owner) + init_name("green") + init_label(_("Green")) + init_description(_("Green")) + init_value(1.0) + init_constraint(k3d::data::constraint::minimum<k3d::double_t>(0.0))),
+    m_blue(init_owner(*Owner) + init_name("blue") + init_label(_("Blue")) + init_description(_("Blue")) + init_value(1.0) + init_constraint(k3d::data::constraint::minimum<k3d::double_t>(0.0))),
+    m_gamma(init_owner(*Owner) + init_name("gamma") + init_label(_("Gamma")) + init_description(_("Gamma")) + init_value(2.2))
   {
   }
-
 
   void setup(const k3d::string_t& ElementName, std::ostream& Stream);
 
 private:
+	enum type
+	{
+		BLACKBODY,
+		RGB,
+	};
+
+	friend std::ostream& operator << (std::ostream& Stream, const type& Value);
+	friend std::istream& operator >> (std::istream& Stream, type& Value);
+	static const k3d::ienumeration_property::enumeration_values_t& type_values();
+
+	k3d_data(type, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_type;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_blackbody_temperature;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_blackbody_gain;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_red;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_green;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_blue;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gamma;
 };
 
 } // namespace indigo
