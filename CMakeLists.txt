@@ -141,6 +141,7 @@ OPTION(K3D_BUILD_K3DSCRIPT_MODULE "Build the k3dscript scripting language module
 OPTION(K3D_BUILD_LINEAR_CURVE_MODULE "Build the linear curve plugin module" ON)
 OPTION(K3D_BUILD_LIPSYNC_MODULE "Build the lip synchronization tools module" ON)
 OPTION(K3D_BUILD_LSYSTEM_MODULE "Build the l-system parser module" ON)
+OPTION(K3D_BUILD_LUXRENDER_MODULE "Build the Luxrender render enegine integration module" ON)
 OPTION(K3D_BUILD_MATRIX_MODULE "Build the matrix operations module" ON)
 OPTION(K3D_BUILD_MD2_IO_MODULE "Build the md2 io plugin module" ON)
 OPTION(K3D_BUILD_MESH_ATTRIBUTES_MODULE "Build the mesh attributes plugin module" ON)
