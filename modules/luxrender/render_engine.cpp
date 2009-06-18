@@ -22,7 +22,7 @@
 */
 
 #include "light.h"
-//#include "material.h"
+#include "material.h"
 #include "utility.h"
 
 #include <k3d-i18n-config.h>
@@ -236,7 +236,63 @@ public:
 	}
 
 private:
-  void render_disk(k3d::inode& MeshInstance, k3d::disk::const_primitive& Disk, std::ostream& Stream)
+	/// Helper class used to triangulate faces
+	class create_triangles :
+		public k3d::triangulator
+	{
+		typedef k3d::triangulator base;
+
+	public:
+		create_triangles(
+			const k3d::mesh::materials_t& FaceMaterials,
+			k3d::mesh::points_t& Points,
+			k3d::mesh::indices_t& APoints,
+			k3d::mesh::indices_t& BPoints,
+			k3d::mesh::indices_t& CPoints
+			) :
+			m_points(Points),
+			m_a_points(APoints),
+			m_b_points(BPoints),
+			m_c_points(CPoints)
+		{
+			m_face_materials.resize(FaceMaterials.size());
+			for(k3d::uint_t i = 0; i != FaceMaterials.size(); ++i)
+				m_face_materials[i] = k3d::material::lookup<luxrender::material>(FaceMaterials[i]);
+		}
+
+	private:
+		void start_face(const k3d::uint_t Face)
+		{
+			m_current_face = Face;
+		}
+
+		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], double Weights[4], k3d::uint_t& NewVertex)
+		{
+			NewVertex = m_points.size();
+			m_points.push_back(Coordinates);
+		}
+
+		void add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3])
+		{
+			m_a_points.push_back(Vertices[0]);
+			m_b_points.push_back(Vertices[1]);
+			m_c_points.push_back(Vertices[2]);
+//			m_triangle_materials.push_back(m_face_materials[m_current_face]);
+//			m_material_list.insert(m_face_materials[m_current_face]);
+		}
+
+		std::vector<luxrender::material*> m_face_materials;
+		k3d::mesh::points_t& m_points;
+		k3d::mesh::indices_t& m_a_points;
+		k3d::mesh::indices_t& m_b_points;
+		k3d::mesh::indices_t& m_c_points;
+//		std::vector<indigo::material*>& m_triangle_materials;
+//		std::set<indigo::material*>& m_material_list;
+
+		k3d::uint_t m_current_face;
+	};
+
+  void render_disk(k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::disk::const_primitive& Disk, std::ostream& Stream)
   {
     for(k3d::uint_t i = 0; i != Disk.matrices.size(); ++i)
     {
@@ -251,7 +307,43 @@ private:
     }
   }
 
-  void render_sphere(k3d::inode& MeshInstance, k3d::sphere::const_primitive& Sphere, std::ostream& Stream)
+  void render_polyhedron(k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::polyhedron::const_primitive& Polyhedron, std::ostream& Stream)
+  {
+		// Triangulate the polyhedron faces ...
+//		std::set<indigo::material*> material_list;
+
+		k3d::mesh::points_t points(*Mesh.points);
+		k3d::mesh::indices_t a_points;
+		k3d::mesh::indices_t b_points;
+		k3d::mesh::indices_t c_points;
+//		std::vector<indigo::material*> triangle_materials;
+
+	  create_triangles(Polyhedron.face_materials, points, a_points, b_points, c_points/*, triangle_materials, material_list*/).process(Mesh, Polyhedron);
+
+    // Make it happen ...
+    Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "Shape \"trianglemesh\"";
+
+
+    Stream << " \"point P\" [";
+    const k3d::uint_t triangle_begin = 0;
+    const k3d::uint_t triangle_end = triangle_begin + a_points.size();
+    for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
+      Stream << " " << convert(points[a_points[triangle]]) << " " << convert(points[b_points[triangle]]) << " " << convert(points[c_points[triangle]]);
+    Stream << "]\n";
+
+    Stream << " \"integer indices\" [";
+    const k3d::uint_t index_begin = 0;
+    const k3d::uint_t index_end = index_begin + (3 * a_points.size());
+    for(k3d::uint_t index = index_begin; index != index_end; ++index)
+      Stream << index << " ";
+    Stream << "]\n";
+
+    Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+  }
+
+  void render_sphere(k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::sphere::const_primitive& Sphere, std::ostream& Stream)
   {
     for(k3d::uint_t i = 0; i != Sphere.matrices.size(); ++i)
     {
@@ -275,14 +367,21 @@ private:
 			boost::scoped_ptr<k3d::disk::const_primitive> disk(k3d::disk::validate(**primitive));
 			if(disk)
       {
-        render_disk(MeshInstance, *disk, Stream);
+        render_disk(MeshInstance, *mesh, *disk, Stream);
+				continue;
+      }
+
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			if(polyhedron)
+      {
+        render_polyhedron(MeshInstance, *mesh, *polyhedron, Stream);
 				continue;
       }
 
 			boost::scoped_ptr<k3d::sphere::const_primitive> sphere(k3d::sphere::validate(**primitive));
 			if(sphere)
       {
-        render_sphere(MeshInstance, *sphere, Stream);
+        render_sphere(MeshInstance, *mesh, *sphere, Stream);
 				continue;
       }
 		}
