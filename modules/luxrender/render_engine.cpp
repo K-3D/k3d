@@ -21,10 +21,9 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
-/*
 #include "light.h"
-#include "material.h"
-*/
+//#include "material.h"
+#include "utility.h"
 
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
@@ -237,27 +236,6 @@ public:
 	}
 
 private:
-  /// Converts from K-3D's right-handed coordinate system
-  static const k3d::point3 convert(const k3d::point3& Value)
-  {
-    return k3d::point3(-Value[0], Value[1], Value[2]);
-  }
-
-  /// Converts from K-3D's right-handed coordinate system
-  static const k3d::vector3 convert(const k3d::vector3& Value)
-  {
-    return k3d::vector3(-Value[0], Value[1], Value[2]);
-  }
-
-  /// Converts from K-3D's right-handed coordinate system
-  /** \todo Handle scaling and rotation */
-  static const k3d::matrix4 convert(const k3d::matrix4& Value)
-  {
-    k3d::matrix4 result = k3d::transpose(Value);
-    result[3][0] = -result[3][0];
-    return result;
-  }
-
   void render_disk(k3d::inode& MeshInstance, k3d::disk::const_primitive& Disk, std::ostream& Stream)
   {
     for(k3d::uint_t i = 0; i != Disk.matrices.size(); ++i)
@@ -374,7 +352,6 @@ private:
       // Scene setup ...
       stream << k3d::standard_indent << "WorldBegin\n" << k3d::push_indent;
 
-/*
 			// Setup lights ...
 			const k3d::inode_collection_property::nodes_t enabled_lights = m_enabled_lights.pipeline_value();
 			for(k3d::inode_collection_property::nodes_t::const_iterator node = enabled_lights.begin(); node != enabled_lights.end(); ++node)
@@ -384,12 +361,6 @@ private:
 					light->setup(stream);
 				}
 			}
-*/
-
-      stream <<
-        "AttributeBegin\n"
-        "LightSource \"distant\" \"point from\" [0 0 0] \"point to\" [0 0 -1] \"color L\" [0.5 0.5 0.5]\n"
-        "AttributeEnd\n";
 
 /*
 			// Setup materials, assigning unique names as-we-go ...
@@ -462,11 +433,7 @@ private:
 	public:
 		k3d::bool_t property_allow(k3d::inode& Node)
 		{
-      assert_not_implemented();
-      return false;
-/*
 			return dynamic_cast<luxrender::light*>(&Node) ? true : false;
-*/
 		}
 
 	protected:

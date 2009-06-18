@@ -1,3 +1,6 @@
+#ifndef MODULES_LUXRENDER_UTILITY_H
+#define MODULES_LUXRENDER_UTILITY_H
+
 // K-3D
 // Copyright (c) 1995-2009, Timothy M. Shead
 //
@@ -18,27 +21,28 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead <tshead@k-3d.com>
 */
 
-#include <k3dsdk/module.h>
+#include <k3dsdk/algebra.h>
 
 namespace module
 {
 
-/// Namespace reserved for the luxrender plugin module, to protect public symbols from name clashes with other modules
 namespace luxrender
 {
 
-extern k3d::iplugin_factory& render_engine_factory();
-extern k3d::iplugin_factory& sky_factory();
+/// Converts from K-3D's right-handed coordinate system
+const k3d::point3 convert(const k3d::point3& Value);
+/// Converts from K-3D's right-handed coordinate system
+const k3d::vector3 convert(const k3d::vector3& Value);
+/// Converts from K-3D's right-handed coordinate system
+const k3d::matrix4 convert(const k3d::matrix4& Value);
 
 } // namespace luxrender
 
 } // namespace module
 
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::luxrender::render_engine_factory());
-	Registry.register_factory(module::luxrender::sky_factory());
-K3D_MODULE_END
+#endif // !MODULES_LUXRENDER_UTILITY_H
+
 
