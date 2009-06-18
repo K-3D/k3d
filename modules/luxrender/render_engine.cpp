@@ -31,6 +31,7 @@
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
+#include <k3dsdk/disk.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/fstream.h>
@@ -57,6 +58,7 @@
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/resolutions.h>
+#include <k3dsdk/sphere.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/triangulator.h>
@@ -235,6 +237,79 @@ public:
 	}
 
 private:
+  /// Converts from K-3D's right-handed coordinate system
+  static const k3d::point3 convert(const k3d::point3& Value)
+  {
+    return k3d::point3(-Value[0], Value[1], Value[2]);
+  }
+
+  /// Converts from K-3D's right-handed coordinate system
+  static const k3d::vector3 convert(const k3d::vector3& Value)
+  {
+    return k3d::vector3(-Value[0], Value[1], Value[2]);
+  }
+
+  /// Converts from K-3D's right-handed coordinate system
+  /** \todo Handle scaling and rotation */
+  static const k3d::matrix4 convert(const k3d::matrix4& Value)
+  {
+    k3d::matrix4 result = k3d::transpose(Value);
+    result[3][0] = -result[3][0];
+    return result;
+  }
+
+  void render_disk(k3d::inode& MeshInstance, k3d::disk::const_primitive& Disk, std::ostream& Stream)
+  {
+    for(k3d::uint_t i = 0; i != Disk.matrices.size(); ++i)
+    {
+      Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+      Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Disk.matrices[i]) << "]\n" << k3d::push_indent;
+      Stream << k3d::standard_indent << "Shape \"disk\"";
+      Stream << " \"float height\" [" << Disk.heights[i] << "]";
+      Stream << " \"float radius\" [" << Disk.radii[i] << "]";
+      Stream << " \"float phimax\" [" << k3d::degrees(Disk.sweep_angles[i]) << "]";
+      Stream << "\n";
+      Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+    }
+  }
+
+  void render_sphere(k3d::inode& MeshInstance, k3d::sphere::const_primitive& Sphere, std::ostream& Stream)
+  {
+    for(k3d::uint_t i = 0; i != Sphere.matrices.size(); ++i)
+    {
+      Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+      Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Sphere.matrices[i]) << "]\n" << k3d::push_indent;
+      Stream << k3d::standard_indent << "Shape \"sphere\"";
+      Stream << " \"float radius\" [" << Sphere.radii[i] << "]";
+      Stream << "\n";
+      Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+    }
+  }
+
+	void render_mesh_instance(k3d::inode& MeshInstance, std::ostream& Stream)
+	{
+    const k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(MeshInstance, "output_mesh");
+    if(!mesh)
+      return;
+
+		for(k3d::mesh::primitives_t::const_iterator primitive = mesh->primitives.begin(); primitive != mesh->primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::disk::const_primitive> disk(k3d::disk::validate(**primitive));
+			if(disk)
+      {
+        render_disk(MeshInstance, *disk, Stream);
+				continue;
+      }
+
+			boost::scoped_ptr<k3d::sphere::const_primitive> sphere(k3d::sphere::validate(**primitive));
+			if(sphere)
+      {
+        render_sphere(MeshInstance, *sphere, Stream);
+				continue;
+      }
+		}
+	}
+
 	k3d::bool_t render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath, const k3d::bool_t VisibleRender)
 	{
 		try
@@ -263,7 +338,7 @@ private:
 			const k3d::point3 camera_from = k3d::position(camera_matrix);
       const k3d::point3 camera_to = camera_from + (camera_matrix * k3d::vector3(0, 0, 1));
 			const k3d::vector3 camera_up = camera_matrix * k3d::vector3(0, 1, 0);
-      stream << k3d::standard_indent << "LookAt " << camera_from << " " << camera_to << " " << camera_up << "\n";
+      stream << k3d::standard_indent << "LookAt " << convert(camera_from) << " " << convert(camera_to) << " " << convert(camera_up) << "\n";
 /*
 			const k3d::double_t camera_near = k3d::property::pipeline_value<k3d::double_t>(projection->near());
 			const k3d::double_t camera_width = std::abs(k3d::property::pipeline_value<k3d::double_t>(projection->left()) - k3d::property::pipeline_value<k3d::double_t>(projection->right()));
@@ -293,7 +368,7 @@ private:
       stream << " \"string filename\" [\"" << OutputImagePath.native_filesystem_string() << "\"]";
 			stream << " \"integer xresolution\" [" << pixel_width << "]";
 			stream << " \"integer yresolution\" [" << pixel_height << "]";
-			stream << " \"integer haltspp\" [" << 100 << "]";
+			stream << " \"integer haltspp\" [" << 200 << "]";
       stream << "\n";
 
       // Scene setup ...
@@ -313,7 +388,7 @@ private:
 
       stream <<
         "AttributeBegin\n"
-        "LightSource \"distant\" \"point from\" [0 0 0] \"point to\" [0 0 -1] \"color L\" [1 1 1]\n"
+        "LightSource \"distant\" \"point from\" [0 0 0] \"point to\" [0 0 -1] \"color L\" [0.5 0.5 0.5]\n"
         "AttributeEnd\n";
 
 /*
@@ -328,29 +403,15 @@ private:
 			}
 */
 
-      stream <<
-        "AttributeBegin\n"
-        "Shape \"sphere\" \"float radius\" [7]\n"
-        "AttributeEnd\n";
-
-/*
 			// Render geometry ...
-			k3d::uint_t mesh_index = 0;
 			const k3d::inode_collection_property::nodes_t visible_nodes = m_visible_nodes.pipeline_value();
 			for(k3d::inode_collection_property::nodes_t::const_iterator node = visible_nodes.begin(); node != visible_nodes.end(); ++node)
 			{
 				if((*node)->factory().factory_id() != k3d::classes::MeshInstance())
 					continue;
 
-				const k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(**node, "output_mesh");
-				if(!mesh)
-					continue;
-
-				const k3d::string_t mesh_name = "mesh_" + k3d::string_cast(mesh_index++);
-
-				render_mesh(material_names, mesh_name, **node, *mesh, stream);
+				render_mesh_instance(**node, stream);
 			}
- */
 
 			stream << k3d::pop_indent << k3d::standard_indent << "WorldEnd\n";
 		}
