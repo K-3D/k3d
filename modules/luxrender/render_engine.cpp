@@ -427,7 +427,6 @@ private:
 			const k3d::vector3 camera_up = camera_matrix * k3d::vector3(0, 1, 0);
       stream << k3d::standard_indent << "LookAt " << convert(camera_from) << " " << convert(camera_to) << " " << convert(camera_up) << "\n";
 
-
       const k3d::double_t camera_left = k3d::property::pipeline_value<k3d::double_t>(perspective->left());
       const k3d::double_t camera_right = k3d::property::pipeline_value<k3d::double_t>(perspective->right());
       const k3d::double_t camera_top = k3d::property::pipeline_value<k3d::double_t>(perspective->top());
@@ -437,12 +436,13 @@ private:
 
       const k3d::double_t camera_width = std::abs(camera_right - camera_left);
       const k3d::double_t camera_height = std::abs(camera_top - camera_bottom);
+      const k3d::double_t camera_fov = k3d::degrees(2 * atan2(0.5 * std::min(camera_width, camera_height), camera_near));
 
 			stream << k3d::standard_indent << "Camera";
       stream << " \"perspective\"";
       stream << " \"float hither\" [" << camera_near << "]";
       stream << " \"float yon\" [" << camera_far << "]";
-      stream << " \"float fov\" [" << k3d::degrees(2 * atan2(std::min(camera_width, camera_height), camera_near)) << "]";
+      stream << " \"float fov\" [" << camera_fov << "]";
       stream << "\n";
 
 			// Setup output options ...
