@@ -1,6 +1,3 @@
-#ifndef MODULES_LUXRENDER_MATERIAL_H
-#define MODULES_LUXRENDER_MATERIAL_H
-
 // K-3D
 // Copyright (c) 1995-2009, Timothy M. Shead
 //
@@ -24,10 +21,9 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
-#include <k3dsdk/imaterial.h>
-#include <k3dsdk/types.h>
+#include "material.h"
 
-#include <iosfwd>
+#include <k3dsdk/iomanip.h>
 
 namespace module
 {
@@ -38,19 +34,12 @@ namespace luxrender
 /////////////////////////////////////////////////////////////////////////////
 // material
 
-/// Used to "flag" LuxRender material objects
-class material :
-  public k3d::imaterial
+void material::default_setup(std::ostream& Stream)
 {
-public:
-  virtual void setup(std::ostream& Stream) = 0;
-
-  static void default_setup(std::ostream& Stream);
-};
+  Stream << k3d::standard_indent << "Material \"matte\"\n";
+}
 
 } // namespace luxrender
 
 } // namespace module
-
-#endif // !MODULES_LUXRENDER_MATERIAL_H
 

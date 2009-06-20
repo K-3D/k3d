@@ -298,6 +298,9 @@ private:
     {
       Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
       Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Disk.matrices[i]) << "]\n" << k3d::push_indent;
+      
+      material::default_setup(Stream);
+
       Stream << k3d::standard_indent << "Shape \"disk\"";
       Stream << " \"float height\" [" << Disk.heights[i] << "]";
       Stream << " \"float radius\" [" << Disk.radii[i] << "]";
@@ -323,6 +326,9 @@ private:
     // Make it happen ...
     Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
     Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
+      
+    material::default_setup(Stream);
+
     Stream << k3d::standard_indent << "Shape \"trianglemesh\"";
 
 
@@ -348,6 +354,9 @@ private:
     for(k3d::uint_t i = 0; i != Sphere.matrices.size(); ++i)
     {
       Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+
+      material::default_setup(Stream);
+
       Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Sphere.matrices[i]) << "]\n" << k3d::push_indent;
       Stream << k3d::standard_indent << "Shape \"sphere\"";
       Stream << " \"float radius\" [" << Sphere.radii[i] << "]";
