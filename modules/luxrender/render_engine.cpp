@@ -306,7 +306,7 @@ private:
       Stream << " \"float radius\" [" << Disk.radii[i] << "]";
       Stream << " \"float phimax\" [" << k3d::degrees(Disk.sweep_angles[i]) << "]";
       Stream << "\n";
-      Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+      Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
     }
   }
 
@@ -346,7 +346,7 @@ private:
       Stream << index << " ";
     Stream << "]\n";
 
-    Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+    Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
   }
 
   void render_sphere(k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::sphere::const_primitive& Sphere, std::ostream& Stream)
@@ -361,7 +361,7 @@ private:
       Stream << k3d::standard_indent << "Shape \"sphere\"";
       Stream << " \"float radius\" [" << Sphere.radii[i] << "]";
       Stream << "\n";
-      Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+      Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
     }
   }
 
