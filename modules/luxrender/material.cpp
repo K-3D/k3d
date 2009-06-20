@@ -36,7 +36,10 @@ namespace luxrender
 
 void material::default_setup(std::ostream& Stream)
 {
-  Stream << k3d::standard_indent << "Material \"matte\"\n";
+  Stream << k3d::standard_indent << "Texture \"a\" \"color\" \"constant\" \"color value\" [1 1 1]\n";
+  Stream << k3d::standard_indent << "Texture \"b\" \"color\" \"constant\" \"color value\" [0.1 0.1 0.1]\n";
+  Stream << k3d::standard_indent << "Texture \"c\" \"float\" \"constant\" \"float value\" [0.000571]\n";
+  Stream << k3d::standard_indent << "Material \"plastic\" \"texture Kd\" \"a\" \"texture Ks\" \"b\" \"texture bumpmap\" \"c\"\n";
 }
 
 } // namespace luxrender
