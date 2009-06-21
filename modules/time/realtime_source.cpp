@@ -30,14 +30,9 @@
 #include <k3dsdk/user_interface.h>
 #include <k3dsdk/value_demand_storage.h>
 
-#include <limits>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
-#ifdef K3D_API_WIN32
-#include <sys/types.h>
-#include <sys/timeb.h>
-#else // K3D_API_WIN32
-#include <sys/time.h>
-#endif // !K3D_API_WIN32
+#include <limits>
 
 namespace module
 {
@@ -56,7 +51,7 @@ class realtime_source :
 public:
 	realtime_source(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_frame_rate(init_owner(*this) + init_name("frame_rate") + init_label(_("Frame rate")) + init_description(_("Frame rate")) + init_value(1.0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(std::numeric_limits<double>::epsilon()))),
+		m_frame_rate(init_owner(*this) + init_name("frame_rate") + init_label(_("Frame rate")) + init_description(_("Frame rate")) + init_value(1.0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(std::numeric_limits<k3d::double_t>::epsilon()))),
 		m_time(init_owner(*this) + init_name("time") + init_label(_("Time")) + init_description(_("Time")) + init_value(0.0))
 	{
 		m_frame_rate.changed_signal().connect(sigc::mem_fun(*this, &realtime_source::on_reset_source));
@@ -88,23 +83,19 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_frame_rate;
-	k3d_data(double, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_time;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_frame_rate;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_time;
 	sigc::connection m_timeout_connection;
 
 	/// Called whenever the output time has been modified and needs to be updated.
 	void execute(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Time)
 	{
-		// We can safely ignore any hints ...
-#ifdef K3D_API_WIN32
-		timeb tv;
-		ftime(&tv);
-		Time = tv.time + (static_cast<double>(tv.millitm) / 1000);
-#else // K3D_API_WIN32
-		timeval tv;
-		gettimeofday(&tv, 0);
-		Time = tv.tv_sec + static_cast<double>(tv.tv_usec) / 1000000;
-#endif // !K3D_API_WIN32
+		const boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
+		const boost::posix_time::ptime current_time = boost::posix_time::microsec_clock::universal_time();
+		const boost::posix_time::time_duration elapsed = current_time - epoch;
+
+		Time = elapsed.total_seconds();
+		Time += static_cast<k3d::double_t>(elapsed.fractional_seconds()) / static_cast<k3d::double_t>(elapsed.ticks_per_second());
 	}
 };
 

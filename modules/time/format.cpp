@@ -28,22 +28,20 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/value_demand_storage.h>
 
-#include <boost/format.hpp>
-
-#include <time.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace module
 {
 
-namespace core
+namespace time
 {
 
-class format_time :
+class format :
 	public k3d::node
 {
 	typedef k3d::node base;
 public:
-	format_time(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	format(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_input(init_owner(*this) + init_name("input") + init_label(_("Input")) + init_description(_("Timestamp value, or 0 to use current system time")) + init_value(0.0)),
 		m_format(init_owner(*this) + init_name("format") + init_label(_("Format")) + init_description(_("strftime() format string")) + init_value(std::string("%H:%M:%S"))),
@@ -54,12 +52,12 @@ public:
 		m_format.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_output.make_slot()));
 
-		m_output.set_update_slot(sigc::mem_fun(*this, &format_time::execute));
+		m_output.set_update_slot(sigc::mem_fun(*this, &format::execute));
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<format_time > factory(
+		static k3d::document_plugin_factory<format > factory(
 			k3d::uuid(0x40d699fb, 0xeb12444f, 0xa84df477, 0x5cca00f9),
 			"FormatTime",
 			_("Converts a scalar to a string using strftime()-style formatting"),
@@ -76,40 +74,42 @@ private:
 
 	void execute(const std::vector<k3d::ihint*>& Hints, k3d::string_t& Result)
 	{
-		const time_t time = static_cast<time_t>(m_input.pipeline_value());
-		tm time_value;
-
-#if defined K3D_API_WIN32
-		time_value = *gmtime(&time);
-#else
-		gmtime_r(&time, &time_value);
-#endif
-
-		k3d::string_t buffer(128, '\0');
-		while(buffer.size() < 2048)
+		try
 		{
-			const int buffer_size = strftime(const_cast<char*>(buffer.data()), buffer.size()-1, m_format.pipeline_value().c_str(), &time_value);
-			if(buffer_size)
-			{
-				buffer.resize(buffer_size);
-				Result = buffer;
-				return;
-			}
-			buffer.resize(buffer.size() * 2);
+			const double_t input_seconds = m_input.pipeline_value();
+			const double_t input_whole_seconds = std::floor(input_seconds);
+			const double_t input_fractional_seconds = input_seconds - input_whole_seconds;
+
+			boost::posix_time::ptime input_time = boost::posix_time::from_time_t(static_cast<time_t>(input_whole_seconds));
+			input_time += boost::posix_time::time_duration(0, 0, 0, input_fractional_seconds * boost::posix_time::time_duration::ticks_per_second());
+
+			std::locale time_locale(std::locale(), new boost::posix_time::time_facet(m_format.pipeline_value().c_str()));
+
+			std::ostringstream buffer;
+			buffer.imbue(time_locale);
+			buffer << input_time;
+
+			Result = buffer.str();
 		}
-
-		k3d::log() << error << k3d_file_reference << " buffer overrun" << std::endl;
-		Result = k3d::string_t();
+		catch(std::exception& e)
+		{
+			k3d::log() << error << "Caught exception: " << e.what() << std::endl;
+			Result = k3d::string_t();
+		}
+		catch(...)
+		{
+			k3d::log() << error << "Caught unknown exception." << std::endl;
+			Result = k3d::string_t();
+		}
 	}
-
 };
 
-k3d::iplugin_factory& format_time_factory()
+k3d::iplugin_factory& format_factory()
 {
-	return format_time::get_factory();
+	return format::get_factory();
 }
 
-} //namespace core
+} //namespace time
 
 } // namespace module
 

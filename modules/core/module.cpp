@@ -32,7 +32,6 @@ namespace core
 extern k3d::iplugin_factory& axes_factory();
 extern k3d::iplugin_factory& camera_factory();
 extern k3d::iplugin_factory& color_property_factory();
-extern k3d::iplugin_factory& format_time_factory();
 extern k3d::iplugin_factory& frozen_transformation_factory();
 extern k3d::iplugin_factory& look_at_factory();
 extern k3d::iplugin_factory& multi_material_factory();
@@ -52,7 +51,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::core::axes_factory());
 	Registry.register_factory(module::core::camera_factory());
 	Registry.register_factory(module::core::color_property_factory());
-	Registry.register_factory(module::core::format_time_factory());
 	Registry.register_factory(module::core::frozen_transformation_factory());
 	Registry.register_factory(module::core::look_at_factory());
 	Registry.register_factory(module::core::multi_material_factory());

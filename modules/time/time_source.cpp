@@ -48,7 +48,7 @@ public:
 		base(Factory, Document),
 		m_start_time(init_owner(*this) + init_name("start_time") + init_label(_("Start Time")) + init_description(_("Controls the start time (in seconds) for rendering animations.")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::time))),
 		m_end_time(init_owner(*this) + init_name("end_time") + init_label(_("End Time")) + init_description(_("Controls the end time (in seconds) for rendering animations.")) + init_value(4.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::time))),
-		m_frame_rate(init_owner(*this) + init_name("frame_rate") + init_label(_("Frame Rate")) + init_description(_("Controls the frame rate (in frames-per-second) for rendering animations.")) + init_value(30.0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(std::numeric_limits<double>::epsilon()))),
+		m_frame_rate(init_owner(*this) + init_name("frame_rate") + init_label(_("Frame Rate")) + init_description(_("Controls the frame rate (in frames-per-second) for rendering animations.")) + init_value(30.0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(std::numeric_limits<k3d::double_t>::epsilon()))),
 		m_time(init_owner(*this) + init_name("time") + init_label(_("Time")) + init_description(_("Controls the current time displayed in the viewports.")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::time)))
 	{
 	}
@@ -66,10 +66,10 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_start_time;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_end_time;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_frame_rate;
-	k3d_data(double, immutable_name, change_signal, no_undo, local_storage, no_constraint, measurement_property, with_serialization) m_time;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_start_time;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_end_time;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_frame_rate;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, measurement_property, with_serialization) m_time;
 };
 
 /////////////////////////////////////////////////////////////////////////////

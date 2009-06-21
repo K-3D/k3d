@@ -13,7 +13,7 @@ ENDIF(WIN32)
 find_package(Boost)
 
 #components that are always needed
-SET(K3D_BOOST_COMPONENTS program_options regex)
+SET(K3D_BOOST_COMPONENTS date_time program_options regex)
 
 # python lib
 IF(${K3D_BUILD_PYTHON_MODULE} STREQUAL "ON")
@@ -42,6 +42,9 @@ SET(K3D_BOOST_FOUND ${Boost_FOUND})
 
 SET(K3D_BOOST_INCLUDE_DIRS
 	${Boost_INCLUDE_DIRS}
+	)
+SET(K3D_BOOST_DATE_TIME_LIBS
+	${Boost_DATE_TIME_LIBRARY}
 	)
 SET(K3D_BOOST_PROGRAM_OPTIONS_LIBS
 	${Boost_PROGRAM_OPTIONS_LIBRARY}
