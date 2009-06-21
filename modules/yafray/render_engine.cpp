@@ -246,26 +246,6 @@ public:
 private:
 	typedef std::map<k3d::yafray::imaterial*, k3d::string_t> shader_names_t;
 
-	void render_sphere(const shader_names_t& ShaderNames, const k3d::string_t& Name, const k3d::inode& Sphere, std::ostream& Stream)
-	{
-		// This stopped working somewhere between yafray 0.0.7 - 0.0.9 !?
-		assert_not_implemented();
-
-/*
-		const k3d::point3 sphere_center = k3d::node_to_world_matrix(Sphere) * k3d::point3(0, 0, 0);
-		const double sphere_radius = k3d::property::pipeline_value<double>(Sphere, "radius");
-	
-		Stream << "<!-- K-3D plugin: " << Sphere.factory().name() << " name: " << Sphere.name() << " -->\n";
-		Stream << "<object name=\"" << Sphere.name() << "\" shader_name=\"" << shader_name(ShaderNames, Sphere) << "\">\n";
-		Stream << "	<attributes>\n";
-		Stream << "	</attributes>\n";
-		Stream << "	<sphere radius=\"" << sphere_radius << "\">\n";
-		Stream << "		<center x=\"" << std::fixed << -sphere_center[0] << "\" y=\"" << std::fixed << sphere_center[1] << "\" z=\"" << std::fixed << sphere_center[2] << "\"/>\n";
-		Stream << "	</sphere>\n";
-		Stream << "</object>\n";
-*/
-	}
-
 	/// Helper class used to triangulate faces for Yafray
 	class create_triangles :
 		public k3d::triangulator
@@ -459,9 +439,7 @@ private:
 				const k3d::string_t object_name = "object_" + k3d::string_cast(object_names.size());
 				object_names.insert(std::make_pair(*node, object_name));
 
-				if((**node).factory().factory_id() == k3d::classes::Sphere())
-					render_sphere(shader_names, object_name, **node, stream);
-				else if((*node)->factory().factory_id() == k3d::classes::MeshInstance())
+				if((*node)->factory().factory_id() == k3d::classes::MeshInstance())
 					render_mesh_instance(shader_names, object_name, **node, stream);
 			}
 
