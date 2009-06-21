@@ -67,7 +67,7 @@ public:
 				k3d::interface_list<k3d::imaterial> > factory(
 			k3d::uuid(0x77bbeecb, 0x59483223, 0x142c92b9, 0x235096bb),
 			"LuxRenderMatteMaterial",
-			_("LuxRender Diffuse Material"),
+			_("LuxRender Matte Material"),
 			"LuxRender Material",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
