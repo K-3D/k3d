@@ -249,12 +249,16 @@ private:
 			k3d::mesh::points_t& Points,
 			k3d::mesh::indices_t& APoints,
 			k3d::mesh::indices_t& BPoints,
-			k3d::mesh::indices_t& CPoints
+			k3d::mesh::indices_t& CPoints,
+      std::vector<luxrender::material*>& TriangleMaterials,
+      std::set<luxrender::material*>& MaterialList
 			) :
 			m_points(Points),
 			m_a_points(APoints),
 			m_b_points(BPoints),
-			m_c_points(CPoints)
+			m_c_points(CPoints),
+      m_triangle_materials(TriangleMaterials),
+      m_material_list(MaterialList)
 		{
 			m_face_materials.resize(FaceMaterials.size());
 			for(k3d::uint_t i = 0; i != FaceMaterials.size(); ++i)
@@ -278,8 +282,8 @@ private:
 			m_a_points.push_back(Vertices[0]);
 			m_b_points.push_back(Vertices[1]);
 			m_c_points.push_back(Vertices[2]);
-//			m_triangle_materials.push_back(m_face_materials[m_current_face]);
-//			m_material_list.insert(m_face_materials[m_current_face]);
+			m_triangle_materials.push_back(m_face_materials[m_current_face]);
+			m_material_list.insert(m_face_materials[m_current_face]);
 		}
 
 		std::vector<luxrender::material*> m_face_materials;
@@ -287,8 +291,8 @@ private:
 		k3d::mesh::indices_t& m_a_points;
 		k3d::mesh::indices_t& m_b_points;
 		k3d::mesh::indices_t& m_c_points;
-//		std::vector<indigo::material*>& m_triangle_materials;
-//		std::set<indigo::material*>& m_material_list;
+		std::vector<luxrender::material*>& m_triangle_materials;
+		std::set<luxrender::material*>& m_material_list;
 
 		k3d::uint_t m_current_face;
 	};
@@ -300,7 +304,7 @@ private:
       Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
       Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Disk.matrices[i]) << "]\n" << k3d::push_indent;
       
-      material::default_setup(Stream);
+      material::setup(Disk.materials[i], Stream);
 
       Stream << k3d::standard_indent << "Shape \"disk\"";
       Stream << " \"float height\" [" << Disk.heights[i] << "]";
@@ -314,38 +318,46 @@ private:
   void render_polyhedron(k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::polyhedron::const_primitive& Polyhedron, std::ostream& Stream)
   {
 		// Triangulate the polyhedron faces ...
-//		std::set<indigo::material*> material_list;
-
 		k3d::mesh::points_t points(*Mesh.points);
 		k3d::mesh::indices_t a_points;
 		k3d::mesh::indices_t b_points;
 		k3d::mesh::indices_t c_points;
-//		std::vector<indigo::material*> triangle_materials;
+		std::vector<luxrender::material*> triangle_materials;
+		std::set<luxrender::material*> material_list;
 
-	  create_triangles(Polyhedron.face_materials, points, a_points, b_points, c_points/*, triangle_materials, material_list*/).process(Mesh, Polyhedron);
+	  create_triangles(Polyhedron.face_materials, points, a_points, b_points, c_points, triangle_materials, material_list).process(Mesh, Polyhedron);
 
     // Make it happen ...
     Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
     Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
       
-    material::default_setup(Stream);
+		for(std::set<luxrender::material*>::const_iterator material = material_list.begin(); material != material_list.end(); ++material)
+		{
+      material::setup(*material, Stream);
 
-    Stream << k3d::standard_indent << "Shape \"trianglemesh\"";
+      Stream << k3d::standard_indent << "Shape \"trianglemesh\"";
 
+      Stream << " \"point P\" [";
+      const k3d::uint_t triangle_begin = 0;
+      const k3d::uint_t triangle_end = triangle_begin + a_points.size();
+      k3d::uint_t point_count = 0;
+      for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
+      {
+        if(triangle_materials[triangle] != *material)
+          continue;
 
-    Stream << " \"point P\" [";
-    const k3d::uint_t triangle_begin = 0;
-    const k3d::uint_t triangle_end = triangle_begin + a_points.size();
-    for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
-      Stream << " " << convert(points[a_points[triangle]]) << " " << convert(points[b_points[triangle]]) << " " << convert(points[c_points[triangle]]);
-    Stream << "]\n";
+        point_count += 3;
+        Stream << " " << convert(points[a_points[triangle]]) << " " << convert(points[b_points[triangle]]) << " " << convert(points[c_points[triangle]]);
+      }
+      Stream << "]\n";
 
-    Stream << " \"integer indices\" [";
-    const k3d::uint_t index_begin = 0;
-    const k3d::uint_t index_end = index_begin + (3 * a_points.size());
-    for(k3d::uint_t index = index_begin; index != index_end; ++index)
-      Stream << index << " ";
-    Stream << "]\n";
+      Stream << " \"integer indices\" [";
+      const k3d::uint_t index_begin = 0;
+      const k3d::uint_t index_end = index_begin + point_count;
+      for(k3d::uint_t index = index_begin; index != index_end; ++index)
+        Stream << index << " ";
+      Stream << "]\n";
+    }
 
     Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
   }
@@ -356,7 +368,7 @@ private:
     {
       Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
 
-      material::default_setup(Stream);
+      material::setup(Sphere.materials[i], Stream);
 
       Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Sphere.matrices[i]) << "]\n" << k3d::push_indent;
       Stream << k3d::standard_indent << "Shape \"sphere\"";

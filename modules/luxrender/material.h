@@ -38,14 +38,15 @@ namespace luxrender
 /////////////////////////////////////////////////////////////////////////////
 // material
 
-/// Used to "flag" LuxRender material objects
+/// Abstract interface for LuxRender material objects
 class material :
   public k3d::imaterial
 {
 public:
   virtual void setup(std::ostream& Stream) = 0;
 
-  static void default_setup(std::ostream& Stream);
+  /// Inserts a material into a scene, handling NULL materials by supplying a standard default.
+  static void setup(k3d::imaterial* const Material, std::ostream& Stream);
 };
 
 } // namespace luxrender

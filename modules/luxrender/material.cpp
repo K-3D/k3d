@@ -24,6 +24,7 @@
 #include "material.h"
 
 #include <k3dsdk/iomanip.h>
+#include <k3dsdk/material.h>
 
 namespace module
 {
@@ -34,8 +35,15 @@ namespace luxrender
 /////////////////////////////////////////////////////////////////////////////
 // material
 
-void material::default_setup(std::ostream& Stream)
+void material::setup(k3d::imaterial* const Material, std::ostream& Stream)
 {
+  if(material* const lux_material = k3d::material::lookup<material>(Material))
+  {
+    lux_material->setup(Stream);
+    return;
+  }
+
+  // Provide a default material ...
   Stream << k3d::standard_indent << "Texture \"a\" \"color\" \"constant\" \"color value\" [1 1 1]\n";
   Stream << k3d::standard_indent << "Texture \"b\" \"color\" \"constant\" \"color value\" [0.1 0.1 0.1]\n";
   Stream << k3d::standard_indent << "Texture \"c\" \"float\" \"constant\" \"float value\" [0.000571]\n";
