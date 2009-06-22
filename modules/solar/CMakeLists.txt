@@ -1,0 +1,9 @@
+ADD_SUBDIRECTORY(solpos)
+
+INCLUDE_DIRECTORIES(${solpos_SOURCE_DIR})
+
+K3D_BUILD_MODULE(k3d-solar)
+K3D_CREATE_MODULE_PROXY(k3d-solar)
+
+TARGET_LINK_LIBRARIES(k3d-solar k3d-solar-solpos)
+
