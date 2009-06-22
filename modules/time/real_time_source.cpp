@@ -41,25 +41,25 @@ namespace time
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// realtime_source
+// real_time_source
 
-class realtime_source :
+class real_time_source :
 	public k3d::node
 {
 	typedef k3d::node base;
 
 public:
-	realtime_source(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	real_time_source(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_frame_rate(init_owner(*this) + init_name("frame_rate") + init_label(_("Frame rate")) + init_description(_("Frame rate")) + init_value(1.0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(std::numeric_limits<k3d::double_t>::epsilon()))),
 		m_time(init_owner(*this) + init_name("time") + init_label(_("Time")) + init_description(_("Time")) + init_value(0.0))
 	{
-		m_frame_rate.changed_signal().connect(sigc::mem_fun(*this, &realtime_source::on_reset_source));
-		m_time.set_update_slot(sigc::mem_fun(*this, &realtime_source::execute));
+		m_frame_rate.changed_signal().connect(sigc::mem_fun(*this, &real_time_source::on_reset_source));
+		m_time.set_update_slot(sigc::mem_fun(*this, &real_time_source::execute));
 		on_reset_source(0);
 	}
 
-	~realtime_source()
+	~real_time_source()
 	{
 		m_timeout_connection.disconnect();
 	}
@@ -72,7 +72,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<realtime_source > factory(
+		static k3d::document_plugin_factory<real_time_source > factory(
 			k3d::uuid(0xf7c119e7, 0xd87b465a, 0x9b7e0289, 0x82d91702),
 			"RealtimeSource",
 			_("Provides a realtime time source for a K-3D document"),
@@ -100,11 +100,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// realtime_source_factory
+// real_time_source_factory
 
-k3d::iplugin_factory& realtime_source_factory()
+k3d::iplugin_factory& real_time_source_factory()
 {
-	return realtime_source::get_factory();
+	return real_time_source::get_factory();
 }
 
 } // namespace time
