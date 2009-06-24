@@ -51,7 +51,6 @@ extern k3d::iplugin_factory& move_first_edge_factory();
 extern k3d::iplugin_factory& sds_corner_factory();
 extern k3d::iplugin_factory& sds_crease_factory();
 extern k3d::iplugin_factory& sds_hole_factory();
-extern k3d::iplugin_factory& set_material_factory();
 extern k3d::iplugin_factory& show_component_numbering_factory();
 extern k3d::iplugin_factory& show_face_orientations_factory();
 extern k3d::iplugin_factory& subdivide_edges_factory();
@@ -84,7 +83,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh::sds_corner_factory());
 	Registry.register_factory(module::mesh::sds_crease_factory());
 	Registry.register_factory(module::mesh::sds_hole_factory());
-	Registry.register_factory(module::mesh::set_material_factory());
 	Registry.register_factory(module::mesh::subdivide_edges_factory());
 	Registry.register_factory(module::mesh::subdivide_faces_factory());
 	Registry.register_factory(module::mesh::weld_factory());
