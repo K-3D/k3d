@@ -29,19 +29,25 @@ namespace module
 namespace luxrender
 {
 
+/// Converts from K-3D's right-handed coordinate system
 const k3d::point3 convert(const k3d::point3& Value)
 {
-	return k3d::point3(-Value[0], Value[1], Value[2]);
+  return k3d::point3(-Value[0], Value[1], Value[2]);
 }
 
+/// Converts from K-3D's right-handed coordinate system
 const k3d::vector3 convert(const k3d::vector3& Value)
 {
-	return k3d::vector3(-Value[0], Value[1], Value[2]);
+  return k3d::vector3(-Value[0], Value[1], Value[2]);
 }
 
+/// Converts from K-3D's right-handed coordinate system
+/** \todo Handle scaling and rotation */
 const k3d::matrix4 convert(const k3d::matrix4& Value)
 {
-	return k3d::transpose(k3d::scale3(-1, 1, 1) * Value);
+  k3d::matrix4 result = k3d::transpose(Value);
+  result[3][0] = -result[3][0];
+  return result;
 }
 
 } // namespace luxrender

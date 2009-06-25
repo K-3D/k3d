@@ -27,16 +27,15 @@ namespace k3d
 {
 
 mesh_simple_deformation_modifier::mesh_simple_deformation_modifier(iplugin_factory& Factory, idocument& Document) :
-	base(Factory, Document),
-	m_selection_changed(true)
+	base(Factory, Document)
 {
-	m_mesh_selection.changed_signal().connect(sigc::mem_fun(*this, &mesh_simple_deformation_modifier::on_selection_changed));
+	m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 }
 
 void mesh_simple_deformation_modifier::on_create_mesh(const mesh& Input, mesh& Output)
 {
 	Output = Input;
-	m_selection_changed = true; // make sure we merge selection after the mesh has been recreated
+	mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
 }
 
 void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& Output)
@@ -47,11 +46,6 @@ void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& O
 		return;
 	return_if_fail(Input.points->size() == Output.points->size());
 
-	if(m_selection_changed)
-	{
-		mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
-		m_selection_changed = false;
-	}
 	return_if_fail(Output.point_selection);
 	return_if_fail(Output.point_selection->size() == Output.points->size());
 
@@ -63,11 +57,6 @@ void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& O
 	document().pipeline_profiler().finish_execution(*this, "Copy points");
 
 	on_deform_mesh(input_points, selection, output_points);
-}
-
-void mesh_simple_deformation_modifier::on_selection_changed(ihint*)
-{
-	m_selection_changed = true;
 }
 
 } // namespace k3d

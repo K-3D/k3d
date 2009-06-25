@@ -32,11 +32,11 @@ namespace module
 namespace luxrender
 {
 
-/// Converts from K-3D's right-handed to LuxRender's left-handed coordinate system
+/// Converts from K-3D's right-handed coordinate system
 const k3d::point3 convert(const k3d::point3& Value);
-/// Converts from K-3D's right-handed to LuxRender's left-handed coordinate system
+/// Converts from K-3D's right-handed coordinate system
 const k3d::vector3 convert(const k3d::vector3& Value);
-/// Converts from K-3D's right-handed to LuxRender's left-handed coordinate system
+/// Converts from K-3D's right-handed coordinate system
 const k3d::matrix4 convert(const k3d::matrix4& Value);
 
 } // namespace luxrender
