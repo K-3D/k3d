@@ -30,6 +30,7 @@ namespace module
 namespace selection
 {
 
+extern k3d::iplugin_factory& face_to_point_selections_factory();
 extern k3d::iplugin_factory& grow_selection_factory();
 extern k3d::iplugin_factory& mesh_selection_factory();
 extern k3d::iplugin_factory& node_selection_factory();
@@ -54,6 +55,7 @@ extern k3d::iplugin_factory& select_point_by_number_factory();
 } // namespace module
 
 K3D_MODULE_START(Registry)
+	Registry.register_factory(module::selection::face_to_point_selections_factory());
 	Registry.register_factory(module::selection::grow_selection_factory());
 	Registry.register_factory(module::selection::mesh_selection_factory());
 	Registry.register_factory(module::selection::node_selection_factory());
