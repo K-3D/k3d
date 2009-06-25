@@ -347,7 +347,7 @@ private:
 					continue;
 
 				point_count += 3;
-				Stream << " " << convert(points[a_points[triangle]]) << " " << convert(points[b_points[triangle]]) << " " << convert(points[c_points[triangle]]);
+				Stream << " " << (points[a_points[triangle]]) << " " << (points[b_points[triangle]]) << " " << (points[c_points[triangle]]);
 			}
 			Stream << "]\n";
 
@@ -434,45 +434,45 @@ private:
 			// Setup the camera ...
 			k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(&Camera.projection());
 			if(!perspective)
-				throw std::runtime_error("A perspective perspective is required.");
+				throw std::runtime_error("A perspective projection is required.");
 
 			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output());
 			const k3d::point3 camera_from = k3d::position(camera_matrix);
-      const k3d::point3 camera_to = camera_from + (camera_matrix * k3d::vector3(0, 0, 1));
+			const k3d::point3 camera_to = camera_from + (camera_matrix * k3d::vector3(0, 0, 1));
 			const k3d::vector3 camera_up = camera_matrix * k3d::vector3(0, 1, 0);
-      stream << k3d::standard_indent << "LookAt " << convert(camera_from) << " " << convert(camera_to) << " " << convert(camera_up) << "\n";
+			stream << k3d::standard_indent << "LookAt " << convert(camera_from) << " " << convert(camera_to) << " " << convert(camera_up) << "\n";
 
-      const k3d::double_t camera_left = k3d::property::pipeline_value<k3d::double_t>(perspective->left());
-      const k3d::double_t camera_right = k3d::property::pipeline_value<k3d::double_t>(perspective->right());
-      const k3d::double_t camera_top = k3d::property::pipeline_value<k3d::double_t>(perspective->top());
-      const k3d::double_t camera_bottom = k3d::property::pipeline_value<k3d::double_t>(perspective->bottom());
-      const k3d::double_t camera_near = k3d::property::pipeline_value<k3d::double_t>(perspective->near());
-      const k3d::double_t camera_far = k3d::property::pipeline_value<k3d::double_t>(perspective->far());
+			const k3d::double_t camera_left = k3d::property::pipeline_value<k3d::double_t>(perspective->left());
+			const k3d::double_t camera_right = k3d::property::pipeline_value<k3d::double_t>(perspective->right());
+			const k3d::double_t camera_top = k3d::property::pipeline_value<k3d::double_t>(perspective->top());
+			const k3d::double_t camera_bottom = k3d::property::pipeline_value<k3d::double_t>(perspective->bottom());
+			const k3d::double_t camera_near = k3d::property::pipeline_value<k3d::double_t>(perspective->near());
+			const k3d::double_t camera_far = k3d::property::pipeline_value<k3d::double_t>(perspective->far());
 
-      const k3d::double_t camera_width = std::abs(camera_right - camera_left);
-      const k3d::double_t camera_height = std::abs(camera_top - camera_bottom);
-      const k3d::double_t camera_fov = k3d::degrees(2 * atan2(0.5 * std::min(camera_width, camera_height), camera_near));
+			const k3d::double_t camera_width = std::abs(camera_right - camera_left);
+			const k3d::double_t camera_height = std::abs(camera_top - camera_bottom);
+			const k3d::double_t camera_fov = k3d::degrees(2 * atan2(0.5 * std::min(camera_width, camera_height), camera_near));
 
 			stream << k3d::standard_indent << "Camera";
-      stream << " \"perspective\"";
-      stream << " \"float hither\" [" << camera_near << "]";
-      stream << " \"float yon\" [" << camera_far << "]";
-      stream << " \"float fov\" [" << camera_fov << "]";
-      stream << "\n";
+			stream << " \"perspective\"";
+			stream << " \"float hither\" [" << camera_near << "]";
+			stream << " \"float yon\" [" << camera_far << "]";
+			stream << " \"float fov\" [" << camera_fov << "]";
+			stream << "\n";
 
 			// Setup output options ...
 			const k3d::int32_t pixel_width = m_pixel_width.pipeline_value();
 			const k3d::int32_t pixel_height = m_pixel_height.pipeline_value();
 			stream << k3d::standard_indent << "Film";
-      stream << " \"fleximage\"";
-      stream << " \"string filename\" [\"" << OutputImagePath.native_filesystem_string() << "\"]";
+			stream << " \"fleximage\"";
+			stream << " \"string filename\" [\"" << OutputImagePath.native_filesystem_string() << "\"]";
 			stream << " \"integer xresolution\" [" << pixel_width << "]";
 			stream << " \"integer yresolution\" [" << pixel_height << "]";
 			stream << " \"integer haltspp\" [" << m_halt_samples.pipeline_value() << "]";
-      stream << "\n";
+			stream << "\n";
 
-      // Scene setup ...
-      stream << k3d::standard_indent << "WorldBegin\n" << k3d::push_indent;
+			// Scene setup ...
+			stream << k3d::standard_indent << "WorldBegin\n" << k3d::push_indent;
 
 			// Setup lights ...
 			const k3d::inode_collection_property::nodes_t enabled_lights = m_enabled_lights.pipeline_value();
