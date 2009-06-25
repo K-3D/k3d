@@ -150,7 +150,15 @@ public:
 	
 	void on_face_end(const k3d::uint_t Face)
 	{
-		f_normals.push_back(k3d::normalize(m_normal)); 
+		if(m_normal.length())
+		{
+			f_normals.push_back(k3d::normalize(m_normal));
+		}
+		else
+		{
+			k3d::log() << debug << "bad normal on face " << m_face << std::endl;
+			f_normals.push_back(k3d::normal3(0,0,1));
+		}
 		m_normal = k3d::normal3(0,0,0);
 	}
 	
