@@ -1,0 +1,25 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Complete LuxRender material set.
+desc: |-
+  With materials the the missing part is texture input not a color,
+  treat color as a 1x1 map of a given color, all the attributes of
+  textures need map input to allow for realism and also to simulate
+  things such as mesh http://images.google.com.au/images?q=architectural
+  mesh and fritted glass
+  http://images.google.com.au/images?q=fritted+glass  which is a common
+  method of sun control in architecture.
+type: :feature
+component: K-3D
+release: 
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-06-27 15:34:38.921913 Z
+references: []
+
+id: 3074be871fbce4de2da49a1abc0432d8e49e30c1
+log_events: 
+- - 2009-06-27 15:34:39.657825 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
