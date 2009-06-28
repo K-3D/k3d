@@ -58,7 +58,7 @@ public:
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Mesh"] = &const_cast<k3d::mesh&>(Mesh);
+		context["Mesh"] = &Mesh;
 		context["PaintMesh"] = true;
 		context["SelectMesh"] = false;
 		execute_script(context);
@@ -71,7 +71,7 @@ public:
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Mesh"] = &const_cast<k3d::mesh&>(Mesh);
+		context["Mesh"] = &Mesh;
 		context["PaintMesh"] = false;
 		context["SelectMesh"] = true;
 		execute_script(context);

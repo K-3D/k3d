@@ -352,6 +352,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_iunknown();
 	define_class_matrix4();
 	define_class_mesh();
+	define_class_const_mesh();
 	define_class_mesh_selection();
 	define_class_named_arrays();
 	define_class_named_attribute_arrays();
@@ -496,6 +497,8 @@ void get_context(dict& Dictionary, k3d::iscript_engine::context_t& Context)
 		else if(type == typeid(k3d::inode*))
 			continue;
 		else if(type == typeid(k3d::mesh*))
+			continue;
+		else if(type == typeid(const k3d::mesh* const))
 			continue;
 		else if(type == typeid(const k3d::ri::render_state*))
 			continue;

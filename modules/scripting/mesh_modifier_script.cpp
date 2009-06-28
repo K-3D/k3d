@@ -63,7 +63,7 @@ public:
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Input"] = const_cast<k3d::mesh*>(&Input);
+		context["Input"] = &Input;
 		context["Output"] = &Output;
 
 		execute_script(context);

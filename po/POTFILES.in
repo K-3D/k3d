@@ -203,12 +203,9 @@ modules/linear_curve/lissajous_curve.cpp
 modules/lipsync/papagayo_lipsync_reader.cpp
 modules/lsystem/l_parser.cpp
 modules/luxrender/distant_light.cpp
-modules/luxrender/environment_light.cpp
 modules/luxrender/glass_material.cpp
-modules/luxrender/goniometric_light.cpp
 modules/luxrender/matte_material.cpp
 modules/luxrender/metal_material.cpp
-modules/luxrender/point_light.cpp
 modules/luxrender/render_engine.cpp
 modules/luxrender/sky_light.cpp
 modules/luxrender/sun_light.cpp
@@ -219,7 +216,6 @@ modules/mesh/array_2d.cpp
 modules/mesh/array_3d.cpp
 modules/mesh_attributes/calculate_normals.cpp
 modules/mesh_attributes/named_text_array.cpp
-modules/mesh_attributes/set_material.cpp
 modules/mesh/bevel_faces.cpp
 modules/mesh/cap_hole.cpp
 modules/mesh/collapse_edges.cpp
@@ -233,6 +229,7 @@ modules/mesh/move_first_edge.cpp
 modules/mesh/sds_corner.cpp
 modules/mesh/sds_crease.cpp
 modules/mesh/sds_hole.cpp
+modules/mesh/set_material.cpp
 modules/mesh/subdivide_edges.cpp
 modules/mesh/subdivide_faces.cpp
 modules/mesh/weld.cpp
@@ -470,7 +467,6 @@ modules/scripting/string_source_script.cpp
 modules/scripting/transform_modifier_script.cpp
 modules/scripting/transform_source_script.cpp
 modules/scripting/vector3_source_script.cpp
-modules/selection/face_to_point_selections.cpp
 modules/selection/grow_selection.cpp
 modules/selection/mesh_selection.cpp
 modules/selection/node_selection.cpp
@@ -530,3 +526,5 @@ modules/yafray/render_engine.cpp
 modules/yafray/soft_light.cpp
 modules/yafray/spot_light.cpp
 modules/yafray/sun_light.cpp
+share/scripts/scripted_plugins/ac3d_exporter.py
+share/scripts/scripted_plugins/ogre_exporter.py
