@@ -1,2 +1,9 @@
 ^tests/benchmarking.pyc$
 ^tests/testing.pyc$
+
+syntax: regexp
+^\.pydevproject$
+syntax: regexp
+^\.project$
+syntax: regexp
+^\.cproject$

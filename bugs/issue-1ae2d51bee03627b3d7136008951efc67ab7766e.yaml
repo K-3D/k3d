@@ -1,0 +1,24 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: GUI widgets to help users know direction and orientation of lights.
+desc: |-
+  All lights that are directional, including those with maps need a
+  visual clue in the 3D view-port as to their orientation, even if it is
+  fixed. Mapping an environment light's EXR file to the back of the
+  veiw-port would be ideal, but in truth a luxury. All that is needed a
+  simple arrow or other way of showing where the map's 0,0 point is and
+  it's orientation.
+type: :feature
+component: K-3D
+release: 
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-06-27 15:33:51.240727 Z
+references: []
+
+id: 1ae2d51bee03627b3d7136008951efc67ab7766e
+log_events: 
+- - 2009-06-27 15:33:52.232586 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
