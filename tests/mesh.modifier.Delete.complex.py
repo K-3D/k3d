@@ -35,6 +35,8 @@ point_selection = k3d.mesh_selection.component(0, 1000, k3d.selection.type.POINT
 point_selection.add_range(0, 7, 0)
 point_selection.add_range(7, 8, 1)
 point_selection.add_range(8, 10000, 0)
+# TODO: remove this when generic selections are complete
+selection.points = [(0, 7, 0), (7, 8, 1), (8, 10000, 0)]
 edge_selection = k3d.mesh_selection.component(0, 1000, k3d.selection.type.SPLIT_EDGE)
 edge_selection.add_range(0, 25, 0)
 edge_selection.add_range(25, 26, 1)
