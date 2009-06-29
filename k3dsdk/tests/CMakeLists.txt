@@ -65,6 +65,9 @@ ADD_TEST(k3dsdk.xml-sanity-checks ${EXECUTABLE_OUTPUT_PATH}/test-xml-sanity-chec
 ADD_EXECUTABLE(test-xml-xpath xml_xpath.cpp)
 ADD_TEST(k3dsdk.xml-xpath ${EXECUTABLE_OUTPUT_PATH}/test-xml-xpath)
 
+ADD_EXECUTABLE(test-document-upgrade document_upgrade.cpp)
+#ADD_TEST(k3dsdk.document-upgrade ${EXECUTABLE_OUTPUT_PATH}/test-document-upgrade)
+
 ADD_EXECUTABLE(test-pipeline-data pipeline_data.cpp)
 ADD_TEST(k3dsdk.pipeline-data ${EXECUTABLE_OUTPUT_PATH}/test-pipeline-data)
 
