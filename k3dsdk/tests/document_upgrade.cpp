@@ -66,6 +66,15 @@ int main(int argc, char* argv[])
 
 		std::cerr << "after:" << std::endl;
 		std::cerr << document << std::endl;
+
+		test_expression(xpath::match(document, "/k3d/objects").size() == 0);
+		test_expression(xpath::match(document, "/k3d/nodes").size() == 1);
+
+		test_expression(xpath::match(document, "/k3d/nodes/object").size() == 0);
+		test_expression(xpath::match(document, "/k3d/nodes/node").size() == 2);
+
+		test_expression(xpath::match(document, "/k3d/pipeline").size() == 0);
+		test_expression(xpath::match(document, "/k3d/dependencies").size() == 1);
 	}
 	catch(std::exception& e)
 	{
