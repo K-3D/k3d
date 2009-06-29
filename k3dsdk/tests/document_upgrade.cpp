@@ -49,10 +49,18 @@ int main(int argc, char* argv[])
 		element document("k3d",
 			element("objects",
 				element("object",
-					attribute("name", "foo")
+					element("variables",
+						element("object"),
+						element("shader"),
+						element("variable")
+						)
 					),
 				element("object",
-					attribute("name", "bar")
+					element("variables",
+						element("object"),
+						element("shader"),
+						element("variable")
+						)
 					)
 				),
 			element("pipeline"
@@ -72,6 +80,14 @@ int main(int argc, char* argv[])
 
 		test_expression(xpath::match(document, "/k3d/nodes/object").size() == 0);
 		test_expression(xpath::match(document, "/k3d/nodes/node").size() == 2);
+
+		test_expression(xpath::match(document, "/k3d/nodes/node/variables").size() == 0);
+		test_expression(xpath::match(document, "/k3d/nodes/node/properties").size() == 2);
+
+		test_expression(xpath::match(document, "/k3d/nodes/node/properties/object").size() == 0);
+		test_expression(xpath::match(document, "/k3d/nodes/node/properties/shader").size() == 0);
+		test_expression(xpath::match(document, "/k3d/nodes/node/properties/variable").size() == 0);
+		test_expression(xpath::match(document, "/k3d/nodes/node/properties/property").size() == 6);
 
 		test_expression(xpath::match(document, "/k3d/pipeline").size() == 0);
 		test_expression(xpath::match(document, "/k3d/dependencies").size() == 1);
