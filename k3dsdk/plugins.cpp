@@ -21,16 +21,15 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application.h"
-#include "iapplication.h"
-#include "iapplication_plugin_factory.h"
-#include "idocument_plugin_factory.h"
-#include "iplugin_factory.h"
-#include "iplugin_factory_collection.h"
-#include "log.h"
-#include "mime_types.h"
-#include "plugins.h"
-#include "utility.h"
+#include <k3dsdk/iapplication_plugin_factory.h>
+#include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iplugin_factory_collection.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/mime_types.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/register_plugin_factories.h>
+#include <k3dsdk/utility.h>
 
 #include <boost/tokenizer.hpp>
 
@@ -148,14 +147,17 @@ inode* create_document_plugin(const uuid& ClassID, idocument& Document, const k3
 namespace factory
 {
 
+static const collection_t g_default_factories;
+static const collection_t* g_factories = &g_default_factories;
+
 const collection_t lookup()
 {
-	return application().plugins();
+	return *g_factories;
 }
 
 iplugin_factory* lookup(const uuid& ID)
 {
-	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	for(iplugin_factory_collection::factories_t::const_iterator factory = g_factories->begin(); factory != g_factories->end(); ++factory)
 	{
 		if((*factory)->factory_id() == ID)
 			return *factory;
@@ -167,7 +169,7 @@ iplugin_factory* lookup(const uuid& ID)
 iplugin_factory* lookup(const k3d::string_t& Name)
 {
 	collection_t results;
-	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	for(iplugin_factory_collection::factories_t::const_iterator factory = g_factories->begin(); factory != g_factories->end(); ++factory)
 	{
 		if((*factory)->name() == Name)
 			results.insert(*factory);
@@ -189,7 +191,7 @@ const collection_t lookup(const string_t& MetadataName, const string_t& Metadata
 {
 	collection_t results;
 
-	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	for(iplugin_factory_collection::factories_t::const_iterator factory = g_factories->begin(); factory != g_factories->end(); ++factory)
 	{
 		const iplugin_factory::metadata_t metadata = (**factory).metadata();
 
@@ -209,7 +211,7 @@ const collection_t lookup(const string_t& MetadataName, const string_t& Metadata
 const collection_t lookup(const std::type_info& Interface)
 {
 	collection_t results;
-	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	for(iplugin_factory_collection::factories_t::const_iterator factory = g_factories->begin(); factory != g_factories->end(); ++factory)
 	{
 		if((*factory)->implements(Interface) == false)
 			continue;
@@ -223,7 +225,7 @@ const collection_t lookup(const std::type_info& Interface)
 const collection_t lookup(const mime::type& Type)
 {
 	collection_t results;
-	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	for(iplugin_factory_collection::factories_t::const_iterator factory = g_factories->begin(); factory != g_factories->end(); ++factory)
 	{
 		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
 		const string_t mime_types = metadata["k3d:mime-types"];
@@ -250,7 +252,7 @@ const collection_t lookup(const mime::type& Type)
 const collection_t lookup(const std::type_info& Interface, const mime::type& Type)
 {
 	collection_t results;
-	for(iplugin_factory_collection::factories_t::const_iterator factory = application().plugins().begin(); factory != application().plugins().end(); ++factory)
+	for(iplugin_factory_collection::factories_t::const_iterator factory = g_factories->begin(); factory != g_factories->end(); ++factory)
 	{
 		if((*factory)->implements(Interface) == false)
 			continue;
@@ -280,6 +282,11 @@ const collection_t lookup(const std::type_info& Interface, const mime::type& Typ
 } // namespace factory
 
 } // namespace plugin
+
+void register_plugin_factories(iplugin_factory_collection& Collection)
+{
+	plugin::factory::g_factories = &Collection.factories();
+}
 
 } // namespace k3d
 

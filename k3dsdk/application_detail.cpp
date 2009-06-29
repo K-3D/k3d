@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,22 +18,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares the application_implementation class, which encapsulates the running K-3D program
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_detail.h"
-#include "plugins.h"
-#include "data.h"
-#include "document.h"
-#include "iapplication.h"
-#include "iapplication_plugin_factory.h"
-#include "idocument.h"
-#include "iscript_engine.h"
-#include "iscripted_action.h"
-#include "result.h"
-#include "signal_accumulators.h"
-#include "state_change_set.h"
+#include <k3dsdk/application_detail.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/document.h>
+#include <k3dsdk/iapplication.h>
+#include <k3dsdk/iapplication_plugin_factory.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/iscript_engine.h>
+#include <k3dsdk/iscripted_action.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/signal_accumulators.h>
+#include <k3dsdk/state_change_set.h>
 
 #include <fstream>
 #include <iostream>
@@ -54,8 +54,7 @@ class application_implementation::implementation :
 	public k3d::iapplication
 {
 public:
-	implementation(k3d::iplugin_factory_collection& Plugins) :
-		m_plugins(Plugins)
+	implementation()
 	{
 	}
 
@@ -82,8 +81,8 @@ public:
 		m_documents.push_back(document);
 
 		// Create any auto-start plugins ...
-		const iplugin_factory_collection::factories_t& factories = plugins();
-		for(iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		const plugin::factory::collection_t factories = plugin::factory::lookup();
+		for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 		{
 			iplugin_factory::metadata_t metadata = (**factory).metadata();
 
@@ -163,13 +162,6 @@ public:
 		return m_close_document_signal.connect(Slot);
 	}
 
-	const k3d::iplugin_factory_collection::factories_t& plugins()
-	{
-		return m_plugins.factories();
-	}
-
-	/// Stores a reference to the collection of available plugin factories
-	k3d::iplugin_factory_collection& m_plugins;
 	/// Stores the collection of open documents
 	document_collection_t m_documents;
 	/// Stores any per-document auto-start plugins
@@ -189,8 +181,8 @@ public:
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // application_implementation
 
-application_implementation::application_implementation(iplugin_factory_collection& PluginFactories) :
-	m_implementation(new implementation(PluginFactories))
+application_implementation::application_implementation() :
+	m_implementation(new implementation())
 {
 }
 

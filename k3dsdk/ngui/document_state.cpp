@@ -1932,8 +1932,8 @@ document_state::document_state(k3d::idocument& Document) :
 	m_focus_viewport(0)
 {
 	// Create auto-start plugins for this document ...
-	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
-	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
+	for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
 		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
 

@@ -38,8 +38,6 @@
 #include "viewport.h"
 #include "widget_manip.h"
 
-#include <k3dsdk/application.h>
-#include <k3dsdk/iapplication.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iplugin_factory_collection.h>
@@ -319,7 +317,7 @@ void control::set_choices()
 
 	add_choice("NGUIViewportPanel", quiet_load_icon("viewport_panel", Gtk::ICON_SIZE_SMALL_TOOLBAR), _("Viewport"), sigc::bind(sigc::mem_fun(*this, &control::on_mount_panel), "NGUIViewportPanel"));
 
-	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
+	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
 	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
 		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();

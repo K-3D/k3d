@@ -1228,6 +1228,8 @@ void upgrade_painters(element& XMLDocument)
 
 void upgrade_node_selection(element& XMLDocument)
 {
+	return_if_fail(plugin::factory::lookup("NodeSelection"));
+
 	element* const xml_nodes = find_element(XMLDocument, "nodes");
 	if(!xml_nodes)
 		return;

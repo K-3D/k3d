@@ -35,9 +35,6 @@
 #include "utility.h"
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/application.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/inode_property.h>
@@ -45,6 +42,7 @@
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/nodes.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
 
@@ -178,7 +176,8 @@ void control::on_choose()
 		}
 
 		// Insert choices for creating new nodes ...
-		std::vector<k3d::iplugin_factory*> sorted_factories(k3d::application().plugins().begin(), k3d::application().plugins().end());
+		const k3d::plugin::factory::collection_t unsorted_factories = k3d::plugin::factory::lookup();
+		std::vector<k3d::iplugin_factory*> sorted_factories(unsorted_factories.begin(), unsorted_factories.end());
 		std::sort(sorted_factories.begin(), sorted_factories.end(), detail::sort_by_name());
 		for(std::vector<k3d::iplugin_factory*>::const_iterator factory = sorted_factories.begin(); factory != sorted_factories.end(); ++factory)
 		{

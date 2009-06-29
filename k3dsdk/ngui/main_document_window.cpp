@@ -887,8 +887,8 @@ private:
 		typedef std::map<std::string, sorted_factories_t> grouped_factories_t;
 		grouped_factories_t grouped_factories;
 
-		const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
-		for(k3d::iplugin_factory_collection::factories_t::const_iterator f = factories.begin(); f != factories.end(); ++f)
+		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
+		for(k3d::plugin::factory::collection_t::const_iterator f = factories.begin(); f != factories.end(); ++f)
 		{
 			// If it isn't a document plugin factory, skip it ...
 			if(!dynamic_cast<k3d::idocument_plugin_factory*>(*f))
@@ -1072,8 +1072,8 @@ private:
 		// Create menu items for (optional) scripted actions ...
 		Gtk::Menu* actions_menu = 0;
 
-		const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
-		for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
+		for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 		{
 			k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
 

@@ -2,7 +2,7 @@
 #define K3DSDK_IAPPLICATION_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,10 +21,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iplugin_factory_collection.h"
 #include "iunknown.h"
 #include "signal_system.h"
 
@@ -53,10 +52,6 @@ public:
 	typedef std::vector<idocument*> document_collection_t;
 	/// Returns the collection of open documents
 	virtual const document_collection_t documents() = 0;
-
-	/// Returns the collection of available plugin factories
-	/** \deprecated Use k3d::plugin::factory::lookup() instead. */
-	virtual const iplugin_factory_collection::factories_t& plugins() = 0;
 
 	// Signals
 

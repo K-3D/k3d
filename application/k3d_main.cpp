@@ -55,6 +55,7 @@
 #include <k3dsdk/parallel/threads.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/register_application.h>
+#include <k3dsdk/register_plugin_factories.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/shader_cache_detail.h>
 #include <k3dsdk/share_detail.h>
@@ -578,7 +579,7 @@ typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
 
 void create_auto_start_plugins(auto_start_plugins_t& Plugins)
 {
-	const k3d::iplugin_factory_collection::factories_t& factories = k3d::application().plugins();
+	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
 	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
 		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
@@ -780,8 +781,11 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 		k3d::network_render_farm render_farm(g_options_path);
 		k3d::set_network_render_farm(render_farm);
 
+		// Register plugins ...
+		k3d::register_plugin_factories(plugins);
+
 		// Create the main application object ...
-		k3d::application_implementation application(plugins);
+		k3d::application_implementation application;
 
 		// We want to be notified when the user requests a shutdown ...
 		application.connect_exit_signal(sigc::ptr_fun(exit_request_handler));
