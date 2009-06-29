@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,41 +18,42 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "array.h"
-#include "classes.h"
-#include "idocument.h"
-#include "imaterial.h"
-#include "imesh_painter_gl.h"
-#include "imesh_painter_ri.h"
-#include "imetadata.h"
-#include "inode.h"
-#include "inode_collection.h"
-#include "inode_selection.h"
-#include "ipersistent_lookup.h"
-#include "ipipeline.h"
-#include "iplugin_factory.h"
-#include "iproperty.h"
-#include "iproperty_collection.h"
-#include "itransform_sink.h"
-#include "itransform_source.h"
-#include "legacy_mesh.h"
-#include "mesh.h"
-#include "mesh_selection.h"
-#include "named_array_types.h"
-#include "nurbs_curve.h"
-#include "nurbs_patch.h"
-#include "plugins.h"
-#include "properties.h"
-#include "result.h"
-#include "serialization_xml.h"
-#include "share.h"
-#include "string_cast.h"
-#include "type_registry.h"
-#include "types_ri.h"
-#include "xml.h"
+#include <k3dsdk/array.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/imesh_painter_gl.h>
+#include <k3dsdk/imesh_painter_ri.h>
+#include <k3dsdk/imetadata.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/inode_selection.h>
+#include <k3dsdk/ipersistent_lookup.h>
+#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/mesh_selection.h>
+#include <k3dsdk/named_array_types.h>
+#include <k3dsdk/nurbs_curve.h>
+#include <k3dsdk/nurbs_patch.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/serialization_xml.h>
+#include <k3dsdk/share.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/type_registry.h>
+#include <k3dsdk/types_ri.h>
+#include <k3dsdk/xml.h>
+#include <k3dsdk/xpath.h>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/mpl/for_each.hpp>
@@ -183,37 +184,28 @@ private:
 	const ipersistent::load_context& m_context;
 };
 
+/// Converts <objects> tags to <nodes> tags.
 void upgrade_objects_element(element& XMLDocument)
 {
-	// Change <objects> to <nodes> ...
-	if(element* const xml_objects = find_element(XMLDocument, "objects"))
-	{
-		log() << warning << "Converting obsolete <objects> tag to <nodes> tag" << std::endl;
-		xml_objects->name = "nodes";
-	}
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/objects");
+	if(results.empty())
+		return;
+
+	log() << warning << "Converting obsolete <objects> tags to <nodes> tags." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		(**result).name = "nodes";
 }
 
+/// Converts <object> tags to <node> tags.
 void upgrade_object_elements(element& XMLDocument)
 {
-	// Change <object> to <node> ...
-	if(element* const xml_nodes = find_element(XMLDocument, "nodes"))
-	{
-		bool nag = true;
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/nodes/object");
+	if(results.empty())
+		return;
 
-		for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
-		{
-			if(xml_node->name == "object")
-			{
-				if(nag)
-				{
-					log() << warning << "Converting obsolete <object> tags to <node> tags" << std::endl;
-					nag = false;
-				}
-
-				xml_node->name = "node";
-			}
-		}
-	}
+	log() << warning << "Converting obsolete <object> tags to <node> tags." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		(**result).name = "node";
 }
 
 void upgrade_class_properties(element& XMLDocument)
@@ -242,83 +234,52 @@ void upgrade_class_properties(element& XMLDocument)
 	}
 }
 
+/// Converts <variables> tags to <properties> tags.
 void upgrade_variables_elements(element& XMLDocument)
 {
-	// Change <variables> to <properties>
-	if(element* const xml_nodes = find_element(XMLDocument, "nodes"))
-	{
-		bool nag_variables = true;
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/nodes/node/variables");
+	if(results.empty())
+		return;
 
-		for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
-		{
-			if(xml_node->name != "node")
-				continue;
-
-			element* const xml_variables = find_element(*xml_node, "variables");
-			if(!xml_variables)
-				continue;
-
-			if(nag_variables)
-			{
-				nag_variables = false;
-				log() << warning << "Converting obsolete <variables> tags to <properties> tags" << std::endl;
-			}
-
-			xml_variables->name = "properties";
-		}
-	}
+	log() << warning << "Converting obsolete <variables> tags to <properties> tags." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		(**result).name = "properties";
 }
 
-void upgrade_variable_elements(element& XMLDocument)
+/// Converts <object> tags to <property> tags.
+void upgrade_property_object_elements(element& XMLDocument)
 {
-	// Change <variable>, <object>, <shader>, and <argument> to <property>
-	if(element* const xml_nodes = find_element(XMLDocument, "nodes"))
-	{
-		bool nag_object = true;
-		bool nag_shader = true;
-		bool nag_variable = true;
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/nodes/node/properties/object");
+	if(results.empty())
+		return;
 
-		for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
-		{
-			if(xml_node->name != "node")
-				continue;
+	log() << warning << "Converting obsolete <object> tags to <property> tags." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		(**result).name = "property";
+}
 
-			element* const xml_properties = find_element(*xml_node, "properties");
-			if(!xml_properties)
-				continue;
+/// Converts <shader> tags to <property> tags.
+void upgrade_property_shader_elements(element& XMLDocument)
+{
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/nodes/node/properties/shader");
+	if(results.empty())
+		return;
 
-			for(element::elements_t::iterator xml_property = xml_properties->children.begin(); xml_property != xml_properties->children.end(); ++xml_property)
-			{
-				if(xml_property->name == "object")
-				{
-					if(nag_object)
-					{
-						nag_object = false;
-						log() << warning << "Converting obsolete <object> tags to <property> tags" << std::endl;
-					}
-					xml_property->name = "property";
-				}
-				else if(xml_property->name == "shader")
-				{
-					if(nag_shader)
-					{
-						nag_shader = false;
-						log() << warning << "Converting obsolete <shader> tags to <property> tags" << std::endl;
-					}
-					xml_property->name = "property";
-				}
-				else if(xml_property->name == "variable")
-				{
-					if(nag_variable)
-					{
-						nag_variable = false;
-						log() << warning << "Converting obsolete <variable> tags to <property> tags" << std::endl;
-					}
-					xml_property->name = "property";
-				}
-			}
-		}
-	}
+	log() << warning << "Converting obsolete <shader> tags to <property> tags." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		(**result).name = "property";
+}
+
+/// Converts <variable> tags to <property> tags.
+void upgrade_property_variable_elements(element& XMLDocument)
+{
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/nodes/node/properties/variable");
+	if(results.empty())
+		return;
+
+	log() << warning << "Converting obsolete <variable> tags to <property> tags." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		(**result).name = "property";
 }
 
 void upgrade_property_values(element& XMLDocument)
@@ -401,14 +362,16 @@ void upgrade_user_property_types(element& XMLDocument)
 	}
 }
 
+/// Converts <pipeline> tags to <dependencies> tags.
 void upgrade_pipeline_element(element& XMLDocument)
 {
-	// Change <pipeline> to <dependencies> ...
-	if(element* const xml_pipeline = find_element(XMLDocument, "pipeline"))
-	{
-		log() << warning << "Converting obsolete <pipeline> tag to <dependencies> tag" << std::endl;
-		xml_pipeline->name = "dependencies";
-	}
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/pipeline");
+	if(results.empty())
+		return;
+
+	log() << warning << "Converting obsolete <pipeline> tags to <dependencies> tags." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		(**result).name = "dependencies";
 }
 
 void upgrade_dependency_elements(element& XMLDocument)
@@ -1409,7 +1372,9 @@ void upgrade_document(element& XMLDocument)
 	detail::upgrade_object_elements(XMLDocument);
 	detail::upgrade_class_properties(XMLDocument);
 	detail::upgrade_variables_elements(XMLDocument);
-	detail::upgrade_variable_elements(XMLDocument);
+	detail::upgrade_property_object_elements(XMLDocument);
+	detail::upgrade_property_shader_elements(XMLDocument);
+	detail::upgrade_property_variable_elements(XMLDocument);
 	detail::upgrade_property_values(XMLDocument);
 	detail::upgrade_user_property_types(XMLDocument);
 	detail::upgrade_pipeline_element(XMLDocument);
