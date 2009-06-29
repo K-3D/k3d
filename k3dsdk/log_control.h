@@ -20,7 +20,8 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "signal_system.h"
+#include <k3dsdk/signal_system.h>
+#include <k3dsdk/types.h>
 
 namespace k3d
 {
@@ -36,23 +37,23 @@ typedef enum
 } log_level_t;
 
 /// Enables logging of timestamps (default: off)
-void log_show_timestamps(bool Enable);
+void log_show_timestamps(bool_t Enable);
 /// Sets a "tag" that will be prepended to log messages (default: empty)
-void log_set_tag(const std::string& Tag);
+void log_set_tag(const string_t& Tag);
 /// Enables color output based on log level (default: off)
-void log_color_level(bool Enable);
+void log_color_level(bool_t Enable);
 /// Prepends the log level to messages (default: off)
-void log_show_level(bool Enable);
+void log_show_level(bool_t Enable);
 /// Enables logging to the syslog on systems that support it (default: off)
-void log_syslog(bool Enable);
+void log_syslog(bool_t Enable);
 /// Sets the minimum level of message to be logged (default: K3D_LOG_LEVEL_WARNING)
 void log_minimum_level(const log_level_t Level);
 
 
 /// Connects a slot to a signal that will be emitted whenever messages are added to the log 
-sigc::connection connect_log_message(const sigc::slot<void, const time_t, const log_level_t, const std::string&>& Slot);
+sigc::connection connect_log_message(const sigc::slot<void, const time_t, const log_level_t, const string_t&>& Slot);
 /// Retrieves the current contents of the log cache by repeatedly calling the given slot
-void get_log_cache(const sigc::slot<void, const time_t, const log_level_t, const std::string&>& Slot);
+void get_log_cache(const sigc::slot<void, const time_t, const log_level_t, const string_t&>& Slot);
 
 } // namespace k3d
 
