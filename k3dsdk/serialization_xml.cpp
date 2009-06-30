@@ -208,30 +208,16 @@ void upgrade_object_elements(element& XMLDocument)
 		(**result).name = "node";
 }
 
+/// Converts "class" attributes to "factory" attributes.
 void upgrade_class_properties(element& XMLDocument)
 {
-	// Change "class" to "factory"
-	if(element* const xml_nodes = find_element(XMLDocument, "nodes"))
-	{
-		bool nag = true;
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/nodes/node[@class]");
+	if(results.empty())
+		return;
 
-		for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
-		{
-			if(xml_node->name != "node")
-				continue;
-
-			if(attribute* const xml_class = find_attribute(*xml_node, "class"))
-			{
-				xml_class->name = "factory";
-
-				if(nag)
-				{
-					log() << warning << "Converting obsolete \"class\" properties to \"factory\" properties" << std::endl;
-					nag = false;
-				}
-			}
-		}
-	}
+	log() << warning << "Converting obsolete \"class\" attributes to \"factory\" attributes." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		find_attribute(**result, "class")->name = "factory";
 }
 
 /// Converts <variables> tags to <properties> tags.
@@ -284,38 +270,13 @@ void upgrade_property_variable_elements(element& XMLDocument)
 
 void upgrade_property_values(element& XMLDocument)
 {
-	if(element* const xml_nodes = find_element(XMLDocument, "nodes"))
-	{
-		bool nag_attribute = true;
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/nodes/node/properties/property[@value]");
+	if(results.empty())
+		return;
 
-		for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
-		{
-			if(xml_node->name != "node")
-				continue;
-
-			element* const xml_properties = find_element(*xml_node, "properties");
-			if(!xml_properties)
-				continue;
-
-			for(element::elements_t::iterator xml_property = xml_properties->children.begin(); xml_property != xml_properties->children.end(); ++xml_property)
-			{
-				if(xml_property->name != "property")
-					continue;
-
-				attribute* const xml_value = find_attribute(*xml_property, "value");
-				if(!xml_value)
-					continue;
-
-				xml_property->text = xml_value->value;
-
-				if(nag_attribute)
-				{
-					log() << warning << "Moving obsolete \"value\" attribute to element text" << std::endl;
-					nag_attribute = false;
-				}
-			}
-		}
-	}
+	log() << warning << "Converting obsolete \"value\" attributes to element text." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		(**result).text = remove_attribute(**result, "value");
 }
 
 void upgrade_user_property_types(element& XMLDocument)
