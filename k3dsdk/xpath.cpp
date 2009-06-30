@@ -25,7 +25,8 @@
 #include <k3dsdk/xml.h>
 #include <k3dsdk/xpath.h>
 
-#include <boost/tokenizer.hpp>
+#include <boost/spirit.hpp>
+using namespace boost::spirit;
 
 namespace k3d
 {
@@ -36,80 +37,174 @@ namespace xml
 namespace xpath
 {
 
-static result_set match_wildcard(const result_set& Anchors)
+struct action
 {
-	result_set results;
-
-	for(result_set::const_iterator anchor = Anchors.begin(); anchor != Anchors.end(); ++anchor)
+	action(result_set& Results) :
+		results(Results)
 	{
-		for(element::elements_t::iterator child = (*anchor)->children.begin(); child != (*anchor)->children.end(); ++child)
-		{
-			results.push_back(&*child);
-		}
 	}
 
-	return results;
-}
+	result_set& results;
+};
 
-static result_set match_child(const result_set& Anchors, const string_t& Name)
+struct match_root_path :
+	public action
 {
-	result_set results;
-
-	for(result_set::const_iterator anchor = Anchors.begin(); anchor != Anchors.end(); ++anchor)
+	match_root_path(result_set& Results) :
+		action(Results)
 	{
-		for(element::elements_t::iterator child = (*anchor)->children.begin(); child != (*anchor)->children.end(); ++child)
-		{
-			if(child->name == Name)
-				results.push_back(&*child);
-		}
 	}
 
-	return results;
-}
+	void operator()(const char&) const
+	{
+		results.clear();
+	}
+};
+
+struct match_absolute_path :
+	public action
+{
+	match_absolute_path(element& Tree, result_set& Results) :
+		action(Results),
+		tree(Tree)
+	{
+	}
+
+	void operator()(const char* Begin, const char* End) const
+	{
+		const std::string name(Begin, End);
+		if(name != tree.name)
+			results.clear();
+	}
+
+	element& tree;
+};
+
+struct match_child :
+	public action
+{
+	match_child(result_set& Results) :
+		action(Results)
+	{
+	}
+
+	void operator()(const char* Begin, const char* End) const
+	{
+		const std::string name(Begin, End);
+
+		result_set new_results;
+		for(result_set::const_iterator anchor = results.begin(); anchor != results.end(); ++anchor)
+		{
+			for(element::elements_t::iterator child = (*anchor)->children.begin(); child != (*anchor)->children.end(); ++child)
+			{
+				if(child->name == name)
+					new_results.push_back(&*child);
+			}
+		}
+		results = new_results;
+	}
+};
+
+struct match_wildcard :
+	public action
+{
+	match_wildcard(result_set& Results) :
+		action(Results)
+	{
+	}
+
+	void operator()(const char*, const char*) const
+	{
+		result_set new_results;
+		for(result_set::const_iterator anchor = results.begin(); anchor != results.end(); ++anchor)
+		{
+			for(element::elements_t::iterator child = (*anchor)->children.begin(); child != (*anchor)->children.end(); ++child)
+			{
+				new_results.push_back(&*child);
+			}
+		}
+		results = new_results;
+	}
+};
+
+struct match_attribute :
+	public action
+{
+	match_attribute(result_set& Results) :
+		action(Results)
+	{
+	}
+
+	void operator()(const char* Begin, const char* End) const
+	{
+		const std::string name(Begin, End);
+
+		result_set new_results;
+		for(result_set::const_iterator anchor = results.begin(); anchor != results.end(); ++anchor)
+		{
+			if(find_attribute(**anchor, name))
+				new_results.push_back(*anchor);
+		}
+		results = new_results;
+	}
+};
+
+class grammar :
+	public boost::spirit::grammar<grammar>
+{
+public:
+	grammar(element& Tree, result_set& Results) :
+		tree(Tree),
+		results(Results)
+	{
+		results.assign(1, &Tree);
+	}
+
+	template<typename ScannerT>
+	struct definition
+	{
+		definition(const grammar& self)
+		{
+			name = chset_p("_a-zA-Z") >> *chset_p("_a-zA-Z0-9");
+			wildcard = ch_p('*');
+			node_test = name[match_child(self.results)] | wildcard[match_wildcard(self.results)];
+			attribute_test = '@' >> name[match_attribute(self.results)];
+			attribute_value_test = '@' >> name >> '=' >> name;
+			predicate_expression = attribute_test | attribute_value_test;
+			predicate = '[' >> predicate_expression >> ']';
+			predicate_list = *predicate;
+			step = node_test >> !predicate_list;
+			root_path = ch_p('/')[match_root_path(self.results)];
+			absolute_path = ch_p('/') >> name[match_absolute_path(self.tree, self.results)] >> *('/' >> step);
+			relative_path = step >> *('/' >> step);
+			expression = relative_path | absolute_path | root_path;
+		}
+
+		rule<ScannerT> const& start() const
+		{
+			return expression;
+		}
+
+		rule<ScannerT> name, wildcard, node_test, attribute_test, attribute_value_test, predicate_expression, predicate, predicate_list, step, root_path, absolute_path, relative_path, expression;
+	};
+
+private:
+	element& tree;
+	result_set& results;
+};
 
 result_set match(element& Tree, const string_t& Expression)
 {
-	// Tokenize the XPath expression ...
-	boost::tokenizer<boost::char_separator<char> > tokenizer(Expression, boost::char_separator<char>("", "/", boost::drop_empty_tokens));
-	std::vector<string_t> tokens(tokenizer.begin(), tokenizer.end());
-
 	// Special-case: an empty expression matches nothing
-	if(tokens.empty())
+	if(Expression.empty())
 		return result_set();
 
-	// Special-case: if this is an absolute path, match the root node
-	if(tokens.front() == "/")
+	result_set results;
+	if(!parse(Expression.c_str(), grammar(Tree, results), space_p).full)
 	{
-		tokens.erase(tokens.begin());
-
-		if(tokens.empty())
-			return result_set();
-
-		if(tokens.front() != Tree.name)
-			return result_set();
-
-		tokens.erase(tokens.begin());
+		k3d::log() << error << "Not a valid XPath expression: " << Expression << std::endl;
+		return result_set();
 	}
-
-	// We begin by matching the root node of the tree ...
-	result_set results(1, &Tree);
-
-	// Iterate over the remaining tokens, refining our results ...
-	for(k3d::uint_t i = 0; i != tokens.size(); ++i)
-	{
-		if(tokens[i] == "/")
-		{
-		}
-		else if(tokens[i] == "*")
-		{
-			results = match_wildcard(results);
-		}
-		else
-		{
-			results = match_child(results, tokens[i]);
-		}
-	}
-
 	return results;
 }
 

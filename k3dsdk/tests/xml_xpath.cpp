@@ -48,13 +48,13 @@ int main(int argc, char* argv[])
 		element document("k3d",
 			element("nodes",
 				element("node",
-					attribute("name", "foo")
+					attribute("class", "foo")
 					),
 				element("node",
-					attribute("name", "bar")
+					attribute("factory", "bar")
 					)
 				),
-			element("pipeline"
+			element("dependencies"
 				)
 			);
 
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 		results = xpath::match(document, "/k3d/*");
 		test_expression(results.size() == 2);
 		test_expression(results[0]->name == "nodes");
-		test_expression(results[1]->name == "pipeline");
+		test_expression(results[1]->name == "dependencies");
 
 		results = xpath::match(document, "/k3d/nodes");
 		test_expression(results.size() == 1);
@@ -86,6 +86,11 @@ int main(int argc, char* argv[])
 		test_expression(results.size() == 2);
 		test_expression(results[0]->name == "node");
 		test_expression(results[1]->name == "node");
+
+		results = xpath::match(document, "/k3d/nodes/node[@class]");
+		test_expression(results.size() == 1);
+		test_expression(find_attribute(*results[0], "class"));
+		test_expression(!find_attribute(*results[0], "factory"));
 
 		results = xpath::match(document, "nodes");
 		test_expression(results.size() == 1);
