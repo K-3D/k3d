@@ -183,6 +183,9 @@ const T attribute_value(const element& Element, const std::string& AttributeName
 	return DefaultValue;
 }
 
+/// Removes an attribute from an element, returning its string value if it exists, or empty string.
+const std::string remove_attribute(element& Element, const std::string& AttributeName);
+
 /// Returns the text value of a child element as a string by name, or a default value if the child element can't be found
 const std::string element_text(const element& Element, const std::string& ElementName, const std::string& DefaultValue = std::string());
 

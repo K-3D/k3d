@@ -567,6 +567,21 @@ const std::string attribute_text(const element& Element, const std::string& Attr
 	return child ? child->value : DefaultValue;
 }
 
+const std::string remove_attribute(element& Element, const std::string& AttributeName)
+{
+	std::string result;
+	for(element::attributes_t::iterator child = Element.attributes.begin(); child != Element.attributes.end(); ++child)
+	{
+		if(child->name == AttributeName)
+		{
+			result = child->value;
+			Element.attributes.erase(child);
+			break;
+		}
+	}
+	return result;
+}
+
 const std::string element_text(const element& Element, const std::string& ElementName, const std::string& DefaultValue)
 {
 	const element* child = find_element(Element, ElementName);
