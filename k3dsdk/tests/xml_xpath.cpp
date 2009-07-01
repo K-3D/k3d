@@ -51,7 +51,13 @@ int main(int argc, char* argv[])
 					attribute("class", "foo")
 					),
 				element("node",
-					attribute("factory", "bar")
+					attribute("factory", "bar"),
+					element("properties",
+						element("property",
+							attribute("user_property", ""),
+							attribute("type", "double")
+							)
+						)
 					)
 				),
 			element("dependencies"
@@ -91,6 +97,9 @@ int main(int argc, char* argv[])
 		test_expression(results.size() == 1);
 		test_expression(find_attribute(*results[0], "class"));
 		test_expression(!find_attribute(*results[0], "factory"));
+
+		results = xpath::match(document, "/k3d/nodes/node/properties/property[@user_property][@type='double']");
+		test_expression(results.size() == 1);
 
 		results = xpath::match(document, "nodes");
 		test_expression(results.size() == 1);

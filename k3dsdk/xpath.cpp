@@ -37,63 +37,64 @@ namespace xml
 namespace xpath
 {
 
-struct action
+struct match_context
 {
-	action(result_set& Results) :
+	match_context(element& Tree, result_set& Results) :
+		tree(Tree),
 		results(Results)
 	{
 	}
 
+	element& tree;
 	result_set& results;
+	string_t attribute_name;
 };
 
-struct match_root_path :
-	public action
+struct match_root_path
 {
-	match_root_path(result_set& Results) :
-		action(Results)
+	match_root_path(match_context& Context) :
+		context(Context)
 	{
 	}
 
 	void operator()(const char&) const
 	{
-		results.clear();
+		context.results.clear();
 	}
+
+	match_context& context;
 };
 
-struct match_absolute_path :
-	public action
+struct match_absolute_path
 {
-	match_absolute_path(element& Tree, result_set& Results) :
-		action(Results),
-		tree(Tree)
+	match_absolute_path(match_context& Context) :
+		context(Context)
 	{
 	}
 
 	void operator()(const char* Begin, const char* End) const
 	{
-		const std::string name(Begin, End);
-		if(name != tree.name)
-			results.clear();
+		const string_t name(Begin, End);
+		if(name != context.tree.name)
+			context.results.clear();
 	}
 
-	element& tree;
+	match_context& context;
 };
 
-struct match_child :
-	public action
+struct match_child
 {
-	match_child(result_set& Results) :
-		action(Results)
+	match_child(match_context& Context) :
+		context(Context)
 	{
 	}
 
 	void operator()(const char* Begin, const char* End) const
 	{
-		const std::string name(Begin, End);
+		const string_t name(Begin, End);
 
 		result_set new_results;
-		for(result_set::const_iterator anchor = results.begin(); anchor != results.end(); ++anchor)
+		for(result_set::const_iterator anchor = context.results.begin(); anchor != context.results.end(); ++anchor)
 		{
 			for(element::elements_t::iterator child = (*anchor)->children.begin(); child != (*anchor)->children.end(); ++child)
 			{
@@ -101,63 +102,89 @@ struct match_child :
 					new_results.push_back(&*child);
 			}
 		}
-		results = new_results;
+		context.results = new_results;
 	}
+
+	match_context& context;
 };
 
-struct match_wildcard :
-	public action
+struct match_wildcard
 {
-	match_wildcard(result_set& Results) :
-		action(Results)
+	match_wildcard(match_context& Context) :
+		context(Context)
 	{
 	}
 
 	void operator()(const char*, const char*) const
 	{
 		result_set new_results;
-		for(result_set::const_iterator anchor = results.begin(); anchor != results.end(); ++anchor)
+		for(result_set::const_iterator anchor = context.results.begin(); anchor != context.results.end(); ++anchor)
 		{
 			for(element::elements_t::iterator child = (*anchor)->children.begin(); child != (*anchor)->children.end(); ++child)
 			{
 				new_results.push_back(&*child);
 			}
 		}
-		results = new_results;
+		context.results = new_results;
 	}
+
+	match_context& context;
 };
 
-struct match_attribute :
-	public action
+struct match_attribute_name
 {
-	match_attribute(result_set& Results) :
-		action(Results)
+	match_attribute_name(match_context& Context) :
+		context(Context)
 	{
 	}
 
 	void operator()(const char* Begin, const char* End) const
 	{
-		const std::string name(Begin, End);
+		context.attribute_name = string_t(Begin, End);
 
 		result_set new_results;
-		for(result_set::const_iterator anchor = results.begin(); anchor != results.end(); ++anchor)
+		for(result_set::const_iterator anchor = context.results.begin(); anchor != context.results.end(); ++anchor)
 		{
-			if(find_attribute(**anchor, name))
+			if(find_attribute(**anchor, context.attribute_name))
 				new_results.push_back(*anchor);
 		}
-		results = new_results;
+		context.results = new_results;
 	}
+
+	match_context& context;
+};
+
+struct match_attribute_value
+{
+	match_attribute_value(match_context& Context) :
+		context(Context)
+	{
+	}
+
+	void operator()(const char* Begin, const char* End) const
+	{
+		const string_t attribute_value = string_t(Begin, End);
+
+		result_set new_results;
+		for(result_set::const_iterator anchor = context.results.begin(); anchor != context.results.end(); ++anchor)
+		{
+			if(attribute_text(**anchor, context.attribute_name) == attribute_value)
+				new_results.push_back(*anchor);
+		}
+		context.results = new_results;
+	}
+
+	match_context& context;
 };
 
 class grammar :
 	public boost::spirit::grammar<grammar>
 {
 public:
-	grammar(element& Tree, result_set& Results) :
-		tree(Tree),
-		results(Results)
+	grammar(match_context& Context) :
+		context(Context)
 	{
-		results.assign(1, &Tree);
+		context.results.assign(1, &context.tree);
 	}
 
 	template<typename ScannerT>
@@ -167,15 +194,15 @@ public:
 		{
 			name = chset_p("_a-zA-Z") >> *chset_p("_a-zA-Z0-9");
 			wildcard = ch_p('*');
-			node_test = name[match_child(self.results)] | wildcard[match_wildcard(self.results)];
-			attribute_test = '@' >> name[match_attribute(self.results)];
-			attribute_value_test = '@' >> name >> '=' >> name;
-			predicate_expression = attribute_test | attribute_value_test;
+			node_test = name[match_child(self.context)] | wildcard[match_wildcard(self.context)];
+			attribute_test = '@' >> name[match_attribute_name(self.context)];
+			attribute_value_test = '@' >> name[match_attribute_name(self.context)] >> ch_p('=') >> confix_p(ch_p('\''), (*anychar_p)[match_attribute_value(self.context)], ch_p('\''));
+			predicate_expression = attribute_value_test | attribute_test;
 			predicate = '[' >> predicate_expression >> ']';
 			predicate_list = *predicate;
 			step = node_test >> !predicate_list;
-			root_path = ch_p('/')[match_root_path(self.results)];
-			absolute_path = ch_p('/') >> name[match_absolute_path(self.tree, self.results)] >> *('/' >> step);
+			root_path = ch_p('/')[match_root_path(self.context)];
+			absolute_path = ch_p('/') >> name[match_absolute_path(self.context)] >> *('/' >> step);
 			relative_path = step >> *('/' >> step);
 			expression = relative_path | absolute_path | root_path;
 		}
@@ -189,8 +216,7 @@ public:
 	};
 
 private:
-	element& tree;
-	result_set& results;
+	match_context& context;
 };
 
 result_set match(element& Tree, const string_t& Expression)
@@ -200,7 +226,8 @@ result_set match(element& Tree, const string_t& Expression)
 		return result_set();
 
 	result_set results;
-	if(!parse(Expression.c_str(), grammar(Tree, results), space_p).full)
+	match_context context(Tree, results);
+	if(!parse(Expression.c_str(), grammar(context), space_p).full)
 	{
 		k3d::log() << error << "Not a valid XPath expression: " << Expression << std::endl;
 		return result_set();
