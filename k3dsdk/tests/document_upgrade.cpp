@@ -63,11 +63,19 @@ int main(int argc, char* argv[])
 						element("shader"),
 						element("property",
 							attribute("value", "12345")
+							),
+						element("property",
+							attribute("user_property", "vanilla"),
+							attribute("type", "double")
 							)
 						)
 					)
 				),
-			element("pipeline"
+			element("pipeline",
+				element("dependency",
+					attribute("from_object", "0"),
+					attribute("to_object", "1")
+					)
 				)
 			);
 
@@ -94,12 +102,17 @@ int main(int argc, char* argv[])
 		test_expression(xpath::match(document, "/k3d/nodes/node/properties/object").size() == 0);
 		test_expression(xpath::match(document, "/k3d/nodes/node/properties/shader").size() == 0);
 		test_expression(xpath::match(document, "/k3d/nodes/node/properties/variable").size() == 0);
-		test_expression(xpath::match(document, "/k3d/nodes/node/properties/property").size() == 6);
+		test_expression(xpath::match(document, "/k3d/nodes/node/properties/property").size() == 7);
 
 		test_expression(xpath::match(document, "/k3d/nodes/node/properties/property[@value]").size() == 0);
 
 		test_expression(xpath::match(document, "/k3d/pipeline").size() == 0);
 		test_expression(xpath::match(document, "/k3d/dependencies").size() == 1);
+
+		test_expression(xpath::match(document, "/k3d/dependencies/dependency[@from_object]").size() == 0);
+		test_expression(xpath::match(document, "/k3d/dependencies/dependency[@to_object]").size() == 0);
+		test_expression(xpath::match(document, "/k3d/dependencies/dependency[@from_node]").size() == 1);
+		test_expression(xpath::match(document, "/k3d/dependencies/dependency[@to_node]").size() == 1);
 	}
 	catch(std::exception& e)
 	{

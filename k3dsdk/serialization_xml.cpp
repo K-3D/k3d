@@ -281,46 +281,13 @@ void upgrade_property_values(element& XMLDocument)
 
 void upgrade_user_property_types(element& XMLDocument)
 {
-	element* const xml_nodes = find_element(XMLDocument, "nodes");
-	if(!xml_nodes)
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/nodes/node/properties/property[@user_property][@type='double']");
+	if(results.empty())
 		return;
 
-	bool nag_attribute = true;
-
-	for(element::elements_t::iterator xml_node = xml_nodes->children.begin(); xml_node != xml_nodes->children.end(); ++xml_node)
-	{
-		if(xml_node->name != "node")
-			continue;
-
-		element* const xml_properties = find_element(*xml_node, "properties");
-		if(!xml_properties)
-			continue;
-
-		for(element::elements_t::iterator xml_property = xml_properties->children.begin(); xml_property != xml_properties->children.end(); ++xml_property)
-		{
-			if(xml_property->name != "property")
-				continue;
-
-			attribute* const xml_user_property = find_attribute(*xml_property, "user_property");
-			if(!xml_user_property)
-				continue;
-
-			attribute* const xml_type = find_attribute(*xml_property, "type");
-			if(!xml_type)
-				continue;
-
-			if(xml_type->value == "double")
-				xml_type->value = "k3d::double_t";
-			else
-				continue;
-
-			if(nag_attribute)
-			{
-				log() << warning << "Upgrading obsolete user property type" << std::endl;
-				nag_attribute = false;
-			}
-		}
-	}
+	log() << warning << "Converting obsolete \"double\" types to \"k3d::double_t\"." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		set_attribute(**result, attribute("type", "k3d::double_t"));
 }
 
 /// Converts <pipeline> tags to <dependencies> tags.
@@ -335,42 +302,28 @@ void upgrade_pipeline_element(element& XMLDocument)
 		(**result).name = "dependencies";
 }
 
-void upgrade_dependency_elements(element& XMLDocument)
+/// Converts "from_object" attributes to "from_node" attributes.
+void upgrade_from_object_attributes(element& XMLDocument)
 {
-	// Update <dependency> properties ...
-	if(element* const xml_dependencies = find_element(XMLDocument, "dependencies"))
-	{
-		bool nag_from = true;
-		bool nag_to = true;
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/dependencies/dependency[@from_object]");
+	if(results.empty())
+		return;
 
-		for(element::elements_t::iterator xml_dependency = xml_dependencies->children.begin(); xml_dependency != xml_dependencies->children.end(); ++xml_dependency)
-		{
-			if(xml_dependency->name != "dependency")
-				continue;
+	log() << warning << "Converting obsolete \"from_object\" attributes to \"from_node\" attributes." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		find_attribute(**result, "from_object")->name = "from_node";
+}
 
-			if(attribute* const from_object = find_attribute(*xml_dependency, "from_object"))
-			{
-				if(nag_from)
-				{
-					nag_from = false;
-					log() << warning << "converting from_object attributes" << std::endl;
-				}
+/// Converts "to_object" attributes to "to_node" attributes.
+void upgrade_to_object_attributes(element& XMLDocument)
+{
+	const xpath::result_set results = xpath::match(XMLDocument, "/k3d/dependencies/dependency[@to_object]");
+	if(results.empty())
+		return;
 
-				from_object->name = "from_node";
-			}
-
-			if(attribute* const to_object = find_attribute(*xml_dependency, "to_object"))
-			{
-				if(nag_to)
-				{
-					nag_to = false;
-					log() << warning << "converting to_object attributes" << std::endl;
-				}
-
-				to_object->name = "to_node";
-			}
-		}
-	}
+	log() << warning << "Converting obsolete \"to_object\" attributes to \"to_node\" attributes." << std::endl;
+	for(xpath::result_set::const_iterator result = results.begin(); result != results.end(); ++result)
+		find_attribute(**result, "to_object")->name = "to_node";
 }
 
 /// Upgrades LSystemParser nodes so their "orientation" property is set correctly
@@ -1341,7 +1294,8 @@ void upgrade_document(element& XMLDocument)
 	detail::upgrade_property_values(XMLDocument);
 	detail::upgrade_user_property_types(XMLDocument);
 	detail::upgrade_pipeline_element(XMLDocument);
-	detail::upgrade_dependency_elements(XMLDocument);
+	detail::upgrade_from_object_attributes(XMLDocument);
+	detail::upgrade_to_object_attributes(XMLDocument);
 	detail::upgrade_l_system_parser_nodes(XMLDocument);
 	detail::upgrade_poly_grid_nodes(XMLDocument);
 	detail::upgrade_poly_sphere_nodes(XMLDocument);
