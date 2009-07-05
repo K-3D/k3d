@@ -81,6 +81,7 @@ public:
 				command_history.push_back(input);
 			command_index = command_history.size();
 			command_signal.emit(input);
+			view.scroll_to(buffer->get_insert());
 
 			return true;
 		}
@@ -118,6 +119,11 @@ public:
 			buffer->place_cursor(buffer->end());
 			return true;
 		}
+		else if(event->keyval == GDK_Home)
+		{
+			buffer->place_cursor(buffer->get_iter_at_mark(begin_input));
+			return true;
+		}
 		else if(event->keyval == GDK_v && (event->state & GDK_CONTROL_MASK))
 		{
 			const k3d::string_t input = Gtk::Clipboard::get()->wait_for_text();
@@ -146,7 +152,6 @@ public:
 		}
 		else if(event->keyval != GDK_Control_L && event->keyval != GDK_Control_R)
 		{
-			buffer->place_cursor(buffer->end());
 			return false;
 		}
 
