@@ -28,6 +28,7 @@
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_cast.h>
+#include <k3dsdk/type_registry.h>
 
 #include <atkmm/object.h>
 
@@ -35,6 +36,7 @@
 #include <gtk/gtk.h>
 
 #include <boost/assign/list_of.hpp>
+#include <stack>
 
 namespace module
 {
@@ -63,19 +65,22 @@ public:
 
 		k3d::log() << debug << "Listening to " << atk_get_toolkit_name() << " " << atk_get_toolkit_version() << std::endl;
 
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:create"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:destroy"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:minimize"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:maximize"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:restore"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:activate"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:deactivate"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:AtkObject:state-change"));
-//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:AtkObject:visible-data-changed"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:GtkButton:enter"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:GtkButton:pressed"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:GtkButton:released"));
-		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:GtkButton:leave"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:create"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:destroy"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:minimize"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:maximize"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:restore"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:activate"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "window:deactivate"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:AtkObject:state-change"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:AtkObject:property-change"));
+////		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:AtkObject:visible-data-changed"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:GtkButton:enter"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:GtkButton:pressed"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:GtkButton:released"));
+//		m_event_listeners.push_back(atk_add_global_event_listener(raw_event_listener, "Gtk:GtkButton:leave"));
+		m_event_listeners.push_back(atk_add_global_event_listener(click_event_listener, "Gtk:GtkButton:clicked"));
+		m_event_listeners.push_back(atk_add_global_event_listener(click_event_listener, "Gtk:GtkMenuItem:activate"));
 	}
 
 	~dialog()
@@ -103,17 +108,90 @@ private:
 		GSignalQuery signal_query;
 		g_signal_query(signal_hint->signal_id, &signal_query);
 		const k3d::string_t signal_name = signal_query.signal_name;
-		Glib::RefPtr<Atk::Object> object = Glib::wrap(ATK_OBJECT(g_value_get_object(param_values + 0)), true);
-
-		k3d::log() << debug << signal_query.signal_name << " [" << object->get_name() << "]";
-
-		if(signal_name == "state-change")
+		Glib::RefPtr<Atk::Object> object;
+		if(GTK_IS_WIDGET(g_value_get_object(param_values)))
 		{
-			k3d::log() << " [" << g_value_get_string(param_values + 1) << "]";
+			Gtk::Widget* widget = Glib::wrap(GTK_WIDGET(g_value_get_object(param_values)));
+			object = widget->get_accessible();
+		}
+		else
+		{
+			object = Glib::wrap(ATK_OBJECT(g_value_get_object(param_values + 0)), true);
+		}
+		return_val_if_fail(object, true);
+
+		k3d::log() << debug << "AtkEvent: signal=" << signal_query.signal_name << ", object=" << object->get_name();
+
+		k3d::log() << debug << ", type=";
+		if(ATK_IS_ACTION(object->gobj()))
+		{
+			k3d::log() << debug << "action, with actions:";
+			AtkAction* action = ATK_ACTION(object->gobj());
+			for(k3d::uint_t i = 0; i != atk_action_get_n_actions(action); ++i)
+				k3d::log() << debug << " (" << atk_action_get_name(action, i) << ")";
 		}
 
-		k3d::log() << std::endl;
+		k3d::log() << debug << ", parameters:";
 
+		for(k3d::uint_t param = 1; param != n_param_values; ++param)
+		{
+			k3d::log() << debug << " [";
+			const GValue* val = param_values + param;
+			if(G_VALUE_HOLDS_STRING(val))
+				k3d::log() << debug << g_value_get_string(val);
+			if(G_VALUE_HOLDS_INT(val))
+				k3d::log() << debug << g_value_get_int(val);
+			k3d::log() << debug << "]";
+		}
+
+		k3d::log() << debug << std::endl;
+
+
+		return true;
+	}
+
+	static gboolean click_event_listener(GSignalInvocationHint* signal_hint, guint n_param_values, const GValue* param_values, gpointer data)
+	{
+		AtkObject* root = atk_get_root();
+		Glib::RefPtr<Atk::Object> object;
+		if(GTK_IS_WIDGET(g_value_get_object(param_values)))
+		{
+			Gtk::Widget* widget = Glib::wrap(GTK_WIDGET(g_value_get_object(param_values)));
+			object = widget->get_accessible();
+		}
+		else
+		{
+			object = Glib::wrap(ATK_OBJECT(g_value_get_object(param_values)), true);
+		}
+		return_val_if_fail(object, true);
+		k3d::bool_t click_found = false;
+		if(ATK_IS_ACTION(object->gobj()))
+		{
+			AtkAction* action = ATK_ACTION(object->gobj());
+			for(k3d::uint_t i = 0; i != atk_action_get_n_actions(action); ++i)
+			{
+				if(std::string(atk_action_get_name(action, i)) == "click")
+					click_found = true;
+			}
+		}
+		return_val_if_fail(click_found, true);
+		std::stack<Glib::RefPtr<Atk::Object> > click_trace;
+		while(object && object->get_index_in_parent() > -1)
+		{
+			click_trace.push(object);
+			object = object->get_parent();
+		}
+		k3d::log() << debug << "k3d.atk.root()";
+		while(!click_trace.empty())
+		{
+			Glib::RefPtr<Atk::Object> obj = click_trace.top();
+			if(obj->get_name() == "")
+				k3d::log() << debug << "[" << obj->get_index_in_parent() << "]";
+			else
+				k3d::log() << debug << "[\"" << obj->get_name() << "\"]";
+			click_trace.pop();
+		}
+		k3d::log() << debug << ".click()" << std::endl;
 		return true;
 	}
 
