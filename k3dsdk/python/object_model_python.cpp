@@ -23,6 +23,7 @@
 
 #include "angle_axis_python.h"
 #include "any_python.h"
+#include "atk_python.h"
 #include "attribute_arrays_python.h"
 #include "bezier_triangle_patch_python.h"
 #include "bicubic_patch_python.h"
@@ -336,6 +337,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_const_typed_array_classes();
 
 	define_class_angle_axis();
+	define_class_atk_object();
 	define_class_attribute_arrays();
 	define_class_bitmap();
 	define_class_bounding_box3();

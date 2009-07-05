@@ -8,6 +8,8 @@ INCLUDE_DIRECTORIES(${K3D_GLIBMM_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${K3D_SIGC_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 
+INCLUDE_DIRECTORIES(${K3D_GTKMM_INCLUDE_DIRS}) # For ATK bindings
+
 LINK_DIRECTORIES(${K3D_BOOST_LIB_DIRS})
 LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 
@@ -119,6 +121,8 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-interfaces k3dsdk-python-mesh)
 TARGET_LINK_LIBRARIES(k3dsdk-python-interfaces k3dsdk-python-values)
 
 ADD_LIBRARY(k3dsdk-python-b SHARED
+    atk_python.cpp
+    atk_python.h
 	attribute_arrays_python.cpp
 	attribute_arrays_python.h
 	const_attribute_arrays_python.cpp
