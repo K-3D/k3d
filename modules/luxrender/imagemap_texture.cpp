@@ -22,6 +22,7 @@
 */
 
 #include "color_texture.h"
+#include "texture2.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
@@ -41,10 +42,10 @@ namespace luxrender
 // imagemap_texture
 
 class imagemap_texture :
-	public k3d::node,
+	public texture2,
 	public color_texture
 {
-	typedef k3d::node base;
+	typedef texture2 base;
 
 public:
 	imagemap_texture(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -56,6 +57,7 @@ public:
 	void setup(const k3d::string_t& Name, std::ostream& Stream)
 	{
 		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"color\" \"imagemap\"";
+		texture2_setup(Stream);
 		Stream << " \"string filename\" \"" << m_file.pipeline_value().native_filesystem_string() << "\"";
 		Stream << "\n"; 
 	}

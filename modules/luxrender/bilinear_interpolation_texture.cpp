@@ -22,6 +22,7 @@
 */
 
 #include "color_texture.h"
+#include "texture2.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
@@ -29,7 +30,6 @@
 #include <k3dsdk/iomanip.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/node.h>
 
 namespace module
 {
@@ -41,10 +41,10 @@ namespace luxrender
 // bilinear_interpolation_texture
 
 class bilinear_interpolation_texture :
-	public k3d::node,
+	public texture2,
 	public color_texture
 {
-	typedef k3d::node base;
+	typedef texture2 base;
 
 public:
 	bilinear_interpolation_texture(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -59,6 +59,7 @@ public:
 	void setup(const k3d::string_t& Name, std::ostream& Stream)
 	{
 		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"color\" \"bilerp\"";
+		texture2_setup(Stream);
 		Stream << " \"color v00\" [" << m_v00.pipeline_value() << "]";
 		Stream << " \"color v01\" [" << m_v01.pipeline_value() << "]";
 		Stream << " \"color v10\" [" << m_v10.pipeline_value() << "]";
