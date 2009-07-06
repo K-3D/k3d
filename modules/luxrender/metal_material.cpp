@@ -22,6 +22,7 @@
 */
 
 #include "material.h"
+#include "scalar_texture_reference.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
@@ -48,16 +49,20 @@ public:
 	metal_material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_name(init_owner(*this) + init_name("name") + init_label(_("Name")) + init_description(_("Metal name, or the path to an NK optical properties file.")) + init_value(k3d::string_t("copper")) + init_values(wrap_names())),
-		m_u_roughness(init_owner(*this) + init_name("u_roughness") + init_label(_("U Roughness")) + init_description(_("Roughness of the surface in the u direction.")) + init_value(0.001)),
-		m_v_roughness(init_owner(*this) + init_name("v_roughness") + init_label(_("V Roughness")) + init_description(_("Roughness of the surface in the v direction.")) + init_value(0.001))
+		m_u_roughness(*this, "u_roughness", _("U Roughness"), _("Roughness of the surface in the u direction."), _("U Roughness Texture"), 0.001),
+		m_v_roughness(*this, "v_roughness", _("V Roughness"), _("Roughness of the surface in the v direction."), _("V Roughness Texture"), 0.001)
 	{
 	}
 
 	void setup(std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "Texture \"a\" \"float\" \"constant\" \"float value\" [" << m_u_roughness.pipeline_value() << "]\n";
-		Stream << k3d::standard_indent << "Texture \"b\" \"float\" \"constant\" \"float value\" [" << m_v_roughness.pipeline_value() << "]\n";
-		Stream << k3d::standard_indent << "Material \"metal\" \"string name\" \"" << m_name.pipeline_value() << "\" \"texture uroughness\" \"a\" \"texture vroughness\" \"b\" \n";
+		m_u_roughness.setup("a", Stream);
+		m_v_roughness.setup("b", Stream);
+
+		Stream << k3d::standard_indent << "Material \"metal\" \"string name\" \"" << m_name.pipeline_value() << "\"";
+		Stream << " \"texture uroughness\" \"a\"";
+		Stream << " \"texture vroughness\" \"b\"";
+		Stream << "\n";
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -75,8 +80,8 @@ public:
 
 private:
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_name;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_u_roughness;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_v_roughness;
+	scalar_texture_reference m_u_roughness;
+	scalar_texture_reference m_v_roughness;
 
 	static const k3d::ilist_property<std::string>::values_t& wrap_names()
 	{

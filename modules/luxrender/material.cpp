@@ -42,7 +42,7 @@ material::material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		init_owner(*this)
 		+ init_name("bumpmap")
 		+ init_label(_("Bumpmap"))
-		+ init_description(_("Bumpmap texture."))
+		+ init_description(_("Optional bumpmap texture."))
 		+ init_value(static_cast<scalar_texture*>(0))
 		)
 {
