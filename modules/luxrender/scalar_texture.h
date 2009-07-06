@@ -1,5 +1,5 @@
-#ifndef MODULES_LUXRENDER_MATERIAL_H
-#define MODULES_LUXRENDER_MATERIAL_H
+#ifndef MODULES_LUXRENDER_SCALAR_TEXTURE_H
+#define MODULES_LUXRENDER_SCALAR_TEXTURE_H
 
 // K-3D
 // Copyright (c) 1995-2009, Timothy M. Shead
@@ -24,12 +24,7 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
-#include "scalar_texture.h"
-
-#include <k3dsdk/data.h>
-#include <k3dsdk/imaterial.h>
 #include <k3dsdk/itexture.h>
-#include <k3dsdk/node.h>
 #include <k3dsdk/types.h>
 
 #include <iosfwd>
@@ -41,28 +36,19 @@ namespace luxrender
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// material
+// scalar_texture
 
-/// Abstract interface for LuxRender material objects
-class material :
-	public k3d::node,
-	public k3d::imaterial
+/// Abstract interface for LuxRender float texture objects
+class scalar_texture :
+	public k3d::itexture
 {
 public:
-	material(k3d::iplugin_factory& Factory, k3d::idocument& Document);
-
-	virtual void setup(std::ostream& Stream) = 0;
-
-	/// Inserts a material into a scene, handling NULL materials by supplying a standard default.
-	static void setup(k3d::imaterial* const Material, std::ostream& Stream);
-
-protected:
-	k3d_data(scalar_texture*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_bumpmap;
+	virtual void setup(const k3d::string_t& Name, std::ostream& Stream) = 0;
 };
 
 } // namespace luxrender
 
 } // namespace module
 
-#endif // !MODULES_LUXRENDER_MATERIAL_H
+#endif // !MODULES_LUXRENDER_SCALAR_TEXTURE_H
 

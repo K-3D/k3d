@@ -24,6 +24,8 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
+#include "color_texture.h"
+
 #include <k3dsdk/color.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/itexture.h>
@@ -56,7 +58,7 @@ public:
 		+ init_name(k3d::make_token((k3d::string_t(Name) + "_texture").c_str()))
 		+ init_label(Label)
 		+ init_description(Description)
-		+ init_value(static_cast<k3d::itexture*>(0))
+		+ init_value(static_cast<color_texture*>(0))
 		)
 	{
 	}
@@ -66,7 +68,7 @@ void setup(const k3d::string_t& Name, std::ostream& Stream);
 
 private:
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
-	k3d_data(k3d::itexture*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_texture;
+	k3d_data(color_texture*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_texture;
 };
 
 } // namespace luxrender

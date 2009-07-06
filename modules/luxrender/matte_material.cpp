@@ -23,6 +23,7 @@
 
 #include "color_texture_reference.h"
 #include "material.h"
+#include "scalar_texture.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
@@ -30,7 +31,6 @@
 #include <k3dsdk/iomanip.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/node.h>
 
 namespace module
 {
@@ -42,10 +42,9 @@ namespace luxrender
 // material
 
 class matte_material :
-	public k3d::node ,
-	public luxrender::material
+	public material
 {
-	typedef k3d::node base;
+	typedef material base;
 
 public:
 	matte_material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -57,9 +56,21 @@ public:
 
 	void setup(std::ostream& Stream)
 	{
+		scalar_texture* const bumpmap = dynamic_cast<scalar_texture*>(m_bumpmap.pipeline_value());
+		if(bumpmap)
+			bumpmap->setup("bumpmap", Stream);
+
 		m_color.setup("a", Stream);
 		Stream << k3d::standard_indent << "Texture \"b\" \"float\" \"constant\" \"float value\" [" << k3d::degrees(m_sigma.pipeline_value()) << "]\n";
-		Stream << k3d::standard_indent << "Material \"matte\" \"texture Kd\" \"a\" \"texture sigma\" \"b\" \n";
+
+		Stream << k3d::standard_indent << "Material \"matte\"";
+
+		if(bumpmap)
+			Stream << " \"texture bumpmap\" \"bumpmap\"";
+
+		Stream << " \"texture Kd\" \"a\"";
+		Stream << " \"texture sigma\" \"b\"";
+		Stream << "\n";
 	}
 
 	static k3d::iplugin_factory& get_factory()

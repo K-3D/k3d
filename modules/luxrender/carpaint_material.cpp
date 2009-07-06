@@ -29,7 +29,6 @@
 #include <k3dsdk/iomanip.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/node.h>
 
 namespace module
 {
@@ -41,10 +40,9 @@ namespace luxrender
 // material
 
 class carpaint_material :
-	public k3d::node ,
-	public luxrender::material
+	public material
 {
-	typedef k3d::node base;
+	typedef material base;
 
 public:
 	carpaint_material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

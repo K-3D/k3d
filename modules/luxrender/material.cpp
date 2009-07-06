@@ -23,6 +23,7 @@
 
 #include "material.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/iomanip.h>
 #include <k3dsdk/material.h>
 
@@ -34,6 +35,18 @@ namespace luxrender
 
 /////////////////////////////////////////////////////////////////////////////
 // material
+
+material::material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	k3d::node(Factory, Document),
+	m_bumpmap(
+		init_owner(*this)
+		+ init_name("bumpmap")
+		+ init_label(_("Bumpmap"))
+		+ init_description(_("Bumpmap texture."))
+		+ init_value(static_cast<scalar_texture*>(0))
+		)
+{
+}
 
 void material::setup(k3d::imaterial* const Material, std::ostream& Stream)
 {
