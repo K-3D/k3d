@@ -36,6 +36,28 @@ namespace module
 namespace luxrender
 {
 
+
+/////////////////////////////////////////////////////////////////////////////
+// name_values
+
+static const k3d::ilist_property<std::string>::values_t& name_values()
+{
+	static k3d::ilist_property<std::string>::values_t values;
+	if(values.empty())
+	{
+		values.push_back("ford f8");
+		values.push_back("polaris silber");
+		values.push_back("opel titan");
+		values.push_back("bmw339");
+		values.push_back("2k acrylack");
+		values.push_back("white");
+		values.push_back("blue");
+		values.push_back("blue matte");
+		values.push_back("");
+	}
+	return values;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // material
 
@@ -47,7 +69,7 @@ class carpaint_material :
 public:
 	carpaint_material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_name(init_owner(*this) + init_name("name") + init_label(_("Name")) + init_description(_("Paint name.")) + init_value(k3d::string_t("ford f8")) + init_values(wrap_names()))
+		m_name(init_owner(*this) + init_name("name") + init_label(_("Name")) + init_description(_("Paint name.")) + init_value(k3d::string_t("ford f8")) + init_values(name_values()))
 	{
 	}
 
@@ -56,8 +78,8 @@ public:
 		setup_bumpmap("a", Stream);
 
 		Stream << k3d::standard_indent << "Material \"carpaint\"";
-		Stream << " \"string name\" \"" << m_name.pipeline_value() << "\"";
-		Stream << " \"texture bumpmap\" \"a\"";
+		Stream << " \"string name\" [\"" << m_name.pipeline_value() << "\"]";
+		Stream << " \"texture bumpmap\" [\"a\"]";
 		Stream << "\n";
 	}
 
@@ -76,24 +98,6 @@ public:
 
 private:
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_name;
-
-	static const k3d::ilist_property<std::string>::values_t& wrap_names()
-	{
-		static k3d::ilist_property<std::string>::values_t values;
-		if(values.empty())
-		{
-			values.push_back("ford f8");
-			values.push_back("polaris silber");
-			values.push_back("opel titan");
-			values.push_back("bmw339");
-			values.push_back("2k acrylack");
-			values.push_back("white");
-			values.push_back("blue");
-			values.push_back("blue matte");
-			values.push_back("");
-		}
-		return values;
-	}
 };
 
 k3d::iplugin_factory& carpaint_material_factory()

@@ -38,6 +38,23 @@ namespace luxrender
 {
 
 /////////////////////////////////////////////////////////////////////////////
+// name_values
+
+static const k3d::ilist_property<std::string>::values_t& name_values()
+{
+	static k3d::ilist_property<std::string>::values_t values;
+	if(values.empty())
+	{
+		values.push_back("amorphous carbon");
+		values.push_back("silver");
+		values.push_back("gold");
+		values.push_back("copper");
+		values.push_back("aluminum");
+	}
+	return values;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // material
 
 class metal_material :
@@ -48,7 +65,7 @@ class metal_material :
 public:
 	metal_material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_name(init_owner(*this) + init_name("name") + init_label(_("Name")) + init_description(_("Metal name, or the path to an NK optical properties file.")) + init_value(k3d::string_t("copper")) + init_values(wrap_names())),
+		m_name(init_owner(*this) + init_name("name") + init_label(_("Name")) + init_description(_("Metal name, or the path to an NK optical properties file.")) + init_value(k3d::string_t("copper")) + init_values(name_values())),
 		m_u_roughness(*this, "u_roughness", _("U Roughness"), _("Roughness of the surface in the u direction."), _("U Roughness Texture"), 0.001),
 		m_v_roughness(*this, "v_roughness", _("V Roughness"), _("Roughness of the surface in the v direction."), _("V Roughness Texture"), 0.001)
 	{
@@ -61,9 +78,9 @@ public:
 		m_v_roughness.setup("c", Stream);
 
 		Stream << k3d::standard_indent << "Material \"metal\" \"string name\" \"" << m_name.pipeline_value() << "\"";
-		Stream << " \"texture bumpmap\" \"a\"";
-		Stream << " \"texture uroughness\" \"b\"";
-		Stream << " \"texture vroughness\" \"c\"";
+		Stream << " \"texture bumpmap\" [\"a\"]";
+		Stream << " \"texture uroughness\" [\"b\"]";
+		Stream << " \"texture vroughness\" [\"c\"]";
 		Stream << "\n";
 	}
 
@@ -84,20 +101,6 @@ private:
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_name;
 	scalar_texture_reference m_u_roughness;
 	scalar_texture_reference m_v_roughness;
-
-	static const k3d::ilist_property<std::string>::values_t& wrap_names()
-	{
-		static k3d::ilist_property<std::string>::values_t values;
-		if(values.empty())
-		{
-			values.push_back("amorphous carbon");
-			values.push_back("silver");
-			values.push_back("gold");
-			values.push_back("copper");
-			values.push_back("aluminum");
-		}
-		return values;
-	}
 };
 
 k3d::iplugin_factory& metal_material_factory()

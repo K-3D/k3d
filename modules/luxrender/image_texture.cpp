@@ -40,9 +40,9 @@ namespace luxrender
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// wrap_names
+// wrap_values
 
-static const k3d::ilist_property<std::string>::values_t& wrap_names()
+static const k3d::ilist_property<std::string>::values_t& wrap_values()
 {
 	static k3d::ilist_property<std::string>::values_t values;
 	if(values.empty())
@@ -50,6 +50,22 @@ static const k3d::ilist_property<std::string>::values_t& wrap_names()
 		values.push_back("repeat");
 		values.push_back("black");
 		values.push_back("clamp");
+	}
+	return values;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// filtertype_values
+
+static const k3d::ilist_property<std::string>::values_t& filtertype_values()
+{
+	static k3d::ilist_property<std::string>::values_t values;
+	if(values.empty())
+	{
+		values.push_back("bilinear");
+		values.push_back("mipmap_trilinear");
+		values.push_back("mapmap_ewa");
+		values.push_back("nearest");
 	}
 	return values;
 }
@@ -68,9 +84,10 @@ public:
 	image_texture(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Path to a bitmap image.")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("texture")),
-		m_wrap(init_owner(*this) + init_name("wrap") + init_label(_("Wrap")) + init_description(_("Specifies how to wrap the texture.")) + init_value(k3d::string_t("repeat")) + init_values(wrap_names())),
-		m_max_anisotropy(init_owner(*this) + init_name("max_anisotropy") + init_label(_("Max Anisotropy")) + init_description(_("Eccentricity of the ellipse used for EWA filtering.")) + init_value(8.0)),
-		m_trilinear(init_owner(*this) + init_name("trilinear") + init_label(_("Trilinear")) + init_description(_("Use faster / lower-quality trilinear filtering.")) + init_value(false))
+		m_wrap(init_owner(*this) + init_name("wrap") + init_label(_("Wrap")) + init_description(_("Specifies how to wrap the texture.")) + init_value(k3d::string_t("repeat")) + init_values(wrap_values())),
+		m_filtertype(init_owner(*this) + init_name("filtertype") + init_label(_("Filter")) + init_description(_("Specifies how to filter the texture.")) + init_value(k3d::string_t("bilinear")) + init_values(filtertype_values())),
+		m_gain(init_owner(*this) + init_name("gain") + init_label(_("Gain")) + init_description(_("Applies a gain function to the texture.")) + init_value(1.0)),
+		m_gamma(init_owner(*this) + init_name("gamma") + init_label(_("Gamma")) + init_description(_("Applies a gamma function to the texture.")) + init_value(2.2))
 	{
 	}
 
@@ -88,10 +105,11 @@ public:
 	{
 		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"" << Type << "\" \"imagemap\"";
 		setup_texture2(Stream);
-		Stream << " \"string filename\" \"" << m_file.pipeline_value().native_filesystem_string() << "\"";
-		Stream << " \"string wrap\" \"" << m_wrap.pipeline_value() << "\"";
-		Stream << " \"float maxanisotropy\" \"" << m_max_anisotropy.pipeline_value() << "\"";
-		Stream << " \"bool trilinear\" \"" << m_trilinear.pipeline_value() << "\"";
+		Stream << " \"string filename\" [\"" << m_file.pipeline_value().native_filesystem_string() << "\"]";
+		Stream << " \"string wrap\" [\"" << m_wrap.pipeline_value() << "\"]";
+		Stream << " \"string filtertype\" [\"" << m_filtertype.pipeline_value() << "\"]";
+		Stream << " \"float gain\" [" << m_gain.pipeline_value() << "]";
+		Stream << " \"float gamma\" [" << m_gamma.pipeline_value() << "]";
 		Stream << "\n"; 
 	}
 
@@ -111,8 +129,9 @@ public:
 private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, with_serialization) m_file;
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_wrap;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_max_anisotropy;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_trilinear;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_filtertype;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gain;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gamma;
 };
 
 k3d::iplugin_factory& image_texture_factory()

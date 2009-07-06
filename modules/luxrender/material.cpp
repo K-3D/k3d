@@ -61,7 +61,7 @@ void material::setup(k3d::imaterial* const Material, std::ostream& Stream)
   Stream << k3d::standard_indent << "Texture \"a\" \"color\" \"constant\" \"color value\" [1 1 1]\n";
   Stream << k3d::standard_indent << "Texture \"b\" \"color\" \"constant\" \"color value\" [0.1 0.1 0.1]\n";
   Stream << k3d::standard_indent << "Texture \"c\" \"float\" \"constant\" \"float value\" [0.000571]\n";
-  Stream << k3d::standard_indent << "Material \"plastic\" \"texture Kd\" \"a\" \"texture Ks\" \"b\" \"texture bumpmap\" \"c\"\n";
+  Stream << k3d::standard_indent << "Material \"plastic\" \"texture Kd\" [\"a\"] \"texture Ks\" [\"b\"] \"texture bumpmap\" [\"c\"]\n";
 }
 
 void material::setup_bumpmap(const k3d::string_t& Name, std::ostream& Stream)

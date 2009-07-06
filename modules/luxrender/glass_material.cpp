@@ -69,13 +69,13 @@ public:
 		m_film_index.setup("g", Stream);
 
 		Stream << k3d::standard_indent << "Material \"glass\"";
-		Stream << " \"texture bumpmap\" \"a\"";
-		Stream << " \"texture Kr\" \"b\"";
-		Stream << " \"texture Kt\" \"c\"";
-		Stream << " \"texture index\" \"d\"";
-		Stream << " \"texture cauchyb\" \"e\"";
-		Stream << " \"texture film\" \"f\"";
-		Stream << " \"texture filmindex\" \"g\"";
+		Stream << " \"texture bumpmap\" [\"a\"]";
+		Stream << " \"texture Kr\" [\"b\"]";
+		Stream << " \"texture Kt\" [\"c\"]";
+		Stream << " \"texture index\" [\"d\"]";
+		Stream << " \"texture cauchyb\" [\"e\"]";
+		Stream << " \"texture film\" [\"f\"]";
+		Stream << " \"texture filmindex\" [\"g\"]";
 		Stream << "\n";
 	}
 

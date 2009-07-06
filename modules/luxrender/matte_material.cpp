@@ -61,9 +61,9 @@ public:
 		m_sigma.setup("c", Stream);
 
 		Stream << k3d::standard_indent << "Material \"matte\"";
-		Stream << " \"texture bumpmap\" \"a\"";
-		Stream << " \"texture Kd\" \"b\"";
-		Stream << " \"texture sigma\" \"c\"";
+		Stream << " \"texture bumpmap\" [\"a\"]";
+		Stream << " \"texture Kd\" [\"b\"]";
+		Stream << " \"texture sigma\" [\"c\"]";
 		Stream << "\n";
 	}
 

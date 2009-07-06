@@ -33,9 +33,9 @@ namespace luxrender
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// mapping_names
+// mapping_values
 
-static const k3d::ilist_property<std::string>::values_t& mapping_names()
+static const k3d::ilist_property<std::string>::values_t& mapping_values()
 {
 	static k3d::ilist_property<std::string>::values_t values;
 	if(values.empty())
@@ -53,7 +53,7 @@ static const k3d::ilist_property<std::string>::values_t& mapping_names()
 
 texture2::texture2(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 	k3d::node(Factory, Document),
-	m_mapping(init_owner(*this) + init_name("mapping") + init_label(_("Mapping")) + init_description(_("Projection mapping.")) + init_value(k3d::string_t("uv")) + init_values(mapping_names())),
+	m_mapping(init_owner(*this) + init_name("mapping") + init_label(_("Mapping")) + init_description(_("Projection mapping.")) + init_value(k3d::string_t("uv")) + init_values(mapping_values())),
 	m_u_scale(init_owner(*this) + init_name("u_scale") + init_label(_("U Scale")) + init_description(_("U Scale.")) + init_value(1.0)),
 	m_v_scale(init_owner(*this) + init_name("v_scale") + init_label(_("V Scale")) + init_description(_("V Scale.")) + init_value(1.0)),
 	m_u_delta(init_owner(*this) + init_name("u_delta") + init_label(_("U Delta")) + init_description(_("U Delta.")) + init_value(0.0)),
