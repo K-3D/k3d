@@ -65,6 +65,7 @@
 #include "iscript_engine.h"
 #include "istring_source.h"
 #include "isurface_shader_ri.h"
+#include "itexture.h"
 #include "itexture_ri.h"
 #include "itime_sink.h"
 #include "itransform_array_1d.h"
@@ -206,6 +207,8 @@ void initialize_types()
 	register_type(typeid(k3d::irender_preview), "k3d::irender_preview");
 	register_type(typeid(k3d::iscript_engine), "k3d::iscript_engine");
 	register_type(typeid(k3d::istring_source), "k3d::istring_source");
+  register_type(typeid(k3d::itexture), "k3d::itexture");
+  register_type(typeid(k3d::itexture*), "k3d::itexture*");
 	register_type(typeid(k3d::itime_sink), "k3d::itime_sink");
 	register_type(typeid(k3d::itransform_array_1d), "k3d::itransform_array_1d");
 	register_type(typeid(k3d::itransform_array_2d), "k3d::itransform_array_2d");
