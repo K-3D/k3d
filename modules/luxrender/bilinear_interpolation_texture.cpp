@@ -56,10 +56,10 @@ public:
 	{
 	}
 
-	void setup(const k3d::string_t& Name, std::ostream& Stream)
+	void setup_color_texture(const k3d::string_t& Name, std::ostream& Stream)
 	{
 		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"color\" \"bilerp\"";
-		texture2_setup(Stream);
+		setup_texture2(Stream);
 		Stream << " \"color v00\" [" << m_v00.pipeline_value() << "]";
 		Stream << " \"color v01\" [" << m_v01.pipeline_value() << "]";
 		Stream << " \"color v10\" [" << m_v10.pipeline_value() << "]";

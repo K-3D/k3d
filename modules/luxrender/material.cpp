@@ -22,6 +22,7 @@
 */
 
 #include "material.h"
+#include "scalar_texture.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/iomanip.h>
@@ -61,6 +62,17 @@ void material::setup(k3d::imaterial* const Material, std::ostream& Stream)
   Stream << k3d::standard_indent << "Texture \"b\" \"color\" \"constant\" \"color value\" [0.1 0.1 0.1]\n";
   Stream << k3d::standard_indent << "Texture \"c\" \"float\" \"constant\" \"float value\" [0.000571]\n";
   Stream << k3d::standard_indent << "Material \"plastic\" \"texture Kd\" \"a\" \"texture Ks\" \"b\" \"texture bumpmap\" \"c\"\n";
+}
+
+void material::setup_bumpmap(const k3d::string_t& Name, std::ostream& Stream)
+{
+	if(scalar_texture* const texture = dynamic_cast<scalar_texture*>(m_bumpmap.pipeline_value()))
+	{
+		texture->setup_scalar_texture(Name, Stream);
+		return;
+	}
+
+	Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"float\" \"constant\" \"float value\" [0.0]\n";
 }
 
 } // namespace luxrender

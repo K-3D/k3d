@@ -43,7 +43,7 @@ class scalar_texture :
 	public k3d::itexture
 {
 public:
-	virtual void setup(const k3d::string_t& Name, std::ostream& Stream) = 0;
+	virtual void setup_scalar_texture(const k3d::string_t& Name, std::ostream& Stream) = 0;
 };
 
 } // namespace luxrender

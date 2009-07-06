@@ -57,6 +57,9 @@ public:
 	static void setup(k3d::imaterial* const Material, std::ostream& Stream);
 
 protected:
+	void setup_bumpmap(const k3d::string_t& Name, std::ostream& Stream);
+
+private:
 	k3d_data(scalar_texture*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_bumpmap;
 };
 

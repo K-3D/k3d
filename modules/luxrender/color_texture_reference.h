@@ -45,7 +45,7 @@ class color_texture_reference
 {
 public:
 	template<typename OwnerT>
-	color_texture_reference(OwnerT& Owner, const char* const Name, const char* const Label, const char* const Description, const k3d::color& Value) :
+	color_texture_reference(OwnerT& Owner, const char* const Name, const char* const Label, const char* const Description, const char* const TextureLabel, const k3d::color& Value) :
 	m_color(
 		init_owner(Owner)
 		+ init_name(Name)
@@ -56,7 +56,7 @@ public:
 	m_texture(
 		init_owner(Owner)
 		+ init_name(k3d::make_token((k3d::string_t(Name) + "_texture").c_str()))
-		+ init_label(Label)
+		+ init_label(TextureLabel)
 		+ init_description(Description)
 		+ init_value(static_cast<color_texture*>(0))
 		)

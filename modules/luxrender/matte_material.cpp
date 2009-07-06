@@ -23,7 +23,7 @@
 
 #include "color_texture_reference.h"
 #include "material.h"
-#include "scalar_texture.h"
+#include "scalar_texture_reference.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
@@ -49,27 +49,21 @@ class matte_material :
 public:
 	matte_material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_color(*this, "kd", _("Color"), _("Color."), k3d::color(0.8, 0.8, 0.8)),
-		m_sigma(init_owner(*this) + init_name("sigma") + init_label(_("Sigma")) + init_description(_("The sigma parameter in the Oren-Nayer shader in degrees.  Zero for pure Lambertian reflection.")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
+		m_color(*this, "kd", _("Color"), _("Diffuse Color."), _("Color Texture"), k3d::color(0.8, 0.8, 0.8)),
+		m_sigma(*this, "sigma", _("Sigma"), _("The sigma parameter in the Oren-Nayer shader in degrees.  Zero for pure Lambertian reflection."), _("Sigma Texture"), 0.0)
 	{
 	}
 
 	void setup(std::ostream& Stream)
 	{
-		scalar_texture* const bumpmap = dynamic_cast<scalar_texture*>(m_bumpmap.pipeline_value());
-		if(bumpmap)
-			bumpmap->setup("bumpmap", Stream);
-
-		m_color.setup("a", Stream);
-		Stream << k3d::standard_indent << "Texture \"b\" \"float\" \"constant\" \"float value\" [" << k3d::degrees(m_sigma.pipeline_value()) << "]\n";
+		setup_bumpmap("a", Stream);
+		m_color.setup("b", Stream);
+		m_sigma.setup("c", Stream);
 
 		Stream << k3d::standard_indent << "Material \"matte\"";
-
-		if(bumpmap)
-			Stream << " \"texture bumpmap\" \"bumpmap\"";
-
-		Stream << " \"texture Kd\" \"a\"";
-		Stream << " \"texture sigma\" \"b\"";
+		Stream << " \"texture bumpmap\" \"a\"";
+		Stream << " \"texture Kd\" \"b\"";
+		Stream << " \"texture sigma\" \"c\"";
 		Stream << "\n";
 	}
 
@@ -88,7 +82,7 @@ public:
 
 private:
 	color_texture_reference m_color;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_sigma;
+	scalar_texture_reference m_sigma;
 };
 
 k3d::iplugin_factory& matte_material_factory()

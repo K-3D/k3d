@@ -33,7 +33,7 @@ namespace luxrender
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// texture2
+// mapping_names
 
 static const k3d::ilist_property<std::string>::values_t& mapping_names()
 {
@@ -56,14 +56,14 @@ texture2::texture2(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 	m_mapping(init_owner(*this) + init_name("mapping") + init_label(_("Mapping")) + init_description(_("Projection mapping.")) + init_value(k3d::string_t("uv")) + init_values(mapping_names())),
 	m_u_scale(init_owner(*this) + init_name("u_scale") + init_label(_("U Scale")) + init_description(_("U Scale.")) + init_value(1.0)),
 	m_v_scale(init_owner(*this) + init_name("v_scale") + init_label(_("V Scale")) + init_description(_("V Scale.")) + init_value(1.0)),
-	m_u_delta(init_owner(*this) + init_name("u_scale") + init_label(_("U Delta")) + init_description(_("U Delta.")) + init_value(0.0)),
-	m_v_delta(init_owner(*this) + init_name("v_scale") + init_label(_("V Delta")) + init_description(_("V Delta.")) + init_value(0.0)),
+	m_u_delta(init_owner(*this) + init_name("u_delta") + init_label(_("U Delta")) + init_description(_("U Delta.")) + init_value(0.0)),
+	m_v_delta(init_owner(*this) + init_name("v_delta") + init_label(_("V Delta")) + init_description(_("V Delta.")) + init_value(0.0)),
 	m_u_axis(init_owner(*this) + init_name("u_axis") + init_label(_("U Axis")) + init_description(_("Specify the U axis for planar mapping.")) + init_value(k3d::vector3(1, 0, 0))),
 	m_v_axis(init_owner(*this) + init_name("v_axis") + init_label(_("V Axis")) + init_description(_("Specify the V axis for planar mapping.")) + init_value(k3d::vector3(0, 1, 0)))
 {
 }
 
-void texture2::texture2_setup(std::ostream& Stream)
+void texture2::setup_texture2(std::ostream& Stream)
 {
 	const k3d::string_t mapping = m_mapping.pipeline_value();
 

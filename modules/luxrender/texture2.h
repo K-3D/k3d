@@ -48,7 +48,7 @@ public:
 	texture2(k3d::iplugin_factory& Factory, k3d::idocument& Document);
 
 protected:
-	void texture2_setup(std::ostream& Stream);
+	void setup_texture2(std::ostream& Stream);
 
 private:
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_mapping;

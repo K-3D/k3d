@@ -56,12 +56,14 @@ public:
 
 	void setup(std::ostream& Stream)
 	{
-		m_u_roughness.setup("a", Stream);
-		m_v_roughness.setup("b", Stream);
+		setup_bumpmap("a", Stream);
+		m_u_roughness.setup("b", Stream);
+		m_v_roughness.setup("c", Stream);
 
 		Stream << k3d::standard_indent << "Material \"metal\" \"string name\" \"" << m_name.pipeline_value() << "\"";
-		Stream << " \"texture uroughness\" \"a\"";
-		Stream << " \"texture vroughness\" \"b\"";
+		Stream << " \"texture bumpmap\" \"a\"";
+		Stream << " \"texture uroughness\" \"b\"";
+		Stream << " \"texture vroughness\" \"c\"";
 		Stream << "\n";
 	}
 

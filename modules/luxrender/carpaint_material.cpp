@@ -53,7 +53,12 @@ public:
 
 	void setup(std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "Material \"carpaint\" \"string name\" \"" << m_name.pipeline_value() << "\" \n";
+		setup_bumpmap("a", Stream);
+
+		Stream << k3d::standard_indent << "Material \"carpaint\"";
+		Stream << " \"string name\" \"" << m_name.pipeline_value() << "\"";
+		Stream << " \"texture bumpmap\" \"a\"";
+		Stream << "\n";
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -39,7 +39,7 @@ void scalar_texture_reference::setup(const k3d::string_t& Name, std::ostream& St
 {
 	if(scalar_texture* const texture = dynamic_cast<scalar_texture*>(m_texture.pipeline_value()))
 	{
-		texture->setup(Name, Stream);
+		texture->setup_scalar_texture(Name, Stream);
 		return;
 	}
 

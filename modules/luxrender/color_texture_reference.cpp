@@ -39,7 +39,7 @@ void color_texture_reference::setup(const k3d::string_t& Name, std::ostream& Str
 {
 	if(color_texture* const texture = dynamic_cast<color_texture*>(m_texture.pipeline_value()))
 	{
-		texture->setup(Name, Stream);
+		texture->setup_color_texture(Name, Stream);
 		return;
 	}
 
