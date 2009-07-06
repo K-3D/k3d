@@ -30,6 +30,7 @@ namespace module
 namespace luxrender
 {
 
+extern k3d::iplugin_factory& carpaint_material_factory();
 extern k3d::iplugin_factory& distant_light_factory();
 extern k3d::iplugin_factory& environment_light_factory();
 extern k3d::iplugin_factory& glass_material_factory();
@@ -46,6 +47,7 @@ extern k3d::iplugin_factory& sun_light_factory();
 } // namespace module
 
 K3D_MODULE_START(Registry)
+	Registry.register_factory(module::luxrender::carpaint_material_factory());
 	Registry.register_factory(module::luxrender::distant_light_factory());
 	Registry.register_factory(module::luxrender::environment_light_factory());
 	Registry.register_factory(module::luxrender::glass_material_factory());
