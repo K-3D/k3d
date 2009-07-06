@@ -42,7 +42,7 @@ namespace luxrender
 
 class metal_material :
 	public k3d::node ,
-  public luxrender::material
+	public luxrender::material
 {
 	typedef k3d::node base;
 
@@ -55,12 +55,12 @@ public:
 	{
 	}
 
-  void setup(std::ostream& Stream)
-  {
-    Stream << k3d::standard_indent << "Texture \"a\" \"float\" \"constant\" \"float value\" [" << m_u_roughness.pipeline_value() << "]\n";
-    Stream << k3d::standard_indent << "Texture \"b\" \"float\" \"constant\" \"float value\" [" << m_v_roughness.pipeline_value() << "]\n";
-    Stream << k3d::standard_indent << "Material \"metal\" \"string name\" \"" << m_name.pipeline_value() << "\" \"texture uroughness\" \"a\" \"texture vroughness\" \"b\" \n";
-  }
+	void setup(std::ostream& Stream)
+	{
+		Stream << k3d::standard_indent << "Texture \"a\" \"float\" \"constant\" \"float value\" [" << m_u_roughness.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "Texture \"b\" \"float\" \"constant\" \"float value\" [" << m_v_roughness.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "Material \"metal\" \"string name\" \"" << m_name.pipeline_value() << "\" \"texture uroughness\" \"a\" \"texture vroughness\" \"b\" \n";
+	}
 
 	static k3d::iplugin_factory& get_factory()
 	{

@@ -42,7 +42,7 @@ namespace luxrender
 
 class carpaint_material :
 	public k3d::node ,
-  public luxrender::material
+	public luxrender::material
 {
 	typedef k3d::node base;
 
@@ -53,15 +53,15 @@ public:
 	{
 	}
 
-  void setup(std::ostream& Stream)
-  {
-    Stream << k3d::standard_indent << "Material \"carpaint\" \"string name\" \"" << m_name.pipeline_value() << "\" \n";
-  }
+	void setup(std::ostream& Stream)
+	{
+		Stream << k3d::standard_indent << "Material \"carpaint\" \"string name\" \"" << m_name.pipeline_value() << "\" \n";
+	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<carpaint_material,
-				k3d::interface_list<k3d::imaterial> > factory(
+			k3d::interface_list<k3d::imaterial> > factory(
 			k3d::uuid(0xa8a9550f, 0x0c496f29, 0xf31fc2a8, 0xa7467491),
 			"LuxRenderCarpaintMaterial",
 			_("LuxRender Carpaint Material"),

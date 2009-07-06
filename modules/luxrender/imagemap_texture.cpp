@@ -21,8 +21,7 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
-#include "color_texture_reference.h"
-#include "material.h"
+#include "color_texture.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
@@ -39,50 +38,48 @@ namespace luxrender
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// material
+// imagemap_texture
 
-class matte_material :
-	public k3d::node ,
-	public luxrender::material
+class imagemap_texture :
+	public k3d::node,
+	public color_texture
 {
 	typedef k3d::node base;
 
 public:
-	matte_material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	imagemap_texture(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_color(*this, "kd", _("Color"), _("Color."), k3d::color(0.8, 0.8, 0.8)),
-		m_sigma(init_owner(*this) + init_name("sigma") + init_label(_("Sigma")) + init_description(_("The sigma parameter in the Oren-Nayer shader in degrees.  Zero for pure Lambertian reflection.")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
+		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Path to a bitmap image.")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("texture"))
 	{
 	}
 
-	void setup(std::ostream& Stream)
+	void setup(const k3d::string_t& Name, std::ostream& Stream)
 	{
-		m_color.setup("a", Stream);
-		Stream << k3d::standard_indent << "Texture \"b\" \"float\" \"constant\" \"float value\" [" << k3d::degrees(m_sigma.pipeline_value()) << "]\n";
-		Stream << k3d::standard_indent << "Material \"matte\" \"texture Kd\" \"a\" \"texture sigma\" \"b\" \n";
+		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"color\" \"imagemap\"";
+		Stream << " \"string filename\" \"" << m_file.pipeline_value().native_filesystem_string() << "\"";
+		Stream << "\n"; 
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<matte_material,
-			k3d::interface_list<k3d::imaterial> > factory(
-			k3d::uuid(0x77bbeecb, 0x59483223, 0x142c92b9, 0x235096bb),
-			"LuxRenderMatteMaterial",
-			_("LuxRender Matte Material"),
-			"LuxRender Material",
+		static k3d::document_plugin_factory<imagemap_texture,
+			k3d::interface_list<k3d::itexture> > factory(
+			k3d::uuid(0x4c6d4e1b, 0x46488112, 0xc82d33a9, 0x0518b7df),
+			"LuxRenderImagemapTexture",
+			_("LuxRender Imagemap Texture"),
+			"LuxRender Texture",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
 
 private:
-	color_texture_reference m_color;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_sigma;
+	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, with_serialization) m_file;
 };
 
-k3d::iplugin_factory& matte_material_factory()
+k3d::iplugin_factory& imagemap_texture_factory()
 {
-	return matte_material::get_factory();
+	return imagemap_texture::get_factory();
 }
 
 } // namespace luxrender
