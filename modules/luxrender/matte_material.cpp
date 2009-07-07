@@ -54,19 +54,6 @@ public:
 	{
 	}
 
-	void setup(std::ostream& Stream)
-	{
-		setup_bumpmap("a", Stream);
-		m_color.setup("b", Stream);
-		m_sigma.setup("c", Stream);
-
-		Stream << k3d::standard_indent << "Material \"matte\"";
-		Stream << " \"texture bumpmap\" [\"a\"]";
-		Stream << " \"texture Kd\" [\"b\"]";
-		Stream << " \"texture sigma\" [\"c\"]";
-		Stream << "\n";
-	}
-
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<matte_material,
@@ -81,6 +68,20 @@ public:
 	}
 
 private:
+	void on_setup(material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
+	{
+		setup_bumpmap("a", Stream);
+		m_color.setup("b", Stream);
+		m_sigma.setup("c", Stream);
+
+		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"";
+		Stream << " \"string type\" [\"matte\"]";
+		Stream << " \"texture bumpmap\" [\"a\"]";
+		Stream << " \"texture Kd\" [\"b\"]";
+		Stream << " \"texture sigma\" [\"c\"]";
+		Stream << "\n";
+	}
+
 	color_texture_reference m_color;
 	scalar_texture_reference m_sigma;
 };

@@ -49,19 +49,18 @@ material::material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 {
 }
 
-void material::setup(k3d::imaterial* const Material, std::ostream& Stream)
+void material::setup(name_map& MaterialNames, std::ostream& Stream)
 {
-  if(material* const lux_material = k3d::material::lookup<material>(Material))
-  {
-    lux_material->setup(Stream);
-    return;
-  }
+	if(MaterialNames.count(this))
+		return;
 
-  // Provide a default material ...
-  Stream << k3d::standard_indent << "Texture \"a\" \"color\" \"constant\" \"color value\" [1 1 1]\n";
-  Stream << k3d::standard_indent << "Texture \"b\" \"color\" \"constant\" \"color value\" [0.1 0.1 0.1]\n";
-  Stream << k3d::standard_indent << "Texture \"c\" \"float\" \"constant\" \"float value\" [0.000571]\n";
-  Stream << k3d::standard_indent << "Material \"plastic\" \"texture Kd\" [\"a\"] \"texture Ks\" [\"b\"] \"texture bumpmap\" [\"c\"]\n";
+	std::ostringstream name_buffer;
+	name_buffer << "Material" << MaterialNames.size();
+	const k3d::string_t name = name_buffer.str();
+
+	MaterialNames.insert(std::make_pair(this, name));
+
+	on_setup(MaterialNames, name, Stream);
 }
 
 void material::setup_bumpmap(const k3d::string_t& Name, std::ostream& Stream)
@@ -73,6 +72,27 @@ void material::setup_bumpmap(const k3d::string_t& Name, std::ostream& Stream)
 	}
 
 	Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"float\" \"constant\" \"float value\" [0.0]\n";
+}
+
+void material::use(const name_map& MaterialNames, k3d::imaterial* const Material, std::ostream& Stream)
+{
+	// Insert a reference to an existing material ...
+	if(material* const lux_material = k3d::material::lookup<material>(Material))
+	{
+		if(MaterialNames.count(lux_material))
+		{
+			Stream << k3d::standard_indent << "NamedMaterial \"" << MaterialNames.find(lux_material)->second << "\"\n";
+			return;
+		}
+
+		k3d::log() << error << "Missing named material, falling-back to default material instead." << std::endl;
+	}
+
+	// Otherwise, provide a default material ...
+	Stream << k3d::standard_indent << "Texture \"a\" \"color\" \"constant\" \"color value\" [1 1 1]\n";
+	Stream << k3d::standard_indent << "Texture \"b\" \"color\" \"constant\" \"color value\" [0.1 0.1 0.1]\n";
+	Stream << k3d::standard_indent << "Texture \"c\" \"float\" \"constant\" \"float value\" [0.000571]\n";
+	Stream << k3d::standard_indent << "Material \"plastic\" \"texture Kd\" [\"a\"] \"texture Ks\" [\"b\"] \"texture bumpmap\" [\"c\"]\n";
 }
 
 } // namespace luxrender

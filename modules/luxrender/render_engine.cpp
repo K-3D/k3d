@@ -297,14 +297,14 @@ private:
 		k3d::uint_t m_current_face;
 	};
 
-	void render_disk(k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::disk::const_primitive& Disk, std::ostream& Stream)
+	void render_disk(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::disk::const_primitive& Disk, std::ostream& Stream)
 	{
 		for(k3d::uint_t i = 0; i != Disk.matrices.size(); ++i)
 		{
 			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
 			Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Disk.matrices[i]) << "]\n" << k3d::push_indent;
 
-			material::setup(Disk.materials[i], Stream);
+			material::use(MaterialNames, Disk.materials[i], Stream);
 
 			Stream << k3d::standard_indent << "Shape \"disk\"";
 			Stream << " \"float height\" [" << Disk.heights[i] << "]";
@@ -315,7 +315,7 @@ private:
 		}
 	}
 
-	void render_polyhedron(k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::polyhedron::const_primitive& Polyhedron, std::ostream& Stream)
+	void render_polyhedron(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::polyhedron::const_primitive& Polyhedron, std::ostream& Stream)
 	{
 		// Triangulate the polyhedron faces ...
 		k3d::mesh::points_t points(*Mesh.points);
@@ -333,7 +333,7 @@ private:
 
 		for(std::set<luxrender::material*>::const_iterator material = material_list.begin(); material != material_list.end(); ++material)
 		{
-			material::setup(*material, Stream);
+			material::use(MaterialNames, *material, Stream);
 
 			Stream << k3d::standard_indent << "Shape \"trianglemesh\"";
 
@@ -362,13 +362,13 @@ private:
 		Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
-	void render_sphere(k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::sphere::const_primitive& Sphere, std::ostream& Stream)
+	void render_sphere(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::sphere::const_primitive& Sphere, std::ostream& Stream)
 	{
 		for(k3d::uint_t i = 0; i != Sphere.matrices.size(); ++i)
 		{
 			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
 
-			material::setup(Sphere.materials[i], Stream);
+			material::use(MaterialNames, Sphere.materials[i], Stream);
 
 			Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Sphere.matrices[i]) << "]\n" << k3d::push_indent;
 			Stream << k3d::standard_indent << "Shape \"sphere\"";
@@ -381,7 +381,7 @@ private:
 		}
 	}
 
-	void render_mesh_instance(k3d::inode& MeshInstance, std::ostream& Stream)
+	void render_mesh_instance(const material::name_map& MaterialNames, k3d::inode& MeshInstance, std::ostream& Stream)
 	{
 		const k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(MeshInstance, "output_mesh");
 		if(!mesh)
@@ -392,21 +392,21 @@ private:
 			boost::scoped_ptr<k3d::disk::const_primitive> disk(k3d::disk::validate(**primitive));
 			if(disk)
 			{
-				render_disk(MeshInstance, *mesh, *disk, Stream);
+				render_disk(MaterialNames, MeshInstance, *mesh, *disk, Stream);
 				continue;
 			}
 
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
 			if(polyhedron)
 			{
-				render_polyhedron(MeshInstance, *mesh, *polyhedron, Stream);
+				render_polyhedron(MaterialNames, MeshInstance, *mesh, *polyhedron, Stream);
 				continue;
 			}
 
 			boost::scoped_ptr<k3d::sphere::const_primitive> sphere(k3d::sphere::validate(**primitive));
 			if(sphere)
 			{
-				render_sphere(MeshInstance, *mesh, *sphere, Stream);
+				render_sphere(MaterialNames, MeshInstance, *mesh, *sphere, Stream);
 				continue;
 			}
 		}
@@ -484,17 +484,13 @@ private:
 				}
 			}
 
-/*
 			// Setup materials, assigning unique names as-we-go ...
-			std::map<luxrender::material*, k3d::string_t> material_names;
-			const std::vector<luxrender::material*> materials = k3d::node::lookup<luxrender::material>(document());
+			material::name_map material_names;
+			const std::vector<material*> materials = k3d::node::lookup<material>(document());
 			for(k3d::uint_t i = 0; i != materials.size(); ++i)
 			{
-				const k3d::string_t material_name = "material_" + k3d::string_cast(material_names.size());
-				material_names.insert(std::make_pair(materials[i], material_name));
-				materials[i]->setup(material_name, stream);
+				materials[i]->setup(material_names, stream);
 			}
-*/
 
 			// Render geometry ...
 			const k3d::inode_collection_property::nodes_t visible_nodes = m_visible_nodes.pipeline_value();
@@ -503,7 +499,7 @@ private:
 				if((*node)->factory().factory_id() != k3d::classes::MeshInstance())
 					continue;
 
-				render_mesh_instance(**node, stream);
+				render_mesh_instance(material_names, **node, stream);
 			}
 
 			stream << k3d::pop_indent << k3d::standard_indent << "WorldEnd\n";
