@@ -100,6 +100,7 @@ public:
 
 		engine->execute(get_factory().name(), "import sys\n", context);
 		engine->execute(get_factory().name(), "print \"Python \" + sys.version + \" on \" + sys.platform", context, &stdout_slot, &stderr_slot);
+		engine->execute(get_factory().name(), "import k3d\n", context);
 
 		print_prompt(">>> ");
 	}
