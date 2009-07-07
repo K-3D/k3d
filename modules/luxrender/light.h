@@ -35,7 +35,7 @@ namespace luxrender
 /////////////////////////////////////////////////////////////////////////////
 // light
 
-/// Used to "flag" Indigo light objects
+/// Abstract interface for LuxRender light nodes.
 class light
 {
 public:

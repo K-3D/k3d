@@ -44,7 +44,7 @@ namespace luxrender
 /////////////////////////////////////////////////////////////////////////////
 // material
 
-/// Abstract interface for LuxRender material objects
+/// Abstract interface for LuxRender material nodes.
 class material :
 	public k3d::node,
 	public k3d::imaterial
