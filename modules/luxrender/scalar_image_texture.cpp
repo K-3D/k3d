@@ -21,7 +21,7 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
-#include "color_texture.h"
+#include "scalar_texture.h"
 #include "texture2.h"
 
 #include <k3d-i18n-config.h>
@@ -70,16 +70,16 @@ static const k3d::ilist_property<std::string>::values_t& filtertype_values()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// image_texture
+// scalar_image_texture
 
-class image_texture :
+class scalar_image_texture :
 	public texture2,
-	public color_texture
+	public scalar_texture
 {
 	typedef texture2 base;
 
 public:
-	image_texture(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	scalar_image_texture(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("Path to a bitmap image.")) + init_value(k3d::filesystem::path()) + init_path_mode(k3d::ipath_property::READ) + init_path_type("texture")),
 		m_wrap(init_owner(*this) + init_name("wrap") + init_label(_("Wrap")) + init_description(_("Specifies how to wrap the texture.")) + init_value(k3d::string_t("repeat")) + init_values(wrap_values())),
@@ -91,7 +91,7 @@ public:
 
 	void on_setup(name_map& TextureNames, const k3d::string_t& Name, std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"color\" \"imagemap\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"float\" \"imagemap\"\n" << k3d::push_indent;
 		setup_texture2(Stream);
 		Stream << k3d::standard_indent << "\"string filename\" [\"" << m_file.pipeline_value().native_filesystem_string() << "\"]\n";
 		Stream << k3d::standard_indent << "\"string wrap\" [\"" << m_wrap.pipeline_value() << "\"]\n";
@@ -103,11 +103,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<image_texture,
+		static k3d::document_plugin_factory<scalar_image_texture,
 			k3d::interface_list<k3d::itexture> > factory(
-			k3d::uuid(0x4c6d4e1b, 0x46488112, 0xc82d33a9, 0x0518b7df),
-			"LuxRenderImageTexture",
-			_("LuxRender Image Texture"),
+			k3d::uuid(0xf730e933, 0xb44761f7, 0x7d5ef696, 0x4290345f),
+			"LuxRenderScalarImageTexture",
+			_("LuxRender Scalar Image Texture"),
 			"LuxRender Texture",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -122,9 +122,9 @@ private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gamma;
 };
 
-k3d::iplugin_factory& image_texture_factory()
+k3d::iplugin_factory& scalar_image_texture_factory()
 {
-	return image_texture::get_factory();
+	return scalar_image_texture::get_factory();
 }
 
 } // namespace luxrender

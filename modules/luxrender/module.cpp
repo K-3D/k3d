@@ -43,6 +43,7 @@ extern k3d::iplugin_factory& mix_material_factory();
 extern k3d::iplugin_factory& null_material_factory();
 extern k3d::iplugin_factory& point_light_factory();
 extern k3d::iplugin_factory& render_engine_factory();
+extern k3d::iplugin_factory& scalar_image_texture_factory();
 extern k3d::iplugin_factory& sky_light_factory();
 extern k3d::iplugin_factory& sun_light_factory();
 
@@ -64,6 +65,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::luxrender::null_material_factory());
 	Registry.register_factory(module::luxrender::point_light_factory());
 	Registry.register_factory(module::luxrender::render_engine_factory());
+	Registry.register_factory(module::luxrender::scalar_image_texture_factory());
 	Registry.register_factory(module::luxrender::sky_light_factory());
 	Registry.register_factory(module::luxrender::sun_light_factory());
 K3D_MODULE_END
