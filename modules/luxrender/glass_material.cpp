@@ -72,26 +72,20 @@ public:
 	}
 
 private:
-	void on_setup(material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
+	void on_setup(const texture::name_map& TextureNames, material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
 	{
-		setup_bumpmap("a", Stream);
-		m_kr.setup("b", Stream);
-		m_kt.setup("c", Stream);
-		m_index.setup("d", Stream);
-		m_cauchy_b.setup("e", Stream);
-		m_film.setup("f", Stream);
-		m_film_index.setup("g", Stream);
+		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "\"string type\" [\"glass\"]\n";
+		
+		setup_bumpmap(TextureNames, Stream);
+		m_kr.setup(TextureNames, "color", "Kr", Stream);
+		m_kt.setup(TextureNames, "color", "Kt", Stream);
+		m_index.setup(TextureNames, "float", "index", Stream);
+		m_cauchy_b.setup(TextureNames, "float", "cauchyb", Stream);
+		m_film.setup(TextureNames, "float", "film", Stream);
+		m_film_index.setup(TextureNames, "float", "filmindex", Stream);
 
-		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"";
-		Stream << " \"string type\" [\"glass\"]";
-		Stream << " \"texture bumpmap\" [\"a\"]";
-		Stream << " \"texture Kr\" [\"b\"]";
-		Stream << " \"texture Kt\" [\"c\"]";
-		Stream << " \"texture index\" [\"d\"]";
-		Stream << " \"texture cauchyb\" [\"e\"]";
-		Stream << " \"texture film\" [\"f\"]";
-		Stream << " \"texture filmindex\" [\"g\"]";
-		Stream << "\n";
+		Stream << k3d::pop_indent;
 	}
 
 	color_texture_reference m_kr;

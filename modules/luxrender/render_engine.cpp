@@ -23,6 +23,7 @@
 
 #include "light.h"
 #include "material.h"
+#include "texture.h"
 #include "utility.h"
 
 #include <k3d-i18n-config.h>
@@ -484,13 +485,17 @@ private:
 				}
 			}
 
+			// Setup textures, assigning unique names as-we-go ...
+			texture::name_map texture_names;
+			const std::vector<texture*> textures = k3d::node::lookup<texture>(document());
+			for(k3d::uint_t i = 0; i != textures.size(); ++i)
+				textures[i]->setup(texture_names, stream);
+
 			// Setup materials, assigning unique names as-we-go ...
 			material::name_map material_names;
 			const std::vector<material*> materials = k3d::node::lookup<material>(document());
 			for(k3d::uint_t i = 0; i != materials.size(); ++i)
-			{
-				materials[i]->setup(material_names, stream);
-			}
+				materials[i]->setup(texture_names, material_names, stream);
 
 			// Render geometry ...
 			const k3d::inode_collection_property::nodes_t visible_nodes = m_visible_nodes.pipeline_value();

@@ -62,11 +62,12 @@ public:
 	}
 
 private:
-	void on_setup(material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
+	void on_setup(const texture::name_map& TextureNames, material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"";
-		Stream << " \"string type\" [\"null\"]";
-		Stream << "\n";
+		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "\"string type\" [\"null\"]\n";
+		setup_bumpmap(TextureNames, Stream);
+		Stream << k3d::pop_indent;
 	}
 };
 

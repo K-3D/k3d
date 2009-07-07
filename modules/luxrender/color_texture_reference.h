@@ -25,6 +25,7 @@
 */
 
 #include "color_texture.h"
+#include "texture.h"
 
 #include <k3dsdk/color.h>
 #include <k3dsdk/data.h>
@@ -63,8 +64,8 @@ public:
 	{
 	}
 
-/// Inserts the K-3D state into a scene, ready for use by a material.
-void setup(const k3d::string_t& Name, std::ostream& Stream);
+	/// Inserts the texture state into a LuxRender scene as part of a Material definition.
+	void setup(const texture::name_map& TextureNames, const k3d::string_t& Type, const k3d::string_t& Name, std::ostream& Stream);
 
 private:
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;

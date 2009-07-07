@@ -24,12 +24,10 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
-#include <k3dsdk/data.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/types.h>
-#include <k3dsdk/vector3.h>
+#include "texture.h"
 
-#include <iosfwd>
+#include <k3dsdk/data.h>
+#include <k3dsdk/vector3.h>
 
 namespace module
 {
@@ -42,9 +40,11 @@ namespace luxrender
 
 /// Abstract base class for LuxRender 2D texture objects
 class texture2 :
-	public k3d::node
+	public texture
 {
 public:
+	typedef texture base;
+
 	texture2(k3d::iplugin_factory& Factory, k3d::idocument& Document);
 
 protected:

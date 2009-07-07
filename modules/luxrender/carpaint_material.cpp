@@ -87,15 +87,13 @@ public:
 	}
 
 private:
-	void on_setup(material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
+	void on_setup(const texture::name_map& TextureNames, material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
 	{
-		setup_bumpmap("a", Stream);
-
-		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"";
-		Stream << " \"string type\" [\"carpaint\"]";
-		Stream << " \"string name\" [\"" << m_name.pipeline_value() << "\"]";
-		Stream << " \"texture bumpmap\" [\"a\"]";
-		Stream << "\n";
+		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "\"string type\" [\"carpaint\"]\n";
+		Stream << k3d::standard_indent << "\"string name\" [\"" << m_name.pipeline_value() << "\"]\n";
+		setup_bumpmap(TextureNames, Stream);
+		Stream << k3d::pop_indent;
 	}
 
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_name;

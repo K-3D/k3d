@@ -68,18 +68,16 @@ public:
 	}
 
 private:
-	void on_setup(material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
+	void on_setup(const texture::name_map& TextureNames, material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
 	{
-		setup_bumpmap("a", Stream);
-		m_color.setup("b", Stream);
-		m_sigma.setup("c", Stream);
+		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "\"string type\" [\"matte\"]\n";
 
-		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"";
-		Stream << " \"string type\" [\"matte\"]";
-		Stream << " \"texture bumpmap\" [\"a\"]";
-		Stream << " \"texture Kd\" [\"b\"]";
-		Stream << " \"texture sigma\" [\"c\"]";
-		Stream << "\n";
+		setup_bumpmap(TextureNames, Stream);
+		m_color.setup(TextureNames, "color", "Kd", Stream);
+		m_sigma.setup(TextureNames, "float", "sigma", Stream);
+		
+		Stream << k3d::pop_indent;
 	}
 
 	color_texture_reference m_color;

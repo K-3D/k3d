@@ -49,7 +49,7 @@ material::material(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 {
 }
 
-void material::setup(name_map& MaterialNames, std::ostream& Stream)
+void material::setup(const texture::name_map& TextureNames, name_map& MaterialNames, std::ostream& Stream)
 {
 	if(MaterialNames.count(this))
 		return;
@@ -60,18 +60,13 @@ void material::setup(name_map& MaterialNames, std::ostream& Stream)
 
 	MaterialNames.insert(std::make_pair(this, name));
 
-	on_setup(MaterialNames, name, Stream);
+	on_setup(TextureNames, MaterialNames, name, Stream);
 }
 
-void material::setup_bumpmap(const k3d::string_t& Name, std::ostream& Stream)
+void material::setup_bumpmap(const texture::name_map& TextureNames, std::ostream& Stream)
 {
-	if(scalar_texture* const texture = dynamic_cast<scalar_texture*>(m_bumpmap.pipeline_value()))
-	{
-		texture->setup_scalar_texture(Name, Stream);
-		return;
-	}
-
-	Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"float\" \"constant\" \"float value\" [0.0]\n";
+	if(texture* const texture_node = dynamic_cast<texture*>(m_bumpmap.pipeline_value()))
+		texture::use(TextureNames, texture_node, "bumpmap", Stream);
 }
 
 void material::use(const name_map& MaterialNames, k3d::imaterial* const Material, std::ostream& Stream)

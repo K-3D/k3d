@@ -25,6 +25,7 @@
 */
 
 #include "scalar_texture.h"
+#include "texture.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/imaterial.h>
@@ -55,16 +56,16 @@ public:
 	/// Provides storage for a mapping from material objects to unique names
 	typedef std::map<material*, k3d::string_t> name_map;
 	/// Inserts a material definition into a scene, assigning the material a unique name
-	void setup(name_map& MaterialNames, std::ostream& Stream);
+	void setup(const texture::name_map& TextureNames, name_map& MaterialNames, std::ostream& Stream);
 	/// Inserts a material reference into a scene, handling NULL materials by supplying a standard default.
 	static void use(const name_map& MaterialNames, k3d::imaterial* const Material, std::ostream& Stream);
 
 protected:
-	void setup_bumpmap(const k3d::string_t& Name, std::ostream& Stream);
+	void setup_bumpmap(const texture::name_map& TextureNames, std::ostream& Stream);
 
 private:
 	/// Implemented in derivatives to do the actual work of inserting the material definition into the scene.
-	virtual void on_setup(name_map& Names, const k3d::string_t& Name, std::ostream& Stream) = 0;
+	virtual void on_setup(const texture::name_map& TextureNames, name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream) = 0;
 
 	k3d_data(scalar_texture*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_bumpmap;
 };

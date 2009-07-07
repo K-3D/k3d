@@ -35,15 +35,15 @@ namespace luxrender
 /////////////////////////////////////////////////////////////////////////////
 // color_texture_reference
 
-void color_texture_reference::setup(const k3d::string_t& Name, std::ostream& Stream)
+void color_texture_reference::setup(const texture::name_map& TextureNames, const k3d::string_t& Type, const k3d::string_t& Name, std::ostream& Stream)
 {
-	if(color_texture* const texture = dynamic_cast<color_texture*>(m_texture.pipeline_value()))
+	if(texture* const texture_node = dynamic_cast<texture*>(m_texture.pipeline_value()))
 	{
-		texture->setup_color_texture(Name, Stream);
+		texture::use(TextureNames, texture_node, Name, Stream);
 		return;
 	}
 
-	Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"color\" \"constant\" \"color value\" [" << m_color.pipeline_value() << "]\n";
+	Stream << k3d::standard_indent << "\"" << Type << " " << Name << "\" [" << m_color.pipeline_value() << "]\n";
 }
 
 } // namespace luxrender

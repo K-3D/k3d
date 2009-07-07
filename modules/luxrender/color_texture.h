@@ -38,12 +38,11 @@ namespace luxrender
 /////////////////////////////////////////////////////////////////////////////
 // color_texture
 
-/// Abstract interface for LuxRender color texture objects
+/// Abstract interface for LuxRender color texture nodes.
 class color_texture :
 	public k3d::itexture
 {
 public:
-	virtual void setup_color_texture(const k3d::string_t& Name, std::ostream& Stream) = 0;
 };
 
 } // namespace luxrender

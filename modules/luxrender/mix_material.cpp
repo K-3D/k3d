@@ -66,31 +66,30 @@ public:
 	}
 
 private:
-	void on_setup(material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
+	void on_setup(const texture::name_map& TextureNames, material::name_map& MaterialNames, const k3d::string_t& Name, std::ostream& Stream)
 	{
 		material* const material1 = m_material_1.pipeline_value();
 		if(material1)
-			material1->setup(MaterialNames, Stream);
+			material1->setup(TextureNames, MaterialNames, Stream);
 
 		material* const material2 = m_material_2.pipeline_value();
 		if(material2)
-			material2->setup(MaterialNames, Stream);
+			material2->setup(TextureNames, MaterialNames, Stream);
 
-		setup_bumpmap("a", Stream);
-		m_amount.setup("b", Stream);
+		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "\"string type\" [\"mix\"]\n";
 
-		Stream << k3d::standard_indent << "MakeNamedMaterial \"" << Name << "\"";
-		Stream << " \"string type\" [\"mix\"]";
-		Stream << " \"texture bumpmap\" [\"a\"]";
-		Stream << " \"texture amount\" [\"b\"]";
+		setup_bumpmap(TextureNames, Stream);
 
 		if(material1 && MaterialNames.count(material1))
-			Stream << " \"string namedmaterial1\" [\"" << MaterialNames.find(material1)->second << "\"]";
+			Stream << k3d::standard_indent << "\"string namedmaterial1\" [\"" << MaterialNames.find(material1)->second << "\"]\n";
 
 		if(material2 && MaterialNames.count(material2))
-			Stream << " \"string namedmaterial2\" [\"" << MaterialNames.find(material2)->second << "\"]";
+			Stream << k3d::standard_indent << "\"string namedmaterial2\" [\"" << MaterialNames.find(material2)->second << "\"]\n";
 
-		Stream << "\n";
+		m_amount.setup(TextureNames, "float", "amount", Stream);
+
+		Stream << k3d::pop_indent;
 	}
 
 	k3d_data(material*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_material_1;

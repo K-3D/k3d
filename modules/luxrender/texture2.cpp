@@ -25,6 +25,7 @@
 #include "utility.h"
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/iomanip.h>
 
 namespace module
 {
@@ -52,7 +53,7 @@ static const k3d::ilist_property<std::string>::values_t& mapping_values()
 // texture2
 
 texture2::texture2(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-	k3d::node(Factory, Document),
+	base(Factory, Document),
 	m_mapping(init_owner(*this) + init_name("mapping") + init_label(_("Mapping")) + init_description(_("Projection mapping.")) + init_value(k3d::string_t("uv")) + init_values(mapping_values())),
 	m_u_scale(init_owner(*this) + init_name("u_scale") + init_label(_("U Scale")) + init_description(_("U Scale.")) + init_value(1.0)),
 	m_v_scale(init_owner(*this) + init_name("v_scale") + init_label(_("V Scale")) + init_description(_("V Scale.")) + init_value(1.0)),
@@ -67,24 +68,24 @@ void texture2::setup_texture2(std::ostream& Stream)
 {
 	const k3d::string_t mapping = m_mapping.pipeline_value();
 
-	Stream << " \"string mapping\" \"" << mapping << "\"";
+	Stream << k3d::standard_indent << "\"string mapping\" \"" << mapping << "\"\n";
 
 	if(mapping == "uv")
 	{
-		Stream << " \"float uscale\" [" << m_u_scale.pipeline_value() << "]";
-		Stream << " \"float vscale\" [" << m_v_scale.pipeline_value() << "]";
+		Stream << k3d::standard_indent << "\"float uscale\" [" << m_u_scale.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"float vscale\" [" << m_v_scale.pipeline_value() << "]\n";
 	}
 
 	if(mapping == "uv" || mapping == "planar")
 	{
-		Stream << " \"float udelta\" [" << m_u_delta.pipeline_value() << "]";
-		Stream << " \"float vdelta\" [" << m_v_delta.pipeline_value() << "]";
+		Stream << k3d::standard_indent << "\"float udelta\" [" << m_u_delta.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"float vdelta\" [" << m_v_delta.pipeline_value() << "]\n";
 	}
 
 	if(mapping == "planar")
 	{
-		Stream << " \"vector v1\" [" << convert(m_u_axis.pipeline_value()) << "]";
-		Stream << " \"vector v2\" [" << convert(m_v_axis.pipeline_value()) << "]";
+		Stream << k3d::standard_indent << "\"vector v1\" [" << convert(m_u_axis.pipeline_value()) << "]\n";
+		Stream << k3d::standard_indent << "\"vector v2\" [" << convert(m_v_axis.pipeline_value()) << "]\n";
 	}
 }
 

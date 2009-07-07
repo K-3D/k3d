@@ -56,15 +56,15 @@ public:
 	{
 	}
 
-	void setup_color_texture(const k3d::string_t& Name, std::ostream& Stream)
+	void on_setup(name_map& TextureNames, const k3d::string_t& Name, std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"color\" \"bilerp\"";
+		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"color\" \"bilerp\"\n" << k3d::push_indent;
 		setup_texture2(Stream);
-		Stream << " \"color v00\" [" << m_v00.pipeline_value() << "]";
-		Stream << " \"color v01\" [" << m_v01.pipeline_value() << "]";
-		Stream << " \"color v10\" [" << m_v10.pipeline_value() << "]";
-		Stream << " \"color v11\" [" << m_v11.pipeline_value() << "]";
-		Stream << "\n"; 
+		Stream << k3d::standard_indent << "\"color v00\" [" << m_v00.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"color v01\" [" << m_v01.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"color v10\" [" << m_v10.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"color v11\" [" << m_v11.pipeline_value() << "]\n";
+		Stream << k3d::pop_indent; 
 	}
 
 	static k3d::iplugin_factory& get_factory()

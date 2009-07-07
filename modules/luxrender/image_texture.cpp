@@ -91,26 +91,16 @@ public:
 	{
 	}
 
-	void setup_color_texture(const k3d::string_t& Name, std::ostream& Stream)
+	void on_setup(name_map& TextureNames, const k3d::string_t& Name, std::ostream& Stream)
 	{
-		setup(Name, "color", Stream);
-	}
-
-	void setup_scalar_texture(const k3d::string_t& Name, std::ostream& Stream)
-	{
-		setup(Name, "float", Stream);
-	}
-
-	void setup(const k3d::string_t& Name, const k3d::string_t& Type, std::ostream& Stream)
-	{
-		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"" << Type << "\" \"imagemap\"";
+		Stream << k3d::standard_indent << "Texture \"" << Name << "\" \"color\" \"imagemap\"\n" << k3d::push_indent;
 		setup_texture2(Stream);
-		Stream << " \"string filename\" [\"" << m_file.pipeline_value().native_filesystem_string() << "\"]";
-		Stream << " \"string wrap\" [\"" << m_wrap.pipeline_value() << "\"]";
-		Stream << " \"string filtertype\" [\"" << m_filtertype.pipeline_value() << "\"]";
-		Stream << " \"float gain\" [" << m_gain.pipeline_value() << "]";
-		Stream << " \"float gamma\" [" << m_gamma.pipeline_value() << "]";
-		Stream << "\n"; 
+		Stream << k3d::standard_indent << "\"string filename\" [\"" << m_file.pipeline_value().native_filesystem_string() << "\"]\n";
+		Stream << k3d::standard_indent << "\"string wrap\" [\"" << m_wrap.pipeline_value() << "\"]\n";
+		Stream << k3d::standard_indent << "\"string filtertype\" [\"" << m_filtertype.pipeline_value() << "\"]\n";
+		Stream << k3d::standard_indent << "\"float gain\" [" << m_gain.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"float gamma\" [" << m_gamma.pipeline_value() << "]\n";
+		Stream << k3d::pop_indent; 
 	}
 
 	static k3d::iplugin_factory& get_factory()

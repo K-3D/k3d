@@ -21,9 +21,9 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
-#include "scalar_texture.h"
-#include "scalar_texture_reference.h"
+#include "texture.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/iomanip.h>
 
 namespace module
@@ -33,17 +33,40 @@ namespace luxrender
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// scalar_texture_reference
+// texture
 
-void scalar_texture_reference::setup(const texture::name_map& TextureNames, const k3d::string_t& Type, const k3d::string_t& Name, std::ostream& Stream)
+texture::texture(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	k3d::node(Factory, Document)
 {
-	if(texture* const texture_node = dynamic_cast<texture*>(m_texture.pipeline_value()))
-	{
-		texture::use(TextureNames, texture_node, Name, Stream);
-		return;
-	}
+}
 
-	Stream << k3d::standard_indent << "\"" << Type << " " << Name << "\" [" << m_scalar.pipeline_value() << "]\n";
+void texture::setup(name_map& TextureNames, std::ostream& Stream)
+{
+	if(TextureNames.count(this))
+		return;
+
+	std::ostringstream name_buffer;
+	name_buffer << "Texture" << TextureNames.size();
+	const k3d::string_t name = name_buffer.str();
+
+	TextureNames.insert(std::make_pair(this, name));
+
+	on_setup(TextureNames, name, Stream);
+}
+
+void texture::use(const name_map& TextureNames, k3d::iunknown* const Texture, const k3d::string_t& Name, std::ostream& Stream)
+{
+	// Insert a reference to an existing texture ...
+	if(texture* const lux_texture = dynamic_cast<texture*>(Texture))
+	{
+		if(TextureNames.count(lux_texture))
+		{
+			Stream << k3d::standard_indent << "\"texture " << Name << "\" [\"" << TextureNames.find(lux_texture)->second << "\"]\n";
+			return;
+		}
+
+		k3d::log() << error << "Missing named texture." << std::endl;
+	}
 }
 
 } // namespace luxrender
