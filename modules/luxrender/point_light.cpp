@@ -63,11 +63,10 @@ public:
 	void setup(std::ostream& Stream)
 	{
 		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-		Stream << k3d::standard_indent << "LightSource \"point\"";
-		Stream << " \"point from\" [" << convert(k3d::world_position(*this)) << "]";
-		Stream << " \"color L\" [" << m_color.pipeline_value() << "]";
-		Stream << "\n";
-		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+		Stream << k3d::standard_indent << "LightSource \"point\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "\"point from\" [" << convert(k3d::world_position(*this)) << "]\n";
+		Stream << k3d::standard_indent << "\"color L\" [" << m_color.pipeline_value() << "]\n";
+		Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
 	void on_gl_draw(const k3d::gl::render_state& State)

@@ -300,20 +300,25 @@ private:
 
 	void render_disk(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::disk::const_primitive& Disk, std::ostream& Stream)
 	{
+		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
 		for(k3d::uint_t i = 0; i != Disk.matrices.size(); ++i)
 		{
 			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-			Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Disk.matrices[i]) << "]\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "ConcatTransform [" << convert(Disk.matrices[i]) << "]\n" << k3d::push_indent;
 
 			material::use(MaterialNames, Disk.materials[i], Stream);
 
-			Stream << k3d::standard_indent << "Shape \"disk\"";
-			Stream << " \"float height\" [" << Disk.heights[i] << "]";
-			Stream << " \"float radius\" [" << Disk.radii[i] << "]";
-			Stream << " \"float phimax\" [" << k3d::degrees(Disk.sweep_angles[i]) << "]";
-			Stream << "\n";
-			Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+			Stream << k3d::standard_indent << "Shape \"disk\"\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "\"float height\" [" << Disk.heights[i] << "]\n";
+			Stream << k3d::standard_indent << "\"float radius\" [" << Disk.radii[i] << "]\n";
+			Stream << k3d::standard_indent << "\"float phimax\" [" << k3d::degrees(Disk.sweep_angles[i]) << "]\n";
+			Stream << k3d::pop_indent;
+			Stream << k3d::pop_indent;
+			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 		}
+		Stream << k3d::pop_indent;
+		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
 	void render_polyhedron(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::polyhedron::const_primitive& Polyhedron, std::ostream& Stream)
@@ -336,9 +341,9 @@ private:
 		{
 			material::use(MaterialNames, *material, Stream);
 
-			Stream << k3d::standard_indent << "Shape \"trianglemesh\"";
+			Stream << k3d::standard_indent << "Shape \"trianglemesh\"\n" << k3d::push_indent;
 
-			Stream << " \"point P\" [";
+			Stream << k3d::standard_indent << "\"point P\" [";
 			const k3d::uint_t triangle_begin = 0;
 			const k3d::uint_t triangle_end = triangle_begin + a_points.size();
 			k3d::uint_t point_count = 0;
@@ -352,34 +357,42 @@ private:
 			}
 			Stream << "]\n";
 
-			Stream << " \"integer indices\" [";
+			Stream << k3d::standard_indent << "\"integer indices\" [";
 			const k3d::uint_t index_begin = 0;
 			const k3d::uint_t index_end = index_begin + point_count;
 			for(k3d::uint_t index = index_begin; index != index_end; ++index)
 			Stream << index << " ";
 			Stream << "]\n";
+
+			Stream << k3d::pop_indent;
 		}
 
-		Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+		Stream << k3d::pop_indent;
+		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
 	void render_sphere(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::sphere::const_primitive& Sphere, std::ostream& Stream)
 	{
+		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
 		for(k3d::uint_t i = 0; i != Sphere.matrices.size(); ++i)
 		{
 			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "ConcatTransform [" << convert(Sphere.matrices[i]) << "]\n" << k3d::push_indent;
 
 			material::use(MaterialNames, Sphere.materials[i], Stream);
 
-			Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Sphere.matrices[i]) << "]\n" << k3d::push_indent;
-			Stream << k3d::standard_indent << "Shape \"sphere\"";
-			Stream << " \"float radius\" [" << Sphere.radii[i] << "]";
-			Stream << " \"float zmin\" [" << Sphere.radii[i] * Sphere.z_min[i] << "]";
-			Stream << " \"float zmax\" [" << Sphere.radii[i] * Sphere.z_max[i] << "]";
-			Stream << " \"float phimax\" [" << k3d::degrees(Sphere.sweep_angles[i]) << "]";
-			Stream << "\n";
-			Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+			Stream << k3d::standard_indent << "Shape \"sphere\"\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "\"float radius\" [" << Sphere.radii[i] << "]\n";
+			Stream << k3d::standard_indent << "\"float zmin\" [" << Sphere.radii[i] * Sphere.z_min[i] << "]\n";
+			Stream << k3d::standard_indent << "\"float zmax\" [" << Sphere.radii[i] * Sphere.z_max[i] << "]\n";
+			Stream << k3d::standard_indent << "\"float phimax\" [" << k3d::degrees(Sphere.sweep_angles[i]) << "]\n";
+			Stream << k3d::pop_indent;
+			Stream << k3d::pop_indent;
+			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 		}
+		Stream << k3d::pop_indent;
+		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
 	void render_mesh_instance(const material::name_map& MaterialNames, k3d::inode& MeshInstance, std::ostream& Stream)
@@ -454,23 +467,22 @@ private:
 			const k3d::double_t camera_height = std::abs(camera_top - camera_bottom);
 			const k3d::double_t camera_fov = k3d::degrees(2 * atan2(0.5 * std::min(camera_width, camera_height), camera_near));
 
-			stream << k3d::standard_indent << "Camera";
-			stream << " \"perspective\"";
-			stream << " \"float hither\" [" << camera_near << "]";
-			stream << " \"float yon\" [" << camera_far << "]";
-			stream << " \"float fov\" [" << camera_fov << "]";
-			stream << "\n";
+			stream << k3d::standard_indent << "Camera \"perspective\"\n" << k3d::push_indent;
+			stream << k3d::standard_indent << "\"float hither\" [" << camera_near << "]\n";
+			stream << k3d::standard_indent << "\"float yon\" [" << camera_far << "]\n";
+			stream << k3d::standard_indent << "\"float fov\" [" << camera_fov << "]\n";
+			stream << k3d::pop_indent;
 
 			// Setup output options ...
 			const k3d::int32_t pixel_width = m_pixel_width.pipeline_value();
 			const k3d::int32_t pixel_height = m_pixel_height.pipeline_value();
-			stream << k3d::standard_indent << "Film";
-			stream << " \"fleximage\"";
-			stream << " \"string filename\" [\"" << OutputImagePath.native_filesystem_string() << "\"]";
-			stream << " \"integer xresolution\" [" << pixel_width << "]";
-			stream << " \"integer yresolution\" [" << pixel_height << "]";
-			stream << " \"integer haltspp\" [" << m_halt_samples.pipeline_value() << "]";
-			stream << "\n";
+
+			stream << k3d::standard_indent << "Film \"fleximage\"\n" << k3d::push_indent;
+			stream << k3d::standard_indent << "\"string filename\" [\"" << OutputImagePath.native_filesystem_string() << "\"]\n";
+			stream << k3d::standard_indent << "\"integer xresolution\" [" << pixel_width << "]\n";
+			stream << k3d::standard_indent << "\"integer yresolution\" [" << pixel_height << "]\n";
+			stream << k3d::standard_indent << "\"integer haltspp\" [" << m_halt_samples.pipeline_value() << "]\n";
+			stream << k3d::pop_indent;
 
 			// Scene setup ...
 			stream << k3d::standard_indent << "WorldBegin\n" << k3d::push_indent;

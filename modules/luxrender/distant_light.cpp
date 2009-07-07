@@ -55,16 +55,15 @@ public:
 	{
 	}
 
-  void setup(std::ostream& Stream)
-  {
-    Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-    Stream << k3d::standard_indent << "LightSource \"distant\"";
-    Stream << " \"point from\" [" << convert(m_from.pipeline_value()) << "]";
-    Stream << " \"point to\" [" << convert(m_to.pipeline_value()) << "]";
-    Stream << " \"color L\" [" << m_color.pipeline_value() << "]";
-    Stream << "\n";
-    Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
-  }
+	void setup(std::ostream& Stream)
+	{
+		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "LightSource \"distant\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "\"point from\" [" << convert(m_from.pipeline_value()) << "]\n";
+		Stream << k3d::standard_indent << "\"point to\" [" << convert(m_to.pipeline_value()) << "]\n";
+		Stream << k3d::standard_indent << "\"color L\" [" << m_color.pipeline_value() << "]\n";
+		Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+	}
 
 	static k3d::iplugin_factory& get_factory()
 	{

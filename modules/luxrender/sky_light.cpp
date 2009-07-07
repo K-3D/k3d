@@ -55,17 +55,16 @@ public:
 	{
 	}
 
-  void setup(std::ostream& Stream)
-  {
-    Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-    Stream << k3d::standard_indent << "LightSource \"sky\"";
-    Stream << " \"float gain\" [" << m_gain.pipeline_value() << "]";
-    Stream << " \"integer nsamples\" [" << m_samples.pipeline_value() << "]";
-    Stream << " \"vector sundir\" [" << convert(m_direction.pipeline_value()) << "]";
-    Stream << " \"float turbidity\" [" << m_turbidity.pipeline_value() << "]";
-    Stream << "\n";
-    Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
-  }
+	void setup(std::ostream& Stream)
+	{
+		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "LightSource \"sky\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "\"float gain\" [" << m_gain.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"integer nsamples\" [" << m_samples.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"vector sundir\" [" << convert(m_direction.pipeline_value()) << "]\n";
+		Stream << k3d::standard_indent << "\"float turbidity\" [" << m_turbidity.pipeline_value() << "]\n";
+		Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+	}
 
 	static k3d::iplugin_factory& get_factory()
 	{

@@ -58,12 +58,11 @@ public:
   void setup(std::ostream& Stream)
   {
     Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-    Stream << k3d::standard_indent << "LightSource \"infinite\"";
-    Stream << " \"color L\" [" << m_color.pipeline_value() << "]";
-    Stream << " \"integer nsamples\" [" << m_samples.pipeline_value() << "]";
-    Stream << " \"string mapname\" [\"" << m_map.pipeline_value().native_filesystem_string() << "\"]";
-    Stream << "\n";
-    Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+    Stream << k3d::standard_indent << "LightSource \"infinite\"\n" << k3d::push_indent;
+    Stream << k3d::standard_indent << "\"color L\" [" << m_color.pipeline_value() << "]\n";
+    Stream << k3d::standard_indent << "\"integer nsamples\" [" << m_samples.pipeline_value() << "]\n";
+    Stream << k3d::standard_indent << "\"string mapname\" [\"" << m_map.pipeline_value().native_filesystem_string() << "\"]\n";
+    Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
   }
 
 	static k3d::iplugin_factory& get_factory()

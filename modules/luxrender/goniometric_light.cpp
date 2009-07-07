@@ -64,12 +64,11 @@ public:
 	void setup(std::ostream& Stream)
 	{
 		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-    Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(*this)) << "]\n" << k3d::push_indent;
-		Stream << k3d::standard_indent << "LightSource \"goniometric\"";
-		Stream << " \"color L\" [" << m_color.pipeline_value() << "]";
-    Stream << " \"string mapname\" [\"" << m_map.pipeline_value().native_filesystem_string() << "\"]";
-		Stream << "\n";
-		Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(*this)) << "]\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "LightSource \"goniometric\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "\"color L\" [" << m_color.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"string mapname\" [\"" << m_map.pipeline_value().native_filesystem_string() << "\"]\n";
+		Stream << k3d::pop_indent << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
 	void on_gl_draw(const k3d::gl::render_state& State)
