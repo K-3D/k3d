@@ -42,7 +42,7 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 namespace detail
@@ -1239,7 +1239,7 @@ k3d::iplugin_factory& subdivide_faces_factory()
 	return subdivide_faces::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 
