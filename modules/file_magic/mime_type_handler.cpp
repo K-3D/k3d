@@ -41,7 +41,7 @@ namespace file
 namespace magic
 {
 
-/// Uses the Gnome API to open a URI in the user's preferred application
+/// Uses a hard-coded list of file extensions to identify MIME types.
 class mime_type_handler :
 	public k3d::imime_type_handler
 {

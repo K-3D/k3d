@@ -39,7 +39,7 @@ namespace module
 namespace gnome
 {
 
-/// Uses the Gnome API to open a URI in the user's preferred application
+/// Uses the Gnome API to identify MIME types.
 class mime_type_handler :
 	public k3d::imime_type_handler
 {
