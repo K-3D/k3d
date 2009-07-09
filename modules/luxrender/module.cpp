@@ -41,6 +41,7 @@ extern k3d::iplugin_factory& image_texture_factory();
 extern k3d::iplugin_factory& matte_material_factory();
 extern k3d::iplugin_factory& matte_translucent_material_factory();
 extern k3d::iplugin_factory& metal_material_factory();
+extern k3d::iplugin_factory& mirror_material_factory();
 extern k3d::iplugin_factory& mix_material_factory();
 extern k3d::iplugin_factory& null_material_factory();
 extern k3d::iplugin_factory& point_light_factory();
@@ -65,6 +66,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::luxrender::matte_material_factory());
 	Registry.register_factory(module::luxrender::matte_translucent_material_factory());
 	Registry.register_factory(module::luxrender::metal_material_factory());
+	Registry.register_factory(module::luxrender::mirror_material_factory());
 	Registry.register_factory(module::luxrender::mix_material_factory());
 	Registry.register_factory(module::luxrender::null_material_factory());
 	Registry.register_factory(module::luxrender::point_light_factory());
