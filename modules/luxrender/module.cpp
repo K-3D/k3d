@@ -35,6 +35,7 @@ extern k3d::iplugin_factory& carpaint_material_factory();
 extern k3d::iplugin_factory& distant_light_factory();
 extern k3d::iplugin_factory& environment_light_factory();
 extern k3d::iplugin_factory& glass_material_factory();
+extern k3d::iplugin_factory& glossy_material_factory();
 extern k3d::iplugin_factory& goniometric_light_factory();
 extern k3d::iplugin_factory& image_texture_factory();
 extern k3d::iplugin_factory& matte_material_factory();
@@ -57,6 +58,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::luxrender::distant_light_factory());
 	Registry.register_factory(module::luxrender::environment_light_factory());
 	Registry.register_factory(module::luxrender::glass_material_factory());
+	Registry.register_factory(module::luxrender::glossy_material_factory());
 	Registry.register_factory(module::luxrender::goniometric_light_factory());
 	Registry.register_factory(module::luxrender::image_texture_factory());
 	Registry.register_factory(module::luxrender::matte_material_factory());
