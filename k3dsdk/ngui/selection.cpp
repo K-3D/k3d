@@ -57,9 +57,11 @@ namespace selection
 namespace detail
 {
 
-/// Uses an update policy to alter the set of all selected MeshInstance mesh selections
+/// Uses an update policy to replace each selection in a set of MeshInstance nodes.
+/// Each update policy must generate a k3d::selection::set based on the current state of the MeshInstance output mesh.
+/// Use replace_selection() to apply selection algorithms to an existing mesh.
 template<typename UpdatePolicyT>
-void set_component_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePolicy, const bool_t VisibleSelection)
+void replace_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePolicy, const bool_t VisibleSelection)
 {
 	for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
 	{
@@ -83,6 +85,7 @@ void set_component_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePo
 	}
 }
 
+/// Update policy for use with replace_selection() that selects all points in a mesh.
 k3d::selection::set select_all_points(const mesh& Mesh)
 {
 	k3d::selection::set results;
@@ -96,6 +99,7 @@ k3d::selection::set select_all_points(const mesh& Mesh)
 	return results;
 }
 
+/// Update policy for use with replace_selection() that selects all split edges in a mesh.
 k3d::selection::set select_all_split_edges(const mesh& Mesh)
 {
 	k3d::selection::set results;
@@ -113,6 +117,7 @@ k3d::selection::set select_all_split_edges(const mesh& Mesh)
 	return results;
 }
 
+/// Update policy for use with replace_selection() that selects all uniform primitives in a mesh.
 k3d::selection::set select_all_uniform(const mesh& Mesh)
 {
 	k3d::selection::set results;
@@ -138,6 +143,7 @@ void invert(k3d::mesh_selection::records_t& Records)
 }
 */
 
+/// Update policy for use with replace_selection() that inverts the selection of all points in a mesh.
 k3d::selection::set invert_points(const k3d::mesh& Mesh)
 {
 assert_not_implemented();
@@ -145,6 +151,7 @@ return k3d::selection::set();
 //		invert(Selection.points);
 }
 
+/// Update policy for use with replace_selection() that inverts the selection of all split edges in a mesh.
 k3d::selection::set invert_split_edges(const k3d::mesh& Mesh)
 {
 assert_not_implemented();
@@ -152,6 +159,7 @@ return k3d::selection::set();
 //		invert(Selection.edges);
 }
 
+/// Update policy for use with replace_selection() that inverts the selection of all uniform primitives in a mesh.
 k3d::selection::set invert_uniform(const k3d::mesh& Mesh)
 {
 assert_not_implemented();
@@ -159,6 +167,7 @@ return k3d::selection::set();
 //		invert(Selection.faces);
 }
 
+/// Update policy for use with replace_selection() that deselects all points and primitives in a mesh.
 k3d::selection::set deselect_all(const mesh& Mesh)
 {
 	k3d::selection::set results;
@@ -166,30 +175,30 @@ k3d::selection::set deselect_all(const mesh& Mesh)
 	return results;
 }
 
-/// Defines a mapping of nodes to selection records
-typedef std::multimap<inode*, const k3d::selection::record*> node_selection_map_t;
-/// Given a set of selection records, generates a mapping of the corresponding nodes to each record
-const node_selection_map_t map_nodes(const k3d::selection::records& Selection)
-{
-	node_selection_map_t results;
-
-	/** \todo Improve the performance of this loop by cacheing nodes */
-	for(k3d::selection::records::const_iterator record = Selection.begin(); record != Selection.end(); ++record)
-		results.insert(std::make_pair(k3d::selection::get_node(*record), &*record));
-
-	if(results.count(0))
-		log() << warning << "Selection contained records without nodes" << std::endl;
-	results.erase(0);
-
-	return results;
-}
-
 /// Uses an update policy to convert the supplied selection into updates to MeshInstance mesh selections
 template<typename UpdatePolicyT>
-void select_components(const k3d::selection::records& Selection, const double_t Weight)
+void merge_interactive_selection(const k3d::selection::records& Selection, const double_t Weight)
 {
 assert_not_implemented();
 /*
+	/// Defines a mapping of nodes to selection records
+	typedef std::multimap<inode*, const k3d::selection::record*> node_selection_map_t;
+	/// Given a set of selection records, generates a mapping of the corresponding nodes to each record
+	const node_selection_map_t map_nodes(const k3d::selection::records& Selection)
+	{
+		node_selection_map_t results;
+
+		// Improve the performance of this loop by cacheing nodes
+		for(k3d::selection::records::const_iterator record = Selection.begin(); record != Selection.end(); ++record)
+			results.insert(std::make_pair(k3d::selection::get_node(*record), &*record));
+
+		if(results.count(0))
+			log() << warning << "Selection contained records without nodes" << std::endl;
+		results.erase(0);
+
+		return results;
+	}
+
 	inode* node = 0;
 	const mesh* mesh = 0;
 	mesh_selection selection;
@@ -563,13 +572,13 @@ void state::select(const k3d::selection::records& Selection)
 			select_nodes(Selection);
 			break;
 		case POINTS:
-			detail::select_components<detail::select_points>(Selection, 1.0);
+			detail::merge_interactive_selection<detail::select_points>(Selection, 1.0);
 			break;
 		case SPLIT_EDGES:
-			detail::select_components<detail::select_split_edges>(Selection, 1.0);
+			detail::merge_interactive_selection<detail::select_split_edges>(Selection, 1.0);
 			break;
 		case UNIFORM:
-			detail::select_components<detail::select_uniform>(Selection, 1.0);
+			detail::merge_interactive_selection<detail::select_uniform>(Selection, 1.0);
 			break;
 	}
 
@@ -611,13 +620,13 @@ void state::select_all()
 			select_all_nodes();
 			break;
 		case POINTS:
-			detail::set_component_selection(selected_nodes(), detail::select_all_points, true);
+			detail::replace_selection(selected_nodes(), detail::select_all_points, true);
 			break;
 		case SPLIT_EDGES:
-			detail::set_component_selection(selected_nodes(), detail::select_all_split_edges, true);
+			detail::replace_selection(selected_nodes(), detail::select_all_split_edges, true);
 			break;
 		case UNIFORM:
-			detail::set_component_selection(selected_nodes(), detail::select_all_uniform, true);
+			detail::replace_selection(selected_nodes(), detail::select_all_uniform, true);
 			break;
 	}
 
@@ -639,13 +648,13 @@ void state::invert_selection()
 			invert_all_nodes();
 			break;
 		case POINTS:
-			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_points, true);
+			detail::replace_selection(internal.document.nodes().collection(), detail::invert_points, true);
 			break;
 		case SPLIT_EDGES:
-			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_split_edges, true);
+			detail::replace_selection(internal.document.nodes().collection(), detail::invert_split_edges, true);
 			break;
 		case UNIFORM:
-			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_uniform, true);
+			detail::replace_selection(internal.document.nodes().collection(), detail::invert_uniform, true);
 			break;
 	}
 
@@ -695,7 +704,7 @@ void state::deselect_all()
 		case POINTS:
 		case SPLIT_EDGES:
 		case UNIFORM:
-			detail::set_component_selection(internal.document.nodes().collection(), detail::deselect_all, true);
+			detail::replace_selection(internal.document.nodes().collection(), detail::deselect_all, false);
 			break;
 	}
 
