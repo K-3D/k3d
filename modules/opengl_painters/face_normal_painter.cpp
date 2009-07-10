@@ -71,7 +71,6 @@ public:
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		const k3d::mesh::points_t& points = *Mesh.points;		
 		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
 
 		k3d::gl::store_attributes attributes;
@@ -84,6 +83,7 @@ public:
 			if(!polyhedron.get())
 				continue;
 		
+			const k3d::mesh::points_t& points = *Mesh.points;		
 			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
 			
 			if(draw_selected)

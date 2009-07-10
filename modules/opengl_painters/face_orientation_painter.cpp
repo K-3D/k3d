@@ -99,13 +99,13 @@ public:
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		const k3d::mesh::points_t& points = *Mesh.points;
-		
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
 			if(!polyhedron.get())
 				continue;
+
+			const k3d::mesh::points_t& points = *Mesh.points;
 			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
 	
 			// Calculate face centers ...
