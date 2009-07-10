@@ -41,7 +41,6 @@
 #include "property_button.h"
 #include "property_label.h"
 #include "script_button.h"
-#include "selection_button.h"
 #include "spin_button.h"
 #include "text.h"
 #include "widget_manip.h"
@@ -351,13 +350,6 @@ public:
 					else if(property_type == typeid(std::map<inode*, std::map<string_t, double_t> >))
 					{
 					}
-/*
-					// Mesh Selection properties ...
-					else if(property_type == typeid(mesh_selection))
-					{
-						control = new selection_button::control(selection_button::proxy(property, state_recorder, property_name));
-					}
-*/
 					else
 					{
 						log() << warning << k3d_file_reference << "unknown property type: " << property_type.name() << " name: " << property_name << std::endl;

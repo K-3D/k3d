@@ -206,8 +206,8 @@ void initialize_types()
 	register_type(typeid(k3d::irender_preview), "k3d::irender_preview");
 	register_type(typeid(k3d::iscript_engine), "k3d::iscript_engine");
 	register_type(typeid(k3d::istring_source), "k3d::istring_source");
-  register_type(typeid(k3d::itexture), "k3d::itexture");
-  register_type(typeid(k3d::itexture*), "k3d::itexture*");
+	register_type(typeid(k3d::itexture), "k3d::itexture");
+	register_type(typeid(k3d::itexture*), "k3d::itexture*");
 	register_type(typeid(k3d::itime_sink), "k3d::itime_sink");
 	register_type(typeid(k3d::itransform_array_1d), "k3d::itransform_array_1d");
 	register_type(typeid(k3d::itransform_array_2d), "k3d::itransform_array_2d");
@@ -240,6 +240,7 @@ void initialize_types()
 	register_type(typeid(k3d::ri::itexture), "k3d::ri::itexture");
 	register_type(typeid(k3d::ri::itexture*), "k3d::ri::itexture*");
 	register_type(typeid(k3d::ri::ivolume_shader), "k3d::ri::ivolume_shader");
+	register_type(typeid(k3d::selection::set), "k3d::selection::set");
 	register_type(typeid(k3d::string_t), "k3d::string_t");
 	register_type(typeid(k3d::texture3), "k3d::texture3");
 	register_type(typeid(k3d::uint16_t), "k3d::uint16_t");
