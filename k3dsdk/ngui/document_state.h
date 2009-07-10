@@ -114,9 +114,6 @@ public:
 	/// True if backfacing components are to be rubber-band selected
 	bool rubber_band_backfacing();
 
-	/// Inverts current selection
-	void invert_selection();
-
 	/// Hides selected nodes
 	void hide_selection();
 	/// Shows selected nodes

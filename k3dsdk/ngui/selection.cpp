@@ -225,6 +225,30 @@ void state::select_all_nodes()
 		select(**node);
 }
 
+void state::invert_selection()
+{
+	assert_not_implemented();
+/*
+	switch(m_selection_mode.internal_value())
+	{
+		case SELECT_NODES:
+			invert_node_selection();
+			break;
+		case SELECT_POINTS:
+			detail::update_component_selection(m_document.nodes().collection(), detail::invert_points(), true);
+			break;
+		case SELECT_SPLIT_EDGES:
+			detail::update_component_selection(m_document.nodes().collection(), detail::invert_split_edges(), true);
+			break;
+		case SELECT_UNIFORM:
+			detail::update_component_selection(m_document.nodes().collection(), detail::invert_uniform(), true);
+			break;
+	}
+
+	selection_changed();
+*/
+}
+
 void state::deselect(inode& Node)
 {
 	if(internal.node_selection())

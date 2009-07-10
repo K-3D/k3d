@@ -83,6 +83,9 @@ public:
 	/// Selects all nodes.
 	void select_all_nodes();
 
+	/// Inverts current selection.
+	void invert_selection();
+
 	/// Deselects one node.
 	void deselect(inode& Node);
 	/// Deselects a collection of components.
