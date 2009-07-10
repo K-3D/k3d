@@ -23,9 +23,13 @@
 #include "gl.h"
 #include "inode_collection.h"
 #include "inode_selection.h"
+#include "ipersistent.h"
 #include "iselectable.h"
 #include "named_arrays.h"
 #include "nodes.h"
+#include "serialization_xml.h"
+#include "xml.h"
+
 #include <vector>
 
 namespace k3d
@@ -272,6 +276,36 @@ public:
 	}
 
 	const uint64_t threshold;
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// selection_set_serialization
+
+/// k3d::data serialization policy for use with selection data
+template<typename value_t, class property_policy_t>
+class selection_set_serialization :
+	public property_policy_t,
+	public ipersistent
+{
+public:
+	void save(xml::element& Element, const ipersistent::save_context& Context)
+	{
+		xml::element& xml_property = Element.append(xml::element("property", xml::attribute("name", property_policy_t::name())));
+		xml::save(property_policy_t::internal_value(), xml_property, Context);
+	}
+
+	void load(xml::element& Element, const ipersistent::load_context& Context)
+	{
+		xml::load(property_policy_t::internal_value(), Element, Context);
+	}
+
+protected:
+	template<typename init_t>
+	selection_set_serialization(const init_t& Init) :
+		property_policy_t(Init)
+	{
+		Init.owner().enable_serialization(Init.name(), *this);
+	}
 };
 
 } // namespace k3d

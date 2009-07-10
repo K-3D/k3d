@@ -24,13 +24,14 @@
 
 #include "helpers.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/measurement.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/utility.h>
 
@@ -826,7 +827,7 @@ public:
 	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Mesh);
+		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Mesh);
 
 		// Clear data caches
 		m_new_points.clear();

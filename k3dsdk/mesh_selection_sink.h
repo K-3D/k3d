@@ -23,7 +23,7 @@
 #include "data.h"
 #include "k3d-i18n-config.h"
 #include "imesh_selection_sink.h"
-#include "mesh_selection.h"
+#include "selection.h"
 
 namespace k3d
 {
@@ -36,7 +36,7 @@ class mesh_selection_sink :
 public:
 	mesh_selection_sink(iplugin_factory& Factory, idocument& Document) :
 		base_t(Factory, Document),
-		m_mesh_selection(init_owner(*this) + init_name("mesh_selection") + init_label(_("Mesh Selection")) + init_description(_("Input Mesh Selection")) + init_value(mesh_selection()))
+		m_mesh_selection(init_owner(*this) + init_name("mesh_selection") + init_label(_("Mesh Selection")) + init_description(_("Input Mesh Selection")) + init_value(selection::set()))
 	{
 	}
 
@@ -46,7 +46,7 @@ public:
 	}
 
 protected:
-	k3d_data(mesh_selection, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, mesh_selection_serialization) m_mesh_selection;
+	k3d_data(selection::set, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, selection_set_serialization) m_mesh_selection;
 };
 
 } // namespace k3d

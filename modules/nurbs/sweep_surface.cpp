@@ -25,6 +25,7 @@
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
@@ -80,7 +81,7 @@ public:
 		if(!nurbs)
 			return;
 
-		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
 
 		std::vector<k3d::uint_t> curves;
 

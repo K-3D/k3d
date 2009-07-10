@@ -213,7 +213,7 @@ public:
 	{
 		// Create output geometry
 		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Mesh);
+		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Mesh);
 
 		std::for_each(Mesh.polyhedra.begin(), Mesh.polyhedra.end(), detail::bridge_edges());
 	}

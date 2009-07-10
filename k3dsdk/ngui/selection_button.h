@@ -26,7 +26,7 @@
 
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iwritable_property.h>
-#include <k3dsdk/mesh_selection.h>
+#include <k3dsdk/selection.h>
 
 #include <gtkmm/box.h>
 
@@ -54,9 +54,9 @@ public:
 	virtual ~idata_proxy() {}
 
 	/// Called to return the underlying data value
-	virtual k3d::mesh_selection value() = 0;
+	virtual k3d::selection::set value() = 0;
 	/// Called to set a new data value
-	virtual void set_value(const k3d::mesh_selection& Value) = 0;
+	virtual void set_value(const k3d::selection::set& Value) = 0;
 	/// Signal emitted if the underlying data changes
 	typedef sigc::signal<void, k3d::ihint*> changed_signal_t;
 	/// Signal emitted if the underlying data changes
@@ -119,12 +119,12 @@ public:
 	{
 	}
 
-	k3d::mesh_selection value()
+	k3d::selection::set value()
 	{
 		return m_data.internal_value();
 	}
 
-	void set_value(const k3d::mesh_selection& Value)
+	void set_value(const k3d::selection::set& Value)
 	{
 		m_data.set_value(Value);
 	}

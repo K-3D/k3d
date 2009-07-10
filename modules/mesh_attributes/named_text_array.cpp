@@ -25,6 +25,7 @@
 #include <k3d-i18n-config.h>
 
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
@@ -60,7 +61,7 @@ public:
 	{
 		Output = Input;
 
-		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
 
 		const k3d::string_t array_name = m_array_name.pipeline_value();
 		const k3d::string_t default_value = m_default_value.pipeline_value();

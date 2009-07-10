@@ -58,12 +58,12 @@ public:
 	{
 	}
 
-	k3d::mesh_selection value()
+	k3d::selection::set value()
 	{
-		return boost::any_cast<k3d::mesh_selection>(m_readable_data.property_internal_value());
+		return boost::any_cast<k3d::selection::set>(m_readable_data.property_internal_value());
 	}
 
-	void set_value(const k3d::mesh_selection& Value)
+	void set_value(const k3d::selection::set& Value)
 	{
 		return_if_fail(m_writable_data);
 		m_writable_data->property_set_value(Value);
@@ -115,6 +115,8 @@ control::control(std::auto_ptr<idata_proxy> Data) :
 
 void control::on_select_all()
 {
+	assert_not_implemented();
+/*
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
 		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
@@ -125,10 +127,13 @@ void control::on_select_all()
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
 		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), _("Select All"), K3D_CHANGE_SET_CONTEXT);
+*/
 }
 
 void control::on_deselect_all()
 {
+	assert_not_implemented();
+/*
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
 		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
@@ -139,10 +144,13 @@ void control::on_deselect_all()
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
 		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), _("Deselect All"), K3D_CHANGE_SET_CONTEXT);
+*/
 }
 
 void control::on_select_null()
 {
+	assert_not_implemented();
+/*
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
 		m_data->state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
@@ -153,6 +161,7 @@ void control::on_select_null()
 	// Turn this into an undo/redo -able event ...
 	if(m_data->state_recorder)
 		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), _("Clear Selection"), K3D_CHANGE_SET_CONTEXT);
+*/
 }
 
 void control::update(k3d::ihint*)
@@ -160,6 +169,8 @@ void control::update(k3d::ihint*)
 	if(!m_data.get())
 		return;
 
+assert_not_implemented();
+/*
 	const k3d::mesh_selection selection = m_data->value();
 
 	m_select_all_button->set_sensitive(selection != k3d::mesh_selection::select_all());
@@ -187,6 +198,7 @@ void control::update(k3d::ihint*)
 	m_select_all_button->set_tooltip_text(buffer.str());
 	m_deselect_all_button->set_tooltip_text(buffer.str());
 	m_select_null_button->set_tooltip_text(buffer.str());
+*/
 }
 
 } // namespace selection_button

@@ -105,11 +105,11 @@ public:
 	tool& scale_tool();
 
 	/// Defines storage for the current document-wide selection mode
-	typedef k3d_data(selection_mode_t, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, no_property, no_serialization) selection_mode_property_t;
+	typedef k3d_data(selection::mode, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, no_property, no_serialization) selection_mode_property_t;
 	/// Returns the current document-wide selection mode
 	selection_mode_property_t& selection_mode();
 
-	void set_selection_mode(selection_mode_t Mode);
+	void set_selection_mode(selection::mode Mode);
 
 	/// Returns a pointer to the document node selection, or null if there is none
 	/**

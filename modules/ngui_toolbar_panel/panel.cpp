@@ -232,7 +232,7 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_NODES, _("Select Nodes mode")),
+				toggle_button::radio_model(m_document_state.selection_mode(), selection::NODES, _("Select Nodes mode")),
 				&m_document_state.document().state_recorder(),
 				load_icon("node", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Objects"))
@@ -241,7 +241,7 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_POINTS, _("Select Points mode")),
+				toggle_button::radio_model(m_document_state.selection_mode(), selection::POINTS, _("Select Points mode")),
 				&m_document_state.document().state_recorder(),
 				load_icon("vertex", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Points"))
@@ -250,7 +250,7 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_SPLIT_EDGES, _("Select Lines mode")),
+				toggle_button::radio_model(m_document_state.selection_mode(), selection::SPLIT_EDGES, _("Select Lines mode")),
 				&m_document_state.document().state_recorder(),
 				load_icon("edge", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Lines"))
@@ -259,7 +259,7 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				toggle_button::radio_model(m_document_state.selection_mode(), SELECT_UNIFORM, _("Select Faces mode")),
+				toggle_button::radio_model(m_document_state.selection_mode(), selection::UNIFORM, _("Select Faces mode")),
 				&m_document_state.document().state_recorder(),
 				load_icon("face", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Faces"))

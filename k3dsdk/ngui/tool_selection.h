@@ -119,13 +119,13 @@ protected:
 		{
 			switch(m_document_state.selection_mode().internal_value())
 			{
-				case SELECT_POINTS:
-				case SELECT_SPLIT_EDGES:
-				case SELECT_UNIFORM:
+				case selection::POINTS:
+				case selection::SPLIT_EDGES:
+				case selection::UNIFORM:
 					if(!m_document_state.is_selected(node))
 						m_mouse_down_selection = k3d::selection::record::empty_record();;
 					break;
-				case SELECT_NODES:
+				case selection::NODES:
 					break;
 				default:
 					assert_not_reached();

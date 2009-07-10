@@ -133,8 +133,6 @@ ADD_LIBRARY(k3dsdk-python-b SHARED
 	geometry_python.h
 	log_python.cpp
 	log_python.h
-	mesh_selection_python.cpp
-	mesh_selection_python.h
 	mime_python.cpp
 	mime_python.h
 	named_arrays_python.cpp

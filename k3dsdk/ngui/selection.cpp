@@ -22,7 +22,9 @@
 */
 
 #include "selection.h"
+
 #include <k3dsdk/log.h>
+
 #include <iostream>
 
 namespace k3d
@@ -31,48 +33,53 @@ namespace k3d
 namespace ngui
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// selection_mode_t
+namespace selection
+{
 
-std::ostream& operator<<(std::ostream& Stream, const selection_mode_t& RHS)
+/////////////////////////////////////////////////////////////////////////////
+// mode
+
+std::ostream& operator<<(std::ostream& Stream, const mode& RHS)
 {
         switch(RHS)
 	{
-		case SELECT_NODES:
+		case NODES:
 			Stream << "nodes";
 			break;
-		case SELECT_POINTS:
+		case POINTS:
 			Stream << "points";
 			break;
-		case SELECT_SPLIT_EDGES:
-			Stream << "lines";
+		case SPLIT_EDGES:
+			Stream << "split_edges";
 			break;
-		case SELECT_UNIFORM:
-			Stream << "faces";
+		case UNIFORM:
+			Stream << "uniform";
 			break;
 	}
 
         return Stream;
 }
 
-std::istream& operator>>(std::istream& Stream, selection_mode_t& RHS)
+std::istream& operator>>(std::istream& Stream, mode& RHS)
 {
         std::string text;
         Stream >> text;
 
         if(text == "nodes")
-                RHS = SELECT_NODES;
+                RHS = NODES;
         else if(text == "points")
-                RHS = SELECT_POINTS;
-        else if(text == "lines")
-                RHS = SELECT_SPLIT_EDGES;
-        else if(text == "faces")
-                RHS = SELECT_UNIFORM;
+                RHS = POINTS;
+        else if(text == "split_edges")
+                RHS = SPLIT_EDGES;
+        else if(text == "uniform")
+                RHS = UNIFORM;
         else
                 k3d::log() << error << "Unknown enumeration [" << text << "]"<< std::endl;
 
         return Stream;
 }
+
+} // namespace selection
 
 } // namespace ngui
 

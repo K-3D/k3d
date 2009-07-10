@@ -8,7 +8,6 @@ namespace k3d
 
 class idocument;
 class inode;
-class mesh_selection;
 class mesh;
 
 namespace selection { class set; }
@@ -40,11 +39,6 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 void save(const selection::set& Selection, element& Container, const ipersistent::save_context& Context);
 /// Loads a selection from XML 
 void load(selection::set& Selection, element& Container, const ipersistent::load_context& Context);
-
-/** \deprecated */
-void save(const mesh_selection& Selection, element& XML, const ipersistent::save_context& Context);
-/** \deprecated */
-void load(mesh_selection& Selection, element& XML, const ipersistent::load_context& Context);
 
 } // namespace xml
 

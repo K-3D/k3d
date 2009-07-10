@@ -23,20 +23,21 @@
 
 #include "nurbs_patch_modifier.h"
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/log.h>
-#include <k3dsdk/module.h>
-#include <k3dsdk/node.h>
-#include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_source.h>
-#include <k3dsdk/material_sink.h>
-#include <k3dsdk/nurbs_curve.h>
-#include <k3dsdk/measurement.h>
-#include <k3dsdk/selection.h>
 #include <k3dsdk/data.h>
-#include <k3dsdk/point3.h>
+#include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/geometry.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/material_sink.h>
+#include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/nurbs_curve.h>
+#include <k3dsdk/point3.h>
+#include <k3dsdk/selection.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -68,7 +69,7 @@ public:
 	{
 		Output = Input;
 
-		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
 
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
 		if(!nurbs)

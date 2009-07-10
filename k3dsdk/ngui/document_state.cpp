@@ -64,7 +64,6 @@
 #include <k3dsdk/itime_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
@@ -86,7 +85,7 @@ namespace ngui
 namespace detail
 {
 
-/// Provides human-readable labels for the selection_mode_t enumeration
+/// Provides human-readable labels for the selection::mode enumeration
 const k3d::ienumeration_property::enumeration_values_t& selection_mode_values()
 {
 	static k3d::ienumeration_property::enumeration_values_t values;
@@ -101,6 +100,7 @@ const k3d::ienumeration_property::enumeration_values_t& selection_mode_values()
 	return values;
 }
 
+/*
 const bool is_point_selected(const k3d::selection::record& Record)
 {
 	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
@@ -117,14 +117,12 @@ const bool is_point_selected(const k3d::selection::record& Record)
 	return false;
 }
 
-/** \todo Support nucurves */
 const bool is_split_edge_selected(const k3d::selection::record& Record)
 {
 	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
 	if(!mesh)
 		return false;
 
-/*
 	if(mesh->polyhedra && mesh->polyhedra->edge_selection)
 	{
 		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_SPLIT_EDGE);
@@ -145,29 +143,26 @@ const bool is_split_edge_selected(const k3d::selection::record& Record)
 		if(id < mesh->cubic_curve_groups->curve_selection->size())
 			return (*mesh->cubic_curve_groups->curve_selection)[id];
 	}
-*/
 
 	return false;
 }
 
-/** \todo Support patches */
 const bool is_uniform_selected(const k3d::selection::record& Record)
 {
 	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
 	if(!mesh)
 		return false;
 
-/*
 	if(mesh->polyhedra && mesh->polyhedra->face_selection)
 	{
 		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_FACE);
 		if(id < mesh->polyhedra->face_selection->size())
 			return (*mesh->polyhedra->face_selection)[id];
 	}
-*/
 
 	return false;
 }
+*/
 
 /// Defines a mapping of nodes to selection records
 typedef std::multimap<k3d::inode*, const k3d::selection::record*> node_selection_map_t;
@@ -187,6 +182,7 @@ const node_selection_map_t map_nodes(const k3d::selection::records& Selection)
 	return results;
 }
 
+/*
 /// Policy class that updates a mesh_selection to select the given points
 struct select_points
 {
@@ -228,7 +224,6 @@ struct select_split_edges
 			const k3d::uint_t edge = token->id;
 			switch(token->type)
 			{
-/*
 				case k3d::selection::ABSOLUTE_SPLIT_EDGE:
 					Selection.edges.push_back(k3d::mesh_selection::record(edge, edge+1, weight));
 					if(edge < companions.size() && companions[edge] != edge)
@@ -248,7 +243,6 @@ struct select_split_edges
 				case k3d::selection::ABSOLUTE_NURBS_CURVE:
 					Selection.nurbs_curves.push_back(k3d::mesh_selection::record(token->id, token->id+1, weight));
 					return;
-*/
 
 				default:
 					break;
@@ -339,13 +333,10 @@ void select_components(const k3d::selection::records& Selection, const k3d::doub
 			if(mesh_source)
 				mesh = k3d::property::pipeline_value<k3d::mesh*>(mesh_source->mesh_source_output());
 
-      assert_not_implemented();
-     /*
 			if(mesh && mesh->polyhedra && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
 			{
 				k3d::polyhedron::create_edge_adjacency_lookup(*mesh->polyhedra->edge_points, *mesh->polyhedra->clockwise_edges, boundary_edges, companions);
     	}
-      */
 		}
 
 		if(!sink)
@@ -397,11 +388,8 @@ struct select_all_points
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection.points = k3d::mesh_selection::component_select_all();
-    assert_not_implemented();
-/*
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
 		Selection.faces = k3d::mesh_selection::component_deselect_all();
-*/
 	}
 };
 
@@ -410,11 +398,8 @@ struct select_all_split_edges
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection.points = k3d::mesh_selection::component_deselect_all();
-    assert_not_implemented();
-/*
 		Selection.edges = k3d::mesh_selection::component_select_all();
 		Selection.faces = k3d::mesh_selection::component_deselect_all();
-*/
 	}
 };
 
@@ -423,11 +408,8 @@ struct select_all_uniform
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
 		Selection.points = k3d::mesh_selection::component_deselect_all();
-    assert_not_implemented();
-/*
 		Selection.edges = k3d::mesh_selection::component_deselect_all();
 		Selection.faces = k3d::mesh_selection::component_select_all();
-*/
 	}
 };
 
@@ -465,10 +447,7 @@ struct invert_split_edges
 {
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
-    assert_not_implemented();
-    /*
 		invert(Selection.edges);
-    */
 	}
 };
 
@@ -476,10 +455,7 @@ struct invert_uniform
 {
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
-    assert_not_implemented();
-    /*
 		invert(Selection.faces);
-    */
 	}
 };
 
@@ -491,14 +467,10 @@ void deselect_gaps(k3d::mesh_selection::records_t& Records)
 void deselect_gaps(k3d::mesh_selection& Selection)
 {
 	deselect_gaps(Selection.points);
-assert_not_implemented();
-/*
 	deselect_gaps(Selection.edges);
 	deselect_gaps(Selection.faces);
-*/
 }
 
-/** \todo Handle adjacent edges */
 struct convert_to_points
 {
 	convert_to_points(bool KeepSelection) : m_keep_selection(KeepSelection) {}
@@ -514,8 +486,6 @@ struct convert_to_points
 				Selection.points.push_back(k3d::mesh_selection::record(point, 1.0));
 		}
 
-assert_not_implemented();
-/*
 		// Convert edge selections to point selections ...
 		if(Mesh.polyhedra && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges)
 		{
@@ -670,15 +640,11 @@ assert_not_implemented();
 				}
 			}
 		}
-*/
 
 		if (!m_keep_selection)
 		{
-      assert_not_implemented();
-      /*
 			Selection.edges.clear();
 			Selection.faces.clear();
-      */
 		}
 
 		// Ensure that anything not explicitly selected gets explicitly deselected ...
@@ -709,8 +675,6 @@ struct convert_to_split_edges
 	
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
-    assert_not_implemented();
-/*
 		// Convert point selections to edge selections ...
 		if(Mesh.polyhedra && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges && Mesh.polyhedra->edge_selection && Mesh.point_selection)
 		{
@@ -860,16 +824,11 @@ struct convert_to_split_edges
 				}
 			}
 		}
-*/
 
 		if (!m_keep_selection)
 		{
 			Selection.points.clear();
-
-      assert_not_implemented();
-      /*
 			Selection.faces.clear();
-      */
 		}
 
 		// Ensure that anything not explicitly selected gets explicitly deselected ...
@@ -879,14 +838,11 @@ struct convert_to_split_edges
 	implementation* m_implementation;
 };
 
-/** \todo Handle adjacent edge selections */
 struct convert_to_uniform
 {
 	convert_to_uniform(bool KeepSelection) : m_keep_selection(KeepSelection) {}
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
-    assert_not_implemented();
-/*
 		// Convert point and edge selections to face selections ...
 		if(Mesh.point_selection && Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges && Mesh.polyhedra->edge_selection)
 		{
@@ -998,15 +954,11 @@ struct convert_to_uniform
 				}
 			}
 		}
-*/
 
 		if (!m_keep_selection)
 		{
 			Selection.points.clear();
-      assert_not_implemented();
-      /*
 			Selection.edges.clear();
-      */
 		}
 
 		// Ensure that anything not explicitly selected gets explicitly deselected ...
@@ -1029,7 +981,6 @@ struct keep_selection
 			}
 		}
 		
-/*
 		if (Mesh.polyhedra && Mesh.polyhedra->edge_selection)
 		{
 			for (k3d::uint_t edge = 0; edge != Mesh.polyhedra->edge_selection->size(); ++edge)
@@ -1101,9 +1052,9 @@ struct keep_selection
 					Selection.nurbs_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
 			}
 		}
-*/
 	}
 };
+*/
 
 } // namespace detail
 
@@ -1118,8 +1069,8 @@ public:
 	implementation(k3d::idocument& Document) :
 		m_document(Document),
 		m_gdkgl_share_list(0),
-		m_selection_mode(init_owner(*this) + init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(SELECT_NODES) + init_values(detail::selection_mode_values())),
-		m_last_selection_mode(SELECT_NODES),
+		m_selection_mode(init_owner(*this) + init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(selection::NODES) + init_values(detail::selection_mode_values())),
+		m_last_selection_mode(selection::NODES),
 		m_active_tool(0),
 		m_selection_tool(0),
 		m_move_tool(0),
@@ -1128,7 +1079,9 @@ public:
 		m_context_menu(0),
 		m_node_selection(0)
 	{
+/*
 		m_selection_mode.connect_explicit_change_signal(sigc::mem_fun(*this, &implementation::on_selection_mode_changed));
+*/
 
 		// Process remove_nodes_signal
 		m_document.nodes().remove_nodes_signal().connect(sigc::mem_fun(*this, &implementation::on_nodes_removed));
@@ -1259,7 +1212,7 @@ public:
 		return m_selection_mode;
 	}
 
-	void set_selection_mode(selection_mode_t Mode)
+	void set_selection_mode(selection::mode Mode)
 	{
 		m_selection_mode.set_value(Mode);
 	}
@@ -1267,9 +1220,13 @@ public:
 	/// Called by the signal system anytime nodes are removed from the document
 	void on_nodes_removed(const k3d::inode_collection::nodes_t& Nodes)
 	{
+assert_not_implemented();
+/*
 		selection_changed();
+*/
 	}
 
+/*
 	typedef std::set<k3d::legacy::mesh*> meshes_t;
 	typedef std::set<k3d::inode*> node_selection_t;
 
@@ -1331,7 +1288,6 @@ public:
 			const k3d::nodes_t nodes = selected_nodes();
 			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 			{
-/** \todo Restore this logic */
 //				if(dynamic_cast<k3d::imesh_source*>(*node))
 				{
 					++selected_mesh_count;
@@ -1573,6 +1529,7 @@ public:
 			k3d::property::set_internal_value(**node, "render_final", true);
 		}
 	}
+*/
 
 	document_state::set_cursor_signal_t& set_cursor_signal()
 	{
@@ -1679,8 +1636,8 @@ public:
 		return_val_if_fail(Factory, 0);
 
 		// Switch to node selection mode
-		if(SELECT_NODES != m_selection_mode.internal_value())
-			set_selection_mode(SELECT_NODES);
+		if(selection::NODES != m_selection_mode.internal_value())
+			set_selection_mode(selection::NODES);
 
 		// Create the requested node ...
 		k3d::record_state_change_set changeset(m_document, k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), K3D_CHANGE_SET_CONTEXT);
@@ -1773,8 +1730,11 @@ public:
 			reset_properties->reset_properties();
 
 		// Replace the current selection
+assert_not_implemented();
+/*
 		deselect_all();
 		select(k3d::selection::make_records(to_be_selected));
+*/
 
 		// Make the newly-created node properties visible ...
 		view_node_properties_signal().emit(node);
@@ -1792,6 +1752,7 @@ public:
 			m_context_menu->popup(0, GDK_CURRENT_TIME);
 	}
 
+/*
 	/// Sets the current selection when node selection mode is chosen
 	void on_set_node_mode()
 	{
@@ -1859,6 +1820,7 @@ public:
 
 		selection_changed();
 	}
+*/
 
 	/// Stores a reference to the owning document
 	k3d::idocument& m_document;
@@ -1878,7 +1840,7 @@ public:
 	/// Stores the current document-wide selection mode
 	selection_mode_property_t m_selection_mode;
 	/// Stores the last document-wide selection mode
-	selection_mode_t m_last_selection_mode;
+	selection::mode m_last_selection_mode;
 
 	document_state::set_cursor_signal_t m_set_cursor_signal;
 	document_state::clear_cursor_signal_t m_clear_cursor_signal;
@@ -2129,39 +2091,60 @@ document_state::selection_mode_property_t& document_state::selection_mode()
 	return m_implementation->selection_mode();
 }
 
-void document_state::set_selection_mode(selection_mode_t Mode)
+void document_state::set_selection_mode(selection::mode Mode)
 {
 	m_implementation->set_selection_mode(Mode);
 }
 
 void document_state::select(const k3d::selection::record& Selection)
 {
+	assert_not_implemented();
+/*
 	m_implementation->select(k3d::selection::records(1, Selection));
+*/
 }
 
 void document_state::select(const k3d::selection::records& Selection)
 {
+	assert_not_implemented();
+/*
 	m_implementation->select(Selection);
+*/
 }
 
 void document_state::select(k3d::inode& Node)
 {
+	assert_not_implemented();
+/*
 	m_implementation->select(Node);
+*/
 }
 
 k3d::inode_selection* document_state::node_selection()
 {
+	assert_not_implemented();
+	return 0;
+/*
 	return m_implementation->node_selection();
+*/
 }
 
 const bool document_state::is_selected(k3d::inode* Node)
 {
+	assert_not_implemented();
+	return false;
+/*
 	return m_implementation->is_selected(Node);
+*/
 }
 
 const bool document_state::is_selected(const k3d::selection::record& Selection)
 {
+	assert_not_implemented();
+	return false;
+/*
 	return m_implementation->is_selected(Selection);
+*/
 }
 
 bool document_state::pick_backfacing()
@@ -2181,57 +2164,90 @@ bool document_state::rubber_band_backfacing()
 
 void document_state::select_all()
 {
+	assert_not_implemented();
+/*
 	m_implementation->select_all();
+*/
 }
 
 void document_state::deselect(const k3d::selection::record& Selection)
 {
+	assert_not_implemented();
+/*
 	m_implementation->deselect(k3d::selection::records(1, Selection));
+*/
 }
 
 void document_state::deselect(const k3d::selection::records& Selection)
 {
+	assert_not_implemented();
+/*
 	m_implementation->deselect(Selection);
+*/
 }
 
 void document_state::deselect(k3d::inode& Node)
 {
+	assert_not_implemented();
+/*
 	m_implementation->deselect(Node);
+*/
 }
 
 void document_state::deselect_all()
 {
+	assert_not_implemented();
+/*
 	m_implementation->deselect_all();
+*/
 }
 
 void document_state::invert_selection()
 {
+	assert_not_implemented();
+/*
 	m_implementation->invert_selection();
+*/
 }
 
 const k3d::nodes_t document_state::selected_nodes()
 {
+	assert_not_implemented();
+/*
 	return m_implementation->selected_nodes();
+*/
 }
 
 void document_state::hide_selection()
 {
+	assert_not_implemented();
+/*
 	return m_implementation->hide_selection();
+*/
 }
 
 void document_state::show_selection()
 {
+	assert_not_implemented();
+/*
 	return m_implementation->show_selection();
+*/
 }
 
 void document_state::hide_unselected()
 {
+	assert_not_implemented();
+/*
 	return m_implementation->hide_unselected();
+*/
 }
 
 void document_state::show_all_nodes()
 {
+	assert_not_implemented();
+/*
 	return m_implementation->show_all_nodes();
+*/
 }
 
 document_state::set_cursor_signal_t& document_state::set_cursor_signal()

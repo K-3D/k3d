@@ -23,9 +23,9 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/selection.h>
 
 namespace module
 {

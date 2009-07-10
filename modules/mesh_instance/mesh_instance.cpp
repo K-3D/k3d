@@ -24,6 +24,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/ibounded.h>
 #include <k3dsdk/imesh_painter_gl.h>
@@ -32,7 +33,6 @@
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/ipipeline_profiler.h>
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/painter_render_state_gl.h>
@@ -148,7 +148,7 @@ public:
 		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
 		{
 			OutputMesh = *input_mesh;
-			k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), OutputMesh);
+			k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
 		}
 		else
 		{

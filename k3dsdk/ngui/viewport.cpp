@@ -751,16 +751,16 @@ k3d::selection::records control::get_object_selectables(const k3d::rectangle& Se
 {
 	switch(m_implementation->m_document_state.selection_mode().internal_value())
 	{
-		case SELECT_NODES:
+		case selection::NODES:
 			return get_node_selectables(SelectionRegion);
 			break;
-		case SELECT_POINTS:
+		case selection::POINTS:
 			return get_point_selectables(SelectionRegion, Backfacing);
 			break;
-		case SELECT_SPLIT_EDGES:
+		case selection::SPLIT_EDGES:
 			return get_split_edge_selectables(SelectionRegion, Backfacing);
 			break;
-		case SELECT_UNIFORM:
+		case selection::UNIFORM:
 			return get_uniform_selectables(SelectionRegion, Backfacing);
 			break;
 	}
@@ -1221,16 +1221,16 @@ k3d::selection::record control::pick_object(const k3d::point2& Coordinates, k3d:
 {
 	switch(m_implementation->m_document_state.selection_mode().internal_value())
 	{
-		case SELECT_NODES:
+		case selection::NODES:
 			return pick_node(Coordinates, Records);
 			break;
-		case SELECT_POINTS:
+		case selection::POINTS:
 			return pick_point(Coordinates, Records, Backfacing);
 			break;
-		case SELECT_SPLIT_EDGES:
+		case selection::SPLIT_EDGES:
 			return pick_split_edge(Coordinates, Records, Backfacing);
 			break;
-		case SELECT_UNIFORM:
+		case selection::UNIFORM:
 			return pick_uniform(Coordinates, Records, Backfacing);
 			break;
 	}

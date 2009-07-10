@@ -25,6 +25,7 @@
 
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
@@ -80,7 +81,7 @@ public:
 	{
 		Output = Input;
 
-		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
 
     const k3d::bool_t store_uniform = m_uniform.pipeline_value();
     const k3d::bool_t store_face_varying = m_face_varying.pipeline_value();

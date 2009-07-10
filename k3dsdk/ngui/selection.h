@@ -32,21 +32,26 @@ namespace k3d
 namespace ngui
 {
 
+namespace selection
+{
+
 /// Enumerates available interactive selection modes
-typedef enum
+enum mode
 {
 	/// Select individual nodes
-	SELECT_NODES,
+	NODES,
 	/// Select points
-	SELECT_POINTS,
+	POINTS,
 	/// Select polyhedron split-edges
-	SELECT_SPLIT_EDGES,
+	SPLIT_EDGES,
 	/// Select uniform components
-	SELECT_UNIFORM
-} selection_mode_t;
+	UNIFORM
+};
 
-std::ostream& operator<<(std::ostream& Stream, const selection_mode_t& Value);
-std::istream& operator>>(std::istream& Stream, selection_mode_t& Value);
+std::ostream& operator<<(std::ostream& Stream, const mode& Value);
+std::istream& operator>>(std::istream& Stream, mode& Value);
+
+} // namespace selection
 
 } // namespace ngui
 

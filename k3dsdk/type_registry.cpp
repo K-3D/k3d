@@ -79,7 +79,6 @@
 #include "legacy_mesh.h"
 #include "log.h"
 #include "mesh.h"
-#include "mesh_selection.h"
 #include "texture3.h"
 #include "type_registry.h"
 #include "types.h"
@@ -224,7 +223,6 @@ void initialize_types()
 	register_type(typeid(k3d::matrix4), "k3d::matrix4");
 	register_type(typeid(k3d::mesh), "k3d::mesh");
 	register_type(typeid(k3d::mesh*), "k3d::mesh*");
-	register_type(typeid(k3d::mesh_selection), "k3d::mesh_selection");
 	register_type(typeid(k3d::normal3), "k3d::normal3");
 	register_type(typeid(k3d::point2), "k3d::point2");
 	register_type(typeid(k3d::point3), "k3d::point3");

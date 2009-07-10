@@ -34,7 +34,6 @@
 #include <k3dsdk/color.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/render_state_ri.h>
 #include <k3dsdk/texture3.h>
@@ -124,8 +123,10 @@ const object any_to_python(const boost::any& Value)
 	if(type == typeid(k3d::euler_angles))
 		return object(boost::any_cast<k3d::euler_angles>(Value));
 
+/*
 	if(type == typeid(k3d::mesh_selection))
 		return object(boost::any_cast<k3d::mesh_selection>(Value));
+*/
 
 	if(type == typeid(k3d::bounding_box3))
 		return object(boost::any_cast<k3d::bounding_box3>(Value));
@@ -312,8 +313,10 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 	if(TargetType == typeid(k3d::matrix4))
 		return boost::any(extract<k3d::matrix4>(Value)());
 
+/*
 	if(TargetType == typeid(k3d::mesh_selection))
 		return boost::any(extract<k3d::mesh_selection>(Value)());
+*/
 
 	if(TargetType == typeid(k3d::bounding_box3))
 		return boost::any(extract<k3d::bounding_box3>(Value)());

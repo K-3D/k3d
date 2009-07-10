@@ -40,7 +40,6 @@
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
@@ -183,6 +182,8 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 		k3d::imesh_selection_sink* const downstream_mesh_selection_sink = dynamic_cast<k3d::imesh_selection_sink*>(&Node);
 		if(modifier_mesh_selection_sink && downstream_mesh_selection_sink)
 		{
+assert_not_implemented();
+/*
 			if(SELECT_NODES == DocumentState.selection_mode().internal_value())
 			{
 				k3d::property::set_internal_value(
@@ -199,6 +200,7 @@ k3d::inode* modify_mesh(document_state& DocumentState, k3d::inode& Node, k3d::ip
 			k3d::property::set_internal_value(
 				downstream_mesh_selection_sink->mesh_selection_sink_input(),
 				k3d::mesh_selection::select_null());
+*/
 		}
 	}
 	
@@ -251,7 +253,10 @@ void modify_selected_meshes(document_state& DocumentState, k3d::iplugin_factory*
 					source_mesh = &transform_points_mesh_source->mesh_source_output();
 					k3d::imesh_selection_sink* selection_sink = dynamic_cast<k3d::imesh_selection_sink*>(transform_points);
 					return_if_fail(selection_sink);
+assert_not_implemented();
+/*
 					k3d::property::set_internal_value(selection_sink->mesh_selection_sink_input(), k3d::mesh_selection::select_all());
+*/
 				}
 			}
 			++count;

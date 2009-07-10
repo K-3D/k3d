@@ -23,6 +23,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
@@ -52,7 +53,7 @@ public:
 	
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
 	}
 	
 	static k3d::iplugin_factory& get_factory()

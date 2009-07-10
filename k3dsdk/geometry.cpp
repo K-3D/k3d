@@ -336,6 +336,11 @@ void merge_selection(const k3d::selection::set& Set, mesh& Mesh)
 	}
 }
 
+void merge_selection(const k3d::selection::set& Set, legacy::mesh& Mesh)
+{
+	assert_not_implemented();
+}
+
 } // namespace geometry
 
 } // namespace k3d

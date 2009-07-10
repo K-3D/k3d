@@ -1756,25 +1756,25 @@ private:
 	void on_select_nodes()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Nodes mode"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.set_selection_mode(SELECT_NODES);
+		m_document_state.set_selection_mode(selection::NODES);
 	}
 
 	void on_select_vertices()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Points mode"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.set_selection_mode(SELECT_POINTS);
+		m_document_state.set_selection_mode(selection::POINTS);
 	}
 
 	void on_select_edges()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Lines mode"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.set_selection_mode(SELECT_SPLIT_EDGES);
+		m_document_state.set_selection_mode(selection::SPLIT_EDGES);
 	}
 
 	void on_select_faces()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Faces mode"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.set_selection_mode(SELECT_UNIFORM);
+		m_document_state.set_selection_mode(selection::UNIFORM);
 	}
 
 	void on_layout_maximize_panel()

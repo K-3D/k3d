@@ -25,6 +25,7 @@
 namespace k3d
 {
 
+namespace legacy { class mesh; }
 namespace selection { class set; }
 namespace selection { class storage; }
 
@@ -128,6 +129,7 @@ void merge(const_storage& Storage, mesh& Mesh);
 } // namespace primitive_selection
 
 void merge_selection(const k3d::selection::set& Set, mesh& Mesh);
+void merge_selection(const k3d::selection::set& Set, legacy::mesh& Mesh);
 
 } // namespace geometry
 

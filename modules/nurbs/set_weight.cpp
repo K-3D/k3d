@@ -24,6 +24,7 @@
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh.h>
@@ -71,7 +72,7 @@ public:
 		// Always cache pipeline values, they may be expensive to compute ...
 		const double weight = m_weight.pipeline_value();
 		// Merge the stored selection state with the output ...
-		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
 
 		// There's no guarantee that the mesh contains NURBS!
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs_curve(get_first_nurbs_curve(Output));

@@ -94,7 +94,7 @@ bool is_front_facing(viewport::control& Viewport, const k3d::vector3& Normal, co
 	return k3d::to_vector(matrix * a).length2() < k3d::to_vector(matrix * b).length2();
 }
 
-k3d::point3 get_selected_points(selection_mode_t SelectionMode, const k3d::mesh& Mesh, component_points_t& PointList)
+k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& Mesh, component_points_t& PointList)
 {
 	PointList.clear();
 	k3d::point3 component_center(0, 0, 0);
@@ -994,7 +994,7 @@ k3d::point3 transform_tool::world_position()
 {
 	if(target_number())
 	{
-		if(SELECT_NODES == m_document_state.selection_mode().internal_value())
+		if(selection::NODES == m_document_state.selection_mode().internal_value())
 		{
 			m_current_target = m_current_target % m_targets.size();
 			itarget* t = m_targets[m_current_target];
@@ -1143,7 +1143,7 @@ void transform_tool::get_current_selection()
 
 	const k3d::nodes_t nodes = m_document_state.selected_nodes();
 
-	if(SELECT_NODES == m_document_state.selection_mode().internal_value())
+	if(selection::NODES == m_document_state.selection_mode().internal_value())
 	{
 		// Save transformable nodes as targets
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
