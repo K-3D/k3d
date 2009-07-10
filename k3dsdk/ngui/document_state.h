@@ -141,9 +141,6 @@ public:
 	/// Inverts current selection
 	void invert_selection();
 
-	/// Returns the current set of selected nodes
-	const k3d::nodes_t selected_nodes();
-
 	/// Hides selected nodes
 	void hide_selection();
 	/// Shows selected nodes

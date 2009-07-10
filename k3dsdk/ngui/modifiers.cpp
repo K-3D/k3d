@@ -43,6 +43,7 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
 
@@ -219,7 +220,7 @@ void modify_selected_meshes(document_state& DocumentState, k3d::iplugin_factory*
 	{ // Mesh modifier taking multiple inputs
 		k3d::uint_t count = 0;
 		k3d::ipipeline::dependencies_t dependencies;
-		const k3d::nodes_t selected_nodes = DocumentState.selected_nodes();
+		const k3d::nodes_t selected_nodes = selection::state(DocumentState.document()).selected_nodes();
 		// Create the node
 		k3d::inode* multi_sink = DocumentState.create_node(Modifier);
 		k3d::record_state_change_set changeset(document, k3d::string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), K3D_CHANGE_SET_CONTEXT);
@@ -283,7 +284,7 @@ assert_not_implemented();
 	{ // Normal mesh modifier
 		k3d::nodes_t new_modifiers;
 	
-		const k3d::nodes_t selected_nodes = DocumentState.selected_nodes();
+		const k3d::nodes_t selected_nodes = selection::state(DocumentState.document()).selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
 		{
 			new_modifiers.push_back(modify_mesh(DocumentState, **node, Modifier));

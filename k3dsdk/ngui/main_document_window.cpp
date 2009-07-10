@@ -1601,7 +1601,7 @@ private:
 	{
 		k3d::record_state_change_set changeset(m_document_state.document(), _("Delete nodes"), K3D_CHANGE_SET_CONTEXT);
 
-		k3d::nodes_t nodes = m_document_state.selected_nodes();
+		k3d::nodes_t nodes = selection::state(m_document_state.document()).selected_nodes();
 		k3d::delete_nodes(m_document_state.document(), nodes);
 
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
@@ -2033,7 +2033,7 @@ private:
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide selection"), K3D_CHANGE_SET_CONTEXT);
 
-		const k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
+		const k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
 		{
 			k3d::property::set_internal_value(**node, "viewport_visible", false);
@@ -2047,7 +2047,7 @@ private:
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Show selection"), K3D_CHANGE_SET_CONTEXT);
 
-		const k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
+		const k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
 		{
 			k3d::property::set_internal_value(**node, "viewport_visible", true);
@@ -2194,7 +2194,7 @@ private:
 
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)
 	{
-		k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
+		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 
 		k3d::inode* new_modifier;
 		for(k3d::nodes_t::iterator selected_node = selected_nodes.begin(); selected_node != selected_nodes.end(); ++selected_node)
@@ -2212,7 +2212,7 @@ private:
 
 	void on_modify_transformations(k3d::iplugin_factory* Modifier)
 	{
-		k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
+		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 
 		k3d::inode* new_modifier;
 		for(k3d::nodes_t::iterator selected_node = selected_nodes.begin(); selected_node != selected_nodes.end(); ++selected_node)
@@ -2351,7 +2351,7 @@ private:
 	/// Unparents all selected nodes
 	void on_unparent()
 	{
-		const k3d::nodes_t nodes = m_document_state.selected_nodes();
+		const k3d::nodes_t nodes = selection::state(m_document_state.document()).selected_nodes();
 		if(nodes.empty())
 			return;
 

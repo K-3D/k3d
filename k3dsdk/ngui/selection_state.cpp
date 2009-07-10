@@ -103,6 +103,13 @@ state::state(idocument& Document) :
 {
 }
 
+const std::vector<inode*> state::selected_nodes()
+{
+	return_val_if_fail(internal.node_selection(), std::vector<inode*>());
+	const k3d::inode_selection::selected_nodes_t nodes = internal.node_selection()->selected_nodes();
+	return std::vector<inode*>(nodes.begin(), nodes.end());
+}
+
 void state::select(inode& Node)
 {
 	return_if_fail(internal.node_selection());

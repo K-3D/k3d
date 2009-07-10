@@ -32,6 +32,7 @@
 #include <k3dsdk/ngui/custom_property_page.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/plugins.h>
@@ -91,7 +92,7 @@ public:
 		m_document_state.document().close_signal().connect(sigc::mem_fun(*this, &implementation::on_document_closed));
 
 		// Initial update ...
-		m_nodes = m_document_state.selected_nodes();
+		m_nodes = selection::state(m_document_state.document()).selected_nodes();
 		if(m_nodes.size() > 1)
 			m_nodes.resize(1);
 		update_connections();

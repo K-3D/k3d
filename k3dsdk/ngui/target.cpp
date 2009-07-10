@@ -35,6 +35,7 @@
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>
@@ -227,7 +228,7 @@ void aim_selection(document_state& DocumentState, viewport::control& Viewport)
 	// Get the bounding box of the current selection
 	k3d::bounding_box3 bbox;
 	k3d::mesh::points_t points;
-	if(!detail::selection_position(DocumentState.selection_mode().internal_value(), DocumentState.selected_nodes(), bbox, points))
+	if(!detail::selection_position(DocumentState.selection_mode().internal_value(), selection::state(DocumentState.document()).selected_nodes(), bbox, points))
 		return;
 	
 	k3d::point3 target = bbox.center();
@@ -250,7 +251,7 @@ void frame_selection(document_state& DocumentState, viewport::control& Viewport)
 	// Get the bounding box of the current selection
 	k3d::bounding_box3 bbox;
 	k3d::mesh::points_t points;
-	if(!detail::selection_position(DocumentState.selection_mode().internal_value(), DocumentState.selected_nodes(), bbox, points))
+	if(!detail::selection_position(DocumentState.selection_mode().internal_value(), selection::state(DocumentState.document()).selected_nodes(), bbox, points))
 		return;
 	
 	k3d::point3 target = bbox.center();

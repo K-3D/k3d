@@ -32,7 +32,6 @@
 #include "icons.h"
 #include "interactive.h"
 #include "keyboard.h"
-#include "selection_state.h"
 #include "transform_tool.h"
 #include "utility.h"
 #include "viewport.h"
@@ -49,6 +48,7 @@
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/transform.h>
@@ -1142,7 +1142,7 @@ void transform_tool::get_current_selection()
 	// Convert the current document selection into the set of targets to be moved interactively
 	clear_targets();
 
-	const k3d::nodes_t nodes = m_document_state.selected_nodes();
+	const k3d::nodes_t nodes = selection::state(m_document_state.document()).selected_nodes();
 
 	if(selection::NODES == m_document_state.selection_mode().internal_value())
 	{

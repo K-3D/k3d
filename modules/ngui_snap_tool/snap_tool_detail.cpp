@@ -993,7 +993,7 @@ void snap_tool_detail::get_current_selection()
 	// Convert the current document selection into the set of targets to be moved interactively
 	clear_targets();
 
-	const k3d::nodes_t nodes = m_document_state.selected_nodes();
+	const k3d::nodes_t nodes = selection::state(m_document_state.document()).selected_nodes();
 
 	if(selection::NODES == m_document_state.selection_mode().internal_value())
 	{

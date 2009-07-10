@@ -60,6 +60,7 @@
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
@@ -245,7 +246,7 @@ public:
 		unsigned long selected_node_counter = 0;
 		unsigned long selected_mesh_counter = 0;
 		unsigned long selected_transform_counter = 0;
-		const k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
+		const k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
 		{
 			++selected_node_counter;
@@ -482,7 +483,7 @@ private:
 	{
 		k3d::record_state_change_set changeset(m_document_state.document(), _("Delete nodes"), K3D_CHANGE_SET_CONTEXT);
 
-		k3d::nodes_t nodes = m_document_state.selected_nodes();
+		k3d::nodes_t nodes = selection::state(m_document_state.document()).selected_nodes();
 
 		k3d::delete_nodes(m_document_state.document(), nodes);
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
@@ -503,7 +504,7 @@ private:
 	/// Easy animation of transformation matrix
 	void on_animate_transformation()
 	{
-		const k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
+		const k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
 		{
 			k3d::inode* upstream_node = 0;
@@ -585,7 +586,7 @@ private:
 	{
 		return_if_fail(Modifier);
 
-		k3d::nodes_t selected_nodes = m_document_state.selected_nodes();
+		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 
 		k3d::inode* new_modifier;
 		for(k3d::nodes_t::iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)

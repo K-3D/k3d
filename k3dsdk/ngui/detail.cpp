@@ -26,7 +26,6 @@
 #include "detail.h"
 #include "document_state.h"
 #include "modifiers.h"
-#include "selection_state.h"
 #include "transform.h"
 
 #include <k3d-i18n-config.h>
@@ -43,6 +42,7 @@
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
@@ -202,7 +202,7 @@ void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocum
 void instantiate_selected_nodes(document_state& DocumentState)
 {
 	// Save selection
-	const k3d::nodes_t nodes = DocumentState.selected_nodes();
+	const k3d::nodes_t nodes = selection::state(DocumentState.document()).selected_nodes();
 	if(!nodes.size())
 		return;
 
@@ -234,7 +234,7 @@ void instantiate_selected_nodes(document_state& DocumentState)
 void duplicate_selected_nodes(document_state& DocumentState)
 {
 	// Save selection
-	const k3d::nodes_t nodes = DocumentState.selected_nodes();
+	const k3d::nodes_t nodes = selection::state(DocumentState.document()).selected_nodes();
 	if(!nodes.size())
 		return;
 

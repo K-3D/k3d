@@ -24,6 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <vector>
+
 namespace k3d
 {
 
@@ -41,6 +43,9 @@ class state
 {
 public:
 	state(idocument& Document);
+
+	/// Returns the current set of selected nodes
+	const std::vector<inode*> selected_nodes();
 
 	/// Selects one node
 	void select(inode& Node);

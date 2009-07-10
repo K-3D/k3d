@@ -419,7 +419,7 @@ struct implementation
 	/// Unparents all selected nodes
 	void on_unparent()
 	{
-		const k3d::nodes_t nodes = m_document_state.selected_nodes();
+		const k3d::nodes_t nodes = selection::state(m_document_state.document()).selected_nodes();
 		if(nodes.empty())
 			return;
 
