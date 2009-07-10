@@ -111,13 +111,6 @@ public:
 
 	void set_selection_mode(selection::mode Mode);
 
-	/// Returns a pointer to the document node selection, or null if there is none
-	/**
-	 * This node is identified by metadata with name "ngui:unique_node" and value
-	 * "node_selection" 
-	 */
-	k3d::inode_selection* node_selection();
-	
 	const bool is_selected(k3d::inode* Node);
 	const bool is_selected(const k3d::selection::record&);
 	
