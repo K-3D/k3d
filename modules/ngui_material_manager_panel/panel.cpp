@@ -431,7 +431,7 @@ void Implementation::init()
   for(node_iter; node_iter != m_document_state.document().nodes().collection().end(); ++node_iter)
     {
       //Check If Node Is Selected
-      selected_result = m_document_state.is_selected((*node_iter));
+      selected_result = selection::state(m_document_state.document()).is_selected(**node_iter);
       if(selected_result)
         {
           onNodeSelection(*node_iter);

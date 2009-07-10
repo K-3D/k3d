@@ -57,7 +57,7 @@ namespace detail
 
 /// Uses an update policy to alter the set of all selected MeshInstance mesh selections
 template<typename UpdatePolicyT>
-void update_component_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePolicy, const bool_t VisibleSelection)
+void set_component_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePolicy, const bool_t VisibleSelection)
 {
 	for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
 	{
@@ -122,6 +122,41 @@ assert_not_implemented();
 		Selection.edges = mesh_selection::component_deselect_all();
 		Selection.faces = mesh_selection::component_select_all();
 */
+	}
+};
+
+/*
+void invert(k3d::mesh_selection::records_t& Records)
+{
+	for(k3d::mesh_selection::records_t::iterator record = Records.begin(); record != Records.end(); ++record)
+		record->weight = record->weight ? 0.0 : 1.0;
+}
+*/
+
+struct invert_points
+{
+	void operator()(const k3d::mesh& Mesh, k3d::selection::set& Selection) const
+	{
+assert_not_implemented();
+//		invert(Selection.points);
+	}
+};
+
+struct invert_split_edges
+{
+	void operator()(const k3d::mesh& Mesh, k3d::selection::set& Selection) const
+	{
+assert_not_implemented();
+//		invert(Selection.edges);
+	}
+};
+
+struct invert_uniform
+{
+	void operator()(const k3d::mesh& Mesh, k3d::selection::set& Selection) const
+	{
+assert_not_implemented();
+//		invert(Selection.faces);
 	}
 };
 
@@ -579,13 +614,13 @@ void state::select_all()
 			select_all_nodes();
 			break;
 		case POINTS:
-			detail::update_component_selection(selected_nodes(), detail::select_all_points(), true);
+			detail::set_component_selection(selected_nodes(), detail::select_all_points(), true);
 			break;
 		case SPLIT_EDGES:
-			detail::update_component_selection(selected_nodes(), detail::select_all_split_edges(), true);
+			detail::set_component_selection(selected_nodes(), detail::select_all_split_edges(), true);
 			break;
 		case UNIFORM:
-			detail::update_component_selection(selected_nodes(), detail::select_all_uniform(), true);
+			detail::set_component_selection(selected_nodes(), detail::select_all_uniform(), true);
 			break;
 	}
 
@@ -601,26 +636,40 @@ void state::select_all_nodes()
 
 void state::invert_selection()
 {
-	assert_not_implemented();
-/*
-	switch(m_selection_mode.internal_value())
+	switch(internal.current_mode.internal_value())
 	{
-		case SELECT_NODES:
-			invert_node_selection();
+		case NODES:
+			invert_all_nodes();
 			break;
-		case SELECT_POINTS:
-			detail::update_component_selection(internal.document.nodes().collection(), detail::invert_points(), true);
+		case POINTS:
+			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_points(), true);
 			break;
-		case SELECT_SPLIT_EDGES:
-			detail::update_component_selection(internal.document.nodes().collection(), detail::invert_split_edges(), true);
+		case SPLIT_EDGES:
+			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_split_edges(), true);
 			break;
-		case SELECT_UNIFORM:
-			detail::update_component_selection(internal.document.nodes().collection(), detail::invert_uniform(), true);
+		case UNIFORM:
+			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_uniform(), true);
 			break;
 	}
 
-	selection_changed();
-*/
+	internal.selection_changed();
+}
+
+void state::invert_all_nodes()
+{
+	for(k3d::inode_collection::nodes_t::const_iterator node = internal.document.nodes().collection().begin(); node != internal.document.nodes().collection().end(); ++node)
+	{
+		if(is_selected(**node))
+			deselect(**node);
+		else
+			select(**node);
+	}
+}
+
+const bool_t state::is_selected(inode& Node)
+{
+	if(internal.node_selection())
+		return internal.node_selection()->selection_weight(Node);
 }
 
 void state::deselect(inode& Node)
@@ -649,7 +698,7 @@ void state::deselect_all()
 		case POINTS:
 		case SPLIT_EDGES:
 		case UNIFORM:
-			detail::update_component_selection(internal.document.nodes().collection(), detail::deselect_all(), true);
+			detail::set_component_selection(internal.document.nodes().collection(), detail::deselect_all(), true);
 			break;
 	}
 

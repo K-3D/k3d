@@ -1642,7 +1642,7 @@ private:
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			// Skip unselected nodes
-			if(!m_document_state.is_selected(*node))
+			if(!selection::state(m_document_state.document()).is_selected(**node))
 				continue;
 
 			// Skip non-parentable nodes
@@ -1678,7 +1678,7 @@ private:
 			if(!parent)
 				continue;
 
-			if(m_document_state.is_selected(parent))
+			if(selection::state(m_document_state.document()).is_selected(*parent))
 				children.insert(*node);
 		}
 
@@ -1698,7 +1698,7 @@ private:
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			// Skip unselected nodes
-			if(!m_document_state.is_selected(*node))
+			if(!selection::state(m_document_state.document()).is_selected(**node))
 				continue;
 
 			// Skip non-parentable nodes
@@ -1719,7 +1719,7 @@ private:
 		for(k3d::inode_collection::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			// Skip selected nodes
-			if(m_document_state.is_selected(*node))
+			if(selection::state(m_document_state.document()).is_selected(**node))
 				continue;
 
 			// Skip non-parentable nodes
@@ -2064,7 +2064,7 @@ private:
 		const k3d::nodes_t& nodes = m_document_state.document().nodes().collection();
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
-			if(!m_document_state.is_selected(*node))
+			if(!selection::state(m_document_state.document()).is_selected(**node))
 			{
 				k3d::property::set_internal_value(**node, "viewport_visible", false);
 				k3d::property::set_internal_value(**node, "render_final", false);

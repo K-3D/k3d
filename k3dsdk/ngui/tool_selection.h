@@ -122,7 +122,7 @@ protected:
 				case selection::POINTS:
 				case selection::SPLIT_EDGES:
 				case selection::UNIFORM:
-					if(!m_document_state.is_selected(node))
+					if(!selection::state(m_document_state.document()).is_selected(*node))
 						m_mouse_down_selection = k3d::selection::record::empty_record();;
 					break;
 				case selection::NODES:

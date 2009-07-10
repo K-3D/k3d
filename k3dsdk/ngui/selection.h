@@ -87,6 +87,11 @@ public:
 
 	/// Inverts current selection.
 	void invert_selection();
+	/// Inverts all nodes.
+	void invert_all_nodes();
+
+	/// Returns true iff the given node is selected.
+	const bool_t is_selected(inode& Node);
 
 	/// Deselects one node.
 	void deselect(inode& Node);

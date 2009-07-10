@@ -429,36 +429,6 @@ struct select_null
 	}
 };
 
-void invert(k3d::mesh_selection::records_t& Records)
-{
-	for(k3d::mesh_selection::records_t::iterator record = Records.begin(); record != Records.end(); ++record)
-		record->weight = record->weight ? 0.0 : 1.0;
-}
-
-struct invert_points
-{
-	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
-	{
-		invert(Selection.points);
-	}
-};
-
-struct invert_split_edges
-{
-	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
-	{
-		invert(Selection.edges);
-	}
-};
-
-struct invert_uniform
-{
-	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
-	{
-		invert(Selection.faces);
-	}
-};
-
 void deselect_gaps(k3d::mesh_selection::records_t& Records)
 {
     Records.insert(Records.begin(), k3d::mesh_selection::record(0, size_t(-1), 0.0));
@@ -1241,14 +1211,6 @@ assert_not_implemented();
 		return m_node_selection;
 	}
 	
-	const bool is_selected(k3d::inode* Node)
-	{
-		if(m_node_selection)
-			return m_node_selection->selection_weight(*Node);
-
-		return false;
-	}
-
 	const bool is_selected(const k3d::selection::record& Record)
 	{
 		switch(m_selection_mode.internal_value())
@@ -1337,40 +1299,6 @@ assert_not_implemented();
 		selection_changed();
 	}
 	
-	void select(k3d::inode& Node)
-	{
-		return_if_fail(node_selection());
-		node_selection()->select(Node, 1.0);	
-	}
-
-	void select_all_nodes()
-	{
-		const k3d::nodes_t& nodes = m_document.nodes().collection();
-		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-			select(**node);
-	}
-
-	void select_all()
-	{
-		switch(m_selection_mode.internal_value())
-		{
-			case SELECT_NODES:
-				select_all_nodes();
-				break;
-			case SELECT_POINTS:
-				detail::update_component_selection(selected_nodes(), detail::select_all_points(), true);
-				break;
-			case SELECT_SPLIT_EDGES:
-				detail::update_component_selection(selected_nodes(), detail::select_all_split_edges(), true);
-				break;
-			case SELECT_UNIFORM:
-				detail::update_component_selection(selected_nodes(), detail::select_all_uniform(), true);
-				break;
-		}
-
-		selection_changed();
-	}
-
 	void deselect_nodes(const k3d::selection::records& Selection)
 	{
 		for(k3d::selection::records::const_iterator record = Selection.begin(); record != Selection.end(); ++record)
@@ -1401,12 +1329,6 @@ assert_not_implemented();
 		selection_changed();
 	}
 	
-	void deselect(k3d::inode& Node)
-	{
-		if(node_selection())
-			node_selection()->select(Node, 0.0);
-	}
-
 	void deselect_all_nodes()
 	{
 		if(node_selection())
@@ -1428,52 +1350,6 @@ assert_not_implemented();
 		}
 
 		selection_changed();
-	}
-
-	void invert_node_selection()
-	{
-		for(k3d::inode_collection::nodes_t::const_iterator node = m_document.nodes().collection().begin(); node != m_document.nodes().collection().end(); ++node)
-		{
-			if(is_selected(*node))
-				deselect(**node);
-			else
-				select(**node);
-		}
-	}
-
-	void invert_selection()
-	{
-		switch(m_selection_mode.internal_value())
-		{
-			case SELECT_NODES:
-				invert_node_selection();
-				break;
-			case SELECT_POINTS:
-				detail::update_component_selection(m_document.nodes().collection(), detail::invert_points(), true);
-				break;
-			case SELECT_SPLIT_EDGES:
-				detail::update_component_selection(m_document.nodes().collection(), detail::invert_split_edges(), true);
-				break;
-			case SELECT_UNIFORM:
-				detail::update_component_selection(m_document.nodes().collection(), detail::invert_uniform(), true);
-				break;
-		}
-
-		selection_changed();
-	}
-
-	const k3d::nodes_t selected_nodes()
-	{
-		k3d::nodes_t results;
-
-		if(node_selection())
-		{
-			k3d::inode_selection::selected_nodes_t selected_node_list = node_selection()->selected_nodes();
-			results.resize(selected_node_list.size());
-			std::copy(selected_node_list.begin(), selected_node_list.end(), results.begin());
-		}
-		
-		return results;
 	}
 
 	void hide_selection()
@@ -2055,15 +1931,6 @@ tool& document_state::rotate_tool()
 tool& document_state::scale_tool()
 {
 	return *m_implementation->m_scale_tool;
-}
-
-const bool document_state::is_selected(k3d::inode* Node)
-{
-	assert_not_implemented();
-	return false;
-/*
-	return m_implementation->is_selected(Node);
-*/
 }
 
 const bool document_state::is_selected(const k3d::selection::record& Selection)

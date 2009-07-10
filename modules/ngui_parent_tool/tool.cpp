@@ -123,7 +123,7 @@ struct implementation
 			if(&Parent == *node)
 				continue;
 
-			if(!m_document_state.is_selected(*node))
+			if(!selection::state(m_document_state.document()).is_selected(**node))
 				continue;
 
 			const transform_history_t history = parent_to_node_history(**node);
@@ -176,7 +176,7 @@ struct implementation
 		k3d::inode* const node = k3d::selection::get_node(selection);
 		return_if_fail(node);
 
-		if(m_document_state.is_selected(node))
+		if(selection::state(m_document_state.document()).is_selected(*node))
 		{
 			m_set_parent = true;
 			m_document_state.set_cursor_signal().emit(load_icon("parent_cursor", Gtk::ICON_SIZE_BUTTON));
