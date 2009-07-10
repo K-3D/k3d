@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\brief Implements the context menu
 	\author Timothy M. Shead (tshead@k-3d.com)
 	\author Romain Behar (romainbehar@yahoo.com)
 */
@@ -29,22 +28,8 @@
 #include <gtkmm/menuitem.h>
 #include <gtkmm/stock.h>
 
-#include "check_menu_item.h"
-#include "context_menu.h"
-#include "detail.h"
-#include "document_state.h"
-#include "file_chooser_dialog.h"
-#include "icons.h"
-#include "menus.h"
-#include "messages.h"
-#include "modifiers.h"
-#include "render.h"
-#include "viewport.h"
-#include "widget_manip.h"
-
 #include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/dependencies.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/icamera.h>
@@ -60,10 +45,24 @@
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/ngui/check_menu_item.h>
+#include <k3dsdk/ngui/context_menu.h>
+#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/menus.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/node.h>
+#include <k3dsdk/ngui/render.h>
 #include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/time_source.h>
@@ -604,26 +603,39 @@ private:
 
 	void on_hide_selection()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide selection"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.hide_selection();
+		record_state_change_set change_set(m_document_state.document(), _("Hide selection"), K3D_CHANGE_SET_CONTEXT);
+		const nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
+		for(nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
+			node::hide(**node);
 	}
 
 	void on_show_selection()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Show selection"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.show_selection();
+		const nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
+		for(nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
+			node::show(**node);
 	}
 
 	void on_hide_unselected()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Hide unselected"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.hide_unselected();
+
+		const nodes_t& nodes = m_document_state.document().nodes().collection();
+		for(nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+		{
+			if(!selection::state(m_document_state.document()).is_selected(**node))
+				node::hide(**node);
+		}
 	}
 
 	void on_show_all()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Show all"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.show_all_nodes();
+
+		const nodes_t& nodes = m_document_state.document().nodes().collection();
+		for(nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+			node::show(**node);
 	}
 
 	// Viewport items

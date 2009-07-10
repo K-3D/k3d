@@ -113,15 +113,6 @@ public:
 	/// True if backfacing components are to be rubber-band selected
 	bool rubber_band_backfacing();
 
-	/// Hides selected nodes
-	void hide_selection();
-	/// Shows selected nodes
-	void show_selection();
-	/// Hides unselected nodes
-	void hide_unselected();
-	/// Shows all nodes
-	void show_all_nodes();
-
 	/// Defines a signal to set the document-wide cursor
 	typedef sigc::signal<void, const Glib::RefPtr<Gdk::Pixbuf> > set_cursor_signal_t;
 	/// Returns a signal for setting the document-wide cursor

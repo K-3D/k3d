@@ -1592,38 +1592,6 @@ bool document_state::rubber_band_backfacing()
 	return m_implementation->m_selection_tool->rubber_band_backfacing();
 }
 
-void document_state::hide_selection()
-{
-	assert_not_implemented();
-/*
-	return m_implementation->hide_selection();
-*/
-}
-
-void document_state::show_selection()
-{
-	assert_not_implemented();
-/*
-	return m_implementation->show_selection();
-*/
-}
-
-void document_state::hide_unselected()
-{
-	assert_not_implemented();
-/*
-	return m_implementation->hide_unselected();
-*/
-}
-
-void document_state::show_all_nodes()
-{
-	assert_not_implemented();
-/*
-	return m_implementation->show_all_nodes();
-*/
-}
-
 document_state::set_cursor_signal_t& document_state::set_cursor_signal()
 {
 	return m_implementation->set_cursor_signal();

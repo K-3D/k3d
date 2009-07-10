@@ -22,55 +22,26 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "application_state.h"
-#include "check_menu_item.h"
-#include "detail.h"
-#include "document.h"
-#include "document_state.h"
-#include "file_chooser_dialog.h"
-#include "icons.h"
-#include "image_toggle_button.h"
-#include "main_document_window.h"
-#include "menus.h"
-#include "merge_nodes.h"
-#include "messages.h"
-#include "modifiers.h"
-#include "panel_frame.h"
-#include "render.h"
-#include "savable_document_window.h"
-#include "scripting.h"
-#include "selection.h"
-#include "target.h"
-#include "toolbar.h"
-#include "transform.h"
-#include "undo_utility.h"
-#include "uri.h"
-#include "utility.h"
-#include "viewport.h"
-#include "widget_manip.h"
-
 #include <k3d-i18n-config.h>
-#include <k3d-version-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/axis.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icamera.h>
-#include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_exporter.h>
+#include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/idocument_sink.h>
-#include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/iparentable.h>
+#include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
@@ -79,9 +50,37 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/mime_types.h>
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/check_menu_item.h>
+#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/document.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/image_toggle_button.h>
+#include <k3dsdk/ngui/main_document_window.h>
+#include <k3dsdk/ngui/menus.h>
+#include <k3dsdk/ngui/merge_nodes.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/node.h>
+#include <k3dsdk/ngui/panel_frame.h>
+#include <k3dsdk/ngui/render.h>
+#include <k3dsdk/ngui/savable_document_window.h>
+#include <k3dsdk/ngui/scripting.h>
+#include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/target.h>
+#include <k3dsdk/ngui/toolbar.h>
+#include <k3dsdk/ngui/transform.h>
+#include <k3dsdk/ngui/undo_utility.h>
+#include <k3dsdk/ngui/uri.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/selection.h>
@@ -93,11 +92,11 @@
 #include <k3dsdk/user_properties.h>
 #include <k3dsdk/utility_gl.h>
 #include <k3dsdk/xml.h>
+#include <k3d-version-config.h>
 
 #include <boost/regex.hpp>
 
 #include <gdkmm/cursor.h>
-
 #include <gtkmm/accelmap.h>
 #include <gtkmm/box.h>
 #include <gtkmm/eventbox.h>
@@ -2035,10 +2034,7 @@ private:
 
 		const k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
-		{
-			k3d::property::set_internal_value(**node, "viewport_visible", false);
-			k3d::property::set_internal_value(**node, "render_final", false);
-		}
+			node::hide(**node);
 
 		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
@@ -2049,10 +2045,7 @@ private:
 
 		const k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 		for(k3d::nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
-		{
-			k3d::property::set_internal_value(**node, "viewport_visible", true);
-			k3d::property::set_internal_value(**node, "render_final", true);
-		}
+			node::show(**node);
 
 		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
@@ -2065,10 +2058,7 @@ private:
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			if(!selection::state(m_document_state.document()).is_selected(**node))
-			{
-				k3d::property::set_internal_value(**node, "viewport_visible", false);
-				k3d::property::set_internal_value(**node, "render_final", false);
-			}
+				node::hide(**node);
 		}
 
 		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
@@ -2080,10 +2070,7 @@ private:
 
 		const k3d::nodes_t& nodes = m_document_state.document().nodes().collection();
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-		{
-			k3d::property::set_internal_value(**node, "viewport_visible", true);
-			k3d::property::set_internal_value(**node, "render_final", true);
-		}
+			node::show(**node);
 
 		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
