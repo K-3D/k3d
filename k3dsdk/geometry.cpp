@@ -346,27 +346,28 @@ storage* validate(k3d::selection::storage& Storage)
 class merge_primitive_selection
 {
 public:
-	merge_primitive_selection(const uint_t Primitive, const_storage& Storage) :
-		m_primitive(Primitive),
+	merge_primitive_selection(const_storage& Storage, const string_t& PrimitiveSelectionType, const uint_t PrimitiveFirstRange, const uint_t PrimitiveRangeCount) :
 		m_storage(Storage),
-		m_selection_type(string_cast(Storage.primitive_selection_type[Primitive]))
+		m_primitive_selection_type(PrimitiveSelectionType),
+		m_primitive_first_range(PrimitiveFirstRange),
+		m_primitive_range_count(PrimitiveRangeCount)
 	{
 	}
 
 	void operator()(const string_t& Name, pipeline_data<array>& Array)
 	{
-		if(Array->get_metadata_value(metadata::key::selection_component()) != m_selection_type)
+		if(Array->get_metadata_value(metadata::key::selection_component()) != m_primitive_selection_type)
 			return;
 
 		mesh::selection_t* const array = dynamic_cast<mesh::selection_t*>(&Array.writable());
 		if(!array)
 		{
-			log() << error << "unexpected type for array [" << Name << "] with k3d:selection-component = " << m_selection_type << std::endl;
+			log() << error << "unexpected type for array [" << Name << "] with k3d:selection-component = " << m_primitive_selection_type << std::endl;
 			return;
 		}
 
-		const uint_t range_begin = m_storage.primitive_first_range[m_primitive];
-		const uint_t range_end = range_begin + m_storage.primitive_range_count[m_primitive];
+		const uint_t range_begin = m_primitive_first_range;
+		const uint_t range_end = range_begin + m_primitive_range_count;
 		for(uint_t range = range_begin; range != range_end; ++range)
 		{
 			std::fill(
@@ -377,9 +378,10 @@ public:
 	}
 
 private:
-	const uint_t m_primitive;
 	const_storage& m_storage;
-	const string_t m_selection_type;
+	const string_t& m_primitive_selection_type;
+	const uint_t m_primitive_first_range;
+	const uint_t m_primitive_range_count;
 };
 
 void merge(const_storage& Storage, mesh& Mesh)
@@ -390,9 +392,13 @@ void merge(const_storage& Storage, mesh& Mesh)
 	{
 		const uint_t primitive_begin = std::min(mesh_primitive_count, Storage.primitive_begin[component]);
 		const uint_t primitive_end = std::min(mesh_primitive_count, std::max(primitive_begin, Storage.primitive_end[component]));
+		const string_t primitive_selection_type = string_cast(static_cast<k3d::selection::type>(Storage.primitive_selection_type[component]));
+		const uint_t primitive_first_range = Storage.primitive_first_range[component];
+		const uint_t primitive_range_count = Storage.primitive_range_count[component];
+
 		for(uint_t primitive = primitive_begin; primitive != primitive_end; ++primitive)
 		{
-			mesh::visit_arrays(Mesh.primitives[primitive].writable(), merge_primitive_selection(primitive, Storage));
+			mesh::visit_arrays(Mesh.primitives[primitive].writable(), merge_primitive_selection(Storage, primitive_selection_type, primitive_first_range, primitive_range_count));
 		}
 	}
 }
