@@ -39,7 +39,7 @@
 #include <k3dsdk/string_modifiers.h>
 
 #include <boost/assign/list_of.hpp>
-#include <boost/python/dict.hpp>
+#include <boost/python.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace module
@@ -201,6 +201,11 @@ public:
 		Script << "\", \"";
 		Script << k3d::replace_all("\"", "\\\"", Arguments); // Make sure arguments are properly escaped
 		Script << "\")\n";
+	}
+
+	const completions_t complete(const k3d::string_t& Command)
+	{
+		return completions_t();
 	}
 
 private:

@@ -46,7 +46,7 @@ class control::implementation
 {
 public:
 	implementation() :
-		command_index(0)
+		command_index(0), completion_key(GDK_VoidSymbol)
 	{
 		buffer = Gtk::TextBuffer::create();
 
@@ -81,6 +81,18 @@ public:
 				command_history.push_back(input);
 			command_index = command_history.size();
 			command_signal.emit(input);
+			view.scroll_to(buffer->get_insert());
+
+			return true;
+		}
+		else if(event->keyval == completion_key)
+		{
+			const k3d::string_t input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
+			buffer->insert(buffer->end(), "\n");
+			complete_key_pressed_signal.emit(input);
+			buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
+			buffer->move_mark(begin_input, buffer->end());
+			buffer->insert(buffer->end(), input);
 			view.scroll_to(buffer->get_insert());
 
 			return true;
@@ -180,6 +192,7 @@ public:
 	std::vector<string_t>::size_type command_index;
 	string_t command_buffer;
 	sigc::signal<void, const string_t&> command_signal;
+	sigc::signal<void, const string_t&> complete_key_pressed_signal;
 
 	Glib::RefPtr<Gtk::TextBuffer> buffer;
 	Glib::RefPtr<Gtk::TextTag> current_format;
@@ -188,6 +201,7 @@ public:
 
 	Gtk::TextView view;
 	Gtk::ScrolledWindow scrolled_window;
+	guint completion_key;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -233,9 +247,19 @@ void control::prompt_string(const string_t& String)
 	m_implementation->view.set_cursor_visible(true);
 }
 
+void control::set_completion_key(const uint_t KeySym)
+{
+	m_implementation->completion_key = KeySym;
+}
+
 sigc::connection control::connect_command_signal(const sigc::slot<void, const string_t&>& Slot)
 {
 	return m_implementation->command_signal.connect(Slot);
+}
+
+sigc::connection control::connect_complete_key_pressed_signal(const sigc::slot<void, const string_t&>& Slot)
+{
+	return m_implementation->complete_key_pressed_signal.connect(Slot);
 }
 
 } // namespace console

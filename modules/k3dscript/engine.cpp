@@ -181,6 +181,11 @@ public:
 		Script << k3d::xml::single_line() << command << "\n";
 	}
 
+	const completions_t complete(const k3d::string_t& Command)
+	{
+		return completions_t();
+	}
+
 private:
 	/// Stores a request to halt execution of a running script
 	k3d::bool_t m_halt_request;

@@ -61,9 +61,18 @@ public:
 	void print_string(const string_t& String);
 	/// Writes the supplied user prompt text to the console.
 	void prompt_string(const string_t& String);
+	/// Set the completion key
+	/**
+	 * Note: By default, comletion is disabled (KeySym == GDK_VoidSymbol), so
+	 * you need to call this with i.e. GDK_Tab to enable it
+	 */
+	void set_completion_key(const uint_t KeySym);
 
 	/// Connects a slot to a signal that will be emitted whenever the user enters a command.
 	sigc::connection connect_command_signal(const sigc::slot<void, const string_t&>& Slot);
+
+	/// Connects a slot to a signal that will be emitted when the "completion request" key (see set_completion_key) is pressed
+	sigc::connection connect_complete_key_pressed_signal(const sigc::slot<void, const string_t&>& Slot);
 
 private:
 	class implementation;

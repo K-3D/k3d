@@ -66,6 +66,8 @@ public:
 	typedef std::map<string_t, boost::any> context_t;
 	/// Defines a slot that can be called to redirect script output.
 	typedef sigc::slot<void, const string_t&> output_t;
+	/// Defines a list of possible command completions
+	typedef std::vector<string_t> completions_t;
 
 	/**	\brief Executes a script
 		\param ScriptName A human readable identifier for the script, which should be used in error messages, etc.
@@ -100,6 +102,10 @@ public:
 		\note The engine is responsible for ensuring that the appended command does not introduce syntactically-incorrect code, e.g. quoting issues or escaped characters with special meanings.
 	*/
 	virtual void append_command(std::ostream& Script, icommand_node& CommandNode, const string_t& Command, const string_t& Arguments) = 0;
+
+	/// Lists the possible completions for the given command
+	virtual const completions_t complete(const string_t& Command) = 0;
+
 
 protected:
 	iscript_engine() {}
