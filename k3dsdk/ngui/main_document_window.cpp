@@ -111,7 +111,6 @@
 #include <gtkmm/paned.h>
 #include <gtkmm/separatortoolitem.h>
 #include <gtkmm/scrolledwindow.h>
-#include <gtkmm/statusbar.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/textview.h>
 #include <gtkmm/treeview.h>
@@ -239,8 +238,6 @@ public:
 
 		m_document_state.set_cursor_signal().connect(sigc::mem_fun(*this, &main_document_window::on_set_cursor));
 		m_document_state.clear_cursor_signal().connect(sigc::mem_fun(*this, &main_document_window::on_clear_cursor));
-		m_document_state.push_status_message_signal().connect(sigc::mem_fun(*this, &main_document_window::on_push_status_message));
-		m_document_state.pop_status_message_signal().connect(sigc::mem_fun(*this, &main_document_window::on_pop_status_message));
 
 		Gtk::MenuBar* const menubar = new Gtk::MenuBar();
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), *manage(create_file_menu())));
@@ -395,16 +392,6 @@ private:
 	void on_clear_cursor()
 	{
 		get_window()->set_cursor();
-	}
-
-	void on_push_status_message(const Glib::ustring Message)
-	{
-		m_statusbar.push(Message);
-	}
-
-	void on_pop_status_message()
-	{
-		m_statusbar.pop();
 	}
 
 	panel_frame::control* create_panel_frame(/*const std::string& Name*/)
@@ -2861,8 +2848,6 @@ private:
 	std::auto_ptr<Gtk::ImageMenuItem> m_redo_menu_item;
 	/// Stores the Edit > Redo All menu item
 	std::auto_ptr<Gtk::ImageMenuItem> m_redo_all_menu_item;
-	/// Main status bar for the window
-	Gtk::Statusbar m_statusbar;
 	/// Set to true iff current panel was maximized
 	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) m_maximize_panel;
 	/// Set to true iff unpinned panels are hidden

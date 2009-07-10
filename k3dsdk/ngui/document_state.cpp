@@ -1541,16 +1541,6 @@ assert_not_implemented();
 		return m_clear_cursor_signal;
 	}
 
-	document_state::push_status_message_signal_t& push_status_message_signal()
-	{
-		return m_push_status_message_signal;
-	}
-
-	document_state::pop_status_message_signal_t& pop_status_message_signal()
-	{
-		return m_pop_status_message_signal;
-	}
-
 	k3d::inode* default_gl_painter()
 	{
 		const k3d::nodes_t nodes = k3d::find_nodes(m_document.nodes(), "GL Default Painter");
@@ -1844,8 +1834,6 @@ assert_not_implemented();
 
 	document_state::set_cursor_signal_t m_set_cursor_signal;
 	document_state::clear_cursor_signal_t m_clear_cursor_signal;
-	document_state::push_status_message_signal_t m_push_status_message_signal;
-	document_state::pop_status_message_signal_t m_pop_status_message_signal;
 
 	/// Store a reference to the current active tool
 	tool* m_active_tool;
@@ -2258,16 +2246,6 @@ document_state::set_cursor_signal_t& document_state::set_cursor_signal()
 document_state::clear_cursor_signal_t& document_state::clear_cursor_signal()
 {
 	return m_implementation->clear_cursor_signal();
-}
-
-document_state::push_status_message_signal_t& document_state::push_status_message_signal()
-{
-	return m_implementation->push_status_message_signal();
-}
-
-document_state::pop_status_message_signal_t& document_state::pop_status_message_signal()
-{
-	return m_implementation->pop_status_message_signal();
 }
 
 k3d::inode* document_state::create_node(k3d::iplugin_factory* Factory)

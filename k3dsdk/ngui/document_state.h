@@ -170,15 +170,6 @@ public:
 	/// Returns a signal for setting the document-wide cursor
 	clear_cursor_signal_t& clear_cursor_signal();
 
-	/// Defines a signal to push a new message onto the status bar
-	typedef sigc::signal<void, const Glib::ustring> push_status_message_signal_t;
-	/// Returns a signal to push a new message onto the status bar
-	push_status_message_signal_t& push_status_message_signal();
-	/// Defines a signal to pop the current message from the status bar
-	typedef sigc::signal<void> pop_status_message_signal_t;
-	/// Returns a signal to pop the current message from the status bar
-	pop_status_message_signal_t& pop_status_message_signal();
-
 	/// Returns focused viewport
 	viewport::control* get_focus_viewport() { return m_focus_viewport; }
 	/// Sets focused viewport
