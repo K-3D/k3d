@@ -78,6 +78,8 @@ public:
 	void select(const k3d::selection::record& Selection);
 	/// Selects a collection of components.
 	void select(const k3d::selection::records& Selection);
+	/// Selects a collection of nodes.
+	void select_nodes(const k3d::selection::records& Selection);
 	/// Selects all nodes or components (depending on current selection mode).
 	void select_all();
 	/// Selects all nodes.
