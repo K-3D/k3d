@@ -24,7 +24,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "types.h"
+#include <k3dsdk/log.h>
+#include <k3dsdk/types.h>
+
 #include <boost/shared_ptr.hpp>
 
 namespace k3d
@@ -142,6 +144,16 @@ public:
 	bool operator!() const
 	{
 		return !storage;
+	}
+
+	bool_t operator==(const pipeline_data<T>& Other) const
+	{
+		return storage.get() == Other.storage.get();
+	}
+
+	bool_t operator!=(const pipeline_data<T>& Other) const
+	{
+		return storage.get() != Other.storage.get();
 	}
 
 private:
