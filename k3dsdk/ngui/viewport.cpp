@@ -44,6 +44,8 @@
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/rectangle.h>
@@ -749,7 +751,7 @@ k3d::selection::records control::get_uniform_selectables(const k3d::rectangle& S
 
 k3d::selection::records control::get_object_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
 {
-	switch(m_implementation->m_document_state.selection_mode().internal_value())
+	switch(selection::state(m_implementation->m_document_state.document()).current_mode())
 	{
 		case selection::NODES:
 			return get_node_selectables(SelectionRegion);
@@ -1219,7 +1221,7 @@ k3d::selection::record control::pick_uniform(const k3d::point2& Coordinates, k3d
 
 k3d::selection::record control::pick_object(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
 {
-	switch(m_implementation->m_document_state.selection_mode().internal_value())
+	switch(selection::state(m_implementation->m_document_state.document()).current_mode())
 	{
 		case selection::NODES:
 			return pick_node(Coordinates, Records);

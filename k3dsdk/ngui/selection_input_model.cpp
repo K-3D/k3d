@@ -111,7 +111,7 @@ struct selection_input_model::implementation :
 			if(k3d::selection::get_node(m_start_selection))
 			{
 				bool extended_mode;
-				switch(m_document_state.selection_mode().internal_value())
+				switch(selection::state(m_document_state.document()).current_mode())
 				{
 					case selection::NODES:
 						// Extended selection
@@ -162,7 +162,7 @@ struct selection_input_model::implementation :
 		if(!m_double_click_mode)
 			return;
 
-		switch(m_document_state.selection_mode().internal_value())
+		switch(selection::state(m_document_state.document()).current_mode())
 		{
 			case selection::NODES:
 			{
@@ -174,7 +174,7 @@ struct selection_input_model::implementation :
 			default:
 			{
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Node Selection"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.set_selection_mode(selection::NODES);
+				selection::state(m_document_state.document()).set_current_mode(selection::NODES);
 				break;
 			}
 		}

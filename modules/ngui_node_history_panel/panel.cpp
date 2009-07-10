@@ -298,7 +298,7 @@ public:
 		return_if_fail(node);
 		
 		// Select only the selected node
-		m_document_state.set_selection_mode(selection::NODES);
+		selection::state(m_document_state.document()).set_current_mode(selection::NODES);
 		selection::state(m_document_state.document()).deselect_all();
 		selection::state(m_document_state.document()).select(*node);
 

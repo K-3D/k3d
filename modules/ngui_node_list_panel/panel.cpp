@@ -582,7 +582,7 @@ public:
 
 			k3d::record_state_change_set change_set(m_document_state.document(), _("Select nodes"), K3D_CHANGE_SET_CONTEXT);
 
-			m_document_state.set_selection_mode(selection::NODES);
+			selection::state(m_document_state.document()).set_current_mode(selection::NODES);
 			selection::state(m_document_state.document()).deselect(deselected_records);
 			selection::state(m_document_state.document()).select(selected_records);
 

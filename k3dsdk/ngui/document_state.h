@@ -21,10 +21,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
-
-#include "selection.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/iproperty_collection.h>
@@ -103,13 +101,6 @@ public:
 	tool& rotate_tool();
 	/// Returns a reference to the builtin Scale Tool that can be passed to set_active_tool()
 	tool& scale_tool();
-
-	/// Defines storage for the current document-wide selection mode
-	typedef k3d_data(selection::mode, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, no_property, no_serialization) selection_mode_property_t;
-	/// Returns the current document-wide selection mode
-	selection_mode_property_t& selection_mode();
-
-	void set_selection_mode(selection::mode Mode);
 
 	const bool is_selected(k3d::inode* Node);
 	const bool is_selected(const k3d::selection::record&);

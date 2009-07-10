@@ -109,52 +109,6 @@ imodel* model(data_t& Data, const Glib::ustring& Label = "")
 	return new generic_model_t<data_t>(Data, Label);
 }
 
-/// Provides an implementation of k3d::toggle_button::imodel that allows the button to act as a radio button
-template<typename data_t, typename choice_t>
-class radio_model_t :
-	public imodel
-{
-public:
-	radio_model_t(data_t& Data, const choice_t& Choice, const Glib::ustring& Label) :
-		m_data(Data),
-		m_choice(Choice),
-		m_label(Label)
-	{
-	}
-
-	const Glib::ustring label()
-	{
-		return m_label;
-	}
-
-	const k3d::bool_t value()
-	{
-		return m_data.internal_value() == m_choice;
-	}
-
-	void set_value(const k3d::bool_t Value)
-	{
-		m_data.set_value(m_choice);
-	}
-
-	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
-	{
-		return m_data.changed_signal().connect(sigc::hide(Slot));
-	}
-
-private:
-	data_t& m_data;
-	const choice_t m_choice;
-	const Glib::ustring m_label;
-};
-
-/// Convenience factory function for creating radio_model_t objects
-template<typename data_t, typename choice_t>
-imodel* radio_model(data_t& Data, const choice_t& Choice, const Glib::ustring& Label = "")
-{
-	return new radio_model_t<data_t, choice_t>(Data, Choice, Label);
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // control
 

@@ -24,7 +24,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/selection.h>
+
 #include <vector>
 
 namespace k3d
@@ -45,29 +47,36 @@ class state
 public:
 	state(idocument& Document);
 
-	/// Returns the current set of selected nodes
+	/// Returns the current selection mode.
+	const mode current_mode();
+	/// Sets the current selection mode.
+	void set_current_mode(const mode Mode);
+	/// Connect a slot to a signal that will be emitted whenever the selection mode changes.
+	sigc::connection connect_current_mode_changed_signal(const sigc::slot<void, ihint*>& Slot);
+
+	/// Returns the current set of selected nodes.
 	const std::vector<inode*> selected_nodes();
 
-	/// Selects one node
+	/// Selects one node.
 	void select(inode& Node);
-	/// Selects a collection of components
+	/// Selects a collection of components.
 	void select(const k3d::selection::record& Selection);
-	/// Selects a collection of components
+	/// Selects a collection of components.
 	void select(const k3d::selection::records& Selection);
-	/// Selects all nodes or components (depending on current selection mode)
+	/// Selects all nodes or components (depending on current selection mode).
 	void select_all();
-	/// Selects all nodes
+	/// Selects all nodes.
 	void select_all_nodes();
 
-	/// Deselects one node
+	/// Deselects one node.
 	void deselect(inode& Node);
-	/// Deselects a collection of components
+	/// Deselects a collection of components.
 	void deselect(const k3d::selection::record& Selection);
-	/// Deselects a collection of components
+	/// Deselects a collection of components.
 	void deselect(const k3d::selection::records& Selection);
-	/// Deselects all nodes or components (depending on current selection mode)
+	/// Deselects all nodes or components (depending on current selection mode).
 	void deselect_all();
-	/// Deselects all nodes
+	/// Deselects all nodes.
 	void deselect_all_nodes();
 
 private:

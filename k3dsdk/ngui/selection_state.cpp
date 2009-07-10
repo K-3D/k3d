@@ -21,7 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
 #include <k3dsdk/idocument.h>
+#include <k3dsdk/ienumeration_property.h>
 #include <k3dsdk/imetadata.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/inode_selection.h>
@@ -39,6 +42,21 @@ namespace ngui
 
 namespace selection
 {
+
+/// Provides human-readable labels for the selection::mode enumeration
+static const ienumeration_property::enumeration_values_t& mode_values()
+{
+	static ienumeration_property::enumeration_values_t values;
+	if(values.empty())
+	{
+		values.push_back(ienumeration_property::enumeration_value_t(_("Nodes"), "nodes", _("Select Nodes")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Points"), "points", _("Select Points")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Lines"), "lines", _("Select Lines")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Faces"), "faces", _("Select Faces")));
+	}
+
+	return values;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // state::implementation
@@ -75,9 +93,15 @@ public:
 	
 	idocument& document;
 
+	/// Defines storage for the current document-wide selection mode
+	/** \todo Restore undo/redo capability */
+//	k3d_data(selection::mode, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, no_property, no_serialization) current_mode;
+	k3d_data(selection::mode, immutable_name, explicit_change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) current_mode;
+
 private:
 	implementation(idocument& Document) :
 		document(Document),
+		current_mode(init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(selection::NODES) + init_values(mode_values())),
 		m_node_selection(0)
 	{
 	}
@@ -101,6 +125,21 @@ private:
 state::state(idocument& Document) :
 	internal(implementation::instance(Document))
 {
+}
+
+const mode state::current_mode()
+{
+	return internal.current_mode.internal_value();
+}
+
+void state::set_current_mode(const mode Mode)
+{
+	internal.current_mode.set_value(Mode);
+}
+
+sigc::connection state::connect_current_mode_changed_signal(const sigc::slot<void, ihint*>& Slot)
+{
+	return internal.current_mode.changed_signal().connect(Slot);
 }
 
 const std::vector<inode*> state::selected_nodes()
