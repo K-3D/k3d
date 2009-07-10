@@ -354,6 +354,15 @@ void merge(const_storage& Storage, mesh& Mesh)
 
 } // namespace primitive_selection
 
+void reset_selection(k3d::selection::set& Set, const double_t Weight)
+{
+	boost::scoped_ptr<point_selection::storage> point_selection_storage(point_selection::create(Set));
+	point_selection::reset(*point_selection_storage, Weight);
+
+	boost::scoped_ptr<primitive_selection::storage> primitive_selection_storage(primitive_selection::create(Set));
+	primitive_selection::reset(*primitive_selection_storage, Weight);
+}
+
 void merge_selection(const k3d::selection::set& Set, mesh& Mesh)
 {
 	for(k3d::selection::set::const_iterator storage = Set.begin(); storage != Set.end(); ++storage)
