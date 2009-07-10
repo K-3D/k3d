@@ -34,7 +34,7 @@
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/render.h>
 #include <k3dsdk/ngui/scripting.h>
-#include <k3dsdk/ngui/selection_state.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/tool.h>
 #include <k3dsdk/ngui/toolbar.h>
 #include <k3dsdk/ngui/transform.h>

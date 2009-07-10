@@ -29,18 +29,17 @@
 #include "icons.h"
 #include "keyboard.h"
 #include "rubber_band.h"
-#include "selection.h"
 #include "selection_input_model.h"
-#include "selection_state.h"
 #include "utility.h"
 #include "viewport.h"
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/high_res_timer.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/system.h>

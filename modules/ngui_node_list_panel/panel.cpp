@@ -48,7 +48,7 @@
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/keyboard.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/selection_state.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>

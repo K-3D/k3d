@@ -2,7 +2,7 @@
 #define K3DSDK_NGUI_SELECTION_H
 
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,10 +24,15 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/selection.h>
 #include <iosfwd>
+#include <vector>
 
 namespace k3d
 {
+
+class idocument;
+class inode;
 
 namespace ngui
 {
@@ -50,6 +55,49 @@ enum mode
 
 std::ostream& operator<<(std::ostream& Stream, const mode& Value);
 std::istream& operator>>(std::istream& Stream, mode& Value);
+
+/// Provides convenience methods for manipulating the selection state of a document.
+class state
+{
+public:
+	state(idocument& Document);
+
+	/// Returns the current selection mode.
+	const mode current_mode();
+	/// Sets the current selection mode.
+	void set_current_mode(const mode Mode);
+	/// Connect a slot to a signal that will be emitted whenever the selection mode changes.
+	sigc::connection connect_current_mode_changed_signal(const sigc::slot<void, ihint*>& Slot);
+
+	/// Returns the current set of selected nodes.
+	const std::vector<inode*> selected_nodes();
+
+	/// Selects one node.
+	void select(inode& Node);
+	/// Selects a collection of components.
+	void select(const k3d::selection::record& Selection);
+	/// Selects a collection of components.
+	void select(const k3d::selection::records& Selection);
+	/// Selects all nodes or components (depending on current selection mode).
+	void select_all();
+	/// Selects all nodes.
+	void select_all_nodes();
+
+	/// Deselects one node.
+	void deselect(inode& Node);
+	/// Deselects a collection of components.
+	void deselect(const k3d::selection::record& Selection);
+	/// Deselects a collection of components.
+	void deselect(const k3d::selection::records& Selection);
+	/// Deselects all nodes or components (depending on current selection mode).
+	void deselect_all();
+	/// Deselects all nodes.
+	void deselect_all_nodes();
+
+private:
+	class implementation;
+	implementation& internal;
+};
 
 } // namespace selection
 

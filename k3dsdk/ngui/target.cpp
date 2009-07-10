@@ -35,7 +35,7 @@
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/ngui/selection_state.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>

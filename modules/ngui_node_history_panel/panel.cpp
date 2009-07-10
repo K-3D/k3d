@@ -35,7 +35,7 @@
 #include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/selection_state.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>

@@ -42,7 +42,7 @@
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/modifiers.h>
 #include <k3dsdk/ngui/navigation_input_model.h>
-#include <k3dsdk/ngui/selection_state.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/tool.h>
 #include <k3dsdk/ngui/transform.h>
 #include <k3dsdk/ngui/viewport.h>

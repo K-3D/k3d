@@ -45,7 +45,7 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/ngui/selection.h>
-#include <k3dsdk/ngui/selection_state.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/rectangle.h>

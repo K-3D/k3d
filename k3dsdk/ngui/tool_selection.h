@@ -27,7 +27,6 @@
 
 #include "document_state.h"
 #include "selection.h"
-#include "selection_state.h"
 #include "utility.h"
 #include "viewport.h"
 

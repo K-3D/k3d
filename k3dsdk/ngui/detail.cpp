@@ -42,7 +42,7 @@
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/ngui/selection_state.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
