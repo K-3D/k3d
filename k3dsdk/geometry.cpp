@@ -147,7 +147,8 @@ storage* validate(k3d::selection::storage& Storage)
 
 void merge(const_storage& Storage, mesh& Mesh)
 {
-	return_if_fail(Mesh.point_selection);
+	if(!Mesh.point_selection)
+		return;
 
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
 	const uint_t point_selection_count = point_selection.size();
