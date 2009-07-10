@@ -39,7 +39,7 @@
 #include "render.h"
 #include "savable_document_window.h"
 #include "scripting.h"
-#include "selection_state.h"
+#include "selection.h"
 #include "target.h"
 #include "toolbar.h"
 #include "transform.h"
@@ -1630,7 +1630,7 @@ private:
 	void on_select_invert()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Invert"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.invert_selection();
+		selection::state(m_document_state.document()).invert_selection();
 	}
 
 	void on_select_parent()
@@ -1747,25 +1747,25 @@ private:
 	void on_select_nodes()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Nodes mode"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.set_selection_mode(selection::NODES);
+		selection::state(m_document_state.document()).set_current_mode(selection::NODES);
 	}
 
 	void on_select_vertices()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Points mode"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.set_selection_mode(selection::POINTS);
+		selection::state(m_document_state.document()).set_current_mode(selection::POINTS);
 	}
 
 	void on_select_edges()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Lines mode"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.set_selection_mode(selection::SPLIT_EDGES);
+		selection::state(m_document_state.document()).set_current_mode(selection::SPLIT_EDGES);
 	}
 
 	void on_select_faces()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Faces mode"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.set_selection_mode(selection::UNIFORM);
+		selection::state(m_document_state.document()).set_current_mode(selection::UNIFORM);
 	}
 
 	void on_layout_maximize_panel()

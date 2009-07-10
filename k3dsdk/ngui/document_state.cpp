@@ -1069,7 +1069,6 @@ public:
 	implementation(k3d::idocument& Document) :
 		m_document(Document),
 		m_gdkgl_share_list(0),
-		m_selection_mode(init_owner(*this) + init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(selection::NODES) + init_values(detail::selection_mode_values())),
 		m_last_selection_mode(selection::NODES),
 		m_active_tool(0),
 		m_selection_tool(0),
@@ -1204,17 +1203,6 @@ public:
 		m_active_tool = &ActiveTool;
 		m_active_tool->activate();
 		m_active_tool_changed_signal.emit();
-	}
-
-	/// Returns the current document-wide selection mode
-	selection_mode_property_t& selection_mode()
-	{
-		return m_selection_mode;
-	}
-
-	void set_selection_mode(selection::mode Mode)
-	{
-		m_selection_mode.set_value(Mode);
 	}
 
 	/// Called by the signal system anytime nodes are removed from the document
@@ -1626,8 +1614,8 @@ assert_not_implemented();
 		return_val_if_fail(Factory, 0);
 
 		// Switch to node selection mode
-		if(selection::NODES != m_selection_mode.internal_value())
-			set_selection_mode(selection::NODES);
+		if(selection::NODES != selection::state(document()).current_mode())
+			selection::state(document()).set_current_mode(selection::NODES);
 
 		// Create the requested node ...
 		k3d::record_state_change_set changeset(m_document, k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), K3D_CHANGE_SET_CONTEXT);
@@ -1720,11 +1708,8 @@ assert_not_implemented();
 			reset_properties->reset_properties();
 
 		// Replace the current selection
-assert_not_implemented();
-/*
-		deselect_all();
-		select(k3d::selection::make_records(to_be_selected));
-*/
+		selection::state(document()).deselect_all();
+		selection::state(document()).select(*to_be_selected);
 
 		// Make the newly-created node properties visible ...
 		view_node_properties_signal().emit(node);
@@ -1827,8 +1812,6 @@ assert_not_implemented();
 	document_selection_change_signal_t m_document_selection_change_signal;
 	/// A signal that will be emitted whenever the active tool changes
 	sigc::signal<void> m_active_tool_changed_signal;
-	/// Stores the current document-wide selection mode
-	selection_mode_property_t m_selection_mode;
 	/// Stores the last document-wide selection mode
 	selection::mode m_last_selection_mode;
 
@@ -2074,49 +2057,6 @@ tool& document_state::scale_tool()
 	return *m_implementation->m_scale_tool;
 }
 
-document_state::selection_mode_property_t& document_state::selection_mode()
-{
-	return m_implementation->selection_mode();
-}
-
-void document_state::set_selection_mode(selection::mode Mode)
-{
-	m_implementation->set_selection_mode(Mode);
-}
-
-void document_state::select(const k3d::selection::record& Selection)
-{
-	assert_not_implemented();
-/*
-	m_implementation->select(k3d::selection::records(1, Selection));
-*/
-}
-
-void document_state::select(const k3d::selection::records& Selection)
-{
-	assert_not_implemented();
-/*
-	m_implementation->select(Selection);
-*/
-}
-
-void document_state::select(k3d::inode& Node)
-{
-	assert_not_implemented();
-/*
-	m_implementation->select(Node);
-*/
-}
-
-k3d::inode_selection* document_state::node_selection()
-{
-	assert_not_implemented();
-	return 0;
-/*
-	return m_implementation->node_selection();
-*/
-}
-
 const bool document_state::is_selected(k3d::inode* Node)
 {
 	assert_not_implemented();
@@ -2148,62 +2088,6 @@ bool document_state::paint_backfacing()
 bool document_state::rubber_band_backfacing()
 {
 	return m_implementation->m_selection_tool->rubber_band_backfacing();
-}
-
-void document_state::select_all()
-{
-	assert_not_implemented();
-/*
-	m_implementation->select_all();
-*/
-}
-
-void document_state::deselect(const k3d::selection::record& Selection)
-{
-	assert_not_implemented();
-/*
-	m_implementation->deselect(k3d::selection::records(1, Selection));
-*/
-}
-
-void document_state::deselect(const k3d::selection::records& Selection)
-{
-	assert_not_implemented();
-/*
-	m_implementation->deselect(Selection);
-*/
-}
-
-void document_state::deselect(k3d::inode& Node)
-{
-	assert_not_implemented();
-/*
-	m_implementation->deselect(Node);
-*/
-}
-
-void document_state::deselect_all()
-{
-	assert_not_implemented();
-/*
-	m_implementation->deselect_all();
-*/
-}
-
-void document_state::invert_selection()
-{
-	assert_not_implemented();
-/*
-	m_implementation->invert_selection();
-*/
-}
-
-const k3d::nodes_t document_state::selected_nodes()
-{
-	assert_not_implemented();
-/*
-	return m_implementation->selected_nodes();
-*/
 }
 
 void document_state::hide_selection()

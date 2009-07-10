@@ -32,7 +32,7 @@
 #include <k3dsdk/ngui/custom_property_page.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/selection_state.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/plugins.h>

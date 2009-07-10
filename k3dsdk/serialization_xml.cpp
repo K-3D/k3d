@@ -40,13 +40,13 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
+#include <k3dsdk/selection.h>
 #include <k3dsdk/serialization_xml.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/string_cast.h>
@@ -1940,41 +1940,6 @@ void load_arrays(const element& Container, const string_t& Storage, mesh::attrib
 	load_arrays<mesh::attribute_arrays_t>(*container, Arrays, Context);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-// save_selection
-
-void save_selection(element& Element, const mesh_selection::records_t& Records, const string_t& ElementName)
-{
-	if(Records.empty())
-		return;
-
-	element& xml_records = Element.append(element(ElementName));
-
-	for(mesh_selection::records_t::const_iterator record = Records.begin(); record != Records.end(); ++record)
-	{
-		xml_records.append(
-			element("selection",
-				attribute("begin", record->begin),
-				attribute("end", record->end),
-				attribute("weight", record->weight)));
-	}
-}
-
-void load_selection(const element& Element, mesh_selection::records_t& Records)
-{
-	for(element::elements_t::const_iterator xml_selection = Element.children.begin(); xml_selection != Element.children.end(); ++xml_selection)
-	{
-		if(xml_selection->name != "selection")
-			continue;
-
-		const size_t begin = attribute_value<size_t>(*xml_selection, "begin", 0);
-		const size_t end = attribute_value<size_t>(*xml_selection, "end", 0);
-		const double weight = attribute_value<double>(*xml_selection, "weight", 0.0);
-
-		Records.push_back(mesh_selection::record(begin, end, weight));
-	}
-}
-
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2794,35 +2759,6 @@ void load(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Con
 	}
 }
 */
-
-///////////////////////////////////////////////////////////////////////////////////
-
-void save(const mesh_selection& Selection, element& XML, const ipersistent::save_context& Context)
-{
-	detail::save_selection(XML, Selection.points, "points");
-
-	// Handle generic primitives
-	assert_not_implemented();
-}
-
-void load(mesh_selection& Selection, element& XML, const ipersistent::load_context& Context)
-{
-	for(element::elements_t::const_iterator xml_selection = XML.children.begin(); xml_selection != XML.children.end(); ++xml_selection)
-	{
-		if(xml_selection->name == "points")
-			detail::load_selection(*xml_selection, Selection.points);
-
-/*
-		if(xml_selection->name == "edges")
-			detail::load_selection(*xml_selection, Selection.edges);
-		if(xml_selection->name == "faces")
-			detail::load_selection(*xml_selection, Selection.faces);
-*/
-	}
-
-	// Handle generic primitives
-	assert_not_implemented();
-}
 
 } // namespace xml
 
