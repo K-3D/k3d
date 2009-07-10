@@ -53,7 +53,6 @@
 #include "log_python.h"
 #include "matrix4_python.h"
 #include "mesh_python.h"
-#include "mesh_selection_python.h"
 #include "mime_python.h"
 #include "named_arrays_python.h"
 #include "named_attribute_arrays_python.h"
@@ -353,7 +352,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_matrix4();
 	define_class_mesh();
 	define_class_const_mesh();
-	define_class_mesh_selection();
 	define_class_named_arrays();
 	define_class_named_attribute_arrays();
 	define_class_normal3();
