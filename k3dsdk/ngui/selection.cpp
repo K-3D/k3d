@@ -78,65 +78,57 @@ void set_component_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePo
 		if(!mesh)
 			continue;
 
-		k3d::selection::set selection =
-			boost::any_cast<k3d::selection::set>(mesh_selection_sink->mesh_selection_sink_input().property_internal_value());
-
-		UpdatePolicy(*mesh, selection);
-
-		property::set_internal_value(mesh_selection_sink->mesh_selection_sink_input(), selection);
+		property::set_internal_value(mesh_selection_sink->mesh_selection_sink_input(), UpdatePolicy(*mesh));
 		property::set_internal_value(**node, "show_component_selection", VisibleSelection);
 	}
 }
 
-struct select_all_points
+k3d::selection::set select_all_points(const mesh& Mesh)
 {
-	void operator()(const mesh& Mesh, k3d::selection::set& Selection) const
-	{
-		Selection = k3d::selection::set();
+	k3d::selection::set results;
 
-		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(Selection));
-		geometry::point_selection::reset(*point_selection, 1.0);
+	boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
+	geometry::point_selection::reset(*point_selection, 1.0);
 
-		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(Selection));
-		geometry::primitive_selection::reset(*primitive_selection, 0.0);
-	}
-};
+	boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
+	geometry::primitive_selection::reset(*primitive_selection, 0.0);
 
-struct select_all_split_edges
+	return results;
+}
+
+k3d::selection::set select_all_split_edges(const mesh& Mesh)
 {
-	void operator()(const mesh& Mesh, k3d::selection::set& Selection) const
-	{
-		Selection = k3d::selection::set();
+	k3d::selection::set results;
 
-		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(Selection));
-		geometry::point_selection::reset(*point_selection, 0.0);
+	boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
+	geometry::point_selection::reset(*point_selection, 0.0);
 
-		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(Selection));
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 1.0);
-	}
-};
+	boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
+	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 0.0);
+	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
+	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
+	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 1.0);
 
-struct select_all_uniform
+	return results;
+}
+
+k3d::selection::set select_all_uniform(const mesh& Mesh)
 {
-	void operator()(const mesh& Mesh, k3d::selection::set& Selection) const
-	{
-		Selection = k3d::selection::set();
+	k3d::selection::set results;
 
-		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(Selection));
-		geometry::point_selection::reset(*point_selection, 0.0);
+	boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
+	geometry::point_selection::reset(*point_selection, 0.0);
 
-		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(Selection));
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 1.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
-	}
-};
+	boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
+	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 1.0);
+	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
+	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
+	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
+
+	return results;
+}
 
 /*
 void invert(k3d::mesh_selection::records_t& Records)
@@ -146,41 +138,107 @@ void invert(k3d::mesh_selection::records_t& Records)
 }
 */
 
-struct invert_points
+k3d::selection::set invert_points(const k3d::mesh& Mesh)
 {
-	void operator()(const k3d::mesh& Mesh, k3d::selection::set& Selection) const
-	{
 assert_not_implemented();
+return k3d::selection::set();
 //		invert(Selection.points);
-	}
-};
+}
 
-struct invert_split_edges
+k3d::selection::set invert_split_edges(const k3d::mesh& Mesh)
 {
-	void operator()(const k3d::mesh& Mesh, k3d::selection::set& Selection) const
-	{
 assert_not_implemented();
+return k3d::selection::set();
 //		invert(Selection.edges);
-	}
-};
+}
 
-struct invert_uniform
+k3d::selection::set invert_uniform(const k3d::mesh& Mesh)
 {
-	void operator()(const k3d::mesh& Mesh, k3d::selection::set& Selection) const
-	{
 assert_not_implemented();
+return k3d::selection::set();
 //		invert(Selection.faces);
-	}
-};
+}
 
-struct deselect_all
+k3d::selection::set deselect_all(const mesh& Mesh)
 {
-	void operator()(const mesh& Mesh, k3d::selection::set& Selection) const
+	k3d::selection::set results;
+	geometry::reset_selection(results, 0.0);
+	return results;
+}
+
+/// Defines a mapping of nodes to selection records
+typedef std::multimap<inode*, const k3d::selection::record*> node_selection_map_t;
+/// Given a set of selection records, generates a mapping of the corresponding nodes to each record
+const node_selection_map_t map_nodes(const k3d::selection::records& Selection)
+{
+	node_selection_map_t results;
+
+	/** \todo Improve the performance of this loop by cacheing nodes */
+	for(k3d::selection::records::const_iterator record = Selection.begin(); record != Selection.end(); ++record)
+		results.insert(std::make_pair(k3d::selection::get_node(*record), &*record));
+
+	if(results.count(0))
+		log() << warning << "Selection contained records without nodes" << std::endl;
+	results.erase(0);
+
+	return results;
+}
+
+/// Uses an update policy to convert the supplied selection into updates to MeshInstance mesh selections
+template<typename UpdatePolicyT>
+void select_components(const k3d::selection::records& Selection, const double_t Weight)
+{
+assert_not_implemented();
+/*
+	inode* node = 0;
+	const mesh* mesh = 0;
+	mesh_selection selection;
+	imesh_selection_sink* sink = 0;
+	mesh::bools_t boundary_edges;
+	mesh::indices_t companions;
+
+	const node_selection_map_t nodes = map_nodes(Selection);
+	for(node_selection_map_t::const_iterator n = nodes.begin(); n != nodes.end(); ++n)
 	{
-		Selection = k3d::selection::set();
-		geometry::reset_selection(Selection, 0.0);
+		if(n->first != node)
+		{
+			if(sink && node)
+			{
+				property::set_internal_value(sink->mesh_selection_sink_input(), selection);
+			}
+
+			node = n->first;
+			selection = mesh_selection::select_null();
+			sink = dynamic_cast<imesh_selection_sink*>(node);
+			if(sink)
+				selection = boost::any_cast<mesh_selection>(sink->mesh_selection_sink_input().property_internal_value());
+				
+			companions.clear();
+			boundary_edges.clear();
+				
+			imesh_source* const mesh_source = dynamic_cast<imesh_source*>(node);
+			if(mesh_source)
+				mesh = property::pipeline_value<mesh*>(mesh_source->mesh_source_output());
+
+			if(mesh && mesh->polyhedra && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
+			{
+				polyhedron::create_edge_adjacency_lookup(*mesh->polyhedra->edge_points, *mesh->polyhedra->clockwise_edges, boundary_edges, companions);
+    	}
+		}
+
+		if(!sink)
+			continue;
+		
+		UpdatePolicyT policy(Weight, companions);
+		policy(*n->second, selection);
 	}
-};
+
+	if(sink && node)
+	{
+		property::set_internal_value(sink->mesh_selection_sink_input(), selection);
+	}
+*/
+}
 
 /// Policy class that updates a mesh_selection to select the given points
 struct select_points
@@ -306,80 +364,6 @@ assert_not_implemented();
 
 	const double_t weight;
 };
-
-/// Defines a mapping of nodes to selection records
-typedef std::multimap<inode*, const k3d::selection::record*> node_selection_map_t;
-/// Given a set of selection records, generates a mapping of the corresponding nodes to each record
-const node_selection_map_t map_nodes(const k3d::selection::records& Selection)
-{
-	node_selection_map_t results;
-
-	/** \todo Improve the performance of this loop by cacheing nodes */
-	for(k3d::selection::records::const_iterator record = Selection.begin(); record != Selection.end(); ++record)
-		results.insert(std::make_pair(k3d::selection::get_node(*record), &*record));
-
-	if(results.count(0))
-		log() << warning << "Selection contained records without nodes" << std::endl;
-	results.erase(0);
-
-	return results;
-}
-
-/// Uses an update policy to convert the supplied selection into updates to MeshInstance mesh selections
-template<typename UpdatePolicyT>
-void select_components(const k3d::selection::records& Selection, const double_t Weight)
-{
-assert_not_implemented();
-/*
-	inode* node = 0;
-	const mesh* mesh = 0;
-	mesh_selection selection;
-	imesh_selection_sink* sink = 0;
-	mesh::bools_t boundary_edges;
-	mesh::indices_t companions;
-
-	const node_selection_map_t nodes = map_nodes(Selection);
-	for(node_selection_map_t::const_iterator n = nodes.begin(); n != nodes.end(); ++n)
-	{
-		if(n->first != node)
-		{
-			if(sink && node)
-			{
-				property::set_internal_value(sink->mesh_selection_sink_input(), selection);
-			}
-
-			node = n->first;
-			selection = mesh_selection::select_null();
-			sink = dynamic_cast<imesh_selection_sink*>(node);
-			if(sink)
-				selection = boost::any_cast<mesh_selection>(sink->mesh_selection_sink_input().property_internal_value());
-				
-			companions.clear();
-			boundary_edges.clear();
-				
-			imesh_source* const mesh_source = dynamic_cast<imesh_source*>(node);
-			if(mesh_source)
-				mesh = property::pipeline_value<mesh*>(mesh_source->mesh_source_output());
-
-			if(mesh && mesh->polyhedra && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
-			{
-				polyhedron::create_edge_adjacency_lookup(*mesh->polyhedra->edge_points, *mesh->polyhedra->clockwise_edges, boundary_edges, companions);
-    	}
-		}
-
-		if(!sink)
-			continue;
-		
-		UpdatePolicyT policy(Weight, companions);
-		policy(*n->second, selection);
-	}
-
-	if(sink && node)
-	{
-		property::set_internal_value(sink->mesh_selection_sink_input(), selection);
-	}
-*/
-}
 
 } // namespace detail
 
@@ -627,13 +611,13 @@ void state::select_all()
 			select_all_nodes();
 			break;
 		case POINTS:
-			detail::set_component_selection(selected_nodes(), detail::select_all_points(), true);
+			detail::set_component_selection(selected_nodes(), detail::select_all_points, true);
 			break;
 		case SPLIT_EDGES:
-			detail::set_component_selection(selected_nodes(), detail::select_all_split_edges(), true);
+			detail::set_component_selection(selected_nodes(), detail::select_all_split_edges, true);
 			break;
 		case UNIFORM:
-			detail::set_component_selection(selected_nodes(), detail::select_all_uniform(), true);
+			detail::set_component_selection(selected_nodes(), detail::select_all_uniform, true);
 			break;
 	}
 
@@ -655,13 +639,13 @@ void state::invert_selection()
 			invert_all_nodes();
 			break;
 		case POINTS:
-			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_points(), true);
+			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_points, true);
 			break;
 		case SPLIT_EDGES:
-			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_split_edges(), true);
+			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_split_edges, true);
 			break;
 		case UNIFORM:
-			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_uniform(), true);
+			detail::set_component_selection(internal.document.nodes().collection(), detail::invert_uniform, true);
 			break;
 	}
 
@@ -711,7 +695,7 @@ void state::deselect_all()
 		case POINTS:
 		case SPLIT_EDGES:
 		case UNIFORM:
-			detail::set_component_selection(internal.document.nodes().collection(), detail::deselect_all(), true);
+			detail::set_component_selection(internal.document.nodes().collection(), detail::deselect_all, true);
 			break;
 	}
 
