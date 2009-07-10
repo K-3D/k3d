@@ -986,48 +986,6 @@ assert_not_implemented();
 		m_active_tool->document_selection_changed();
 		m_document_selection_change_signal.emit();
 	}
-
-	void hide_selection()
-	{
-		k3d::nodes_t nodes = selected_nodes();
-		for(k3d::nodes_t::iterator node = nodes.begin(); node != nodes.end(); ++node)
-		{
-			select(**node);
-			k3d::property::set_internal_value(**node, "viewport_visible", false);
-			k3d::property::set_internal_value(**node, "render_final", false);
-		}
-	}
-
-	void show_selection()
-	{
-		const k3d::nodes_t nodes = selected_nodes();
-		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-		{
-			k3d::property::set_internal_value(**node, "viewport_visible", true);
-			k3d::property::set_internal_value(**node, "render_final", true);
-		}
-	}
-
-	void hide_unselected()
-	{
-		for(k3d::inode_collection::nodes_t::const_iterator node = m_document.nodes().collection().begin(); node != m_document.nodes().collection().end(); ++node)
-		{
-			if(!is_selected(*node))
-			{
-				k3d::property::set_internal_value(**node, "viewport_visible", false);
-				k3d::property::set_internal_value(**node, "render_final", false);
-			}
-		}
-	}
-
-	void show_all_nodes()
-	{
-		for(k3d::inode_collection::nodes_t::const_iterator node = m_document.nodes().collection().begin(); node != m_document.nodes().collection().end(); ++node)
-		{
-			k3d::property::set_internal_value(**node, "viewport_visible", true);
-			k3d::property::set_internal_value(**node, "render_final", true);
-		}
-	}
 */
 
 	document_state::set_cursor_signal_t& set_cursor_signal()
