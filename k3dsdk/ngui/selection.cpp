@@ -34,6 +34,7 @@
 #include <k3dsdk/inode_selection.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/properties.h>
@@ -80,100 +81,172 @@ void replace_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePolicy, 
 		if(!mesh)
 			continue;
 
-		property::set_internal_value(mesh_selection_sink->mesh_selection_sink_input(), UpdatePolicy(*mesh));
+		const k3d::selection::set current_selection =
+			boost::any_cast<k3d::selection::set>(mesh_selection_sink->mesh_selection_sink_input().property_internal_value());
+
+		property::set_internal_value(mesh_selection_sink->mesh_selection_sink_input(), UpdatePolicy(*mesh, current_selection));
 		property::set_internal_value(**node, "show_component_selection", VisibleSelection);
 	}
 }
 
 /// Update policy for use with replace_selection() that selects all points in a mesh.
-const k3d::selection::set select_all_points(const mesh& Mesh)
+struct select_all_points
 {
-	k3d::selection::set results;
+	const k3d::selection::set operator()(const mesh& Mesh, const k3d::selection::set& CurrentSelection) const
+	{
+		k3d::selection::set results;
 
-	boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
-	geometry::point_selection::reset(*point_selection, 1.0);
+		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
+		geometry::point_selection::reset(*point_selection, 1.0);
 
-	boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
-	geometry::primitive_selection::reset(*primitive_selection, 0.0);
+		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
+		geometry::primitive_selection::reset(*primitive_selection, 0.0);
 
-	return results;
-}
+		return results;
+	}
+};
 
 /// Update policy for use with replace_selection() that selects all split edges in a mesh.
-const k3d::selection::set select_all_split_edges(const mesh& Mesh)
+struct select_all_split_edges
 {
-	k3d::selection::set results;
+	const k3d::selection::set operator()(const mesh& Mesh, const k3d::selection::set& CurrentSelection) const
+	{
+		k3d::selection::set results;
 
-	boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
-	geometry::point_selection::reset(*point_selection, 0.0);
+		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
+		geometry::point_selection::reset(*point_selection, 0.0);
 
-	boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
-	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
-	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 0.0);
-	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
-	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
-	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 1.0);
+		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 1.0);
 
-	return results;
-}
+		return results;
+	}
+};
 
 /// Update policy for use with replace_selection() that selects all uniform primitives in a mesh.
-const k3d::selection::set select_all_uniform(const mesh& Mesh)
+struct select_all_uniform
 {
-	k3d::selection::set results;
+	const k3d::selection::set operator()(const mesh& Mesh, const k3d::selection::set& CurrentSelection) const
+	{
+		k3d::selection::set results;
 
-	boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
-	geometry::point_selection::reset(*point_selection, 0.0);
+		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
+		geometry::point_selection::reset(*point_selection, 0.0);
 
-	boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
-	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
-	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 1.0);
-	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
-	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
-	geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
+		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 1.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
 
-	return results;
-}
-
-/*
-void invert(k3d::mesh_selection::records_t& Records)
-{
-	for(k3d::mesh_selection::records_t::iterator record = Records.begin(); record != Records.end(); ++record)
-		record->weight = record->weight ? 0.0 : 1.0;
-}
-*/
+		return results;
+	}
+};
 
 /// Update policy for use with replace_selection() that inverts the selection of all points in a mesh.
-const k3d::selection::set invert_points(const k3d::mesh& Mesh)
+struct invert_points
 {
-assert_not_implemented();
-return k3d::selection::set();
-//		invert(Selection.points);
-}
+	const k3d::selection::set operator()(const k3d::mesh& Mesh, const k3d::selection::set& CurrentSelection) const
+	{
+		const k3d::mesh::selection_t* current_point_selection = Mesh.point_selection.get();
+		if(!current_point_selection)
+			return CurrentSelection;
 
-/// Update policy for use with replace_selection() that inverts the selection of all split edges in a mesh.
-const k3d::selection::set invert_split_edges(const k3d::mesh& Mesh)
-{
-assert_not_implemented();
-return k3d::selection::set();
-//		invert(Selection.edges);
-}
+		k3d::selection::set results = CurrentSelection;
 
-/// Update policy for use with replace_selection() that inverts the selection of all uniform primitives in a mesh.
-const k3d::selection::set invert_uniform(const k3d::mesh& Mesh)
+		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
+		for(k3d::uint_t i = 0; i != current_point_selection->size(); ++i)
+		{
+			point_selection->index_begin.push_back(i);
+			point_selection->index_end.push_back(i + 1);
+			point_selection->weight.push_back((*current_point_selection)[i] ? 0.0 : 1.0);
+		}
+
+		return results;
+	}
+};
+
+/// Update policy for use with replace_selection() that inverts the selection of a specific component type in a mesh.
+struct invert_components
 {
-assert_not_implemented();
-return k3d::selection::set();
-//		invert(Selection.faces);
-}
+	invert_components(const k3d::selection::type Component) :
+		component(Component)
+	{
+	}
+
+	struct generate_selection
+	{
+		generate_selection(const uint_t Primitive, const k3d::selection::type Component, k3d::selection::set& Results) :
+			primitive(Primitive),
+			component(Component),
+			component_string(string_cast(Component)),
+			results(Results)
+		{
+		}
+
+		void operator()(const string_t& Name, const pipeline_data<array>& Array)
+		{
+			if(Array->get_metadata_value(metadata::key::selection_component()) != component_string)
+				return;
+
+			const mesh::selection_t* const array = dynamic_cast<const mesh::selection_t*>(Array.get());
+			if(!array)
+			{
+				log() << error << "unexpected type for array [" << Name << "] with k3d:selection-component = " << component << std::endl;
+				return;
+			}
+
+			boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
+			primitive_selection->primitive_begin.push_back(primitive);
+			primitive_selection->primitive_end.push_back(primitive + 1);
+			primitive_selection->primitive_selection_type.push_back(component);
+			primitive_selection->primitive_first_range.push_back(0);
+			primitive_selection->primitive_range_count.push_back(array->size());
+
+			for(uint_t i = 0; i != array->size(); ++i)
+			{
+				primitive_selection->index_begin.push_back(i);
+				primitive_selection->index_end.push_back(i+1);
+				primitive_selection->weight.push_back((*array)[i] ? 0.0 : 1.0);
+			}
+		}
+
+		const uint_t primitive;
+		const k3d::selection::type component;
+		const string_t component_string;
+		k3d::selection::set& results;
+	};
+	
+	const k3d::selection::set operator()(const k3d::mesh& Mesh, const k3d::selection::set& CurrentSelection) const
+	{
+		k3d::selection::set results = CurrentSelection;
+
+		for(k3d::uint_t primitive = 0; primitive != Mesh.primitives.size(); ++primitive)
+		{
+			k3d::mesh::visit_arrays(*Mesh.primitives[primitive], generate_selection(primitive, component, results));
+		}
+
+		return results;
+	}
+
+	const k3d::selection::type component;
+};
 
 /// Update policy for use with replace_selection() that deselects all points and primitives in a mesh.
-const k3d::selection::set deselect_all(const mesh& Mesh)
+struct deselect_all
 {
-	k3d::selection::set results;
-	geometry::reset_selection(results, 0.0);
-	return results;
-}
+	const k3d::selection::set operator()(const mesh& Mesh, const k3d::selection::set& CurrentSelection) const
+	{
+		k3d::selection::set results;
+		geometry::reset_selection(results, 0.0);
+		return results;
+	}
+};
 
 /// Uses an update policy to convert the supplied selection into updates to MeshInstance mesh selections
 template<typename UpdatePolicyT>
@@ -618,13 +691,13 @@ void state::select_all()
 			select_all_nodes();
 			break;
 		case POINTS:
-			detail::replace_selection(selected_nodes(), detail::select_all_points, true);
+			detail::replace_selection(selected_nodes(), detail::select_all_points(), true);
 			break;
 		case SPLIT_EDGES:
-			detail::replace_selection(selected_nodes(), detail::select_all_split_edges, true);
+			detail::replace_selection(selected_nodes(), detail::select_all_split_edges(), true);
 			break;
 		case UNIFORM:
-			detail::replace_selection(selected_nodes(), detail::select_all_uniform, true);
+			detail::replace_selection(selected_nodes(), detail::select_all_uniform(), true);
 			break;
 	}
 
@@ -646,13 +719,13 @@ void state::invert_selection()
 			invert_all_nodes();
 			break;
 		case POINTS:
-			detail::replace_selection(internal.document.nodes().collection(), detail::invert_points, true);
+			detail::replace_selection(internal.document.nodes().collection(), detail::invert_points(), true);
 			break;
 		case SPLIT_EDGES:
-			detail::replace_selection(internal.document.nodes().collection(), detail::invert_split_edges, true);
+			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::SPLIT_EDGE), true);
 			break;
 		case UNIFORM:
-			detail::replace_selection(internal.document.nodes().collection(), detail::invert_uniform, true);
+			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::UNIFORM), true);
 			break;
 	}
 
@@ -733,7 +806,7 @@ void state::deselect_all()
 		case POINTS:
 		case SPLIT_EDGES:
 		case UNIFORM:
-			detail::replace_selection(internal.document.nodes().collection(), detail::deselect_all, false);
+			detail::replace_selection(internal.document.nodes().collection(), detail::deselect_all(), false);
 			break;
 	}
 
