@@ -24,7 +24,6 @@
  * 	\author Bart Janssens (bart.janssens@lid.kviv.be)
  */
 
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/polyhedron.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -39,13 +38,16 @@ namespace painters
 {
 
 /// Storage for selection data
-typedef std::vector<k3d::mesh_selection::record> selection_records_t;
+//typedef std::vector<k3d::mesh_selection::record> selection_records_t;
+typedef std::vector<int> selection_records_t;
 
 namespace detail
 {
 
 inline void copy_selection(const k3d::mesh::selection_t& Selection, selection_records_t& Records)
 {
+	assert_not_implemented();
+/*
 	for (k3d::uint_t i = 0; i < Selection.size();)
 	{
 		k3d::uint_t start = i;
@@ -57,6 +59,7 @@ inline void copy_selection(const k3d::mesh::selection_t& Selection, selection_re
 		}
 		Records.push_back(record);
 	}
+*/
 }
 
 } // namespace detail

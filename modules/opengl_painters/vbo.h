@@ -32,7 +32,6 @@
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/mesh_selection.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/subdivision_surface/catmull_clark.h>
 
@@ -42,6 +41,8 @@
 #include "selection_cache.h"
 
 #include <boost/ptr_container/ptr_map.hpp>
+
+#include <stdexcept>
 
 namespace module
 {

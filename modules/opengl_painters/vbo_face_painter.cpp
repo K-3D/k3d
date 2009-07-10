@@ -105,7 +105,9 @@ public:
 			glEnable(GL_LIGHTING);
 			
 			clean_vbo_state();
-			
+
+assert_not_implemented();
+/*
 			vbos.bind();
 			if (!face_selection_records.empty())
 			{
@@ -126,6 +128,7 @@ public:
 				vbos.draw_range(face_offset, face_count + face_offset, this);
 			}
 			face_offset += face_count;
+*/
 		}
 		
 		clean_vbo_state();

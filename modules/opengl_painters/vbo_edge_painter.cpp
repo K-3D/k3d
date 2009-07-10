@@ -90,7 +90,9 @@ public:
 				continue;
 		
 			get_data<edge_vbo>(&Mesh, this).bind(primitive->get());
-			
+
+assert_not_implemented();
+/*
 			const k3d::uint_t edge_count = polyhedron->edge_points.size();
 			const selection_records_t& edge_selection_records = selected_edges.records(primitive->get());
 			if (!edge_selection_records.empty())
@@ -111,6 +113,7 @@ public:
 				color4d(color);
 				glDrawElements(GL_LINES, polyhedron->edge_points.size() * 2, GL_UNSIGNED_INT, 0);
 			}
+*/
 		}
 		
 		clean_vbo_state();

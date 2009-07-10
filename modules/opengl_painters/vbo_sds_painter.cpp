@@ -177,6 +177,8 @@ protected:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 
+assert_not_implemented();
+/*
 		k3d::uint_t face_count = Cache.face_starts.size();
 		const selection_records_t& face_selection_records = Selection.records(Primitive);
 		if (!face_selection_records.empty())
@@ -198,6 +200,7 @@ protected:
 			color4d(color);
 			glDrawElements(GL_QUADS, Cache.index_size, GL_UNSIGNED_INT, static_cast<GLuint*>(0));
 		}
+*/
 	}
 	virtual void select(vbo_t& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
@@ -272,7 +275,9 @@ private:
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
 		k3d::uint_t edge_count = Cache.edge_starts.size();
-		
+
+assert_not_implemented();
+/*
 		const selection_records_t& edge_selection_records = Selection.records(Primitive);
 		if (!edge_selection_records.empty())
 		{
@@ -292,6 +297,7 @@ private:
 			color4d(color);
 			glDrawArrays(GL_LINES, 0, edge_count);
 		}
+*/
 	}
 	
 	virtual void select(vbo_t& Cache, const k3d::gl::painter_selection_state& SelectionState)
@@ -364,7 +370,9 @@ private:
 		
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-		
+
+assert_not_implemented();
+/*
 		const selection_records_t& point_selection_records = Selection.records();
 		if (!point_selection_records.empty())
 		{
@@ -382,6 +390,7 @@ private:
 			color4d(color);
 			glDrawArrays(GL_POINTS, 0, point_count);
 		}
+*/
 	}
 	
 	virtual void select(vbo_t& Cache, const k3d::gl::painter_selection_state& SelectionState)

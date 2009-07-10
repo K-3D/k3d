@@ -82,7 +82,9 @@ public:
 		glDisable(GL_LIGHTING);
 		
 		enable_blending();
-		
+
+assert_not_implemented();
+/*
 		size_t point_count = Mesh.points->size();
 		const selection_records_t& pselection = get_data<point_selection>(&Mesh, this).records(); // obtain selection data
 		
@@ -103,7 +105,7 @@ public:
 			color4d(color);
 			glDrawArrays(GL_POINTS, 0, Mesh.points->size());
 		}
-		
+*/		
 		clean_vbo_state();
 		disable_blending();
 	}

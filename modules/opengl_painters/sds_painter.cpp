@@ -174,6 +174,8 @@ protected:
 		glBegin(GL_QUADS);
 		if (interpolateboundary)
 		{
+			assert_not_implemented();
+/*
 			if (!face_selection_records.empty())
 			{
 				for (selection_records_t::const_iterator record = face_selection_records.begin(); record != face_selection_records.end() && record->begin < face_count; ++record)
@@ -201,6 +203,7 @@ protected:
 					k3d::gl::vertex3d(visitor.points_array[visitor.indices[i]]);
 				}
 			}
+*/
 		}
 		else // no boundary interpolation requires us not to render the faces of the mesh boundary
 		{
@@ -315,6 +318,8 @@ private:
 		k3d::uint_t edge_count = visitor.edge_starts.size();
 		
 		glBegin(GL_LINES);
+assert_not_implemented();
+/*
 		const selection_records_t& edge_selection_records = Selection.records(&Primitive);
 		if (!edge_selection_records.empty())
 		{
@@ -340,6 +345,7 @@ private:
 				k3d::gl::vertex3d(visitor.points_array[i]);
 			}
 		}
+*/
 		glEnd();
 	}
 	
@@ -428,7 +434,9 @@ private:
 		
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-		
+
+assert_not_implemented();
+/*
 		glBegin(GL_POINTS);
 		const selection_records_t& point_selection_records = Selection.records();
 		if (!point_selection_records.empty())
@@ -454,6 +462,7 @@ private:
 			}
 		}
 		glEnd();
+*/
 	}
 	
 	virtual void select(const k3d::mesh::primitive& Primitive, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
