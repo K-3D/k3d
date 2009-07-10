@@ -21,6 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
  */
 
+#include <k3dsdk/geometry.h>
 #include "mesh_simple_deformation_modifier.h"
 
 namespace k3d
@@ -35,7 +36,7 @@ mesh_simple_deformation_modifier::mesh_simple_deformation_modifier(iplugin_facto
 void mesh_simple_deformation_modifier::on_create_mesh(const mesh& Input, mesh& Output)
 {
 	Output = Input;
-	mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+	geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
 }
 
 void mesh_simple_deformation_modifier::on_update_mesh(const mesh& Input, mesh& Output)

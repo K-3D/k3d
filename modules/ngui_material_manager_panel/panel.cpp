@@ -69,7 +69,7 @@
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/image_toggle_button.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/selection_state.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/text.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
