@@ -34,6 +34,18 @@ namespace k3d
 
 /// Tests storage to verify that it contains an array with given name and type, throws an exception otherwise.
 template<typename ArrayT>
+const ArrayT& require_const_array(const selection::storage& Storage, const string_t& Name)
+{
+	const ArrayT* const array = Storage.structure.lookup<ArrayT>(Name);
+
+	if(!array)
+		throw std::runtime_error("[" + Storage.type + "] primitive missing array [" + Name + "]");
+
+	return *array;
+}
+
+/// Tests storage to verify that it contains an array with given name and type, throws an exception otherwise.
+template<typename ArrayT>
 ArrayT& require_array(selection::storage& Storage, const string_t& Name)
 {
 	ArrayT* const array = Storage.structure.writable<ArrayT>(Name);
