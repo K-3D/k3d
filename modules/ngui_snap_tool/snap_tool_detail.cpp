@@ -46,6 +46,7 @@
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/keyboard.h>
 #include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/properties.h>
@@ -545,7 +546,7 @@ void snap_tool_detail::lmb_down_deselected()
 	m_mouse_down_content = DESELECTED_OBJECT;
 
 	// Deselect all
-	m_document_state.deselect_all();
+	selection::state(m_document_state.document()).deselect_all();
 	// Select clicked object
 	m_document_state.select(m_mouse_down_selection);
 }
@@ -617,7 +618,7 @@ void snap_tool_detail::lmb_click_replace()
 {
 
 	// Replace selection
-	m_document_state.deselect_all();
+	selection::state(m_document_state.document()).deselect_all();
 	if(k3d::selection::get_node(m_mouse_down_selection))
 		m_document_state.select(m_mouse_down_selection);
 
@@ -652,7 +653,7 @@ void snap_tool_detail::lmb_click_deselect_all()
 {
 
 	// Deselect all
-	m_document_state.deselect_all();
+	selection::state(m_document_state.document()).deselect_all();
 
 	k3d::finish_state_change_set(m_document, "Deselect all", K3D_CHANGE_SET_CONTEXT);
 

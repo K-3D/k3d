@@ -26,6 +26,7 @@
 #include "detail.h"
 #include "document_state.h"
 #include "modifiers.h"
+#include "selection_state.h"
 #include "transform.h"
 
 #include <k3d-i18n-config.h>
@@ -212,7 +213,7 @@ void instantiate_selected_nodes(document_state& DocumentState)
 	k3d::record_state_change_set changeset(DocumentState.document(), action, K3D_CHANGE_SET_CONTEXT);
 
 	// Deselect all
-	DocumentState.deselect_all();
+	selection::state(DocumentState.document()).deselect_all();
 
 	// Instantiate nodes and select new ones
 	k3d::nodes_t new_nodes;
@@ -220,7 +221,7 @@ void instantiate_selected_nodes(document_state& DocumentState)
 	{
 		if(k3d::inode* new_node = DocumentState.instantiate_mesh(*selected_node))
 		{
-			DocumentState.select(*new_node);
+			selection::state(DocumentState.document()).select(*new_node);
 			new_nodes.push_back(new_node);
 		}
 	}
@@ -244,7 +245,7 @@ void duplicate_selected_nodes(document_state& DocumentState)
 	k3d::record_state_change_set changeset(DocumentState.document(), action, K3D_CHANGE_SET_CONTEXT);
 
 	// Deselect all
-	DocumentState.deselect_all();
+	selection::state(DocumentState.document()).deselect_all();
 
 	// Instantiate nodes and select new ones
 	k3d::nodes_t new_nodes;
@@ -258,7 +259,7 @@ void duplicate_selected_nodes(document_state& DocumentState)
 
 		if(new_node)
 		{
-			DocumentState.select(*new_node);
+			selection::state(DocumentState.document()).select(*new_node);
 			new_nodes.push_back(new_node);
 		}
 	}

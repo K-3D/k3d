@@ -34,6 +34,7 @@
 #include <k3dsdk/ngui/panel.h>
 #include <k3dsdk/ngui/render.h>
 #include <k3dsdk/ngui/scripting.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/ngui/tool.h>
 #include <k3dsdk/ngui/toolbar.h>
 #include <k3dsdk/ngui/transform.h>
@@ -427,7 +428,7 @@ struct implementation
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 			k3d::ngui::unparent(**node);
 
-		m_document_state.deselect_all();
+		selection::state(m_document_state.document()).deselect_all();
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 

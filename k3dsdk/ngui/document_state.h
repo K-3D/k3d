@@ -134,18 +134,10 @@ public:
 	void select(const k3d::selection::record& Selection);
 	/// Selects a collection of components
 	void select(const k3d::selection::records& Selection);
-	/// Selects the given node
-	void select(k3d::inode& Node);
-	/// Selects all nodes or components (depending on current selection mode)
-	void select_all();
 	/// Deselects a collection of components
 	void deselect(const k3d::selection::record& Selection);
 	/// Deselects a collection of components
 	void deselect(const k3d::selection::records& Selection);
-	/// Deselects the given node
-	void deselect(k3d::inode& Node);
-	/// Deselects all selected nodes and components
-	void deselect_all();
 	/// Inverts current selection
 	void invert_selection();
 

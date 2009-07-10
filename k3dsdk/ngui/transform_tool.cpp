@@ -32,6 +32,7 @@
 #include "icons.h"
 #include "interactive.h"
 #include "keyboard.h"
+#include "selection_state.h"
 #include "transform_tool.h"
 #include "utility.h"
 #include "viewport.h"
@@ -660,7 +661,7 @@ void transform_tool::lmb_down_deselected()
 	m_mouse_down_content = DESELECTED_OBJECT;
 
 	// Deselect all
-	m_document_state.deselect_all();
+	selection::state(m_document_state.document()).deselect_all();
 	// Select clicked object
 	m_document_state.select(m_mouse_down_selection);
 }
@@ -760,7 +761,7 @@ void transform_tool::lmb_click_stop_motion()
 void transform_tool::lmb_click_deselect_all()
 {
 	// Deselect all
-	m_document_state.deselect_all();
+	selection::state(m_document_state.document()).deselect_all();
 
 	k3d::finish_state_change_set(m_document, "Deselect all", K3D_CHANGE_SET_CONTEXT);
 

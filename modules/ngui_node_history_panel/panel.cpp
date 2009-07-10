@@ -35,6 +35,7 @@
 #include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
@@ -298,8 +299,8 @@ public:
 		
 		// Select only the selected node
 		m_document_state.set_selection_mode(selection::NODES);
-		m_document_state.deselect_all();
-		m_document_state.select(*node);
+		selection::state(m_document_state.document()).deselect_all();
+		selection::state(m_document_state.document()).select(*node);
 
 		// Request that (somebody somewhere) show node details ...
 		m_document_state.view_node_properties_signal().emit(node);

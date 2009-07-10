@@ -31,6 +31,7 @@
 #include "rubber_band.h"
 #include "selection.h"
 #include "selection_input_model.h"
+#include "selection_state.h"
 #include "utility.h"
 #include "viewport.h"
 
@@ -149,7 +150,7 @@ struct selection_input_model::implementation :
 			case REPLACE:
 			{
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Replace"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect_all();
+				selection::state(m_document_state.document()).deselect_all();
 				m_document_state.select(m_start_selection);
 				break;
 			}
@@ -166,7 +167,7 @@ struct selection_input_model::implementation :
 			case selection::NODES:
 			{
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect All"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect_all();
+				selection::state(m_document_state.document()).deselect_all();
 				break;
 			}
 
@@ -337,7 +338,7 @@ struct selection_input_model::implementation :
 				m_rubber_band.draw(Viewport);
 
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Replace"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect_all();
+				selection::state(m_document_state.document()).deselect_all();
 				m_document_state.select(selection);
 				break;
 			}

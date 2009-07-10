@@ -27,6 +27,7 @@
 
 #include "document_state.h"
 #include "selection.h"
+#include "selection_state.h"
 #include "utility.h"
 #include "viewport.h"
 
@@ -200,7 +201,7 @@ protected:
 			case SELECTED_OBJECT:
 			case DESELECTED_OBJECT:
 			case NOTHING:
-				m_document_state.deselect_all();
+				selection::state(m_document_state.document()).deselect_all();
 				m_document_state.select(selection);
 				break;
 			default:

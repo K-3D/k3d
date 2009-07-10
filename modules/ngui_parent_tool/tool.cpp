@@ -42,6 +42,7 @@
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/modifiers.h>
 #include <k3dsdk/ngui/navigation_input_model.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/ngui/tool.h>
 #include <k3dsdk/ngui/transform.h>
 #include <k3dsdk/ngui/viewport.h>
@@ -147,8 +148,8 @@ struct implementation
 			}
 		}
 
-		m_document_state.deselect_all();
-		m_document_state.select(Parent);
+		selection::state(m_document_state.document()).deselect_all();
+		selection::state(m_document_state.document()).select(Parent);
 		m_document_state.document().pipeline().set_dependencies(dependencies);
 	}
 	

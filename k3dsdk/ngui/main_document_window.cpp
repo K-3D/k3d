@@ -39,6 +39,7 @@
 #include "render.h"
 #include "savable_document_window.h"
 #include "scripting.h"
+#include "selection_state.h"
 #include "target.h"
 #include "toolbar.h"
 #include "transform.h"
@@ -137,14 +138,17 @@ namespace detail
 
 struct select
 {
-	select(document_state& DocumentState) : m_document_state(DocumentState) {}
+	select(idocument& Document) : document(Document)
+	{
+	}
+
 	void operator()(k3d::inode* Node)
 	{
 		if(Node)
-			m_document_state.select(*Node);
+			selection::state(document).select(*Node);
 	}
 private:
-	document_state& m_document_state;
+	idocument& document;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1614,13 +1618,13 @@ private:
 	void on_select_all()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select All"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.select_all();
+		selection::state(m_document_state.document()).select_all();
 	}
 
 	void on_select_none()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select None"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.deselect_all();
+		selection::state(m_document_state.document()).deselect_all();
 	}
 
 	void on_select_invert()
@@ -1653,8 +1657,8 @@ private:
 			return;
 
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select parent"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.deselect_all();
-		std::for_each(parents.begin(), parents.end(), detail::select(m_document_state));
+		selection::state(m_document_state.document()).deselect_all();
+		std::for_each(parents.begin(), parents.end(), detail::select(m_document_state.document()));
 	}
 
 	void on_select_child()
@@ -1682,8 +1686,8 @@ private:
 			return;
 
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select child"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.deselect_all();
-		std::for_each(children.begin(), children.end(), detail::select(m_document_state));
+		selection::state(m_document_state.document()).deselect_all();
+		std::for_each(children.begin(), children.end(), detail::select(m_document_state.document()));
 	}
 
 	void on_select_sibling()
@@ -1736,8 +1740,8 @@ private:
 			return;
 
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select sibling"), K3D_CHANGE_SET_CONTEXT);
-		m_document_state.deselect_all();
-		std::for_each(siblings.begin(), siblings.end(), detail::select(m_document_state));
+		selection::state(m_document_state.document()).deselect_all();
+		std::for_each(siblings.begin(), siblings.end(), detail::select(m_document_state.document()));
 	}
 
 	void on_select_nodes()
@@ -2356,7 +2360,7 @@ private:
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 			k3d::ngui::unparent(**node);
 
-		m_document_state.deselect_all();
+		selection::state(m_document_state.document()).deselect_all();
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
