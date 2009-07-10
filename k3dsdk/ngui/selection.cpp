@@ -538,11 +538,11 @@ sigc::connection state::connect_current_mode_changed_signal(const sigc::slot<voi
 	return internal.current_mode.changed_signal().connect(Slot);
 }
 
-const std::vector<inode*> state::selected_nodes()
+const nodes_t state::selected_nodes()
 {
-	return_val_if_fail(internal.node_selection(), std::vector<inode*>());
+	return_val_if_fail(internal.node_selection(), nodes_t());
 	const inode_selection::selected_nodes_t nodes = internal.node_selection()->selected_nodes();
-	return std::vector<inode*>(nodes.begin(), nodes.end());
+	return nodes_t(nodes.begin(), nodes.end());
 }
 
 void state::select(inode& Node)
@@ -602,6 +602,12 @@ assert_not_implemented();
 		m_view_node_history_signal.emit(selected_node);
 */
 	}
+}
+
+void state::select_nodes(const nodes_t& Selection)
+{
+	for(nodes_t::const_iterator node = Selection.begin(); node != Selection.end(); ++node)
+		select(**node);
 }
 
 void state::select_all()
@@ -709,6 +715,12 @@ void state::deselect_nodes(const k3d::selection::records& Selection)
 		if(k3d::inode* const node = k3d::selection::get_node(*record))
 			deselect(*node);
 	}
+}
+
+void state::deselect_nodes(const nodes_t& Selection)
+{
+	for(nodes_t::const_iterator node = Selection.begin(); node != Selection.end(); ++node)
+		deselect(**node);
 }
 
 void state::deselect_all()

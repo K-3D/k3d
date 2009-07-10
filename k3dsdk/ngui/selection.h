@@ -24,7 +24,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/nodes.h>
 #include <k3dsdk/selection.h>
+
 #include <iosfwd>
 #include <vector>
 
@@ -70,7 +72,7 @@ public:
 	sigc::connection connect_current_mode_changed_signal(const sigc::slot<void, ihint*>& Slot);
 
 	/// Returns the current set of selected nodes.
-	const std::vector<inode*> selected_nodes();
+	const nodes_t selected_nodes();
 
 	/// Selects one node.
 	void select(inode& Node);
@@ -80,6 +82,8 @@ public:
 	void select(const k3d::selection::records& Selection);
 	/// Selects a collection of nodes.
 	void select_nodes(const k3d::selection::records& Selection);
+	/// Selects a collection of nodes.
+	void select_nodes(const nodes_t& Selection);
 	/// Selects all nodes or components (depending on current selection mode).
 	void select_all();
 	/// Selects all nodes.
@@ -101,6 +105,8 @@ public:
 	void deselect(const k3d::selection::records& Selection);
 	/// Deselects a collection of nodes.
 	void deselect_nodes(const k3d::selection::records& Selection);
+	/// Deselects a collection of nodes.
+	void deselect_nodes(const nodes_t& Selection);
 	/// Deselects all nodes or components (depending on current selection mode).
 	void deselect_all();
 	/// Deselects all nodes.
