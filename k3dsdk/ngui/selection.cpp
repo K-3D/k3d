@@ -40,6 +40,8 @@
 #include <k3dsdk/result.h>
 #include <k3dsdk/selection.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include <map>
 #include <iostream>
 
@@ -90,12 +92,13 @@ struct select_all_points
 {
 	void operator()(const mesh& Mesh, k3d::selection::set& Selection) const
 	{
-assert_not_implemented();
-/*
-		Selection.points = mesh_selection::component_select_all();
-		Selection.edges = mesh_selection::component_deselect_all();
-		Selection.faces = mesh_selection::component_deselect_all();
-*/
+		Selection = k3d::selection::set();
+
+		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(Selection));
+		geometry::point_selection::reset(*point_selection, 1.0);
+
+		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(Selection));
+		geometry::primitive_selection::reset(*primitive_selection, 0.0);
 	}
 };
 
@@ -103,12 +106,17 @@ struct select_all_split_edges
 {
 	void operator()(const mesh& Mesh, k3d::selection::set& Selection) const
 	{
-assert_not_implemented();
-/*
-		Selection.points = mesh_selection::component_deselect_all();
-		Selection.edges = mesh_selection::component_select_all();
-		Selection.faces = mesh_selection::component_deselect_all();
-*/
+		Selection = k3d::selection::set();
+
+		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(Selection));
+		geometry::point_selection::reset(*point_selection, 0.0);
+
+		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(Selection));
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 1.0);
 	}
 };
 
@@ -116,12 +124,17 @@ struct select_all_uniform
 {
 	void operator()(const mesh& Mesh, k3d::selection::set& Selection) const
 	{
-assert_not_implemented();
-/*
-		Selection.points = mesh_selection::component_deselect_all();
-		Selection.edges = mesh_selection::component_deselect_all();
-		Selection.faces = mesh_selection::component_select_all();
-*/
+		Selection = k3d::selection::set();
+
+		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(Selection));
+		geometry::point_selection::reset(*point_selection, 0.0);
+
+		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(Selection));
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 1.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
+		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
 	}
 };
 
@@ -157,6 +170,15 @@ struct invert_uniform
 	{
 assert_not_implemented();
 //		invert(Selection.faces);
+	}
+};
+
+struct deselect_all
+{
+	void operator()(const mesh& Mesh, k3d::selection::set& Selection) const
+	{
+		Selection = k3d::selection::set();
+		geometry::reset_selection(Selection, 0.0);
 	}
 };
 
@@ -283,15 +305,6 @@ assert_not_implemented();
 	}
 
 	const double_t weight;
-};
-
-struct deselect_all
-{
-	void operator()(const mesh& Mesh, k3d::selection::set& Selection) const
-	{
-		assert_not_implemented();
-		//Selection = mesh_selection::deselect_all();
-	}
 };
 
 /// Defines a mapping of nodes to selection records
