@@ -25,6 +25,7 @@
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/euler_operations.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/measurement.h>
@@ -65,7 +66,7 @@ public:
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-		k3d::mesh_selection::merge(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
 
 		k3d::mesh::primitives_t::iterator output_primitive = Output.primitives.begin();
 		for(k3d::mesh::primitives_t::const_iterator input_primitive = Input.primitives.begin(); input_primitive != Input.primitives.end(); ++input_primitive)
