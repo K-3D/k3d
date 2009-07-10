@@ -79,6 +79,16 @@ storage* create(k3d::selection::set& Set)
 }
 
 //////////////////////////////////////////////////////////////////////
+// reset
+
+void reset(storage& Storage, const double_t Weight)
+{
+	Storage.index_begin.push_back(0);
+	Storage.index_end.push_back(uint_t(-1));
+	Storage.weight.push_back(Weight);
+}
+
+//////////////////////////////////////////////////////////////////////
 // validate
 
 const_storage* validate(const k3d::selection::storage& Storage)
@@ -210,6 +220,34 @@ storage* create(k3d::selection::set& Set)
 		);
 
 	return result;
+}
+
+//////////////////////////////////////////////////////////////////////
+// reset
+
+void reset(storage& Storage, const double_t Weight)
+{
+	reset(Storage, selection::CONSTANT, Weight);
+	reset(Storage, selection::UNIFORM, Weight);
+	reset(Storage, selection::VARYING, Weight);
+	reset(Storage, selection::FACE_VARYING, Weight);
+	reset(Storage, selection::SPLIT_EDGE, Weight);
+}
+
+//////////////////////////////////////////////////////////////////////
+// reset
+
+void reset(storage& Storage, const int32_t SelectionType, const double_t Weight)
+{
+	Storage.primitive_begin.push_back(0);
+	Storage.primitive_end.push_back(uint_t(-1));
+	Storage.primitive_selection_type.push_back(SelectionType);
+	Storage.primitive_first_range.push_back(Storage.index_begin.size());
+	Storage.primitive_range_count.push_back(1);
+
+	Storage.index_begin.push_back(0);
+	Storage.index_end.push_back(uint_t(-1));
+	Storage.weight.push_back(Weight);
 }
 
 //////////////////////////////////////////////////////////////////////

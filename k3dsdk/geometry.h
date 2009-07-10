@@ -64,6 +64,7 @@ public:
 };
 
 storage* create(k3d::selection::set& Set);
+void reset(storage& Storage, const double_t Weight);
 const_storage* validate(const k3d::selection::storage& GenericStorage);
 storage* validate(k3d::selection::storage& GenericStorage);
 void merge(const_storage& Storage, mesh& Mesh);
@@ -122,6 +123,8 @@ public:
 };
 
 storage* create(k3d::selection::set& Set);
+void reset(storage& Storage, const double_t Weight);
+void reset(storage& Storage, const int32_t SelectionType, const double_t Weight);
 const_storage* validate(const k3d::selection::storage& GenericStorage);
 storage* validate(k3d::selection::storage& GenericStorage);
 void merge(const_storage& Storage, mesh& Mesh);
