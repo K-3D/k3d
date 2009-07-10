@@ -245,14 +245,6 @@ std::istream& operator>>(std::istream& Stream, record& RHS)
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-// node_id
-
-id node_id(inode* Node)
-{
-	return detail::node_lookup.lookup_id(Node);
-}
-
-//////////////////////////////////////////////////////////////////////////////////
 // make_record
 
 const record make_record(inode* Node)
@@ -261,17 +253,9 @@ const record make_record(inode* Node)
 	result.zmin = 0;
 	result.zmax = 0;
 
-	result.tokens.push_back(token(NODE, node_id(Node)));
+	result.tokens.push_back(token(NODE, detail::node_lookup.lookup_id(Node)));
 
 	return result;
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// make_records
-
-const records make_records(inode* Node)
-{
-	return records(1, make_record(Node));
 }
 
 ///////////////////////////////////////////////////////////////////////////////////

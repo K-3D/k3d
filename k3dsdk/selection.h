@@ -149,9 +149,7 @@ std::istream& operator>>(std::istream& Stream, record& RHS);
 
 typedef std::vector<record> records;
 
-id node_id(inode*);
 const record make_record(inode*);
-const records make_records(inode*);
 
 inode* get_node(const record& Record);
 mesh* get_mesh(const record& Record);
