@@ -548,7 +548,7 @@ void snap_tool_detail::lmb_down_deselected()
 	// Deselect all
 	selection::state(m_document_state.document()).deselect_all();
 	// Select clicked object
-	m_document_state.select(m_mouse_down_selection);
+	selection::state(m_document_state.document()).select(m_mouse_down_selection);
 }
 
 void snap_tool_detail::lmb_down_nothing()
@@ -595,7 +595,7 @@ void snap_tool_detail::lmb_click_add()
 
 	// Shift key modifier always adds to the selection
 	if(k3d::selection::get_node(m_mouse_down_selection))
-		m_document_state.select(m_mouse_down_selection);
+		selection::state(m_document_state.document()).select(m_mouse_down_selection);
 
 	k3d::finish_state_change_set(m_document, "Selection add", K3D_CHANGE_SET_CONTEXT);
 
@@ -607,7 +607,7 @@ void snap_tool_detail::lmb_click_subtract()
 
 	// Control key modifier always adds to the selection
 	if(k3d::selection::get_node(m_mouse_down_selection))
-		m_document_state.deselect(m_mouse_down_selection);
+		selection::state(m_document_state.document()).deselect(m_mouse_down_selection);
 
 	k3d::finish_state_change_set(m_document, "Selection subtract", K3D_CHANGE_SET_CONTEXT);
 
@@ -620,7 +620,7 @@ void snap_tool_detail::lmb_click_replace()
 	// Replace selection
 	selection::state(m_document_state.document()).deselect_all();
 	if(k3d::selection::get_node(m_mouse_down_selection))
-		m_document_state.select(m_mouse_down_selection);
+		selection::state(m_document_state.document()).select(m_mouse_down_selection);
 
 	k3d::finish_state_change_set(m_document, "Selection replace", K3D_CHANGE_SET_CONTEXT);
 

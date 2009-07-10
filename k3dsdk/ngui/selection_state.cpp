@@ -116,6 +116,16 @@ void state::select(inode& Node)
 	internal.node_selection()->select(Node, 1.0);	
 }
 
+void state::select(const k3d::selection::record& Selection)
+{
+	select(k3d::selection::records(1, Selection));
+}
+
+void state::select(const k3d::selection::records& Selection)
+{
+	assert_not_implemented();
+}
+
 void state::select_all()
 {
 	assert_not_implemented();
@@ -133,6 +143,16 @@ void state::deselect(inode& Node)
 {
 	if(internal.node_selection())
 		internal.node_selection()->select(Node, 0.0);	
+}
+
+void state::deselect(const k3d::selection::record& Selection)
+{
+	select(k3d::selection::records(1, Selection));
+}
+
+void state::deselect(const k3d::selection::records& Selection)
+{
+	assert_not_implemented();
 }
 
 void state::deselect_all()

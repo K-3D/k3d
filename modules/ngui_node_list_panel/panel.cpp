@@ -48,6 +48,7 @@
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/keyboard.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
@@ -582,8 +583,8 @@ public:
 			k3d::record_state_change_set change_set(m_document_state.document(), _("Select nodes"), K3D_CHANGE_SET_CONTEXT);
 
 			m_document_state.set_selection_mode(selection::NODES);
-			m_document_state.deselect(deselected_records);
-			m_document_state.select(selected_records);
+			selection::state(m_document_state.document()).deselect(deselected_records);
+			selection::state(m_document_state.document()).select(selected_records);
 
 			m_document_selection_change_mutex = false;
 		}

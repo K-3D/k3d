@@ -123,14 +123,6 @@ public:
 	/// True if backfacing components are to be rubber-band selected
 	bool rubber_band_backfacing();
 
-	/// Selects a collection of components
-	void select(const k3d::selection::record& Selection);
-	/// Selects a collection of components
-	void select(const k3d::selection::records& Selection);
-	/// Deselects a collection of components
-	void deselect(const k3d::selection::record& Selection);
-	/// Deselects a collection of components
-	void deselect(const k3d::selection::records& Selection);
 	/// Inverts current selection
 	void invert_selection();
 

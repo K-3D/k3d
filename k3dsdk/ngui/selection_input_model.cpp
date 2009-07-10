@@ -136,14 +136,14 @@ struct selection_input_model::implementation :
 			case SELECT:
 			{
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Select"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.select(m_start_selection);
+				selection::state(m_document_state.document()).select(m_start_selection);
 				break;
 			}
 
 			case DESELECT:
 			{
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect(m_start_selection);
+				selection::state(m_document_state.document()).deselect(m_start_selection);
 				break;
 			}
 
@@ -151,7 +151,7 @@ struct selection_input_model::implementation :
 			{
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Replace"), K3D_CHANGE_SET_CONTEXT);
 				selection::state(m_document_state.document()).deselect_all();
-				m_document_state.select(m_start_selection);
+				selection::state(m_document_state.document()).select(m_start_selection);
 				break;
 			}
 		}
@@ -223,7 +223,7 @@ struct selection_input_model::implementation :
 			case MOTION_PAINT_SELECT:
 			{
 				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.select(m_start_selection);
+				selection::state(m_document_state.document()).select(m_start_selection);
 
 				break;
 			}
@@ -231,7 +231,7 @@ struct selection_input_model::implementation :
 			case MOTION_PAINT_DESELECT:
 			{
 				k3d::start_state_change_set(m_document_state.document(), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect(m_start_selection);
+				selection::state(m_document_state.document()).deselect(m_start_selection);
 
 				break;
 			}
@@ -277,7 +277,7 @@ struct selection_input_model::implementation :
 				const k3d::selection::record selection = Viewport.pick_object(coordinates, m_paint_backfacing);
 				if(!m_document_state.is_selected(selection))
 				{
-					m_document_state.select(selection);
+					selection::state(m_document_state.document()).select(selection);
 				}
 				else
 				{
@@ -290,7 +290,7 @@ struct selection_input_model::implementation :
 				const k3d::selection::record selection = Viewport.pick_object(coordinates, m_paint_backfacing);
 				if(m_document_state.is_selected(selection))
 				{
-					m_document_state.deselect(selection);
+					selection::state(m_document_state.document()).deselect(selection);
 				}
 				else
 				{
@@ -339,7 +339,7 @@ struct selection_input_model::implementation :
 
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Replace"), K3D_CHANGE_SET_CONTEXT);
 				selection::state(m_document_state.document()).deselect_all();
-				m_document_state.select(selection);
+				selection::state(m_document_state.document()).select(selection);
 				break;
 			}
 
@@ -350,7 +350,7 @@ struct selection_input_model::implementation :
 				m_rubber_band.draw(Viewport);
 
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.select(selection);
+				selection::state(m_document_state.document()).select(selection);
 				break;
 			}
 
@@ -361,7 +361,7 @@ struct selection_input_model::implementation :
 				m_rubber_band.draw(Viewport);
 
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Deselect"), K3D_CHANGE_SET_CONTEXT);
-				m_document_state.deselect(selection);
+				selection::state(m_document_state.document()).deselect(selection);
 				break;
 			}
 		}

@@ -96,7 +96,7 @@ class MaterialObj
     data_t* artistNameData() const	{return this->m_artistname;}
      data_t* artistNotesData() const	{return this->m_artistnotes;} */
     
-    const k3d::inode* docNode() const 					{return this->m_doc_node;}
+    k3d::inode* docNode() const 					{return this->m_doc_node;}
     const k3d::string_t docNodeName() const			{return this->m_doc_node->factory().name();}
     MaterialGroup* groupParent() const	 				{return this->m_group_parent;}
 

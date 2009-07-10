@@ -69,6 +69,7 @@
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/image_toggle_button.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/selection_state.h>
 #include <k3dsdk/ngui/text.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
@@ -588,13 +589,10 @@ void Implementation::onTreeRowChanged()
       else
         {
           //Emit Selection Signal For Other Panels (Node Properties Panel etc)
-          const k3d::inode *selectedNode 
+          k3d::inode* const selectedNode 
             = (row->get_value(m_columns.m_col_moptr))->docNode();
 
-          k3d::selection::record selected_record =
-            k3d::selection::make_record(const_cast<k3d::inode*>(selectedNode));
-
-          m_document_state.select(selected_record);
+          selection::state(m_document_state.document()).select(*selectedNode);
 
           //Build The GTK GUI Context
           buildContentPanel(row, false);

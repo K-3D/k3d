@@ -183,7 +183,7 @@ struct implementation
 		}
 		else
 		{
-			m_document_state.select(selection);
+			selection::state(m_document_state.document()).select(selection);
 		}
 	}
 

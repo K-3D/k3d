@@ -24,6 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/selection.h>
 #include <vector>
 
 namespace k3d
@@ -49,6 +50,10 @@ public:
 
 	/// Selects one node
 	void select(inode& Node);
+	/// Selects a collection of components
+	void select(const k3d::selection::record& Selection);
+	/// Selects a collection of components
+	void select(const k3d::selection::records& Selection);
 	/// Selects all nodes or components (depending on current selection mode)
 	void select_all();
 	/// Selects all nodes
@@ -56,6 +61,10 @@ public:
 
 	/// Deselects one node
 	void deselect(inode& Node);
+	/// Deselects a collection of components
+	void deselect(const k3d::selection::record& Selection);
+	/// Deselects a collection of components
+	void deselect(const k3d::selection::records& Selection);
 	/// Deselects all nodes or components (depending on current selection mode)
 	void deselect_all();
 	/// Deselects all nodes

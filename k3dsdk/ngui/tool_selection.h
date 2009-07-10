@@ -190,19 +190,19 @@ protected:
 		{
 			//case MOTION_RUBBER_BAND_SELECT:
 			case SELECTION_ADD:
-				m_document_state.select(selection);
+				selection::state(m_document_state.document()).select(selection);
 				break;
 
 			//case MOTION_RUBBER_BAND_DESELECT:
 			case SELECTION_SUBTRACT:
-				m_document_state.deselect(selection);
+				selection::state(m_document_state.document()).deselect(selection);
 				break;
 
 			case SELECTED_OBJECT:
 			case DESELECTED_OBJECT:
 			case NOTHING:
 				selection::state(m_document_state.document()).deselect_all();
-				m_document_state.select(selection);
+				selection::state(m_document_state.document()).select(selection);
 				break;
 			default:
 				assert_not_reached();
