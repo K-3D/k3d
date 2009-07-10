@@ -199,7 +199,7 @@ public:
 		if(!has_non_sds_polyhedra(Mesh))
 			return;
 			
-		if (!SelectionState.select_faces)
+		if (!SelectionState.select_uniform)
 			return;
 
 		k3d::gl::store_attributes attributes;
@@ -222,7 +222,8 @@ public:
 		const cached_triangulation::indices_t& indices = triangles.indices();
 		
 		k3d::uint_t face_offset = 0;
-		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		k3d::uint_t primitive_index = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive, ++primitive_index)
 		{
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
 			if(!polyhedron.get())
@@ -230,6 +231,9 @@ public:
 			
 			if (k3d::polyhedron::is_sds(*polyhedron))
 				continue;
+
+			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
+
 			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
 			for(k3d::uint_t poly_face = 0; poly_face != face_count; ++poly_face)
 			{
@@ -246,6 +250,8 @@ public:
 				k3d::gl::pop_selection_token(); // UNIFORM
 			}
 			face_offset += face_count;
+
+			k3d::gl::pop_selection_token(); // PRIMITIVE
 		}
 	}
 	

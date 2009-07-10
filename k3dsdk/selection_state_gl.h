@@ -39,19 +39,17 @@ public:
 	selection_state() :
 		exclude_unselected_nodes(false),
 		select_points(false),
-		select_faces(false),
-		select_backfacing(false),
 		select_uniform(false),
-		select_split_edges(false)
+		select_split_edges(false),
+		select_backfacing(false)
 	{
 	}
 
 	bool_t exclude_unselected_nodes;
 	bool_t select_points;
-	bool_t select_faces;
-	bool_t select_backfacing;
 	bool_t select_uniform;
 	bool_t select_split_edges;
+	bool_t select_backfacing;
 };
 
 } // namespace gl

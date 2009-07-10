@@ -99,6 +99,8 @@ public:
 	void deselect(const k3d::selection::record& Selection);
 	/// Deselects a collection of components.
 	void deselect(const k3d::selection::records& Selection);
+	/// Deselects a collection of nodes.
+	void deselect_nodes(const k3d::selection::records& Selection);
 	/// Deselects all nodes or components (depending on current selection mode).
 	void deselect_all();
 	/// Deselects all nodes.

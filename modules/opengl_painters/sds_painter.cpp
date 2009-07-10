@@ -227,7 +227,7 @@ protected:
 	}
 	virtual void select(const k3d::mesh::primitive& Primitive, sds_cache& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if (!SelectionState.select_faces)
+		if (!SelectionState.select_uniform)
 			return;
 		
 		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Primitive));

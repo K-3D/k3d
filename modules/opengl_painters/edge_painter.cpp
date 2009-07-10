@@ -93,12 +93,15 @@ public:
 		if(!SelectionState.select_split_edges)
 			return;
 
-		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		k3d::uint_t primitive_index = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive, ++primitive_index)
 		{
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
 			if(!polyhedron.get())
 				continue;
 		
+			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
+
 			const k3d::mesh::points_t& points = *Mesh.points;
 
 			k3d::gl::store_attributes attributes;
@@ -122,6 +125,8 @@ public:
 					k3d::gl::pop_selection_token(); // SPLIT_EDGE
 				}
 			}
+
+			k3d::gl::pop_selection_token(); // PRIMITIVE
 		}
 	}
 	

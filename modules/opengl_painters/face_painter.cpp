@@ -126,11 +126,12 @@ public:
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!SelectionState.select_faces)
+		if(!SelectionState.select_uniform)
 			return;
 	
 		k3d::uint_t face_offset = 0;
-		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
+		k3d::uint_t primitive_index = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive, ++primitive_index)
 		{
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
 			if(!polyhedron.get())
@@ -138,11 +139,13 @@ public:
 			
 			if(k3d::polyhedron::is_sds(*polyhedron))
 				continue;
-				
+
+			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
+
 			k3d::gl::store_attributes attributes;
-			
+
 			glDisable(GL_LIGHTING);
-	
+
 			glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			k3d::gl::set(GL_CULL_FACE, !SelectionState.select_backfacing);
@@ -173,6 +176,8 @@ public:
 				k3d::gl::pop_selection_token(); // UNIFORM
 			}
 			face_offset += face_count;
+
+			k3d::gl::pop_selection_token(); // PRIMITIVE
 		}
 	}
 	

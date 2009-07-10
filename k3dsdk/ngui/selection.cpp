@@ -86,7 +86,7 @@ void replace_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePolicy, 
 }
 
 /// Update policy for use with replace_selection() that selects all points in a mesh.
-k3d::selection::set select_all_points(const mesh& Mesh)
+const k3d::selection::set select_all_points(const mesh& Mesh)
 {
 	k3d::selection::set results;
 
@@ -100,7 +100,7 @@ k3d::selection::set select_all_points(const mesh& Mesh)
 }
 
 /// Update policy for use with replace_selection() that selects all split edges in a mesh.
-k3d::selection::set select_all_split_edges(const mesh& Mesh)
+const k3d::selection::set select_all_split_edges(const mesh& Mesh)
 {
 	k3d::selection::set results;
 
@@ -118,7 +118,7 @@ k3d::selection::set select_all_split_edges(const mesh& Mesh)
 }
 
 /// Update policy for use with replace_selection() that selects all uniform primitives in a mesh.
-k3d::selection::set select_all_uniform(const mesh& Mesh)
+const k3d::selection::set select_all_uniform(const mesh& Mesh)
 {
 	k3d::selection::set results;
 
@@ -144,7 +144,7 @@ void invert(k3d::mesh_selection::records_t& Records)
 */
 
 /// Update policy for use with replace_selection() that inverts the selection of all points in a mesh.
-k3d::selection::set invert_points(const k3d::mesh& Mesh)
+const k3d::selection::set invert_points(const k3d::mesh& Mesh)
 {
 assert_not_implemented();
 return k3d::selection::set();
@@ -152,7 +152,7 @@ return k3d::selection::set();
 }
 
 /// Update policy for use with replace_selection() that inverts the selection of all split edges in a mesh.
-k3d::selection::set invert_split_edges(const k3d::mesh& Mesh)
+const k3d::selection::set invert_split_edges(const k3d::mesh& Mesh)
 {
 assert_not_implemented();
 return k3d::selection::set();
@@ -160,7 +160,7 @@ return k3d::selection::set();
 }
 
 /// Update policy for use with replace_selection() that inverts the selection of all uniform primitives in a mesh.
-k3d::selection::set invert_uniform(const k3d::mesh& Mesh)
+const k3d::selection::set invert_uniform(const k3d::mesh& Mesh)
 {
 assert_not_implemented();
 return k3d::selection::set();
@@ -168,7 +168,7 @@ return k3d::selection::set();
 }
 
 /// Update policy for use with replace_selection() that deselects all points and primitives in a mesh.
-k3d::selection::set deselect_all(const mesh& Mesh)
+const k3d::selection::set deselect_all(const mesh& Mesh)
 {
 	k3d::selection::set results;
 	geometry::reset_selection(results, 0.0);
@@ -177,102 +177,70 @@ k3d::selection::set deselect_all(const mesh& Mesh)
 
 /// Uses an update policy to convert the supplied selection into updates to MeshInstance mesh selections
 template<typename UpdatePolicyT>
-void merge_interactive_selection(const k3d::selection::records& Selection, const double_t Weight)
+void merge_interactive_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePolicy, const k3d::selection::records& InteractiveSelection)
 {
-assert_not_implemented();
-/*
-	/// Defines a mapping of nodes to selection records
-	typedef std::multimap<inode*, const k3d::selection::record*> node_selection_map_t;
-	/// Given a set of selection records, generates a mapping of the corresponding nodes to each record
-	const node_selection_map_t map_nodes(const k3d::selection::records& Selection)
+	for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
 	{
-		node_selection_map_t results;
-
-		// Improve the performance of this loop by cacheing nodes
-		for(k3d::selection::records::const_iterator record = Selection.begin(); record != Selection.end(); ++record)
-			results.insert(std::make_pair(k3d::selection::get_node(*record), &*record));
-
-		if(results.count(0))
-			log() << warning << "Selection contained records without nodes" << std::endl;
-		results.erase(0);
-
-		return results;
-	}
-
-	inode* node = 0;
-	const mesh* mesh = 0;
-	mesh_selection selection;
-	imesh_selection_sink* sink = 0;
-	mesh::bools_t boundary_edges;
-	mesh::indices_t companions;
-
-	const node_selection_map_t nodes = map_nodes(Selection);
-	for(node_selection_map_t::const_iterator n = nodes.begin(); n != nodes.end(); ++n)
-	{
-		if(n->first != node)
-		{
-			if(sink && node)
-			{
-				property::set_internal_value(sink->mesh_selection_sink_input(), selection);
-			}
-
-			node = n->first;
-			selection = mesh_selection::select_null();
-			sink = dynamic_cast<imesh_selection_sink*>(node);
-			if(sink)
-				selection = boost::any_cast<mesh_selection>(sink->mesh_selection_sink_input().property_internal_value());
-				
-			companions.clear();
-			boundary_edges.clear();
-				
-			imesh_source* const mesh_source = dynamic_cast<imesh_source*>(node);
-			if(mesh_source)
-				mesh = property::pipeline_value<mesh*>(mesh_source->mesh_source_output());
-
-			if(mesh && mesh->polyhedra && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
-			{
-				polyhedron::create_edge_adjacency_lookup(*mesh->polyhedra->edge_points, *mesh->polyhedra->clockwise_edges, boundary_edges, companions);
-    	}
-		}
-
-		if(!sink)
+		if(classes::MeshInstance() != (*node)->factory().factory_id())
 			continue;
-		
-		UpdatePolicyT policy(Weight, companions);
-		policy(*n->second, selection);
-	}
 
-	if(sink && node)
-	{
-		property::set_internal_value(sink->mesh_selection_sink_input(), selection);
+		imesh_selection_sink* const mesh_selection_sink = dynamic_cast<imesh_selection_sink*>(*node);
+		if(!mesh_selection_sink)
+			continue;
+
+		imesh_source* const mesh_source = dynamic_cast<imesh_source*>(*node);
+		if(!mesh_source)
+			continue;
+
+		const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_internal_value());
+		if(!mesh)
+			continue;
+
+		const k3d::selection::set current_selection =
+			boost::any_cast<k3d::selection::set>(mesh_selection_sink->mesh_selection_sink_input().property_internal_value());
+
+		property::set_internal_value(mesh_selection_sink->mesh_selection_sink_input(), UpdatePolicy(*node, *mesh, current_selection, InteractiveSelection));
+		property::set_internal_value(**node, "show_component_selection", true);
 	}
-*/
 }
 
 /// Policy class that updates a mesh_selection to select the given points
 struct select_points
 {
-	select_points(const double_t Weight, const mesh::indices_t& Companions) :
+	select_points(const double_t Weight) :
 		weight(Weight)
 	{
 	}
 
-	void operator()(const k3d::selection::record& Record, k3d::selection::set& Selection) const
+	const k3d::selection::set operator()(k3d::inode* const Node, const k3d::mesh& Mesh, const k3d::selection::set& CurrentSelection, const k3d::selection::records& InteractiveSelection) const
 	{
-assert_not_implemented();
-/*
-		for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
+		k3d::selection::set results = CurrentSelection;
+
+		boost::scoped_ptr<geometry::point_selection::storage> point_selection;
+		for(k3d::selection::records::const_iterator record = InteractiveSelection.begin(); record != InteractiveSelection.end(); ++record)
 		{
-			switch(token->type)
+			if(k3d::selection::get_node(*record) != Node)
+				continue;
+
+			if(!point_selection)
+				point_selection.reset(geometry::point_selection::create(results));				
+
+			for(k3d::selection::record::tokens_t::const_iterator token = record->tokens.begin(); token != record->tokens.end(); ++token)
 			{
-				case selection::POINT:
-					Selection.points.push_back(mesh_selection::record(token->id, token->id+1, weight));
-					return;
-				default:
-					break;
+				switch(token->type)
+				{
+					case k3d::selection::POINT:
+						point_selection->index_begin.push_back(token->id);
+						point_selection->index_end.push_back(token->id + 1);
+						point_selection->weight.push_back(weight);
+						continue;
+					default:
+						continue;
+				}
 			}
 		}
-*/
+
+		return results;
 	}
 
 	const double_t weight;
@@ -281,94 +249,118 @@ assert_not_implemented();
 /// Policy class that updates a mesh_selection to select the given lines
 struct select_split_edges
 {
-	select_split_edges(const double_t Weight, const mesh::indices_t& Companions) :
-		weight(Weight), companions(Companions)
+	select_split_edges(const double_t Weight) :
+		weight(Weight)
 	{
 	}
 
-	void operator()(const k3d::selection::record& Record, k3d::selection::set& Selection) const
+	const k3d::selection::set operator()(k3d::inode* const Node, const k3d::mesh& Mesh, const k3d::selection::set& CurrentSelection, const k3d::selection::records& InteractiveSelection) const
 	{
-assert_not_implemented();
-/*
-		for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
+		k3d::selection::set results = CurrentSelection;
+
+		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection;
+		for(k3d::selection::records::const_iterator record = InteractiveSelection.begin(); record != InteractiveSelection.end(); ++record)
 		{
-			const uint_t edge = token->id;
-			switch(token->type)
+			if(k3d::selection::get_node(*record) != Node)
+				continue;
+
+			if(!primitive_selection)
+				primitive_selection.reset(geometry::primitive_selection::create(results));				
+
+			bool_t found_primitive = false;
+			for(k3d::selection::record::tokens_t::const_iterator token = record->tokens.begin(); token != record->tokens.end(); ++token)
 			{
-				case selection::ABSOLUTE_SPLIT_EDGE:
-					Selection.edges.push_back(mesh_selection::record(edge, edge+1, weight));
-					if(edge < companions.size() && companions[edge] != edge)
-					{
-						const uint_t companion = companions[edge];
-						Selection.edges.push_back(mesh_selection::record(companion, companion+1, weight));
-					}
-					return;
-
-				case selection::ABSOLUTE_LINEAR_CURVE:
-					Selection.linear_curves.push_back(mesh_selection::record(token->id, token->id+1, weight));
-					return;
-
-				case selection::ABSOLUTE_CUBIC_CURVE:
-					Selection.cubic_curves.push_back(mesh_selection::record(token->id, token->id+1, weight));
-					return;
-				case selection::ABSOLUTE_NURBS_CURVE:
-					Selection.nurbs_curves.push_back(mesh_selection::record(token->id, token->id+1, weight));
-					return;
-
-				default:
-					break;
+				switch(token->type)
+				{
+					case k3d::selection::PRIMITIVE:
+						found_primitive = true;
+						if(primitive_selection->primitive_begin.empty() || primitive_selection->primitive_begin.back() != token->id)
+						{
+							primitive_selection->primitive_begin.push_back(token->id);
+							primitive_selection->primitive_end.push_back(token->id + 1);
+							primitive_selection->primitive_selection_type.push_back(k3d::selection::SPLIT_EDGE);
+							primitive_selection->primitive_first_range.push_back(primitive_selection->index_begin.size());
+							primitive_selection->primitive_range_count.push_back(0);
+						}
+						break;
+					case k3d::selection::SPLIT_EDGE:
+						if(!found_primitive)
+						{
+							log() << error << "Selection records missing primitive token" << std::endl;
+							break;
+						}
+						primitive_selection->primitive_range_count.back() += 1;
+						primitive_selection->index_begin.push_back(token->id);
+						primitive_selection->index_end.push_back(token->id + 1);
+						primitive_selection->weight.push_back(weight);
+						break;
+					default:
+						break;
+				}
 			}
 		}
-*/
+
+		return results;
 	}
 
 	const double_t weight;
-	const mesh::indices_t& companions;
 };
 
 /// Policy class that updates a mesh_selection to select the given uniform components
 struct select_uniform
 {
-	select_uniform(const double_t Weight, const mesh::indices_t& Companions) :
+	select_uniform(const double_t Weight) :
 		weight(Weight)
 	{
 	}
 
-	void operator()(const k3d::selection::record& Record, k3d::selection::set& Selection) const
+	const k3d::selection::set operator()(k3d::inode* const Node, const k3d::mesh& Mesh, const k3d::selection::set& CurrentSelection, const k3d::selection::records& InteractiveSelection) const
 	{
-assert_not_implemented();
-/*
-		// Generic geometry selection behavior ...
-		mesh_selection::component current_component(0, 0, selection::UNIFORM);
-		for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
+		k3d::selection::set results = CurrentSelection;
+
+		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection;
+		for(k3d::selection::records::const_iterator record = InteractiveSelection.begin(); record != InteractiveSelection.end(); ++record)
 		{
-			switch(token->type)
+			if(k3d::selection::get_node(*record) != Node)
+				continue;
+
+			if(!primitive_selection)
+				primitive_selection.reset(geometry::primitive_selection::create(results));				
+
+			bool_t found_primitive = false;
+			for(k3d::selection::record::tokens_t::const_iterator token = record->tokens.begin(); token != record->tokens.end(); ++token)
 			{
-				case selection::PRIMITIVE:
-					if((current_component.primitive_begin != token->id) || (current_component.primitive_end != token->id + 1))
-					{
-						if(!current_component.empty())
+				switch(token->type)
+				{
+					case k3d::selection::PRIMITIVE:
+						found_primitive = true;
+						if(primitive_selection->primitive_begin.empty() || primitive_selection->primitive_begin.back() != token->id)
 						{
-							Selection.add_component(current_component);
-							current_component.clear();
+							primitive_selection->primitive_begin.push_back(token->id);
+							primitive_selection->primitive_end.push_back(token->id + 1);
+							primitive_selection->primitive_selection_type.push_back(k3d::selection::UNIFORM);
+							primitive_selection->primitive_first_range.push_back(primitive_selection->index_begin.size());
+							primitive_selection->primitive_range_count.push_back(0);
 						}
-						current_component.primitive_begin = token->id;
-						current_component.primitive_end = token->id + 1;
-						current_component.type = selection::UNIFORM;
-					}
-					break;
-				case selection::UNIFORM:
-					current_component.add_range(token->id, token->id+1, weight);
-					break;
-				default:
-					break;
+						break;
+					case k3d::selection::UNIFORM:
+						if(!found_primitive)
+						{
+							log() << error << "Selection records missing primitive token" << std::endl;
+							break;
+						}
+						primitive_selection->primitive_range_count.back() += 1;
+						primitive_selection->index_begin.push_back(token->id);
+						primitive_selection->index_end.push_back(token->id + 1);
+						primitive_selection->weight.push_back(weight);
+						break;
+					default:
+						break;
+				}
 			}
 		}
-		if(!current_component.empty())
-		{
-			Selection.add_component(current_component);
-		}
-*/
+
+		return results;
 	}
 
 	const double_t weight;
@@ -572,13 +564,13 @@ void state::select(const k3d::selection::records& Selection)
 			select_nodes(Selection);
 			break;
 		case POINTS:
-			detail::merge_interactive_selection<detail::select_points>(Selection, 1.0);
+			detail::merge_interactive_selection(selected_nodes(), detail::select_points(1.0), Selection);
 			break;
 		case SPLIT_EDGES:
-			detail::merge_interactive_selection<detail::select_split_edges>(Selection, 1.0);
+			detail::merge_interactive_selection(selected_nodes(), detail::select_split_edges(1.0), Selection);
 			break;
 		case UNIFORM:
-			detail::merge_interactive_selection<detail::select_uniform>(Selection, 1.0);
+			detail::merge_interactive_selection(selected_nodes(), detail::select_uniform(1.0), Selection);
 			break;
 	}
 
@@ -691,7 +683,32 @@ void state::deselect(const k3d::selection::record& Selection)
 
 void state::deselect(const k3d::selection::records& Selection)
 {
-	assert_not_implemented();
+	switch(internal.current_mode.internal_value())
+	{
+		case NODES:
+			deselect_nodes(Selection);
+			break;
+		case POINTS:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_points(0.0), Selection);
+			break;
+		case SPLIT_EDGES:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_split_edges(0.0), Selection);
+			break;
+		case UNIFORM:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_uniform(0.0), Selection);
+			break;
+	}
+
+	internal.selection_changed();
+}
+
+void state::deselect_nodes(const k3d::selection::records& Selection)
+{
+	for(k3d::selection::records::const_iterator record = Selection.begin(); record != Selection.end(); ++record)
+	{
+		if(k3d::inode* const node = k3d::selection::get_node(*record))
+			deselect(*node);
+	}
 }
 
 void state::deselect_all()

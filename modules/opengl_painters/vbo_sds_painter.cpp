@@ -204,7 +204,7 @@ assert_not_implemented();
 	}
 	virtual void select(vbo_t& Cache, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if (!SelectionState.select_faces)
+		if (!SelectionState.select_uniform)
 			return;
 		
 		k3d::gl::store_attributes attributes;

@@ -107,7 +107,6 @@ const k3d::gl::selection_state select_uniform(bool Backfacing)
 	k3d::gl::selection_state result;
 
 	result.exclude_unselected_nodes = true;
-	result.select_faces = true;
 	result.select_backfacing = Backfacing;
 	result.select_uniform = true;
 
@@ -119,7 +118,6 @@ const k3d::gl::selection_state select_nodes()
 	k3d::gl::selection_state result;
 
 	result.select_points = true;
-	result.select_faces = true;
 	result.select_backfacing = true;
 	result.select_uniform = true;
 	result.select_split_edges = true;
@@ -829,7 +827,6 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	k3d::gl::selection_state selection_state;
 	selection_state.exclude_unselected_nodes = true;
 	selection_state.select_points = true;
-	selection_state.select_faces = true;
 	selection_state.select_backfacing = Backfacing;
 	selection_state.select_uniform = true;
 	selection_state.select_split_edges = true;
@@ -1099,7 +1096,6 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	k3d::gl::selection_state selection_state;
 	selection_state.exclude_unselected_nodes = true;
 	selection_state.select_split_edges = true;
-	selection_state.select_faces = true;
 	selection_state.select_backfacing = Backfacing;
 
 	const double sensitivity = 5;
@@ -1271,10 +1267,6 @@ const k3d::selection::records control::get_selection(const k3d::gl::selection_st
 
 		selection.push_back(record);
 	}
-
-k3d::log() << debug << "get_selection(): \n";
-for(k3d::selection::records::const_iterator record = selection.begin(); record != selection.end(); ++record)
-	k3d::log() << debug << "  " << *record << std::endl; 
 
 	return selection;
 }
