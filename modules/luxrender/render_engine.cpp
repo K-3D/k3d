@@ -64,6 +64,7 @@
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/sphere.h>
 #include <k3dsdk/time_source.h>
+#include <k3dsdk/torus.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/triangulator.h>
 #include <k3dsdk/utility_gl.h>
@@ -493,6 +494,31 @@ private:
 		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
+	void render_torus(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::torus::const_primitive& Torus, std::ostream& Stream)
+	{
+		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
+		for(k3d::uint_t i = 0; i != Torus.matrices.size(); ++i)
+		{
+			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "ConcatTransform [" << convert(Torus.matrices[i]) << "]\n" << k3d::push_indent;
+
+			material::use(MaterialNames, Torus.materials[i], Stream);
+
+			Stream << k3d::standard_indent << "Shape \"torus\"\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "\"float majorradius\" [" << Torus.major_radii[i] << "]\n";
+			Stream << k3d::standard_indent << "\"float minorradius\" [" << Torus.minor_radii[i] << "]\n";
+			Stream << k3d::standard_indent << "\"float thetamin\" [" << k3d::degrees(Torus.phi_min[i]) << "]\n";
+			Stream << k3d::standard_indent << "\"float thetamax\" [" << k3d::degrees(Torus.phi_max[i]) << "]\n";
+			Stream << k3d::standard_indent << "\"float phimax\" [" << k3d::degrees(Torus.sweep_angles[i]) << "]\n";
+			Stream << k3d::pop_indent;
+			Stream << k3d::pop_indent;
+			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+		}
+		Stream << k3d::pop_indent;
+		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+	}
+
 	void render_mesh_instance(const material::name_map& MaterialNames, k3d::inode& MeshInstance, std::ostream& Stream)
 	{
 		const k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(MeshInstance, "output_mesh");
@@ -547,6 +573,13 @@ private:
 			if(sphere)
 			{
 				render_sphere(MaterialNames, MeshInstance, *mesh, *sphere, Stream);
+				continue;
+			}
+
+			boost::scoped_ptr<k3d::torus::const_primitive> torus(k3d::torus::validate(**primitive));
+			if(torus)
+			{
+				render_torus(MaterialNames, MeshInstance, *mesh, *torus, Stream);
 				continue;
 			}
 		}
