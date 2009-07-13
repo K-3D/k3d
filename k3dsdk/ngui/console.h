@@ -57,8 +57,8 @@ public:
 	void clear();
 	/// Sets the text formatting tag that will be applied to text passed to print_string() and prompt_string().
 	void set_current_format(Glib::RefPtr<Gtk::TextTag>& Tag);
-	/// Writes the supplied text to the console.
-	void print_string(const string_t& String);
+	/// Writes the supplied text to the console. If Editable is true, the text can be edited on the commad line
+	void print_string(const string_t& String, const bool_t Editable=false);
 	/// Writes the supplied user prompt text to the console.
 	void prompt_string(const string_t& String);
 	/// Set the completion key

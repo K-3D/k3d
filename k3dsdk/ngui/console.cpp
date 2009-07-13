@@ -88,12 +88,7 @@ public:
 		else if(event->keyval == completion_key)
 		{
 			const k3d::string_t input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
-			buffer->insert(buffer->end(), "\n");
 			complete_key_pressed_signal.emit(input);
-			buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
-			buffer->move_mark(begin_input, buffer->end());
-			buffer->insert(buffer->end(), input);
-			view.scroll_to(buffer->get_insert());
 
 			return true;
 		}
@@ -170,7 +165,7 @@ public:
 		return false;
 	}
 
-	void print_string(const string_t& String)
+	void print_string(const string_t& String, const bool_t Editable)
 	{
 		if(current_format)
 		{
@@ -184,7 +179,8 @@ public:
 			buffer->insert(buffer->end(), String);
 		}
 
-		buffer->apply_tag(read_only, buffer->begin(), buffer->end());
+		if(!Editable)
+			buffer->apply_tag(read_only, buffer->begin(), buffer->end());
 		view.scroll_to(buffer->get_insert());
 	}
 
@@ -231,16 +227,19 @@ void control::set_current_format(Glib::RefPtr<Gtk::TextTag>& Tag)
 	m_implementation->current_format = Tag;
 }
 
-void control::print_string(const string_t& String)
+void control::print_string(const string_t& String, const bool_t Editable)
 {
-	m_implementation->print_string(String);
-	m_implementation->view.set_editable(false);
-	m_implementation->view.set_cursor_visible(false);
+	m_implementation->print_string(String, Editable);
+	if(!Editable)
+	{
+		m_implementation->view.set_editable(false);
+		m_implementation->view.set_cursor_visible(false);
+	}
 }
 
 void control::prompt_string(const string_t& String)
 {
-	m_implementation->print_string(String);
+	m_implementation->print_string(String, false);
 	m_implementation->buffer->move_mark(m_implementation->begin_input, m_implementation->buffer->end());
 	m_implementation->buffer->place_cursor(m_implementation->buffer->end());
 	m_implementation->view.set_editable(true);

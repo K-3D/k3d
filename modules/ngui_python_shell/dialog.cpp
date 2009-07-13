@@ -33,6 +33,7 @@
 #include <k3dsdk/result.h>
 
 #include <gtkmm/texttag.h>
+#include <gdk/gdkkeysyms.h>
 
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>
@@ -86,6 +87,8 @@ public:
 
 		add(*console);
 		console->connect_command_signal(sigc::mem_fun(*this, &dialog::on_command));
+		console->connect_complete_key_pressed_signal(sigc::mem_fun(*this, &dialog::on_complete_key_pressed));
+		console->set_completion_key(GDK_Tab);
 
 		show_all();
 
@@ -108,6 +111,12 @@ public:
 	void set_document(k3d::idocument* Document)
 	{
 		document = Document;
+		if(document)
+		{
+			k3d::iscript_engine::context_t context;
+			context["Document"] = document;
+			engine->execute(get_factory().name(), "", context);
+		}
 	}
 
 	void on_command(const k3d::string_t& Command)
@@ -126,8 +135,6 @@ public:
 		k3d::iscript_engine::context_t context;
 		context["__incomplete"] = false;
 		context["__close"] = false;
-		if(document)
-			context["Document"] = document;
 
 		engine->execute(get_factory().name(), console_command.str(), context, &stdout_slot, &stderr_slot);
 
@@ -138,6 +145,21 @@ public:
 		}
 
 		print_prompt(boost::any_cast<k3d::bool_t>(context["__incomplete"]) ? "... " : ">>> ");
+	}
+
+	void on_complete_key_pressed(const k3d::string_t& Command)
+	{
+		const k3d::iscript_engine::completions_t completions = engine->complete(Command);
+		k3d::string_t completions_string(completions.size() ? "\n" : "");
+		for(k3d::uint_t i = 0; i != completions.size(); ++i)
+			completions_string += "  " + completions[i];
+		print_stdout(completions_string + "\n");
+		print_prompt(">>> ");
+		console->set_current_format(no_tag);
+		k3d::string_t completed = Command;
+		if(completions.size() == 1)
+			completed = completions[0];
+		console->print_string(completed, true);
 	}
 
 	void print_prompt(const k3d::string_t& Output)
@@ -166,6 +188,7 @@ public:
 	Glib::RefPtr<Gtk::TextTag> prompt_tag;
 	Glib::RefPtr<Gtk::TextTag> stdout_tag;
 	Glib::RefPtr<Gtk::TextTag> stderr_tag;
+	Glib::RefPtr<Gtk::TextTag> no_tag;
 
 	k3d::idocument* document;
 
