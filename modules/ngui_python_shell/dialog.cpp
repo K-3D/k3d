@@ -35,8 +35,7 @@
 #include <gtkmm/texttag.h>
 #include <gdk/gdkkeysyms.h>
 
-#include <boost/algorithm/string/erase.hpp>
-#include <boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -50,6 +49,22 @@ namespace ngui
 
 namespace python_shell
 {
+
+namespace detail
+{
+
+/// Extracts the command's base, before completion
+const k3d::string_t base(const k3d::string_t Command)
+{
+	const k3d::uint_t last_separator = Command.find_last_of(".= ");
+	if(last_separator != k3d::string_t::npos)
+	{
+		return Command.substr(0, last_separator + 1);
+	}
+	return "";
+}
+
+} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // dialog
@@ -78,6 +93,9 @@ public:
 
 		stderr_tag = Gtk::TextTag::create("stderr");
 		stderr_tag->property_foreground() = "#ff0000";
+
+		completion_tag = Gtk::TextTag::create("completion");
+		completion_tag->property_foreground() = "#00ff00";
 
 		set_title(_("K-3D Python Shell"));
 		set_role("python_shell_window");
@@ -153,12 +171,14 @@ public:
 		k3d::string_t completions_string(completions.size() ? "\n" : "");
 		for(k3d::uint_t i = 0; i != completions.size(); ++i)
 			completions_string += "  " + completions[i];
-		print_stdout(completions_string + "\n");
+		print_completion(completions_string + "\n");
 		print_prompt(">>> ");
 		console->set_current_format(no_tag);
 		k3d::string_t completed = Command;
 		if(completions.size() == 1)
-			completed = completions[0];
+		{
+				completed = detail::base(Command) + completions[0];
+		}
 		console->print_string(completed, true);
 	}
 
@@ -180,6 +200,12 @@ public:
 		console->print_string(Output);
 	}
 
+	void print_completion(const k3d::string_t& Output)
+	{
+		console->set_current_format(completion_tag);
+		console->print_string(Output);
+	}
+
 	boost::scoped_ptr<k3d::iscript_engine> engine;
 	k3d::iscript_engine::output_t stdout_slot;
 	k3d::iscript_engine::output_t stderr_slot;
@@ -188,6 +214,7 @@ public:
 	Glib::RefPtr<Gtk::TextTag> prompt_tag;
 	Glib::RefPtr<Gtk::TextTag> stdout_tag;
 	Glib::RefPtr<Gtk::TextTag> stderr_tag;
+	Glib::RefPtr<Gtk::TextTag> completion_tag;
 	Glib::RefPtr<Gtk::TextTag> no_tag;
 
 	k3d::idocument* document;
