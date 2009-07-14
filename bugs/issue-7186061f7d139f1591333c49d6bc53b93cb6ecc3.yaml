@@ -1,0 +1,27 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: RenderManArrayXD plugins should be more generic.
+desc: |-
+  I think that RenderManArray...
+  (http://www.k-3d.org/wiki/Array_Plugins) should be converted into a
+  more generic RenderingProxyArray and that it should also be able to
+  generate an array of actual object instances so that it can be used as
+  a modeling tool and for cases where a proxy cannot be used in the
+  chosen output format.
+  
+  At the moment it will not work with LuxRender but Lux does support
+  geometry instancing.
+type: :feature
+component: K-3D
+release: 
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-07-14 03:54:59.949374 Z
+references: []
+
+id: 7186061f7d139f1591333c49d6bc53b93cb6ecc3
+log_events: 
+- - 2009-07-14 03:55:01.277314 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
