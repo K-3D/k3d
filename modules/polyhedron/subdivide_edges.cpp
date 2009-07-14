@@ -41,7 +41,7 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 namespace detail
@@ -439,7 +439,7 @@ k3d::iplugin_factory& subdivide_edges_factory()
 	return subdivide_edges::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 

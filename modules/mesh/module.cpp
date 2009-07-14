@@ -53,7 +53,6 @@ extern k3d::iplugin_factory& sds_crease_factory();
 extern k3d::iplugin_factory& sds_hole_factory();
 extern k3d::iplugin_factory& show_component_numbering_factory();
 extern k3d::iplugin_factory& show_face_orientations_factory();
-extern k3d::iplugin_factory& subdivide_edges_factory();
 extern k3d::iplugin_factory& subdivide_faces_factory();
 extern k3d::iplugin_factory& weld_factory();
 
