@@ -19,6 +19,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/dependencies.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/iomanip.h>
 #include <k3dsdk/mesh.h>
@@ -28,6 +29,7 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/entry.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/type_registry.h>
 
@@ -127,12 +129,38 @@ public:
 			
 		m_menu.reset(new Gtk::Menu());
 
+		Gtk::MenuItem* const save_mesh = new Gtk::MenuItem(_("Save Mesh ..."));
+		save_mesh->signal_activate().connect(sigc::bind(sigc::mem_fun(*this, &control::on_save_mesh), mesh));
+		m_menu->items().push_back(*manage(save_mesh));
+
 		Gtk::MenuItem* const save_detailed_dotfile = new Gtk::MenuItem(_("Save GraphViz (.dot) file ..."));
 		save_detailed_dotfile->signal_activate().connect(sigc::bind(sigc::mem_fun(*this, &control::on_save_dotfile), mesh));
 		m_menu->items().push_back(*manage(save_detailed_dotfile));
 
 		m_menu->show_all();
 		m_menu->popup(1, gtk_get_current_event_time());
+	}
+
+	void on_save_mesh(const k3d::mesh* const Mesh)
+	{
+		k3d::filesystem::path output_path;
+		{
+			file_chooser_dialog dialog(_("Save mesh file:"), "k3d", Gtk::FILE_CHOOSER_ACTION_SAVE);
+			if(!dialog.get_file_path(output_path))
+				return;
+		}
+
+		const k3d::filesystem::path root_path = output_path.branch_path();
+		k3d::dependencies dependencies;
+		k3d::persistent_lookup lookup;
+		k3d::ipersistent::save_context context(root_path, dependencies, lookup);
+
+		k3d::xml::element xml("k3dml");
+		k3d::xml::element& xml_mesh = xml.append(k3d::xml::element("mesh_arrays"));
+		k3d::xml::save(*Mesh, xml_mesh, context);
+
+		k3d::filesystem::ofstream stream(output_path);
+		stream << k3d::xml::declaration() << xml << std::endl;
 	}
 
 	class save_dotfile
