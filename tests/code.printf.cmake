@@ -20,6 +20,7 @@ SET(SKIP_FILES
 	"^modules/pdiff/Metric.cpp$"
 	"^modules/polyhedron_sources/polyhedron.cpp$"
 	"^modules/scalar/format_scalar.cpp$"
+	"^modules/solar/solpos/solpos.cpp$"
 	"^share/shaders/k3d_tile.h$"
 	"^tests/code.printf.cmake$"
 	"^tests/CMakeLists.txt$"
