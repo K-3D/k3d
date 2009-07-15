@@ -14,6 +14,7 @@ SET(SKIP_FILES
 	"^modules/pdiff/Metric.h$"
 	"^modules/pdiff/RGBAImage.h$"
 	"^modules/qslim/Mx.*$"
+	"^modules/solar/solpos/solpos.h$"
 	"^share/.*$"
 	)
 
