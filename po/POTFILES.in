@@ -246,8 +246,6 @@ modules/mesh/move_first_edge.cpp
 modules/mesh/sds_corner.cpp
 modules/mesh/sds_crease.cpp
 modules/mesh/sds_hole.cpp
-modules/mesh/subdivide_edges.cpp
-modules/mesh/subdivide_faces.cpp
 modules/mesh/weld.cpp
 modules/ngui_about/dialog.cpp
 modules/ngui_animation_timeline_panel/panel.cpp
@@ -397,6 +395,8 @@ modules/polyhedron_sources/polyhedron.cpp
 modules/polyhedron_sources/poly_icosahedron.cpp
 modules/polyhedron_sources/poly_sphere.cpp
 modules/polyhedron_sources/poly_torus.cpp
+modules/polyhedron/subdivide_edges.cpp
+modules/polyhedron/subdivide_faces.cpp
 modules/polyhedron/triangulate_faces.cpp
 modules/python/engine.cpp
 modules/qslim/quadric_decimation.cpp

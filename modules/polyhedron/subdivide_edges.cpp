@@ -25,6 +25,7 @@
 #include <k3dsdk/attribute_array_copier.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/measurement.h>
