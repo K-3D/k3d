@@ -3,7 +3,7 @@ title: Create tests to ensure that new code uses the standard K-3D types.
 desc: ""
 type: :task
 component: K-3D
-release: 
+release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,8 @@ log_events:
 - - 2009-04-30 05:26:35.581870 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2009-07-15 06:00:22.427191 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.0.0 from unassigned
   - ""

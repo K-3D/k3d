@@ -3,7 +3,7 @@ title: Create a test to validate that code never calls exit().
 desc: ""
 type: :task
 component: K-3D
-release: 
+release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,8 @@ log_events:
 - - 2009-04-30 05:22:37.529359 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2009-07-15 06:00:11.659989 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.0.0 from unassigned
   - ""
