@@ -24,6 +24,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/axis.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/measurement.h>
