@@ -256,19 +256,15 @@ private:
 			k3d::mesh::indices_t& APoints,
 			k3d::mesh::indices_t& BPoints,
 			k3d::mesh::indices_t& CPoints,
-			std::vector<luxrender::material*>& TriangleMaterials,
-			std::set<luxrender::material*>& MaterialList
+			std::vector<k3d::imaterial*>& TriangleMaterials
 			) :
+			m_face_materials(FaceMaterials),
 			m_points(Points),
 			m_a_points(APoints),
 			m_b_points(BPoints),
 			m_c_points(CPoints),
-			m_triangle_materials(TriangleMaterials),
-			m_material_list(MaterialList)
+			m_triangle_materials(TriangleMaterials)
 		{
-			m_face_materials.resize(FaceMaterials.size());
-			for(k3d::uint_t i = 0; i != FaceMaterials.size(); ++i)
-				m_face_materials[i] = k3d::material::lookup<luxrender::material>(FaceMaterials[i]);
 		}
 
 	private:
@@ -289,16 +285,14 @@ private:
 			m_b_points.push_back(Vertices[1]);
 			m_c_points.push_back(Vertices[2]);
 			m_triangle_materials.push_back(m_face_materials[m_current_face]);
-			m_material_list.insert(m_face_materials[m_current_face]);
 		}
 
-		std::vector<luxrender::material*> m_face_materials;
+		const k3d::mesh::materials_t& m_face_materials;
 		k3d::mesh::points_t& m_points;
 		k3d::mesh::indices_t& m_a_points;
 		k3d::mesh::indices_t& m_b_points;
 		k3d::mesh::indices_t& m_c_points;
-		std::vector<luxrender::material*>& m_triangle_materials;
-		std::set<luxrender::material*>& m_material_list;
+		std::vector<k3d::imaterial*>& m_triangle_materials;
 
 		k3d::uint_t m_current_face;
 	};
@@ -403,16 +397,19 @@ private:
 		k3d::mesh::indices_t a_points;
 		k3d::mesh::indices_t b_points;
 		k3d::mesh::indices_t c_points;
-		std::vector<luxrender::material*> triangle_materials;
-		std::set<luxrender::material*> material_list;
+		std::vector<k3d::imaterial*> triangle_materials;
 
-		create_triangles(Polyhedron.face_materials, points, a_points, b_points, c_points, triangle_materials, material_list).process(Mesh, Polyhedron);
+		create_triangles(Polyhedron.face_materials, points, a_points, b_points, c_points, triangle_materials).process(Mesh, Polyhedron);
+
+		// Get the set of unique materials ...
+		std::set<k3d::imaterial*> material_list(triangle_materials.begin(), triangle_materials.end());
 
 		// Make it happen ...
 		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
 		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
 
-		for(std::set<luxrender::material*>::const_iterator material = material_list.begin(); material != material_list.end(); ++material)
+		// For each material, render the triangles that use that material ...
+		for(std::set<k3d::imaterial*>::const_iterator material = material_list.begin(); material != material_list.end(); ++material)
 		{
 			material::use(MaterialNames, *material, Stream);
 
