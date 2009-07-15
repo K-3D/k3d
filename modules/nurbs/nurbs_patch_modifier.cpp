@@ -15,6 +15,7 @@ k3d::nurbs_patch::primitive* get_first_nurbs_patch(k3d::mesh& Mesh)
 			return k3d::nurbs_patch::validate(primitive->writable());
 		}
 	}
+	return 0;
 }
 
 k3d::nurbs_patch::const_primitive* get_first_nurbs_patch(const k3d::mesh& Mesh)
@@ -26,6 +27,7 @@ k3d::nurbs_patch::const_primitive* get_first_nurbs_patch(const k3d::mesh& Mesh)
 			return k3d::nurbs_patch::validate(**primitive);
 		}
 	}
+	return 0;
 }
 
 nurbs_patch_modifier::nurbs_patch_modifier(k3d::mesh& input, k3d::nurbs_patch::primitive& NurbsPatches) : m_instance(input), m_nurbs_patches(NurbsPatches)
