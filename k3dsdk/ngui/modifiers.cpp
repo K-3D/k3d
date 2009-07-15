@@ -185,12 +185,9 @@ inode* modify_mesh(document_state& DocumentState, inode& Node, iplugin_factory* 
 		{
 			if(selection::NODES == selection::state(DocumentState.document()).current_mode())
 			{
-				k3d::selection::set select_all;
-				geometry::reset_selection(select_all, 1.0);
-
 				property::set_internal_value(
 					modifier_mesh_selection_sink->mesh_selection_sink_input(),
-					select_all);
+					geometry::uniform_selection(1.0));
 			}
 			else
 			{

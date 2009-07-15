@@ -242,9 +242,7 @@ struct deselect_all
 {
 	const k3d::selection::set operator()(const mesh& Mesh, const k3d::selection::set& CurrentSelection) const
 	{
-		k3d::selection::set results;
-		geometry::reset_selection(results, 0.0);
-		return results;
+		return geometry::uniform_selection(0.0);
 	}
 };
 

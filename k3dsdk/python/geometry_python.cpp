@@ -134,6 +134,8 @@ public:
 void define_namespace_geometry()
 {
 	scope outer = class_<geometry>("geometry", no_init)
+		.def("uniform_selection", &k3d::geometry::uniform_selection)
+		.staticmethod("uniform_selection")
 		;
 
 	{

@@ -131,7 +131,7 @@ void merge(const_storage& Storage, mesh& Mesh);
 
 } // namespace primitive_selection
 
-void reset_selection(k3d::selection::set& Set, const double_t Weight);
+k3d::selection::set uniform_selection(const double_t Weight);
 void merge_selection(const k3d::selection::set& Set, mesh& Mesh);
 void merge_selection(const k3d::selection::set& Set, legacy::mesh& Mesh);
 
