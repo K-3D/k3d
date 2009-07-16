@@ -289,19 +289,19 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				new detail::selection_mode_model(m_document_state.document(), selection::SPLIT_EDGES, _("Select Lines mode")),
+				new detail::selection_mode_model(m_document_state.document(), selection::SPLIT_EDGES, _("Select Polygon Edges")),
 				&m_document_state.document().state_recorder(),
 				load_icon("edge", Gtk::ICON_SIZE_SMALL_TOOLBAR))
-			<< set_tooltip(_("Select Lines"))
+			<< set_tooltip(_("Select Polygon Edges"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				new detail::selection_mode_model(m_document_state.document(), selection::UNIFORM, _("Select Faces mode")),
+				new detail::selection_mode_model(m_document_state.document(), selection::UNIFORM, _("Select Uniform")),
 				&m_document_state.document().state_recorder(),
 				load_icon("face", Gtk::ICON_SIZE_SMALL_TOOLBAR))
-			<< set_tooltip(_("Select Faces"))
+			<< set_tooltip(_("Select Uniform"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 

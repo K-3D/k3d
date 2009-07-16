@@ -680,13 +680,13 @@ private:
 			<< set_accelerator_path("<k3d-document>/actions/select/select_points", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new Gtk::MenuItem(_("_Lines"), true)
+			new Gtk::MenuItem(_("_Edges"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_edges))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_lines", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new Gtk::MenuItem(_("_Faces"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_faces))
+			new Gtk::MenuItem(_("_Uniform"), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_uniform))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_faces", get_accel_group())));
 		
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
@@ -1745,25 +1745,25 @@ private:
 
 	void on_select_nodes()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Nodes mode"), K3D_CHANGE_SET_CONTEXT);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Nodes"), K3D_CHANGE_SET_CONTEXT);
 		selection::state(m_document_state.document()).set_current_mode(selection::NODES);
 	}
 
 	void on_select_vertices()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Points mode"), K3D_CHANGE_SET_CONTEXT);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Points"), K3D_CHANGE_SET_CONTEXT);
 		selection::state(m_document_state.document()).set_current_mode(selection::POINTS);
 	}
 
 	void on_select_edges()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Lines mode"), K3D_CHANGE_SET_CONTEXT);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Polygon Edges"), K3D_CHANGE_SET_CONTEXT);
 		selection::state(m_document_state.document()).set_current_mode(selection::SPLIT_EDGES);
 	}
 
-	void on_select_faces()
+	void on_select_uniform()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Faces mode"), K3D_CHANGE_SET_CONTEXT);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Uniform"), K3D_CHANGE_SET_CONTEXT);
 		selection::state(m_document_state.document()).set_current_mode(selection::UNIFORM);
 	}
 
