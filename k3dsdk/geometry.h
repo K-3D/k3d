@@ -64,6 +64,8 @@ public:
 };
 
 storage* create(k3d::selection::set& Set);
+storage* uniform(k3d::selection::set& Set, const double_t Weight);
+
 void reset(storage& Storage, const double_t Weight);
 const_storage* validate(const k3d::selection::storage& GenericStorage);
 storage* validate(k3d::selection::storage& GenericStorage);

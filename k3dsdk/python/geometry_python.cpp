@@ -70,6 +70,11 @@ public:
 			return wrap_owned(k3d::geometry::point_selection::create(Set));
 		}
 
+		static object uniform(k3d::selection::set& Set, const double_t Weight)
+		{
+			return wrap_owned(k3d::geometry::point_selection::uniform(Set, Weight));
+		}
+
 		static object validate(selection_storage_wrapper& Storage)
 		{
 			return wrap_owned(k3d::geometry::point_selection::validate(Storage.wrapped()));
@@ -142,6 +147,8 @@ void define_namespace_geometry()
 		scope inner = class_<geometry::point_selection>("point_selection", no_init)
 			.def("create", &geometry::point_selection::create)
 			.staticmethod("create")
+			.def("uniform", &geometry::point_selection::uniform)
+			.staticmethod("uniform")
 			.def("validate", &geometry::point_selection::validate)
 			.staticmethod("validate")
 			.def("merge", &geometry::point_selection::merge)

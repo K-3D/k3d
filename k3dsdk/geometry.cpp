@@ -79,6 +79,16 @@ storage* create(k3d::selection::set& Set)
 }
 
 //////////////////////////////////////////////////////////////////////
+// uniform
+
+storage* uniform(k3d::selection::set& Set, const double_t Weight)
+{
+	storage* const result = create(Set);
+	reset(*result, Weight);
+	return result;
+}
+
+//////////////////////////////////////////////////////////////////////
 // reset
 
 void reset(storage& Storage, const double_t Weight)
