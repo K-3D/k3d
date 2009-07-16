@@ -8,7 +8,7 @@ try:
 	frozen_mesh = doc.new_node("FrozenMesh")
 	frozen_mesh.name = "Simple Polyhedron"
 
-	mesh = k3d.dynamic_cast(frozen_mesh, "imesh_storage").reset_mesh()
+	mesh = frozen_mesh.create_mesh()
 
 	vertices = [k3d.point3(-3, -3, 0), k3d.point3(3, -3, 0), k3d.point3(3, 3, 0), k3d.point3(-3, 3, 0)]
 	vertex_counts = [3, 3]
