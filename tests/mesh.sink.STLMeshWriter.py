@@ -12,7 +12,7 @@ file = k3d.filesystem.generic_path(testing.binary_path() + "/mesh.sink.STLMeshWr
 cube = doc.new_node("PolyCube")
 #triangulate it
 source = doc.new_node("TriangulateFaces")
-source.mesh_selection = k3d.mesh_selection.select_all()
+source.mesh_selection = k3d.geometry.uniform_selection(1)
 doc.set_dependency(source.get_property("input_mesh"), cube.get_property("output_mesh"))
 
 # Write the geometry to a temporary file ...
