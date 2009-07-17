@@ -602,7 +602,10 @@ private:
 			k3d::inetwork_render_frame::arguments arguments;
 			arguments.push_back(k3d::inetwork_render_frame::argument(scene_path.native_filesystem_string()));
 
-			Frame.add_exec_command("luxconsole", environment, arguments);
+			if(VisibleRender)
+				Frame.add_exec_command("luxrender", environment, arguments);
+			else
+				Frame.add_exec_command("luxconsole", environment, arguments);
 
 			// Setup the camera ...
 			k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(&Camera.projection());
@@ -640,7 +643,10 @@ private:
 			scene_stream << k3d::standard_indent << "\"string filename\" [\"" << OutputImagePath.native_filesystem_string() << "\"]\n";
 			scene_stream << k3d::standard_indent << "\"integer xresolution\" [" << pixel_width << "]\n";
 			scene_stream << k3d::standard_indent << "\"integer yresolution\" [" << pixel_height << "]\n";
-			scene_stream << k3d::standard_indent << "\"integer haltspp\" [" << m_halt_samples.pipeline_value() << "]\n";
+
+			if(!VisibleRender)
+				scene_stream << k3d::standard_indent << "\"integer haltspp\" [" << m_halt_samples.pipeline_value() << "]\n";
+
 			scene_stream << k3d::pop_indent;
 
 			// Scene setup ...
