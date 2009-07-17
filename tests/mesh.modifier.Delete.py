@@ -10,9 +10,9 @@ source = document.new_node("PolyGrid")
 modifier = document.new_node("Delete")
 
 # select some faces, distributed along polyhedra
-selection = k3d.mesh_selection.deselect_all()
-face_selection = k3d.mesh_selection.component(0, 1000, k3d.selection.type.UNIFORM, 12, 13, 1)
-selection.add_component(face_selection)
+selection = k3d.geometry.uniform_selection(0)
+face_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.UNIFORM)
+k3d.geometry.primitive_selection.append(face_selection, 12, 13, 1)
 modifier.mesh_selection = selection
 
 document.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
