@@ -119,9 +119,19 @@ public:
 			static object weight(wrapper& Self) { return wrap(Self.wrapped().weight); }
 		};
 
-		static object create(k3d::selection::set& Set)
+		static object create1(k3d::selection::set& Set)
 		{
 			return wrap_owned(k3d::geometry::primitive_selection::create(Set));
+		}
+
+		static object create2(k3d::selection::set& Set, int32_t Type)
+		{
+			return wrap_owned(k3d::geometry::primitive_selection::create(Set, Type));
+		}
+
+		static void append(storage::wrapper& Storage, uint_t Begin, uint_t End, double_t Weight)
+		{
+			k3d::geometry::primitive_selection::append(Storage.wrapped(), Begin, End, Weight);
 		}
 
 		static object validate(selection_storage_wrapper& Storage)
@@ -170,8 +180,11 @@ void define_namespace_geometry()
 
 	{
 		scope inner = class_<geometry::primitive_selection>("primitive_selection", no_init)
-			.def("create", &geometry::primitive_selection::create)
+			.def("create", &geometry::primitive_selection::create1)
+			.def("create", &geometry::primitive_selection::create2)
 			.staticmethod("create")
+			.def("append", &geometry::primitive_selection::append)
+			.staticmethod("append")
 			.def("validate", &geometry::primitive_selection::validate)
 			.staticmethod("validate")
 			.def("merge", &geometry::primitive_selection::merge)

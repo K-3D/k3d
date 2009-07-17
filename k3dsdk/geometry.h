@@ -125,8 +125,12 @@ public:
 };
 
 storage* create(k3d::selection::set& Set);
+storage* create(k3d::selection::set& Set, const int32_t SelectionType);
+
 void reset(storage& Storage, const double_t Weight);
 void reset(storage& Storage, const int32_t SelectionType, const double_t Weight);
+void append(storage& Storage, const uint_t Begin, const uint_t End, const double_t Weight);
+
 const_storage* validate(const k3d::selection::storage& GenericStorage);
 storage* validate(k3d::selection::storage& GenericStorage);
 void merge(const_storage& Storage, mesh& Mesh);

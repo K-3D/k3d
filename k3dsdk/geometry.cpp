@@ -251,6 +251,19 @@ storage* create(k3d::selection::set& Set)
 	return result;
 }
 
+storage* create(k3d::selection::set& Set, const int32_t SelectionType)
+{
+	storage* const result = create(Set);
+
+	result->primitive_begin.push_back(0);
+	result->primitive_end.push_back(uint_t(-1));
+	result->primitive_selection_type.push_back(SelectionType);
+	result->primitive_first_range.push_back(0);
+	result->primitive_range_count.push_back(0);
+
+	return result;
+}
+
 //////////////////////////////////////////////////////////////////////
 // reset
 
@@ -276,6 +289,20 @@ void reset(storage& Storage, const int32_t SelectionType, const double_t Weight)
 
 	Storage.index_begin.push_back(0);
 	Storage.index_end.push_back(uint_t(-1));
+	Storage.weight.push_back(Weight);
+}
+
+//////////////////////////////////////////////////////////////////////
+// append
+
+void append(storage& Storage, const uint_t Begin, const uint_t End, const double_t Weight)
+{
+	return_if_fail(!Storage.primitive_range_count.empty());
+
+	Storage.primitive_range_count.back() += 1;
+
+	Storage.index_begin.push_back(Begin);
+	Storage.index_end.push_back(End);
 	Storage.weight.push_back(Weight);
 }
 
