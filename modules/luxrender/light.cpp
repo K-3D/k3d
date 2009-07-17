@@ -1,6 +1,3 @@
-#ifndef MODULES_LUXRENDER_LIGHT_H
-#define MODULES_LUXRENDER_LIGHT_H
-
 // K-3D
 // Copyright (c) 1995-2009, Timothy M. Shead
 //
@@ -24,10 +21,10 @@
 	\author Tim Shead <tshead@k-3d.com>
 */
 
-#include <k3dsdk/data.h>
-#include <k3dsdk/node.h>
+#include "light.h"
 
-#include <iosfwd>
+#include <k3d-i18n-config.h>
+#include <k3dsdk/iomanip.h>
 
 namespace module
 {
@@ -38,24 +35,23 @@ namespace luxrender
 /////////////////////////////////////////////////////////////////////////////
 // light
 
-/// Abstract interface for LuxRender light nodes.
-class light :
-	public k3d::node
+light::light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	k3d::node(Factory, Document),
+	m_group(init_owner(*this) + init_name("group") + init_label(_("Light Group")) + init_description(_("Light group.")) + init_value(k3d::string_t("default")))
 {
-public:
-	light(k3d::iplugin_factory& Factory, k3d::idocument& Document);
+}
 
-	void setup(std::ostream& Stream);
+void light::setup(std::ostream& Stream)
+{
+	Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+	Stream << k3d::standard_indent << "LightGroup \"" << m_group.pipeline_value() << "\"\n";
 
-private:
-	/// Implemented in derivatives to do the actual work of inserting the light definition into the scene.
-	virtual void on_setup(std::ostream& Stream) = 0;
+	on_setup(Stream);
 
-	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_group;
-};
+	Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+}
 
 } // namespace luxrender
 
 } // namespace module
 
-#endif // !MODULES_LUXRENDER_LIGHT_H

@@ -25,7 +25,6 @@
 #include "utility.h"
 
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/node.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/transformable.h>
@@ -41,10 +40,9 @@ namespace luxrender
 // goniometric_light
 
 class goniometric_light :
-	public k3d::gl::renderable<k3d::transformable<k3d::node > >,
-	public light
+	public k3d::gl::renderable<k3d::transformable<light > >
 {
-	typedef k3d::gl::renderable<k3d::transformable<k3d::node > > base;
+	typedef k3d::gl::renderable<k3d::transformable<light > > base;
 
 public:
 	goniometric_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -61,14 +59,13 @@ public:
 		gluDeleteQuadric(m_quadric);
 	}
 
-	void setup(std::ostream& Stream)
+	void on_setup(std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
 		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(*this)) << "]\n" << k3d::push_indent;
 		Stream << k3d::standard_indent << "LightSource \"goniometric\"\n" << k3d::push_indent;
 		Stream << k3d::standard_indent << "\"color L\" [" << m_color.pipeline_value() << "]\n";
 		Stream << k3d::standard_indent << "\"string mapname\" [\"" << m_map.pipeline_value().native_filesystem_string() << "\"]\n";
-		Stream << k3d::pop_indent << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+		Stream << k3d::pop_indent << k3d::pop_indent;
 	}
 
 	void on_gl_draw(const k3d::gl::render_state& State)

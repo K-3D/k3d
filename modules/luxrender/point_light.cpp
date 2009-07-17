@@ -41,10 +41,9 @@ namespace luxrender
 // point_light
 
 class point_light :
-	public k3d::gl::renderable<k3d::transformable<k3d::node > >,
-	public light
+	public k3d::gl::renderable<k3d::transformable<light> >
 {
-	typedef k3d::gl::renderable<k3d::transformable<k3d::node > > base;
+	typedef k3d::gl::renderable<k3d::transformable<light> > base;
 
 public:
 	point_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -60,13 +59,12 @@ public:
 		gluDeleteQuadric(m_quadric);
 	}
 
-	void setup(std::ostream& Stream)
+	void on_setup(std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
 		Stream << k3d::standard_indent << "LightSource \"point\"\n" << k3d::push_indent;
 		Stream << k3d::standard_indent << "\"point from\" [" << convert(k3d::world_position(*this)) << "]\n";
 		Stream << k3d::standard_indent << "\"color L\" [" << m_color.pipeline_value() << "]\n";
-		Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+		Stream << k3d::pop_indent;
 	}
 
 	void on_gl_draw(const k3d::gl::render_state& State)

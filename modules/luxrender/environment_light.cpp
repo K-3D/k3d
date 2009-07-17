@@ -28,7 +28,6 @@
 #include <k3dsdk/color.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/iomanip.h>
-#include <k3dsdk/node.h>
 #include <k3dsdk/path.h>
 
 namespace module
@@ -41,10 +40,9 @@ namespace luxrender
 // environment_light
 
 class environment_light :
-	public k3d::node,
-	public luxrender::light
+	public light
 {
-	typedef k3d::node base;
+	typedef light base;
 
 public:
 	environment_light(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -55,15 +53,14 @@ public:
 	{
 	}
 
-  void setup(std::ostream& Stream)
-  {
-    Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-    Stream << k3d::standard_indent << "LightSource \"infinite\"\n" << k3d::push_indent;
-    Stream << k3d::standard_indent << "\"color L\" [" << m_color.pipeline_value() << "]\n";
-    Stream << k3d::standard_indent << "\"integer nsamples\" [" << m_samples.pipeline_value() << "]\n";
-    Stream << k3d::standard_indent << "\"string mapname\" [\"" << m_map.pipeline_value().native_filesystem_string() << "\"]\n";
-    Stream << k3d::pop_indent << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
-  }
+	void on_setup(std::ostream& Stream)
+	{
+		Stream << k3d::standard_indent << "LightSource \"infinite\"\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "\"color L\" [" << m_color.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"integer nsamples\" [" << m_samples.pipeline_value() << "]\n";
+		Stream << k3d::standard_indent << "\"string mapname\" [\"" << m_map.pipeline_value().native_filesystem_string() << "\"]\n";
+		Stream << k3d::pop_indent;
+	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
