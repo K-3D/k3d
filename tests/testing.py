@@ -315,7 +315,7 @@ def mesh_comparison_to_reference(document, input_mesh, reference_mesh_name, thre
 	
 	# if there is a difference, output it
 	difference_file = open(str(k3d.filesystem.generic_path(binary_path() + "/" + reference_mesh_name + ".difference.html")), "w")
-	difference_file.write(difflib.HtmlDiff().make_file(repr(input_mesh.pipeline_value()).splitlines(1), repr(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry"))
+	difference_file.write(difflib.HtmlDiff().make_file(str(input_mesh.pipeline_value()).splitlines(1), str(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry"))
 	difference_file.close()
 
 	print "**** Test Mesh ****"
