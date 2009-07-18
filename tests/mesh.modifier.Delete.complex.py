@@ -18,32 +18,31 @@ document.set_dependency(varying_colors.get_property("input_mesh"), reader.get_pr
 modifier = document.new_node("Delete")
 
 # select some faces, distributed along polyhedra
-selection = k3d.mesh_selection.deselect_all()
-face_selection = k3d.mesh_selection.component(0, 1000, k3d.selection.type.UNIFORM)
-face_selection.add_range(0, 6, 0)
-face_selection.add_range(6, 7, 1)
-face_selection.add_range(7, 8, 0)
-face_selection.add_range(8, 9, 1)
-face_selection.add_range(9, 13, 0)
-face_selection.add_range(13, 15, 1)
-face_selection.add_range(15, 16, 0)
-face_selection.add_range(16, 17, 1)
-face_selection.add_range(17, 19, 0)
-face_selection.add_range(19, 20, 1)
-face_selection.add_range(20, 23, 0)
-point_selection = k3d.mesh_selection.component(0, 1000, k3d.selection.type.POINT)
-point_selection.add_range(0, 7, 0)
-point_selection.add_range(7, 8, 1)
-point_selection.add_range(8, 10000, 0)
-# TODO: remove this when generic selections are complete
-selection.points = [(0, 7, 0), (7, 8, 1), (8, 10000, 0)]
-edge_selection = k3d.mesh_selection.component(0, 1000, k3d.selection.type.SPLIT_EDGE)
-edge_selection.add_range(0, 25, 0)
-edge_selection.add_range(25, 26, 1)
-edge_selection.add_range(26, 10000, 0)
-selection.add_component(face_selection)
-selection.add_component(point_selection)
-selection.add_component(edge_selection)
+selection = k3d.geometry.uniform_selection(0)
+
+point_selection = k3d.geometry.point_selection.create(selection)
+k3d.geometry.point_selection.append(point_selection, 0, 7, 0)
+k3d.geometry.point_selection.append(point_selection, 7, 8, 1)
+k3d.geometry.point_selection.append(point_selection, 8, 10000, 0)
+
+face_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.UNIFORM)
+k3d.geometry.primitive_selection.append(face_selection, 0, 6, 0)
+k3d.geometry.primitive_selection.append(face_selection, 6, 7, 1)
+k3d.geometry.primitive_selection.append(face_selection, 7, 8, 0)
+k3d.geometry.primitive_selection.append(face_selection, 8, 9, 1)
+k3d.geometry.primitive_selection.append(face_selection, 9, 13, 0)
+k3d.geometry.primitive_selection.append(face_selection, 13, 15, 1)
+k3d.geometry.primitive_selection.append(face_selection, 15, 16, 0)
+k3d.geometry.primitive_selection.append(face_selection, 16, 17, 1)
+k3d.geometry.primitive_selection.append(face_selection, 17, 19, 0)
+k3d.geometry.primitive_selection.append(face_selection, 19, 20, 1)
+k3d.geometry.primitive_selection.append(face_selection, 20, 23, 0)
+
+edge_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.SPLIT_EDGE)
+k3d.geometry.primitive_selection.append(edge_selection, 0, 25, 0)
+k3d.geometry.primitive_selection.append(edge_selection, 25, 26, 1)
+k3d.geometry.primitive_selection.append(edge_selection, 26, 10000, 0)
+
 modifier.mesh_selection = selection
 
 document.set_dependency(modifier.get_property("input_mesh"), varying_colors.get_property("output_mesh"))
