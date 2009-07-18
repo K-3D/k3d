@@ -17,7 +17,7 @@ document.set_dependency(varying_colors.get_property("input_mesh"), reader.get_pr
 
 modifier = document.new_node("SubdivideFaces")
 # select some faces, distributed along polyhedra
-selection = k3d.mesh_selection.deselect_all()
+selection = k3d.geometry.selection.create(0)
 face_selection = k3d.mesh_selection.component(0, 1000, k3d.selection.type.UNIFORM)
 face_selection.add_range(0, 6, 0)
 face_selection.add_range(6, 7, 1)

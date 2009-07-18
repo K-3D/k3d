@@ -7,7 +7,7 @@ setup = testing.setup_mesh_modifier_test("PolyGrid", "TriangulateFaces")
 setup.source.rows = 3
 setup.source.columns = 3
 
-selection = k3d.geometry.uniform_selection(0)
+selection = k3d.geometry.selection.create(0)
 face_selection = k3d.geometry.primitive_selection.create(selection)
 face_selection.primitive_begin().append(0)
 face_selection.primitive_end().append(1)

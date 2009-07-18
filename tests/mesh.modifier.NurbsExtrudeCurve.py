@@ -11,7 +11,7 @@ modifier.along = 'z'
 modifier.distance = 3.0
 modifier.segments = 2
 modifier.delete_original = False
-mesh_selection = k3d.geometry.uniform_selection(1.0)
+mesh_selection = k3d.geometry.selection.create(1.0)
 modifier.mesh_selection = mesh_selection
 
 document.set_dependency(modifier.get_property("input_mesh"), setup.reader.get_property("output_mesh"))

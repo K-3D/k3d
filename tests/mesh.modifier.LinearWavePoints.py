@@ -5,8 +5,8 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("PolyCylinder", "LinearWavePoints")
 
-selection = k3d.geometry.uniform_selection(0)
-selection.points = k3d.geometry.point_selection.uniform(selection, 1)
+selection = k3d.geometry.selection.create(0)
+selection.points = k3d.geometry.point_selection.create(selection, 1)
 
 setup.source.u_segments = 4
 setup.source.v_segments = 16

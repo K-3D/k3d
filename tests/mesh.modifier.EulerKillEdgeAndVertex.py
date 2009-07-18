@@ -5,7 +5,7 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("PolyGrid", "EulerKillEdgeAndVertex")
 
-selection = k3d.mesh_selection.deselect_all()
+selection = k3d.geometry.selection.create(0)
 selection.edges = [(0, 4294967295, 0), (49, 50, 1), (55, 56, 1)]
 
 setup.modifier.mesh_selection = selection

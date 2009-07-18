@@ -4,7 +4,7 @@ import k3d
 import testing
 
 setup = testing.setup_mesh_modifier_test("PolyCube", "CalculateNormals")
-setup.modifier.mesh_selection = k3d.geometry.uniform_selection(1)
+setup.modifier.mesh_selection = k3d.geometry.selection.create(1)
 setup.modifier.uniform = True
 setup.modifier.face_varying = True
 setup.modifier.vertex = True

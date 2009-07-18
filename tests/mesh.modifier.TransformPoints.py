@@ -5,8 +5,8 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("PolyCube", "TransformPoints")
 
-selection = k3d.geometry.uniform_selection(0)
-selection.points = k3d.geometry.point_selection.uniform(selection, 1)
+selection = k3d.geometry.selection.create(0)
+selection.points = k3d.geometry.point_selection.create(selection, 1)
 
 setup.modifier.mesh_selection = selection
 setup.modifier.input_matrix = k3d.translate3(k3d.vector3(0, 0, 1))

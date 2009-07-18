@@ -18,7 +18,7 @@ document.set_dependency(varying_colors.get_property("input_mesh"), reader.get_pr
 modifier = document.new_node("Delete")
 
 # select some faces, distributed along polyhedra
-selection = k3d.geometry.uniform_selection(0)
+selection = k3d.geometry.selection.create(0)
 
 point_selection = k3d.geometry.point_selection.create(selection)
 k3d.geometry.point_selection.append(point_selection, 0, 7, 0)

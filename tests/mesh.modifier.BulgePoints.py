@@ -7,8 +7,8 @@ setup = testing.setup_mesh_modifier_test("PolyCylinder", "BulgePoints")
 
 setup.source.radius = 1
 
-selection = k3d.geometry.uniform_selection(0)
-selection.points = k3d.geometry.point_selection.uniform(selection, 1)
+selection = k3d.geometry.selection.create(0)
+selection.points = k3d.geometry.point_selection.create(selection, 1)
 
 setup.modifier.mesh_selection = selection
 setup.modifier.bulge_factor = 5

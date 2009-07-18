@@ -78,7 +78,7 @@ polyhedron.edge_selections().append(0.0)
 Cs.append(k3d.color(1, 1, 1))
 
 modifier = document.new_node("TriangulateFaces")
-mesh_selection = k3d.geometry.uniform_selection(1)
+mesh_selection = k3d.geometry.selection.create(1)
 modifier.mesh_selection = mesh_selection
 document.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
 
