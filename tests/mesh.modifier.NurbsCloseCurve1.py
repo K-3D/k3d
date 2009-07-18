@@ -7,8 +7,8 @@ document = k3d.new_document()
 setup = testing.setup_mesh_reader_test("K3DMeshReader","mesh.modifier.NurbsCloseCurveReference.k3d")
 
 selection = k3d.geometry.selection.create(0)
-component_selection = k3d.mesh_selection.component(0, 1, k3d.selection.type.UNIFORM, 0, 1000, 1)
-selection.add_component(component_selection)
+nurbs_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.UNIFORM)
+k3d.geometry.primitive_selection.append(nurbs_selection, 1)
 
 modifier = setup.document.new_node("NurbsCloseCurve")
 modifier.mesh_selection = selection

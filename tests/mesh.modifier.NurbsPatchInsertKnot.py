@@ -5,7 +5,7 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("NurbsGrid","NurbsPatchInsertKnot")
 
-setup.modifier.mesh_selection = k3d.mesh_selection.select_all()
+setup.modifier.mesh_selection = k3d.geometry.selection.create(1)
 setup.modifier.u_value = 0.735
 setup.modifier.multiplicity = 2
 setup.modifier.insert_to_v = False

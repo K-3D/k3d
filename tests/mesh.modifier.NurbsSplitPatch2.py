@@ -5,7 +5,7 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("NurbsGrid","NurbsSplitPatch")
 
-setup.modifier.mesh_selection = k3d.mesh_selection.select_all()
+setup.modifier.mesh_selection = k3d.geometry.selection.create(1)
 setup.modifier.u_value = 0.147
 setup.modifier.insert_to_v = True
 

@@ -12,12 +12,10 @@ grid.rows = 1
 modifier = document.new_node("SubdivideEdges")
 cuda_modifier = document.new_node("CUDASubdivideEdges")
 
-
-selection = k3d.mesh_selection.select_all()
-modifier.mesh_selection = selection
+modifier.mesh_selection = k3d.geometry.selection.create(1)
 modifier.vertices = 1
 
-cuda_modifier.mesh_selection = selection
+cuda_modifier.mesh_selection = modifier.mesh_selection
 cuda_modifier.vertices = 1
 
 document.set_dependency(modifier.get_property("input_mesh"), grid.get_property("output_mesh"))

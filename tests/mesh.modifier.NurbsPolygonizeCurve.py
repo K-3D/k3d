@@ -5,7 +5,7 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("NurbsCircle","NurbsPolygonizeCurve")
 
-setup.modifier.mesh_selection = k3d.mesh_selection.select_all()
+setup.modifier.mesh_selection = k3d.geometry.selection.create(1)
 setup.modifier.segments = 10
 setup.modifier.delete_original = True
 
