@@ -147,6 +147,12 @@ public:
 /// Creates an empty primitive selection, returning references to its member arrays.
 /// The caller is responsible for the lifetime of the returned object.
 storage* create(k3d::selection::set& Set);
+/// Creates a primitive selection that will apply to all primitives, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
+storage* create(k3d::selection::set& Set, const int32_t SelectionType);
+/// Creates a primitive selection that will apply to a range of primitives, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
+storage* create(k3d::selection::set& Set, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const int32_t SelectionType);
 
 /// Tests the given storage to see if it is a valid primitive selection, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
@@ -162,6 +168,10 @@ void append(storage& Storage, const uint_t PrimitiveBegin, const uint_t Primitiv
 void append(storage& Storage, const int32_t SelectionType, const uint_t Begin, const uint_t End, const double_t Weight);
 /// Appends a selection weight to all components across all primitives.
 void append(storage& Storage, const int32_t SelectionType, const double_t Weight);
+/// Appends a selection weight to a range of components.
+void append(storage& Storage, const uint_t Begin, const uint_t End, const double_t Weight);
+/// Appends a selection weight to all components.
+void append(storage& Storage, const double_t Weight);
 
 /// Merges a primitive selection with the primitives in a mesh.
 void merge(const_storage& Storage, mesh& Mesh);
