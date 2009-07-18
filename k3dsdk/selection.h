@@ -236,7 +236,7 @@ std::ostream& operator<<(std::ostream& Stream, const set& RHS);
 
 } // namespace selection
 
-/// Specialization of almost_equal that tests k3d::mesh::selection for equality
+/// Specialization of almost_equal that tests k3d::selection::storage for equality
 template<>
 class almost_equal<selection::storage>
 {
@@ -256,7 +256,7 @@ public:
 	const uint64_t threshold;
 };
 
-/// Specialization of almost_equal that tests k3d::mesh::selection_set for equality
+/// Specialization of almost_equal that tests k3d::selection::set for equality
 template<>
 class almost_equal<selection::set>
 {
@@ -279,7 +279,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // selection_set_serialization
 
-/// k3d::data serialization policy for use with selection data
+/// k3d::data serialization policy for use with k3d::selection.
 template<typename value_t, class property_policy_t>
 class selection_set_serialization :
 	public property_policy_t,

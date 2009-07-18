@@ -2,7 +2,7 @@
 #define K3DSDK_GEOMETRY_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -35,6 +35,7 @@ namespace geometry
 namespace point_selection
 {
 
+/// Gathers the member arrays of a point selection into a convenient package.
 class const_storage
 {
 public:
@@ -49,6 +50,7 @@ public:
 	const mesh::selection_t& weight;
 };
 
+/// Gathers the member arrays of a mutable point selection into a convenient package.
 class storage
 {
 public:
@@ -63,14 +65,28 @@ public:
 	mesh::selection_t& weight;
 };
 
+/// Creates an empty point selection, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
 storage* create(k3d::selection::set& Set);
-storage* uniform(k3d::selection::set& Set, const double_t Weight);
+/// Creates a point selection that assigns a uniform weight to all points, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
+storage* create(k3d::selection::set& Set, const double_t Weight);
 
-void reset(storage& Storage, const double_t Weight);
+/// Tests the given storage to see if it is a valid point selection, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
+const_storage* validate(const k3d::selection::storage& GenericStorage);
+
+/// Tests the given storage to see if it is a valid point selection, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
+storage* validate(k3d::selection::storage& GenericStorage);
+
+/// Appends a uniform weight to all points.  Useful for "select all" and "deselect all".
+void append(storage& Storage, const double_t Weight);
+
+/// Appends a weight to a range of points.
 void append(storage& Storage, const uint_t Begin, const uint_t End, const double_t Weight);
 
-const_storage* validate(const k3d::selection::storage& GenericStorage);
-storage* validate(k3d::selection::storage& GenericStorage);
+/// Merges a point selection with the points in a mesh.
 void merge(const_storage& Storage, mesh& Mesh);
 
 } // namespace point_selection
@@ -78,6 +94,7 @@ void merge(const_storage& Storage, mesh& Mesh);
 namespace primitive_selection
 {
 
+/// Gathers the member arrays of a primitive selection into a convenient package.
 class const_storage
 {
 public:
@@ -102,6 +119,7 @@ public:
 	const mesh::selection_t& weight;
 };
 
+/// Gathers the member arrays of a mutable primitive selection into a convenient package.
 class storage
 {
 public:
@@ -126,22 +144,42 @@ public:
 	mesh::selection_t& weight;
 };
 
+/// Creates an empty primitive selection, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
 storage* create(k3d::selection::set& Set);
-storage* create(k3d::selection::set& Set, const int32_t SelectionType);
 
-void reset(storage& Storage, const double_t Weight);
-void reset(storage& Storage, const int32_t SelectionType, const double_t Weight);
-void append(storage& Storage, const uint_t Begin, const uint_t End, const double_t Weight);
-
+/// Tests the given storage to see if it is a valid primitive selection, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
 const_storage* validate(const k3d::selection::storage& GenericStorage);
+
+/// Tests the given storage to see if it is a valid primitive selection, returning references to its member arrays, or NULL.
+/// The caller is responsible for the lifetime of the returned object.
 storage* validate(k3d::selection::storage& GenericStorage);
+
+/// Appends a selection weight to a range of components within a range of primitives.
+void append(storage& Storage, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const int32_t SelectionType, const uint_t Begin, const uint_t End, const double_t Weight);
+/// Appends a selection weight to a range of components across all primitives.
+void append(storage& Storage, const int32_t SelectionType, const uint_t Begin, const uint_t End, const double_t Weight);
+/// Appends a selection weight to all components across all primitives.
+void append(storage& Storage, const int32_t SelectionType, const double_t Weight);
+
+/// Merges a primitive selection with the primitives in a mesh.
 void merge(const_storage& Storage, mesh& Mesh);
 
 } // namespace primitive_selection
 
-k3d::selection::set uniform_selection(const double_t Weight);
-void merge_selection(const k3d::selection::set& Set, mesh& Mesh);
-void merge_selection(const k3d::selection::set& Set, legacy::mesh& Mesh);
+namespace selection
+{
+
+/// Returns a selection set that applies a uniform weight to every component.
+/// Useful for "select all" and "deselect all".
+k3d::selection::set create(const double_t Weight);
+/// Merges a selection set with the selections in a mesh.
+void merge(const k3d::selection::set& Set, mesh& Mesh);
+/// Merges a selection set with the selections in a mesh.
+void merge(const k3d::selection::set& Set, legacy::mesh& Mesh);
+
+} // namespace selection
 
 } // namespace geometry
 

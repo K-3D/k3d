@@ -63,7 +63,7 @@ public:
 	{
 		m_subdividers.clear();
 		Output = Input;
-		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 		const k3d::uint_t level = m_level.pipeline_value();
 		for(k3d::mesh::primitives_t::const_iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
@@ -88,7 +88,7 @@ public:
 			polyhedron->face_selections = input_polyhedron->face_selections;
 			++input_primitive;
 		}
-		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 		Output.points = Input.points;
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{

@@ -859,7 +859,7 @@ public:
 		// Shallow copy of the input (no data is copied, only shared pointers are)
 		document().pipeline_profiler().start_execution(*this, "Merge selection");
 		Output = Input;
-		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
 		document().pipeline_profiler().finish_execution(*this, "Merge selection");
 
 		k3d::mesh::points_t& output_points = Output.points.writable();

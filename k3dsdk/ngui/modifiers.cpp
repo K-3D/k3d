@@ -187,7 +187,7 @@ inode* modify_mesh(document_state& DocumentState, inode& Node, iplugin_factory* 
 			{
 				property::set_internal_value(
 					modifier_mesh_selection_sink->mesh_selection_sink_input(),
-					geometry::uniform_selection(1.0));
+					geometry::selection::create(1));
 			}
 			else
 			{

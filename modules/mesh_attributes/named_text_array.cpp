@@ -61,7 +61,7 @@ public:
 	{
 		Output = Input;
 
-		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		const k3d::string_t array_name = m_array_name.pipeline_value();
 		const k3d::string_t default_value = m_default_value.pipeline_value();

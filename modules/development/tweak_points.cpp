@@ -104,7 +104,7 @@ public:
 		
 		if (!m_selection_copied)
 		{
-			k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
+			k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 			m_selection_copied = true;
 		}
 		return_if_fail(Output.point_selection);

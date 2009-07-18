@@ -81,7 +81,7 @@ public:
 	{
 		Output = Input;
 
-		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
     const k3d::bool_t store_uniform = m_uniform.pipeline_value();
     const k3d::bool_t store_face_varying = m_face_varying.pipeline_value();

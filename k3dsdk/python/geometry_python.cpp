@@ -65,24 +65,29 @@ public:
 			static object weight(wrapper& Self) { return wrap(Self.wrapped().weight); }
 		};
 
-		static object create(k3d::selection::set& Set)
+		static object create1(k3d::selection::set& Set)
 		{
 			return wrap_owned(k3d::geometry::point_selection::create(Set));
 		}
 
-		static object uniform(k3d::selection::set& Set, const double_t Weight)
+		static object create2(k3d::selection::set& Set, const double_t Weight)
 		{
-			return wrap_owned(k3d::geometry::point_selection::uniform(Set, Weight));
-		}
-
-		static void append(storage::wrapper& Storage, const uint_t Begin, const uint_t End, const double_t Weight)
-		{
-			k3d::geometry::point_selection::append(Storage.wrapped(), Begin, End, Weight);
+			return wrap_owned(k3d::geometry::point_selection::create(Set, Weight));
 		}
 
 		static object validate(selection_storage_wrapper& Storage)
 		{
 			return wrap_owned(k3d::geometry::point_selection::validate(Storage.wrapped()));
+		}
+
+		static void append1(storage::wrapper& Storage, const double_t Weight)
+		{
+			k3d::geometry::point_selection::append(Storage.wrapped(), Weight);
+		}
+
+		static void append2(storage::wrapper& Storage, const uint_t Begin, const uint_t End, const double_t Weight)
+		{
+			k3d::geometry::point_selection::append(Storage.wrapped(), Begin, End, Weight);
 		}
 
 		static void merge(const_storage::wrapper& Storage, python::mesh& Mesh)
@@ -124,19 +129,9 @@ public:
 			static object weight(wrapper& Self) { return wrap(Self.wrapped().weight); }
 		};
 
-		static object create1(k3d::selection::set& Set)
+		static object create(k3d::selection::set& Set)
 		{
 			return wrap_owned(k3d::geometry::primitive_selection::create(Set));
-		}
-
-		static object create2(k3d::selection::set& Set, int32_t Type)
-		{
-			return wrap_owned(k3d::geometry::primitive_selection::create(Set, Type));
-		}
-
-		static void append(storage::wrapper& Storage, uint_t Begin, uint_t End, double_t Weight)
-		{
-			k3d::geometry::primitive_selection::append(Storage.wrapped(), Begin, End, Weight);
 		}
 
 		static object validate(selection_storage_wrapper& Storage)
@@ -144,30 +139,48 @@ public:
 			return wrap_owned(k3d::geometry::primitive_selection::validate(Storage.wrapped()));
 		}
 
+		static void append1(storage::wrapper& Storage, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const int32_t SelectionType, const uint_t Begin, const uint_t End, const double_t Weight)
+		{
+			k3d::geometry::primitive_selection::append(Storage.wrapped(), PrimitiveBegin, PrimitiveEnd, SelectionType, Begin, End, Weight);
+		}
+
+		static void append2(storage::wrapper& Storage, const int32_t SelectionType, const uint_t Begin, const uint_t End, const double_t Weight)
+		{
+			k3d::geometry::primitive_selection::append(Storage.wrapped(), SelectionType, Begin, End, Weight);
+		}
+
+		static void append3(storage::wrapper& Storage, const int32_t SelectionType, const double_t Weight)
+		{
+			k3d::geometry::primitive_selection::append(Storage.wrapped(), SelectionType, Weight);
+		}
+
 		static void merge(const_storage::wrapper& Storage, python::mesh& Mesh)
 		{
 			k3d::geometry::primitive_selection::merge(Storage.wrapped(), Mesh.wrapped());
 		}
+	};
+
+	class selection
+	{
+	public:
 	};
 };
 
 void define_namespace_geometry()
 {
 	scope outer = class_<geometry>("geometry", no_init)
-		.def("uniform_selection", &k3d::geometry::uniform_selection)
-		.staticmethod("uniform_selection")
 		;
 
 	{
 		scope inner = class_<geometry::point_selection>("point_selection", no_init)
-			.def("create", &geometry::point_selection::create)
+			.def("create", &geometry::point_selection::create1)
+			.def("create", &geometry::point_selection::create2)
 			.staticmethod("create")
-			.def("uniform", &geometry::point_selection::uniform)
-			.staticmethod("uniform")
-			.def("append", &geometry::point_selection::append)
-			.staticmethod("append")
 			.def("validate", &geometry::point_selection::validate)
 			.staticmethod("validate")
+			.def("append", &geometry::point_selection::append1)
+			.def("append", &geometry::point_selection::append2)
+			.staticmethod("append")
 			.def("merge", &geometry::point_selection::merge)
 			.staticmethod("merge")
 			;
@@ -187,13 +200,14 @@ void define_namespace_geometry()
 
 	{
 		scope inner = class_<geometry::primitive_selection>("primitive_selection", no_init)
-			.def("create", &geometry::primitive_selection::create1)
-			.def("create", &geometry::primitive_selection::create2)
+			.def("create", &geometry::primitive_selection::create)
 			.staticmethod("create")
-			.def("append", &geometry::primitive_selection::append)
-			.staticmethod("append")
 			.def("validate", &geometry::primitive_selection::validate)
 			.staticmethod("validate")
+			.def("append", &geometry::primitive_selection::append1)
+			.def("append", &geometry::primitive_selection::append2)
+			.def("append", &geometry::primitive_selection::append3)
+			.staticmethod("append")
 			.def("merge", &geometry::primitive_selection::merge)
 			.staticmethod("merge")
 			;
@@ -218,6 +232,13 @@ void define_namespace_geometry()
 			.def("index_begin", &geometry::primitive_selection::storage::index_begin)
 			.def("index_end", &geometry::primitive_selection::storage::index_end)
 			.def("weight", &geometry::primitive_selection::storage::weight)
+			;
+	}
+
+	{
+		scope inner = class_<geometry::selection>("selection", no_init)
+			.def("create", &k3d::geometry::selection::create)
+			.staticmethod("create")
 			;
 	}
 }

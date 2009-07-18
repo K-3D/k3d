@@ -97,10 +97,14 @@ struct select_all_points
 		k3d::selection::set results;
 
 		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
-		geometry::point_selection::reset(*point_selection, 1.0);
+		geometry::point_selection::append(*point_selection, 1.0);
 
 		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
-		geometry::primitive_selection::reset(*primitive_selection, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::UNIFORM, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
 
 		return results;
 	}
@@ -114,14 +118,14 @@ struct select_all_split_edges
 		k3d::selection::set results;
 
 		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
-		geometry::point_selection::reset(*point_selection, 0.0);
+		geometry::point_selection::append(*point_selection, 0.0);
 
 		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 1.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::UNIFORM, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, 1.0);
 
 		return results;
 	}
@@ -135,14 +139,14 @@ struct select_all_uniform
 		k3d::selection::set results;
 
 		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
-		geometry::point_selection::reset(*point_selection, 0.0);
+		geometry::point_selection::append(*point_selection, 0.0);
 
 		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::CONSTANT, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::UNIFORM, 1.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::VARYING, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
-		geometry::primitive_selection::reset(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::UNIFORM, 1.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
 
 		return results;
 	}
@@ -242,7 +246,7 @@ struct deselect_all
 {
 	const k3d::selection::set operator()(const mesh& Mesh, const k3d::selection::set& CurrentSelection) const
 	{
-		return geometry::uniform_selection(0.0);
+		return geometry::selection::create(0);
 	}
 };
 

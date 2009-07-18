@@ -148,7 +148,7 @@ public:
 		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
 		{
 			OutputMesh = *input_mesh;
-			k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), OutputMesh);
+			k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), OutputMesh);
 		}
 		else
 		{

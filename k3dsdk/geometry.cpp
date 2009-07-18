@@ -78,34 +78,11 @@ storage* create(k3d::selection::set& Set)
 	return result;
 }
 
-//////////////////////////////////////////////////////////////////////
-// uniform
-
-storage* uniform(k3d::selection::set& Set, const double_t Weight)
+storage* create(k3d::selection::set& Set, const double_t Weight)
 {
 	storage* const result = create(Set);
-	reset(*result, Weight);
+	append(*result, Weight);
 	return result;
-}
-
-//////////////////////////////////////////////////////////////////////
-// reset
-
-void reset(storage& Storage, const double_t Weight)
-{
-	Storage.index_begin.push_back(0);
-	Storage.index_end.push_back(uint_t(-1));
-	Storage.weight.push_back(Weight);
-}
-
-//////////////////////////////////////////////////////////////////////
-// append
-
-void append(storage& Storage, const uint_t Begin, const uint_t End, const double_t Weight)
-{
-	Storage.index_begin.push_back(Begin);
-	Storage.index_end.push_back(End);
-	Storage.weight.push_back(Weight);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -160,6 +137,26 @@ storage* validate(k3d::selection::storage& Storage)
 	}
 
 	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////
+// append
+
+void append(storage& Storage, const double_t Weight)
+{
+	Storage.index_begin.push_back(0);
+	Storage.index_end.push_back(uint_t(-1));
+	Storage.weight.push_back(Weight);
+}
+
+//////////////////////////////////////////////////////////////////////
+// append
+
+void append(storage& Storage, const uint_t Begin, const uint_t End, const double_t Weight)
+{
+	Storage.index_begin.push_back(Begin);
+	Storage.index_end.push_back(End);
+	Storage.weight.push_back(Weight);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -261,6 +258,7 @@ storage* create(k3d::selection::set& Set)
 	return result;
 }
 
+/*
 storage* create(k3d::selection::set& Set, const int32_t SelectionType)
 {
 	storage* const result = create(Set);
@@ -273,48 +271,7 @@ storage* create(k3d::selection::set& Set, const int32_t SelectionType)
 
 	return result;
 }
-
-//////////////////////////////////////////////////////////////////////
-// reset
-
-void reset(storage& Storage, const double_t Weight)
-{
-	reset(Storage, selection::CONSTANT, Weight);
-	reset(Storage, selection::UNIFORM, Weight);
-	reset(Storage, selection::VARYING, Weight);
-	reset(Storage, selection::FACE_VARYING, Weight);
-	reset(Storage, selection::SPLIT_EDGE, Weight);
-}
-
-//////////////////////////////////////////////////////////////////////
-// reset
-
-void reset(storage& Storage, const int32_t SelectionType, const double_t Weight)
-{
-	Storage.primitive_begin.push_back(0);
-	Storage.primitive_end.push_back(uint_t(-1));
-	Storage.primitive_selection_type.push_back(SelectionType);
-	Storage.primitive_first_range.push_back(Storage.index_begin.size());
-	Storage.primitive_range_count.push_back(1);
-
-	Storage.index_begin.push_back(0);
-	Storage.index_end.push_back(uint_t(-1));
-	Storage.weight.push_back(Weight);
-}
-
-//////////////////////////////////////////////////////////////////////
-// append
-
-void append(storage& Storage, const uint_t Begin, const uint_t End, const double_t Weight)
-{
-	return_if_fail(!Storage.primitive_range_count.empty());
-
-	Storage.primitive_range_count.back() += 1;
-
-	Storage.index_begin.push_back(Begin);
-	Storage.index_end.push_back(End);
-	Storage.weight.push_back(Weight);
-}
+*/
 
 //////////////////////////////////////////////////////////////////////
 // validate
@@ -389,6 +346,54 @@ storage* validate(k3d::selection::storage& Storage)
 }
 
 //////////////////////////////////////////////////////////////////////
+// append
+
+void append(storage& Storage, const uint_t PrimitiveBegin, const uint_t PrimitiveEnd, const int32_t SelectionType, const uint_t Begin, const uint_t End, const double_t Weight)
+{
+	Storage.primitive_begin.push_back(PrimitiveBegin);
+	Storage.primitive_end.push_back(PrimitiveEnd);
+	Storage.primitive_selection_type.push_back(SelectionType);
+	Storage.primitive_first_range.push_back(Storage.index_begin.size());
+	Storage.primitive_range_count.push_back(1);
+
+	Storage.index_begin.push_back(Begin);
+	Storage.index_end.push_back(End);
+	Storage.weight.push_back(Weight);
+}
+
+//////////////////////////////////////////////////////////////////////
+// append
+
+void append(storage& Storage, const int32_t SelectionType, const uint_t Begin, const uint_t End, const double_t Weight)
+{
+	Storage.primitive_begin.push_back(0);
+	Storage.primitive_end.push_back(uint_t(-1));
+	Storage.primitive_selection_type.push_back(SelectionType);
+	Storage.primitive_first_range.push_back(Storage.index_begin.size());
+	Storage.primitive_range_count.push_back(1);
+
+	Storage.index_begin.push_back(Begin);
+	Storage.index_end.push_back(End);
+	Storage.weight.push_back(Weight);
+}
+
+//////////////////////////////////////////////////////////////////////
+// append
+
+void append(storage& Storage, const int32_t SelectionType, const double_t Weight)
+{
+	Storage.primitive_begin.push_back(0);
+	Storage.primitive_end.push_back(uint_t(-1));
+	Storage.primitive_selection_type.push_back(SelectionType);
+	Storage.primitive_first_range.push_back(Storage.index_begin.size());
+	Storage.primitive_range_count.push_back(1);
+
+	Storage.index_begin.push_back(0);
+	Storage.index_end.push_back(uint_t(-1));
+	Storage.weight.push_back(Weight);
+}
+
+//////////////////////////////////////////////////////////////////////
 // merge
 
 class merge_primitive_selection
@@ -453,20 +458,27 @@ void merge(const_storage& Storage, mesh& Mesh)
 
 } // namespace primitive_selection
 
-k3d::selection::set uniform_selection(const double_t Weight)
+namespace selection
+{
+
+k3d::selection::set create(const double_t Weight)
 {
 	k3d::selection::set result;
 
 	boost::scoped_ptr<point_selection::storage> point_selection_storage(point_selection::create(result));
-	point_selection::reset(*point_selection_storage, Weight);
+	point_selection::append(*point_selection_storage, Weight);
 
 	boost::scoped_ptr<primitive_selection::storage> primitive_selection_storage(primitive_selection::create(result));
-	primitive_selection::reset(*primitive_selection_storage, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::CONSTANT, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::UNIFORM, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::VARYING, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::FACE_VARYING, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::SPLIT_EDGE, Weight);
 
 	return result;
 }
 
-void merge_selection(const k3d::selection::set& Set, mesh& Mesh)
+void merge(const k3d::selection::set& Set, mesh& Mesh)
 {
 	for(k3d::selection::set::const_iterator storage = Set.begin(); storage != Set.end(); ++storage)
 	{
@@ -486,10 +498,12 @@ void merge_selection(const k3d::selection::set& Set, mesh& Mesh)
 	}
 }
 
-void merge_selection(const k3d::selection::set& Set, legacy::mesh& Mesh)
+void merge(const k3d::selection::set& Set, legacy::mesh& Mesh)
 {
 	assert_not_implemented();
 }
+
+} // namespace selection
 
 } // namespace geometry
 

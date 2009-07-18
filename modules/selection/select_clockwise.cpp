@@ -58,7 +58,7 @@ public:
 
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-    k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
+    k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
