@@ -75,6 +75,11 @@ public:
 			return wrap_owned(k3d::geometry::point_selection::uniform(Set, Weight));
 		}
 
+		static void append(storage::wrapper& Storage, const uint_t Begin, const uint_t End, const double_t Weight)
+		{
+			k3d::geometry::point_selection::append(Storage.wrapped(), Begin, End, Weight);
+		}
+
 		static object validate(selection_storage_wrapper& Storage)
 		{
 			return wrap_owned(k3d::geometry::point_selection::validate(Storage.wrapped()));
@@ -159,6 +164,8 @@ void define_namespace_geometry()
 			.staticmethod("create")
 			.def("uniform", &geometry::point_selection::uniform)
 			.staticmethod("uniform")
+			.def("append", &geometry::point_selection::append)
+			.staticmethod("append")
 			.def("validate", &geometry::point_selection::validate)
 			.staticmethod("validate")
 			.def("merge", &geometry::point_selection::merge)

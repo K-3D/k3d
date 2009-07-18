@@ -99,6 +99,16 @@ void reset(storage& Storage, const double_t Weight)
 }
 
 //////////////////////////////////////////////////////////////////////
+// append
+
+void append(storage& Storage, const uint_t Begin, const uint_t End, const double_t Weight)
+{
+	Storage.index_begin.push_back(Begin);
+	Storage.index_end.push_back(End);
+	Storage.weight.push_back(Weight);
+}
+
+//////////////////////////////////////////////////////////////////////
 // validate
 
 const_storage* validate(const k3d::selection::storage& Storage)

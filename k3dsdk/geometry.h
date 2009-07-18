@@ -67,6 +67,8 @@ storage* create(k3d::selection::set& Set);
 storage* uniform(k3d::selection::set& Set, const double_t Weight);
 
 void reset(storage& Storage, const double_t Weight);
+void append(storage& Storage, const uint_t Begin, const uint_t End, const double_t Weight);
+
 const_storage* validate(const k3d::selection::storage& GenericStorage);
 storage* validate(k3d::selection::storage& GenericStorage);
 void merge(const_storage& Storage, mesh& Mesh);
