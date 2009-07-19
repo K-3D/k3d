@@ -299,12 +299,10 @@ private:
 
 	void render_cone(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::cone::const_primitive& Cone, std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
 		for(k3d::uint_t i = 0; i != Cone.matrices.size(); ++i)
 		{
 			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-			Stream << k3d::standard_indent << "ConcatTransform [" << convert(Cone.matrices[i]) << "]\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "ConcatTransform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Cone.matrices[i]) << "]\n" << k3d::push_indent;
 
 			material::use(MaterialNames, Cone.materials[i], Stream);
 
@@ -316,18 +314,14 @@ private:
 			Stream << k3d::pop_indent;
 			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 		}
-		Stream << k3d::pop_indent;
-		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
 	void render_cylinder(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::cylinder::const_primitive& Cylinder, std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
 		for(k3d::uint_t i = 0; i != Cylinder.matrices.size(); ++i)
 		{
 			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-			Stream << k3d::standard_indent << "ConcatTransform [" << convert(Cylinder.matrices[i]) << "]\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "ConcatTransform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Cylinder.matrices[i]) << "]\n" << k3d::push_indent;
 
 			material::use(MaterialNames, Cylinder.materials[i], Stream);
 
@@ -340,18 +334,14 @@ private:
 			Stream << k3d::pop_indent;
 			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 		}
-		Stream << k3d::pop_indent;
-		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
 	void render_disk(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::disk::const_primitive& Disk, std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
 		for(k3d::uint_t i = 0; i != Disk.matrices.size(); ++i)
 		{
 			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-			Stream << k3d::standard_indent << "ConcatTransform [" << convert(Disk.matrices[i]) << "]\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "ConcatTransform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Disk.matrices[i]) << "]\n" << k3d::push_indent;
 
 			material::use(MaterialNames, Disk.materials[i], Stream);
 
@@ -363,18 +353,14 @@ private:
 			Stream << k3d::pop_indent;
 			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 		}
-		Stream << k3d::pop_indent;
-		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
 	void render_hyperboloid(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::hyperboloid::const_primitive& Hyperboloid, std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
 		for(k3d::uint_t i = 0; i != Hyperboloid.matrices.size(); ++i)
 		{
 			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-			Stream << k3d::standard_indent << "ConcatTransform [" << convert(Hyperboloid.matrices[i]) << "]\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "ConcatTransform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Hyperboloid.matrices[i]) << "]\n" << k3d::push_indent;
 
 			material::use(MaterialNames, Hyperboloid.materials[i], Stream);
 
@@ -386,8 +372,26 @@ private:
 			Stream << k3d::pop_indent;
 			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 		}
-		Stream << k3d::pop_indent;
-		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+	}
+
+	void render_paraboloid(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::paraboloid::const_primitive& Paraboloid, std::ostream& Stream)
+	{
+		for(k3d::uint_t i = 0; i != Paraboloid.matrices.size(); ++i)
+		{
+			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "ConcatTransform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Paraboloid.matrices[i]) << "]\n" << k3d::push_indent;
+
+			material::use(MaterialNames, Paraboloid.materials[i], Stream);
+
+			Stream << k3d::standard_indent << "Shape \"paraboloid\"\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "\"float radius\" [" << Paraboloid.radii[i] << "]\n";
+			Stream << k3d::standard_indent << "\"float zmin\" [" << Paraboloid.z_min[i] << "]\n";
+			Stream << k3d::standard_indent << "\"float zmax\" [" << Paraboloid.z_max[i] << "]\n";
+			Stream << k3d::standard_indent << "\"float phimax\" [" << k3d::degrees(Paraboloid.sweep_angles[i]) << "]\n";
+			Stream << k3d::pop_indent;
+			Stream << k3d::pop_indent;
+			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+		}
 	}
 
 	void render_polyhedron(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::polyhedron::const_primitive& Polyhedron, std::ostream& Stream)
@@ -443,38 +447,12 @@ private:
 		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
-	void render_paraboloid(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::paraboloid::const_primitive& Paraboloid, std::ostream& Stream)
-	{
-		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
-		for(k3d::uint_t i = 0; i != Paraboloid.matrices.size(); ++i)
-		{
-			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-			Stream << k3d::standard_indent << "ConcatTransform [" << convert(Paraboloid.matrices[i]) << "]\n" << k3d::push_indent;
-
-			material::use(MaterialNames, Paraboloid.materials[i], Stream);
-
-			Stream << k3d::standard_indent << "Shape \"paraboloid\"\n" << k3d::push_indent;
-			Stream << k3d::standard_indent << "\"float radius\" [" << Paraboloid.radii[i] << "]\n";
-			Stream << k3d::standard_indent << "\"float zmin\" [" << Paraboloid.z_min[i] << "]\n";
-			Stream << k3d::standard_indent << "\"float zmax\" [" << Paraboloid.z_max[i] << "]\n";
-			Stream << k3d::standard_indent << "\"float phimax\" [" << k3d::degrees(Paraboloid.sweep_angles[i]) << "]\n";
-			Stream << k3d::pop_indent;
-			Stream << k3d::pop_indent;
-			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
-		}
-		Stream << k3d::pop_indent;
-		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
-	}
-
 	void render_sphere(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::sphere::const_primitive& Sphere, std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
 		for(k3d::uint_t i = 0; i != Sphere.matrices.size(); ++i)
 		{
 			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-			Stream << k3d::standard_indent << "ConcatTransform [" << convert(Sphere.matrices[i]) << "]\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "ConcatTransform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Sphere.matrices[i]) << "]\n" << k3d::push_indent;
 
 			material::use(MaterialNames, Sphere.materials[i], Stream);
 
@@ -487,18 +465,14 @@ private:
 			Stream << k3d::pop_indent;
 			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 		}
-		Stream << k3d::pop_indent;
-		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
 	void render_torus(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::torus::const_primitive& Torus, std::ostream& Stream)
 	{
-		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
 		for(k3d::uint_t i = 0; i != Torus.matrices.size(); ++i)
 		{
 			Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
-			Stream << k3d::standard_indent << "ConcatTransform [" << convert(Torus.matrices[i]) << "]\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "ConcatTransform [" << convert(k3d::node_to_world_matrix(MeshInstance) * Torus.matrices[i]) << "]\n" << k3d::push_indent;
 
 			material::use(MaterialNames, Torus.materials[i], Stream);
 
@@ -512,8 +486,6 @@ private:
 			Stream << k3d::pop_indent;
 			Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 		}
-		Stream << k3d::pop_indent;
-		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
 	}
 
 	void render_mesh_instance(const material::name_map& MaterialNames, k3d::inode& MeshInstance, std::ostream& Stream)
