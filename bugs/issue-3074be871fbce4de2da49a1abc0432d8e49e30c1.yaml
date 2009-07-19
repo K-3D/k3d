@@ -12,8 +12,8 @@ type: :feature
 component: K-3D
 release: 
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-06-27 15:34:38.921913 Z
 references: []
 
@@ -22,4 +22,8 @@ log_events:
 - - 2009-06-27 15:34:39.657825 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2009-07-19 21:09:04.326798 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
   - ""
