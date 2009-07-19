@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Selection issues when moving from 64-bit to 32-bit platforms.
+desc: We store "select all" and "deselect all" operations as an assignment of selection weights to the entire range of values that can be stored in uint_t.  Because the range varies depending on platform word size, documents saved on a 64-bit platform cannot be deserialized on 32-bit platforms.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-07-19 22:11:44.622812 Z
+references: []
+
+id: 5fde01d7a4fcdff886003dbaeb9773d33e2b9f18
+log_events: 
+- - 2009-07-19 22:11:46.198687 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
