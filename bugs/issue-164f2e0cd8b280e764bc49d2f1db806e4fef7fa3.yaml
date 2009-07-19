@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Create a test to ensure that const_cast isn't abused.
+desc: ""
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2009-07-19 20:53:20.743085 Z
+references: []
+
+id: 164f2e0cd8b280e764bc49d2f1db806e4fef7fa3
+log_events: 
+- - 2009-07-19 20:53:22.023030 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2009-07-19 21:23:29.542665 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""
