@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Pass normals to the LuxRender engine.
+desc: Currently, normal attribute data is ignored when rendering in LuxRender.  Pass the data along.
+type: :feature
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-07-19 23:34:29.094984 Z
+references: []
+
+id: c4fac5d4134a27c60a732f65c7aca6d081d888bd
+log_events: 
+- - 2009-07-19 23:34:30.782971 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
