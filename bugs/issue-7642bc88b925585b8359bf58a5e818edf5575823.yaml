@@ -5,8 +5,8 @@ type: :task
 component: K-3D
 release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-04-30 05:22:36.017534 Z
 references: []
 
@@ -19,4 +19,8 @@ log_events:
 - - 2009-07-15 06:00:11.659989 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 0.8.0.0 from unassigned
+  - ""
+- - 2009-07-19 21:33:24.462772 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
   - ""
