@@ -251,18 +251,22 @@ private:
 
 	public:
 		create_triangles(
+			const k3d::mesh::points_t& FacePoints,
+			const k3d::mesh::normals_t* VertexNormals,
+			const k3d::mesh::normals_t* UniformNormals,
+			const k3d::mesh::normals_t* FaceVaryingNormals,
 			const k3d::mesh::materials_t& FaceMaterials,
-			k3d::mesh::points_t& Points,
-			k3d::mesh::indices_t& APoints,
-			k3d::mesh::indices_t& BPoints,
-			k3d::mesh::indices_t& CPoints,
+			k3d::mesh::points_t& TrianglePoints,
+			k3d::mesh::normals_t& TriangleNormals,
 			std::vector<k3d::imaterial*>& TriangleMaterials
 			) :
+			m_face_points(FacePoints),
+			m_vertex_normals(VertexNormals),
+			m_uniform_normals(UniformNormals),
+			m_face_varying_normals(FaceVaryingNormals),
 			m_face_materials(FaceMaterials),
-			m_points(Points),
-			m_a_points(APoints),
-			m_b_points(BPoints),
-			m_c_points(CPoints),
+			m_triangle_points(TrianglePoints),
+			m_triangle_normals(TriangleNormals),
 			m_triangle_materials(TriangleMaterials)
 		{
 		}
@@ -275,23 +279,45 @@ private:
 
 		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], double Weights[4], k3d::uint_t& NewVertex)
 		{
-			NewVertex = m_points.size();
-			m_points.push_back(Coordinates);
+			NewVertex = m_face_points.size();
+			m_face_points.push_back(Coordinates);
 		}
 
 		void add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3])
 		{
-			m_a_points.push_back(Vertices[0]);
-			m_b_points.push_back(Vertices[1]);
-			m_c_points.push_back(Vertices[2]);
+			m_triangle_points.push_back(m_face_points[Vertices[0]]);
+			m_triangle_points.push_back(m_face_points[Vertices[1]]);
+			m_triangle_points.push_back(m_face_points[Vertices[2]]);
+
+			if(m_face_varying_normals)
+			{
+				m_triangle_normals.push_back((*m_face_varying_normals)[Edges[0]]);
+				m_triangle_normals.push_back((*m_face_varying_normals)[Edges[1]]);
+				m_triangle_normals.push_back((*m_face_varying_normals)[Edges[2]]);
+			}
+			else if(m_vertex_normals)
+			{
+				m_triangle_normals.push_back((*m_vertex_normals)[Vertices[0]]);
+				m_triangle_normals.push_back((*m_vertex_normals)[Vertices[1]]);
+				m_triangle_normals.push_back((*m_vertex_normals)[Vertices[2]]);
+			}
+			else if(m_uniform_normals)
+			{
+				m_triangle_normals.push_back((*m_uniform_normals)[m_current_face]);
+				m_triangle_normals.push_back((*m_uniform_normals)[m_current_face]);
+				m_triangle_normals.push_back((*m_uniform_normals)[m_current_face]);
+			}
+
 			m_triangle_materials.push_back(m_face_materials[m_current_face]);
 		}
 
+		k3d::mesh::points_t m_face_points;
+		const k3d::mesh::normals_t* const m_vertex_normals;
+		const k3d::mesh::normals_t* const m_uniform_normals;
+		const k3d::mesh::normals_t* const m_face_varying_normals;
 		const k3d::mesh::materials_t& m_face_materials;
-		k3d::mesh::points_t& m_points;
-		k3d::mesh::indices_t& m_a_points;
-		k3d::mesh::indices_t& m_b_points;
-		k3d::mesh::indices_t& m_c_points;
+		k3d::mesh::points_t& m_triangle_points;
+		k3d::mesh::normals_t& m_triangle_normals;
 		std::vector<k3d::imaterial*>& m_triangle_materials;
 
 		k3d::uint_t m_current_face;
@@ -397,13 +423,15 @@ private:
 	void render_polyhedron(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::polyhedron::const_primitive& Polyhedron, std::ostream& Stream)
 	{
 		// Triangulate the polyhedron faces ...
-		k3d::mesh::points_t points(*Mesh.points);
-		k3d::mesh::indices_t a_points;
-		k3d::mesh::indices_t b_points;
-		k3d::mesh::indices_t c_points;
-		std::vector<k3d::imaterial*> triangle_materials;
+		const k3d::mesh::normals_t* const vertex_normals = Mesh.vertex_data.lookup<k3d::mesh::normals_t>("N");
+		const k3d::mesh::normals_t* const uniform_normals = Polyhedron.uniform_data.lookup<k3d::mesh::normals_t>("N");
+		const k3d::mesh::normals_t* const face_varying_normals = Polyhedron.face_varying_data.lookup<k3d::mesh::normals_t>("N");
 
-		create_triangles(Polyhedron.face_materials, points, a_points, b_points, c_points, triangle_materials).process(Mesh, Polyhedron);
+		k3d::mesh::points_t triangle_points; // Receives the list of triangle vertices
+		k3d::mesh::normals_t triangle_normals; // Receives the (optional) list of triangle normals
+		std::vector<k3d::imaterial*> triangle_materials; // Recieves the list of triangle materials
+
+		create_triangles(*Mesh.points, vertex_normals, uniform_normals, face_varying_normals, Polyhedron.face_materials, triangle_points, triangle_normals, triangle_materials).process(Mesh, Polyhedron);
 
 		// Get the set of unique materials ...
 		std::set<k3d::imaterial*> material_list(triangle_materials.begin(), triangle_materials.end());
@@ -419,26 +447,41 @@ private:
 
 			Stream << k3d::standard_indent << "Shape \"trianglemesh\"\n" << k3d::push_indent;
 
-			Stream << k3d::standard_indent << "\"point P\" [";
 			const k3d::uint_t triangle_begin = 0;
-			const k3d::uint_t triangle_end = triangle_begin + a_points.size();
-			k3d::uint_t point_count = 0;
+			const k3d::uint_t triangle_end = triangle_begin + triangle_materials.size();
+
+			Stream << k3d::standard_indent << "\"integer indices\" [";
 			for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
 			{
 				if(triangle_materials[triangle] != *material)
 					continue;
 
-				point_count += 3;
-				Stream << " " << (points[a_points[triangle]]) << " " << (points[b_points[triangle]]) << " " << (points[c_points[triangle]]);
+				Stream << " " << (triangle * 3) + 0 << " " << (triangle * 3) + 1 << " " << (triangle * 3) + 2;
 			}
 			Stream << "]\n";
 
-			Stream << k3d::standard_indent << "\"integer indices\" [";
-			const k3d::uint_t index_begin = 0;
-			const k3d::uint_t index_end = index_begin + point_count;
-			for(k3d::uint_t index = index_begin; index != index_end; ++index)
-			Stream << index << " ";
+			Stream << k3d::standard_indent << "\"point P\" [";
+			for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
+			{
+				if(triangle_materials[triangle] != *material)
+					continue;
+
+				Stream << " " << triangle_points[(triangle * 3) + 0] << " " << triangle_points[(triangle * 3) + 1] << " " << triangle_points[(triangle * 3) + 2];
+			}
 			Stream << "]\n";
+
+			if(triangle_normals.size())
+			{
+				Stream << k3d::standard_indent << "\"normal N\" [";
+				for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
+				{
+					if(triangle_materials[triangle] != *material)
+						continue;
+
+					Stream << " " << triangle_normals[(triangle * 3) + 0] << " " << triangle_normals[(triangle * 3) + 1] << " " << triangle_normals[(triangle * 3) + 2];
+				}
+				Stream << "]\n";
+			}
 
 			Stream << k3d::pop_indent;
 		}
