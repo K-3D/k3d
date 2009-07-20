@@ -83,113 +83,113 @@ public:
 
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-    const k3d::bool_t store_uniform = m_uniform.pipeline_value();
-    const k3d::bool_t store_face_varying = m_face_varying.pipeline_value();
-    const k3d::bool_t store_vertex = m_vertex.pipeline_value();
+		const k3d::bool_t store_uniform = m_uniform.pipeline_value();
+		const k3d::bool_t store_face_varying = m_face_varying.pipeline_value();
+		const k3d::bool_t store_vertex = m_vertex.pipeline_value();
 
-    const k3d::mesh::points_t& points = *Output.points;
+		const k3d::mesh::points_t& points = *Output.points;
 
-    // Optionally store vertex normals ...
-    k3d::mesh::normals_t* vertex_normals = 0;
-    if(store_vertex)
-      vertex_normals = &Output.vertex_data.create(m_vertex_array.pipeline_value(), new k3d::mesh::normals_t(points.size()));
+		// Optionally store vertex normals ...
+		k3d::mesh::normals_t* vertex_normals = 0;
+		if(store_vertex)
+			vertex_normals = &Output.vertex_data.create(m_vertex_array.pipeline_value(), new k3d::mesh::normals_t(points.size()));
 
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-      boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
-      if(!polyhedron)
-        continue;
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+			if(!polyhedron)
+				continue;
 
-      const k3d::uint_t face_begin = 0;
-      const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
 
-      // Compute uniform (per-face) normals (used for all subsequent calculations) ...
-      k3d::mesh::normals_t uniform_normals(polyhedron->face_first_loops.size());
-      for(k3d::uint_t face = face_begin; face != face_end; ++face)
-        uniform_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
+			// Compute uniform (per-face) normals (used for all subsequent calculations) ...
+			k3d::mesh::normals_t uniform_normals(polyhedron->face_first_loops.size());
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
+				uniform_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
 
-      // Optionally store the uniform normals ...
-      if(store_uniform)
-        polyhedron->uniform_data.create(m_uniform_array.pipeline_value(), new k3d::mesh::normals_t(uniform_normals));
+			// Optionally store the uniform normals ...
+			if(store_uniform)
+				polyhedron->uniform_data.create(m_uniform_array.pipeline_value(), new k3d::mesh::normals_t(uniform_normals));
 
-      // Optionally compute face-varying (per-edge) normals ...
-      if(store_face_varying)
-      {
-        const k3d::double_t cos_max_angle = std::cos(std::max(0.0, m_max_angle.pipeline_value()));
+			// Optionally compute face-varying (per-edge) normals ...
+			if(store_face_varying)
+			{
+				const k3d::double_t cos_max_angle = std::cos(std::max(0.0, m_max_angle.pipeline_value()));
 
-        k3d::mesh::normals_t& face_varying_normals = polyhedron->face_varying_data.create(m_face_varying_array.pipeline_value(), new k3d::mesh::normals_t(polyhedron->edge_points.size()));
+				k3d::mesh::normals_t& face_varying_normals = polyhedron->face_varying_data.create(m_face_varying_array.pipeline_value(), new k3d::mesh::normals_t(polyhedron->edge_points.size()));
 
-        k3d::mesh::indices_t point_first_faces;
-        k3d::mesh::counts_t point_face_counts;
-        k3d::mesh::indices_t point_faces;
-        k3d::polyhedron::create_vertex_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->edge_points, polyhedron->clockwise_edges, points, point_first_faces, point_face_counts, point_faces);
+				k3d::mesh::indices_t point_first_faces;
+				k3d::mesh::counts_t point_face_counts;
+				k3d::mesh::indices_t point_faces;
+				k3d::polyhedron::create_vertex_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->edge_points, polyhedron->clockwise_edges, points, point_first_faces, point_face_counts, point_faces);
 
-        for(k3d::uint_t face = face_begin; face != face_end; ++face)
-        {
-          const k3d::normal3 face_normal = uniform_normals[face];
+				for(k3d::uint_t face = face_begin; face != face_end; ++face)
+				{
+					const k3d::normal3 face_normal = uniform_normals[face];
 
-          const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-          const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-          for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-          {
-            const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-            for(k3d::uint_t edge = first_edge; ;)
-            {
-              face_varying_normals[edge] += face_normal;
+					const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+					const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+					for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+					{
+						const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+						for(k3d::uint_t edge = first_edge; ;)
+						{
+							face_varying_normals[edge] += face_normal;
 
-              if(polyhedron->face_selections[face])
-              {
-                const k3d::uint_t point_face_begin = point_first_faces[polyhedron->edge_points[edge]];
-                const k3d::uint_t point_face_end = point_face_begin + point_face_counts[polyhedron->edge_points[edge]];
-                for(k3d::uint_t point_face = point_face_begin; point_face != point_face_end; ++point_face)
-                {
-                  const k3d::uint_t adjacent_face = point_faces[point_face];
-                  if(adjacent_face == face)
-                    continue;
+							if(polyhedron->face_selections[face])
+							{
+								const k3d::uint_t point_face_begin = point_first_faces[polyhedron->edge_points[edge]];
+								const k3d::uint_t point_face_end = point_face_begin + point_face_counts[polyhedron->edge_points[edge]];
+								for(k3d::uint_t point_face = point_face_begin; point_face != point_face_end; ++point_face)
+								{
+									const k3d::uint_t adjacent_face = point_faces[point_face];
+									if(adjacent_face == face)
+										continue;
 
-                  if(!polyhedron->face_selections[adjacent_face])
-                    continue;
+									if(!polyhedron->face_selections[adjacent_face])
+										continue;
 
-                  const k3d::normal3 adjacent_normal = uniform_normals[adjacent_face];
+									const k3d::normal3 adjacent_normal = uniform_normals[adjacent_face];
 
-                  const k3d::double_t cos_angle = adjacent_normal * face_normal;
-                  if(cos_angle < cos_max_angle)
-                    continue;
+									const k3d::double_t cos_angle = adjacent_normal * face_normal;
+									if(cos_angle < cos_max_angle)
+										continue;
 
-                  face_varying_normals[edge] += adjacent_normal;
-                }
-              }
+									face_varying_normals[edge] += adjacent_normal;
+								}
+							}
 
-              edge = polyhedron->clockwise_edges[edge];
-              if(edge == first_edge)
-                break;
-            }
-          }
-        }
-      }
+							edge = polyhedron->clockwise_edges[edge];
+							if(edge == first_edge)
+								break;
+						}
+					}
+				}
+      			}
 
-      // Optionally compute per-vertex normals as the sum of adjacent face normals ...
-      if(store_vertex)
-      {
-        for(k3d::uint_t face = face_begin; face != face_end; ++face)
-        {
-          const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-          const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-          for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-          {
-            const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-            for(k3d::uint_t edge = first_edge; ;)
-            {
-              (*vertex_normals)[polyhedron->edge_points[edge]] += uniform_normals[face];
+			// Optionally compute per-vertex normals as the sum of adjacent face normals ...
+			if(store_vertex)
+			{
+				for(k3d::uint_t face = face_begin; face != face_end; ++face)
+				{
+					const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+					const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+					for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+					{
+						const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+						for(k3d::uint_t edge = first_edge; ;)
+						{
+							(*vertex_normals)[polyhedron->edge_points[edge]] += uniform_normals[face];
 
-              edge = polyhedron->clockwise_edges[edge];
-              if(edge == first_edge)
-                break;
-            }
-          }
-        }
-      }
-    }
+							edge = polyhedron->clockwise_edges[edge];
+							if(edge == first_edge)
+								break;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	static k3d::iplugin_factory& get_factory()
