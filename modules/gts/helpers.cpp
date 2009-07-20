@@ -66,7 +66,7 @@ private:
 	void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], double Weights[4], k3d::uint_t& NewVertex)
 	{
 		NewVertex = gts_vertices.size();
-		gts_vertices.push_back(0);
+		gts_vertices.push_back(gts_vertex_new(gts_vertex_class(), Coordinates[0], Coordinates[1], Coordinates[2]));
 	}
 
 	void add_triangle(k3d::uint_t Vertices[3], k3d::uint_t Edges[3])
