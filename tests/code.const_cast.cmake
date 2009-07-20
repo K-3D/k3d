@@ -2,6 +2,7 @@
 
 SET(ERROR_COUNT 0)
 SET(SKIP_FILES
+	"^[.]hg/.*$"
 	"[.]yaml$"
 	"^application/k3d_main.cpp$"
 	"^k3dsdk/document.cpp$"
