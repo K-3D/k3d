@@ -1751,6 +1751,30 @@ void load_array(const element& Storage, typed_array<uint8_t>& Array, const ipers
 /////////////////////////////////////////////////////////////////////////////
 // load_array
 
+void load_array(const element& Storage, uint_t_array& Array, const ipersistent::load_context& Context)
+{
+	uint64_t value;
+
+	std::istringstream buffer(Storage.text);
+	while(true)
+	{
+		buffer >> value;
+
+		if(!buffer)
+			break;
+
+		if(value == uint64_t(-1))
+			value = uint_t(-1);
+
+		Array.push_back(value);
+	}
+
+	load_array_metadata(Storage, Array, Context);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// load_array
+
 void load_array(const element& Storage, typed_array<string_t>& Array, const ipersistent::load_context& Context)
 {
 	for(element::elements_t::const_iterator xml_value = Storage.children.begin(); xml_value != Storage.children.end(); ++xml_value)
