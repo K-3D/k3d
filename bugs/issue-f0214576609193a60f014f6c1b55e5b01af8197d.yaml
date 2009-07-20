@@ -1,0 +1,29 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Problems with Axes text labels
+desc: |-
+  But I still have a problem with the text labels of the Axes node, they
+  all seem to read Z but it is in wire-frame and light gray, basically
+  unreadable, and changing the font does not help, but you can see the
+  size change.
+  
+  This is using "make run" from the build directory. I also tried
+  copying the fonts to the /k3d-build/share/fonts dir and also
+  installing them on my system with sudo cp *.ttf
+  /usr/share/fonts/truetype/; sudo fc-cache -f -v
+  
+  Text annotations 2D and 3D work without a problem.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-07-20 04:12:18.454952 Z
+references: []
+
+id: f0214576609193a60f014f6c1b55e5b01af8197d
+log_events: 
+- - 2009-07-20 04:12:19.622889 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
