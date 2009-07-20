@@ -1763,8 +1763,10 @@ void load_array(const element& Storage, uint_t_array& Array, const ipersistent::
 		if(!buffer)
 			break;
 
-		if(value == uint64_t(-1))
-			value = uint_t(-1);
+		/** \note We clamp 64-bit values on 32-bit platforms.  This makes selections work. */
+		#if defined K3D_UINT_T_32_BITS
+			value = std::min(uint64_t(uint_t(-1)), value);
+		#endif 
 
 		Array.push_back(value);
 	}
