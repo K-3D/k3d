@@ -53,8 +53,8 @@ namespace nurbs
 namespace detail
 {
 
-/// TODO: Figure out a way to do this using k3d::almost_equal
-bool point3_float_equal(const k3d::point3& p1, const k3d::point3& p2, float threshold)
+/// TODO: Figure out a way to do this using k3d::equal
+bool equal(const k3d::point3& p1, const k3d::point3& p2, float threshold = 0.000001)
 {
 	float point1[3], point2[3];
 
@@ -73,13 +73,92 @@ bool point3_float_equal(const k3d::point3& p1, const k3d::point3& p2, float thre
 	return false;
 }
 
+void find_loops(const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::const_primitive& Curves, k3d::mesh::bools_t& IsInLoop, k3d::mesh::indices_t& LoopFirstCurves, k3d::mesh::indices_t& CurveLoops, k3d::mesh::indices_t& NextCurves, k3d::mesh::bools_t& LoopSelections, k3d::mesh::points_t& LoopCentroids)
+{
+	const k3d::uint_t curve_count = Curves.curve_first_points.size();
+	k3d::mesh::indices_t curve_starts(curve_count);
+	k3d::mesh::indices_t curve_ends(curve_count);
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		curve_starts[curve] = Curves.curve_first_points[curve];
+		curve_ends[curve] = curve_starts[curve] + Curves.curve_point_counts[curve] - 1;
+	}
+
+	IsInLoop.assign(curve_count, false);
+	NextCurves.assign(curve_count, 0);
+	CurveLoops.assign(curve_count, 0);
+	k3d::mesh::bools_t has_next_curve(curve_count, false);
+
+	for(k3d::uint_t first_curve = 0; first_curve != curve_count; ++first_curve)
+	{
+		// check if there is a follow-on curve
+		for(k3d::uint_t second_curve = 0; second_curve != curve_count; ++second_curve)
+		{
+			if(Curves.curve_points[curve_ends[first_curve]] == Curves.curve_points[curve_starts[second_curve]] || equal(CurvePoints[Curves.curve_points[curve_ends[first_curve]]], CurvePoints[Curves.curve_points[curve_starts[second_curve]]]))
+			{
+				NextCurves[first_curve] = second_curve;
+				has_next_curve[first_curve] = true;
+			}
+		}
+	}
+
+	// Find multi-curve loops
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		if(IsInLoop[curve])
+			continue;
+		k3d::bool_t is_loop = true;
+		k3d::point3 centroid(0,0,0);
+		k3d::uint_t count = 0;
+		k3d::uint_t selected_count = 0;
+		k3d::uint_t point_count = 0;
+		for(k3d::uint_t next_curve = curve; ;)
+		{
+			if(!has_next_curve[next_curve])
+			{
+				is_loop = false;
+				break;
+			}
+			++count;
+			if(Curves.curve_selections[next_curve])
+				++selected_count;
+
+			for(k3d::uint_t i = curve_starts[next_curve]; i != curve_ends[next_curve]; ++i)
+			{
+				const k3d::uint_t point = Curves.curve_points[i];
+				++point_count;
+				centroid += k3d::to_vector(CurvePoints[point]);
+			}
+
+			next_curve = NextCurves[next_curve];
+			if(next_curve == curve)
+				break;
+		}
+		if(is_loop)
+		{
+			for(k3d::uint_t next_curve = curve; ;)
+			{
+				IsInLoop[next_curve] = true;
+				CurveLoops[next_curve] = LoopFirstCurves.size();
+
+				next_curve = NextCurves[next_curve];
+				if(next_curve == curve)
+					break;
+			}
+			LoopCentroids.push_back(centroid / point_count);
+			LoopSelections.push_back(selected_count == count);
+			LoopFirstCurves.push_back(curve);
+		}
+	}
+}
+
 k3d::uint_t insert_point(k3d::mesh::points_t& Points, const k3d::point3& Point, const k3d::bool_t Reuse, const k3d::uint64_t Threshold)
 {
 	if(Reuse)
 	{
 		for(k3d::uint_t point_idx = Points.size(); point_idx != 0; --point_idx)
 		{
-			if(point3_float_equal(Points[point_idx-1], Point, 0.000001))
+			if(equal(Points[point_idx-1], Point))
 				return point_idx-1;
 		}
 	}
@@ -134,7 +213,7 @@ void add_patch(k3d::mesh& Mesh,
 }
 
 /// Create a cap over a curve, if it is closed
-void create_cap(k3d::mesh& Mesh, k3d::nurbs_patch::primitive& Patches, const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::uint_t VSegments = 1)
+void create_cap(k3d::mesh& Mesh, k3d::nurbs_patch::primitive& Patches, const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::point3& Centroid, const k3d::uint_t VSegments = 1)
 {
 	return_if_fail(Curve < Curves.curve_first_points.size());
 	k3d::mesh::points_t control_points;
@@ -150,28 +229,19 @@ void create_cap(k3d::mesh& Mesh, k3d::nurbs_patch::primitive& Patches, const k3d
 	const k3d::uint_t curve_points_begin = Curves.curve_first_points[Curve];
 	const k3d::uint_t curve_points_end = curve_points_begin + Curves.curve_point_counts[Curve];
 
-	// the centroid of the curve to cap
-	k3d::point3 centroid;
-	for(k3d::uint_t i = curve_points_begin; i != curve_points_end; ++i)
-	{
-		centroid += k3d::to_vector(CurvePoints[Curves.curve_points[i]]);
-	}
-	centroid /= Curves.curve_point_counts[Curve];
-	k3d::log() << debug << "located centroid at " << centroid << std::endl;
-
 	// Distance from each point to the centroid
 	std::vector<k3d::double_t> radii;
 	for(k3d::uint_t i = curve_points_begin; i != curve_points_end; ++i)
 	{
-		radii.push_back((CurvePoints[Curves.curve_points[i]] - centroid).length());
+		radii.push_back((CurvePoints[Curves.curve_points[i]] - Centroid).length());
 	}
 
 	for(k3d::uint_t i = 0; i <= VSegments; ++i)
 	{
-		for(k3d::uint_t j = 0; j != Curves.curve_point_counts[Curve]; ++j)
+		for(k3d::uint_t j = curve_points_begin; j != curve_points_end; ++j)
 		{
 			const k3d::double_t scale_factor = static_cast<k3d::double_t>(i) / static_cast<k3d::double_t>(VSegments);
-			const k3d::point3 control_point(centroid + (scale_factor * (CurvePoints[Curves.curve_points[j]] - centroid)));
+			const k3d::point3 control_point(Centroid + (scale_factor * (CurvePoints[Curves.curve_points[j]] - Centroid)));
 			control_points.push_back(control_point);
 			weights.push_back(Curves.curve_point_weights[j]);
 		}
@@ -187,15 +257,6 @@ void create_cap(k3d::mesh& Mesh, k3d::nurbs_patch::primitive& Patches, const k3d
 	add_patch(Mesh, Patches, control_points, weights, u_knots, v_knots, Curves.curve_orders[Curve], 2);
 }
 
-/// Check if the give curve is closed
-const k3d::bool_t is_closed(const k3d::mesh::points_t& Points, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve)
-{
-	return_val_if_fail(Curve < Curves.curve_first_points.size(), false);
-	const k3d::uint_t curve_points_begin = Curves.curve_first_points[Curve];
-	const k3d::uint_t curve_points_end = curve_points_begin + Curves.curve_point_counts[Curve];
-	return (Curves.curve_points[curve_points_begin] == Curves.curve_points[curve_points_end - 1] || point3_float_equal(Points[Curves.curve_points[curve_points_begin]], Points[Curves.curve_points[curve_points_end - 1]], 0.000001));
-}
-
 /// Traverse each selected curve in SourceCurves along each selected curve in CurvesToTraverse
 void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTraverse, k3d::nurbs_patch::primitive& OutputPatches, k3d::mesh& OutputMesh, const k3d::bool_t CreateCaps)
 {
@@ -205,6 +266,16 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> source_curves(k3d::nurbs_curve::validate(**primitive));
 		if(!source_curves)
 			continue;
+
+		// Get the loops that exist in the source_curves primitive
+		k3d::mesh::bools_t is_in_loop, loop_selections;
+		k3d::mesh::indices_t loop_first_curves, next_curves, curve_loops;
+		k3d::mesh::points_t loop_centroids;
+		if(CreateCaps)
+		{
+			find_loops(*SourceCurves.points, *source_curves, is_in_loop, loop_first_curves, curve_loops, next_curves, loop_selections, loop_centroids);
+		}
+
 		for(k3d::mesh::primitives_t::const_iterator trav_primitive = CurvesToTraverse.primitives.begin(); trav_primitive != CurvesToTraverse.primitives.end(); ++trav_primitive)
 		{
 			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves_to_traverse(k3d::nurbs_curve::validate(**trav_primitive));
@@ -264,10 +335,11 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 					add_patch(OutputMesh, OutputPatches, new_points, new_weights, u_knots, v_knots, source_curves->curve_orders[source_curve], curves_to_traverse->curve_orders[curve_to_traverse]);
 					if(CreateCaps)
 					{
-						if(is_closed(*SourceCurves.points, *source_curves, source_curve))
+						if(is_in_loop[source_curve] && loop_selections[curve_loops[source_curve]])
 						{
+							const k3d::point3& centroid = loop_centroids[curve_loops[source_curve]];
 							// Cap over the original curve
-							detail::create_cap(OutputMesh, OutputPatches, *SourceCurves.points, *source_curves, source_curve);
+							detail::create_cap(OutputMesh, OutputPatches, *SourceCurves.points, *source_curves, source_curve, centroid);
 
 							// Cap over the opposite curve
 							k3d::mesh tempmesh(SourceCurves);
@@ -280,11 +352,15 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 							k3d::mesh::points_t& temp_points = tempmesh.points.writable();
 							for (int i = curve_points_begin[0]; i != curve_points_end[0]; i++)
 							{
-								temp_points[tempcurve->curve_points[i]] += delta_u;
 								tempcurve->curve_point_weights[i] *= weight;
 							}
+							for(k3d::uint_t point = 0; point != temp_points.size(); ++point)
+							{
+								temp_points[point] += delta_u;
+							}
+
 							boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_tempcurve(k3d::nurbs_curve::validate(*tempmesh.primitives[source_prim_idx]));
-							detail::create_cap(OutputMesh, OutputPatches, temp_points, *const_tempcurve, source_curve);
+							detail::create_cap(OutputMesh, OutputPatches, temp_points, *const_tempcurve, source_curve, centroid + delta_u);
 						}
 					}
 				}
