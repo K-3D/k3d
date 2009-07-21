@@ -84,6 +84,14 @@ void find_loops(const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::
 		curve_ends[curve] = curve_starts[curve] + Curves.curve_point_counts[curve] - 1;
 	}
 
+	// Get curve endpoint valences, since only valence 2 points are allowed
+	k3d::mesh::counts_t valences(CurvePoints.size(), 0);
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		valences[Curves.curve_points[curve_starts[curve]]]++;
+		valences[Curves.curve_points[curve_ends[curve]]]++;
+	}
+
 	IsInLoop.assign(curve_count, false);
 	NextCurves.assign(curve_count, 0);
 	CurveLoops.assign(curve_count, 0);
@@ -94,7 +102,7 @@ void find_loops(const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::
 		// check if there is a follow-on curve
 		for(k3d::uint_t second_curve = 0; second_curve != curve_count; ++second_curve)
 		{
-			if(Curves.curve_points[curve_ends[first_curve]] == Curves.curve_points[curve_starts[second_curve]] || equal(CurvePoints[Curves.curve_points[curve_ends[first_curve]]], CurvePoints[Curves.curve_points[curve_starts[second_curve]]]))
+			if(Curves.curve_points[curve_ends[first_curve]] == Curves.curve_points[curve_starts[second_curve]] && valences[Curves.curve_points[curve_ends[first_curve]]] == 2)
 			{
 				NextCurves[first_curve] = second_curve;
 				has_next_curve[first_curve] = true;
