@@ -257,10 +257,10 @@ IF(K3D_BUILD_NGUI_MODULE)
 		atk_python.h
 		)
 	K3D_GENERATE_DEF_FILE(k3dsdk-python-atk)
-	TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays k3dsdk)
-	TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays ${K3D_BOOST_PYTHON_LIBS})
-	TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays ${K3D_PYTHON_LIBS})
-	TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays ${K3D_GTKMM_LIBS})
+	TARGET_LINK_LIBRARIES(k3dsdk-python-atk k3dsdk)
+	TARGET_LINK_LIBRARIES(k3dsdk-python-atk ${K3D_BOOST_PYTHON_LIBS})
+	TARGET_LINK_LIBRARIES(k3dsdk-python-atk ${K3D_PYTHON_LIBS})
+	TARGET_LINK_LIBRARIES(k3dsdk-python-atk ${K3D_GTKMM_LIBS})
 
 	TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-atk)
 
