@@ -481,7 +481,7 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-		k3d::geometry::merge_selection(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		double distance = m_distance.pipeline_value();
 		k3d::axis axis = m_along.pipeline_value();
