@@ -21,6 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <k3d-python-config.h>
+
 #include "angle_axis_python.h"
 #include "any_python.h"
 #include "atk_python.h"
@@ -337,7 +339,9 @@ BOOST_PYTHON_MODULE(k3d)
 	define_const_typed_array_classes();
 
 	define_class_angle_axis();
+#ifdef K3D_BUILD_NGUI_MODULE
 	define_class_atk_object();
+#endif // K3D_BUILD_NGUI_MODULE
 	define_class_attribute_arrays();
 	define_class_bitmap();
 	define_class_bounding_box3();
