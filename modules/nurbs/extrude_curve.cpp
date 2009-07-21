@@ -435,13 +435,13 @@ public:
 		switch (axis)
 		{
 		case k3d::X:
-			endpoint = k3d::point3(1.0, 0.0, 0.0);
+			endpoint = k3d::point3(distance, 0.0, 0.0);
 			break;
 		case k3d::Y:
-			endpoint = k3d::point3(0.0, 1.0, 0.0);
+			endpoint = k3d::point3(0.0, distance, 0.0);
 			break;
 		case k3d::Z:
-			endpoint = k3d::point3(0.0, 0.0, 1.0);
+			endpoint = k3d::point3(0.0, 0.0, distance);
 			break;
 		}
 
