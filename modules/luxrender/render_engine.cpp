@@ -58,6 +58,7 @@
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/nodes.h>
+#include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/paraboloid.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
@@ -400,6 +401,109 @@ private:
 		}
 	}
 
+	void render_nurbs_patch(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::nurbs_patch::const_primitive& Nurbs, std::ostream& Stream)
+	{
+		const k3d::mesh::points_t& mesh_points = *Mesh.points;
+
+		Stream << k3d::standard_indent << "AttributeBegin\n" << k3d::push_indent;
+		Stream << k3d::standard_indent << "Transform [" << convert(k3d::node_to_world_matrix(MeshInstance)) << "]\n" << k3d::push_indent;
+
+		const k3d::uint_t patch_begin = 0;
+		const k3d::uint_t patch_end = patch_begin + Nurbs.patch_first_points.size();
+		for(k3d::uint_t patch = patch_begin; patch != patch_end; ++patch)
+		{
+			material::use(MaterialNames, Nurbs.patch_materials[patch], Stream);
+
+			Stream << k3d::standard_indent << "Shape \"nurbs\"\n" << k3d::push_indent;
+			Stream << k3d::standard_indent << "\"integer nu\" [" << Nurbs.patch_u_point_counts[patch] << "]\n";
+			Stream << k3d::standard_indent << "\"integer nv\" [" << Nurbs.patch_v_point_counts[patch] << "]\n";
+			Stream << k3d::standard_indent << "\"integer uorder\" [" << Nurbs.patch_u_orders[patch] << "]\n";
+			Stream << k3d::standard_indent << "\"integer vorder\" [" << Nurbs.patch_v_orders[patch] << "]\n";
+
+			Stream << k3d::standard_indent << "\"float uknots\" [";
+			const k3d::uint_t u_knot_begin = Nurbs.patch_u_first_knots[patch];
+			const k3d::uint_t u_knot_end = u_knot_begin + Nurbs.patch_u_point_counts[patch] + Nurbs.patch_u_orders[patch];
+			for(k3d::uint_t knot = u_knot_begin; knot != u_knot_end; ++knot)
+				Stream << " " << Nurbs.patch_u_knots[knot];
+			Stream << "]\n";
+
+			Stream << k3d::standard_indent << "\"float vknots\" [";
+			const k3d::uint_t v_knot_begin = Nurbs.patch_v_first_knots[patch];
+			const k3d::uint_t v_knot_end = v_knot_begin + Nurbs.patch_v_point_counts[patch] + Nurbs.patch_v_orders[patch];
+			for(k3d::uint_t knot = v_knot_begin; knot != v_knot_end; ++knot)
+				Stream << " " << Nurbs.patch_v_knots[knot];
+			Stream << "]\n";
+
+			Stream << k3d::standard_indent << "\"float Pw\" [";
+			const k3d::uint_t point_begin = Nurbs.patch_first_points[patch];
+			const k3d::uint_t point_end = point_begin + (Nurbs.patch_u_point_counts[patch] * Nurbs.patch_v_point_counts[patch]);
+			for(k3d::uint_t point = point_begin; point != point_end; ++point)
+			{
+				const k3d::uint_t point_index = Nurbs.patch_points[point];
+				const k3d::double_t point_weight = Nurbs.patch_point_weights[point];
+
+				Stream << " " << point_weight * mesh_points[point_index][0];
+				Stream << " " << point_weight * mesh_points[point_index][1];
+				Stream << " " << point_weight * mesh_points[point_index][2];
+				Stream << " " << point_weight;
+			}
+			Stream << "]\n";
+
+			Stream << k3d::pop_indent;
+		}
+
+/*
+		// For each material, render the triangles that use that material ...
+		for(std::set<k3d::imaterial*>::const_iterator material = material_list.begin(); material != material_list.end(); ++material)
+		{
+			material::use(MaterialNames, *material, Stream);
+
+			Stream << k3d::standard_indent << "Shape \"trianglemesh\"\n" << k3d::push_indent;
+
+			const k3d::uint_t triangle_begin = 0;
+			const k3d::uint_t triangle_end = triangle_begin + triangle_materials.size();
+
+			Stream << k3d::standard_indent << "\"integer indices\" [";
+			for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
+			{
+				if(triangle_materials[triangle] != *material)
+					continue;
+
+				Stream << " " << (triangle * 3) + 0 << " " << (triangle * 3) + 1 << " " << (triangle * 3) + 2;
+			}
+			Stream << "]\n";
+
+			Stream << k3d::standard_indent << "\"point P\" [";
+			for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
+			{
+				if(triangle_materials[triangle] != *material)
+					continue;
+
+				Stream << " " << triangle_points[(triangle * 3) + 0] << " " << triangle_points[(triangle * 3) + 1] << " " << triangle_points[(triangle * 3) + 2];
+			}
+			Stream << "]\n";
+
+			if(triangle_normals.size())
+			{
+				Stream << k3d::standard_indent << "\"normal N\" [";
+				for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
+				{
+					if(triangle_materials[triangle] != *material)
+						continue;
+
+					Stream << " " << triangle_normals[(triangle * 3) + 0] << " " << triangle_normals[(triangle * 3) + 1] << " " << triangle_normals[(triangle * 3) + 2];
+				}
+				Stream << "]\n";
+			}
+
+			Stream << k3d::pop_indent;
+		}
+*/
+
+		Stream << k3d::pop_indent;
+		Stream << k3d::pop_indent << k3d::standard_indent << "AttributeEnd\n";
+	}
+
 	void render_paraboloid(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::paraboloid::const_primitive& Paraboloid, std::ostream& Stream)
 	{
 		for(k3d::uint_t i = 0; i != Paraboloid.matrices.size(); ++i)
@@ -564,6 +668,13 @@ private:
 			if(hyperboloid)
 			{
 				render_hyperboloid(MaterialNames, MeshInstance, *mesh, *hyperboloid, Stream);
+				continue;
+			}
+
+			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs_patch(k3d::nurbs_patch::validate(**primitive));
+			if(nurbs_patch)
+			{
+				render_nurbs_patch(MaterialNames, MeshInstance, *mesh, *nurbs_patch, Stream);
 				continue;
 			}
 
