@@ -10,7 +10,7 @@ desc: |-
   method of sun control in architecture.
 type: :feature
 component: K-3D
-release: 
+release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :closed
 disposition: :fixed
@@ -26,4 +26,8 @@ log_events:
 - - 2009-07-19 21:09:04.326798 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - closed with disposition fixed
+  - ""
+- - 2009-07-22 02:45:42.372434 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.0.0 from unassigned
   - ""

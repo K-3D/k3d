@@ -16,7 +16,7 @@ desc: "In file included from\n\
   make: *** [all] Error 2"
 type: :bugfix
 component: K-3D
-release: 
+release: 0.8.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -28,4 +28,8 @@ log_events:
 - - 2009-05-06 03:57:48.248324 Z
   - Beverly L. Shead <bshead@k-3d.com>
   - created
+  - ""
+- - 2009-07-22 02:51:26.468479 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.0.0 from unassigned
   - ""

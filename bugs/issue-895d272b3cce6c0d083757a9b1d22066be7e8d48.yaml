@@ -28,7 +28,7 @@ desc: |-
   Additional information:
 type: :bugfix
 component: K-3D
-release: 
+release: 0.8.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -40,4 +40,8 @@ log_events:
 - - 2009-05-06 03:57:06.040297 Z
   - Beverly L. Shead <bshead@k-3d.com>
   - created
+  - ""
+- - 2009-07-22 02:50:51.236490 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.0.0 from unassigned
   - ""
