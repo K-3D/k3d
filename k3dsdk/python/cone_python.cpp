@@ -48,9 +48,9 @@ public:
 		static object radii(wrapper& Self) { return wrap(Self.wrapped().radii); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 	class primitive
@@ -64,9 +64,9 @@ public:
 		static object radii(wrapper& Self) { return wrap(Self.wrapped().radii); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 
@@ -103,9 +103,9 @@ void define_namespace_cone()
 		.def("radii", &cone::const_primitive::radii)
 		.def("sweep_angles", &cone::const_primitive::sweep_angles)
 		.def("selections", &cone::const_primitive::selections)
-		.def("constant_data", &cone::const_primitive::constant_data)
-		.def("uniform_data", &cone::const_primitive::uniform_data)
-		.def("varying_data", &cone::const_primitive::varying_data)
+		.def("constant_attributes", &cone::const_primitive::constant_attributes)
+		.def("uniform_attributes", &cone::const_primitive::uniform_attributes)
+		.def("varying_attributes", &cone::const_primitive::varying_attributes)
 		;
 
 	class_<cone::primitive::wrapper>("primitive", no_init)
@@ -115,9 +115,9 @@ void define_namespace_cone()
 		.def("radii", &cone::primitive::radii)
 		.def("sweep_angles", &cone::primitive::sweep_angles)
 		.def("selections", &cone::primitive::selections)
-		.def("constant_data", &cone::primitive::constant_data)
-		.def("uniform_data", &cone::primitive::uniform_data)
-		.def("varying_data", &cone::primitive::varying_data)
+		.def("constant_attributes", &cone::primitive::constant_attributes)
+		.def("uniform_attributes", &cone::primitive::uniform_attributes)
+		.def("varying_attributes", &cone::primitive::varying_attributes)
 		;
 }
 

@@ -48,9 +48,9 @@ public:
 		static object curve_point_counts(wrapper& Self) { return wrap(Self.wrapped().curve_point_counts); }
 		static object curve_selections(wrapper& Self) { return wrap(Self.wrapped().curve_selections); }
 		static object curve_points(wrapper& Self) { return wrap(Self.wrapped().curve_points); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 	class primitive
@@ -64,9 +64,9 @@ public:
 		static object curve_point_counts(wrapper& Self) { return wrap(Self.wrapped().curve_point_counts); }
 		static object curve_selections(wrapper& Self) { return wrap(Self.wrapped().curve_selections); }
 		static object curve_points(wrapper& Self) { return wrap(Self.wrapped().curve_points); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 
@@ -103,9 +103,9 @@ void define_namespace_cubic_curve()
 		.def("curve_point_counts", &cubic_curve::const_primitive::curve_point_counts)
 		.def("curve_selections", &cubic_curve::const_primitive::curve_selections)
 		.def("curve_points", &cubic_curve::const_primitive::curve_points)
-		.def("constant_data", &cubic_curve::const_primitive::constant_data)
-		.def("uniform_data", &cubic_curve::const_primitive::uniform_data)
-		.def("varying_data", &cubic_curve::const_primitive::varying_data)
+		.def("constant_attributes", &cubic_curve::const_primitive::constant_attributes)
+		.def("uniform_attributes", &cubic_curve::const_primitive::uniform_attributes)
+		.def("varying_attributes", &cubic_curve::const_primitive::varying_attributes)
 		;
 
 	class_<cubic_curve::primitive::wrapper>("primitive", no_init)
@@ -115,9 +115,9 @@ void define_namespace_cubic_curve()
 		.def("curve_point_counts", &cubic_curve::primitive::curve_point_counts)
 		.def("curve_selections", &cubic_curve::primitive::curve_selections)
 		.def("curve_points", &cubic_curve::primitive::curve_points)
-		.def("constant_data", &cubic_curve::primitive::constant_data)
-		.def("uniform_data", &cubic_curve::primitive::uniform_data)
-		.def("varying_data", &cubic_curve::primitive::varying_data)
+		.def("constant_attributes", &cubic_curve::primitive::constant_attributes)
+		.def("uniform_attributes", &cubic_curve::primitive::uniform_attributes)
+		.def("varying_attributes", &cubic_curve::primitive::varying_attributes)
 		;
 }
 

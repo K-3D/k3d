@@ -96,7 +96,7 @@ void sds_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 		k3d::mesh::normals_t uniform_normals(polyhedron->face_first_loops.size());
 		for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			uniform_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, *input_with_normals.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
-		k3d::mesh::normals_t& vertex_normals = input_with_normals.vertex_data.create("sds_normals", new k3d::mesh::normals_t(points.size()));
+		k3d::mesh::normals_t& vertex_normals = input_with_normals.vertex_attributes.create("sds_normals", new k3d::mesh::normals_t(points.size()));
 		for(k3d::uint_t face = face_begin; face != face_end; ++face)
 		{
 			const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
@@ -124,7 +124,7 @@ void sds_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 			m_caches[primitive->get()].set_levels(m_levels);
 			m_caches[primitive->get()].create_mesh(points, *polyhedron, face_selections, Painter);
 		}
-		m_caches[primitive->get()].update_mesh(points, *polyhedron, input_with_normals.vertex_data, face_selections, Painter);
+		m_caches[primitive->get()].update_mesh(points, *polyhedron, input_with_normals.vertex_attributes, face_selections, Painter);
 	}
 }
 

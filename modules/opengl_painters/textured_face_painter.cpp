@@ -153,7 +153,7 @@ public:
 			normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
 	
 			const k3d::typed_array<k3d::texture3>* texcoords = 0;
-			for(k3d::named_arrays::const_iterator array_it = polyhedron->face_varying_data.begin(); array_it != polyhedron->face_varying_data.end(); ++array_it)
+			for(k3d::named_arrays::const_iterator array_it = polyhedron->face_varying_attributes.begin(); array_it != polyhedron->face_varying_attributes.end(); ++array_it)
 			{
 				texcoords = dynamic_cast<const k3d::typed_array<k3d::texture3>* >(array_it->second.get());
 				if(texcoords)

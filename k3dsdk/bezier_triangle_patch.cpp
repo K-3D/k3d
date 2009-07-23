@@ -45,9 +45,9 @@ const_primitive::const_primitive(
 	const mesh::materials_t& PatchMaterials,
 	const mesh::indices_t& PatchPoints,
 	const mesh::weights_t& PatchPointWeights,
-	const mesh::attribute_arrays_t& ConstantData,
-	const mesh::attribute_arrays_t& UniformData,
-	const mesh::attribute_arrays_t& VaryingData
+	const mesh::table_t& ConstantAttributes,
+	const mesh::table_t& UniformAttributes,
+	const mesh::table_t& VaryingAttributes
 		) :
 	patch_first_points(PatchFirstPoints),
 	patch_orders(PatchOrders),
@@ -55,9 +55,9 @@ const_primitive::const_primitive(
 	patch_materials(PatchMaterials),
 	patch_points(PatchPoints),
 	patch_point_weights(PatchPointWeights),
-	constant_data(ConstantData),
-	uniform_data(UniformData),
-	varying_data(VaryingData)
+	constant_attributes(ConstantAttributes),
+	uniform_attributes(UniformAttributes),
+	varying_attributes(VaryingAttributes)
 {
 }
 
@@ -71,9 +71,9 @@ primitive::primitive(
 	mesh::materials_t& PatchMaterials,
 	mesh::indices_t& PatchPoints,
 	mesh::weights_t& PatchPointWeights,
-	mesh::attribute_arrays_t& ConstantData,
-	mesh::attribute_arrays_t& UniformData,
-	mesh::attribute_arrays_t& VaryingData
+	mesh::table_t& ConstantAttributes,
+	mesh::table_t& UniformAttributes,
+	mesh::table_t& VaryingAttributes
 		) :
 	patch_first_points(PatchFirstPoints),
 	patch_orders(PatchOrders),
@@ -81,9 +81,9 @@ primitive::primitive(
 	patch_materials(PatchMaterials),
 	patch_points(PatchPoints),
 	patch_point_weights(PatchPointWeights),
-	constant_data(ConstantData),
-	uniform_data(UniformData),
-	varying_data(VaryingData)
+	constant_attributes(ConstantAttributes),
+	uniform_attributes(UniformAttributes),
+	varying_attributes(VaryingAttributes)
 {
 }
 
@@ -95,12 +95,12 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("bezier_triangle_patch");
 
 	primitive* const result = new primitive(
-		generic_primitive.structure.create<mesh::indices_t >("patch_first_points"),
-		generic_primitive.structure.create<mesh::orders_t >("patch_orders"),
-		generic_primitive.structure.create<mesh::selection_t >("patch_selections"),
-		generic_primitive.structure.create<mesh::materials_t >("patch_materials"),
-		generic_primitive.structure.create<mesh::indices_t >("patch_points"),
-		generic_primitive.structure.create<mesh::weights_t >("patch_point_weights"),
+		generic_primitive.structure["uniform"].create<mesh::indices_t >("patch_first_points"),
+		generic_primitive.structure["uniform"].create<mesh::orders_t >("patch_orders"),
+		generic_primitive.structure["uniform"].create<mesh::selection_t >("patch_selections"),
+		generic_primitive.structure["uniform"].create<mesh::materials_t >("patch_materials"),
+		generic_primitive.structure["varying"].create<mesh::indices_t >("patch_points"),
+		generic_primitive.structure["varying"].create<mesh::weights_t >("patch_point_weights"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
 		generic_primitive.attributes["varying"]
@@ -122,16 +122,19 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
-		const mesh::indices_t& patch_first_points = require_const_array<mesh::indices_t >(Primitive, "patch_first_points");
-		const mesh::orders_t& patch_orders = require_const_array<mesh::orders_t >(Primitive, "patch_orders");
-		const mesh::selection_t& patch_selections = require_const_array<mesh::selection_t >(Primitive, "patch_selections");
-		const mesh::materials_t& patch_materials = require_const_array<mesh::materials_t >(Primitive, "patch_materials");
-		const mesh::indices_t& patch_points = require_const_array<mesh::indices_t >(Primitive, "patch_points");
-		const mesh::weights_t& patch_point_weights = require_const_array<mesh::weights_t >(Primitive, "patch_point_weights");
+		const table& uniform_structure = require_structure(Primitive, "uniform");
+		const table& varying_structure = require_structure(Primitive, "varying");
 
-		const attribute_arrays& constant_data = require_const_attribute_arrays(Primitive, "constant");
-		const attribute_arrays& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
-		const attribute_arrays& varying_data = require_const_attribute_arrays(Primitive, "varying");
+		const mesh::indices_t& patch_first_points = require_array<mesh::indices_t >(Primitive, uniform_structure, "patch_first_points");
+		const mesh::orders_t& patch_orders = require_array<mesh::orders_t >(Primitive, uniform_structure, "patch_orders");
+		const mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, uniform_structure, "patch_selections");
+		const mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "patch_materials");
+		const mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, varying_structure, "patch_points");
+		const mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, varying_structure, "patch_point_weights");
+
+		const table& constant_attributes = require_attributes(Primitive, "constant");
+		const table& uniform_attributes = require_attributes(Primitive, "uniform");
+		const table& varying_attributes = require_attributes(Primitive, "varying");
 
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
@@ -159,11 +162,11 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_array_size(Primitive, patch_points, "patch_points", num_control_points);
 		require_array_size(Primitive, patch_point_weights, "patch_point_weights", num_control_points);
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
-		require_attribute_arrays_size(Primitive, uniform_data, "uniform", patch_selections.size());
-		require_attribute_arrays_size(Primitive, varying_data, "varying", patch_selections.size() * 4);
+		require_table_size(Primitive, constant_attributes, "constant", 1);
+		require_table_size(Primitive, uniform_attributes, "uniform", patch_selections.size());
+		require_table_size(Primitive, varying_attributes, "varying", patch_selections.size() * 4);
 
-		return new const_primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_data, uniform_data, varying_data);
+		return new const_primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, varying_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -180,16 +183,19 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
-		mesh::indices_t& patch_first_points = require_array<mesh::indices_t >(Primitive, "patch_first_points");
-		mesh::orders_t& patch_orders = require_array<mesh::orders_t >(Primitive, "patch_orders");
-		mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, "patch_selections");
-		mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, "patch_materials");
-		mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, "patch_points");
-		mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, "patch_point_weights");
+		table& uniform_structure = require_structure(Primitive, "uniform");
+		table& varying_structure = require_structure(Primitive, "varying");
 
-		attribute_arrays& constant_data = require_attribute_arrays(Primitive, "constant");
-		attribute_arrays& uniform_data = require_attribute_arrays(Primitive, "uniform");
-		attribute_arrays& varying_data = require_attribute_arrays(Primitive, "varying");
+		mesh::indices_t& patch_first_points = require_array<mesh::indices_t >(Primitive, uniform_structure, "patch_first_points");
+		mesh::orders_t& patch_orders = require_array<mesh::orders_t >(Primitive, uniform_structure, "patch_orders");
+		mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, uniform_structure, "patch_selections");
+		mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "patch_materials");
+		mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, varying_structure, "patch_points");
+		mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, varying_structure, "patch_point_weights");
+
+		table& constant_attributes = require_attributes(Primitive, "constant");
+		table& uniform_attributes = require_attributes(Primitive, "uniform");
+		table& varying_attributes = require_attributes(Primitive, "varying");
 
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
@@ -219,11 +225,11 @@ primitive* validate(mesh::primitive& Primitive)
 		require_array_size(Primitive, patch_points, "patch_points", num_control_points);
 		require_array_size(Primitive, patch_point_weights, "patch_point_weights", num_control_points);
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
-		require_attribute_arrays_size(Primitive, uniform_data, "uniform", patch_selections.size());
-		require_attribute_arrays_size(Primitive, varying_data, "varying", patch_selections.size() * 4);
+		require_table_size(Primitive, constant_attributes, "constant", 1);
+		require_table_size(Primitive, uniform_attributes, "uniform", patch_selections.size());
+		require_table_size(Primitive, varying_attributes, "varying", patch_selections.size() * 4);
 
-		return new primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_data, uniform_data, varying_data);
+		return new primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, varying_attributes);
 	}
 	catch(std::exception& e)
 	{

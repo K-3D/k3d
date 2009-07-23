@@ -45,8 +45,8 @@ public:
 		static object matrices(wrapper& Self) { return wrap(Self.wrapped().matrices); }
 		static object materials(wrapper& Self) { return wrap(Self.wrapped().materials); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
 	};
 
 	class primitive
@@ -57,8 +57,8 @@ public:
 		static object matrices(wrapper& Self) { return wrap(Self.wrapped().matrices); }
 		static object materials(wrapper& Self) { return wrap(Self.wrapped().materials); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
 	};
 
 
@@ -92,16 +92,16 @@ void define_namespace_teapot()
 		.def("matrices", &teapot::const_primitive::matrices)
 		.def("materials", &teapot::const_primitive::materials)
 		.def("selections", &teapot::const_primitive::selections)
-		.def("constant_data", &teapot::const_primitive::constant_data)
-		.def("uniform_data", &teapot::const_primitive::uniform_data)
+		.def("constant_attributes", &teapot::const_primitive::constant_attributes)
+		.def("uniform_attributes", &teapot::const_primitive::uniform_attributes)
 		;
 
 	class_<teapot::primitive::wrapper>("primitive", no_init)
 		.def("matrices", &teapot::primitive::matrices)
 		.def("materials", &teapot::primitive::materials)
 		.def("selections", &teapot::primitive::selections)
-		.def("constant_data", &teapot::primitive::constant_data)
-		.def("uniform_data", &teapot::primitive::uniform_data)
+		.def("constant_attributes", &teapot::primitive::constant_attributes)
+		.def("uniform_attributes", &teapot::primitive::uniform_attributes)
 		;
 }
 

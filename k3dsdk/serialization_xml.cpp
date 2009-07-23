@@ -1640,10 +1640,10 @@ void save_arrays(element& Container, element Storage, const mesh::named_arrays_t
 	}
 }
 
-void save_arrays(element& Container, element Storage, const mesh::attribute_arrays_t& Arrays, const ipersistent::save_context& Context)
+void save_arrays(element& Container, element Storage, const mesh::table_t& Arrays, const ipersistent::save_context& Context)
 {
 	element& container = Container.append(Storage);
-	for(mesh::attribute_arrays_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
+	for(mesh::table_t::const_iterator array_iterator = Arrays.begin(); array_iterator != Arrays.end(); ++array_iterator)
 	{
 		const string_t name = array_iterator->first;
 		const array* const abstract_array = array_iterator->second.get();
@@ -1957,13 +1957,13 @@ void load_arrays(const element& Container, const string_t& Storage, mesh::named_
 /////////////////////////////////////////////////////////////////////////////
 // load_arrays
 
-void load_arrays(const element& Container, const string_t& Storage, mesh::attribute_arrays_t& Arrays, const ipersistent::load_context& Context)
+void load_arrays(const element& Container, const string_t& Storage, mesh::table_t& Table, const ipersistent::load_context& Context)
 {
 	const element* const container = find_element(Container, Storage);
 	if(!container)
 		return;
 
-	load_arrays<mesh::attribute_arrays_t>(*container, Arrays, Context);
+	load_arrays<mesh::table_t>(*container, Table, Context);
 }
 
 } // namespace detail
@@ -1976,7 +1976,7 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 	// Save points ...
 	detail::save_array(Container, element("points"), Mesh.points, Context);
 	detail::save_array(Container, element("point_selection"), Mesh.point_selection, Context);
-	detail::save_arrays(Container, element("vertex_data"), Mesh.vertex_data, Context);
+	detail::save_arrays(Container, element("vertex_attributes"), Mesh.vertex_attributes, Context);
 
 	// Save primitives ...
 	if(Mesh.primitives.size())
@@ -1991,15 +1991,19 @@ void save(const mesh& Mesh, element& Container, const ipersistent::save_context&
 
 			if((*primitive)->structure.size())
 			{
-				detail::save_arrays(xml_primitive, element("structure"), (*primitive)->structure, Context);
+				element& xml_structure = xml_primitive.append(element("structure"));
+				for(mesh::named_tables_t::const_iterator structure = (*primitive)->structure.begin(); structure != (*primitive)->structure.end(); ++structure)
+				{
+					detail::save_arrays(xml_structure, element("tables", xml::attribute("type", structure->first)), structure->second, Context);
+				}
 			}
 			
 			if((*primitive)->attributes.size())
 			{
 				element& xml_attributes = xml_primitive.append(element("attributes"));
-				for(mesh::named_attribute_arrays_t::const_iterator attribute = (*primitive)->attributes.begin(); attribute != (*primitive)->attributes.end(); ++attribute)
+				for(mesh::named_tables_t::const_iterator attribute = (*primitive)->attributes.begin(); attribute != (*primitive)->attributes.end(); ++attribute)
 				{
-					detail::save_arrays(xml_attributes, element("arrays", xml::attribute("type", attribute->first)), attribute->second, Context);
+					detail::save_arrays(xml_attributes, element("tables", xml::attribute("type", attribute->first)), attribute->second, Context);
 				}
 			}
 		}
@@ -2013,7 +2017,7 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 {
 	detail::load_array(Container, "points", Mesh.points, Context);
 	detail::load_array(Container, "point_selection", Mesh.point_selection, Context);
-	detail::load_arrays(Container, "vertex_data", Mesh.vertex_data, Context);
+	detail::load_arrays(Container, "vertex_attributes", Mesh.vertex_attributes, Context);
 
 	if(const element* const xml_primitives = find_element(Container, "primitives"))
 	{
@@ -2026,24 +2030,29 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 			if(const element* const xml_structure = find_element(*xml_primitive, "structure"))
 			{
-				detail::load_arrays(*xml_structure, primitive.structure, Context);
-			}
-			else if(const element* const xml_topology = find_element(*xml_primitive, "topology"))
-			{
-				detail::load_arrays(*xml_topology, primitive.structure, Context);
+				for(element::elements_t::const_iterator xml_tables = xml_structure->children.begin(); xml_tables != xml_structure->children.end(); ++xml_tables)
+				{
+					if(xml_tables->name != "tables")
+						continue;
+
+					mesh::table_t arrays;
+					detail::load_arrays(*xml_tables, arrays, Context);
+
+					primitive.attributes.insert(std::make_pair(attribute_text(*xml_tables, "type"), arrays));
+				}
 			}
 
 			if(const element* const xml_attributes = find_element(*xml_primitive, "attributes"))
 			{
-				for(element::elements_t::const_iterator xml_arrays = xml_attributes->children.begin(); xml_arrays != xml_attributes->children.end(); ++xml_arrays)
+				for(element::elements_t::const_iterator xml_tables = xml_attributes->children.begin(); xml_tables != xml_attributes->children.end(); ++xml_tables)
 				{
-					if(xml_arrays->name != "arrays")
+					if(xml_tables->name != "tables")
 						continue;
 
-					mesh::attribute_arrays_t arrays;
-					detail::load_arrays(*xml_arrays, arrays, Context);
+					mesh::table_t arrays;
+					detail::load_arrays(*xml_tables, arrays, Context);
 
-					primitive.attributes.insert(std::make_pair(attribute_text(*xml_arrays, "type"), arrays));
+					primitive.attributes.insert(std::make_pair(attribute_text(*xml_tables, "type"), arrays));
 				}
 			}
 		}
@@ -2204,7 +2213,7 @@ Assuming that that never happens, it should be safe to remove this code entirely
 		detail::load_array(*container, "primitive_first_floats", blobbies->primitive_first_floats, Context);
 		detail::load_array(*container, "primitive_float_counts", blobbies->primitive_float_counts, Context);
 		detail::load_arrays(*container, "varying_data", blobbies->varying_data, Context);
-		detail::load_arrays(*container, "vertex_data", blobbies->vertex_data, Context);
+		detail::load_arrays(*container, "vertex_attributes", blobbies->vertex_attributes, Context);
 		detail::load_array(*container, "operators", blobbies->operators, Context);
 		detail::load_array(*container, "operator_first_operands", blobbies->operator_first_operands, Context);
 		detail::load_array(*container, "operator_operand_counts", blobbies->operator_operand_counts, Context);
@@ -2405,7 +2414,7 @@ void load(legacy::mesh& Mesh, element& XML, const ipersistent::load_context& Con
 				continue;
 
 			Mesh.points.push_back(new legacy::point(attribute_value<point3>(*xml_point, "position", point3(0, 0, 0))));
-			detail::load_parameters(*xml_point, ri::VERTEX, Mesh.points.back()->vertex_data);
+			detail::load_parameters(*xml_point, ri::VERTEX, Mesh.points.back()->vertex_attributes);
 			detail::load_tags(*xml_point, Mesh.points.back()->tags);
 		}
 	}

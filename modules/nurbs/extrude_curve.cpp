@@ -23,7 +23,7 @@
 
 #include "nurbs_patch_modifier.h"
 
-#include <k3dsdk/attribute_array_copier.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
@@ -413,14 +413,14 @@ void delete_curve(k3d::nurbs_curve::primitive& Curves, const k3d::uint_t Curve)
 {
 	const k3d::uint_t curve_count = Curves.curve_first_points.size();
 
-	k3d::attribute_arrays uniform_data = Curves.uniform_data.clone_types();
-	k3d::attribute_array_copier uniform_copier(Curves.uniform_data, uniform_data);
+	k3d::table uniform_attributes = Curves.uniform_attributes.clone_types();
+	k3d::table_copier uniform_copier(Curves.uniform_attributes, uniform_attributes);
 	for(k3d::uint_t i = 0; i != Curve; ++i)
 		uniform_copier.push_back(i);
 	for(k3d::uint_t i = Curve + 1; i != curve_count; ++i)
 		uniform_copier.push_back(i);
-	k3d::attribute_arrays varying_data = Curves.varying_data.clone_types();
-	k3d::attribute_array_copier varying_copier(Curves.varying_data, varying_data);
+	k3d::table varying_attributes = Curves.varying_attributes.clone_types();
+	k3d::table_copier varying_copier(Curves.varying_attributes, varying_attributes);
 	k3d::uint_t curve_start_index = Curves.curve_first_points[Curve];
 	k3d::uint_t curve_end_index = curve_start_index + Curves.curve_point_counts[Curve];
 	for(k3d::uint_t i = 0; i != curve_start_index; ++i)

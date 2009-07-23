@@ -22,9 +22,29 @@
 namespace k3d
 {
 
-const mesh::attribute_arrays_t& require_const_attribute_arrays(const mesh::primitive& Primitive, const string_t& Name)
+const mesh::table_t& require_structure(const mesh::primitive& Primitive, const string_t& Name)
 {
-	const attribute_arrays* const attributes = Primitive.attributes.lookup(Name);
+	const table* const structure = Primitive.structure.lookup(Name);
+
+	if(!structure)
+		throw std::runtime_error("[" + Primitive.type + "] primitive missing structure [" + Name + "]");
+
+	return *structure;
+}
+
+mesh::table_t& require_structure(mesh::primitive& Primitive, const string_t& Name)
+{
+	table* const structure = Primitive.structure.writable(Name);
+
+	if(!structure)
+		throw std::runtime_error("[" + Primitive.type + "] primitive missing structure [" + Name + "]");
+
+	return *structure;
+}
+
+const mesh::table_t& require_attributes(const mesh::primitive& Primitive, const string_t& Name)
+{
+	const table* const attributes = Primitive.attributes.lookup(Name);
 
 	if(!attributes)
 		throw std::runtime_error("[" + Primitive.type + "] primitive missing attributes [" + Name + "]");
@@ -32,9 +52,9 @@ const mesh::attribute_arrays_t& require_const_attribute_arrays(const mesh::primi
 	return *attributes;
 }
 
-mesh::attribute_arrays_t& require_attribute_arrays(mesh::primitive& Primitive, const string_t& Name)
+mesh::table_t& require_attributes(mesh::primitive& Primitive, const string_t& Name)
 {
-	attribute_arrays* const attributes = Primitive.attributes.writable(Name);
+	table* const attributes = Primitive.attributes.writable(Name);
 
 	if(!attributes)
 		throw std::runtime_error("[" + Primitive.type + "] primitive missing attributes [" + Name + "]");
@@ -42,7 +62,7 @@ mesh::attribute_arrays_t& require_attribute_arrays(mesh::primitive& Primitive, c
 	return *attributes;
 }
 
-void require_attribute_arrays_size(const mesh::primitive& Primitive, const attribute_arrays& Attributes, const string_t& AttributesName, const uint_t Reference)
+void require_table_size(const mesh::primitive& Primitive, const table& Attributes, const string_t& AttributesName, const uint_t Reference)
 {
 	if(!Attributes.match_size(Reference))
 	{

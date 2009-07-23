@@ -48,7 +48,7 @@ public:
 	const_mesh();
 	const_mesh(const k3d::mesh* const Mesh);
 
-	boost::python::object vertex_data();
+	boost::python::object vertex_attributes();
 	boost::python::object point_selection();
 	boost::python::object points();
 	boost::python::object primitives();
@@ -71,7 +71,7 @@ public:
 	boost::python::object create_point_selection();
 	boost::python::object create_points();
 
-	boost::python::object vertex_data();
+	boost::python::object vertex_attributes();
 	boost::python::object point_selection();
 	boost::python::object points();
 	boost::python::object primitives();

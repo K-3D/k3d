@@ -25,7 +25,7 @@
 */
 
 #include "instance_wrapper_python.h"
-#include <k3dsdk/attribute_arrays.h>
+#include <k3dsdk/table.h>
 
 namespace k3d
 {
@@ -33,9 +33,9 @@ namespace k3d
 namespace python
 {
 
-typedef instance_wrapper<k3d::attribute_arrays> attribute_arrays_wrapper;
+typedef instance_wrapper<k3d::table> table_wrapper;
 
-void define_class_attribute_arrays();
+void define_class_table();
 
 } // namespace python
 

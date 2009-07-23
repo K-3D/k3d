@@ -122,14 +122,14 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-interfaces k3dsdk-python-mesh)
 TARGET_LINK_LIBRARIES(k3dsdk-python-interfaces k3dsdk-python-values)
 
 ADD_LIBRARY(k3dsdk-python-b SHARED
-	attribute_arrays_python.cpp
-	attribute_arrays_python.h
-	const_attribute_arrays_python.cpp
-	const_attribute_arrays_python.h
+	table_python.cpp
+	table_python.h
+	const_table_python.cpp
+	const_table_python.h
 	const_named_arrays_python.cpp
 	const_named_arrays_python.h
-	const_named_attribute_arrays_python.cpp
-	const_named_attribute_arrays_python.h
+	const_named_tables_python.cpp
+	const_named_tables_python.h
 	euler_python.cpp
 	euler_python.h
 	geometry_python.cpp
@@ -140,8 +140,8 @@ ADD_LIBRARY(k3dsdk-python-b SHARED
 	mime_python.h
 	named_arrays_python.cpp
 	named_arrays_python.h
-	named_attribute_arrays_python.cpp
-	named_attribute_arrays_python.h
+	named_tables_python.cpp
+	named_tables_python.h
 	parallel_python.cpp
 	plugin_python.cpp
 	plugin_python.h

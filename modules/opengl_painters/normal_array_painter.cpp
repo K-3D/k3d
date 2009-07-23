@@ -168,7 +168,7 @@ public:
 					boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
 					if(!polyhedron.get())
 						continue;
-					if(const k3d::mesh::normals_t* const array = polyhedron->uniform_data.lookup<k3d::mesh::normals_t>(array_name))
+					if(const k3d::mesh::normals_t* const array = polyhedron->uniform_attributes.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);
@@ -194,7 +194,7 @@ public:
 					boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
 					if(!polyhedron.get())
 						continue;
-					if(const k3d::mesh::normals_t* const array = polyhedron->face_varying_data.lookup<k3d::mesh::normals_t>(array_name))
+					if(const k3d::mesh::normals_t* const array = polyhedron->face_varying_attributes.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);
@@ -235,7 +235,7 @@ public:
 					boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
 					if(!polyhedron.get())
 						continue;
-					if(const k3d::mesh::normals_t* const array = Mesh.vertex_data.lookup<k3d::mesh::normals_t>(array_name))
+					if(const k3d::mesh::normals_t* const array = Mesh.vertex_attributes.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);

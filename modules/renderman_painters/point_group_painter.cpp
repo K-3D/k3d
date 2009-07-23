@@ -64,7 +64,7 @@ public:
 			return;
 
 		const k3d::mesh::points_t& points = *Mesh.points;
-		const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.vertex_data;
+		const k3d::mesh::table_t& vertex_attributes = Mesh.vertex_attributes;
 
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
@@ -72,28 +72,28 @@ public:
 			if(!point_group)
 				continue;
 
-			array_copier ri_constant_data;
-			ri_constant_data.add_arrays(point_group->constant_data);
+			array_copier ri_constant_attributes;
+			ri_constant_attributes.add_arrays(point_group->constant_attributes);
 
-			array_copier ri_varying_data;
-			ri_varying_data.add_arrays(point_group->varying_data);
+			array_copier ri_varying_attributes;
+			ri_varying_attributes.add_arrays(point_group->varying_attributes);
 
-			array_copier ri_vertex_data;
-			ri_vertex_data.add_arrays(vertex_data);
-			ri_vertex_data.add_array(k3d::ri::RI_P(), points);
+			array_copier ri_vertex_attributes;
+			ri_vertex_attributes.add_arrays(vertex_attributes);
+			ri_vertex_attributes.add_array(k3d::ri::RI_P(), points);
 
 			const k3d::uint_t point_begin = 0;
 			const k3d::uint_t point_end = point_begin + point_group->points.size();
 			for(k3d::uint_t point = point_begin; point != point_end; ++point)
-				ri_vertex_data.push_back(point_group->points[point]);
+				ri_vertex_attributes.push_back(point_group->points[point]);
 
-			ri_constant_data.push_back(0);
-			ri_varying_data.insert(point_begin, point_end);
+			ri_constant_attributes.push_back(0);
+			ri_varying_attributes.insert(point_begin, point_end);
 
 			k3d::ri::parameter_list ri_parameters;
-			ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
-			ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
-			ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
+			ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
+			ri_varying_attributes.copy_to(k3d::ri::VARYING, ri_parameters);
+			ri_vertex_attributes.copy_to(k3d::ri::VERTEX, ri_parameters);
 
 			k3d::ri::setup_material(point_group->material[0], RenderState);
 			RenderState.stream.RiPointsV(point_group->points.size(), ri_parameters);

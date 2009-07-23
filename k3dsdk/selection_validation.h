@@ -34,7 +34,7 @@ namespace k3d
 
 /// Tests storage to verify that it contains an array with given name and type, throws an exception otherwise.
 template<typename ArrayT>
-const ArrayT& require_const_array(const selection::storage& Storage, const string_t& Name)
+const ArrayT& require_array(const selection::storage& Storage, const string_t& Name)
 {
 	const ArrayT* const array = Storage.structure.lookup<ArrayT>(Name);
 

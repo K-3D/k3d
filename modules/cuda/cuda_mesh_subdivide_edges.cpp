@@ -23,7 +23,7 @@
         \author Evan Lezar (evanlezar@gmail.com)
 */
 
-#include <k3dsdk/attribute_array_copier.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
@@ -66,7 +66,7 @@ public:
             const k3d::mesh::bools_t& BoundaryEdges,
             const k3d::mesh::bools_t& HasMidpoint,
             const k3d::uint_t SplitPointCount,
-            k3d::attribute_array_copier& Copier) :
+            k3d::table_copier& Copier) :
                 m_points(Points),
                 m_edge_points(EdgePoints),
                 m_clockwise_edges(ClockwiseEdges),
@@ -104,7 +104,7 @@ private:
     const k3d::mesh::bools_t& m_boundary_edges;
     const k3d::mesh::bools_t& m_has_midpoint;
     const k3d::uint_t m_split_point_count;
-    k3d::attribute_array_copier& m_copier;
+    k3d::table_copier& m_copier;
 };
 
 } // namespace detail

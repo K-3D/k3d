@@ -1,5 +1,5 @@
-#ifndef K3DSDK_ATTRIBUTE_ARRAYS_H
-#define K3DSDK_ATTRIBUTE_ARRAYS_H
+#ifndef K3DSDK_TABLE_H
+#define K3DSDK_TABLE_H
 
 // K-3D
 // Copyright (c) 1995-2007, Timothy M. Shead
@@ -34,8 +34,8 @@ class array;
 
 /// Defines a heterogeneous collection of named, shared arrays of equal length.  Note that the length of every
 /// array in the collection must remain equal at all times.
-/// For a concrete list of the datatypes that can be stored using attribute_arrays, see k3d::named_array_types.
-class attribute_arrays :
+/// For a concrete list of the datatypes that can be stored using table, see k3d::named_array_types.
+class table :
 	public std::map<string_t, pipeline_data<array> >
 {
 public:
@@ -73,16 +73,16 @@ public:
 		return dynamic_cast<ArrayT*>(writable(Name));
 	}
 	/// Returns an object containing empty arrays with the same name and type as the originals.
-	attribute_arrays clone_types() const;
+	table clone_types() const;
 	/// Returns an object containing deep copies of all the original arrays.
-	attribute_arrays clone() const;
+	table clone() const;
 	/// Returns an object containing copies of a half-open range of all the original arrays.
-	attribute_arrays clone(const uint_t Begin, const uint_t End) const;
+	table clone(const uint_t Begin, const uint_t End) const;
 	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
-	bool_t almost_equal(const attribute_arrays& Other, const uint64_t Threshold) const;
+	bool_t almost_equal(const table& Other, const uint64_t Threshold) const;
 
-	typedef std::vector<const attribute_arrays*> attribute_arrays_collection;
-	static attribute_arrays clone_types(const attribute_arrays_collection& AttributeArrays);
+	typedef std::vector<const table*> table_collection;
+	static table clone_types(const table_collection& AttributeArrays);
 
 	/// Sets the size of every array in the collection.
 	void resize(const uint_t NewSize);
@@ -92,13 +92,13 @@ public:
 };
 
 /// Serialization
-std::ostream& operator<<(std::ostream& Stream, const attribute_arrays& RHS);
+std::ostream& operator<<(std::ostream& Stream, const table& RHS);
 
-/// Specialization of almost_equal that tests attribute_arrays for equality
+/// Specialization of almost_equal that tests table for equality
 template<>
-class almost_equal<attribute_arrays>
+class almost_equal<table>
 {
-	typedef attribute_arrays T;
+	typedef table T;
 
 public:
 	almost_equal(const uint64_t Threshold) :
@@ -116,5 +116,5 @@ public:
 
 } // namespace k3d
 
-#endif // !K3DSDK_ATTRIBUTE_ARRAYS_H
+#endif // !K3DSDK_TABLE_H
 

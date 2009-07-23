@@ -49,9 +49,9 @@ public:
 		static object z_max(wrapper& Self) { return wrap(Self.wrapped().z_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 	class primitive
@@ -66,9 +66,9 @@ public:
 		static object z_max(wrapper& Self) { return wrap(Self.wrapped().z_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 
@@ -106,9 +106,9 @@ void define_namespace_paraboloid()
 		.def("z_max", &paraboloid::const_primitive::z_max)
 		.def("sweep_angles", &paraboloid::const_primitive::sweep_angles)
 		.def("selections", &paraboloid::const_primitive::selections)
-		.def("constant_data", &paraboloid::const_primitive::constant_data)
-		.def("uniform_data", &paraboloid::const_primitive::uniform_data)
-		.def("varying_data", &paraboloid::const_primitive::varying_data)
+		.def("constant_attributes", &paraboloid::const_primitive::constant_attributes)
+		.def("uniform_attributes", &paraboloid::const_primitive::uniform_attributes)
+		.def("varying_attributes", &paraboloid::const_primitive::varying_attributes)
 		;
 
 	class_<paraboloid::primitive::wrapper>("primitive", no_init)
@@ -119,9 +119,9 @@ void define_namespace_paraboloid()
 		.def("z_max", &paraboloid::primitive::z_max)
 		.def("sweep_angles", &paraboloid::primitive::sweep_angles)
 		.def("selections", &paraboloid::primitive::selections)
-		.def("constant_data", &paraboloid::primitive::constant_data)
-		.def("uniform_data", &paraboloid::primitive::uniform_data)
-		.def("varying_data", &paraboloid::primitive::varying_data)
+		.def("constant_attributes", &paraboloid::primitive::constant_attributes)
+		.def("uniform_attributes", &paraboloid::primitive::uniform_attributes)
+		.def("varying_attributes", &paraboloid::primitive::varying_attributes)
 		;
 }
 

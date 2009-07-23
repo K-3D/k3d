@@ -41,9 +41,9 @@ const_primitive::const_primitive(
 	const mesh::counts_t& CurvePointCounts,
 	const mesh::selection_t& CurveSelections,
 	const mesh::indices_t& CurvePoints,
-	const mesh::attribute_arrays_t& ConstantData,
-	const mesh::attribute_arrays_t& UniformData,
-	const mesh::attribute_arrays_t& VaryingData
+	const mesh::table_t& ConstantAttributes,
+	const mesh::table_t& UniformAttributes,
+	const mesh::table_t& VaryingAttributes
 		) :
 	periodic(Periodic),
 	material(Material),
@@ -51,9 +51,9 @@ const_primitive::const_primitive(
 	curve_point_counts(CurvePointCounts),
 	curve_selections(CurveSelections),
 	curve_points(CurvePoints),
-	constant_data(ConstantData),
-	uniform_data(UniformData),
-	varying_data(VaryingData)
+	constant_attributes(ConstantAttributes),
+	uniform_attributes(UniformAttributes),
+	varying_attributes(VaryingAttributes)
 {
 }
 
@@ -67,9 +67,9 @@ primitive::primitive(
 	mesh::counts_t& CurvePointCounts,
 	mesh::selection_t& CurveSelections,
 	mesh::indices_t& CurvePoints,
-	mesh::attribute_arrays_t& ConstantData,
-	mesh::attribute_arrays_t& UniformData,
-	mesh::attribute_arrays_t& VaryingData
+	mesh::table_t& ConstantAttributes,
+	mesh::table_t& UniformAttributes,
+	mesh::table_t& VaryingAttributes
 		) :
 	periodic(Periodic),
 	material(Material),
@@ -77,9 +77,9 @@ primitive::primitive(
 	curve_point_counts(CurvePointCounts),
 	curve_selections(CurveSelections),
 	curve_points(CurvePoints),
-	constant_data(ConstantData),
-	uniform_data(UniformData),
-	varying_data(VaryingData)
+	constant_attributes(ConstantAttributes),
+	uniform_attributes(UniformAttributes),
+	varying_attributes(VaryingAttributes)
 {
 }
 
@@ -91,12 +91,12 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("cubic_curve");
 
 	primitive* const result = new primitive(
-		generic_primitive.structure.create<mesh::bools_t>("periodic"),
-		generic_primitive.structure.create<mesh::materials_t>("material"),
-		generic_primitive.structure.create<mesh::indices_t>("curve_first_points"),
-		generic_primitive.structure.create<mesh::counts_t>("curve_point_counts"),
-		generic_primitive.structure.create<mesh::selection_t>("curve_selections"),
-		generic_primitive.structure.create<mesh::indices_t>("curve_points"),
+		generic_primitive.structure["uniform"].create<mesh::bools_t>("periodic"),
+		generic_primitive.structure["uniform"].create<mesh::materials_t>("material"),
+		generic_primitive.structure["uniform"].create<mesh::indices_t>("curve_first_points"),
+		generic_primitive.structure["uniform"].create<mesh::counts_t>("curve_point_counts"),
+		generic_primitive.structure["uniform"].create<mesh::selection_t>("curve_selections"),
+		generic_primitive.structure["varying"].create<mesh::indices_t>("curve_points"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
 		generic_primitive.attributes["varying"]
@@ -118,16 +118,19 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
-		const mesh::bools_t& periodic = require_const_array<mesh::bools_t>(Primitive, "periodic");
-		const mesh::materials_t& material = require_const_array<mesh::materials_t>(Primitive, "material");
-		const mesh::indices_t& curve_first_points = require_const_array<mesh::indices_t>(Primitive, "curve_first_points");
-		const mesh::counts_t& curve_point_counts = require_const_array<mesh::counts_t>(Primitive, "curve_point_counts");
-		const mesh::selection_t& curve_selections = require_const_array<mesh::selection_t>(Primitive, "curve_selections");
-		const mesh::indices_t& curve_points = require_const_array<mesh::indices_t>(Primitive, "curve_points");
+		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		const mesh::table_t& varying_structure = require_structure(Primitive, "varying");
 
-		const mesh::attribute_arrays_t& constant_data = require_const_attribute_arrays(Primitive, "constant");
-		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
-		const mesh::attribute_arrays_t& varying_data = require_const_attribute_arrays(Primitive, "varying");
+		const mesh::bools_t& periodic = require_array<mesh::bools_t>(Primitive, uniform_structure, "periodic");
+		const mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, uniform_structure, "material");
+		const mesh::indices_t& curve_first_points = require_array<mesh::indices_t>(Primitive, uniform_structure, "curve_first_points");
+		const mesh::counts_t& curve_point_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "curve_point_counts");
+		const mesh::selection_t& curve_selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "curve_selections");
+		const mesh::indices_t& curve_points = require_array<mesh::indices_t>(Primitive, varying_structure, "curve_points");
+
+		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
+		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 
 		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
@@ -138,11 +141,11 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_array_size(Primitive, curve_selections, "curve_selections", curve_first_points.size());
 		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
-		require_attribute_arrays_size(Primitive, uniform_data, "uniform", curve_first_points.size());
-		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_table_size(Primitive, constant_attributes, "constant", 1);
+		require_table_size(Primitive, uniform_attributes, "uniform", curve_first_points.size());
+		require_table_size(Primitive, varying_attributes, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		return new const_primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_data, uniform_data, varying_data);
+		return new const_primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_attributes, uniform_attributes, varying_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -159,16 +162,19 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
-		mesh::bools_t& periodic = require_array<mesh::bools_t>(Primitive, "periodic");
-		mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, "material");
-		mesh::indices_t& curve_first_points = require_array<mesh::indices_t>(Primitive, "curve_first_points");
-		mesh::counts_t& curve_point_counts = require_array<mesh::counts_t>(Primitive, "curve_point_counts");
-		mesh::selection_t& curve_selections = require_array<mesh::selection_t>(Primitive, "curve_selections");
-		mesh::indices_t& curve_points = require_array<mesh::indices_t>(Primitive, "curve_points");
+		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		mesh::table_t& varying_structure = require_structure(Primitive, "varying");
 
-		mesh::attribute_arrays_t& constant_data = require_attribute_arrays(Primitive, "constant");
-		mesh::attribute_arrays_t& uniform_data = require_attribute_arrays(Primitive, "uniform");
-		mesh::attribute_arrays_t& varying_data = require_attribute_arrays(Primitive, "varying");
+		mesh::bools_t& periodic = require_array<mesh::bools_t>(Primitive, uniform_structure, "periodic");
+		mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, uniform_structure, "material");
+		mesh::indices_t& curve_first_points = require_array<mesh::indices_t>(Primitive, uniform_structure, "curve_first_points");
+		mesh::counts_t& curve_point_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "curve_point_counts");
+		mesh::selection_t& curve_selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "curve_selections");
+		mesh::indices_t& curve_points = require_array<mesh::indices_t>(Primitive, varying_structure, "curve_points");
+
+		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
+		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 
 		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
@@ -179,11 +185,11 @@ primitive* validate(mesh::primitive& Primitive)
 		require_array_size(Primitive, curve_selections, "curve_selections", curve_first_points.size());
 		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", 1);
-		require_attribute_arrays_size(Primitive, uniform_data, "uniform", curve_first_points.size());
-		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_table_size(Primitive, constant_attributes, "constant", 1);
+		require_table_size(Primitive, uniform_attributes, "uniform", curve_first_points.size());
+		require_table_size(Primitive, varying_attributes, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		return new primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_data, uniform_data, varying_data);
+		return new primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_attributes, uniform_attributes, varying_attributes);
 	}
 	catch(std::exception& e)
 	{

@@ -82,7 +82,7 @@ public:
 			k3d::typed_array<k3d::color> default_color_array;
 	
 			// Get the color array ...
-			color_array_proxy color(m_array_type.pipeline_value(), m_color_array.pipeline_value(), *polyhedron, Mesh.vertex_data);
+			color_array_proxy color(m_array_type.pipeline_value(), m_color_array.pipeline_value(), *polyhedron, Mesh.vertex_attributes);
 	
 			k3d::gl::store_attributes attributes;
 			glEnable(GL_LIGHTING);
@@ -251,7 +251,7 @@ private:
 		color_array_proxy(const array_t ArrayType,
 				const k3d::string_t& ArrayName,
 				const k3d::polyhedron::const_primitive& Polyhedron,
-				const k3d::attribute_arrays& VertexData) :
+				const k3d::table& VertexData) :
 					m_array_type(ArrayType),
 					m_edge_points(Polyhedron.edge_points)
 		{
@@ -259,13 +259,13 @@ private:
 			switch(m_array_type)
 			{
 			case CONSTANT:
-				m_color_array = Polyhedron.constant_data.lookup<k3d::mesh::colors_t>(ArrayName);
+				m_color_array = Polyhedron.constant_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
 			case UNIFORM:
-				m_color_array = Polyhedron.uniform_data.lookup<k3d::mesh::colors_t>(ArrayName);
+				m_color_array = Polyhedron.uniform_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
 			case VARYING:
-				m_color_array = Polyhedron.face_varying_data.lookup<k3d::mesh::colors_t>(ArrayName);
+				m_color_array = Polyhedron.face_varying_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
 			case VERTEX:
 				m_color_array = VertexData.lookup<k3d::mesh::colors_t>(ArrayName);

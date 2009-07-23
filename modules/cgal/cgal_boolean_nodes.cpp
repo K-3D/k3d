@@ -29,7 +29,7 @@
 
 #include "conversion.h"
 
-#include <k3dsdk/attribute_array_copier.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/euler_operations.h>
 #include <k3dsdk/imaterial.h>

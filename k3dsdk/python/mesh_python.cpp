@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "attribute_arrays_python.h"
-#include "const_attribute_arrays_python.h"
+#include "table_python.h"
+#include "const_table_python.h"
 #include "const_typed_array_python.h"
 #include "instance_wrapper_python.h"
 #include "mesh_python.h"
@@ -141,7 +141,7 @@ object mesh::create_point_selection() { return detail::create_array(wrapped().po
 object mesh::create_points() { return detail::create_array(wrapped().points); }
 object mesh::point_selection() { return detail::wrap_non_const_array(wrapped().point_selection); }
 object mesh::points() { return detail::wrap_non_const_array(wrapped().points); }
-object mesh::vertex_data() { return wrap(wrapped().vertex_data); }
+object mesh::vertex_attributes() { return wrap(wrapped().vertex_attributes); }
 object mesh::primitives() { return wrap(wrapped().primitives); }
 
 const string_t mesh::repr()
@@ -174,7 +174,7 @@ const_mesh::const_mesh(const k3d::mesh* const Mesh) :
 
 object const_mesh::point_selection() { return detail::wrap_const_array(wrapped().point_selection); }
 object const_mesh::points() { return detail::wrap_const_array(wrapped().points); }
-object const_mesh::vertex_data() { return wrap(wrapped().vertex_data); }
+object const_mesh::vertex_attributes() { return wrap(wrapped().vertex_attributes); }
 object const_mesh::primitives() { return wrap(wrapped().primitives); }
 
 const string_t const_mesh::repr()
@@ -270,8 +270,8 @@ void define_class_mesh()
 {
 	scope outer = class_<mesh>("mesh", 
 		"Stores a heterogeneous collection of geometric mesh primitives.", no_init)
-		.def("vertex_data", &mesh::vertex_data,
-			"Returns a L{attribute_arrays} object containing a collection of mutable per-vertex data, or None.")
+		.def("vertex_attributes", &mesh::vertex_attributes,
+			"Returns a L{table} object containing a collection of mutable per-vertex data, or None.")
 		.def("point_selection", &mesh::point_selection,
 			"Returns an mutable L{double_array} object containing the selection state of every vertex in the mesh, or None.")
 		.def("points", &mesh::points,
@@ -309,7 +309,7 @@ void define_class_const_mesh()
 {
 	scope outer = class_<const_mesh>("mesh",
 		"Stores a heterogeneous, immutable collection of geometric mesh primitives.", no_init)
-		.def("vertex_data", &const_mesh::vertex_data,
+		.def("vertex_attributes", &const_mesh::vertex_attributes,
 			"Returns a L{const_named_arrays} object containing a collection of immutable (read-only) per-vertex data, or None.")
 		.def("point_selection", &const_mesh::point_selection,
 			"Returns an immutable (read-only) L{const_double_array} object containing the selection state of every vertex in the mesh, or None.")

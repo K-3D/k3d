@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "array.h"
-#include "attribute_arrays.h"
+#include "table.h"
 #include "iomanip.h"
 #include "log.h"
 #include "type_registry.h"
@@ -27,23 +27,23 @@ namespace k3d
 {
 
 ///////////////////////////////////////////////////////////////////////////
-// attribute_arrays
+// table
 
-const array* attribute_arrays::lookup(const string_t& Name) const
+const array* table::lookup(const string_t& Name) const
 {
 	const_iterator result = find(Name);
 	return result == end() ? static_cast<const array*>(0) : result->second.get();
 }
 
-array* attribute_arrays::writable(const string_t& Name)
+array* table::writable(const string_t& Name)
 {
 	iterator result = find(Name);
 	return result == end() ? static_cast<array*>(0) : &result->second.writable();
 }
 
-attribute_arrays attribute_arrays::clone_types() const
+table table::clone_types() const
 {
-	attribute_arrays result;
+	table result;
 
 	for(const_iterator array = begin(); array != end(); ++array)
 		result.insert(std::make_pair(array->first, array->second->clone_type()));
@@ -51,9 +51,9 @@ attribute_arrays attribute_arrays::clone_types() const
 	return result;
 }
 
-attribute_arrays attribute_arrays::clone() const
+table table::clone() const
 {
-	attribute_arrays result;
+	table result;
 
 	for(const_iterator array = begin(); array != end(); ++array)
 		result.insert(std::make_pair(array->first, array->second->clone()));
@@ -61,9 +61,9 @@ attribute_arrays attribute_arrays::clone() const
 	return result;
 }
 
-attribute_arrays attribute_arrays::clone(const uint_t Begin, const uint_t End) const
+table table::clone(const uint_t Begin, const uint_t End) const
 {
-	attribute_arrays result;
+	table result;
 
 	for(const_iterator array = begin(); array != end(); ++array)
 		result.insert(std::make_pair(array->first, array->second->clone(Begin, End)));
@@ -71,13 +71,13 @@ attribute_arrays attribute_arrays::clone(const uint_t Begin, const uint_t End) c
 	return result;
 }
 
-bool_t attribute_arrays::almost_equal(const attribute_arrays& Other, const uint64_t Threshold) const
+bool_t table::almost_equal(const table& Other, const uint64_t Threshold) const
 {
 	// If we have differing numbers of arrays, we definitely aren't equal
 	if(size() != Other.size())
 		return false;
 
-	for(attribute_arrays::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
+	for(table::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
 		// Each pair of arrays must have equal names
 		if(a->first != b->first)
@@ -102,9 +102,9 @@ bool_t attribute_arrays::almost_equal(const attribute_arrays& Other, const uint6
 	return true;
 }
 
-attribute_arrays attribute_arrays::clone_types(const attribute_arrays_collection& AttributeArrays)
+table table::clone_types(const table_collection& AttributeArrays)
 {
-	attribute_arrays result;
+	table result;
 
 	if(AttributeArrays.size())
 	{
@@ -129,13 +129,13 @@ attribute_arrays attribute_arrays::clone_types(const attribute_arrays_collection
 	return result;
 }
 
-void attribute_arrays::resize(const uint_t NewSize)
+void table::resize(const uint_t NewSize)
 {
 	for(iterator array = begin(); array != end(); ++array)
 		array->second.writable().resize(NewSize);
 }
 
-bool_t attribute_arrays::match_size(const uint_t Size) const
+bool_t table::match_size(const uint_t Size) const
 {
 	for(const_iterator array = begin(); array != end(); ++array)
 	{
@@ -149,9 +149,9 @@ bool_t attribute_arrays::match_size(const uint_t Size) const
 ////////////////////////////////////////////////////////////////////////////////////////////
 // operator<<
 
-std::ostream& operator<<(std::ostream& Stream, const attribute_arrays& RHS)
+std::ostream& operator<<(std::ostream& Stream, const table& RHS)
 {
-	for(attribute_arrays::const_iterator array_iterator = RHS.begin(); array_iterator != RHS.end(); ++array_iterator)
+	for(table::const_iterator array_iterator = RHS.begin(); array_iterator != RHS.end(); ++array_iterator)
 	{
 		Stream << standard_indent << "\"" << array_iterator->first << "\" [" << array_iterator->second->type_string() << "] (" << array_iterator->second->size() << "):\n";
 		if(array_iterator->second->size())

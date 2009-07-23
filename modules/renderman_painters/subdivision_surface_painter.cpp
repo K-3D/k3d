@@ -69,7 +69,7 @@ public:
 
       const k3d::mesh::points_t& points = *Mesh.points;
     
-      const strings_t* const interpolateboundary_tags = polyhedron->constant_data.lookup<strings_t>("interpolateboundary");
+      const strings_t* const interpolateboundary_tags = polyhedron->constant_attributes.lookup<strings_t>("interpolateboundary");
 
       const k3d::uint_t shell_begin = 0;
       const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();

@@ -75,21 +75,21 @@ public:
 
 				k3d::ri::parameter_list ri_parameters;
 
-				array_copier ri_constant_data;
-				ri_constant_data.add_arrays(cone->constant_data);
-				ri_constant_data.push_back(0);
-				ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
+				array_copier ri_constant_attributes;
+				ri_constant_attributes.add_arrays(cone->constant_attributes);
+				ri_constant_attributes.push_back(0);
+				ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
 
-				array_copier ri_uniform_data;
-				ri_uniform_data.add_arrays(cone->uniform_data);
-				ri_uniform_data.push_back(i);
-				ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
+				array_copier ri_uniform_attributes;
+				ri_uniform_attributes.add_arrays(cone->uniform_attributes);
+				ri_uniform_attributes.push_back(i);
+				ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
 
-				array_copier ri_varying_data;
-				ri_varying_data.add_arrays(cone->varying_data);
+				array_copier ri_varying_attributes;
+				ri_varying_attributes.add_arrays(cone->varying_attributes);
 				for(k3d::uint_t j = 0; j != 4; ++j)
-					ri_varying_data.push_back((i * 4) + j);
-				ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
+					ri_varying_attributes.push_back((i * 4) + j);
+				ri_varying_attributes.copy_to(k3d::ri::VARYING, ri_parameters);
 				
 				RenderState.stream.RiConeV(
 					cone->heights[i],

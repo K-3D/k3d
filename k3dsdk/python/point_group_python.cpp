@@ -44,8 +44,8 @@ public:
 
 		static object material(wrapper& Self) { return wrap(Self.wrapped().material); }
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 	class primitive
@@ -55,8 +55,8 @@ public:
 
 		static object material(wrapper& Self) { return wrap(Self.wrapped().material); }
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 
@@ -89,15 +89,15 @@ void define_namespace_point_group()
 	class_<point_group::const_primitive::wrapper>("const_primitive", no_init)
 		.def("material", &point_group::const_primitive::material)
 		.def("points", &point_group::const_primitive::points)
-		.def("constant_data", &point_group::const_primitive::constant_data)
-		.def("varying_data", &point_group::const_primitive::varying_data)
+		.def("constant_attributes", &point_group::const_primitive::constant_attributes)
+		.def("varying_attributes", &point_group::const_primitive::varying_attributes)
 		;
 
 	class_<point_group::primitive::wrapper>("primitive", no_init)
 		.def("material", &point_group::primitive::material)
 		.def("points", &point_group::primitive::points)
-		.def("constant_data", &point_group::primitive::constant_data)
-		.def("varying_data", &point_group::primitive::varying_data)
+		.def("constant_attributes", &point_group::primitive::constant_attributes)
+		.def("varying_attributes", &point_group::primitive::varying_attributes)
 		;
 }
 

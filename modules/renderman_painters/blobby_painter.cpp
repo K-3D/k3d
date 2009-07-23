@@ -71,17 +71,17 @@ public:
 			const size_t blobby_end = blobby_begin + primitive->first_primitives.size();
 			for(size_t blobby = blobby_begin; blobby != blobby_end; ++blobby)
 			{
-				array_copier ri_constant_data;
-				ri_constant_data.add_arrays(primitive->constant_data);
+				array_copier ri_constant_attributes;
+				ri_constant_attributes.add_arrays(primitive->constant_attributes);
 
-				array_copier ri_uniform_data;
-				ri_uniform_data.add_arrays(primitive->uniform_data);
+				array_copier ri_uniform_attributes;
+				ri_uniform_attributes.add_arrays(primitive->uniform_attributes);
 
-				array_copier ri_varying_data;
-				ri_varying_data.add_arrays(primitive->varying_data);
+				array_copier ri_varying_attributes;
+				ri_varying_attributes.add_arrays(primitive->varying_attributes);
 
-				array_copier ri_vertex_data;
-				ri_vertex_data.add_arrays(primitive->vertex_data);
+				array_copier ri_vertex_attributes;
+				ri_vertex_attributes.add_arrays(primitive->vertex_attributes);
 
 				const k3d::ri::unsigned_integer ri_nleaf = primitive->primitive_counts[blobby];
 				k3d::ri::unsigned_integers ri_codes;
@@ -99,8 +99,8 @@ public:
 					const size_t floats_end = floats_begin + primitive->primitive_float_counts[blobby_primitive];
 					ri_floats.insert(ri_floats.end(), &primitive->floats[floats_begin], &primitive->floats[floats_end]);
 
-					ri_varying_data.push_back(blobby_primitive);
-					ri_vertex_data.push_back(blobby_primitive);
+					ri_varying_attributes.push_back(blobby_primitive);
+					ri_vertex_attributes.push_back(blobby_primitive);
 				}
 
 				const size_t operators_begin = primitive->first_operators[blobby];
@@ -115,14 +115,14 @@ public:
 						ri_codes.push_back(primitive->operands[operand]);
 				}
 
-				ri_constant_data.push_back(blobby);
-				ri_uniform_data.push_back(blobby);
+				ri_constant_attributes.push_back(blobby);
+				ri_uniform_attributes.push_back(blobby);
 
 				k3d::ri::parameter_list ri_parameters;
-				ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
-				ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
-				ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
-				ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
+				ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
+				ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
+				ri_varying_attributes.copy_to(k3d::ri::VARYING, ri_parameters);
+				ri_vertex_attributes.copy_to(k3d::ri::VERTEX, ri_parameters);
 
 				k3d::ri::setup_material(primitive->materials[blobby], RenderState);
 				RenderState.stream.RiBlobbyV(ri_nleaf, ri_codes, ri_floats, ri_strings, ri_parameters);

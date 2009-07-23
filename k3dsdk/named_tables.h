@@ -1,5 +1,5 @@
-#ifndef K3DSDK_NAMED_ATTRIBUTE_ARRAYS_H
-#define K3DSDK_NAMED_ATTRIBUTE_ARRAYS_H
+#ifndef K3DSDK_NAMED_TABLES_H
+#define K3DSDK_NAMED_TABLES_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -20,33 +20,33 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "attribute_arrays.h"
+#include "table.h"
 
 namespace k3d
 {
 
-/// Defines a collection of named attribute_arrays objects.  The length of the individual
-/// attribute_arrays objects may vary.
-class named_attribute_arrays :
-	public std::map<string_t, attribute_arrays>
+/// Defines a collection of named table objects.  The length of the individual
+/// table objects may vary.
+class named_tables :
+	public std::map<string_t, table>
 {
 public:
 	/// Return an attribute_array by name, or NULL
-	const attribute_arrays* lookup(const string_t& Name) const;
+	const table* lookup(const string_t& Name) const;
 	/// Return an attribute_array by name, or NULL
-	attribute_arrays* writable(const string_t& Name);
+	table* writable(const string_t& Name);
 	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
-	bool_t almost_equal(const named_attribute_arrays& Other, const uint64_t Threshold) const;
+	bool_t almost_equal(const named_tables& Other, const uint64_t Threshold) const;
 };
 
 /// Serialization
-std::ostream& operator<<(std::ostream& Stream, const named_attribute_arrays& RHS);
+std::ostream& operator<<(std::ostream& Stream, const named_tables& RHS);
 
-/// Specialization of almost_equal that tests named_attribute_arrays for equality
+/// Specialization of almost_equal that tests named_tables for equality
 template<>
-class almost_equal<named_attribute_arrays>
+class almost_equal<named_tables>
 {
-	typedef named_attribute_arrays T;
+	typedef named_tables T;
 
 public:
 	almost_equal(const uint64_t Threshold) :
@@ -64,5 +64,5 @@ public:
 
 } // namespace k3d
 
-#endif // !K3DSDK_NAMED_ATTRIBUTE_ARRAYS_H
+#endif // !K3DSDK_NAMED_TABLES_H
 

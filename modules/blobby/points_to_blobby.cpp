@@ -23,7 +23,7 @@
 */
 
 #include <k3dsdk/algebra.h>
-#include <k3dsdk/attribute_array_copier.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/blobby.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/material_sink.h>
@@ -62,12 +62,12 @@ public:
 			return;
 
 		const k3d::mesh::points_t& input_points = *Input.points;
-		const k3d::mesh::attribute_arrays_t& input_vertex_data = Input.vertex_data;
+		const k3d::mesh::table_t& input_vertex_attributes = Input.vertex_attributes;
 
 		boost::scoped_ptr<k3d::blobby::primitive> blobby(k3d::blobby::create(Output));
 
-		blobby->vertex_data = input_vertex_data.clone_types();
-		k3d::attribute_array_copier vertex_data_copier(input_vertex_data, blobby->vertex_data);
+		blobby->vertex_attributes = input_vertex_attributes.clone_types();
+		k3d::table_copier vertex_attributes_copier(input_vertex_attributes, blobby->vertex_attributes);
 
 		const k3d::double_t radius = m_radius.pipeline_value();
 		k3d::imaterial* const material = m_material.pipeline_value();
@@ -85,7 +85,7 @@ public:
 			blobby->primitives.push_back(k3d::blobby::ELLIPSOID);
 			blobby->primitive_first_floats.push_back(blobby->floats.size());
 			blobby->primitive_float_counts.push_back(16);
-			vertex_data_copier.push_back(point);
+			vertex_attributes_copier.push_back(point);
 
 			k3d::matrix4 matrix = k3d::transpose(k3d::translate3(k3d::to_vector(input_points[point])) * k3d::scale3(radius, radius, radius));
 			blobby->floats.insert(blobby->floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);

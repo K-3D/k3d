@@ -18,34 +18,34 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "iomanip.h"
-#include "named_attribute_arrays.h"
+#include "named_tables.h"
 
 namespace k3d
 {
 
 ///////////////////////////////////////////////////////////////////////////
-// named_attribute_arrays
+// named_tables
 
-const attribute_arrays* named_attribute_arrays::lookup(const string_t& Name) const
+const table* named_tables::lookup(const string_t& Name) const
 {
 	const_iterator result = find(Name);
-	return result == end() ? static_cast<attribute_arrays*>(0) : &result->second;
+	return result == end() ? static_cast<table*>(0) : &result->second;
 }
 
-attribute_arrays* named_attribute_arrays::writable(const string_t& Name)
+table* named_tables::writable(const string_t& Name)
 {
 	iterator result = find(Name);
-	return result == end() ? static_cast<attribute_arrays*>(0) : &result->second;
+	return result == end() ? static_cast<table*>(0) : &result->second;
 }
 
-bool_t named_attribute_arrays::almost_equal(const named_attribute_arrays& Other, const uint64_t Threshold) const
+bool_t named_tables::almost_equal(const named_tables& Other, const uint64_t Threshold) const
 {
 	// If our sizes differ, we definitely ain't equal
 	if(size() != Other.size())
 		return false;
 
 	// Test each pair ...
-	named_attribute_arrays::const_iterator a, b;
+	named_tables::const_iterator a, b;
 	for(a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
 		// Each pair must have equal names
@@ -67,9 +67,9 @@ bool_t named_attribute_arrays::almost_equal(const named_attribute_arrays& Other,
 /////////////////////////////////////////////////////////////////////////////////
 // operator<<
 
-std::ostream& operator<<(std::ostream& Stream, const named_attribute_arrays& RHS)
+std::ostream& operator<<(std::ostream& Stream, const named_tables& RHS)
 {
-	for(named_attribute_arrays::const_iterator attributes = RHS.begin(); attributes != RHS.end(); ++attributes)
+	for(named_tables::const_iterator attributes = RHS.begin(); attributes != RHS.end(); ++attributes)
 		Stream << standard_indent << "attributes \"" << attributes->first << "\"" << attributes->second << "\n";
 
 	return Stream;

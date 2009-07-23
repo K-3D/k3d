@@ -39,9 +39,9 @@ public:
 		const mesh::counts_t& CurvePointCounts,
 		const mesh::selection_t& CurveSelections,
 		const mesh::indices_t& CurvePoints,
-		const mesh::attribute_arrays_t& ConstantData,
-		const mesh::attribute_arrays_t& UniformData,
-		const mesh::attribute_arrays_t& VaryingData
+		const mesh::table_t& ConstantAttributes,
+		const mesh::table_t& UniformAttributes,
+		const mesh::table_t& VaryingAttributes
 		);
 
 	const mesh::bools_t& periodic;
@@ -50,9 +50,9 @@ public:
 	const mesh::counts_t& curve_point_counts;
 	const mesh::selection_t& curve_selections;
 	const mesh::indices_t& curve_points;
-	const mesh::attribute_arrays_t& constant_data;
-	const mesh::attribute_arrays_t& uniform_data;
-	const mesh::attribute_arrays_t& varying_data;
+	const mesh::table_t& constant_attributes;
+	const mesh::table_t& uniform_attributes;
+	const mesh::table_t& varying_attributes;
 };
 
 /// Gathers the member arrays of a linear_curve primitive into a convenient package
@@ -66,9 +66,9 @@ public:
 		mesh::counts_t& CurvePointCounts,
 		mesh::selection_t& CurveSelections,
 		mesh::indices_t& CurvePoints,
-		mesh::attribute_arrays_t& ConstantData,
-		mesh::attribute_arrays_t& UniformData,
-		mesh::attribute_arrays_t& VaryingData
+		mesh::table_t& ConstantAttributes,
+		mesh::table_t& UniformAttributes,
+		mesh::table_t& VaryingAttributes
 		);
 
 	mesh::bools_t& periodic;
@@ -77,9 +77,9 @@ public:
 	mesh::counts_t& curve_point_counts;
 	mesh::selection_t& curve_selections;
 	mesh::indices_t& curve_points;
-	mesh::attribute_arrays_t& constant_data;
-	mesh::attribute_arrays_t& uniform_data;
-	mesh::attribute_arrays_t& varying_data;
+	mesh::table_t& constant_attributes;
+	mesh::table_t& uniform_attributes;
+	mesh::table_t& varying_attributes;
 };
 
 /// Creates a new linear_curve mesh primitive, returning references to its member arrays.

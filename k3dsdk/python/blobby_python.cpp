@@ -55,10 +55,10 @@ public:
 		static object operator_operand_counts(wrapper& Self) { return wrap(Self.wrapped().operator_operand_counts); }
 		static object floats(wrapper& Self) { return wrap(Self.wrapped().floats); }
 		static object operands(wrapper& Self) { return wrap(Self.wrapped().operands); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
-		static object vertex_data(wrapper& Self) { return wrap(Self.wrapped().vertex_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 	class primitive
@@ -79,10 +79,10 @@ public:
 		static object operator_operand_counts(wrapper& Self) { return wrap(Self.wrapped().operator_operand_counts); }
 		static object floats(wrapper& Self) { return wrap(Self.wrapped().floats); }
 		static object operands(wrapper& Self) { return wrap(Self.wrapped().operands); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
-		static object vertex_data(wrapper& Self) { return wrap(Self.wrapped().vertex_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 
@@ -143,10 +143,10 @@ void define_namespace_blobby()
 		.def("operator_operand_counts", &blobby::const_primitive::operator_operand_counts)
 		.def("floats", &blobby::const_primitive::floats)
 		.def("operands", &blobby::const_primitive::operands)
-		.def("constant_data", &blobby::const_primitive::constant_data)
-		.def("uniform_data", &blobby::const_primitive::uniform_data)
-		.def("varying_data", &blobby::const_primitive::varying_data)
-		.def("vertex_data", &blobby::const_primitive::vertex_data)
+		.def("constant_attributes", &blobby::const_primitive::constant_attributes)
+		.def("uniform_attributes", &blobby::const_primitive::uniform_attributes)
+		.def("varying_attributes", &blobby::const_primitive::varying_attributes)
+		.def("vertex_attributes", &blobby::const_primitive::vertex_attributes)
 		;
 
 	class_<blobby::primitive::wrapper>("primitive", no_init)
@@ -163,10 +163,10 @@ void define_namespace_blobby()
 		.def("operator_operand_counts", &blobby::primitive::operator_operand_counts)
 		.def("floats", &blobby::primitive::floats)
 		.def("operands", &blobby::primitive::operands)
-		.def("constant_data", &blobby::primitive::constant_data)
-		.def("uniform_data", &blobby::primitive::uniform_data)
-		.def("varying_data", &blobby::primitive::varying_data)
-		.def("vertex_data", &blobby::primitive::vertex_data)
+		.def("constant_attributes", &blobby::primitive::constant_attributes)
+		.def("uniform_attributes", &blobby::primitive::uniform_attributes)
+		.def("varying_attributes", &blobby::primitive::varying_attributes)
+		.def("vertex_attributes", &blobby::primitive::vertex_attributes)
 		;
 }
 

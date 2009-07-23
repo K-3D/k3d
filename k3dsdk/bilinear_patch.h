@@ -36,17 +36,17 @@ public:
 		const mesh::selection_t& PatchSelections,
 		const mesh::materials_t& PatchMaterials,
 		const mesh::indices_t& PatchPoints,
-		const mesh::attribute_arrays_t& ConstantData,
-		const mesh::attribute_arrays_t& UniformData,
-		const mesh::attribute_arrays_t& VaryingData
+		const mesh::table_t& ConstantAttributes,
+		const mesh::table_t& UniformAttributes,
+		const mesh::table_t& VaryingAttributes
 		);
 
 	const mesh::selection_t& patch_selections;
 	const mesh::materials_t& patch_materials;
 	const mesh::indices_t& patch_points;
-	const mesh::attribute_arrays_t& constant_data;
-	const mesh::attribute_arrays_t& uniform_data;
-	const mesh::attribute_arrays_t& varying_data;
+	const mesh::table_t& constant_attributes;
+	const mesh::table_t& uniform_attributes;
+	const mesh::table_t& varying_attributes;
 };
 
 /// Gathers the member arrays of a bilinear_patch primitive into a convenient package
@@ -57,17 +57,17 @@ public:
 		mesh::selection_t& PatchSelections,
 		mesh::materials_t& PatchMaterials,
 		mesh::indices_t& PatchPoints,
-		mesh::attribute_arrays_t& ConstantData,
-		mesh::attribute_arrays_t& UniformData,
-		mesh::attribute_arrays_t& VaryingData
+		mesh::table_t& ConstantAttributes,
+		mesh::table_t& UniformAttributes,
+		mesh::table_t& VaryingAttributes
 		);
 
 	mesh::selection_t& patch_selections;
 	mesh::materials_t& patch_materials;
 	mesh::indices_t& patch_points;
-	mesh::attribute_arrays_t& constant_data;
-	mesh::attribute_arrays_t& uniform_data;
-	mesh::attribute_arrays_t& varying_data;
+	mesh::table_t& constant_attributes;
+	mesh::table_t& uniform_attributes;
+	mesh::table_t& varying_attributes;
 };
 
 /// Creates a new bilinear_patch mesh primitive, returning references to its member arrays.

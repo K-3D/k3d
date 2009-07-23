@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "const_named_attribute_arrays_python.h"
+#include "named_tables_python.h"
 #include "utility_python.h"
 
 #include <boost/python.hpp>
@@ -34,13 +34,36 @@ namespace python
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// define_class_const_named_attribute_arrays 
+// named_tables
 
-void define_class_const_named_attribute_arrays()
+static object named_tables_create(named_tables_wrapper& Self, const string_t& Name)
 {
-	class_<const_named_attribute_arrays_wrapper>("const_named_attribute_arrays", no_init)
-		.def("__len__", &utility::wrapped_len<const_named_attribute_arrays_wrapper>)
-		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<const_named_attribute_arrays_wrapper>)
+	if(Name.empty())
+		throw std::runtime_error("empty attribute name");
+
+	if(Self.wrapped().count(Name))
+		throw std::runtime_error("name already exists");
+
+	Self.wrapped().insert(std::make_pair(Name, k3d::table()));
+	return wrap(Self.wrapped()[Name]);
+}
+
+static void delete_1(named_tables_wrapper& Self, const string_t& Name)
+{
+	Self.wrapped().erase(Name);	
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// define_class_named_tables 
+
+void define_class_named_tables()
+{
+	class_<named_tables_wrapper>("named_tables", no_init)
+		.def("__len__", &utility::wrapped_len<named_tables_wrapper>)
+		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<named_tables_wrapper>)
+		.def("create", &named_tables_create)
+		.def("delete", &delete_1,
+			"Deletes a set of attribute arrays with the given name, if any.")
 		;
 }
 

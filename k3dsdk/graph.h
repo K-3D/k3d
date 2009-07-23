@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "attribute_arrays.h"
+#include "table.h"
 #include "named_array_types.h"
 #include "typed_array.h"
 #include "uint_t_array.h"
@@ -52,7 +52,7 @@ typedef typed_array<vector2> vectors_2d_t;
 /// Defines storage for a generic collection of inode objects
 typedef typed_array<inode*> nodes_t;
 /// Defines a heterogeneous collection of named, shared arrays
-typedef k3d::attribute_arrays attribute_arrays_t;
+typedef k3d::table table_t;
 
 ////////////////////////////////////////////////////////////////////////////////
 // undirected
@@ -85,11 +85,11 @@ public:
 	/// Stores the graph topology
 	pipeline_data<adjacency_list_t> topology;
 	/// Stores user-defined per-graph data
-	attribute_arrays_t graph_data;
+	table_t graph_data;
 	/// Stores user-defined per-vertex data
-	attribute_arrays_t vertex_data;
+	table_t vertex_data;
 	/// Stores user-defined per-edge data
-	attribute_arrays_t edge_data;
+	table_t edge_data;
 };
 
 /// Stream serialization

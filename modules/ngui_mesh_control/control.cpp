@@ -69,10 +69,10 @@ namespace k3d
 			Functor.finish_structure(primitive.structure);
 
 			Functor.start_named_attributes(primitive.attributes);
-			for(mesh::named_attribute_arrays_t::const_iterator attributes = primitive.attributes.begin(); attributes != primitive.attributes.end(); ++attributes)
+			for(mesh::named_tables_t::const_iterator attributes = primitive.attributes.begin(); attributes != primitive.attributes.end(); ++attributes)
 			{
 				Functor.start_attributes(attributes->first, attributes->second);
-				for(mesh::attribute_arrays_t::const_iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
+				for(mesh::table_t::const_iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
 					Functor.attribute_array(array->first, *array->second);
 				Functor.finish_attributes(attributes->first, attributes->second);
 			}
@@ -170,8 +170,8 @@ public:
 			current_mesh(0),
 			current_primitive(0),
 			current_structure_arrays(0),
-			current_named_attribute_arrays(0),
-			current_attribute_arrays(0),
+			current_named_tables(0),
+			current_table(0),
 			current_array(0),
 			stream(Stream)
 		{
@@ -272,33 +272,33 @@ public:
 			current_structure_arrays = 0;
 		}
 
-		void start_named_attributes(const k3d::mesh::named_attribute_arrays_t& NamedAttributes)
+		void start_named_attributes(const k3d::mesh::named_tables_t& NamedAttributes)
 		{
-			current_named_attribute_arrays = &NamedAttributes;
+			current_named_tables = &NamedAttributes;
 
-			stream << indentation << "v" << current_named_attribute_arrays;
-			stream << " [label=\"<named_attribute_arrays>Named Attribute Arrays";
+			stream << indentation << "v" << current_named_tables;
+			stream << " [label=\"<named_tables>Named Attribute Arrays";
 			
-			for(k3d::mesh::named_attribute_arrays_t::const_iterator attributes = NamedAttributes.begin(); attributes != NamedAttributes.end(); ++attributes)
+			for(k3d::mesh::named_tables_t::const_iterator attributes = NamedAttributes.begin(); attributes != NamedAttributes.end(); ++attributes)
 				stream << "|<" << attributes->first << ">" << "\\\"" << attributes->first << "\\\"";
 
 			stream << "\"]\n";
-			stream << indentation << "v" << current_primitive << ":attributes:e -> " << "v" << current_named_attribute_arrays << ":named_attribute_arrays:w\n";
+			stream << indentation << "v" << current_primitive << ":attributes:e -> " << "v" << current_named_tables << ":named_tables:w\n";
 			stream << k3d::push_indent;
 		}
 
-		void start_attributes(const k3d::string_t& Name, const k3d::mesh::attribute_arrays_t& Attributes)
+		void start_attributes(const k3d::string_t& Name, const k3d::mesh::table_t& Attributes)
 		{
-			current_attribute_arrays = &Attributes;
+			current_table = &Attributes;
 
-			stream << indentation << "v" << current_attribute_arrays;
-			stream << " [label=\"<attribute_arrays>Attribute Arrays";
+			stream << indentation << "v" << current_table;
+			stream << " [label=\"<table>Attribute Arrays";
 
-			for(k3d::mesh::attribute_arrays_t::const_iterator array = Attributes.begin(); array != Attributes.end(); ++array)
+			for(k3d::mesh::table_t::const_iterator array = Attributes.begin(); array != Attributes.end(); ++array)
 				stream << "|<" << array->first << ">" << "\\\"" << array->first << "\\\"";
 
 			stream << "\"]\n";
-			stream << indentation << "v" << current_named_attribute_arrays << ":" << Name << ":e -> " << "v" << current_attribute_arrays << ":attribute_arrays:w\n";
+			stream << indentation << "v" << current_named_tables << ":" << Name << ":e -> " << "v" << current_table << ":table:w\n";
 		}
 
 		void attribute_array(const k3d::string_t& Name, const k3d::array& Array)
@@ -306,20 +306,20 @@ public:
 			current_array = &Array;
 
 			stream << indentation << "v" << current_array << " [label=\"{|||...|}\"]\n";
-			stream << indentation << "v" << current_attribute_arrays << ":" << Name << ":e -> " << "v" << current_array << ":w\n";
+			stream << indentation << "v" << current_table << ":" << Name << ":e -> " << "v" << current_array << ":w\n";
 
 			current_array = 0;
 		}
 
-		void finish_attributes(const k3d::string_t& Name, const k3d::mesh::attribute_arrays_t& Attributes)
+		void finish_attributes(const k3d::string_t& Name, const k3d::mesh::table_t& Attributes)
 		{
-			current_attribute_arrays = 0;
+			current_table = 0;
 		}
 
-		void finish_named_attributes(const k3d::mesh::named_attribute_arrays_t& NamedAttributes)
+		void finish_named_attributes(const k3d::mesh::named_tables_t& NamedAttributes)
 		{
 			stream << k3d::pop_indent;
-			current_named_attribute_arrays = 0;
+			current_named_tables = 0;
 		}
 
 		void finish_primitive(const k3d::mesh::primitive& Primitive)
@@ -340,8 +340,8 @@ public:
 		const k3d::mesh* current_mesh;
 		const k3d::mesh::primitive* current_primitive;
 		const k3d::mesh::named_arrays_t* current_structure_arrays;
-		const k3d::mesh::named_attribute_arrays_t* current_named_attribute_arrays;
-		const k3d::mesh::attribute_arrays_t* current_attribute_arrays;
+		const k3d::mesh::named_tables_t* current_named_tables;
+		const k3d::mesh::table_t* current_table;
 		const k3d::array* current_array;
 		std::ostream& stream;
 	};

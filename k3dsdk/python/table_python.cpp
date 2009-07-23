@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "attribute_arrays_python.h"
+#include "table_python.h"
 #include "typed_array_python.h"
 #include "utility_python.h"
 
@@ -39,10 +39,10 @@ namespace k3d
 namespace python
 {
 
-class attribute_arrays_array_factory
+class table_array_factory
 {
 public:
-	attribute_arrays_array_factory(const string_t& Name, const string_t& Type, boost::python::object& Array, k3d::attribute_arrays& Arrays) :
+	table_array_factory(const string_t& Name, const string_t& Type, boost::python::object& Array, k3d::table& Arrays) :
 		name(Name),
 		type(Type),
 		array(Array),
@@ -69,60 +69,60 @@ private:
 	string_t name;
 	string_t type;
 	boost::python::object& array;
-	k3d::attribute_arrays& arrays;
+	k3d::table& arrays;
 };
 
-static list keys(attribute_arrays_wrapper& Self)
+static list keys(table_wrapper& Self)
 {
 	list results;
 
-	for(k3d::attribute_arrays::const_iterator array = Self.wrapped().begin(); array != Self.wrapped().end(); ++array)
+	for(k3d::table::const_iterator array = Self.wrapped().begin(); array != Self.wrapped().end(); ++array)
 		results.append(array->first);
 
 	return results;
 }
 
-static object create(attribute_arrays_wrapper& Self, const string_t& Name, const string_t& Type)
+static object create(table_wrapper& Self, const string_t& Name, const string_t& Type)
 {
 	if(Name.empty())
 		throw std::runtime_error("Empty array name");
 
 	boost::python::object result;
-	boost::mpl::for_each<k3d::named_array_types>(attribute_arrays_array_factory(Name, Type, result, Self.wrapped()));
+	boost::mpl::for_each<k3d::named_array_types>(table_array_factory(Name, Type, result, Self.wrapped()));
 	if(result == boost::python::object())
 		throw std::runtime_error("Cannot create array [" + Name + "] with unknown type [" + Type + "]");
 
 	return result;
 }
 
-static object create_array(attribute_arrays_wrapper& Self, const string_t& Name, const string_t& Type)
+static object create_array(table_wrapper& Self, const string_t& Name, const string_t& Type)
 {
 	k3d::log() << warning << "create_array() is deprecated, use create() instead." << std::endl;
 	return create(Self, Name, Type);
 }
 
-static void delete_1(attribute_arrays_wrapper& Self, const string_t& Name)
+static void delete_1(table_wrapper& Self, const string_t& Name)
 {
 	Self.wrapped().erase(Name);	
 }
 
-static void resize(attribute_arrays_wrapper& Self, const uint_t NewSize)
+static void resize(table_wrapper& Self, const uint_t NewSize)
 {
 	Self.wrapped().resize(NewSize);
 }
 
-static object get_item(attribute_arrays_wrapper& Self, const string_t& Key)
+static object get_item(table_wrapper& Self, const string_t& Key)
 {
-	k3d::attribute_arrays::iterator iterator = Self.wrapped().find(Key);
+	k3d::table::iterator iterator = Self.wrapped().find(Key);
 	if(iterator == Self.wrapped().end())
 		throw std::runtime_error("unknown key: " + Key);
 
 	return wrap_array(iterator->second.writable());
 }
 
-void define_class_attribute_arrays()
+void define_class_table()
 {
-	class_<attribute_arrays_wrapper>("attribute_arrays", 
+	class_<table_wrapper>("table", 
 		"Stores a mutable (read-write) collection of attribute arrays (named arrays of equal length).", no_init)
 		.def("keys", &keys,
 			"Returns a list containing names for all the arrays in the collection.")
@@ -134,7 +134,7 @@ void define_class_attribute_arrays()
 			"Deletes an array with given name, if any.")
 		.def("resize", &resize,
 			"Sets the size of every array in the collection.")
-		.def("__len__", &utility::wrapped_len<attribute_arrays_wrapper>)
+		.def("__len__", &utility::wrapped_len<table_wrapper>)
 		.def("__getitem__", &get_item);
 }
 

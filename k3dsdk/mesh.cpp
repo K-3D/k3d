@@ -213,9 +213,9 @@ bool_t almost_equal(const pipeline_data<T>& A, const pipeline_data<T>& B, const 
 
 /// Return true iff two sets of attributes arrays are equivalent (we provide this function mainly for consistency).
 
-bool_t almost_equal(const mesh::attribute_arrays_t& A, const mesh::attribute_arrays_t& B, const uint64_t Threshold)
+bool_t almost_equal(const mesh::table_t& A, const mesh::table_t& B, const uint64_t Threshold)
 {
-	return k3d::almost_equal<mesh::attribute_arrays_t>(Threshold)(A, B);
+	return k3d::almost_equal<mesh::table_t>(Threshold)(A, B);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -266,7 +266,7 @@ bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) const
 	return
 		detail::almost_equal(points, Other.points, Threshold) &&
 		detail::almost_equal(point_selection, Other.point_selection, Threshold) &&
-		detail::almost_equal(vertex_data, Other.vertex_data, Threshold) &&
+		detail::almost_equal(vertex_attributes, Other.vertex_attributes, Threshold) &&
 		detail::almost_equal(primitives, Other.primitives, Threshold)
 		;
 }
@@ -519,8 +519,8 @@ bool_t mesh::primitive::almost_equal(const primitive& Other, const uint64_t Thre
 {
 	return
 		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&
-		k3d::almost_equal<named_arrays_t>(Threshold)(structure, Other.structure) &&
-		k3d::almost_equal<named_attribute_arrays_t>(Threshold)(attributes, Other.attributes);
+		k3d::almost_equal<named_tables_t>(Threshold)(structure, Other.structure) &&
+		k3d::almost_equal<named_tables_t>(Threshold)(attributes, Other.attributes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -549,8 +549,8 @@ std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 		Stream << push_indent << start_block() << *RHS.point_selection << finish_block << pop_indent << "\n";
 	}
 
-	Stream << standard_indent << "vertex_data (" << RHS.vertex_data.size() << "):\n";
-	Stream << push_indent << RHS.vertex_data << pop_indent;
+	Stream << standard_indent << "vertex_attributes (" << RHS.vertex_attributes.size() << "):\n";
+	Stream << push_indent << RHS.vertex_attributes << pop_indent;
 
 	Stream << standard_indent << "primitives (" << RHS.primitives.size() << "):\n" << push_indent;
 	for(mesh::primitives_t::const_iterator primitive = RHS.primitives.begin(); primitive != RHS.primitives.end(); ++primitive)

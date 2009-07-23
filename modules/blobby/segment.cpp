@@ -94,7 +94,7 @@ public:
 		Output = k3d::mesh();
 
 		boost::scoped_ptr<k3d::blobby::primitive> blobby(k3d::blobby::create(Output));
-		k3d::typed_array<k3d::color>& varying_colors = blobby->varying_data.create<k3d::typed_array<k3d::color> >("Cs");
+		k3d::typed_array<k3d::color>& varying_colors = blobby->varying_attributes.create<k3d::typed_array<k3d::color> >("Cs");
 
 		blobby->first_primitives.push_back(blobby->primitives.size());
 		blobby->primitive_counts.push_back(1);

@@ -39,9 +39,9 @@ public:
 		const mesh::doubles_t& Radii,
 		const mesh::doubles_t& SweepAngles,
 		const mesh::selection_t& Selections,
-		const mesh::attribute_arrays_t& ConstantData,
-		const mesh::attribute_arrays_t& UniformData,
-		const mesh::attribute_arrays_t& VaryingData);
+		const mesh::table_t& ConstantAttributes,
+		const mesh::table_t& UniformAttributes,
+		const mesh::table_t& VaryingAttributes);
 
 	const mesh::matrices_t& matrices;
 	const mesh::materials_t& materials;
@@ -49,9 +49,9 @@ public:
 	const mesh::doubles_t& radii;
 	const mesh::doubles_t& sweep_angles;
 	const mesh::selection_t& selections;
-	const mesh::attribute_arrays_t& constant_data;
-	const mesh::attribute_arrays_t& uniform_data;
-	const mesh::attribute_arrays_t& varying_data;
+	const mesh::table_t& constant_attributes;
+	const mesh::table_t& uniform_attributes;
+	const mesh::table_t& varying_attributes;
 };
 
 /// Gathers the member arrays of a disk primitive into a convenient package
@@ -65,9 +65,9 @@ public:
 		mesh::doubles_t& Radii,
 		mesh::doubles_t& SweepAngles,
 		mesh::selection_t& Selections,
-		mesh::attribute_arrays_t& ConstantData,
-		mesh::attribute_arrays_t& UniformData,
-		mesh::attribute_arrays_t& VaryingData);
+		mesh::table_t& ConstantAttributes,
+		mesh::table_t& UniformAttributes,
+		mesh::table_t& VaryingAttributes);
 
 	mesh::matrices_t& matrices;
 	mesh::materials_t& materials;
@@ -75,9 +75,9 @@ public:
 	mesh::doubles_t& radii;
 	mesh::doubles_t& sweep_angles;
 	mesh::selection_t& selections;
-	mesh::attribute_arrays_t& constant_data;
-	mesh::attribute_arrays_t& uniform_data;
-	mesh::attribute_arrays_t& varying_data;
+	mesh::table_t& constant_attributes;
+	mesh::table_t& uniform_attributes;
+	mesh::table_t& varying_attributes;
 };
 
 /// Creates a new disk mesh primitive, returning references to its member arrays.

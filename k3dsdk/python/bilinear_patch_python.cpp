@@ -45,9 +45,9 @@ public:
 		static object patch_selections(wrapper& Self) { return wrap(Self.wrapped().patch_selections); }
 		static object patch_materials(wrapper& Self) { return wrap(Self.wrapped().patch_materials); }
 		static object patch_points(wrapper& Self) { return wrap(Self.wrapped().patch_points); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 	class primitive
@@ -58,9 +58,9 @@ public:
 		static object patch_selections(wrapper& Self) { return wrap(Self.wrapped().patch_selections); }
 		static object patch_materials(wrapper& Self) { return wrap(Self.wrapped().patch_materials); }
 		static object patch_points(wrapper& Self) { return wrap(Self.wrapped().patch_points); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 
@@ -94,18 +94,18 @@ void define_namespace_bilinear_patch()
 		.def("patch_selections", &bilinear_patch::const_primitive::patch_selections)
 		.def("patch_materials", &bilinear_patch::const_primitive::patch_materials)
 		.def("patch_points", &bilinear_patch::const_primitive::patch_points)
-		.def("constant_data", &bilinear_patch::const_primitive::constant_data)
-		.def("uniform_data", &bilinear_patch::const_primitive::uniform_data)
-		.def("varying_data", &bilinear_patch::const_primitive::varying_data)
+		.def("constant_attributes", &bilinear_patch::const_primitive::constant_attributes)
+		.def("uniform_attributes", &bilinear_patch::const_primitive::uniform_attributes)
+		.def("varying_attributes", &bilinear_patch::const_primitive::varying_attributes)
 		;
 
 	class_<bilinear_patch::primitive::wrapper>("primitive", no_init)
 		.def("patch_selections", &bilinear_patch::primitive::patch_selections)
 		.def("patch_materials", &bilinear_patch::primitive::patch_materials)
 		.def("patch_points", &bilinear_patch::primitive::patch_points)
-		.def("constant_data", &bilinear_patch::primitive::constant_data)
-		.def("uniform_data", &bilinear_patch::primitive::uniform_data)
-		.def("varying_data", &bilinear_patch::primitive::varying_data)
+		.def("constant_attributes", &bilinear_patch::primitive::constant_attributes)
+		.def("uniform_attributes", &bilinear_patch::primitive::uniform_attributes)
+		.def("varying_attributes", &bilinear_patch::primitive::varying_attributes)
 		;
 }
 

@@ -22,8 +22,8 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include <k3dsdk/attribute_arrays.h>
-#include <k3dsdk/attribute_array_copier.h>
+#include <k3dsdk/table.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
 #include <k3dsdk/mesh_modifier.h>
@@ -290,17 +290,17 @@ private:
 
 /// Delete elements of an attribute array
 template<>
-class array_element_deleter<k3d::mesh::attribute_arrays_t>
+class array_element_deleter<k3d::mesh::table_t>
 {
 public:
 	array_element_deleter(const k3d::mesh::counts_t& ToRemoveIndicesSum,
-			const k3d::mesh::attribute_arrays_t& InputArray,
-			k3d::mesh::attribute_arrays_t& OutputArray) :
+			const k3d::mesh::table_t& InputArray,
+			k3d::mesh::table_t& OutputArray) :
 				m_to_remove_indices_sum(ToRemoveIndicesSum)
 	{
 		OutputArray = InputArray.clone_types();
 		OutputArray.resize(ToRemoveIndicesSum.size() - ToRemoveIndicesSum.back());
-		m_copier.reset(new k3d::attribute_array_copier(InputArray, OutputArray));
+		m_copier.reset(new k3d::table_copier(InputArray, OutputArray));
 	}
 	
 	void operator()(const k3d::uint_t Index)
@@ -311,7 +311,7 @@ public:
 	
 private:
 	const k3d::mesh::counts_t& m_to_remove_indices_sum;
-	boost::scoped_ptr<k3d::attribute_array_copier> m_copier;
+	boost::scoped_ptr<k3d::table_copier> m_copier;
 };
 
 
@@ -428,9 +428,9 @@ public:
 			detail::update_indices(edges_to_remove, edges_to_remove, input_polyhedron->clockwise_edges, output_polyhedron->clockwise_edges);
 			detail::delete_elements(edges_to_remove, edge_selection, output_polyhedron->edge_selections);
 			detail::delete_elements(m_points_to_remove, point_selection, Output.point_selection.writable());
-			detail::delete_elements(m_points_to_remove, Input.vertex_data, Output.vertex_data);
-			detail::delete_elements(edges_to_remove, input_polyhedron->face_varying_data, output_polyhedron->face_varying_data);
-			detail::delete_elements(faces_to_remove, input_polyhedron->uniform_data, output_polyhedron->uniform_data);
+			detail::delete_elements(m_points_to_remove, Input.vertex_attributes, Output.vertex_attributes);
+			detail::delete_elements(edges_to_remove, input_polyhedron->face_varying_attributes, output_polyhedron->face_varying_attributes);
+			detail::delete_elements(faces_to_remove, input_polyhedron->uniform_attributes, output_polyhedron->uniform_attributes);
 			
 			// Update the per-polyhedra arrays
 			output_polyhedron->shell_face_counts.clear();
@@ -443,8 +443,8 @@ public:
 			const k3d::uint_t polyhedra_count = input_first_faces.size();
 			k3d::uint_t new_first_face = 0;
 			k3d::uint_t total_removed_faces = 0;
-			output_polyhedron->constant_data = input_polyhedron->constant_data.clone_types();
-			k3d::attribute_array_copier constant_copier(input_polyhedron->constant_data, output_polyhedron->constant_data);
+			output_polyhedron->constant_attributes = input_polyhedron->constant_attributes.clone_types();
+			k3d::table_copier constant_copier(input_polyhedron->constant_attributes, output_polyhedron->constant_attributes);
 			for(k3d::uint_t polyhedron = 0; polyhedron < polyhedra_count; ++polyhedron)
 			{
 				k3d::uint_t deleted_face_count = faces_to_remove[input_first_faces[polyhedron] + input_face_counts[polyhedron] - 1] - total_removed_faces;

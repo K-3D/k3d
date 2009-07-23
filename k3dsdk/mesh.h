@@ -20,12 +20,12 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "attribute_arrays.h"
 #include "bounding_box3.h"
-#include "named_attribute_arrays.h"
 #include "named_arrays.h"
 #include "named_array_types.h"
+#include "named_tables.h"
 #include "pipeline_data.h"
+#include "table.h"
 #include "typed_array.h"
 #include "uint_t_array.h"
 
@@ -83,9 +83,9 @@ public:
 	/// Defines a heterogeneous collection of named, shared arrays with varying lengths.
 	typedef k3d::named_arrays named_arrays_t;
 	/// Defines a heterogeneous collection of named, shared arrays with identical length.
-	typedef k3d::attribute_arrays attribute_arrays_t;
+	typedef k3d::table table_t;
 	/// Defines a named collection of attribute arrays.
-	typedef k3d::named_attribute_arrays named_attribute_arrays_t;
+	typedef k3d::named_tables named_tables_t;
 
 	/// Defines storage for a generic mesh primitive.
 	class primitive
@@ -97,9 +97,9 @@ public:
 		/// Stores the primitive type ("point_groups", "polyhedra", "teapot", etc).
 		string_t type;
 		/// Stores array data that defines the primitive's structure (topology and geometry).
-		named_arrays_t structure;
+		named_tables_t structure;
 		/// Stores array data that defines the primitive's attributes.
-		named_attribute_arrays_t attributes;
+		named_tables_t attributes;
 
 		/// Compares two primitives for equality using the fuzzy semantics of almost_equal.
 		bool_t almost_equal(const primitive& Other, const uint64_t Threshold) const;
@@ -119,7 +119,7 @@ public:
 	/// Stores per-point selection state.
 	pipeline_data<selection_t> point_selection;
 	/// Stores user-defined per-point data (maps to RenderMan vertex data).
-	attribute_arrays_t vertex_data;
+	table_t vertex_attributes;
 	/// Stores mesh primitives.
 	primitives_t primitives;
 
@@ -144,12 +144,15 @@ public:
 	template<typename FunctorT>
 	static void visit_arrays(const mesh::primitive& Primitive, FunctorT Functor)
 	{
-		for(mesh::named_arrays_t::const_iterator array = Primitive.structure.begin(); array != Primitive.structure.end(); ++array)
-			Functor(array->first, array->second);
-
-		for(mesh::named_attribute_arrays_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
+		for(mesh::named_tables_t::const_iterator structure = Primitive.structure.begin(); structure != Primitive.structure.end(); ++structure)
 		{
-			for(mesh::attribute_arrays_t::const_iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
+			for(mesh::table_t::const_iterator array = structure->second.begin(); array != structure->second.end(); ++array)
+				Functor(array->first, array->second);
+		}
+
+		for(mesh::named_tables_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
+		{
+			for(mesh::table_t::const_iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
 				Functor(array->first, array->second);
 		}
 	}
@@ -158,12 +161,15 @@ public:
 	template<typename FunctorT>
 	static void visit_arrays(mesh::primitive& Primitive, FunctorT Functor)
 	{
-		for(mesh::named_arrays_t::iterator array = Primitive.structure.begin(); array != Primitive.structure.end(); ++array)
-			Functor(array->first, array->second);
-
-		for(mesh::named_attribute_arrays_t::iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
+		for(mesh::named_tables_t::iterator structure = Primitive.structure.begin(); structure != Primitive.structure.end(); ++structure)
 		{
-			for(mesh::attribute_arrays_t::iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
+			for(mesh::named_arrays_t::iterator array = structure->second.begin(); array != structure->second.end(); ++array)
+				Functor(array->first, array->second);
+		}
+
+		for(mesh::named_tables_t::iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
+		{
+			for(mesh::table_t::iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
 				Functor(array->first, array->second);
 		}
 	}

@@ -21,7 +21,7 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "attribute_array_copier.h"
+#include "table_copier.h"
 #include "metadata_keys.h"
 #include "parallel/blocked_range.h"
 #include "parallel/parallel_for.h"
@@ -61,9 +61,9 @@ const_primitive::const_primitive(
 	const mesh::indices_t& EdgePoints,
 	const mesh::indices_t& ClockwiseEdges,
 	const mesh::selection_t& EdgeSelections,
-	const mesh::attribute_arrays_t& ConstantData,
-	const mesh::attribute_arrays_t& UniformData,
-	const mesh::attribute_arrays_t& FaceVaryingData
+	const mesh::table_t& ConstantAttributes,
+	const mesh::table_t& UniformAttributes,
+	const mesh::table_t& FaceVaryingAttributes
 		) :
 	shell_first_faces(ShellFirstFaces),
 	shell_face_counts(ShellFaceCounts),
@@ -76,9 +76,9 @@ const_primitive::const_primitive(
 	edge_points(EdgePoints),
 	clockwise_edges(ClockwiseEdges),
 	edge_selections(EdgeSelections),
-	constant_data(ConstantData),
-	uniform_data(UniformData),
-	face_varying_data(FaceVaryingData)
+	constant_attributes(ConstantAttributes),
+	uniform_attributes(UniformAttributes),
+	face_varying_attributes(FaceVaryingAttributes)
 {
 }
 
@@ -94,9 +94,9 @@ const_primitive::const_primitive(const primitive& Primitive) :
 	edge_points(Primitive.edge_points),
 	clockwise_edges(Primitive.clockwise_edges),
 	edge_selections(Primitive.edge_selections),
-	constant_data(Primitive.constant_data),
-	uniform_data(Primitive.uniform_data),
-	face_varying_data(Primitive.face_varying_data)
+	constant_attributes(Primitive.constant_attributes),
+	uniform_attributes(Primitive.uniform_attributes),
+	face_varying_attributes(Primitive.face_varying_attributes)
 {
 }
 
@@ -115,9 +115,9 @@ primitive::primitive(
 	mesh::indices_t& EdgePoints,
 	mesh::indices_t& ClockwiseEdges,
 	mesh::selection_t& EdgeSelections,
-	mesh::attribute_arrays_t& ConstantData,
-	mesh::attribute_arrays_t& UniformData,
-	mesh::attribute_arrays_t& FaceVaryingData
+	mesh::table_t& ConstantAttributes,
+	mesh::table_t& UniformAttributes,
+	mesh::table_t& FaceVaryingAttributes
 		) :
 	shell_first_faces(ShellFirstFaces),
 	shell_face_counts(ShellFaceCounts),
@@ -130,9 +130,9 @@ primitive::primitive(
 	edge_points(EdgePoints),
 	clockwise_edges(ClockwiseEdges),
 	edge_selections(EdgeSelections),
-	constant_data(ConstantData),
-	uniform_data(UniformData),
-	face_varying_data(FaceVaryingData)
+	constant_attributes(ConstantAttributes),
+	uniform_attributes(UniformAttributes),
+	face_varying_attributes(FaceVaryingAttributes)
 {
 }
 
@@ -146,17 +146,17 @@ primitive* create(mesh::primitive& GenericPrimitive)
 	GenericPrimitive.attributes.clear();
 
 	primitive* const result = new primitive(
-		GenericPrimitive.structure.create<mesh::indices_t>("shell_first_faces"),
-		GenericPrimitive.structure.create<mesh::counts_t>("shell_face_counts"),
-		GenericPrimitive.structure.create<typed_array<int32_t> >("shell_types"),
-		GenericPrimitive.structure.create<mesh::indices_t>("face_first_loops"),
-		GenericPrimitive.structure.create<mesh::counts_t>("face_loop_counts"),
-		GenericPrimitive.structure.create<mesh::selection_t>("face_selections"),
-		GenericPrimitive.structure.create<mesh::materials_t>("face_materials"),
-		GenericPrimitive.structure.create<mesh::indices_t>("loop_first_edges"),
-		GenericPrimitive.structure.create<mesh::indices_t>("edge_points"),
-		GenericPrimitive.structure.create<mesh::indices_t>("clockwise_edges"),
-		GenericPrimitive.structure.create<mesh::selection_t>("edge_selections"),
+		GenericPrimitive.structure["constant"].create<mesh::indices_t>("shell_first_faces"),
+		GenericPrimitive.structure["constant"].create<mesh::counts_t>("shell_face_counts"),
+		GenericPrimitive.structure["constant"].create<typed_array<int32_t> >("shell_types"),
+		GenericPrimitive.structure["uniform"].create<mesh::indices_t>("face_first_loops"),
+		GenericPrimitive.structure["uniform"].create<mesh::counts_t>("face_loop_counts"),
+		GenericPrimitive.structure["uniform"].create<mesh::selection_t>("face_selections"),
+		GenericPrimitive.structure["uniform"].create<mesh::materials_t>("face_materials"),
+		GenericPrimitive.structure["face_varying"].create<mesh::indices_t>("loop_first_edges"),
+		GenericPrimitive.structure["face_varying"].create<mesh::indices_t>("edge_points"),
+		GenericPrimitive.structure["face_varying"].create<mesh::indices_t>("clockwise_edges"),
+		GenericPrimitive.structure["face_varying"].create<mesh::selection_t>("edge_selections"),
 		GenericPrimitive.attributes["constant"],
 		GenericPrimitive.attributes["uniform"],
 		GenericPrimitive.attributes["face_varying"]
@@ -207,7 +207,7 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 		const uint_t point_offset = points.size();
 		points.insert(points.end(), Vertices.begin(), Vertices.end());
 		point_selection.insert(point_selection.end(), Vertices.size(), 0.0);
-		Mesh.vertex_data.resize(points.size());
+		Mesh.vertex_attributes.resize(points.size());
 
 		// Append a new polyhedron to the mesh ...
 		primitive* const polyhedron = create(Mesh);
@@ -273,7 +273,7 @@ primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imat
 		const uint_t point_offset = points.size();
 		points.insert(points.end(), point_rows * point_columns, point3());
 		point_selection.insert(point_selection.end(), point_rows * point_columns, 0.0);
-		Mesh.vertex_data.resize(point_offset + (point_rows * point_columns));
+		Mesh.vertex_attributes.resize(point_offset + (point_rows * point_columns));
 
 		// Append a new polyhedron to the mesh ...
 		primitive* const polyhedron = create(Mesh);
@@ -351,7 +351,7 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 		const uint_t point_offset = points.size();
 		points.insert(points.end(), point_rows * point_columns, point3());
 		point_selection.insert(point_selection.end(), point_rows * point_columns, 0);
-		Mesh.vertex_data.resize(point_offset + (point_rows * point_columns));
+		Mesh.vertex_attributes.resize(point_offset + (point_rows * point_columns));
 
 		// Append a new polyhedron to the mesh ...
 		primitive* const polyhedron = create(Mesh);
@@ -414,21 +414,25 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
-		const mesh::indices_t& shell_first_faces = require_const_array<mesh::indices_t>(Primitive, "shell_first_faces");
-		const mesh::counts_t& shell_face_counts = require_const_array<mesh::counts_t>(Primitive, "shell_face_counts");
-		const typed_array<int32_t>& shell_types = require_const_array<typed_array<int32_t> >(Primitive, "shell_types");
-		const mesh::indices_t& face_first_loops = require_const_array<mesh::indices_t>(Primitive, "face_first_loops");
-		const mesh::counts_t& face_loop_counts = require_const_array<mesh::counts_t>(Primitive, "face_loop_counts");
-		const mesh::selection_t& face_selections = require_const_array<mesh::selection_t>(Primitive, "face_selections");
-		const mesh::materials_t& face_materials = require_const_array<mesh::materials_t>(Primitive, "face_materials");
-		const mesh::indices_t& loop_first_edges = require_const_array<mesh::indices_t>(Primitive, "loop_first_edges");
-		const mesh::indices_t& edge_points = require_const_array<mesh::indices_t>(Primitive, "edge_points");
-		const mesh::indices_t& clockwise_edges = require_const_array<mesh::indices_t>(Primitive, "clockwise_edges");
-		const mesh::selection_t& edge_selections = require_const_array<mesh::selection_t>(Primitive, "edge_selections");
+		const mesh::table_t& constant_structure = require_structure(Primitive, "constant");
+		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		const mesh::table_t& face_varying_structure = require_structure(Primitive, "face_varying");
 
-		const mesh::attribute_arrays_t& constant_data = require_const_attribute_arrays(Primitive, "constant");
-		const mesh::attribute_arrays_t& uniform_data = require_const_attribute_arrays(Primitive, "uniform");
-		const mesh::attribute_arrays_t& face_varying_data = require_const_attribute_arrays(Primitive, "face_varying");
+		const mesh::indices_t& shell_first_faces = require_array<mesh::indices_t>(Primitive, constant_structure, "shell_first_faces");
+		const mesh::counts_t& shell_face_counts = require_array<mesh::counts_t>(Primitive, constant_structure, "shell_face_counts");
+		const typed_array<int32_t>& shell_types = require_array<typed_array<int32_t> >(Primitive, constant_structure, "shell_types");
+		const mesh::indices_t& face_first_loops = require_array<mesh::indices_t>(Primitive, uniform_structure, "face_first_loops");
+		const mesh::counts_t& face_loop_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "face_loop_counts");
+		const mesh::selection_t& face_selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "face_selections");
+		const mesh::materials_t& face_materials = require_array<mesh::materials_t>(Primitive, uniform_structure, "face_materials");
+		const mesh::indices_t& loop_first_edges = require_array<mesh::indices_t>(Primitive, face_varying_structure, "loop_first_edges");
+		const mesh::indices_t& edge_points = require_array<mesh::indices_t>(Primitive, face_varying_structure, "edge_points");
+		const mesh::indices_t& clockwise_edges = require_array<mesh::indices_t>(Primitive, face_varying_structure, "clockwise_edges");
+		const mesh::selection_t& edge_selections = require_array<mesh::selection_t>(Primitive, face_varying_structure, "edge_selections");
+
+		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
+		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		const mesh::table_t& face_varying_attributes = require_attributes(Primitive, "face_varying");
 
 		require_metadata(Primitive, face_selections, "face_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, edge_points, "edge_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
@@ -447,9 +451,9 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_array_size(Primitive, clockwise_edges, "clockwise_edges", edge_points.size());
 		require_array_size(Primitive, edge_selections, "edge_selections", edge_points.size());
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", shell_first_faces.size());
-		require_attribute_arrays_size(Primitive, uniform_data, "uniform", face_first_loops.size());
-//		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_table_size(Primitive, constant_attributes, "constant", shell_first_faces.size());
+		require_table_size(Primitive, uniform_attributes, "uniform", face_first_loops.size());
+//		require_table_size(Primitive, varying_attributes, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
 		// Check for infinite loops in our edge lists ...
 		const uint_t loop_begin = 0;
@@ -479,7 +483,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 			}
 		}
 
-		return new const_primitive(shell_first_faces, shell_face_counts, shell_types, face_first_loops, face_loop_counts, face_selections, face_materials, loop_first_edges, edge_points, clockwise_edges, edge_selections, constant_data, uniform_data, face_varying_data);
+		return new const_primitive(shell_first_faces, shell_face_counts, shell_types, face_first_loops, face_loop_counts, face_selections, face_materials, loop_first_edges, edge_points, clockwise_edges, edge_selections, constant_attributes, uniform_attributes, face_varying_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -496,21 +500,25 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
-		mesh::indices_t& shell_first_faces = require_array<mesh::indices_t>(Primitive, "shell_first_faces");
-		mesh::counts_t& shell_face_counts = require_array<mesh::counts_t>(Primitive, "shell_face_counts");
-		typed_array<int32_t>& shell_types = require_array<typed_array<int32_t> >(Primitive, "shell_types");
-		mesh::indices_t& face_first_loops = require_array<mesh::indices_t>(Primitive, "face_first_loops");
-		mesh::counts_t& face_loop_counts = require_array<mesh::counts_t>(Primitive, "face_loop_counts");
-		mesh::selection_t& face_selections = require_array<mesh::selection_t>(Primitive, "face_selections");
-		mesh::materials_t& face_materials = require_array<mesh::materials_t>(Primitive, "face_materials");
-		mesh::indices_t& loop_first_edges = require_array<mesh::indices_t>(Primitive, "loop_first_edges");
-		mesh::indices_t& edge_points = require_array<mesh::indices_t>(Primitive, "edge_points");
-		mesh::indices_t& clockwise_edges = require_array<mesh::indices_t>(Primitive, "clockwise_edges");
-		mesh::selection_t& edge_selections = require_array<mesh::selection_t>(Primitive, "edge_selections");
+		mesh::table_t& constant_structure = require_structure(Primitive, "constant");
+		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		mesh::table_t& face_varying_structure = require_structure(Primitive, "face_varying");
 
-		mesh::attribute_arrays_t& constant_data = require_attribute_arrays(Primitive, "constant");
-		mesh::attribute_arrays_t& uniform_data = require_attribute_arrays(Primitive, "uniform");
-		mesh::attribute_arrays_t& face_varying_data = require_attribute_arrays(Primitive, "face_varying");
+		mesh::indices_t& shell_first_faces = require_array<mesh::indices_t>(Primitive, constant_structure, "shell_first_faces");
+		mesh::counts_t& shell_face_counts = require_array<mesh::counts_t>(Primitive, constant_structure, "shell_face_counts");
+		typed_array<int32_t>& shell_types = require_array<typed_array<int32_t> >(Primitive, constant_structure, "shell_types");
+		mesh::indices_t& face_first_loops = require_array<mesh::indices_t>(Primitive, uniform_structure, "face_first_loops");
+		mesh::counts_t& face_loop_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "face_loop_counts");
+		mesh::selection_t& face_selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "face_selections");
+		mesh::materials_t& face_materials = require_array<mesh::materials_t>(Primitive, uniform_structure, "face_materials");
+		mesh::indices_t& loop_first_edges = require_array<mesh::indices_t>(Primitive, face_varying_structure, "loop_first_edges");
+		mesh::indices_t& edge_points = require_array<mesh::indices_t>(Primitive, face_varying_structure, "edge_points");
+		mesh::indices_t& clockwise_edges = require_array<mesh::indices_t>(Primitive, face_varying_structure, "clockwise_edges");
+		mesh::selection_t& edge_selections = require_array<mesh::selection_t>(Primitive, face_varying_structure, "edge_selections");
+
+		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
+		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		mesh::table_t& face_varying_attributes = require_attributes(Primitive, "face_varying");
 
 		require_metadata(Primitive, face_selections, "face_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, edge_points, "edge_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
@@ -529,9 +537,9 @@ primitive* validate(mesh::primitive& Primitive)
 		require_array_size(Primitive, clockwise_edges, "clockwise_edges", edge_points.size());
 		require_array_size(Primitive, edge_selections, "edge_selections", edge_points.size());
 
-		require_attribute_arrays_size(Primitive, constant_data, "constant", shell_first_faces.size());
-		require_attribute_arrays_size(Primitive, uniform_data, "uniform", face_first_loops.size());
-//		require_attribute_arrays_size(Primitive, varying_data, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_table_size(Primitive, constant_attributes, "constant", shell_first_faces.size());
+		require_table_size(Primitive, uniform_attributes, "uniform", face_first_loops.size());
+//		require_table_size(Primitive, varying_attributes, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
 		// Check for infinite loops in our edge lists ...
 		const uint_t loop_begin = 0;
@@ -561,7 +569,7 @@ primitive* validate(mesh::primitive& Primitive)
 			}
 		}
 
-		return new primitive(shell_first_faces, shell_face_counts, shell_types, face_first_loops, face_loop_counts, face_selections, face_materials, loop_first_edges, edge_points, clockwise_edges, edge_selections, constant_data, uniform_data, face_varying_data);
+		return new primitive(shell_first_faces, shell_face_counts, shell_types, face_first_loops, face_loop_counts, face_selections, face_materials, loop_first_edges, edge_points, clockwise_edges, edge_selections, constant_attributes, uniform_attributes, face_varying_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -841,16 +849,16 @@ public:
 		output_point_selection = &Output.point_selection.create(new mesh::selection_t(Input.points->size(), 0.0));
 
 		// Setup copying of attribute arrays ...
-		output_polyhedron->constant_data = input_polyhedron->constant_data;
+		output_polyhedron->constant_attributes = input_polyhedron->constant_attributes;
 
-		output_polyhedron->uniform_data = input_polyhedron->uniform_data.clone_types();
-		uniform_data_copier.reset(new attribute_array_copier(input_polyhedron->uniform_data, output_polyhedron->uniform_data));
+		output_polyhedron->uniform_attributes = input_polyhedron->uniform_attributes.clone_types();
+		uniform_attributes_copier.reset(new table_copier(input_polyhedron->uniform_attributes, output_polyhedron->uniform_attributes));
 
-		output_polyhedron->face_varying_data = input_polyhedron->face_varying_data.clone_types();
-		face_varying_data_copier.reset(new attribute_array_copier(input_polyhedron->face_varying_data, output_polyhedron->face_varying_data));
+		output_polyhedron->face_varying_attributes = input_polyhedron->face_varying_attributes.clone_types();
+		face_varying_attributes_copier.reset(new table_copier(input_polyhedron->face_varying_attributes, output_polyhedron->face_varying_attributes));
 
-		Output.vertex_data = Input.vertex_data.clone();
-		vertex_data_copier.reset(new attribute_array_copier(Input.vertex_data, Output.vertex_data));
+		Output.vertex_attributes = Input.vertex_attributes.clone();
+		vertex_attributes_copier.reset(new table_copier(Input.vertex_attributes, Output.vertex_attributes));
 
 		// Create the output polyhedron ...
 		const uint_t face_begin = 0;
@@ -894,9 +902,9 @@ private:
 		output_points->push_back(Coordinates);
 		output_point_selection->push_back(0.0);
 
-		vertex_data_copier->push_back(4, Vertices, Weights);
+		vertex_attributes_copier->push_back(4, Vertices, Weights);
 
-		new_face_varying_data[NewVertex] = new_face_varying_record(Edges, Weights);
+		new_face_varying_attributes[NewVertex] = new_face_varying_record(Edges, Weights);
 	}
 
 	void add_triangle(uint_t Vertices[3], uint_t Edges[3])
@@ -906,7 +914,7 @@ private:
 		output_polyhedron->face_selections.push_back(1.0);
 		output_polyhedron->face_materials.push_back(input_polyhedron->face_materials[current_face]);
 
-		uniform_data_copier->push_back(current_face);
+		uniform_attributes_copier->push_back(current_face);
 
 		output_polyhedron->loop_first_edges.push_back(output_polyhedron->edge_points.size());
 		output_polyhedron->edge_points.push_back(Vertices[0]);
@@ -921,10 +929,10 @@ private:
 
 		for(uint_t i = 0; i != 3; ++i)
 		{
-			if(new_face_varying_data.count(Vertices[i]))
-				face_varying_data_copier->push_back(4, new_face_varying_data[Vertices[i]].edges, new_face_varying_data[Vertices[i]].weights);
+			if(new_face_varying_attributes.count(Vertices[i]))
+				face_varying_attributes_copier->push_back(4, new_face_varying_attributes[Vertices[i]].edges, new_face_varying_attributes[Vertices[i]].weights);
 			else
-				face_varying_data_copier->push_back(Edges[i]);
+				face_varying_attributes_copier->push_back(Edges[i]);
 		}
 	}
 
@@ -935,7 +943,7 @@ private:
 		output_polyhedron->face_selections.push_back(0.0);
 		output_polyhedron->face_materials.push_back(input_polyhedron->face_materials[Face]);
 
-		uniform_data_copier->push_back(Face);
+		uniform_attributes_copier->push_back(Face);
 
 		const uint_t loop_begin = input_polyhedron->face_first_loops[Face];
 		const uint_t loop_end = loop_begin + input_polyhedron->face_loop_counts[Face];
@@ -950,7 +958,7 @@ private:
 				output_polyhedron->edge_points.push_back(input_polyhedron->edge_points[edge]);
 				output_polyhedron->clockwise_edges.push_back(input_polyhedron->clockwise_edges[edge] + edge_offset);
 				output_polyhedron->edge_selections.push_back(0.0);
-				face_varying_data_copier->push_back(edge);
+				face_varying_attributes_copier->push_back(edge);
 
 				edge = input_polyhedron->clockwise_edges[edge];
 				if(edge == first_edge)
@@ -965,9 +973,9 @@ private:
 	mesh::selection_t* output_point_selection;
 	boost::scoped_ptr<primitive> output_polyhedron;
 
-	boost::shared_ptr<attribute_array_copier> uniform_data_copier;
-	boost::shared_ptr<attribute_array_copier> face_varying_data_copier;
-	boost::shared_ptr<attribute_array_copier> vertex_data_copier;
+	boost::shared_ptr<table_copier> uniform_attributes_copier;
+	boost::shared_ptr<table_copier> face_varying_attributes_copier;
+	boost::shared_ptr<table_copier> vertex_attributes_copier;
 
 	uint_t current_face;
 
@@ -987,7 +995,7 @@ private:
 		double_t weights[4];
 	};
 
-	std::map<uint_t, new_face_varying_record> new_face_varying_data;
+	std::map<uint_t, new_face_varying_record> new_face_varying_attributes;
 }; // class create_triangles
 
 } // namespace detail

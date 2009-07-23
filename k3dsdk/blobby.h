@@ -67,10 +67,10 @@ public:
 		const mesh::counts_t& OperatorOperandCounts,
 		const mesh::doubles_t& Floats,
 		const mesh::indices_t& Operands,
-		const mesh::attribute_arrays_t& ConstantData,
-		const mesh::attribute_arrays_t& UniformData,
-		const mesh::attribute_arrays_t& VaryingData,
-		const mesh::attribute_arrays_t& VertexData
+		const mesh::table_t& ConstantAttributes,
+		const mesh::table_t& UniformAttributes,
+		const mesh::table_t& VaryingAttributes,
+		const mesh::table_t& VertexAttributes
 		);
 
 	const mesh::indices_t& first_primitives;
@@ -86,10 +86,10 @@ public:
 	const mesh::counts_t& operator_operand_counts;
 	const mesh::doubles_t& floats;
 	const mesh::indices_t& operands;
-	const mesh::attribute_arrays_t& constant_data;
-	const mesh::attribute_arrays_t& uniform_data;
-	const mesh::attribute_arrays_t& varying_data;
-	const mesh::attribute_arrays_t& vertex_data;
+	const mesh::table_t& constant_attributes;
+	const mesh::table_t& uniform_attributes;
+	const mesh::table_t& varying_attributes;
+	const mesh::table_t& vertex_attributes;
 };
 
 /// Gathers the member arrays of a blobby primitive into a convenient package
@@ -110,10 +110,10 @@ public:
 		mesh::counts_t& OperatorOperandCounts,
 		mesh::doubles_t& Floats,
 		mesh::indices_t& Operands,
-		mesh::attribute_arrays_t& ConstantData,
-		mesh::attribute_arrays_t& UniformData,
-		mesh::attribute_arrays_t& VaryingData,
-		mesh::attribute_arrays_t& VertexData
+		mesh::table_t& ConstantAttributes,
+		mesh::table_t& UniformAttributes,
+		mesh::table_t& VaryingAttributes,
+		mesh::table_t& VertexAttributes
 		);
 
 	mesh::indices_t& first_primitives;
@@ -129,10 +129,10 @@ public:
 	mesh::counts_t& operator_operand_counts;
 	mesh::doubles_t& floats;
 	mesh::indices_t& operands;
-	mesh::attribute_arrays_t& constant_data;
-	mesh::attribute_arrays_t& uniform_data;
-	mesh::attribute_arrays_t& varying_data;
-	mesh::attribute_arrays_t& vertex_data;
+	mesh::table_t& constant_attributes;
+	mesh::table_t& uniform_attributes;
+	mesh::table_t& varying_attributes;
+	mesh::table_t& vertex_attributes;
 };
 
 /// Creates a new blobby mesh primitive, returning references to its member arrays.

@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh.h"
+#include <k3dsdk/mesh.h>
 
 #include <sstream>
 #include <stdexcept>
@@ -32,11 +32,11 @@ namespace k3d
 
 /// Helper methods for use with in mesh primitive validate() functions only!
 
-/// Tests a primitive to verify that it contains an array with given name and type, throws an exception otherwise.
+/// Tests a table to verify that it contains an array with given name and type, throws an exception otherwise.
 template<typename ArrayT>
-const ArrayT& require_const_array(const mesh::primitive& Primitive, const string_t& Name)
+const ArrayT& require_array(const mesh::primitive& Primitive, const mesh::table_t& Table, const string_t& Name)
 {
-	const ArrayT* const array = Primitive.structure.lookup<ArrayT>(Name);
+	const ArrayT* const array = Table.lookup<ArrayT>(Name);
 
 	if(!array)
 		throw std::runtime_error("[" + Primitive.type + "] primitive missing array [" + Name + "]");
@@ -44,11 +44,11 @@ const ArrayT& require_const_array(const mesh::primitive& Primitive, const string
 	return *array;
 }
 
-/// Tests a primitive to verify that it contains an array with given name and type, throws an exception otherwise.
+/// Tests a table to verify that it contains an array with given name and type, throws an exception otherwise.
 template<typename ArrayT>
-ArrayT& require_array(mesh::primitive& Primitive, const string_t& Name)
+ArrayT& require_array(mesh::primitive& Primitive, mesh::table_t& Table, const string_t& Name)
 {
-	ArrayT* const array = Primitive.structure.writable<ArrayT>(Name);
+	ArrayT* const array = Table.writable<ArrayT>(Name);
 
 	if(!array)
 		throw std::runtime_error("[" + Primitive.type + "] primitive missing array [" + Name + "]");
@@ -56,11 +56,17 @@ ArrayT& require_array(mesh::primitive& Primitive, const string_t& Name)
 	return *array;
 }
 
-/// Tests a primitive to verify that it contains a set of named attributes, throws an exception otherwise.
-const mesh::attribute_arrays_t& require_const_attribute_arrays(const mesh::primitive& Primitive, const string_t& Name);
+/// Tests a primitive to verify that it contains the named structure table, throws an exception otherwise.
+const mesh::table_t& require_structure(const mesh::primitive& Primitive, const string_t& Name);
 
-/// Tests a primitive to verify that it contains a set of named attributes, throws an exception otherwise.
-mesh::attribute_arrays_t& require_attribute_arrays(mesh::primitive& Primitive, const string_t& Name);
+/// Tests a primitive to verify that it contains the named structure table, throws an exception otherwise.
+mesh::table_t& require_structure(mesh::primitive& Primitive, const string_t& Name);
+
+/// Tests a primitive to verify that it contains the named attribute table, throws an exception otherwise.
+const mesh::table_t& require_attributes(const mesh::primitive& Primitive, const string_t& Name);
+
+/// Tests a primitive to verify that it contains the named attribute table, throws an exception otherwise.
+mesh::table_t& require_attributes(mesh::primitive& Primitive, const string_t& Name);
 
 /// Tests a primitive array to verify that it matches the given length, throws an exception otherwise.
 template<typename ArrayT>
@@ -75,7 +81,7 @@ void require_array_size(const mesh::primitive& Primitive, const ArrayT& Array, c
 }
 
 /// Tests a set of attributes to verify that they match the given length, throws an exception otherwise.
-void require_attribute_arrays_size(const mesh::primitive& Primitive, const attribute_arrays& Attributes, const string_t& AttributesName, const uint_t Reference);
+void require_table_size(const mesh::primitive& Primitive, const table& Attributes, const string_t& AttributesName, const uint_t Reference);
 
 /// Tests an array to verify that it has metadata with the given name and value, throws an exception otherwise.
 void require_metadata(const mesh::primitive& Primitive, const array& Array, const string_t& ArrayName, const string_t& MetadataName, const string_t& MetadataValue);

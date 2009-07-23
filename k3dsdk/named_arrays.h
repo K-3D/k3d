@@ -32,7 +32,7 @@ namespace k3d
 class array;
 
 /// Defines a heterogeneous collection of named, shared arrays.  Arrays in the collection are not length-constrained.
-/// For a collection of arrays that all have the same length, see attribute_arrays.  For a concrete list of the
+/// For a collection of arrays that all have the same length, see table.  For a concrete list of the
 /// datatypes that can be stored using named_arrays, see k3d::named_array_types.
 class named_arrays :
 	public std::map<string_t, pipeline_data<array> >

@@ -53,7 +53,7 @@ typedef std::map<k3d::string_t, k3d::mesh::indices_t> solids_t;
 /// Groups triangles into named solids, based on the given uniform array name 
 void extract_solids(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::string_t& ArrayName, solids_t& Solids)
 {
-	const strings_t* solid_names = Polyhedron.uniform_data.lookup<strings_t>(ArrayName); 
+	const strings_t* solid_names = Polyhedron.uniform_attributes.lookup<strings_t>(ArrayName); 
 	for(k3d::uint_t face = 0; face != Polyhedron.face_first_loops.size(); ++face)
 	{
 		k3d::mesh::indices_t& indices = solid_names ? Solids[solid_names->at(face)] : Solids["default"];

@@ -22,7 +22,7 @@
  */
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/attribute_array_copier.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
 #include <k3dsdk/hints.h>

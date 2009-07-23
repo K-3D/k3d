@@ -70,7 +70,7 @@ public:
         continue;
 
       const k3d::mesh::points_t& points = *Mesh.points;
-      const k3d::mesh::attribute_arrays_t& vertex_data = Mesh.vertex_data;
+      const k3d::mesh::table_t& vertex_attributes = Mesh.vertex_attributes;
 
       const k3d::uint_t shell_begin = 0;
       const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();
@@ -97,18 +97,18 @@ public:
           k3d::ri::unsigned_integers vertex_counts;
           k3d::ri::unsigned_integers vertex_ids;
 
-          array_copier ri_constant_data;
-          ri_constant_data.add_arrays(polyhedron->constant_data);
+          array_copier ri_constant_attributes;
+          ri_constant_attributes.add_arrays(polyhedron->constant_attributes);
 
-          array_copier ri_uniform_data;
-          ri_uniform_data.add_arrays(polyhedron->uniform_data);
+          array_copier ri_uniform_attributes;
+          ri_uniform_attributes.add_arrays(polyhedron->uniform_attributes);
 
-          array_copier ri_facevarying_data;
-          ri_facevarying_data.add_arrays(polyhedron->face_varying_data);
+          array_copier ri_facevarying_attributes;
+          ri_facevarying_attributes.add_arrays(polyhedron->face_varying_attributes);
 
-          array_copier ri_vertex_data;
-          ri_vertex_data.add_arrays(vertex_data);
-          ri_vertex_data.add_array(k3d::ri::RI_P(), points);
+          array_copier ri_vertex_attributes;
+          ri_vertex_attributes.add_arrays(vertex_attributes);
+          ri_vertex_attributes.add_array(k3d::ri::RI_P(), points);
 
           const k3d::uint_t faces_begin = polyhedron->shell_first_faces[shell];
           const k3d::uint_t faces_end = faces_begin + polyhedron->shell_face_counts[shell];
@@ -119,7 +119,7 @@ public:
 
             loop_counts.push_back(polyhedron->face_loop_counts[face]);
 
-            ri_uniform_data.push_back(face);
+            ri_uniform_attributes.push_back(face);
 
             const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
             const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
@@ -130,7 +130,7 @@ public:
               const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
               for(k3d::uint_t edge = first_edge; ; )
               {
-                ri_facevarying_data.push_back(edge);
+                ri_facevarying_attributes.push_back(edge);
 
                 ++vertex_count;
                 vertex_ids.push_back(polyhedron->edge_points[edge]);
@@ -144,15 +144,15 @@ public:
             }
           }
 
-          ri_constant_data.push_back(shell);
+          ri_constant_attributes.push_back(shell);
 
-          ri_vertex_data.insert(0, points.size());
+          ri_vertex_attributes.insert(0, points.size());
 
           k3d::ri::parameter_list ri_parameters;
-          ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
-          ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
-          ri_facevarying_data.copy_to(k3d::ri::FACEVARYING, ri_parameters);
-          ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
+          ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
+          ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
+          ri_facevarying_attributes.copy_to(k3d::ri::FACEVARYING, ri_parameters);
+          ri_vertex_attributes.copy_to(k3d::ri::VERTEX, ri_parameters);
 
           k3d::ri::setup_material(material, RenderState);
           RenderState.stream.RiPointsGeneralPolygonsV(loop_counts, vertex_counts, vertex_ids, ri_parameters);

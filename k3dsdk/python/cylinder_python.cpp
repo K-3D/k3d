@@ -49,9 +49,9 @@ public:
 		static object z_max(wrapper& Self) { return wrap(Self.wrapped().z_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 	class primitive
@@ -66,9 +66,9 @@ public:
 		static object z_max(wrapper& Self) { return wrap(Self.wrapped().z_max); }
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 
@@ -106,9 +106,9 @@ void define_namespace_cylinder()
 		.def("z_max", &cylinder::const_primitive::z_max)
 		.def("sweep_angles", &cylinder::const_primitive::sweep_angles)
 		.def("selections", &cylinder::const_primitive::selections)
-		.def("constant_data", &cylinder::const_primitive::constant_data)
-		.def("uniform_data", &cylinder::const_primitive::uniform_data)
-		.def("varying_data", &cylinder::const_primitive::varying_data)
+		.def("constant_attributes", &cylinder::const_primitive::constant_attributes)
+		.def("uniform_attributes", &cylinder::const_primitive::uniform_attributes)
+		.def("varying_attributes", &cylinder::const_primitive::varying_attributes)
 		;
 
 	class_<cylinder::primitive::wrapper>("primitive", no_init)
@@ -119,9 +119,9 @@ void define_namespace_cylinder()
 		.def("z_max", &cylinder::primitive::z_max)
 		.def("sweep_angles", &cylinder::primitive::sweep_angles)
 		.def("selections", &cylinder::primitive::selections)
-		.def("constant_data", &cylinder::primitive::constant_data)
-		.def("uniform_data", &cylinder::primitive::uniform_data)
-		.def("varying_data", &cylinder::primitive::varying_data)
+		.def("constant_attributes", &cylinder::primitive::constant_attributes)
+		.def("uniform_attributes", &cylinder::primitive::uniform_attributes)
+		.def("varying_attributes", &cylinder::primitive::varying_attributes)
 		;
 }
 

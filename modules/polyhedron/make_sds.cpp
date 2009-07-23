@@ -67,7 +67,7 @@ public:
 			std::fill(polyhedron->shell_types.begin(), polyhedron->shell_types.end(), k3d::polyhedron::CATMULL_CLARK);
 			
 			if(interpolateboundary)
-				polyhedron->constant_data.create("interpolateboundary", new k3d::typed_array<k3d::string_t>(polyhedron->shell_types.size(), "interpolateboundary"));
+				polyhedron->constant_attributes.create("interpolateboundary", new k3d::typed_array<k3d::string_t>(polyhedron->shell_types.size(), "interpolateboundary"));
 		}
 	}
 

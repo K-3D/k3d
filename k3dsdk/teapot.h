@@ -36,14 +36,14 @@ public:
 		const mesh::matrices_t& Matrices,
 		const mesh::materials_t& Materials,
 		const mesh::selection_t& Selections,
-		const mesh::attribute_arrays_t& ConstantData,
-		const mesh::attribute_arrays_t& UniformData);
+		const mesh::table_t& ConstantAttributes,
+		const mesh::table_t& UniformAttributes);
 
 	const mesh::matrices_t& matrices;
 	const mesh::materials_t& materials;
 	const mesh::selection_t& selections;
-	const mesh::attribute_arrays_t& constant_data;
-	const mesh::attribute_arrays_t& uniform_data;
+	const mesh::table_t& constant_attributes;
+	const mesh::table_t& uniform_attributes;
 };
 
 /// Gathers the member arrays of a teapot primitive into a convenient package
@@ -54,14 +54,14 @@ public:
 		mesh::matrices_t& Matrices,
 		mesh::materials_t& Materials,
 		mesh::selection_t& Selections,
-		mesh::attribute_arrays_t& ConstantData,
-		mesh::attribute_arrays_t& UniformData);
+		mesh::table_t& ConstantAttributes,
+		mesh::table_t& UniformAttributes);
 
 	mesh::matrices_t& matrices;
 	mesh::materials_t& materials;
 	mesh::selection_t& selections;
-	mesh::attribute_arrays_t& constant_data;
-	mesh::attribute_arrays_t& uniform_data;
+	mesh::table_t& constant_attributes;
+	mesh::table_t& uniform_attributes;
 };
 
 /// Creates a new teapot mesh primitive, returning references to its member arrays.

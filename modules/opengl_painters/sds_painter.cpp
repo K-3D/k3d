@@ -156,7 +156,7 @@ protected:
 		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 		
-		const k3d::bool_t interpolateboundary = polyhedron->constant_data.lookup<strings_t>("interpolateboundary") ? true : false;
+		const k3d::bool_t interpolateboundary = polyhedron->constant_attributes.lookup<strings_t>("interpolateboundary") ? true : false;
 		k3d::mesh::indices_t companions;
 		k3d::mesh::bools_t boundary_edges;
 		k3d::mesh::bools_t boundary_faces;

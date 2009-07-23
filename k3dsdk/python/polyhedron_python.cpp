@@ -56,9 +56,9 @@ public:
 		static object edge_points(wrapper& Self) { return wrap(Self.wrapped().edge_points); }
 		static object clockwise_edges(wrapper& Self) { return wrap(Self.wrapped().clockwise_edges); }
 		static object edge_selections(wrapper& Self) { return wrap(Self.wrapped().edge_selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object face_varying_data(wrapper& Self) { return wrap(Self.wrapped().face_varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object face_varying_attributes(wrapper& Self) { return wrap(Self.wrapped().face_varying_attributes); }
 	};
 
 	class primitive
@@ -77,9 +77,9 @@ public:
 		static object edge_points(wrapper& Self) { return wrap(Self.wrapped().edge_points); }
 		static object clockwise_edges(wrapper& Self) { return wrap(Self.wrapped().clockwise_edges); }
 		static object edge_selections(wrapper& Self) { return wrap(Self.wrapped().edge_selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object face_varying_data(wrapper& Self) { return wrap(Self.wrapped().face_varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object face_varying_attributes(wrapper& Self) { return wrap(Self.wrapped().face_varying_attributes); }
 	};
 
 
@@ -170,9 +170,9 @@ void define_namespace_polyhedron()
 		.def("edge_points", &polyhedron::const_primitive::edge_points)
 		.def("clockwise_edges", &polyhedron::const_primitive::clockwise_edges)
 		.def("edge_selections", &polyhedron::const_primitive::edge_selections)
-		.def("constant_data", &polyhedron::const_primitive::constant_data)
-		.def("uniform_data", &polyhedron::const_primitive::uniform_data)
-		.def("face_varying_data", &polyhedron::const_primitive::face_varying_data)
+		.def("constant_attributes", &polyhedron::const_primitive::constant_attributes)
+		.def("uniform_attributes", &polyhedron::const_primitive::uniform_attributes)
+		.def("face_varying_attributes", &polyhedron::const_primitive::face_varying_attributes)
 		;
 
 	class_<polyhedron::primitive::wrapper>("primitive", no_init)
@@ -187,9 +187,9 @@ void define_namespace_polyhedron()
 		.def("edge_points", &polyhedron::primitive::edge_points)
 		.def("clockwise_edges", &polyhedron::primitive::clockwise_edges)
 		.def("edge_selections", &polyhedron::primitive::edge_selections)
-		.def("constant_data", &polyhedron::primitive::constant_data)
-		.def("uniform_data", &polyhedron::primitive::uniform_data)
-		.def("face_varying_data", &polyhedron::primitive::face_varying_data)
+		.def("constant_attributes", &polyhedron::primitive::constant_attributes)
+		.def("uniform_attributes", &polyhedron::primitive::uniform_attributes)
+		.def("face_varying_attributes", &polyhedron::primitive::face_varying_attributes)
 		;
 }
 

@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "const_attribute_arrays_python.h"
+#include "const_table_python.h"
 #include "const_typed_array_python.h"
 #include "utility_python.h"
 
@@ -34,32 +34,32 @@ namespace k3d
 namespace python
 {
 
-static list keys(const_attribute_arrays_wrapper& Self)
+static list keys(const_table_wrapper& Self)
 {
 	list results;
 
-	for(k3d::attribute_arrays::const_iterator array = Self.wrapped().begin(); array != Self.wrapped().end(); ++array)
+	for(k3d::table::const_iterator array = Self.wrapped().begin(); array != Self.wrapped().end(); ++array)
 		results.append(array->first);
 
 	return results;
 }
 
-static object get_item(const_attribute_arrays_wrapper& Self, const string_t& Key)
+static object get_item(const_table_wrapper& Self, const string_t& Key)
 {
-	k3d::attribute_arrays::const_iterator iterator = Self.wrapped().find(Key);
+	k3d::table::const_iterator iterator = Self.wrapped().find(Key);
 	if(iterator == Self.wrapped().end())
 		throw std::runtime_error("unknown key: " + Key);
 
 	return wrap_array(iterator->second.get());
 }
 
-void define_class_const_attribute_arrays()
+void define_class_const_table()
 {
-	class_<const_attribute_arrays_wrapper>("const_attribute_arrays", 
+	class_<const_table_wrapper>("const_table", 
 		"Stores an immutable (read-only) collection of attribute arrays (named arrays with identical lengths).", no_init)
 		.def("keys", &keys,
 			"Returns a list containing names for all the arrays in the collection.")
-		.def("__len__", &utility::wrapped_len<const_attribute_arrays_wrapper>)
+		.def("__len__", &utility::wrapped_len<const_table_wrapper>)
 		.def("__getitem__", &get_item);
 }
 

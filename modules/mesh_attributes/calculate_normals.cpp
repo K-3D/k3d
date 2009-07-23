@@ -92,7 +92,7 @@ public:
 		// Optionally store vertex normals ...
 		k3d::mesh::normals_t* vertex_normals = 0;
 		if(store_vertex)
-			vertex_normals = &Output.vertex_data.create(m_vertex_array.pipeline_value(), new k3d::mesh::normals_t(points.size()));
+			vertex_normals = &Output.vertex_attributes.create(m_vertex_array.pipeline_value(), new k3d::mesh::normals_t(points.size()));
 
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
@@ -110,14 +110,14 @@ public:
 
 			// Optionally store the uniform normals ...
 			if(store_uniform)
-				polyhedron->uniform_data.create(m_uniform_array.pipeline_value(), new k3d::mesh::normals_t(uniform_normals));
+				polyhedron->uniform_attributes.create(m_uniform_array.pipeline_value(), new k3d::mesh::normals_t(uniform_normals));
 
 			// Optionally compute face-varying (per-edge) normals ...
 			if(store_face_varying)
 			{
 				const k3d::double_t cos_max_angle = std::cos(std::max(0.0, m_max_angle.pipeline_value()));
 
-				k3d::mesh::normals_t& face_varying_normals = polyhedron->face_varying_data.create(m_face_varying_array.pipeline_value(), new k3d::mesh::normals_t(polyhedron->edge_points.size()));
+				k3d::mesh::normals_t& face_varying_normals = polyhedron->face_varying_attributes.create(m_face_varying_array.pipeline_value(), new k3d::mesh::normals_t(polyhedron->edge_points.size()));
 
 				k3d::mesh::indices_t point_first_faces;
 				k3d::mesh::counts_t point_face_counts;

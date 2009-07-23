@@ -91,7 +91,7 @@ public:
 		point_selection.assign(edge_count, 0.0);
 
 		boost::scoped_ptr<k3d::linear_curve::primitive> primitive(k3d::linear_curve::create(Output));
-		k3d::mesh::doubles_t& widths = primitive->constant_data.create<k3d::mesh::doubles_t>("width");
+		k3d::mesh::doubles_t& widths = primitive->constant_attributes.create<k3d::mesh::doubles_t>("width");
 
 		primitive->periodic.push_back(wrap);
 		primitive->material.push_back(material);

@@ -77,15 +77,15 @@ public:
 				{
 					k3d::ri::parameter_list ri_parameters;
 
-					array_copier ri_constant_data;
-					ri_constant_data.add_arrays(teapot->constant_data);
-					ri_constant_data.push_back(0);
-					ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
+					array_copier ri_constant_attributes;
+					ri_constant_attributes.add_arrays(teapot->constant_attributes);
+					ri_constant_attributes.push_back(0);
+					ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
 
-					array_copier ri_uniform_data;
-					ri_uniform_data.add_arrays(teapot->uniform_data);
-					ri_uniform_data.push_back(i);
-					ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
+					array_copier ri_uniform_attributes;
+					ri_uniform_attributes.add_arrays(teapot->uniform_attributes);
+					ri_uniform_attributes.push_back(i);
+					ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
 
 					k3d::typed_array<k3d::point3>* const ri_points = new k3d::typed_array<k3d::point3>(16);
 					for(k3d::uint_t vertex = 0; vertex != 16; ++vertex)

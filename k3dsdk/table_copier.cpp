@@ -22,7 +22,7 @@
 */
 
 #include "array.h"
-#include "attribute_array_copier.h"
+#include "table_copier.h"
 #include "named_array_types.h"
 #include "result.h"
 #include "typed_array.h"
@@ -303,27 +303,27 @@ inode* weighted_sum(const typed_array<inode*>& Source, const uint_t Count, const
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// attribute_array_copier::implementation
+// table_copier::implementation
 
-class attribute_array_copier::implementation
+class table_copier::implementation
 {
 public:
-	implementation(const attribute_arrays& Source, attribute_arrays& Target, const copy_policy& CopyPolicy)
+	implementation(const table& Source, table& Target, const copy_policy& CopyPolicy)
 	{
 		std::vector<bool_t> used_source(Source.size(), false);
 		std::vector<bool_t> used_target(Target.size(), false);
 
-		const attribute_arrays::const_iterator source_begin = Source.begin();
-		const attribute_arrays::const_iterator source_end = Source.end();
+		const table::const_iterator source_begin = Source.begin();
+		const table::const_iterator source_end = Source.end();
 
-		const attribute_arrays::iterator target_begin = Target.begin();
-		const attribute_arrays::iterator target_end = Target.end();
+		const table::iterator target_begin = Target.begin();
+		const table::iterator target_end = Target.end();
 	
 		uint_t target_index = 0;
-		for(attribute_arrays::iterator target = target_begin; target != target_end; ++target, ++target_index)
+		for(table::iterator target = target_begin; target != target_end; ++target, ++target_index)
 		{
 			uint_t source_index = 0;
-			for(attribute_arrays::const_iterator source = source_begin; source != source_end; ++source, ++source_index)
+			for(table::const_iterator source = source_begin; source != source_end; ++source, ++source_index)
 			{
 				if(CopyPolicy.copy(source->first, *source->second.get(), target->first, *target->second.get()))
 				{
@@ -342,7 +342,7 @@ public:
 
 		{
 			uint_t source_index = 0;
-			for(attribute_arrays::const_iterator source = source_begin; source != source_end; ++source, ++source_index)
+			for(table::const_iterator source = source_begin; source != source_end; ++source, ++source_index)
 			{
 				if(!used_source[source_index])
 					CopyPolicy.unused_source(source->first, *source->second);
@@ -351,7 +351,7 @@ public:
 
 		{
 			uint_t target_index = 0;
-			for(attribute_arrays::const_iterator target = target_begin; target != target_end; ++target, ++target_index)
+			for(table::const_iterator target = target_begin; target != target_end; ++target, ++target_index)
 			{
 				if(!used_target[target_index])
 					CopyPolicy.unused_target(target->first, *target->second);
@@ -492,9 +492,9 @@ private:
 };
 
 ////////////////////////////////////////////////////////////////////////////
-// attribute_array_copier::strict_copy
+// table_copier::strict_copy
 
-bool_t attribute_array_copier::strict_copy::copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const
+bool_t table_copier::strict_copy::copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const
 {
 	if(SourceName != TargetName)
 		return false;
@@ -508,61 +508,61 @@ bool_t attribute_array_copier::strict_copy::copy(const string_t& SourceName, con
 	return true;
 }
 
-void attribute_array_copier::strict_copy::unused_source(const string_t& SourceName, const array& Source) const
+void table_copier::strict_copy::unused_source(const string_t& SourceName, const array& Source) const
 {
 	log() << error << "Source array [" << SourceName << "] of type [" << demangle(typeid(Source)) << "] has no corresponding target and will not supply data." << std::endl;
 }
 
-void attribute_array_copier::strict_copy::unused_target(const string_t& TargetName, const array& Target) const
+void table_copier::strict_copy::unused_target(const string_t& TargetName, const array& Target) const
 {
 	log() << error << "Target array [" << TargetName << "] of type [" << demangle(typeid(Target)) << "] has no corresponding source and will not receive data." << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// attribute_array_copier::copy_subset
+// table_copier::copy_subset
 
-bool_t attribute_array_copier::copy_subset::copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const
+bool_t table_copier::copy_subset::copy(const string_t& SourceName, const array& Source, const string_t& TargetName, const array& Target) const
 {
 	return SourceName == TargetName && typeid(Source) == typeid(Target);
 }
 
-void attribute_array_copier::copy_subset::unused_source(const string_t&, const array&) const
+void table_copier::copy_subset::unused_source(const string_t&, const array&) const
 {
 }
 
-void attribute_array_copier::copy_subset::unused_target(const string_t& TargetName, const array& Target) const
+void table_copier::copy_subset::unused_target(const string_t& TargetName, const array& Target) const
 {
 	log() << error << "Target array [" << TargetName << "] of type [" << demangle(typeid(Target)) << "] has no corresponding source and will not receive data." << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// attribute_array_copier
+// table_copier
 
-attribute_array_copier::attribute_array_copier(const attribute_arrays& Source, attribute_arrays& Target, const copy_policy& CopyPolicy) :
+table_copier::table_copier(const table& Source, table& Target, const copy_policy& CopyPolicy) :
 	m_implementation(new implementation(Source, Target, CopyPolicy))
 {
 }
 
-attribute_array_copier::~attribute_array_copier()
+table_copier::~table_copier()
 {
 }
 
-void attribute_array_copier::push_back(const uint_t Index)
+void table_copier::push_back(const uint_t Index)
 {
 	m_implementation->push_back(Index);
 }
 
-void attribute_array_copier::push_back(const uint_t Count, const uint_t* Indices, const double_t* Weights)
+void table_copier::push_back(const uint_t Count, const uint_t* Indices, const double_t* Weights)
 {
 	m_implementation->push_back(Count, Indices, Weights);
 }
 
-void attribute_array_copier::copy(const uint_t SourceIndex, const uint_t TargetIndex)
+void table_copier::copy(const uint_t SourceIndex, const uint_t TargetIndex)
 {
 	m_implementation->copy(SourceIndex, TargetIndex);
 }
 
-void attribute_array_copier::copy(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex)
+void table_copier::copy(const uint_t Count, const uint_t* Indices, const double_t* Weights, const uint_t TargetIndex)
 {
 	m_implementation->copy(Count, Indices, Weights, TargetIndex);
 }

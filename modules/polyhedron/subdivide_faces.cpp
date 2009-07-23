@@ -23,7 +23,7 @@
 */
 
 #include <k3d-i18n-config.h>
-#include <k3dsdk/attribute_array_copier.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
@@ -452,8 +452,8 @@ struct mesh_arrays
 			k3d::mesh::counts_t& OutputFaceLoopCounts,
 			k3d::mesh::materials_t& OutputFaceMaterials,
 			k3d::mesh::selection_t& OutputFaceSelection,
-			k3d::attribute_array_copier& UniformCopier,
-			k3d::attribute_array_copier& VaryingCopier
+			k3d::table_copier& UniformCopier,
+			k3d::table_copier& VaryingCopier
 			) :
 				input_first_faces(InputFirstFaces),
 				input_face_counts(InputFaceCounts),
@@ -564,8 +564,8 @@ struct mesh_arrays
 	k3d::mesh::counts_t& output_face_loop_counts;
 	k3d::mesh::materials_t& output_face_materials;
 	k3d::mesh::selection_t& output_face_selection;
-	k3d::attribute_array_copier& uniform_copier;
-	k3d::attribute_array_copier& varying_copier;
+	k3d::table_copier& uniform_copier;
+	k3d::table_copier& varying_copier;
 };
 
 /// Subdivide faces by connecting their centers to the midpoints of the edges.
@@ -883,12 +883,12 @@ public:
 			k3d::mesh::selection_t& output_edge_selection = output_polyhedron->edge_selections;
 
 			// Copy the unaffected constant data
-			output_polyhedron->constant_data = input_polyhedron->constant_data;
+			output_polyhedron->constant_attributes = input_polyhedron->constant_attributes;
 			// Create copiers for the uniform and varying data
-			output_polyhedron->uniform_data = input_polyhedron->uniform_data.clone_types();
-			k3d::attribute_array_copier uniform_data_copier(input_polyhedron->uniform_data, output_polyhedron->uniform_data);
-			output_polyhedron->face_varying_data = input_polyhedron->face_varying_data.clone_types();
-			k3d::attribute_array_copier face_varying_data_copier(input_polyhedron->face_varying_data, output_polyhedron->face_varying_data);
+			output_polyhedron->uniform_attributes = input_polyhedron->uniform_attributes.clone_types();
+			k3d::table_copier uniform_attributes_copier(input_polyhedron->uniform_attributes, output_polyhedron->uniform_attributes);
+			output_polyhedron->face_varying_attributes = input_polyhedron->face_varying_attributes.clone_types();
+			k3d::table_copier face_varying_attributes_copier(input_polyhedron->face_varying_attributes, output_polyhedron->face_varying_attributes);
 
 			// Face-related arrays can not be appended to because of the possibility of multiple polyhedron,
 			// so we will rebuild them from scratch in the new order
@@ -1031,8 +1031,8 @@ public:
 			output_face_loop_counts.resize(face_edge_counter.face_count, 1);
 			output_face_selection.resize(face_edge_counter.face_count, 0.0);
 			output_face_materials.resize(face_edge_counter.face_count);
-			output_polyhedron->face_varying_data.resize(face_edge_counter.edge_count);
-			output_polyhedron->uniform_data.resize(face_edge_counter.face_count);
+			output_polyhedron->face_varying_attributes.resize(face_edge_counter.edge_count);
+			output_polyhedron->uniform_attributes.resize(face_edge_counter.face_count);
 			document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
 			detail::mesh_arrays mesh_arrays(
@@ -1063,8 +1063,8 @@ public:
 							output_face_loop_counts,
 							output_face_materials,
 							output_face_selection,
-							uniform_data_copier,
-							face_varying_data_copier);
+							uniform_attributes_copier,
+							face_varying_attributes_copier);
 
 			if(subdivision_type == CENTERTOMIDPOINTS)
 			{

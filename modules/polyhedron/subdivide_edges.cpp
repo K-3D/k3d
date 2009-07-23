@@ -22,7 +22,7 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include <k3dsdk/attribute_array_copier.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
@@ -146,7 +146,7 @@ public:
 			const k3d::uint_t SplitPointCount,
 			k3d::mesh::indices_t& OutputEdgePoints,
 			k3d::mesh::indices_t& OutputClockwiseEdges,
-			k3d::attribute_array_copier& Copier) :
+			k3d::table_copier& Copier) :
 				m_input_polyhedron(InputPolyhedron),
 				m_edge_list(EdgeList),
 				m_index_map(IndexMap),
@@ -212,7 +212,7 @@ private:
 	const k3d::uint_t m_split_point_count;
 	k3d::mesh::indices_t& m_output_edge_points;
 	k3d::mesh::indices_t& m_output_clockwise_edges;
-	k3d::attribute_array_copier& m_copier;
+	k3d::table_copier& m_copier;
 };
 
 /// Updates edge indices using the mapping from old to new indices
@@ -224,7 +224,7 @@ public:
 			const k3d::mesh::indices_t& IndexMap,
 			k3d::mesh::indices_t& OutputEdgePoints,
 			k3d::mesh::indices_t& OutputClockwiseEdges,
-			k3d::attribute_array_copier& Copier) :
+			k3d::table_copier& Copier) :
 				m_input_edge_points(InputEdgePoints),
 				m_input_clockwise_edges(InputClockwiseEdges),
 				m_index_map(IndexMap),
@@ -247,7 +247,7 @@ private:
 	const k3d::mesh::indices_t& m_index_map;
 	k3d::mesh::indices_t& m_output_edge_points;
 	k3d::mesh::indices_t& m_output_clockwise_edges;
-	k3d::attribute_array_copier& m_copier;
+	k3d::table_copier& m_copier;
 };
 
 /// Calculates the split points positions for each edge
@@ -361,8 +361,8 @@ public:
 			const k3d::uint_t new_point_count = m_edge_list.size() * split_point_count + Input.points->size();
 			output_points.resize(new_point_count);
 			output_point_selection.resize(new_point_count, 1.0);
-			output_polyhedron->face_varying_data.resize(edge_index_calculator.edge_count);
-			k3d::attribute_array_copier face_varying_data_copier(input_polyhedron->face_varying_data, output_polyhedron->face_varying_data);
+			output_polyhedron->face_varying_attributes.resize(edge_index_calculator.edge_count);
+			k3d::table_copier face_varying_attributes_copier(input_polyhedron->face_varying_attributes, output_polyhedron->face_varying_attributes);
 			document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
 			document().pipeline_profiler().start_execution(*this, "Update indices");
@@ -371,7 +371,7 @@ public:
 					index_map,
 					output_polyhedron->edge_points,
 					output_polyhedron->clockwise_edges,
-					face_varying_data_copier);
+					face_varying_attributes_copier);
 			for(k3d::uint_t edge = 0; edge != index_map.size(); ++edge) edge_index_updater(edge);
 			for(k3d::uint_t loop = 0; loop != output_polyhedron->loop_first_edges.size(); ++loop)
 				output_polyhedron->loop_first_edges[loop] = index_map[output_polyhedron->loop_first_edges[loop]];
@@ -387,7 +387,7 @@ public:
 						split_point_count,
 						output_polyhedron->edge_points,
 						output_polyhedron->clockwise_edges,
-						face_varying_data_copier);
+						face_varying_attributes_copier);
 			for(k3d::uint_t edge_index = 0; edge_index != m_edge_list.size(); ++edge_index) edge_splitter(edge_index);
 			document().pipeline_profiler().finish_execution(*this, "Split edges");
 		}

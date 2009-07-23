@@ -116,10 +116,10 @@ public:
 	/**
 	 * Note: the Node is passed in order to enable pipeline profiling
 	 */
-	void update_mesh(const k3d::mesh::points_t& InputPoints, const k3d::polyhedron::const_primitive& InputPolyhedron, const k3d::attribute_arrays& InputVertexData, const k3d::mesh::selection_t& InputFaceSelection, k3d::inode* Node = 0);
+	void update_mesh(const k3d::mesh::points_t& InputPoints, const k3d::polyhedron::const_primitive& InputPolyhedron, const k3d::table& InputVertexData, const k3d::mesh::selection_t& InputFaceSelection, k3d::inode* Node = 0);
 	
 	/// Stores the subdivided mesh in the provided structures
-	void copy_output(k3d::mesh::points_t& Points, k3d::polyhedron::primitive& Polyhedron, k3d::attribute_arrays& VertexData);
+	void copy_output(k3d::mesh::points_t& Points, k3d::polyhedron::primitive& Polyhedron, k3d::table& VertexData);
 	
 	/// Visit the data representing the SDS patch surface
 	void visit_surface(const k3d::uint_t Level, ipatch_surface_visitor& Visitor);

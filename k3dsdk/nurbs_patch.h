@@ -61,9 +61,9 @@ public:
 		const mesh::knots_t& CurveKnots,
 		const mesh::points_2d_t& Points,
 		const mesh::selection_t& PointSelections,
-		const mesh::attribute_arrays_t& ConstantData,
-		const mesh::attribute_arrays_t& UniformData,
-		const mesh::attribute_arrays_t& VaryingData
+		const mesh::table_t& ConstantAttributes,
+		const mesh::table_t& UniformAttributes,
+		const mesh::table_t& VaryingAttributes
 		);
 
 	const mesh::indices_t& patch_first_points;
@@ -94,9 +94,9 @@ public:
 	const mesh::knots_t& curve_knots;
 	const mesh::points_2d_t& points;
 	const mesh::selection_t& point_selections;
-	const mesh::attribute_arrays_t& constant_data;
-	const mesh::attribute_arrays_t& uniform_data;
-	const mesh::attribute_arrays_t& varying_data;
+	const mesh::table_t& constant_attributes;
+	const mesh::table_t& uniform_attributes;
+	const mesh::table_t& varying_attributes;
 };
 
 /// Gathers the member arrays of a nurbs_patch primitive into a convenient package
@@ -132,9 +132,9 @@ public:
 		mesh::knots_t& CurveKnots,
 		mesh::points_2d_t& Points,
 		mesh::selection_t& PointSelections,
-		mesh::attribute_arrays_t& ConstantData,
-		mesh::attribute_arrays_t& UniformData,
-		mesh::attribute_arrays_t& VaryingData
+		mesh::table_t& ConstantAttributes,
+		mesh::table_t& UniformAttributes,
+		mesh::table_t& VaryingAttributes
 		);
 
 	mesh::indices_t& patch_first_points;
@@ -165,9 +165,9 @@ public:
 	mesh::knots_t& curve_knots;
 	mesh::points_2d_t& points;
 	mesh::selection_t& point_selections;
-	mesh::attribute_arrays_t& constant_data;
-	mesh::attribute_arrays_t& uniform_data;
-	mesh::attribute_arrays_t& varying_data;
+	mesh::table_t& constant_attributes;
+	mesh::table_t& uniform_attributes;
+	mesh::table_t& varying_attributes;
 };
 
 /// Creates a new nurbs_patch mesh primitive, returning references to its member arrays.

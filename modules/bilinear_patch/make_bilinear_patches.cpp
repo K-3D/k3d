@@ -62,7 +62,7 @@ public:
 
       Output.points = Input.points;
       Output.point_selection = Input.point_selection;
-      Output.vertex_data = Input.vertex_data;
+      Output.vertex_attributes = Input.vertex_attributes;
 
       boost::scoped_ptr<k3d::bilinear_patch::primitive> primitive(k3d::bilinear_patch::create(Output));
 

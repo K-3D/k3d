@@ -71,9 +71,9 @@ public:
 		static object curve_knots(wrapper& Self) { return wrap(Self.wrapped().curve_knots); }
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
 		static object point_selections(wrapper& Self) { return wrap(Self.wrapped().point_selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 	class primitive
@@ -109,9 +109,9 @@ public:
 		static object curve_knots(wrapper& Self) { return wrap(Self.wrapped().curve_knots); }
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
 		static object point_selections(wrapper& Self) { return wrap(Self.wrapped().point_selections); }
-		static object constant_data(wrapper& Self) { return wrap(Self.wrapped().constant_data); }
-		static object uniform_data(wrapper& Self) { return wrap(Self.wrapped().uniform_data); }
-		static object varying_data(wrapper& Self) { return wrap(Self.wrapped().varying_data); }
+		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
+		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
 
@@ -174,9 +174,9 @@ void define_namespace_nurbs_patch()
 		.def("curve_knots", &nurbs_patch::const_primitive::curve_knots)
 		.def("points", &nurbs_patch::const_primitive::points)
 		.def("point_selections", &nurbs_patch::const_primitive::point_selections)
-		.def("constant_data", &nurbs_patch::const_primitive::constant_data)
-		.def("uniform_data", &nurbs_patch::const_primitive::uniform_data)
-		.def("varying_data", &nurbs_patch::const_primitive::varying_data)
+		.def("constant_attributes", &nurbs_patch::const_primitive::constant_attributes)
+		.def("uniform_attributes", &nurbs_patch::const_primitive::uniform_attributes)
+		.def("varying_attributes", &nurbs_patch::const_primitive::varying_attributes)
 		;
 
 	class_<nurbs_patch::primitive::wrapper>("primitive", no_init)
@@ -208,9 +208,9 @@ void define_namespace_nurbs_patch()
 		.def("curve_knots", &nurbs_patch::primitive::curve_knots)
 		.def("points", &nurbs_patch::primitive::points)
 		.def("point_selections", &nurbs_patch::primitive::point_selections)
-		.def("constant_data", &nurbs_patch::primitive::constant_data)
-		.def("uniform_data", &nurbs_patch::primitive::uniform_data)
-		.def("varying_data", &nurbs_patch::primitive::varying_data)
+		.def("constant_attributes", &nurbs_patch::primitive::constant_attributes)
+		.def("uniform_attributes", &nurbs_patch::primitive::uniform_attributes)
+		.def("varying_attributes", &nurbs_patch::primitive::varying_attributes)
 		;
 }
 

@@ -432,7 +432,7 @@ void sds_face_vbo::update(const k3d::mesh::primitive* Primitive, const k3d::uint
 	return_if_fail(polyhedron && k3d::polyhedron::is_sds(*polyhedron));
 	if (!m_point_vbo) // new cache -> completely regenerate the VBOs
 	{
-		if(polyhedron->constant_data.lookup<tags_t>("interpolateboundary"))
+		if(polyhedron->constant_attributes.lookup<tags_t>("interpolateboundary"))
 		{
 			face_visitor visitor(Cache.point_count(), Cache.edge_count(Primitive), polyhedron->face_first_loops.size());
 			Cache.visit_surface(Primitive, Level, visitor);

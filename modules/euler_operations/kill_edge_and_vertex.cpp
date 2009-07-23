@@ -21,7 +21,7 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include <k3dsdk/attribute_array_copier.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/euler_operations.h>

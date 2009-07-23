@@ -95,9 +95,9 @@ const_storage* validate(const k3d::selection::storage& Storage)
 
 	try
 	{
-		const mesh::indices_t& index_begin = require_const_array<mesh::indices_t >(Storage, "index_begin");
-		const mesh::indices_t& index_end = require_const_array<mesh::indices_t>(Storage, "index_end");
-		const mesh::selection_t& weight = require_const_array<mesh::selection_t>(Storage, "weight");
+		const mesh::indices_t& index_begin = require_array<mesh::indices_t >(Storage, "index_begin");
+		const mesh::indices_t& index_end = require_array<mesh::indices_t>(Storage, "index_end");
+		const mesh::selection_t& weight = require_array<mesh::selection_t>(Storage, "weight");
 
 		require_array_size(Storage, index_end, "index_end", index_begin.size());
 		require_array_size(Storage, weight, "weight", index_begin.size());
@@ -294,14 +294,14 @@ const_storage* validate(const k3d::selection::storage& Storage)
 
 	try
 	{
-		const mesh::indices_t& primitive_begin = require_const_array<mesh::indices_t>(Storage, "primitive_begin");
-		const mesh::indices_t& primitive_end = require_const_array<mesh::indices_t>(Storage, "primitive_end");
-		const typed_array<k3d::int32_t>& primitive_selection_type = require_const_array<typed_array<k3d::int32_t> >(Storage, "primitive_selection_type");
-		const mesh::indices_t& primitive_first_range = require_const_array<mesh::indices_t>(Storage, "primitive_first_range");
-		const mesh::indices_t& primitive_range_count = require_const_array<mesh::counts_t>(Storage, "primitive_range_count");
-		const mesh::indices_t& index_begin = require_const_array<mesh::indices_t>(Storage, "index_begin");
-		const mesh::indices_t& index_end = require_const_array<mesh::indices_t>(Storage, "index_end");
-		const mesh::selection_t& weight = require_const_array<mesh::selection_t>(Storage, "weight");
+		const mesh::indices_t& primitive_begin = require_array<mesh::indices_t>(Storage, "primitive_begin");
+		const mesh::indices_t& primitive_end = require_array<mesh::indices_t>(Storage, "primitive_end");
+		const typed_array<k3d::int32_t>& primitive_selection_type = require_array<typed_array<k3d::int32_t> >(Storage, "primitive_selection_type");
+		const mesh::indices_t& primitive_first_range = require_array<mesh::indices_t>(Storage, "primitive_first_range");
+		const mesh::indices_t& primitive_range_count = require_array<mesh::counts_t>(Storage, "primitive_range_count");
+		const mesh::indices_t& index_begin = require_array<mesh::indices_t>(Storage, "index_begin");
+		const mesh::indices_t& index_end = require_array<mesh::indices_t>(Storage, "index_end");
+		const mesh::selection_t& weight = require_array<mesh::selection_t>(Storage, "weight");
 
 		require_array_size(Storage, primitive_end, "primitive_end", primitive_begin.size());
 		require_array_size(Storage, primitive_selection_type, "primitive_selection_type", primitive_begin.size());

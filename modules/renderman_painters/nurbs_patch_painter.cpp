@@ -80,17 +80,17 @@ public:
 				k3d::ri::reals u_knots(nurbs->patch_u_knots.begin() + nurbs->patch_u_first_knots[patch], nurbs->patch_u_knots.begin() + nurbs->patch_u_first_knots[patch] + nurbs->patch_u_point_counts[patch] + nurbs->patch_u_orders[patch]);
 				k3d::ri::reals v_knots(nurbs->patch_v_knots.begin() + nurbs->patch_v_first_knots[patch], nurbs->patch_v_knots.begin() + nurbs->patch_v_first_knots[patch] + nurbs->patch_v_point_counts[patch] + nurbs->patch_v_orders[patch]);
 
-				array_copier ri_constant_data;
-				ri_constant_data.add_arrays(nurbs->constant_data);
+				array_copier ri_constant_attributes;
+				ri_constant_attributes.add_arrays(nurbs->constant_attributes);
 
-				array_copier ri_uniform_data;
-				ri_uniform_data.add_arrays(nurbs->uniform_data);
+				array_copier ri_uniform_attributes;
+				ri_uniform_attributes.add_arrays(nurbs->uniform_attributes);
 
-				array_copier ri_varying_data;
-				ri_varying_data.add_arrays(nurbs->varying_data);
+				array_copier ri_varying_attributes;
+				ri_varying_attributes.add_arrays(nurbs->varying_attributes);
 
-				array_copier ri_vertex_data;
-				ri_vertex_data.add_arrays(Mesh.vertex_data);
+				array_copier ri_vertex_attributes;
+				ri_vertex_attributes.add_arrays(Mesh.vertex_attributes);
 
 				k3d::typed_array<k3d::ri::hpoint>* const ri_points = new k3d::typed_array<k3d::ri::hpoint>();
 
@@ -104,18 +104,18 @@ public:
 						nurbs->patch_point_weights[point] * points[nurbs->patch_points[point]][2],
 						nurbs->patch_point_weights[point]));
 
-					ri_vertex_data.push_back(nurbs->patch_points[point]);
+					ri_vertex_attributes.push_back(nurbs->patch_points[point]);
 				}
 
-				ri_constant_data.push_back(patch);
-				ri_uniform_data.push_back(patch);
-				ri_varying_data.insert(4 * patch, 4 * (patch + 1));
+				ri_constant_attributes.push_back(patch);
+				ri_uniform_attributes.push_back(patch);
+				ri_varying_attributes.insert(4 * patch, 4 * (patch + 1));
 
 				k3d::ri::parameter_list ri_parameters;
-				ri_constant_data.copy_to(k3d::ri::CONSTANT, ri_parameters);
-				ri_uniform_data.copy_to(k3d::ri::UNIFORM, ri_parameters);
-				ri_varying_data.copy_to(k3d::ri::VARYING, ri_parameters);
-				ri_vertex_data.copy_to(k3d::ri::VERTEX, ri_parameters);
+				ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
+				ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
+				ri_varying_attributes.copy_to(k3d::ri::VARYING, ri_parameters);
+				ri_vertex_attributes.copy_to(k3d::ri::VERTEX, ri_parameters);
 				ri_parameters.push_back(k3d::ri::parameter(k3d::ri::RI_PW(), k3d::ri::VERTEX, 1, ri_points));
 
 				k3d::ri::setup_material(nurbs->patch_materials[patch], RenderState);

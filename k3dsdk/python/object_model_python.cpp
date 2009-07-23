@@ -26,7 +26,7 @@
 #include "angle_axis_python.h"
 #include "any_python.h"
 #include "atk_python.h"
-#include "attribute_arrays_python.h"
+#include "table_python.h"
 #include "bezier_triangle_patch_python.h"
 #include "bicubic_patch_python.h"
 #include "bilinear_patch_python.h"
@@ -35,10 +35,10 @@
 #include "bounding_box3_python.h"
 #include "color_python.h"
 #include "cone_python.h"
-#include "const_attribute_arrays_python.h"
+#include "const_table_python.h"
 #include "const_bitmap_python.h"
 #include "const_named_arrays_python.h"
-#include "const_named_attribute_arrays_python.h"
+#include "const_named_tables_python.h"
 #include "const_typed_array_python.h"
 #include "cubic_curve_python.h"
 #include "cylinder_python.h"
@@ -58,7 +58,7 @@
 #include "mesh_python.h"
 #include "mime_python.h"
 #include "named_arrays_python.h"
-#include "named_attribute_arrays_python.h"
+#include "named_tables_python.h"
 #include "normal3_python.h"
 #include "nurbs_curve_python.h"
 #include "nurbs_patch_python.h"
@@ -342,14 +342,14 @@ BOOST_PYTHON_MODULE(k3d)
 #ifdef K3D_BUILD_NGUI_MODULE
 	define_class_atk_object();
 #endif // K3D_BUILD_NGUI_MODULE
-	define_class_attribute_arrays();
+	define_class_table();
 	define_class_bitmap();
 	define_class_bounding_box3();
 	define_class_color();
-	define_class_const_attribute_arrays();
+	define_class_const_table();
 	define_class_const_bitmap();
 	define_class_const_named_arrays();
-	define_class_const_named_attribute_arrays();
+	define_class_const_named_tables();
 	define_class_euler_angles();
 	define_class_file_change_receiver();
 	define_class_file_signal();
@@ -359,7 +359,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_class_mesh();
 	define_class_const_mesh();
 	define_class_named_arrays();
-	define_class_named_attribute_arrays();
+	define_class_named_tables();
 	define_class_normal3();
 	define_class_point2();
 	define_class_point3();
