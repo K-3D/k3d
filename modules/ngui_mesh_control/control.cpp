@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -43,47 +43,6 @@
 #include <gtk/gtkmain.h>
 
 using namespace k3d::ngui;
-
-namespace k3d
-{
-	/// Iterates over every structure in the given mesh, in hierarchical order, passing each structure to a functor.
-	template<typename FunctorT>
-	static void visit(const mesh& Mesh, FunctorT Functor)
-	{
-		Functor.start_mesh(Mesh);
-
-		if(Mesh.points)
-			Functor.mesh_points(*Mesh.points);
-
-		if(Mesh.point_selection)
-			Functor.mesh_point_selection(*Mesh.point_selection);
-
-		for(mesh::primitives_t::const_iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
-		{
-			const mesh::primitive& primitive = **p;
-			Functor.start_primitive(primitive);
-
-			Functor.start_structure(primitive.structure);
-			for(mesh::named_arrays_t::const_iterator array = primitive.structure.begin(); array != primitive.structure.end(); ++array)
-				Functor.structure_array(array->first, *array->second);
-			Functor.finish_structure(primitive.structure);
-
-			Functor.start_named_attributes(primitive.attributes);
-			for(mesh::named_tables_t::const_iterator attributes = primitive.attributes.begin(); attributes != primitive.attributes.end(); ++attributes)
-			{
-				Functor.start_attributes(attributes->first, attributes->second);
-				for(mesh::table_t::const_iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
-					Functor.attribute_array(array->first, *array->second);
-				Functor.finish_attributes(attributes->first, attributes->second);
-			}
-			Functor.finish_named_attributes(primitive.attributes);
-
-			Functor.finish_primitive(primitive);
-		}
-		Functor.finish_mesh(Mesh);
-	}
-
-} // namespace k3d
 
 namespace module
 {
@@ -163,188 +122,22 @@ public:
 		stream << k3d::xml::declaration() << xml << std::endl;
 	}
 
-	class save_dotfile
-	{
-	public:
-		save_dotfile(std::ostream& Stream) :
-			current_mesh(0),
-			current_primitive(0),
-			current_structure_arrays(0),
-			current_named_tables(0),
-			current_table(0),
-			current_array(0),
-			stream(Stream)
-		{
-		}
+  template<typename ContainerT>
+  const k3d::string_t dot_array_vertex(const ContainerT& Container)
+  {
+    std::ostringstream buffer;
+//    buffer << "v" << Container.get() << " [label=\"{|||...|}\"]";
+    buffer << "v" << Container.get() << " [label=\"{Array}\"]";
+    return buffer.str();
+  }
 
-		/// Inserts whitespace into a stream, proportional to its indentation level (we override the default to implement single_line behavior).
-		static std::ostream& indentation(std::ostream& Stream)
-		{
-			Stream << k3d::string_t(2 * k3d::current_indent(Stream), ' ');
-			return Stream;
-		}
- 
-		void start_mesh(const k3d::mesh& Mesh)
-		{
-			current_mesh = &Mesh;
-
-			stream << indentation << "digraph\n";
-			stream << indentation << "{\n";
-			stream << k3d::push_indent;
-
-			stream << indentation << "graph [rankdir=\"LR\"]\n";
-			stream << indentation << "node [shape=\"record\" fontname=\"Helvetica\" fontsize=12 height=0 width=0]\n";
-			stream << indentation << "edge [fontname=\"Helvetica\" fontsize=10]\n";
-
-			stream << indentation << "v" << current_mesh << " [label=\"<geometry>Geometry|<points>points|<point_selection>point_selection|<primitives>primitives\"]\n";
-			stream << k3d::push_indent;
-		}
-
-		void mesh_points(const k3d::mesh::points_t& Points)
-		{
-			current_array = &Points;
-
-			stream << indentation << "subgraph cluster_0\n";
-			stream << indentation << "{\n";
-			stream << k3d::push_indent;
-			stream << indentation << "color=white;\n";
-
-			stream << indentation << "v" << current_array << " [label=\"{|||...|}\"]\n";
-			stream << indentation << "v" << current_mesh << ":points:e -> " << "v" << current_array << ":w\n";
-
-			current_array = 0;
-		}
-
-		void mesh_point_selection(const k3d::mesh::selection_t& PointSelection)
-		{
-			current_array = &PointSelection;
-
-			stream << indentation << "v" << current_array << " [label=\"{|||...|}\"]\n";
-			stream << indentation << "v" << current_mesh << ":point_selection:e -> " << "v" << current_array << ":w\n";
-
-			stream << k3d::pop_indent;
-			stream << indentation << "}\n";
-
-			current_array = 0;
-		}
-
-		void start_primitive(const k3d::mesh::primitive& Primitive)
-		{
-			current_primitive = &Primitive;
-
-			stream << indentation << "v" << current_primitive << " [label=\"<primitive>Primitive|<type>type|<structure>structure|<attributes>attributes\"]\n";
-			stream << indentation << "v" << current_mesh << ":primitives:e -> " << "v" << current_primitive << ":primitive:w\n";
-			stream << k3d::push_indent;
-
-			stream << indentation << "v" << current_primitive << "type [label=\"\\\"" << current_primitive->type << "\\\"\" shape=\"plaintext\"]\n";
-			stream << indentation << "v" << current_primitive << ":type:e -> " << "v" << current_primitive << "type:w\n";
-		}
-
-		void start_structure(const k3d::mesh::named_arrays_t& Structure)
-		{
-			current_structure_arrays = &Structure;
-
-			stream << indentation << "v" << current_structure_arrays;
-			stream << " [label=\"<named_arrays>Named Arrays";
-			
-			for(k3d::mesh::named_arrays_t::const_iterator array = Structure.begin(); array != Structure.end(); ++array)
-				stream << "|<" << array->first << ">" << "\\\"" << array->first << "\\\"";
-
-			stream << "\"]\n";
-			stream << indentation << "v" << current_primitive << ":structure:e -> " << "v" << current_structure_arrays << ":named_arrays:w\n";
-		}
-
-		void structure_array(const k3d::string_t& Name, const k3d::array& Array)
-		{
-			current_array = &Array;
-
-			stream << indentation << "v" << current_array << " [label=\"{|||...|}\"]\n";
-			stream << indentation << "v" << current_structure_arrays << ":" << Name << ":e -> " << "v" << current_array << ":w\n";
-
-			if(Array.get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::mesh_point_indices_domain())
-				stream << indentation << "v" << current_array << ":n -> " << "v" << current_mesh->points.get() << ":n\n";
-
-			current_array = 0;
-		}
-
-		void finish_structure(const k3d::mesh::named_arrays_t& Structure)
-		{
-			current_structure_arrays = 0;
-		}
-
-		void start_named_attributes(const k3d::mesh::named_tables_t& NamedAttributes)
-		{
-			current_named_tables = &NamedAttributes;
-
-			stream << indentation << "v" << current_named_tables;
-			stream << " [label=\"<named_tables>Named Attribute Arrays";
-			
-			for(k3d::mesh::named_tables_t::const_iterator attributes = NamedAttributes.begin(); attributes != NamedAttributes.end(); ++attributes)
-				stream << "|<" << attributes->first << ">" << "\\\"" << attributes->first << "\\\"";
-
-			stream << "\"]\n";
-			stream << indentation << "v" << current_primitive << ":attributes:e -> " << "v" << current_named_tables << ":named_tables:w\n";
-			stream << k3d::push_indent;
-		}
-
-		void start_attributes(const k3d::string_t& Name, const k3d::mesh::table_t& Attributes)
-		{
-			current_table = &Attributes;
-
-			stream << indentation << "v" << current_table;
-			stream << " [label=\"<table>Attribute Arrays";
-
-			for(k3d::mesh::table_t::const_iterator array = Attributes.begin(); array != Attributes.end(); ++array)
-				stream << "|<" << array->first << ">" << "\\\"" << array->first << "\\\"";
-
-			stream << "\"]\n";
-			stream << indentation << "v" << current_named_tables << ":" << Name << ":e -> " << "v" << current_table << ":table:w\n";
-		}
-
-		void attribute_array(const k3d::string_t& Name, const k3d::array& Array)
-		{
-			current_array = &Array;
-
-			stream << indentation << "v" << current_array << " [label=\"{|||...|}\"]\n";
-			stream << indentation << "v" << current_table << ":" << Name << ":e -> " << "v" << current_array << ":w\n";
-
-			current_array = 0;
-		}
-
-		void finish_attributes(const k3d::string_t& Name, const k3d::mesh::table_t& Attributes)
-		{
-			current_table = 0;
-		}
-
-		void finish_named_attributes(const k3d::mesh::named_tables_t& NamedAttributes)
-		{
-			stream << k3d::pop_indent;
-			current_named_tables = 0;
-		}
-
-		void finish_primitive(const k3d::mesh::primitive& Primitive)
-		{
-			stream << k3d::pop_indent;
-			current_primitive = 0;
-		}
-
-		void finish_mesh(const k3d::mesh&)
-		{
-			stream << k3d::pop_indent;
-			stream << k3d::pop_indent;
-			stream << indentation << "}\n";
-			current_mesh = 0;
-		}
-
-	private:
-		const k3d::mesh* current_mesh;
-		const k3d::mesh::primitive* current_primitive;
-		const k3d::mesh::named_arrays_t* current_structure_arrays;
-		const k3d::mesh::named_tables_t* current_named_tables;
-		const k3d::mesh::table_t* current_table;
-		const k3d::array* current_array;
-		std::ostream& stream;
-	};
+  template<typename ContainerT>
+  const k3d::string_t dot_array_reference(const ContainerT& Container)
+  {
+    std::ostringstream buffer;
+    buffer << "v" << Container.get();
+    return buffer.str();
+  }
 
 	void on_save_dotfile(const k3d::mesh* const Mesh)
 	{
@@ -356,7 +149,98 @@ public:
 		}
 
 		k3d::filesystem::ofstream stream(output_path);
-		k3d::visit(*Mesh, save_dotfile(stream));
+
+    stream << k3d::standard_indent << "digraph\n";
+    stream << k3d::standard_indent << "{\n";
+    stream << k3d::push_indent;
+
+    stream << k3d::standard_indent << "graph [rankdir=\"LR\"]\n";
+    stream << k3d::standard_indent << "node [shape=\"record\" fontname=\"Helvetica\" fontsize=12 height=0 width=0]\n";
+    stream << k3d::standard_indent << "edge [fontname=\"Helvetica\" fontsize=10]\n";
+
+    stream << k3d::standard_indent << "v" << Mesh << " [label=\"<geometry>Geometry|<points>points|<point_selection>point_selection|<vertex_attributes>vertex_attributes|<primitives>primitives\"]\n";
+    stream << k3d::push_indent;
+
+    if(Mesh->points)
+		{
+			stream << k3d::standard_indent << "subgraph cluster_0\n";
+			stream << k3d::standard_indent << "{\n";
+			stream << k3d::push_indent;
+			stream << k3d::standard_indent << "color=white;\n";
+
+			stream << k3d::standard_indent << dot_array_vertex(Mesh->points) << "\n";
+			stream << k3d::standard_indent << "v" << Mesh << ":points:e -> " << dot_array_reference(Mesh->points) << ":w\n";
+		}
+
+    if(Mesh->point_selection)
+		{
+			stream << k3d::standard_indent << dot_array_vertex(Mesh->point_selection) << "\n";
+			stream << k3d::standard_indent << "v" << Mesh << ":point_selection:e -> " << dot_array_reference(Mesh->point_selection) << ":w\n";
+
+			stream << k3d::pop_indent;
+			stream << k3d::standard_indent << "}\n";
+		}
+ 
+    for(k3d::mesh::primitives_t::const_iterator primitive = Mesh->primitives.begin(); primitive != Mesh->primitives.end(); ++primitive)
+    { 
+			stream << k3d::standard_indent << "v" << (*primitive).get() << " [label=\"<primitive>Primitive \\\"" << (*primitive)->type << "\\\"|<structure>structure|<attributes>attributes\"]\n";
+			stream << k3d::standard_indent << "v" << Mesh << ":primitives:e -> " << "v" << (*primitive).get() << ":primitive:w\n";
+			stream << k3d::push_indent;
+
+      for(k3d::mesh::named_tables_t::const_iterator named_table = (**primitive).structure.begin(); named_table != (**primitive).structure.end(); ++named_table)
+      {
+        const k3d::string_t name = (*named_table).first;
+        const k3d::mesh::table_t& table = (*named_table).second;
+
+        stream << k3d::standard_indent << "v" << &table;
+        stream << " [label=\"<name>Table \\\"" << name << "\\\"";
+
+        for(k3d::mesh::table_t::const_iterator array = table.begin(); array != table.end(); ++array)
+          stream << "|<" << array->first << ">" << "\\\"" << array->first << "\\\"";
+
+        stream << "\"]\n";
+        stream << k3d::standard_indent << "v" << (*primitive).get() << ":structure:e -> " << "v" << &table << ":name:w\n";
+        stream << k3d::push_indent;
+
+        for(k3d::mesh::table_t::const_iterator array = table.begin(); array != table.end(); ++array)
+        {
+          stream << k3d::standard_indent << dot_array_vertex(array->second) << "\n";
+          stream << k3d::standard_indent << "v" << &table << ":" << array->first << ":e -> " << dot_array_reference(array->second) << ":w\n";
+        }
+
+        stream << k3d::pop_indent;
+      }
+
+      for(k3d::mesh::named_tables_t::const_iterator named_table = (**primitive).attributes.begin(); named_table != (**primitive).attributes.end(); ++named_table)
+      {
+        const k3d::string_t name = (*named_table).first;
+        const k3d::mesh::table_t& table = (*named_table).second;
+
+        stream << k3d::standard_indent << "v" << &table;
+        stream << " [label=\"<name>Table \\\"" << name << "\\\"";
+
+        for(k3d::mesh::table_t::const_iterator array = table.begin(); array != table.end(); ++array)
+          stream << "|<" << array->first << ">" << "\\\"" << array->first << "\\\"";
+
+        stream << "\"]\n";
+        stream << k3d::standard_indent << "v" << (*primitive).get() << ":attributes:e -> " << "v" << &table << ":name:w\n";
+        stream << k3d::push_indent;
+
+        for(k3d::mesh::table_t::const_iterator array = table.begin(); array != table.end(); ++array)
+        {
+          stream << k3d::standard_indent << dot_array_vertex(array->second) << "\n";
+          stream << k3d::standard_indent << "v" << &table << ":" << array->first << ":e -> " << dot_array_reference(array->second) << ":w\n";
+        }
+
+        stream << k3d::pop_indent;
+      }
+
+			stream << k3d::pop_indent;
+    }
+
+    stream << k3d::pop_indent;
+    stream << k3d::pop_indent;
+    stream << k3d::standard_indent << "}\n";
 	}
 
 	static k3d::iplugin_factory& get_factory()
