@@ -89,10 +89,10 @@ public:
 
 		const k3d::mesh::points_t& points = *Output.points;
 
-		// Optionally store vertex normals ...
-		k3d::mesh::normals_t* vertex_normals = 0;
+		// Optionally store point normals ...
+		k3d::mesh::normals_t* point_normals = 0;
 		if(store_vertex)
-			vertex_normals = &Output.vertex_attributes.create(m_vertex_array.pipeline_value(), new k3d::mesh::normals_t(points.size()));
+			point_normals = &Output.point_attributes.create(m_vertex_array.pipeline_value(), new k3d::mesh::normals_t(points.size()));
 
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
@@ -180,7 +180,7 @@ public:
 						const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
 						for(k3d::uint_t edge = first_edge; ;)
 						{
-							(*vertex_normals)[polyhedron->edge_points[edge]] += uniform_normals[face];
+							(*point_normals)[polyhedron->edge_points[edge]] += uniform_normals[face];
 
 							edge = polyhedron->clockwise_edges[edge];
 							if(edge == first_edge)

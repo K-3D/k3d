@@ -119,7 +119,7 @@ public:
 	/// Stores per-point selection state.
 	pipeline_data<selection_t> point_selection;
 	/// Stores user-defined per-point data (maps to RenderMan vertex data).
-	table_t vertex_attributes;
+	table_t point_attributes;
 	/// Stores mesh primitives.
 	primitives_t primitives;
 

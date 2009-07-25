@@ -125,7 +125,13 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
+		require_valid_primitive(Primitive);
+
 		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+
+		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
+		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 
 		const mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, uniform_structure, "matrices");
 		const mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "materials");
@@ -136,23 +142,11 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::doubles_t& sweep_angles = require_array<mesh::doubles_t >(Primitive, uniform_structure, "sweep_angles");
 		const mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
 
-		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
-		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
-
 		require_metadata(Primitive, selections, "selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 
-		require_array_size(Primitive, materials, "materials", matrices.size());
-		require_array_size(Primitive, major_radii, "major_radii", matrices.size());
-		require_array_size(Primitive, minor_radii, "minor_radii", matrices.size());
-		require_array_size(Primitive, phi_min, "phi_min", matrices.size());
-		require_array_size(Primitive, phi_max, "phi_max", matrices.size());
-		require_array_size(Primitive, sweep_angles, "sweep_angles", matrices.size());
-		require_array_size(Primitive, selections, "selections", matrices.size());
-
 		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", matrices.size());
-		require_table_size(Primitive, varying_attributes, "varying", matrices.size() * 4);
+		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
+		require_table_size(Primitive, varying_attributes, "varying", uniform_structure.size() * 4);
 
 		return new const_primitive(matrices, materials, major_radii, minor_radii, phi_min, phi_max, sweep_angles, selections, constant_attributes, uniform_attributes, varying_attributes);
 	}
@@ -171,7 +165,13 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
+		require_valid_primitive(Primitive);
+
 		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+
+		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
+		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 
 		mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, uniform_structure, "matrices");
 		mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "materials");
@@ -182,23 +182,11 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::doubles_t& sweep_angles = require_array<mesh::doubles_t >(Primitive, uniform_structure, "sweep_angles");
 		mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
 
-		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
-		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
-
 		require_metadata(Primitive, selections, "selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 
-		require_array_size(Primitive, materials, "materials", matrices.size());
-		require_array_size(Primitive, major_radii, "major_radii", matrices.size());
-		require_array_size(Primitive, minor_radii, "minor_radii", matrices.size());
-		require_array_size(Primitive, phi_min, "phi_min", matrices.size());
-		require_array_size(Primitive, phi_max, "phi_max", matrices.size());
-		require_array_size(Primitive, sweep_angles, "sweep_angles", matrices.size());
-		require_array_size(Primitive, selections, "selections", matrices.size());
-
 		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", matrices.size());
-		require_table_size(Primitive, varying_attributes, "varying", matrices.size() * 4);
+		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
+		require_table_size(Primitive, varying_attributes, "varying", uniform_structure.size() * 4);
 
 		return new primitive(matrices, materials, major_radii, minor_radii, phi_min, phi_max, sweep_angles, selections, constant_attributes, uniform_attributes, varying_attributes);
 	}

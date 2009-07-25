@@ -45,7 +45,7 @@ public:
 		static object material(wrapper& Self) { return wrap(Self.wrapped().material); }
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 	class primitive
@@ -56,7 +56,7 @@ public:
 		static object material(wrapper& Self) { return wrap(Self.wrapped().material); }
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 
@@ -90,14 +90,14 @@ void define_namespace_point_group()
 		.def("material", &point_group::const_primitive::material)
 		.def("points", &point_group::const_primitive::points)
 		.def("constant_attributes", &point_group::const_primitive::constant_attributes)
-		.def("varying_attributes", &point_group::const_primitive::varying_attributes)
+		.def("vertex_attributes", &point_group::const_primitive::vertex_attributes)
 		;
 
 	class_<point_group::primitive::wrapper>("primitive", no_init)
 		.def("material", &point_group::primitive::material)
 		.def("points", &point_group::primitive::points)
 		.def("constant_attributes", &point_group::primitive::constant_attributes)
-		.def("varying_attributes", &point_group::primitive::varying_attributes)
+		.def("vertex_attributes", &point_group::primitive::vertex_attributes)
 		;
 }
 

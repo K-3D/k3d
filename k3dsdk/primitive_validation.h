@@ -2,7 +2,7 @@
 #define K3DSDK_PRIMITIVE_VALIDATION_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -32,6 +32,21 @@ namespace k3d
 
 /// Helper methods for use with in mesh primitive validate() functions only!
 
+/// Performs automated validation of the structure of a mesh primitive.
+void require_valid_primitive(const mesh::primitive& Primitive);
+
+/// Tests a primitive to verify that it contains the named structure table, throws an exception otherwise.
+const mesh::table_t& require_structure(const mesh::primitive& Primitive, const string_t& Name);
+/// Tests a primitive to verify that it contains the named structure table, throws an exception otherwise.
+mesh::table_t& require_structure(mesh::primitive& Primitive, const string_t& Name);
+/// Tests a primitive to verify that it contains the named attribute table, throws an exception otherwise.
+const mesh::table_t& require_attributes(const mesh::primitive& Primitive, const string_t& Name);
+/// Tests a primitive to verify that it contains the named attribute table, throws an exception otherwise.
+mesh::table_t& require_attributes(mesh::primitive& Primitive, const string_t& Name);
+
+/// Tests a table to verify that it matches the given length, throws an exception otherwise.
+void require_table_size(const mesh::primitive& Primitive, const table& Table, const string_t& TableName, const uint_t ReferenceSize);
+
 /// Tests a table to verify that it contains an array with given name and type, throws an exception otherwise.
 template<typename ArrayT>
 const ArrayT& require_array(const mesh::primitive& Primitive, const mesh::table_t& Table, const string_t& Name)
@@ -56,18 +71,7 @@ ArrayT& require_array(mesh::primitive& Primitive, mesh::table_t& Table, const st
 	return *array;
 }
 
-/// Tests a primitive to verify that it contains the named structure table, throws an exception otherwise.
-const mesh::table_t& require_structure(const mesh::primitive& Primitive, const string_t& Name);
-
-/// Tests a primitive to verify that it contains the named structure table, throws an exception otherwise.
-mesh::table_t& require_structure(mesh::primitive& Primitive, const string_t& Name);
-
-/// Tests a primitive to verify that it contains the named attribute table, throws an exception otherwise.
-const mesh::table_t& require_attributes(const mesh::primitive& Primitive, const string_t& Name);
-
-/// Tests a primitive to verify that it contains the named attribute table, throws an exception otherwise.
-mesh::table_t& require_attributes(mesh::primitive& Primitive, const string_t& Name);
-
+/*
 /// Tests a primitive array to verify that it matches the given length, throws an exception otherwise.
 template<typename ArrayT>
 void require_array_size(const mesh::primitive& Primitive, const ArrayT& Array, const string_t& ArrayName, const uint_t Reference)
@@ -79,9 +83,7 @@ void require_array_size(const mesh::primitive& Primitive, const ArrayT& Array, c
 		throw std::runtime_error(buffer.str());
 	}
 }
-
-/// Tests a set of attributes to verify that they match the given length, throws an exception otherwise.
-void require_table_size(const mesh::primitive& Primitive, const table& Attributes, const string_t& AttributesName, const uint_t Reference);
+*/
 
 /// Tests an array to verify that it has metadata with the given name and value, throws an exception otherwise.
 void require_metadata(const mesh::primitive& Primitive, const array& Array, const string_t& ArrayName, const string_t& MetadataName, const string_t& MetadataValue);

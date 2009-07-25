@@ -90,7 +90,7 @@ public:
 				ri_varying_attributes.add_arrays(nurbs->varying_attributes);
 
 				array_copier ri_vertex_attributes;
-				ri_vertex_attributes.add_arrays(Mesh.vertex_attributes);
+				ri_vertex_attributes.add_arrays(Mesh.point_attributes);
 
 				k3d::typed_array<k3d::ri::hpoint>* const ri_points = new k3d::typed_array<k3d::ri::hpoint>();
 

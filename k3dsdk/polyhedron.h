@@ -60,7 +60,8 @@ public:
 		const mesh::selection_t& EdgeSelections,
 		const mesh::table_t& ConstantAttributes,
 		const mesh::table_t& UniformAttributes,
-		const mesh::table_t& FaceVaryingAttributes
+		const mesh::table_t& FaceVaryingAttributes,
+		const mesh::table_t& VertexAttributes
 		);
 
 	/// Implicit conversion
@@ -80,6 +81,7 @@ public:
 	const mesh::table_t& constant_attributes;
 	const mesh::table_t& uniform_attributes;
 	const mesh::table_t& face_varying_attributes;
+	const mesh::table_t& vertex_attributes;
 };
 
 /// Gathers the member arrays of a polyhedron primitive into a convenient package
@@ -100,7 +102,8 @@ public:
 		mesh::selection_t& EdgeSelections,
 		mesh::table_t& ConstantAttributes,
 		mesh::table_t& UniformAttributes,
-		mesh::table_t& FaceVaryingAttributes
+		mesh::table_t& FaceVaryingAttributes,
+		mesh::table_t& VertexAttributes
 		);
 
 	mesh::indices_t& shell_first_faces;
@@ -117,6 +120,7 @@ public:
 	mesh::table_t& constant_attributes;
 	mesh::table_t& uniform_attributes;
 	mesh::table_t& face_varying_attributes;
+	mesh::table_t& vertex_attributes;
 };
 
 /// Creates a new polyhedron mesh primitive, returning references to its member arrays.

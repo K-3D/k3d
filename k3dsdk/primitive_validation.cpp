@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,6 +21,11 @@
 
 namespace k3d
 {
+
+void require_valid_primitive(const mesh::primitive& Primitive)
+{
+	assert_not_implemented();
+}
 
 const mesh::table_t& require_structure(const mesh::primitive& Primitive, const string_t& Name)
 {
@@ -62,12 +67,12 @@ mesh::table_t& require_attributes(mesh::primitive& Primitive, const string_t& Na
 	return *attributes;
 }
 
-void require_table_size(const mesh::primitive& Primitive, const table& Attributes, const string_t& AttributesName, const uint_t Reference)
+void require_table_size(const mesh::primitive& Primitive, const table& Table, const string_t& TableName, const uint_t ReferenceSize)
 {
-	if(!Attributes.match_size(Reference))
+	if(!Table.match_size(ReferenceSize))
 	{
 		std::ostringstream buffer;
-		buffer << "[" << Primitive.type << "] attributes [" << AttributesName << "] incorrect length [" << Attributes.size() << "], expected [" << Reference << "]";
+		buffer << "[" << Primitive.type << "] table [" << TableName << "] incorrect length [" << Table.size() << "], expected [" << ReferenceSize << "]";
 		throw std::runtime_error(buffer.str());
 	}
 }

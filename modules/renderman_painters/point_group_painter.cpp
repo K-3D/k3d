@@ -64,7 +64,7 @@ public:
 			return;
 
 		const k3d::mesh::points_t& points = *Mesh.points;
-		const k3d::mesh::table_t& vertex_attributes = Mesh.vertex_attributes;
+		const k3d::mesh::table_t& vertex_attributes = Mesh.point_attributes;
 
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
@@ -76,7 +76,7 @@ public:
 			ri_constant_attributes.add_arrays(point_group->constant_attributes);
 
 			array_copier ri_varying_attributes;
-			ri_varying_attributes.add_arrays(point_group->varying_attributes);
+			ri_varying_attributes.add_arrays(point_group->vertex_attributes);
 
 			array_copier ri_vertex_attributes;
 			ri_vertex_attributes.add_arrays(vertex_attributes);

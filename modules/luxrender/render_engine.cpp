@@ -527,7 +527,7 @@ private:
 	void render_polyhedron(const material::name_map& MaterialNames, k3d::inode& MeshInstance, const k3d::mesh& Mesh, k3d::polyhedron::const_primitive& Polyhedron, std::ostream& Stream)
 	{
 		// Triangulate the polyhedron faces ...
-		const k3d::mesh::normals_t* const vertex_normals = Mesh.vertex_attributes.lookup<k3d::mesh::normals_t>("N");
+		const k3d::mesh::normals_t* const vertex_normals = Mesh.point_attributes.lookup<k3d::mesh::normals_t>("N");
 		const k3d::mesh::normals_t* const uniform_normals = Polyhedron.uniform_attributes.lookup<k3d::mesh::normals_t>("N");
 		const k3d::mesh::normals_t* const face_varying_normals = Polyhedron.face_varying_attributes.lookup<k3d::mesh::normals_t>("N");
 

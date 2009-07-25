@@ -70,7 +70,7 @@ public:
         continue;
 
       const k3d::mesh::points_t& points = *Mesh.points;
-      const k3d::mesh::table_t& vertex_attributes = Mesh.vertex_attributes;
+      const k3d::mesh::table_t& vertex_attributes = Mesh.point_attributes;
 
       const k3d::uint_t shell_begin = 0;
       const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();

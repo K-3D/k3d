@@ -74,7 +74,7 @@ public:
 			const k3d::mesh::table_t& varying_attributes = bilinear_patch->varying_attributes;
 
 			const k3d::mesh::points_t& points = *Mesh.points;
-			const k3d::mesh::table_t& vertex_attributes = Mesh.vertex_attributes;
+			const k3d::mesh::table_t& vertex_attributes = Mesh.point_attributes;
 
 			const k3d::uint_t patch_begin = 0;
 			const k3d::uint_t patch_end = patch_begin + (patch_points.size() / 4);

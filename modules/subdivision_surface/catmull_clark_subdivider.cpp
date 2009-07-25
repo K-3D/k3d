@@ -95,8 +95,8 @@ public:
 			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
 			if(!polyhedron.get())
 				continue;
-			m_subdividers[primitive->get()].update_mesh(*Output.points, *polyhedron, Output.vertex_attributes, polyhedron->face_selections, this);
-			m_subdividers[primitive->get()].copy_output(Output.points.writable(), *polyhedron, Output.vertex_attributes);
+			m_subdividers[primitive->get()].update_mesh(*Output.points, *polyhedron, Output.point_attributes, polyhedron->face_selections, this);
+			m_subdividers[primitive->get()].copy_output(Output.points.writable(), *polyhedron, Output.point_attributes);
 			Output.point_selection.writable().resize(Output.points->size());
 		}
 	}

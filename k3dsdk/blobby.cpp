@@ -152,11 +152,18 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
+		require_valid_primitive(Primitive);
+
 		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
 		const mesh::table_t& varying_structure = require_structure(Primitive, "varying");
 		const mesh::table_t& operator_structure = require_structure(Primitive, "operator");
 		const mesh::table_t& float_structure = require_structure(Primitive, "float");
 		const mesh::table_t& operand_structure = require_structure(Primitive, "operand");
+
+		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
+		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		const mesh::indices_t& first_primitives = require_array<mesh::indices_t>(Primitive, uniform_structure, "first_primitives");
 		const mesh::counts_t& primitive_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "primitive_counts");
@@ -171,11 +178,6 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::counts_t& operator_operand_counts = require_array<mesh::counts_t>(Primitive, operator_structure, "operator_operand_counts");
 		const mesh::doubles_t& floats = require_array<mesh::doubles_t>(Primitive, float_structure, "floats");
 		const mesh::indices_t& operands = require_array<mesh::indices_t>(Primitive, operand_structure, "operands");
-
-		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
-		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
-		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 /*
 		require_array_size(Primitive, curve_counts, "curve_counts", first_curves.size());
@@ -212,11 +214,18 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
+		require_valid_primitive(Primitive);
+
 		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
 		mesh::table_t& varying_structure = require_structure(Primitive, "varying");
 		mesh::table_t& operator_structure = require_structure(Primitive, "operator");
 		mesh::table_t& float_structure = require_structure(Primitive, "float");
 		mesh::table_t& operand_structure = require_structure(Primitive, "operand");
+
+		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
+		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		mesh::indices_t& first_primitives = require_array<mesh::indices_t>(Primitive, uniform_structure, "first_primitives");
 		mesh::counts_t& primitive_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "primitive_counts");
@@ -231,11 +240,6 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::counts_t& operator_operand_counts = require_array<mesh::counts_t>(Primitive, operator_structure, "operator_operand_counts");
 		mesh::doubles_t& floats = require_array<mesh::doubles_t>(Primitive, float_structure, "floats");
 		mesh::indices_t& operands = require_array<mesh::indices_t>(Primitive, operand_structure, "operands");
-
-		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
-		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
-		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 /*
 		require_array_size(Primitive, curve_counts, "curve_counts", first_curves.size());

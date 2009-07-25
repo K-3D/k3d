@@ -266,7 +266,7 @@ bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) const
 	return
 		detail::almost_equal(points, Other.points, Threshold) &&
 		detail::almost_equal(point_selection, Other.point_selection, Threshold) &&
-		detail::almost_equal(vertex_attributes, Other.vertex_attributes, Threshold) &&
+		detail::almost_equal(point_attributes, Other.point_attributes, Threshold) &&
 		detail::almost_equal(primitives, Other.primitives, Threshold)
 		;
 }
@@ -549,8 +549,8 @@ std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 		Stream << push_indent << start_block() << *RHS.point_selection << finish_block << pop_indent << "\n";
 	}
 
-	Stream << standard_indent << "vertex_attributes (" << RHS.vertex_attributes.size() << "):\n";
-	Stream << push_indent << RHS.vertex_attributes << pop_indent;
+	Stream << standard_indent << "point_attributes (" << RHS.point_attributes.size() << "):\n";
+	Stream << push_indent << RHS.point_attributes << pop_indent;
 
 	Stream << standard_indent << "primitives (" << RHS.primitives.size() << "):\n" << push_indent;
 	for(mesh::primitives_t::const_iterator primitive = RHS.primitives.begin(); primitive != RHS.primitives.end(); ++primitive)

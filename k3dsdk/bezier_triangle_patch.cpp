@@ -122,8 +122,14 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
+		require_valid_primitive(Primitive);
+
 		const table& uniform_structure = require_structure(Primitive, "uniform");
 		const table& varying_structure = require_structure(Primitive, "varying");
+
+		const table& constant_attributes = require_attributes(Primitive, "constant");
+		const table& uniform_attributes = require_attributes(Primitive, "uniform");
+		const table& varying_attributes = require_attributes(Primitive, "varying");
 
 		const mesh::indices_t& patch_first_points = require_array<mesh::indices_t >(Primitive, uniform_structure, "patch_first_points");
 		const mesh::orders_t& patch_orders = require_array<mesh::orders_t >(Primitive, uniform_structure, "patch_orders");
@@ -132,21 +138,12 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, varying_structure, "patch_points");
 		const mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, varying_structure, "patch_point_weights");
 
-		const table& constant_attributes = require_attributes(Primitive, "constant");
-		const table& uniform_attributes = require_attributes(Primitive, "uniform");
-		const table& varying_attributes = require_attributes(Primitive, "varying");
-
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		const k3d::uint_t num_patches = patch_selections.size();
 		k3d::uint_t num_control_points = 0;
-
-		require_array_size(Primitive, patch_materials, "patch_materials", num_patches);
-		require_array_size(Primitive, patch_orders, "patch_orders", num_patches);
-		require_array_size(Primitive, patch_first_points, "patch_first_points", num_patches);
-
-		for(k3d::uint_t patch = 0; patch < num_patches; ++patch)
+		const k3d::uint_t num_patches = patch_selections.size();
+		for(k3d::uint_t patch = 0; patch != num_patches; ++patch)
 		{
 			const k3d::uint_t patch_size = (patch_orders[patch] * (patch_orders[patch] + 1)) / 2;
 			num_control_points += patch_size;
@@ -159,12 +156,11 @@ const_primitive* validate(const mesh::primitive& Primitive)
 				throw std::runtime_error(buffer.str());
 			}
 		}
-		require_array_size(Primitive, patch_points, "patch_points", num_control_points);
-		require_array_size(Primitive, patch_point_weights, "patch_point_weights", num_control_points);
+		require_table_size(Primitive, varying_structure, "varying", num_control_points);
 
 		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", patch_selections.size());
-		require_table_size(Primitive, varying_attributes, "varying", patch_selections.size() * 4);
+		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
+		require_table_size(Primitive, varying_attributes, "varying", uniform_structure.size() * 4);
 
 		return new const_primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, varying_attributes);
 	}
@@ -183,8 +179,14 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
+		require_valid_primitive(Primitive);
+
 		table& uniform_structure = require_structure(Primitive, "uniform");
 		table& varying_structure = require_structure(Primitive, "varying");
+
+		table& constant_attributes = require_attributes(Primitive, "constant");
+		table& uniform_attributes = require_attributes(Primitive, "uniform");
+		table& varying_attributes = require_attributes(Primitive, "varying");
 
 		mesh::indices_t& patch_first_points = require_array<mesh::indices_t >(Primitive, uniform_structure, "patch_first_points");
 		mesh::orders_t& patch_orders = require_array<mesh::orders_t >(Primitive, uniform_structure, "patch_orders");
@@ -193,24 +195,13 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, varying_structure, "patch_points");
 		mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, varying_structure, "patch_point_weights");
 
-		table& constant_attributes = require_attributes(Primitive, "constant");
-		table& uniform_attributes = require_attributes(Primitive, "uniform");
-		table& varying_attributes = require_attributes(Primitive, "varying");
-
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		const k3d::uint_t num_patches = patch_selections.size();
 		k3d::uint_t num_control_points = 0;
-
-		require_array_size(Primitive, patch_materials, "patch_materials", patch_selections.size());
-		require_array_size(Primitive, patch_orders, "patch_orders", num_patches);
-		require_array_size(Primitive, patch_first_points, "patch_first_points", num_patches);
-
-		for(k3d::uint_t patch = 0; patch < num_patches; ++patch)
+		const k3d::uint_t num_patches = patch_selections.size();
+		for(k3d::uint_t patch = 0; patch != num_patches; ++patch)
 		{
-			require_array_size(Primitive, patch_points, "patch_points", patch_selections.size() * 16);
-
 			const k3d::uint_t patch_size = (patch_orders[patch] * (patch_orders[patch] + 1)) / 2;
 			num_control_points += patch_size;
 			if (patch < num_patches-1 && patch_first_points[patch] + patch_size != patch_first_points[patch+1])
@@ -222,12 +213,11 @@ primitive* validate(mesh::primitive& Primitive)
 				throw std::runtime_error(buffer.str());
 			}
 		}
-		require_array_size(Primitive, patch_points, "patch_points", num_control_points);
-		require_array_size(Primitive, patch_point_weights, "patch_point_weights", num_control_points);
+		require_table_size(Primitive, varying_structure, "varying", num_control_points);
 
 		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", patch_selections.size());
-		require_table_size(Primitive, varying_attributes, "varying", patch_selections.size() * 4);
+		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
+		require_table_size(Primitive, varying_attributes, "varying", uniform_structure.size() * 4);
 
 		return new primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, varying_attributes);
 	}

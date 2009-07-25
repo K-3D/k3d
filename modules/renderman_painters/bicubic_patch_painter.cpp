@@ -69,28 +69,24 @@ public:
 
 			const k3d::mesh::materials_t& patch_materials = bicubic_patch->patch_materials;
 			const k3d::mesh::indices_t& patch_points = bicubic_patch->patch_points;
-			const k3d::mesh::table_t constant_attributes = bicubic_patch->constant_attributes;
-			const k3d::mesh::table_t uniform_attributes = bicubic_patch->uniform_attributes;
-			const k3d::mesh::table_t varying_attributes = bicubic_patch->varying_attributes;
 
 			const k3d::mesh::points_t& points = *Mesh.points;
-			const k3d::mesh::table_t vertex_attributes = Mesh.vertex_attributes;
 
 			const k3d::uint_t patch_begin = 0;
 			const k3d::uint_t patch_end = patch_begin + (patch_points.size() / 16);
 			for(k3d::uint_t patch = patch_begin; patch != patch_end; ++patch)
 			{
 				array_copier ri_constant_attributes;
-				ri_constant_attributes.add_arrays(constant_attributes);
+				ri_constant_attributes.add_arrays(bicubic_patch->constant_attributes);
 
 				array_copier ri_uniform_attributes;
-				ri_uniform_attributes.add_arrays(uniform_attributes);
+				ri_uniform_attributes.add_arrays(bicubic_patch->uniform_attributes);
 
 				array_copier ri_varying_attributes;
-				ri_varying_attributes.add_arrays(varying_attributes);
+				ri_varying_attributes.add_arrays(bicubic_patch->varying_attributes);
 
 				array_copier ri_vertex_attributes;
-				ri_vertex_attributes.add_arrays(vertex_attributes);
+				ri_vertex_attributes.add_arrays(bicubic_patch->vertex_attributes);
 				ri_vertex_attributes.add_array(k3d::ri::RI_P(), points);
 
 				const k3d::uint_t point_begin = patch * 16;

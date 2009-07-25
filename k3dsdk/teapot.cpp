@@ -95,22 +95,21 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 	try
 	{
+		require_valid_primitive(Primitive);
+
 		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+
+		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
+		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
 
 		const mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, uniform_structure, "matrices");
 		const mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "materials");
 		const mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
 
-		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
-
 		require_metadata(Primitive, selections, "selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 
-		require_array_size(Primitive, materials, "materials", matrices.size());
-		require_array_size(Primitive, selections, "selections", matrices.size());
-
 		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", matrices.size());
+		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
 
 		return new const_primitive(matrices, materials, selections, constant_attributes, uniform_attributes);
 	}
@@ -129,22 +128,21 @@ primitive* validate(mesh::primitive& Primitive)
 
 	try
 	{
+		require_valid_primitive(Primitive);
+
 		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+
+		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
+		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
 
 		mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, uniform_structure, "matrices");
 		mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "materials");
 		mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
 
-		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
-
 		require_metadata(Primitive, selections, "selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 
-		require_array_size(Primitive, materials, "materials", matrices.size());
-		require_array_size(Primitive, selections, "selections", matrices.size());
-
 		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", matrices.size());
+		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
 
 		return new primitive(matrices, materials, selections, constant_attributes, uniform_attributes);
 	}

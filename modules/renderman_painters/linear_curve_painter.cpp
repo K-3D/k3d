@@ -68,7 +68,7 @@ public:
 				continue;
 			
 			const k3d::mesh::points_t& points = *Mesh.points;
-			const k3d::mesh::table_t& vertex_attributes = Mesh.vertex_attributes;
+			const k3d::mesh::table_t& vertex_attributes = Mesh.point_attributes;
 
 			k3d::ri::unsigned_integers ri_point_counts;
 

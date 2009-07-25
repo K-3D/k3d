@@ -38,7 +38,8 @@ public:
 		const mesh::indices_t& PatchPoints,
 		const mesh::table_t& ConstantAttributes,
 		const mesh::table_t& UniformAttributes,
-		const mesh::table_t& VaryingAttributes
+		const mesh::table_t& VaryingAttributes,
+		const mesh::table_t& VertexAttributes
 		);
 
 	const mesh::selection_t& patch_selections;
@@ -47,6 +48,7 @@ public:
 	const mesh::table_t& constant_attributes;
 	const mesh::table_t& uniform_attributes;
 	const mesh::table_t& varying_attributes;
+	const mesh::table_t& vertex_attributes;
 };
 
 /// Gathers the member arrays of a bicubic_patch primitive into a convenient package
@@ -59,7 +61,8 @@ public:
 		mesh::indices_t& PatchPoints,
 		mesh::table_t& ConstantAttributes,
 		mesh::table_t& UniformAttributes,
-		mesh::table_t& VaryingAttributes
+		mesh::table_t& VaryingAttributes,
+		mesh::table_t& VertexAttributes
 		);
 
 	mesh::selection_t& patch_selections;
@@ -68,6 +71,7 @@ public:
 	mesh::table_t& constant_attributes;
 	mesh::table_t& uniform_attributes;
 	mesh::table_t& varying_attributes;
+	mesh::table_t& vertex_attributes;
 };
 
 /// Creates a new bicubic_patch mesh primitive, returning references to its member arrays.

@@ -82,7 +82,7 @@ public:
 			k3d::typed_array<k3d::color> default_color_array;
 	
 			// Get the color array ...
-			color_array_proxy color(m_array_type.pipeline_value(), m_color_array.pipeline_value(), *polyhedron, Mesh.vertex_attributes);
+			color_array_proxy color(m_array_type.pipeline_value(), m_color_array.pipeline_value(), *polyhedron, Mesh.point_attributes);
 	
 			k3d::gl::store_attributes attributes;
 			glEnable(GL_LIGHTING);

@@ -1389,6 +1389,7 @@ private:
 		k3d::mesh::table_t constant_attributes;
 		k3d::mesh::table_t uniform_attributes;
 		k3d::mesh::table_t face_varying_attributes;
+		k3d::mesh::table_t vertex_attributes;
 	};
 	
 	k3d::polyhedron::const_primitive* create_polyhedron_const_primitive(const polyhedron& Polyhedron)
@@ -1406,7 +1407,8 @@ private:
 				Polyhedron.edge_selections,
 				Polyhedron.constant_attributes,
 				Polyhedron.uniform_attributes,
-				Polyhedron.face_varying_attributes);
+				Polyhedron.face_varying_attributes,
+				Polyhedron.vertex_attributes);
 	}
 	
 	template<typename ArrayT>

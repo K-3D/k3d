@@ -44,7 +44,8 @@ public:
 		const mesh::knots_t& CurveKnots,
 		const mesh::table_t& ConstantAttributes,
 		const mesh::table_t& UniformAttributes,
-		const mesh::table_t& VaryingAttributes
+		const mesh::table_t& VaryingAttributes,
+		const mesh::table_t& VertexAttributes
 		);
 
 	const mesh::materials_t& material;
@@ -59,6 +60,7 @@ public:
 	const mesh::table_t& constant_attributes;
 	const mesh::table_t& uniform_attributes;
 	const mesh::table_t& varying_attributes;
+	const mesh::table_t& vertex_attributes;
 };
 
 /// Gathers the member arrays of a nurbs_curve primitive into a convenient package
@@ -77,7 +79,8 @@ public:
 		mesh::knots_t& CurveKnots,
 		mesh::table_t& ConstantAttributes,
 		mesh::table_t& UniformAttributes,
-		mesh::table_t& VaryingAttributes
+		mesh::table_t& VaryingAttributes,
+		mesh::table_t& VertexAttributes
 		);
 
 
@@ -93,6 +96,7 @@ public:
 	mesh::table_t& constant_attributes;
 	mesh::table_t& uniform_attributes;
 	mesh::table_t& varying_attributes;
+	mesh::table_t& vertex_attributes;
 };
 
 /// Creates a new nurbs_curve mesh primitive, returning references to its member arrays.

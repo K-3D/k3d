@@ -36,13 +36,13 @@ public:
 		const typed_array<imaterial*>& Material,
 		const uint_t_array& Points,
 		const table& ConstantAttributes,
-		const table& VaryingAttributes
+		const table& VertexAttributes
 		);
 
 	const typed_array<imaterial*>& material;
 	const uint_t_array& points;
 	const table& constant_attributes;
-	const table& varying_attributes;
+	const table& vertex_attributes;
 };
 
 /// Gathers the member arrays of a point_group primitive into a convenient package
@@ -53,13 +53,13 @@ public:
 		typed_array<imaterial*>& Material,
 		uint_t_array& Points,
 		table& ConstantAttributes,
-		table& VaryingAttributes
+		table& VertexAttributes
 		);
 
 	typed_array<imaterial*>& material;
 	uint_t_array& points;
 	table& constant_attributes;
-	table& varying_attributes;
+	table& vertex_attributes;
 };
 
 /// Creates a new point_group mesh primitive, returning references to its member arrays.

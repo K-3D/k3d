@@ -65,7 +65,7 @@ public:
 
 		Output.points = Input.points;
 		Output.point_selection = Input.point_selection;
-		Output.vertex_attributes = Input.vertex_attributes;
+		Output.point_attributes = Input.point_attributes;
 
 		boost::scoped_ptr<k3d::point_group::primitive> primitive(k3d::point_group::create(Output));
 		k3d::typed_array<k3d::double_t>& width = primitive->constant_attributes.create<k3d::typed_array<k3d::double_t> >("constantwidth");

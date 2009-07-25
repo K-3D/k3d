@@ -142,11 +142,11 @@ public:
 		// Try some different types for the array to print
 		const k3d::string_t array_name = m_array_name.pipeline_value();
 		detail::strings_t string_array;
-		detail::named_array_to_strings<k3d::mesh::colors_t>(Mesh.vertex_attributes, array_name, string_array);
-		detail::named_array_to_strings<k3d::mesh::normals_t>(Mesh.vertex_attributes, array_name, string_array);
-		detail::named_array_to_strings<k3d::mesh::indices_t>(Mesh.vertex_attributes, array_name, string_array);
-		detail::named_array_to_strings<k3d::mesh::weights_t>(Mesh.vertex_attributes, array_name, string_array);
-		detail::named_array_to_strings<k3d::mesh::points_t>(Mesh.vertex_attributes, array_name, string_array);
+		detail::named_array_to_strings<k3d::mesh::colors_t>(Mesh.point_attributes, array_name, string_array);
+		detail::named_array_to_strings<k3d::mesh::normals_t>(Mesh.point_attributes, array_name, string_array);
+		detail::named_array_to_strings<k3d::mesh::indices_t>(Mesh.point_attributes, array_name, string_array);
+		detail::named_array_to_strings<k3d::mesh::weights_t>(Mesh.point_attributes, array_name, string_array);
+		detail::named_array_to_strings<k3d::mesh::points_t>(Mesh.point_attributes, array_name, string_array);
 		draw(points, m_color.pipeline_value(), *m_font, string_array);
 	}
 	

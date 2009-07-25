@@ -41,7 +41,8 @@ public:
 		const mesh::indices_t& CurvePoints,
 		const mesh::table_t& ConstantAttributes,
 		const mesh::table_t& UniformAttributes,
-		const mesh::table_t& VaryingAttributes
+		const mesh::table_t& VaryingAttributes,
+		const mesh::table_t& VertexAttributes
 		);
 
 	const mesh::bools_t& periodic;
@@ -53,6 +54,7 @@ public:
 	const mesh::table_t& constant_attributes;
 	const mesh::table_t& uniform_attributes;
 	const mesh::table_t& varying_attributes;
+	const mesh::table_t& vertex_attributes;
 };
 
 /// Gathers the member arrays of a linear_curve primitive into a convenient package
@@ -68,7 +70,8 @@ public:
 		mesh::indices_t& CurvePoints,
 		mesh::table_t& ConstantAttributes,
 		mesh::table_t& UniformAttributes,
-		mesh::table_t& VaryingAttributes
+		mesh::table_t& VaryingAttributes,
+		mesh::table_t& VertexAttributes
 		);
 
 	mesh::bools_t& periodic;
@@ -80,6 +83,7 @@ public:
 	mesh::table_t& constant_attributes;
 	mesh::table_t& uniform_attributes;
 	mesh::table_t& varying_attributes;
+	mesh::table_t& vertex_attributes;
 };
 
 /// Creates a new linear_curve mesh primitive, returning references to its member arrays.
