@@ -282,18 +282,18 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_table_size(Primitive, u_knot_structure, "u_knot",
+		require_table_row_count(Primitive, u_knot_structure, "u_knot",
 			std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)
 			+ std::accumulate(patch_u_orders.begin(), patch_u_orders.end(), 0));
-		require_table_size(Primitive, v_knot_structure, "v_knot",
+		require_table_row_count(Primitive, v_knot_structure, "v_knot",
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
 
-		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
+		require_table_row_count(Primitive, constant_attributes, "constant", 1);
+		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
 		/** \todo Compute the varying attribute size */
-		//require_table_size(Primitive, varying_attributes, "varying", );
-		require_table_size(Primitive, vertex_attributes, "vertex", vertex_structure.size());
+		//require_table_row_count(Primitive, varying_attributes, "varying", );
+		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 	return new const_primitive(
 		patch_first_points,
@@ -393,18 +393,18 @@ primitive* validate(mesh::primitive& Primitive)
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_table_size(Primitive, u_knot_structure, "u_knot",
+		require_table_row_count(Primitive, u_knot_structure, "u_knot",
 			std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)
 			+ std::accumulate(patch_u_orders.begin(), patch_u_orders.end(), 0));
-		require_table_size(Primitive, v_knot_structure, "v_knot",
+		require_table_row_count(Primitive, v_knot_structure, "v_knot",
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
 
-		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
+		require_table_row_count(Primitive, constant_attributes, "constant", 1);
+		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
 		/** \todo Compute the varying attribute size */
-		//require_table_size(Primitive, varying_attributes, "varying", );
-		require_table_size(Primitive, vertex_attributes, "vertex", vertex_structure.size());
+		//require_table_row_count(Primitive, varying_attributes, "varying", );
+		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 	return new primitive(
 		patch_first_points,

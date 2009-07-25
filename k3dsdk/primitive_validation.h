@@ -44,8 +44,8 @@ const mesh::table_t& require_attributes(const mesh::primitive& Primitive, const 
 /// Tests a primitive to verify that it contains the named attribute table, throws an exception otherwise.
 mesh::table_t& require_attributes(mesh::primitive& Primitive, const string_t& Name);
 
-/// Tests a table to verify that it matches the given length, throws an exception otherwise.
-void require_table_size(const mesh::primitive& Primitive, const table& Table, const string_t& TableName, const uint_t ReferenceSize);
+/// Tests a table to verify that it matches the given row count, throws an exception otherwise.
+void require_table_row_count(const mesh::primitive& Primitive, const table& Table, const string_t& TableName, const uint_t RowCount);
 
 /// Tests a table to verify that it contains an array with given name and type, throws an exception otherwise.
 template<typename ArrayT>
@@ -70,20 +70,6 @@ ArrayT& require_array(mesh::primitive& Primitive, mesh::table_t& Table, const st
 
 	return *array;
 }
-
-/*
-/// Tests a primitive array to verify that it matches the given length, throws an exception otherwise.
-template<typename ArrayT>
-void require_array_size(const mesh::primitive& Primitive, const ArrayT& Array, const string_t& ArrayName, const uint_t Reference)
-{
-	if(Array.size() != Reference)
-	{
-		std::ostringstream buffer;
-		buffer << "[" << Primitive.type << "] primitive [" << ArrayName << "] incorrect array length [" << Array.size() << "], expected [" << Reference << "]";
-		throw std::runtime_error(buffer.str());
-	}
-}
-*/
 
 /// Tests an array to verify that it has metadata with the given name and value, throws an exception otherwise.
 void require_metadata(const mesh::primitive& Primitive, const array& Array, const string_t& ArrayName, const string_t& MetadataName, const string_t& MetadataValue);

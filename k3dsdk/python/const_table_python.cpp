@@ -53,13 +53,18 @@ static object get_item(const_table_wrapper& Self, const string_t& Key)
 	return wrap_array(iterator->second.get());
 }
 
+static uint_t row_count(const_table_wrapper& Self)
+{
+	return Self.wrapped().row_count();
+}
+
 void define_class_const_table()
 {
 	class_<const_table_wrapper>("const_table", 
 		"Stores an immutable (read-only) collection of attribute arrays (named arrays with identical lengths).", no_init)
 		.def("keys", &keys,
 			"Returns a list containing names for all the arrays in the collection.")
-		.def("__len__", &utility::wrapped_len<const_table_wrapper>)
+		.def("__len__", &row_count)
 		.def("__getitem__", &get_item);
 }
 

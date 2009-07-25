@@ -125,11 +125,11 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_table_size(Primitive, vertex_structure, "vertex", uniform_structure.size() * 4);
+		require_table_row_count(Primitive, vertex_structure, "vertex", uniform_structure.row_count() * 4);
 
-		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
-		require_table_size(Primitive, varying_attributes, "varying", uniform_structure.size() * 4);
+		require_table_row_count(Primitive, constant_attributes, "constant", 1);
+		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
+		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
 
 		return new const_primitive(patch_selections, patch_materials, patch_points, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
 	}
@@ -165,11 +165,11 @@ primitive* validate(mesh::primitive& Primitive)
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_table_size(Primitive, vertex_structure, "vertex", uniform_structure.size() * 4);
+		require_table_row_count(Primitive, vertex_structure, "vertex", uniform_structure.row_count() * 4);
 
-		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
-		require_table_size(Primitive, varying_attributes, "varying", uniform_structure.size() * 4);
+		require_table_row_count(Primitive, constant_attributes, "constant", 1);
+		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
+		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
 
 		return new primitive(patch_selections, patch_materials, patch_points, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
 	}

@@ -1031,8 +1031,8 @@ public:
 			output_face_loop_counts.resize(face_edge_counter.face_count, 1);
 			output_face_selection.resize(face_edge_counter.face_count, 0.0);
 			output_face_materials.resize(face_edge_counter.face_count);
-			output_polyhedron->face_varying_attributes.resize(face_edge_counter.edge_count);
-			output_polyhedron->uniform_attributes.resize(face_edge_counter.face_count);
+			output_polyhedron->face_varying_attributes.set_row_count(face_edge_counter.edge_count);
+			output_polyhedron->uniform_attributes.set_row_count(face_edge_counter.face_count);
 			document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
 			detail::mesh_arrays mesh_arrays(

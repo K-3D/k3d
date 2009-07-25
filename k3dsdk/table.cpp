@@ -74,7 +74,7 @@ table table::clone(const uint_t Begin, const uint_t End) const
 bool_t table::almost_equal(const table& Other, const uint64_t Threshold) const
 {
 	// If we have differing numbers of arrays, we definitely aren't equal
-	if(size() != Other.size())
+	if(column_count() != Other.column_count())
 		return false;
 
 	for(table::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
@@ -129,21 +129,22 @@ table table::clone_types(const table_collection& AttributeArrays)
 	return result;
 }
 
-void table::resize(const uint_t NewSize)
+uint_t table::column_count() const
+{
+	return base::size();
+}
+
+uint_t table::row_count() const
+{
+	for(const_iterator array = begin(); array != end(); )
+		return array->second->size();
+	return 0;
+}
+
+void table::set_row_count(const uint_t NewSize)
 {
 	for(iterator array = begin(); array != end(); ++array)
 		array->second.writable().resize(NewSize);
-}
-
-bool_t table::match_size(const uint_t Size) const
-{
-	for(const_iterator array = begin(); array != end(); ++array)
-	{
-		if(array->second->size() != Size)
-			return false;
-	}
-	
-	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

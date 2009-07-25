@@ -549,7 +549,7 @@ std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 		Stream << push_indent << start_block() << *RHS.point_selection << finish_block << pop_indent << "\n";
 	}
 
-	Stream << standard_indent << "point_attributes (" << RHS.point_attributes.size() << "):\n";
+	Stream << standard_indent << "point_attributes (" << RHS.point_attributes.row_count() << "):\n";
 	Stream << push_indent << RHS.point_attributes << pop_indent;
 
 	Stream << standard_indent << "primitives (" << RHS.primitives.size() << "):\n" << push_indent;

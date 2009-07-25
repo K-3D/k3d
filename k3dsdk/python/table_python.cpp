@@ -106,9 +106,14 @@ static void delete_1(table_wrapper& Self, const string_t& Name)
 	Self.wrapped().erase(Name);	
 }
 
-static void resize(table_wrapper& Self, const uint_t NewSize)
+static uint_t row_count(const table_wrapper& Self)
 {
-	Self.wrapped().resize(NewSize);
+	return Self.wrapped().row_count();
+}
+
+static void set_row_count(table_wrapper& Self, const uint_t NewSize)
+{
+	Self.wrapped().set_row_count(NewSize);
 }
 
 static object get_item(table_wrapper& Self, const string_t& Key)
@@ -132,9 +137,9 @@ void define_class_table()
 			"Creates an array with given name and type.")
 		.def("delete", &delete_1,
 			"Deletes an array with given name, if any.")
-		.def("resize", &resize,
+		.def("set_row_count", &set_row_count,
 			"Sets the size of every array in the collection.")
-		.def("__len__", &utility::wrapped_len<table_wrapper>)
+		.def("__len__", &row_count)
 		.def("__getitem__", &get_item);
 }
 

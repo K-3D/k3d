@@ -144,14 +144,14 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_table_size(Primitive, constant_structure, "constant", 1);
-		require_table_size(Primitive, vertex_structure, "vertex", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_table_row_count(Primitive, constant_structure, "constant", 1);
+		require_table_row_count(Primitive, vertex_structure, "vertex", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		require_table_size(Primitive, constant_attributes, "constant", constant_structure.size());
-		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
+		require_table_row_count(Primitive, constant_attributes, "constant", constant_structure.row_count());
+		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
 		/** \todo Compute varying attributes size here */
-		//require_table_size(Primitive, varying_attributes, "varying", );
-		require_table_size(Primitive, vertex_attributes, "vertex", vertex_structure.size());
+		//require_table_row_count(Primitive, varying_attributes, "varying", );
+		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 		return new const_primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
 	}
@@ -191,14 +191,14 @@ primitive* validate(mesh::primitive& Primitive)
 		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_table_size(Primitive, constant_structure, "constant", 1);
-		require_table_size(Primitive, vertex_structure, "vertex", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_table_row_count(Primitive, constant_structure, "constant", 1);
+		require_table_row_count(Primitive, vertex_structure, "vertex", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		require_table_size(Primitive, constant_attributes, "constant", constant_structure.size());
-		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
+		require_table_row_count(Primitive, constant_attributes, "constant", constant_structure.row_count());
+		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
 		/** \todo Compute varying attributes size here */
-		//require_table_size(Primitive, varying_attributes, "varying", );
-		require_table_size(Primitive, vertex_attributes, "vertex", vertex_structure.size());
+		//require_table_row_count(Primitive, varying_attributes, "varying", );
+		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 		return new primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
 	}

@@ -1035,8 +1035,8 @@ public:
 			output_polyhedron.face_loop_counts.resize(topology_data.face_subface_counts.back(), 1);
 			output_polyhedron.face_selections.resize(topology_data.face_subface_counts.back(), 0.0);
 			output_polyhedron.face_materials.resize(topology_data.face_subface_counts.back());
-			output_polyhedron.face_varying_attributes.resize(face_edge_counts.back());
-			output_polyhedron.uniform_attributes.resize(topology_data.face_subface_counts.back());
+			output_polyhedron.face_varying_attributes.set_row_count(face_edge_counts.back());
+			output_polyhedron.uniform_attributes.set_row_count(topology_data.face_subface_counts.back());
 			allocate_memory_time += timer.elapsed();
 			
 			timer.restart();
@@ -1151,9 +1151,9 @@ public:
 			output_polyhedron.uniform_attributes = input_polyhedron.uniform_attributes.clone_types();
 			output_polyhedron.face_varying_attributes = input_polyhedron.face_varying_attributes.clone_types();
 			output_vertex_data = input_vertex_data.clone_types();
-			output_polyhedron.uniform_attributes.resize(output_polyhedron.face_first_loops.size());
-			output_polyhedron.face_varying_attributes.resize(output_polyhedron.edge_points.size());
-			output_vertex_data.resize(output_points.size());
+			output_polyhedron.uniform_attributes.set_row_count(output_polyhedron.face_first_loops.size());
+			output_polyhedron.face_varying_attributes.set_row_count(output_polyhedron.edge_points.size());
+			output_vertex_data.set_row_count(output_points.size());
 			k3d::table_copier uniform_attributes_copier(input_polyhedron.uniform_attributes, output_polyhedron.uniform_attributes);
 			k3d::table_copier face_varying_attributes_copier(input_polyhedron.face_varying_attributes, output_polyhedron.face_varying_attributes);
 			k3d::table_copier vertex_data_copier(input_vertex_data, output_vertex_data);

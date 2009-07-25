@@ -190,11 +190,11 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		require_table_size(Primitive, constant_attributes, "constant", 1);
+		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 		
-		require_table_size(Primitive, uniform_attributes, "uniform", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
+		require_table_row_count(Primitive, uniform_attributes, "uniform", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
 		
-		require_table_size(Primitive, varying_attributes, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_table_row_count(Primitive, varying_attributes, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 */
 
 		return new const_primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
@@ -252,11 +252,11 @@ primitive* validate(mesh::primitive& Primitive)
 
 		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
-		require_table_size(Primitive, constant_attributes, "constant", 1);
+		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 		
-		require_table_size(Primitive, uniform_attributes, "uniform", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
+		require_table_row_count(Primitive, uniform_attributes, "uniform", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
 		
-		require_table_size(Primitive, varying_attributes, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
+		require_table_row_count(Primitive, varying_attributes, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 */
 
 		return new primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);

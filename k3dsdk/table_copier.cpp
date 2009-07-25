@@ -310,8 +310,8 @@ class table_copier::implementation
 public:
 	implementation(const table& Source, table& Target, const copy_policy& CopyPolicy)
 	{
-		std::vector<bool_t> used_source(Source.size(), false);
-		std::vector<bool_t> used_target(Target.size(), false);
+		std::vector<bool_t> used_source(Source.column_count(), false);
+		std::vector<bool_t> used_target(Target.column_count(), false);
 
 		const table::const_iterator source_begin = Source.begin();
 		const table::const_iterator source_end = Source.end();

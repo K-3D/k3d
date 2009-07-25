@@ -299,7 +299,7 @@ public:
 				m_to_remove_indices_sum(ToRemoveIndicesSum)
 	{
 		OutputArray = InputArray.clone_types();
-		OutputArray.resize(ToRemoveIndicesSum.size() - ToRemoveIndicesSum.back());
+		OutputArray.set_row_count(ToRemoveIndicesSum.size() - ToRemoveIndicesSum.back());
 		m_copier.reset(new k3d::table_copier(InputArray, OutputArray));
 	}
 	
@@ -334,6 +334,16 @@ void delete_elements(const k3d::mesh::counts_t& ToRemoveIndicesSum,
 	if(InputArray.size() == 0)
 		return;
 	array_element_deleter<ArrayT> deleter(ToRemoveIndicesSum, InputArray, OutputArray);
+	for(k3d::uint_t i = 0; i != ToRemoveIndicesSum.size(); ++i) deleter(i);
+}
+
+void delete_elements(const k3d::mesh::counts_t& ToRemoveIndicesSum,
+			const k3d::table& InputTable,
+			k3d::table& OutputTable)
+{
+	if(InputTable.row_count() == 0)
+		return;
+	array_element_deleter<k3d::table> deleter(ToRemoveIndicesSum, InputTable, OutputTable);
 	for(k3d::uint_t i = 0; i != ToRemoveIndicesSum.size(); ++i) deleter(i);
 }
 

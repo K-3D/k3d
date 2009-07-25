@@ -213,7 +213,7 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 		const uint_t point_offset = points.size();
 		points.insert(points.end(), Vertices.begin(), Vertices.end());
 		point_selection.insert(point_selection.end(), Vertices.size(), 0.0);
-		Mesh.point_attributes.resize(points.size());
+		Mesh.point_attributes.set_row_count(points.size());
 
 		// Append a new polyhedron to the mesh ...
 		primitive* const polyhedron = create(Mesh);
@@ -279,7 +279,7 @@ primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imat
 		const uint_t point_offset = points.size();
 		points.insert(points.end(), point_rows * point_columns, point3());
 		point_selection.insert(point_selection.end(), point_rows * point_columns, 0.0);
-		Mesh.point_attributes.resize(point_offset + (point_rows * point_columns));
+		Mesh.point_attributes.set_row_count(point_offset + (point_rows * point_columns));
 
 		// Append a new polyhedron to the mesh ...
 		primitive* const polyhedron = create(Mesh);
@@ -357,7 +357,7 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 		const uint_t point_offset = points.size();
 		points.insert(points.end(), point_rows * point_columns, point3());
 		point_selection.insert(point_selection.end(), point_rows * point_columns, 0);
-		Mesh.point_attributes.resize(point_offset + (point_rows * point_columns));
+		Mesh.point_attributes.set_row_count(point_offset + (point_rows * point_columns));
 
 		// Append a new polyhedron to the mesh ...
 		primitive* const polyhedron = create(Mesh);
@@ -448,14 +448,14 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_metadata(Primitive, edge_points, "edge_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::selection_component(), string_cast(selection::SPLIT_EDGE));
 
-		require_table_size(Primitive, uniform_structure, "uniform", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
-		require_table_size(Primitive, loop_structure, "loop", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
+		require_table_row_count(Primitive, uniform_structure, "uniform", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
+		require_table_row_count(Primitive, loop_structure, "loop", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
 
-		require_table_size(Primitive, constant_attributes, "constant", constant_structure.size());
-		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
-		require_table_size(Primitive, face_varying_attributes, "face_varying", face_varying_structure.size());
+		require_table_row_count(Primitive, constant_attributes, "constant", constant_structure.row_count());
+		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
+		require_table_row_count(Primitive, face_varying_attributes, "face_varying", face_varying_structure.row_count());
 		/** \todo Calculate vertex attributes size here */
-		//require_table_size(Primitive, point_attributes, "vertex", );
+		//require_table_row_count(Primitive, point_attributes, "vertex", );
 
 		// Check for infinite loops in our edge lists ...
 		const uint_t loop_begin = 0;
@@ -530,14 +530,14 @@ primitive* validate(mesh::primitive& Primitive)
 		require_metadata(Primitive, edge_points, "edge_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::selection_component(), string_cast(selection::SPLIT_EDGE));
 
-		require_table_size(Primitive, uniform_structure, "uniform", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
-		require_table_size(Primitive, loop_structure, "loop", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
+		require_table_row_count(Primitive, uniform_structure, "uniform", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
+		require_table_row_count(Primitive, loop_structure, "loop", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
 
-		require_table_size(Primitive, constant_attributes, "constant", constant_structure.size());
-		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
-		require_table_size(Primitive, face_varying_attributes, "face_varying", face_varying_structure.size());
+		require_table_row_count(Primitive, constant_attributes, "constant", constant_structure.row_count());
+		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
+		require_table_row_count(Primitive, face_varying_attributes, "face_varying", face_varying_structure.row_count());
 		/** \todo Calculate vertex attributes size here */
-		//require_table_size(Primitive, vertex_attributes, "vertex", );
+		//require_table_row_count(Primitive, vertex_attributes, "vertex", );
 
 		// Check for infinite loops in our edge lists ...
 		const uint_t loop_begin = 0;

@@ -361,7 +361,7 @@ public:
 			const k3d::uint_t new_point_count = m_edge_list.size() * split_point_count + Input.points->size();
 			output_points.resize(new_point_count);
 			output_point_selection.resize(new_point_count, 1.0);
-			output_polyhedron->face_varying_attributes.resize(edge_index_calculator.edge_count);
+			output_polyhedron->face_varying_attributes.set_row_count(edge_index_calculator.edge_count);
 			k3d::table_copier face_varying_attributes_copier(input_polyhedron->face_varying_attributes, output_polyhedron->face_varying_attributes);
 			document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 

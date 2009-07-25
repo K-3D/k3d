@@ -34,12 +34,14 @@ class array;
 
 /// Defines a heterogeneous collection of named, shared arrays of equal length.  Note that the length of every
 /// array in the collection must remain equal at all times.
-/// For a concrete list of the datatypes that can be stored using table, see k3d::named_array_types.
+/// For a concrete list of the datatypes that can be stored using k3d::table, see k3d::named_array_types.
 class table :
 	public std::map<string_t, pipeline_data<array> >
 {
+	typedef std::map<string_t, pipeline_data<array> > base;
+
 public:
-	/// Creates a new array with given name and type, inserting it into the collection and returning a reference to the result.
+	/// Creates a new array with given name and type, inserting it into the table and returning a reference to the result.
 	/** \note: An existing array with the same name will be replaced by the new array. */
 	template<typename ArrayT>
 	ArrayT& create(const string_t& Name)
@@ -48,7 +50,7 @@ public:
 		(*this)[Name].create(array);
 		return *array;
 	}
-	/// Inserts a new array into the collection with the given name, returning a reference to the result.
+	/// Inserts a new array into the table with the given name, returning a reference to the result.
 	/** \note: An existing array with the same name will be replaced by the new array. */
 	template<typename ArrayT>
 	ArrayT& create(const string_t& Name, ArrayT* Array)
@@ -72,23 +74,28 @@ public:
 	{
 		return dynamic_cast<ArrayT*>(writable(Name));
 	}
-	/// Returns an object containing empty arrays with the same name and type as the originals.
+	/// Returns an table containing empty arrays with the same name and type as the originals.
 	table clone_types() const;
-	/// Returns an object containing deep copies of all the original arrays.
+	/// Returns an table containing deep copies of all the original arrays.
 	table clone() const;
-	/// Returns an object containing copies of a half-open range of all the original arrays.
+	/// Returns an table containing copies of a half-open range of all the original arrays.
 	table clone(const uint_t Begin, const uint_t End) const;
-	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
+	/// Returns true iff two tables are equivalent, using the imprecise semantics of almost_equal to compare values.
 	bool_t almost_equal(const table& Other, const uint64_t Threshold) const;
 
 	typedef std::vector<const table*> table_collection;
 	static table clone_types(const table_collection& AttributeArrays);
 
-	/// Sets the size of every array in the collection.
-	void resize(const uint_t NewSize);
+	/// Returns the number of columns in the table.
+	uint_t column_count() const;
 
-	/// Returns true if every array in the collection matches the given size (or there aren't any arrays in the collection).
-	bool_t match_size(const uint_t Size) const;
+	/// Returns the number of rows in the table.
+	uint_t row_count() const;
+	/// Sets the number of rows in the table (i.e: resizes every column array).
+	void set_row_count(const uint_t NewSize);
+
+private:
+	uint_t size() const;
 };
 
 /// Serialization

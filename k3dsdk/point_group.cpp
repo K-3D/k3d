@@ -103,10 +103,10 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		require_metadata(Primitive, points, "points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_table_size(Primitive, constant_structure, "constant", 1);
+		require_table_row_count(Primitive, constant_structure, "constant", 1);
 
-		require_table_size(Primitive, constant_attributes, "constant", constant_structure.size());
-		require_table_size(Primitive, vertex_attributes, "vertex", vertex_structure.size());
+		require_table_row_count(Primitive, constant_attributes, "constant", constant_structure.row_count());
+		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 		return new const_primitive(material, points, constant_attributes, vertex_attributes);
 	}
@@ -138,10 +138,10 @@ primitive* validate(mesh::primitive& Primitive)
 
 		require_metadata(Primitive, points, "points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_table_size(Primitive, constant_structure, "constant", 1);
+		require_table_row_count(Primitive, constant_structure, "constant", 1);
 
-		require_table_size(Primitive, constant_attributes, "constant", constant_structure.size());
-		require_table_size(Primitive, vertex_attributes, "vertex", vertex_structure.size());
+		require_table_row_count(Primitive, constant_attributes, "constant", constant_structure.row_count());
+		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 		return new primitive(material, points, constant_attributes, vertex_attributes);
 	}

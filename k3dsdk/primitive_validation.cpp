@@ -24,7 +24,7 @@ namespace k3d
 
 void require_valid_primitive(const mesh::primitive& Primitive)
 {
-	assert_not_implemented();
+	/** \todo Implement something here */
 }
 
 const mesh::table_t& require_structure(const mesh::primitive& Primitive, const string_t& Name)
@@ -67,12 +67,15 @@ mesh::table_t& require_attributes(mesh::primitive& Primitive, const string_t& Na
 	return *attributes;
 }
 
-void require_table_size(const mesh::primitive& Primitive, const table& Table, const string_t& TableName, const uint_t ReferenceSize)
+void require_table_row_count(const mesh::primitive& Primitive, const table& Table, const string_t& TableName, const uint_t RowCount)
 {
-	if(!Table.match_size(ReferenceSize))
+	if(0 == Table.column_count())
+		return;
+
+	if(Table.row_count() != RowCount)
 	{
 		std::ostringstream buffer;
-		buffer << "[" << Primitive.type << "] table [" << TableName << "] incorrect length [" << Table.size() << "], expected [" << ReferenceSize << "]";
+		buffer << "[" << Primitive.type << "] table [" << TableName << "] incorrect length [" << Table.row_count() << "], expected [" << RowCount << "]";
 		throw std::runtime_error(buffer.str());
 	}
 }

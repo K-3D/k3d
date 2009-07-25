@@ -156,11 +156,11 @@ const_primitive* validate(const mesh::primitive& Primitive)
 				throw std::runtime_error(buffer.str());
 			}
 		}
-		require_table_size(Primitive, varying_structure, "varying", num_control_points);
+		require_table_row_count(Primitive, varying_structure, "varying", num_control_points);
 
-		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
-		require_table_size(Primitive, varying_attributes, "varying", uniform_structure.size() * 4);
+		require_table_row_count(Primitive, constant_attributes, "constant", 1);
+		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
+		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
 
 		return new const_primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, varying_attributes);
 	}
@@ -213,11 +213,11 @@ primitive* validate(mesh::primitive& Primitive)
 				throw std::runtime_error(buffer.str());
 			}
 		}
-		require_table_size(Primitive, varying_structure, "varying", num_control_points);
+		require_table_row_count(Primitive, varying_structure, "varying", num_control_points);
 
-		require_table_size(Primitive, constant_attributes, "constant", 1);
-		require_table_size(Primitive, uniform_attributes, "uniform", uniform_structure.size());
-		require_table_size(Primitive, varying_attributes, "varying", uniform_structure.size() * 4);
+		require_table_row_count(Primitive, constant_attributes, "constant", 1);
+		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
+		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
 
 		return new primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, varying_attributes);
 	}
