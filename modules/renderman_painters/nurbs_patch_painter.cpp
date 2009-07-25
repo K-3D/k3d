@@ -69,7 +69,7 @@ public:
 		{
 			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs(k3d::nurbs_patch::validate(**primitive));
 			if(!nurbs)
-				return;
+				continue;
 
 			const k3d::mesh::points_t& points = *Mesh.points;
 
