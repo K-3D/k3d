@@ -29,8 +29,8 @@
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/polyhedron.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -67,19 +67,56 @@ public:
 
 		k3d::imaterial* const material = m_material.pipeline_value();
 
-		/** \todo Make this work for all primitive types */
-		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		// Note: this loop is tricky because we want to avoid deep-copies where possible ...
+		for(k3d::mesh::primitives_t::iterator p = Output.primitives.begin(); p != Output.primitives.end(); ++p)
 		{
-			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
-			if(!polyhedron)
-				continue;
-
-			const k3d::uint_t face_begin = 0;
-			const k3d::uint_t face_end = face_begin + polyhedron->face_selections.size();
-			for(k3d::uint_t face = face_begin; face != face_end; ++face)
+			// Look for primitive structures that contain a material and a selection ...
+			for(k3d::mesh::named_tables_t::const_iterator s = (**p).structure.begin(); s != (**p).structure.end(); ++s)
 			{
-				if(polyhedron->face_selections[face])
-					polyhedron->face_materials[face] = material;
+				k3d::string_t materials_name;
+				k3d::string_t selection_name;
+
+				for(k3d::mesh::named_arrays_t::const_iterator array = s->second.begin(); array != s->second.end(); ++array)
+				{
+					if(materials_name.empty())
+					{
+						if(dynamic_cast<const k3d::mesh::materials_t*>(array->second.get()))
+						{
+							materials_name = array->first;
+							continue;
+						}
+					}
+
+					if(selection_name.empty())
+					{
+						if(array->second->get_metadata_value(k3d::metadata::key::selection_component()).size())
+						{
+							if(dynamic_cast<const k3d::mesh::selection_t*>(array->second.get()))
+							{
+								selection_name = array->first;
+								continue;
+							}
+						}
+					}
+				}
+
+				// Only now that we've got what we're looking for do we starting making changes ...
+				if(materials_name.size() && selection_name.size())
+				{
+					k3d::mesh::primitive& primitive = p->writable();
+					k3d::mesh::table_t& structure = primitive.structure[s->first];
+
+					k3d::mesh::materials_t* const materials = structure.writable<k3d::mesh::materials_t>(materials_name);
+					k3d::mesh::selection_t* const selection = structure.writable<k3d::mesh::selection_t>(selection_name);
+
+					const k3d::uint_t begin = 0;
+					const k3d::uint_t end = begin + materials->size();
+					for(k3d::uint_t i = begin; i != end; ++i)
+					{
+						if((*selection)[i])
+							(*materials)[i] = material;
+					}
+				}
 			}
 		}
 	}
