@@ -30,7 +30,9 @@
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/xml.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <stack>
@@ -54,6 +56,34 @@ static void get_pair(std::istream& Stream, k3d::double_t& X, k3d::double_t& Y)
 {
 	char separator;
 	Stream >> X >> separator >> Y;
+}
+
+/// Tries to find the color of the given element. Returns true if a color was found
+k3d::bool_t get_color(const k3d::xml::element& SVG, k3d::color& Color)
+{
+	k3d::string_t style = k3d::xml::attribute_text(SVG, "style");
+	k3d::mesh::strings_t styles;
+	boost::split(styles, style, boost::is_any_of(";"));
+	for(k3d::uint_t i = 0; i != styles.size(); ++i)
+	{
+		if(boost::algorithm::starts_with(styles[i], "stroke:"))
+		{
+			k3d::string_t stroke = styles[i].substr(8,6);
+			std::stringstream stream;
+			k3d::uint32_t red, green, blue;
+			stream << "0x000000" << stroke.substr(0, 2);
+			stream >> std::hex >> red;
+			stream.clear();
+			stream << "0x000000" << stroke.substr(2, 2);
+			stream >> std::hex >> green;
+			stream.clear();
+			stream << "0x000000" << stroke.substr(4, 2);
+			stream >> std::hex >> blue;
+			Color = k3d::color(static_cast<k3d::double_t>(red)/255.0, static_cast<k3d::double_t>(green)/255.0, static_cast<k3d::double_t>(blue)/255.0);
+			return true;
+		}
+	}
+	return false;
 }
 
 static void parse_line(const k3d::xml::element& SVG, transform_stack& Transformation, k3d::mesh& Mesh, k3d::nurbs_curve::primitive& Primitive)
@@ -688,6 +718,7 @@ k3d::log() << debug << token << std::endl;
 /// Main parsing function, doesn't handle grouping and just traverse the XML tree recursively
 static void parse_graphics(const k3d::xml::element& SVG, transform_stack& Transformation, k3d::mesh& Mesh, k3d::nurbs_curve::primitive& Primitive)
 {
+	k3d::mesh::colors_t colors;
 	for(k3d::xml::element::elements_t::const_iterator svg = SVG.children.begin(); svg != SVG.children.end(); ++svg)
 	{
 		const k3d::string_t trans = k3d::xml::attribute_text(*svg, "transform", "none");
@@ -805,9 +836,17 @@ static void parse_graphics(const k3d::xml::element& SVG, transform_stack& Transf
 		if(svg->name == "path")
 			parse_path(*svg, Transformation, Mesh, Primitive);
 
+		k3d::color color;
+		if(get_color(*svg, color))
+		{
+			colors.resize(Primitive.curve_first_points.size(), color);
+		}
+
 		if(trans != "none")
 			Transformation.pop();
 	}
+	if(colors.size() == Primitive.curve_first_points.size())
+		Primitive.uniform_data.create("Cs", new k3d::mesh::colors_t(colors));
 }
 
 /////////////////////////////////////////////////////////////////////////////
