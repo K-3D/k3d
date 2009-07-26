@@ -7,7 +7,7 @@ k3d.check_node_environment(locals(), "MeshSourceScript")
 
 # Construct a sphere mesh primitive ...
 disk = k3d.disk.create(Output)
-color = disk.varying_data().create("Cs", "k3d::color")
+color = disk.varying_attributes().create("Cs", "k3d::color")
 
 # Add two disks ...
 disk.matrices().append(k3d.translate3(k3d.vector3(-5, 0, 0)))
