@@ -7,7 +7,7 @@ k3d.check_node_environment(locals(), "MeshSourceScript")
 
 # Construct a sphere mesh primitive ...
 paraboloids = k3d.paraboloid.create(Output)
-color = paraboloids.varying_data().create("Cs", "k3d::color")
+color = paraboloids.varying_attributes().create("Cs", "k3d::color")
 
 # Add two paraboloids ...
 paraboloids.matrices().append(k3d.translate3(k3d.vector3(-5, 0, 0)))
