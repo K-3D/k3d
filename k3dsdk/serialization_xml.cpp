@@ -2030,29 +2030,29 @@ void load(mesh& Mesh, element& Container, const ipersistent::load_context& Conte
 
 			if(const element* const xml_structure = find_element(*xml_primitive, "structure"))
 			{
-				for(element::elements_t::const_iterator xml_tables = xml_structure->children.begin(); xml_tables != xml_structure->children.end(); ++xml_tables)
+				for(element::elements_t::const_iterator xml_table = xml_structure->children.begin(); xml_table != xml_structure->children.end(); ++xml_table)
 				{
-					if(xml_tables->name != "table")
+					if(xml_table->name != "table")
 						continue;
 
 					mesh::table_t arrays;
-					detail::load_arrays(*xml_tables, arrays, Context);
+					detail::load_arrays(*xml_table, arrays, Context);
 
-					primitive.attributes.insert(std::make_pair(attribute_text(*xml_tables, "type"), arrays));
+					primitive.structure.insert(std::make_pair(attribute_text(*xml_table, "type"), arrays));
 				}
 			}
 
 			if(const element* const xml_attributes = find_element(*xml_primitive, "attributes"))
 			{
-				for(element::elements_t::const_iterator xml_tables = xml_attributes->children.begin(); xml_tables != xml_attributes->children.end(); ++xml_tables)
+				for(element::elements_t::const_iterator xml_table = xml_attributes->children.begin(); xml_table != xml_attributes->children.end(); ++xml_table)
 				{
-					if(xml_tables->name != "table")
+					if(xml_table->name != "table")
 						continue;
 
 					mesh::table_t arrays;
-					detail::load_arrays(*xml_tables, arrays, Context);
+					detail::load_arrays(*xml_table, arrays, Context);
 
-					primitive.attributes.insert(std::make_pair(attribute_text(*xml_tables, "type"), arrays));
+					primitive.attributes.insert(std::make_pair(attribute_text(*xml_table, "type"), arrays));
 				}
 			}
 		}

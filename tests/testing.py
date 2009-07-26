@@ -344,7 +344,7 @@ def get_mesh_difference(document, input_mesh, reference_mesh, threshold):
 	Output the mesh difference to the dashboard
 """
 def output_mesh_difference(input_mesh, reference_mesh, threshold, name = "Mesh Difference"):
-	print """<DartMeasurement name="Mesh Difference" type="text/html"><![CDATA[\n"""
+	print """<DartMeasurement name="Geometry Difference" type="text/html"><![CDATA[\n"""
 	print difflib.HtmlDiff().make_file(str(input_mesh).splitlines(1), str(reference_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
 	print """]]></DartMeasurement>\n"""
 	sys.stdout.flush()
