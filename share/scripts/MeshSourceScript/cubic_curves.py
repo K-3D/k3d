@@ -11,10 +11,10 @@ point_selection = Output.create_point_selection()
 curves = k3d.cubic_curve.create(Output)
 
 # Create an (optional) array to store per-group curve widths ...
-constantwidth = curves.constant_data().create("constantwidth", "k3d::double_t")
+constantwidth = curves.constant_attributes().create("constantwidth", "k3d::double_t")
 
 # Create an (optional) array to store per-curve curve colors ...
-Cs = curves.uniform_data().create("Cs", "k3d::color")
+Cs = curves.uniform_attributes().create("Cs", "k3d::color")
 
 # Add some curves ...
 curves.periodic().append(False)
