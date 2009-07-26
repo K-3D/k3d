@@ -47,7 +47,7 @@ const_primitive::const_primitive(
 	const mesh::weights_t& PatchPointWeights,
 	const mesh::table_t& ConstantAttributes,
 	const mesh::table_t& UniformAttributes,
-	const mesh::table_t& VaryingAttributes
+	const mesh::table_t& VertexAttributes
 		) :
 	patch_first_points(PatchFirstPoints),
 	patch_orders(PatchOrders),
@@ -57,7 +57,7 @@ const_primitive::const_primitive(
 	patch_point_weights(PatchPointWeights),
 	constant_attributes(ConstantAttributes),
 	uniform_attributes(UniformAttributes),
-	varying_attributes(VaryingAttributes)
+	vertex_attributes(VertexAttributes)
 {
 }
 
@@ -73,7 +73,7 @@ primitive::primitive(
 	mesh::weights_t& PatchPointWeights,
 	mesh::table_t& ConstantAttributes,
 	mesh::table_t& UniformAttributes,
-	mesh::table_t& VaryingAttributes
+	mesh::table_t& VertexAttributes
 		) :
 	patch_first_points(PatchFirstPoints),
 	patch_orders(PatchOrders),
@@ -83,7 +83,7 @@ primitive::primitive(
 	patch_point_weights(PatchPointWeights),
 	constant_attributes(ConstantAttributes),
 	uniform_attributes(UniformAttributes),
-	varying_attributes(VaryingAttributes)
+	vertex_attributes(VertexAttributes)
 {
 }
 
@@ -99,11 +99,11 @@ primitive* create(mesh& Mesh)
 		generic_primitive.structure["uniform"].create<mesh::orders_t >("patch_orders"),
 		generic_primitive.structure["uniform"].create<mesh::selection_t >("patch_selections"),
 		generic_primitive.structure["uniform"].create<mesh::materials_t >("patch_materials"),
-		generic_primitive.structure["varying"].create<mesh::indices_t >("patch_points"),
-		generic_primitive.structure["varying"].create<mesh::weights_t >("patch_point_weights"),
+		generic_primitive.structure["vertex"].create<mesh::indices_t >("patch_points"),
+		generic_primitive.structure["vertex"].create<mesh::weights_t >("patch_point_weights"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["uniform"],
-		generic_primitive.attributes["varying"]
+		generic_primitive.attributes["vertex"]
 		);
 
 	result->patch_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
@@ -125,18 +125,18 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_valid_primitive(Primitive);
 
 		const table& uniform_structure = require_structure(Primitive, "uniform");
-		const table& varying_structure = require_structure(Primitive, "varying");
+		const table& vertex_structure = require_structure(Primitive, "vertex");
 
 		const table& constant_attributes = require_attributes(Primitive, "constant");
 		const table& uniform_attributes = require_attributes(Primitive, "uniform");
-		const table& varying_attributes = require_attributes(Primitive, "varying");
+		const table& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		const mesh::indices_t& patch_first_points = require_array<mesh::indices_t >(Primitive, uniform_structure, "patch_first_points");
 		const mesh::orders_t& patch_orders = require_array<mesh::orders_t >(Primitive, uniform_structure, "patch_orders");
 		const mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, uniform_structure, "patch_selections");
 		const mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "patch_materials");
-		const mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, varying_structure, "patch_points");
-		const mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, varying_structure, "patch_point_weights");
+		const mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, vertex_structure, "patch_points");
+		const mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, vertex_structure, "patch_point_weights");
 
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
@@ -156,13 +156,13 @@ const_primitive* validate(const mesh::primitive& Primitive)
 				throw std::runtime_error(buffer.str());
 			}
 		}
-		require_table_row_count(Primitive, varying_structure, "varying", num_control_points);
+		require_table_row_count(Primitive, vertex_structure, "vertex", num_control_points);
 
 		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
-		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
+		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
-		return new const_primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, varying_attributes);
+		return new const_primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -182,18 +182,18 @@ primitive* validate(mesh::primitive& Primitive)
 		require_valid_primitive(Primitive);
 
 		table& uniform_structure = require_structure(Primitive, "uniform");
-		table& varying_structure = require_structure(Primitive, "varying");
+		table& vertex_structure = require_structure(Primitive, "vertex");
 
 		table& constant_attributes = require_attributes(Primitive, "constant");
 		table& uniform_attributes = require_attributes(Primitive, "uniform");
-		table& varying_attributes = require_attributes(Primitive, "varying");
+		table& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		mesh::indices_t& patch_first_points = require_array<mesh::indices_t >(Primitive, uniform_structure, "patch_first_points");
 		mesh::orders_t& patch_orders = require_array<mesh::orders_t >(Primitive, uniform_structure, "patch_orders");
 		mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, uniform_structure, "patch_selections");
 		mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "patch_materials");
-		mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, varying_structure, "patch_points");
-		mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, varying_structure, "patch_point_weights");
+		mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, vertex_structure, "patch_points");
+		mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, vertex_structure, "patch_point_weights");
 
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
@@ -213,13 +213,13 @@ primitive* validate(mesh::primitive& Primitive)
 				throw std::runtime_error(buffer.str());
 			}
 		}
-		require_table_row_count(Primitive, varying_structure, "varying", num_control_points);
+		require_table_row_count(Primitive, vertex_structure, "vertex", num_control_points);
 
 		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
-		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
+		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
-		return new primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, varying_attributes);
+		return new primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
