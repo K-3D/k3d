@@ -4,7 +4,7 @@ import k3d
 k3d.check_node_environment(locals(), "MeshSourceScript")
 
 blobby = k3d.blobby.create(Output)
-Cs = blobby.varying_data().create("Cs", "k3d::color")
+Cs = blobby.varying_attributes().create("Cs", "k3d::color")
 
 # Add four ellipsoids to the blobby ...
 ellipsoids = [k3d.point3(-1, 0, 1), k3d.point3(1, 0, 1), k3d.point3(1, 0, -1), k3d.point3(-1, 0, -1)]

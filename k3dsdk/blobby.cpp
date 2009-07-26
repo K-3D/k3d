@@ -125,9 +125,9 @@ primitive* create(mesh& Mesh)
 		generic_primitive.structure["uniform"].create<mesh::indices_t>("first_operators"),
 		generic_primitive.structure["uniform"].create<mesh::counts_t>("operator_counts"),
 		generic_primitive.structure["uniform"].create<mesh::materials_t>("materials"),
-		generic_primitive.structure["varying"].create<typed_array<int32_t> >("primitives"),
-		generic_primitive.structure["varying"].create<mesh::indices_t>("primitive_first_floats"),
-		generic_primitive.structure["varying"].create<mesh::counts_t>("primitive_float_counts"),
+		generic_primitive.structure["vertex"].create<typed_array<int32_t> >("primitives"),
+		generic_primitive.structure["vertex"].create<mesh::indices_t>("primitive_first_floats"),
+		generic_primitive.structure["vertex"].create<mesh::counts_t>("primitive_float_counts"),
 		generic_primitive.structure["operator"].create<typed_array<int32_t> >("operators"),
 		generic_primitive.structure["operator"].create<mesh::indices_t>("operator_first_operands"),
 		generic_primitive.structure["operator"].create<mesh::counts_t >("operator_operand_counts"),
@@ -155,7 +155,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_valid_primitive(Primitive);
 
 		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
-		const mesh::table_t& varying_structure = require_structure(Primitive, "varying");
+		const mesh::table_t& vertex_structure = require_structure(Primitive, "vertex");
 		const mesh::table_t& operator_structure = require_structure(Primitive, "operator");
 		const mesh::table_t& float_structure = require_structure(Primitive, "float");
 		const mesh::table_t& operand_structure = require_structure(Primitive, "operand");
@@ -170,32 +170,16 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::indices_t& first_operators = require_array<mesh::indices_t>(Primitive, uniform_structure, "first_operators");
 		const mesh::counts_t& operator_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "operator_counts");
 		const mesh::materials_t& materials = require_array<mesh::materials_t>(Primitive, uniform_structure, "materials");
-		const typed_array<int32_t>& primitives = require_array<typed_array<int32_t> >(Primitive, varying_structure, "primitives");
-		const mesh::indices_t& primitive_first_floats = require_array<mesh::indices_t>(Primitive, varying_structure, "primitive_first_floats");
-		const mesh::counts_t& primitive_float_counts = require_array<mesh::counts_t>(Primitive, varying_structure, "primitive_float_counts");
+		const typed_array<int32_t>& primitives = require_array<typed_array<int32_t> >(Primitive, vertex_structure, "primitives");
+		const mesh::indices_t& primitive_first_floats = require_array<mesh::indices_t>(Primitive, vertex_structure, "primitive_first_floats");
+		const mesh::counts_t& primitive_float_counts = require_array<mesh::counts_t>(Primitive, vertex_structure, "primitive_float_counts");
 		const typed_array<int32_t>& operators = require_array<typed_array<int32_t> >(Primitive, operator_structure, "operators");
 		const mesh::indices_t& operator_first_operands = require_array<mesh::indices_t>(Primitive, operator_structure, "operator_first_operands");
 		const mesh::counts_t& operator_operand_counts = require_array<mesh::counts_t>(Primitive, operator_structure, "operator_operand_counts");
 		const mesh::doubles_t& floats = require_array<mesh::doubles_t>(Primitive, float_structure, "floats");
 		const mesh::indices_t& operands = require_array<mesh::indices_t>(Primitive, operand_structure, "operands");
 
-/*
-		require_array_size(Primitive, curve_counts, "curve_counts", first_curves.size());
-		require_array_size(Primitive, periodic_curves, "periodic_curves", first_curves.size());
-		require_array_size(Primitive, materials, "materials", first_curves.size());
-
-		require_array_size(Primitive, curve_first_points, "curve_first_points", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		require_array_size(Primitive, curve_point_counts, "curve_point_counts", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		require_array_size(Primitive, curve_selections, "curve_selections", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-
-		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
-
-		require_table_row_count(Primitive, constant_attributes, "constant", 1);
-		
-		require_table_row_count(Primitive, uniform_attributes, "uniform", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		
-		require_table_row_count(Primitive, varying_attributes, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
-*/
+		/** \todo Validate table lengths here */
 
 		return new const_primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
 	}
@@ -217,7 +201,7 @@ primitive* validate(mesh::primitive& Primitive)
 		require_valid_primitive(Primitive);
 
 		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
-		mesh::table_t& varying_structure = require_structure(Primitive, "varying");
+		mesh::table_t& vertex_structure = require_structure(Primitive, "vertex");
 		mesh::table_t& operator_structure = require_structure(Primitive, "operator");
 		mesh::table_t& float_structure = require_structure(Primitive, "float");
 		mesh::table_t& operand_structure = require_structure(Primitive, "operand");
@@ -232,32 +216,16 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::indices_t& first_operators = require_array<mesh::indices_t>(Primitive, uniform_structure, "first_operators");
 		mesh::counts_t& operator_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "operator_counts");
 		mesh::materials_t& materials = require_array<mesh::materials_t>(Primitive, uniform_structure, "materials");
-		typed_array<int32_t>& primitives = require_array<typed_array<int32_t> >(Primitive, varying_structure, "primitives");
-		mesh::indices_t& primitive_first_floats = require_array<mesh::indices_t>(Primitive, varying_structure, "primitive_first_floats");
-		mesh::counts_t& primitive_float_counts = require_array<mesh::counts_t>(Primitive, varying_structure, "primitive_float_counts");
+		typed_array<int32_t>& primitives = require_array<typed_array<int32_t> >(Primitive, vertex_structure, "primitives");
+		mesh::indices_t& primitive_first_floats = require_array<mesh::indices_t>(Primitive, vertex_structure, "primitive_first_floats");
+		mesh::counts_t& primitive_float_counts = require_array<mesh::counts_t>(Primitive, vertex_structure, "primitive_float_counts");
 		typed_array<int32_t>& operators = require_array<typed_array<int32_t> >(Primitive, operator_structure, "operators");
 		mesh::indices_t& operator_first_operands = require_array<mesh::indices_t>(Primitive, operator_structure, "operator_first_operands");
 		mesh::counts_t& operator_operand_counts = require_array<mesh::counts_t>(Primitive, operator_structure, "operator_operand_counts");
 		mesh::doubles_t& floats = require_array<mesh::doubles_t>(Primitive, float_structure, "floats");
 		mesh::indices_t& operands = require_array<mesh::indices_t>(Primitive, operand_structure, "operands");
 
-/*
-		require_array_size(Primitive, curve_counts, "curve_counts", first_curves.size());
-		require_array_size(Primitive, periodic_curves, "periodic_curves", first_curves.size());
-		require_array_size(Primitive, materials, "materials", first_curves.size());
-
-		require_array_size(Primitive, curve_first_points, "curve_first_points", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		require_array_size(Primitive, curve_point_counts, "curve_point_counts", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		require_array_size(Primitive, curve_selections, "curve_selections", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-
-		require_array_size(Primitive, curve_points, "curve_points", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
-
-		require_table_row_count(Primitive, constant_attributes, "constant", 1);
-		
-		require_table_row_count(Primitive, uniform_attributes, "uniform", std::accumulate(curve_counts.begin(), curve_counts.end(), 0));
-		
-		require_table_row_count(Primitive, varying_attributes, "varying", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
-*/
+		/** \todo Validate table lengths here */
 
 		return new primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
 	}
