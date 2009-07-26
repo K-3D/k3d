@@ -89,7 +89,7 @@ public:
 
 					if(selection_name.empty())
 					{
-						if(array->second->get_metadata_value(k3d::metadata::key::selection_component()).size())
+						if(array->second->get_metadata_value(k3d::metadata::key::role()) == k3d::metadata::value::selection_role())
 						{
 							if(dynamic_cast<const k3d::mesh::selection_t*>(array->second.get()))
 							{

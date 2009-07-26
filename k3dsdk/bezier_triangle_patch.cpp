@@ -106,7 +106,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["varying"]
 		);
 
-	result->patch_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->patch_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
@@ -138,7 +138,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, varying_structure, "patch_points");
 		const mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, varying_structure, "patch_point_weights");
 
-		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		k3d::uint_t num_control_points = 0;
@@ -195,7 +195,7 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, varying_structure, "patch_points");
 		mesh::weights_t& patch_point_weights = require_array<mesh::weights_t >(Primitive, varying_structure, "patch_point_weights");
 
-		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		k3d::uint_t num_control_points = 0;

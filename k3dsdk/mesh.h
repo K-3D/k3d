@@ -147,13 +147,13 @@ public:
 		for(mesh::named_tables_t::const_iterator structure = Primitive.structure.begin(); structure != Primitive.structure.end(); ++structure)
 		{
 			for(mesh::table_t::const_iterator array = structure->second.begin(); array != structure->second.end(); ++array)
-				Functor(array->first, array->second);
+				Functor(structure->first, structure->second, array->first, array->second);
 		}
 
 		for(mesh::named_tables_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
 		{
 			for(mesh::table_t::const_iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
-				Functor(array->first, array->second);
+				Functor(attributes->first, attributes->second, array->first, array->second);
 		}
 	}
 
@@ -164,13 +164,13 @@ public:
 		for(mesh::named_tables_t::iterator structure = Primitive.structure.begin(); structure != Primitive.structure.end(); ++structure)
 		{
 			for(mesh::named_arrays_t::iterator array = structure->second.begin(); array != structure->second.end(); ++array)
-				Functor(array->first, array->second);
+				Functor(structure->first, structure->second, array->first, array->second);
 		}
 
 		for(mesh::named_tables_t::iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
 		{
 			for(mesh::table_t::iterator array = attributes->second.begin(); array != attributes->second.end(); ++array)
-				Functor(array->first, array->second);
+				Functor(attributes->first, attributes->second, array->first, array->second);
 		}
 	}
 

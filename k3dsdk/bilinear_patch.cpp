@@ -92,7 +92,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["vertex"]
 		);
 
-	result->patch_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->patch_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
@@ -122,7 +122,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const table& varying_attributes = require_attributes(Primitive, "varying");
 		const table& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_structure, "vertex", uniform_structure.row_count() * 4);
@@ -162,7 +162,7 @@ primitive* validate(mesh::primitive& Primitive)
 		table& varying_attributes = require_attributes(Primitive, "varying");
 		table& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_structure, "vertex", uniform_structure.row_count() * 4);

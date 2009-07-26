@@ -434,15 +434,18 @@ public:
 	{
 	}
 
-	void operator()(const string_t& Name, pipeline_data<array>& Array)
+	void operator()(const string_t& StructureName, table& Structure, const string_t& ArrayName, pipeline_data<array>& Array)
 	{
-		if(Array->get_metadata_value(metadata::key::selection_component()) != m_primitive_selection_type)
+		if(StructureName != m_primitive_selection_type)
+			return;
+
+		if(Array->get_metadata_value(metadata::key::role()) != metadata::value::selection_role())
 			return;
 
 		mesh::selection_t* const array = dynamic_cast<mesh::selection_t*>(&Array.writable());
 		if(!array)
 		{
-			log() << error << "unexpected type for array [" << Name << "] with k3d:selection-component = " << m_primitive_selection_type << std::endl;
+			log() << error << "unexpected type for array [" << ArrayName << "] with k3d:selection-component = " << m_primitive_selection_type << std::endl;
 			return;
 		}
 

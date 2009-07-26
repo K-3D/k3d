@@ -92,7 +92,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["vertex"]
 		);
 
-	result->patch_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->patch_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
@@ -122,7 +122,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "patch_materials");
 		const mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, vertex_structure, "patch_points");
 
-		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_structure, "vertex", uniform_structure.row_count() * 16);
@@ -163,7 +163,7 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "patch_materials");
 		mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, vertex_structure, "patch_points");
 
-		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_structure, "vertex", uniform_structure.row_count() * 16);

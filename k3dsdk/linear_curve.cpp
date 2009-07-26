@@ -107,7 +107,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["vertex"]
 		);
 
-	result->curve_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->curve_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 	result->curve_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
@@ -141,7 +141,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::selection_t& curve_selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "curve_selections");
 		const mesh::indices_t& curve_points = require_array<mesh::indices_t>(Primitive, vertex_structure, "curve_points");
 
-		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_table_row_count(Primitive, constant_structure, "constant", 1);
@@ -188,7 +188,7 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::selection_t& curve_selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "curve_selections");
 		mesh::indices_t& curve_points = require_array<mesh::indices_t>(Primitive, vertex_structure, "curve_points");
 
-		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_table_row_count(Primitive, constant_structure, "constant", 1);

@@ -217,7 +217,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["vertex"]
 		);
 
-	result->patch_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->patch_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
@@ -279,7 +279,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::points_2d_t& points = require_array<mesh::points_2d_t>(Primitive, trim_point_structure, "points");
 		const mesh::selection_t& point_selections = require_array<mesh::selection_t>(Primitive, trim_point_structure, "point_selections");
 
-		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_table_row_count(Primitive, u_knot_structure, "u_knot",
@@ -390,7 +390,7 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::points_2d_t& points = require_array<mesh::points_2d_t>(Primitive, trim_point_structure, "points");
 		mesh::selection_t& point_selections = require_array<mesh::selection_t>(Primitive, trim_point_structure, "point_selections");
 
-		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_table_row_count(Primitive, u_knot_structure, "u_knot",

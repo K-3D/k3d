@@ -384,7 +384,7 @@ struct mark_used_primitive_points
 	{
 	}
 
-	void operator()(const string_t&, const pipeline_data<array>& Array)
+	void operator()(const string_t&, const table&, const string_t&, const pipeline_data<array>& Array)
 	{
 		if(Array->get_metadata_value(metadata::key::domain()) != metadata::value::mesh_point_indices_domain())
 			return;
@@ -447,7 +447,7 @@ struct remap_primitive_points
 	{
 	}
 
-	void operator()(const string_t&, pipeline_data<array>& Array)
+	void operator()(const string_t&, const table&, const string_t&, pipeline_data<array>& Array)
 	{
 		if(Array->get_metadata_value(metadata::key::domain()) != metadata::value::mesh_point_indices_domain())
 			return;

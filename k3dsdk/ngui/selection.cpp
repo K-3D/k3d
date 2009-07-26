@@ -193,15 +193,18 @@ struct invert_components
 		{
 		}
 
-		void operator()(const string_t& Name, const pipeline_data<array>& Array)
+		void operator()(const string_t& StructureName, const table& Structure, const string_t& ArrayName, const pipeline_data<array>& Array)
 		{
-			if(Array->get_metadata_value(metadata::key::selection_component()) != component_string)
+			if(StructureName != component_string)
+				return;
+
+			if(Array->get_metadata_value(metadata::key::role()) != metadata::value::selection_role())
 				return;
 
 			const mesh::selection_t* const array = dynamic_cast<const mesh::selection_t*>(Array.get());
 			if(!array)
 			{
-				log() << error << "unexpected type for array [" << Name << "] with k3d:selection-component = " << component << std::endl;
+				log() << error << "unexpected type for array [" << ArrayName << "]" << std::endl;
 				return;
 			}
 

@@ -168,9 +168,9 @@ primitive* create(mesh::primitive& GenericPrimitive)
 		GenericPrimitive.attributes["vertex"]
 		);
 
-	result->face_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->face_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 	result->edge_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
-	result->edge_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::SPLIT_EDGE));
+	result->edge_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 
 	return result;
 }
@@ -444,9 +444,9 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::indices_t& clockwise_edges = require_array<mesh::indices_t>(Primitive, face_varying_structure, "clockwise_edges");
 		const mesh::selection_t& edge_selections = require_array<mesh::selection_t>(Primitive, face_varying_structure, "edge_selections");
 
-		require_metadata(Primitive, face_selections, "face_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, face_selections, "face_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, edge_points, "edge_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
-		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::selection_component(), string_cast(selection::SPLIT_EDGE));
+		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::role(), metadata::value::selection_role());
 
 		require_table_row_count(Primitive, uniform_structure, "uniform", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
 		require_table_row_count(Primitive, loop_structure, "loop", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
@@ -526,9 +526,9 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::indices_t& clockwise_edges = require_array<mesh::indices_t>(Primitive, face_varying_structure, "clockwise_edges");
 		mesh::selection_t& edge_selections = require_array<mesh::selection_t>(Primitive, face_varying_structure, "edge_selections");
 
-		require_metadata(Primitive, face_selections, "face_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, face_selections, "face_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, edge_points, "edge_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
-		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::selection_component(), string_cast(selection::SPLIT_EDGE));
+		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::role(), metadata::value::selection_role());
 
 		require_table_row_count(Primitive, uniform_structure, "uniform", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
 		require_table_row_count(Primitive, loop_structure, "loop", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));

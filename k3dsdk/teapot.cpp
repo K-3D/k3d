@@ -80,7 +80,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["uniform"]
 		);
 
-	result->selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 
 	return result;
 }
@@ -106,7 +106,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "materials");
 		const mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
 
-		require_metadata(Primitive, selections, "selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
 		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
@@ -139,7 +139,7 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "materials");
 		mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
 
-		require_metadata(Primitive, selections, "selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
 		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());

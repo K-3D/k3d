@@ -41,22 +41,25 @@ const string_t authors();
 const string_t copyright();
 
 /// Metadata key "k3d:domain" is used to define the domain over which a value / collection of values is defined.
-/// It is commonly used with generic mesh primitives to specify that one array contains indices into another.
+/// It is commonly used with geometric primitives to specify that one array contains indices into another.
 const string_t domain();
 
-/// Metadata key "k3d:selection-component" is used to identify mesh arrays that hold selection values.  The
-/// key value will be a selection type from the k3d::selection::type enumeration.
-const string_t selection_component();
+/// Metadata key "k3d:role" is used to identify the purpose of an object beyond what can be inferred from its type.
+/// A common key value will be k3d::metadata::value::selection(), to identify arrays that hold selection state.
+const string_t role();
 
 } // namespace key
 
 namespace value
 {
 
-/// Metadata value for use with "k3d:domain" that specifies the mesh point array
+/// Metadata value for use with "k3d:domain" that specifies the mesh point array.
 const string_t mesh_point_indices_domain();
-/// Metadata value for use with "k3d:domain" that specifies that an array of floating-point values is a NURBS knot vector
+/// Metadata value for use with "k3d:domain" that specifies that an array of floating-point values is a NURBS knot vector.
 const string_t nurbs_knot_vector_domain();
+
+/// Metadata value for use with "k3d:role" that specifies that an array of floating-point values is a selection state.
+const string_t selection_role();
 
 } // namespace value
 

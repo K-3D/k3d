@@ -124,7 +124,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["vertex"]
 		);
 
-	result->curve_selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->curve_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 	result->curve_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 	return result;
@@ -162,7 +162,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::weights_t& curve_point_weights = require_array<mesh::weights_t>(Primitive, vertex_structure, "curve_point_weights");
 		const mesh::knots_t& curve_knots = require_array<mesh::knots_t>(Primitive, knot_structure, "curve_knots");
 
-		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_table_row_count(Primitive, constant_structure, "constant", 1);
@@ -215,7 +215,7 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::weights_t& curve_point_weights = require_array<mesh::weights_t>(Primitive, vertex_structure, "curve_point_weights");
 		mesh::knots_t& curve_knots = require_array<mesh::knots_t>(Primitive, knot_structure, "curve_knots");
 
-		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
 		require_table_row_count(Primitive, constant_structure, "constant", 1);

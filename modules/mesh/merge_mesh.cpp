@@ -75,7 +75,7 @@ public:
 		{
 		}
 
-		void operator()(const k3d::string_t& Name, k3d::pipeline_data<k3d::array>& Array)
+		void operator()(const k3d::string_t&, const k3d::table&, const k3d::string_t& ArrayName, k3d::pipeline_data<k3d::array>& Array)
 		{
 			if(Array->get_metadata_value(k3d::metadata::key::domain()) != k3d::metadata::value::mesh_point_indices_domain())
 				return;
@@ -83,7 +83,7 @@ public:
 			k3d::uint_t_array* const array = dynamic_cast<k3d::uint_t_array*>(&Array.writable());
 			if(!array)
 			{
-				k3d::log() << error << "array [" << Name << "] must be a k3d::uint_t_array." << std::endl;
+				k3d::log() << error << "array [" << ArrayName << "] must be a k3d::uint_t_array." << std::endl;
 				return;
 			}
 

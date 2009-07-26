@@ -47,9 +47,9 @@ const string_t domain()
 	return "k3d:domain";
 }
 
-const string_t selection_component()
+const string_t role()
 {
-	return "k3d:selection-component";
+	return "k3d:role";
 }
 
 } // namespace key
@@ -65,6 +65,11 @@ const string_t mesh_point_indices_domain()
 const string_t nurbs_knot_vector_domain()
 {
 	return "k3d:nurbs-knot-vector";
+}
+
+const string_t selection_role()
+{
+	return "k3d:selection";
 }
 
 } // namespace value

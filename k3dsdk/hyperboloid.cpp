@@ -100,7 +100,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["varying"]
 		);
 
-	result->selections.set_metadata_value(metadata::key::selection_component(), string_cast(selection::UNIFORM));
+	result->selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 
 	return result;
 }
@@ -130,7 +130,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::doubles_t& sweep_angles = require_array<mesh::doubles_t >(Primitive, uniform_structure, "sweep_angles");
 		const mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
 
-		require_metadata(Primitive, selections, "selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
 		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
@@ -168,7 +168,7 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::doubles_t& sweep_angles = require_array<mesh::doubles_t >(Primitive, uniform_structure, "sweep_angles");
 		mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
 
-		require_metadata(Primitive, selections, "selections", metadata::key::selection_component(), string_cast(selection::UNIFORM));
+		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
 		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
