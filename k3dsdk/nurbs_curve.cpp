@@ -152,7 +152,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		const mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, uniform_structure, "material");
+		const mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, constant_structure, "material");
 		const mesh::indices_t& curve_first_points = require_array<mesh::indices_t>(Primitive, uniform_structure, "curve_first_points");
 		const mesh::counts_t& curve_point_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "curve_point_counts");
 		const mesh::orders_t& curve_orders = require_array<mesh::orders_t>(Primitive, uniform_structure, "curve_orders");
@@ -205,7 +205,7 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, uniform_structure, "material");
+		mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, constant_structure, "material");
 		mesh::indices_t& curve_first_points = require_array<mesh::indices_t>(Primitive, uniform_structure, "curve_first_points");
 		mesh::counts_t& curve_point_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "curve_point_counts");
 		mesh::orders_t& curve_orders = require_array<mesh::orders_t>(Primitive, uniform_structure, "curve_orders");
