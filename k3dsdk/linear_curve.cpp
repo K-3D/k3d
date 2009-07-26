@@ -127,7 +127,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		const mesh::table_t& constant_structure = require_structure(Primitive, "constant");
 		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
-		const mesh::table_t& vertex_structure = require_structure(Primitive, "varying");
+		const mesh::table_t& vertex_structure = require_structure(Primitive, "vertex");
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
@@ -174,7 +174,7 @@ primitive* validate(mesh::primitive& Primitive)
 
 		mesh::table_t& constant_structure = require_structure(Primitive, "constant");
 		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
-		mesh::table_t& vertex_structure = require_structure(Primitive, "varying");
+		mesh::table_t& vertex_structure = require_structure(Primitive, "vertex");
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
