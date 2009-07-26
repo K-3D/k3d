@@ -42,16 +42,22 @@ test_unequal(mesh_a, mesh_b, "mesh without primitive")
 primitive_b = mesh_b.primitives().create("foo")
 test_equal(mesh_a, mesh_b, "matched primitives")
 
-structure_a = primitive_a.structure().create("indices", "k3d::uint_t")
+structure_a = primitive_a.structure().create("uniform")
+test_unequal(mesh_a, mesh_b, "primitive with missing structure")
+
+structure_b = primitive_b.structure().create("uniform")
+test_equal(mesh_a, mesh_b, "primitive with matched structures")
+
+array_a = structure_a.create("indices", "k3d::uint_t")
 test_unequal(mesh_a, mesh_b, "structure with missing array")
 
-structure_b = primitive_b.structure().create("indices", "k3d::uint_t")
+array_b = structure_b.create("indices", "k3d::uint_t")
 test_equal(mesh_a, mesh_b, "structure with matched arrays")
 
-structure_a.append(5)
+array_a.append(5)
 test_unequal(mesh_a, mesh_b, "mismatched structure arrays")
 
-structure_b.append(5)
+array_b.append(5)
 test_equal(mesh_a, mesh_b, "matched structure_arrays")
 
 attributes_a = primitive_a.attributes().create("uniform")
