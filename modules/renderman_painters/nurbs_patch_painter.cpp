@@ -108,7 +108,11 @@ public:
 				}
 
 				ri_constant_data.push_back(patch);
-				ri_uniform_data.push_back(patch);
+				// uniform data is per segment in RenderMan, so we have to repeat it for every segment
+				const k3d::uint_t nusegments = 1 + nurbs->patch_u_point_counts[patch] - nurbs->patch_u_orders[patch];
+				const k3d::uint_t nvsegments = 1 + nurbs->patch_v_point_counts[patch] - nurbs->patch_v_orders[patch];
+				for(k3d::uint_t i = 0; i != nusegments * nvsegments; ++i)
+					ri_uniform_data.push_back(patch);
 				ri_varying_data.insert(4 * patch, 4 * (patch + 1));
 
 				k3d::ri::parameter_list ri_parameters;
