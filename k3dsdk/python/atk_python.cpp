@@ -22,7 +22,13 @@
 
 #include <k3dsdk/result.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/mpl/for_each.hpp>
+#include <boost/mpl/range_c.hpp>
 #include <boost/python.hpp>
+
+#include <k3dsdk/type_registry.h> // for demangle
+
 using namespace boost::python;
 
 namespace k3d
@@ -33,6 +39,17 @@ namespace python
 
 namespace detail
 {
+
+boost::python::object wrap(AtkObject* Object);
+
+/// Converts the given string to a name suitable as Python function name
+/**
+ * TODO: Move this to the SDK, so the conversion is always consistent?
+ */
+const k3d::string_t script_name(const k3d::string_t& Name)
+{
+	return boost::replace_all_copy(Name, " ", "_");
+}
 
 const k3d::int32_t action_index(AtkAction* Action, const k3d::string_t& ActionName)
 {
@@ -80,45 +97,96 @@ void define_action_methods(AtkObject* Object, boost::python::object& Instance)
 	}
 }
 
-/// Wrap an AtkObject, adding additional dynamic methods for any actions it may have
-boost::python::object wrap(AtkObject* Object)
-{
-	boost::python::object wrapped = k3d::python::wrap(Object);
-	define_action_methods(Object, wrapped);
-	return wrapped;
-}
-
-}
-
-static object get_item_name(atk_object_wrapper& Self, const string_t& Key)
+/// Get the item with role Role and name Key
+static object get_item_name(atk_object_wrapper& Self, const string_t& Key, const AtkRole Role)
 {
 	AtkObject* atk_obj = Self.wrapped_ptr();
+	AtkObject* found = 0;
 	for(k3d::uint_t i = 0; i != atk_object_get_n_accessible_children(atk_obj); ++i)
 	{
 		AtkObject* child = atk_object_ref_accessible_child(atk_obj, i);
 		const gchar* name_ptr = atk_object_get_name(child);
 		const k3d::string_t name_str(name_ptr ? name_ptr : "");
-		if(name_str == Key)
+		if(name_str == Key && atk_object_get_role(child) == Role)
 		{
-			return detail::wrap(child);
+			if(found)
+				throw std::runtime_error("Duplicate value for key: " + Key);
+			found = child;
 		}
 	}
 
-	throw std::runtime_error("unknown key: " + Key);
+	if(!found)
+		throw std::runtime_error("unknown key: " + Key);
+
+	return wrap(found);
 }
 
-static object get_item_idx(atk_object_wrapper& Self, const k3d::uint_t Key)
+/// Get the item with index Key and role Role, with indices counted within children of the same type
+static object get_item_idx(atk_object_wrapper& Self, const k3d::uint_t Key, const AtkRole Role)
 {
 	AtkObject* atk_obj = Self.wrapped_ptr();
-	if(Key >= atk_object_get_n_accessible_children(atk_obj))
+	const k3d::uint_t child_count = atk_object_get_n_accessible_children(atk_obj);
+	if(Key >= child_count)
 		throw std::runtime_error("index out of range: " + Key);
-	return detail::wrap(atk_object_ref_accessible_child(atk_obj, Key));
+	k3d::uint_t idx = 0;
+	for(k3d::uint_t i = 0; i != child_count; ++i)
+	{
+		AtkObject* child = atk_object_ref_accessible_child(atk_obj, i);
+		if(atk_object_get_role(child) == Role)
+		{
+			if(idx == Key)
+				return wrap(child);
+			++idx;
+		}
+	}
+	std::stringstream error;
+	error << "No child with role " << atk_role_get_name(Role) << " at index " << Key;
+	throw std::runtime_error(error.str());
 }
 
-static int len(atk_object_wrapper& Self)
+template<typename Role>
+static object get_item(atk_object_wrapper& Self, object Key)
 {
-	return atk_object_get_n_accessible_children(Self.wrapped_ptr());
+	if(PyString_Check(Key.ptr()))
+		return get_item_name(Self, boost::python::extract<string_t>(Key), static_cast<AtkRole>(Role::value));
+	else if(PyInt_Check(Key.ptr()))
+		return get_item_idx(Self, boost::python::extract<int32_t>(Key), static_cast<AtkRole>(Role::value));
+	else
+		throw std::runtime_error("Item lookup key must be a string or an integer");
 }
+
+class role_method_creator
+{
+public:
+	role_method_creator(boost::python::object& Instance) : m_instance(Instance)
+	{
+	}
+
+	template<typename T> void operator()(T RoleIdx)
+	{
+		const string_t role_name(atk_role_get_name(static_cast<AtkRole>(RoleIdx.value)));
+		const string_t function_name(script_name(role_name));
+		const string_t doc1 = "Get a " + role_name + " by name.";
+		const string_t doc2 = "Get a " + role_name + " by index.";
+		utility::add_method(utility::make_function(&get_item<T>, doc1.c_str()), function_name, m_instance);
+	}
+private:
+	boost::python::object& m_instance;
+};
+
+/// Wrap an AtkObject, adding additional dynamic methods for any actions it may have
+boost::python::object wrap(AtkObject* Object)
+{
+	boost::python::object wrapped = k3d::python::wrap(Object);
+
+	role_method_creator creator(wrapped);
+	boost::mpl::for_each<boost::mpl::range_c<int32_t,0,ATK_ROLE_LAST_DEFINED> >(creator);
+
+	define_action_methods(Object, wrapped);
+	return wrapped;
+}
+
+} // namespace detail
 
 static k3d::string_t name(atk_object_wrapper& Self)
 {
@@ -145,11 +213,8 @@ void define_class_atk_object()
 		.staticmethod("root");
 
 	class_<atk_object_wrapper>("object",
-			"Wraps an ATK object", no_init)
-			.def("name", &name, "Get the name of the ATK object")
-			.def("__len__", &len)
-			.def("__getitem__", &get_item_name)
-			.def("__getitem__", &get_item_idx);
+		"Wraps an ATK object", no_init)
+		.def("name", &name, "Get the name of the ATK object");
 }
 
 } // namespace python
