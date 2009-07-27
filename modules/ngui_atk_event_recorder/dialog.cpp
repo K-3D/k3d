@@ -35,6 +35,7 @@
 #include <gtkmm/label.h>
 #include <gtk/gtk.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/assign/list_of.hpp>
 #include <stack>
 
@@ -46,6 +47,32 @@ namespace ngui
 
 namespace atk_event_recorder
 {
+
+namespace detail
+{
+
+const k3d::string_t script_name(const k3d::string_t& Name)
+{
+	return boost::replace_all_copy(Name, " ", "_");
+}
+
+/// Returns the index in a "per role" array of children, for the given child number of the parent Object
+const k3d::uint_t get_index_in_role(AtkObject* Object)
+{
+	const k3d::uint_t index_in_parent = atk_object_get_index_in_parent(Object);
+	const AtkRole role = atk_object_get_role(Object);
+	AtkObject* parent = atk_object_get_parent(Object);
+	return_val_if_fail(parent, 0);
+	k3d::uint_t result = 0;
+	for(k3d::uint_t i = 0; i != index_in_parent; ++i)
+	{
+		if(atk_object_get_role(atk_object_ref_accessible_child(parent, i)) == role)
+			++result;
+	}
+	return result;
+}
+
+} // namespace detail
 
 class dialog :
 	public k3d::ngui::application_window,
@@ -185,10 +212,11 @@ private:
 		while(!click_trace.empty())
 		{
 			Glib::RefPtr<Atk::Object> obj = click_trace.top();
+			k3d::log() << debug << "." << detail::script_name(atk_role_get_name(atk_object_get_role(obj->gobj())));
 			if(obj->get_name() == "")
-				k3d::log() << debug << "[" << obj->get_index_in_parent() << "]";
+				k3d::log() << debug << "(" << detail::get_index_in_role(obj->gobj()) << ")";
 			else
-				k3d::log() << debug << "[\"" << obj->get_name() << "\"]";
+				k3d::log() << debug << "(\"" << obj->get_name() << "\")";
 			click_trace.pop();
 		}
 		k3d::log() << debug << ".click()" << std::endl;
