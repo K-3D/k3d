@@ -127,7 +127,8 @@ public:
   {
     std::ostringstream buffer;
 //    buffer << "v" << Container.get() << " [label=\"{|||...|}\"]";
-    buffer << "v" << Container.get() << " [label=\"{Array}\"]";
+//    buffer << "v" << Container.get() << " [label=\"{Array}\"]";
+    buffer << "v" << Container.get() << " [label=\"{" << Container->type_string() << " array}\"]";
     return buffer.str();
   }
 
@@ -158,16 +159,16 @@ public:
     stream << k3d::standard_indent << "node [shape=\"record\" fontname=\"Helvetica\" fontsize=12 height=0 width=0]\n";
     stream << k3d::standard_indent << "edge [fontname=\"Helvetica\" fontsize=10]\n";
 
-    stream << k3d::standard_indent << "v" << Mesh << " [label=\"<geometry>Geometry|<points>points|<point_selection>point_selection|<vertex_attributes>vertex_attributes|<primitives>primitives\"]\n";
+    stream << k3d::standard_indent << "v" << Mesh << " [label=\"<geometry>Geometry|<points>points|<point_selection>point_selection|<point_attributes>point_attributes|<primitives>primitives\"]\n";
     stream << k3d::push_indent;
+
+    stream << k3d::standard_indent << "subgraph cluster_0\n";
+    stream << k3d::standard_indent << "{\n";
+    stream << k3d::push_indent;
+    stream << k3d::standard_indent << "color=white;\n";
 
     if(Mesh->points)
 		{
-			stream << k3d::standard_indent << "subgraph cluster_0\n";
-			stream << k3d::standard_indent << "{\n";
-			stream << k3d::push_indent;
-			stream << k3d::standard_indent << "color=white;\n";
-
 			stream << k3d::standard_indent << dot_array_vertex(Mesh->points) << "\n";
 			stream << k3d::standard_indent << "v" << Mesh << ":points:e -> " << dot_array_reference(Mesh->points) << ":w\n";
 		}
@@ -176,10 +177,10 @@ public:
 		{
 			stream << k3d::standard_indent << dot_array_vertex(Mesh->point_selection) << "\n";
 			stream << k3d::standard_indent << "v" << Mesh << ":point_selection:e -> " << dot_array_reference(Mesh->point_selection) << ":w\n";
-
-			stream << k3d::pop_indent;
-			stream << k3d::standard_indent << "}\n";
 		}
+
+    stream << k3d::pop_indent;
+    stream << k3d::standard_indent << "}\n";
  
     for(k3d::mesh::primitives_t::const_iterator primitive = Mesh->primitives.begin(); primitive != Mesh->primitives.end(); ++primitive)
     { 
