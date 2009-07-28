@@ -11,10 +11,10 @@ point_selection = Output.create_point_selection()
 point_group = k3d.point_group.create(Output)
 
 # Create an (optional) array to store per-group point widths
-constantwidth = point_group.constant_data().create("constantwidth", "k3d::double_t")
+constantwidth = point_group.constant_attributes().create("constantwidth", "k3d::double_t")
 
 # Create an (optional) array to store per-point point colors
-Cs = point_group.varying_data().create("Cs", "k3d::color")
+Cs = point_group.vertex_attributes().create("Cs", "k3d::color")
 
 # Add some points ...
 point_group.material().append(None)
