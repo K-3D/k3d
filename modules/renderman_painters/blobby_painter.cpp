@@ -125,6 +125,10 @@ public:
 				ri_vertex_attributes.copy_to(k3d::ri::VERTEX, ri_parameters);
 
 				k3d::ri::setup_material(primitive->materials[blobby], RenderState);
+
+				// We always have at least one string?
+				ri_strings.push_back(k3d::ri::string());
+
 				RenderState.stream.RiBlobbyV(ri_nleaf, ri_codes, ri_floats, ri_strings, ri_parameters);
 			}
 		}
