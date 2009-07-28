@@ -12,7 +12,7 @@ for i in range(2):
 	polyhedron = k3d.polyhedron.create(Output)
 
 	# Create an (optional) array to store uniform (per-face) colors ...
-	Cs = polyhedron.uniform_data().create("Cs", "k3d::color")
+	Cs = polyhedron.uniform_attributes().create("Cs", "k3d::color")
 
 	polyhedron.shell_first_faces().append(len(polyhedron.face_first_loops()))
 	polyhedron.shell_face_counts().append(3)
