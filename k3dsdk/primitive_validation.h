@@ -32,7 +32,10 @@ namespace k3d
 
 /// Helper methods for use with in mesh primitive validate() functions only!
 
-/// Performs automated validation of the structure of a mesh primitive.
+/// Performs automated validation of the structure of a mesh primitive:
+///
+/// 1. Validates that matching structure and attribute tables contain the same number of rows.
+/// 2. Validates that every array in a given table is the same length.
 void require_valid_primitive(const mesh::primitive& Primitive);
 
 /// Tests a primitive to verify that it contains the named structure table, throws an exception otherwise.

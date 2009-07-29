@@ -17,14 +17,54 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "primitive_validation.h"
+#include <k3dsdk/array.h>
+#include <k3dsdk/primitive_validation.h>
 
 namespace k3d
 {
 
 void require_valid_primitive(const mesh::primitive& Primitive)
 {
-	/** \todo Implement something here */
+  for(mesh::named_tables_t::const_iterator structure = Primitive.structure.begin(); structure != Primitive.structure.end(); ++structure)
+  {
+    for(mesh::table_t::const_iterator array_iterator = structure->second.begin(); array_iterator != structure->second.end(); ++array_iterator)
+    {
+      const array* const current_array = array_iterator->second.get();
+      if(!current_array)
+        throw std::runtime_error("NULL structure array.");
+
+      const array* const first_array = structure->second.begin()->second.get();
+      if(current_array->size() != first_array->size())
+        throw std::runtime_error("Structure array length mismatch.");
+    }
+  }
+
+  for(mesh::named_tables_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
+  {
+    for(mesh::table_t::const_iterator array_iterator = attributes->second.begin(); array_iterator != attributes->second.end(); ++array_iterator)
+    {
+      const array* const current_array = array_iterator->second.get();
+      if(!current_array)
+        throw std::runtime_error("NULL attributes array.");
+
+      const array* const first_array = attributes->second.begin()->second.get();
+      if(current_array->size() != first_array->size())
+        throw std::runtime_error("Attribute array length mismatch.");
+    }
+  }
+
+  for(mesh::named_tables_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
+  {
+    if(0 == attributes->second.column_count())
+      continue;
+
+    const mesh::named_tables_t::const_iterator structure = Primitive.structure.find(attributes->first);
+    if(structure != Primitive.structure.end())
+    {
+      if(structure->second.row_count() != attributes->second.row_count())
+        throw std::runtime_error("Attribute / structure table length mismatch.");
+    }
+  }
 }
 
 const mesh::table_t& require_structure(const mesh::primitive& Primitive, const string_t& Name)
