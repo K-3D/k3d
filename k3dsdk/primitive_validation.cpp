@@ -27,7 +27,7 @@ void require_valid_primitive(const mesh::primitive& Primitive)
 {
 	for(mesh::named_tables_t::const_iterator structure = Primitive.structure.begin(); structure != Primitive.structure.end(); ++structure)
 	{
-		if(structure->first == "constant" && structure->second.row_count() != 1)
+		if(structure->first == "constant" && structure->second.column_count() && structure->second.row_count() != 1)
 			throw std::runtime_error("'constant' structure must have length 1.");
 
 		for(mesh::table_t::const_iterator array_iterator = structure->second.begin(); array_iterator != structure->second.end(); ++array_iterator)
@@ -44,7 +44,7 @@ void require_valid_primitive(const mesh::primitive& Primitive)
 
 	for(mesh::named_tables_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
 	{
-		if(attributes->first == "constant" && attributes->second.row_count() != 1)
+		if(attributes->first == "constant" && attributes->second.column_count() && attributes->second.row_count() != 1)
 			throw std::runtime_error("'constant' attributes must have length 1.");
 
 		for(mesh::table_t::const_iterator array_iterator = attributes->second.begin(); array_iterator != attributes->second.end(); ++array_iterator)
