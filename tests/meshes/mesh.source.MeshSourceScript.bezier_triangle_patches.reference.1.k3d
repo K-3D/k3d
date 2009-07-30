@@ -29,6 +29,7 @@
 				<attributes>
 					<table type="constant"/>
 					<table type="uniform"/>
+					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>
