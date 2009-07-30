@@ -183,21 +183,21 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("nurbs_patch");
 
 	primitive* const result = new primitive(
-		generic_primitive.structure["constant"].create<mesh::indices_t>("patch_first_points"),
-		generic_primitive.structure["constant"].create<mesh::counts_t>("patch_u_point_counts"),
-		generic_primitive.structure["constant"].create<mesh::counts_t>("patch_v_point_counts"),
-		generic_primitive.structure["constant"].create<mesh::orders_t>("patch_u_orders"),
-		generic_primitive.structure["constant"].create<mesh::orders_t>("patch_v_orders"),
-		generic_primitive.structure["constant"].create<mesh::indices_t>("patch_u_first_knots"),
-		generic_primitive.structure["constant"].create<mesh::indices_t>("patch_v_first_knots"),
-		generic_primitive.structure["constant"].create<mesh::selection_t>("patch_selections"),
-		generic_primitive.structure["constant"].create<mesh::materials_t>("patch_materials"),
+		generic_primitive.structure["patch"].create<mesh::indices_t>("patch_first_points"),
+		generic_primitive.structure["patch"].create<mesh::counts_t>("patch_u_point_counts"),
+		generic_primitive.structure["patch"].create<mesh::counts_t>("patch_v_point_counts"),
+		generic_primitive.structure["patch"].create<mesh::orders_t>("patch_u_orders"),
+		generic_primitive.structure["patch"].create<mesh::orders_t>("patch_v_orders"),
+		generic_primitive.structure["patch"].create<mesh::indices_t>("patch_u_first_knots"),
+		generic_primitive.structure["patch"].create<mesh::indices_t>("patch_v_first_knots"),
+		generic_primitive.structure["patch"].create<mesh::selection_t>("patch_selections"),
+		generic_primitive.structure["patch"].create<mesh::materials_t>("patch_materials"),
 		generic_primitive.structure["vertex"].create<mesh::indices_t>("patch_points"),
 		generic_primitive.structure["vertex"].create<mesh::weights_t>("patch_point_weights"),
 		generic_primitive.structure["u_knot"].create<mesh::knots_t>("patch_u_knots"),
 		generic_primitive.structure["v_knot"].create<mesh::knots_t>("patch_v_knots"),
-		generic_primitive.structure["constant"].create<mesh::indices_t>("patch_first_trim_loops"),
-		generic_primitive.structure["constant"].create<mesh::counts_t>("patch_trim_loop_counts"),
+		generic_primitive.structure["patch"].create<mesh::indices_t>("patch_first_trim_loops"),
+		generic_primitive.structure["patch"].create<mesh::counts_t>("patch_trim_loop_counts"),
 		generic_primitive.structure["trim_loop"].create<mesh::indices_t>("trim_loop_first_curves"),
 		generic_primitive.structure["trim_loop"].create<mesh::counts_t>("trim_loop_curve_counts"),
 		generic_primitive.structure["trim_loop"].create<mesh::selection_t>("trim_loop_selections"),
@@ -235,7 +235,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Primitive);
 
-		const mesh::table_t& constant_structure = require_structure(Primitive, "constant");
+		const mesh::table_t& patch_structure = require_structure(Primitive, "patch");
 		const mesh::table_t& vertex_structure = require_structure(Primitive, "vertex");
 		const mesh::table_t& u_knot_structure = require_structure(Primitive, "u_knot");
 		const mesh::table_t& v_knot_structure = require_structure(Primitive, "v_knot");
@@ -250,21 +250,21 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		const mesh::indices_t& patch_first_points = require_array<mesh::indices_t>(Primitive, constant_structure, "patch_first_points");
-		const mesh::counts_t& patch_u_point_counts = require_array<mesh::counts_t>(Primitive, constant_structure, "patch_u_point_counts");
-		const mesh::counts_t& patch_v_point_counts = require_array<mesh::counts_t>(Primitive, constant_structure, "patch_v_point_counts");
-		const mesh::orders_t& patch_u_orders = require_array<mesh::orders_t>(Primitive, constant_structure, "patch_u_orders");
-		const mesh::orders_t& patch_v_orders = require_array<mesh::orders_t>(Primitive, constant_structure, "patch_v_orders");
-		const mesh::indices_t& patch_u_first_knots = require_array<mesh::indices_t>(Primitive, constant_structure, "patch_u_first_knots");
-		const mesh::indices_t& patch_v_first_knots = require_array<mesh::indices_t>(Primitive, constant_structure, "patch_v_first_knots");
-		const mesh::selection_t& patch_selections = require_array<mesh::selection_t>(Primitive, constant_structure, "patch_selections");
-		const mesh::materials_t& patch_materials = require_array<mesh::materials_t>(Primitive, constant_structure, "patch_materials");
+		const mesh::indices_t& patch_first_points = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_first_points");
+		const mesh::counts_t& patch_u_point_counts = require_array<mesh::counts_t>(Primitive, patch_structure, "patch_u_point_counts");
+		const mesh::counts_t& patch_v_point_counts = require_array<mesh::counts_t>(Primitive, patch_structure, "patch_v_point_counts");
+		const mesh::orders_t& patch_u_orders = require_array<mesh::orders_t>(Primitive, patch_structure, "patch_u_orders");
+		const mesh::orders_t& patch_v_orders = require_array<mesh::orders_t>(Primitive, patch_structure, "patch_v_orders");
+		const mesh::indices_t& patch_u_first_knots = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_u_first_knots");
+		const mesh::indices_t& patch_v_first_knots = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_v_first_knots");
+		const mesh::selection_t& patch_selections = require_array<mesh::selection_t>(Primitive, patch_structure, "patch_selections");
+		const mesh::materials_t& patch_materials = require_array<mesh::materials_t>(Primitive, patch_structure, "patch_materials");
 		const mesh::indices_t& patch_points = require_array<mesh::indices_t>(Primitive, vertex_structure, "patch_points");
 		const mesh::weights_t& patch_point_weights = require_array<mesh::weights_t>(Primitive, vertex_structure, "patch_point_weights");
 		const mesh::knots_t& patch_u_knots = require_array<mesh::knots_t>(Primitive, u_knot_structure, "patch_u_knots");
 		const mesh::knots_t& patch_v_knots = require_array<mesh::knots_t>(Primitive, v_knot_structure, "patch_v_knots");
-		const mesh::indices_t& patch_first_trim_loops = require_array<mesh::indices_t>(Primitive, constant_structure, "patch_first_trim_loops");
-		const mesh::counts_t& patch_trim_loop_counts = require_array<mesh::counts_t>(Primitive, constant_structure, "patch_trim_loop_counts");
+		const mesh::indices_t& patch_first_trim_loops = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_first_trim_loops");
+		const mesh::counts_t& patch_trim_loop_counts = require_array<mesh::counts_t>(Primitive, patch_structure, "patch_trim_loop_counts");
 		const mesh::indices_t& trim_loop_first_curves = require_array<mesh::indices_t>(Primitive, trim_loop_structure, "trim_loop_first_curves");
 		const mesh::counts_t& trim_loop_curve_counts = require_array<mesh::counts_t>(Primitive, trim_loop_structure, "trim_loop_curve_counts");
 		const mesh::selection_t& trim_loop_selections = require_array<mesh::selection_t>(Primitive, trim_loop_structure, "trim_loop_selections");
@@ -289,15 +289,15 @@ const_primitive* validate(const mesh::primitive& Primitive)
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
 
-    const uint_t u_segments
-      = patch_u_point_counts.size()
-      + std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)
-      - std::accumulate(patch_u_orders.begin(), patch_u_orders.end(), 0);
+		const uint_t u_segments
+			= patch_u_point_counts.size()
+			+ std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)
+			- std::accumulate(patch_u_orders.begin(), patch_u_orders.end(), 0);
 
-    const uint_t v_segments
-      = patch_v_point_counts.size()
-      + std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
-      - std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0);
+		const uint_t v_segments
+			= patch_v_point_counts.size()
+			+ std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
+			- std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0);
 
 		require_table_row_count(Primitive, uniform_attributes, "uniform", u_segments * v_segments);
 		require_table_row_count(Primitive, varying_attributes, "varying", 4 * (u_segments * v_segments));
@@ -353,7 +353,7 @@ primitive* validate(mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Primitive);
 
-		mesh::table_t& constant_structure = require_structure(Primitive, "constant");
+		mesh::table_t& patch_structure = require_structure(Primitive, "patch");
 		mesh::table_t& vertex_structure = require_structure(Primitive, "vertex");
 		mesh::table_t& u_knot_structure = require_structure(Primitive, "u_knot");
 		mesh::table_t& v_knot_structure = require_structure(Primitive, "v_knot");
@@ -368,21 +368,21 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		mesh::indices_t& patch_first_points = require_array<mesh::indices_t>(Primitive, constant_structure, "patch_first_points");
-		mesh::counts_t& patch_u_point_counts = require_array<mesh::counts_t>(Primitive, constant_structure, "patch_u_point_counts");
-		mesh::counts_t& patch_v_point_counts = require_array<mesh::counts_t>(Primitive, constant_structure, "patch_v_point_counts");
-		mesh::orders_t& patch_u_orders = require_array<mesh::orders_t>(Primitive, constant_structure, "patch_u_orders");
-		mesh::orders_t& patch_v_orders = require_array<mesh::orders_t>(Primitive, constant_structure, "patch_v_orders");
-		mesh::indices_t& patch_u_first_knots = require_array<mesh::indices_t>(Primitive, constant_structure, "patch_u_first_knots");
-		mesh::indices_t& patch_v_first_knots = require_array<mesh::indices_t>(Primitive, constant_structure, "patch_v_first_knots");
-		mesh::selection_t& patch_selections = require_array<mesh::selection_t>(Primitive, constant_structure, "patch_selections");
-		mesh::materials_t& patch_materials = require_array<mesh::materials_t>(Primitive, constant_structure, "patch_materials");
+		mesh::indices_t& patch_first_points = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_first_points");
+		mesh::counts_t& patch_u_point_counts = require_array<mesh::counts_t>(Primitive, patch_structure, "patch_u_point_counts");
+		mesh::counts_t& patch_v_point_counts = require_array<mesh::counts_t>(Primitive, patch_structure, "patch_v_point_counts");
+		mesh::orders_t& patch_u_orders = require_array<mesh::orders_t>(Primitive, patch_structure, "patch_u_orders");
+		mesh::orders_t& patch_v_orders = require_array<mesh::orders_t>(Primitive, patch_structure, "patch_v_orders");
+		mesh::indices_t& patch_u_first_knots = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_u_first_knots");
+		mesh::indices_t& patch_v_first_knots = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_v_first_knots");
+		mesh::selection_t& patch_selections = require_array<mesh::selection_t>(Primitive, patch_structure, "patch_selections");
+		mesh::materials_t& patch_materials = require_array<mesh::materials_t>(Primitive, patch_structure, "patch_materials");
 		mesh::indices_t& patch_points = require_array<mesh::indices_t>(Primitive, vertex_structure, "patch_points");
 		mesh::weights_t& patch_point_weights = require_array<mesh::weights_t>(Primitive, vertex_structure, "patch_point_weights");
 		mesh::knots_t& patch_u_knots = require_array<mesh::knots_t>(Primitive, u_knot_structure, "patch_u_knots");
 		mesh::knots_t& patch_v_knots = require_array<mesh::knots_t>(Primitive, v_knot_structure, "patch_v_knots");
-		mesh::indices_t& patch_first_trim_loops = require_array<mesh::indices_t>(Primitive, constant_structure, "patch_first_trim_loops");
-		mesh::counts_t& patch_trim_loop_counts = require_array<mesh::counts_t>(Primitive, constant_structure, "patch_trim_loop_counts");
+		mesh::indices_t& patch_first_trim_loops = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_first_trim_loops");
+		mesh::counts_t& patch_trim_loop_counts = require_array<mesh::counts_t>(Primitive, patch_structure, "patch_trim_loop_counts");
 		mesh::indices_t& trim_loop_first_curves = require_array<mesh::indices_t>(Primitive, trim_loop_structure, "trim_loop_first_curves");
 		mesh::counts_t& trim_loop_curve_counts = require_array<mesh::counts_t>(Primitive, trim_loop_structure, "trim_loop_curve_counts");
 		mesh::selection_t& trim_loop_selections = require_array<mesh::selection_t>(Primitive, trim_loop_structure, "trim_loop_selections");
@@ -407,15 +407,15 @@ primitive* validate(mesh::primitive& Primitive)
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
 
-    const uint_t u_segments
-      = patch_u_point_counts.size()
-      + std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)
-      - std::accumulate(patch_u_orders.begin(), patch_u_orders.end(), 0);
+		const uint_t u_segments
+			= patch_u_point_counts.size()
+			+ std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)
+			- std::accumulate(patch_u_orders.begin(), patch_u_orders.end(), 0);
 
-    const uint_t v_segments
-      = patch_v_point_counts.size()
-      + std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
-      - std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0);
+		const uint_t v_segments
+			= patch_v_point_counts.size()
+			+ std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
+			- std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0);
 
 		require_table_row_count(Primitive, uniform_attributes, "uniform", u_segments * v_segments);
 		require_table_row_count(Primitive, varying_attributes, "varying", 4 * (u_segments * v_segments));
