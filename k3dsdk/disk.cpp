@@ -132,7 +132,6 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
-		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
 
 		return new const_primitive(matrices, materials, heights, radii, sweep_angles, selections, constant_attributes, uniform_attributes, varying_attributes);
@@ -169,7 +168,6 @@ primitive* validate(mesh::primitive& Primitive)
 
 		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
-		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
 
 		return new primitive(matrices, materials, heights, radii, sweep_angles, selections, constant_attributes, uniform_attributes, varying_attributes);

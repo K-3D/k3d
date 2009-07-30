@@ -158,8 +158,6 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		}
 		require_table_row_count(Primitive, vertex_structure, "vertex", num_control_points);
 
-		require_table_row_count(Primitive, constant_attributes, "constant", 1);
-
 		return new const_primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
@@ -212,8 +210,6 @@ primitive* validate(mesh::primitive& Primitive)
 			}
 		}
 		require_table_row_count(Primitive, vertex_structure, "vertex", num_control_points);
-
-		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 
 		return new primitive(patch_first_points, patch_orders, patch_selections, patch_materials, patch_points, patch_point_weights, constant_attributes, uniform_attributes, vertex_attributes);
 	}

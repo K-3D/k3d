@@ -108,8 +108,6 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
-		require_table_row_count(Primitive, constant_attributes, "constant", 1);
-
 		return new const_primitive(matrices, materials, selections, constant_attributes, uniform_attributes);
 	}
 	catch(std::exception& e)
@@ -139,8 +137,6 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
 
 		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
-
-		require_table_row_count(Primitive, constant_attributes, "constant", 1);
 
 		return new primitive(matrices, materials, selections, constant_attributes, uniform_attributes);
 	}

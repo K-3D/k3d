@@ -103,8 +103,6 @@ const_primitive* validate(const mesh::primitive& Primitive)
 
 		require_metadata(Primitive, points, "points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 
-		require_table_row_count(Primitive, constant_structure, "constant", 1);
-
 		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 		return new const_primitive(material, points, constant_attributes, vertex_attributes);
@@ -136,8 +134,6 @@ primitive* validate(mesh::primitive& Primitive)
 		table& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		require_metadata(Primitive, points, "points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
-
-		require_table_row_count(Primitive, constant_structure, "constant", 1);
 
 		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
