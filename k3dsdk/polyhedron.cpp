@@ -451,9 +451,6 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_table_row_count(Primitive, uniform_structure, "uniform", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
 		require_table_row_count(Primitive, loop_structure, "loop", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
 
-		require_table_row_count(Primitive, constant_attributes, "constant", constant_structure.row_count());
-		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
-		require_table_row_count(Primitive, face_varying_attributes, "face_varying", face_varying_structure.row_count());
 		/** \todo Calculate vertex attributes size here */
 		//require_table_row_count(Primitive, point_attributes, "vertex", );
 
@@ -533,9 +530,6 @@ primitive* validate(mesh::primitive& Primitive)
 		require_table_row_count(Primitive, uniform_structure, "uniform", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
 		require_table_row_count(Primitive, loop_structure, "loop", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
 
-		require_table_row_count(Primitive, constant_attributes, "constant", constant_structure.row_count());
-		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
-		require_table_row_count(Primitive, face_varying_attributes, "face_varying", face_varying_structure.row_count());
 		/** \todo Calculate vertex attributes size here */
 		//require_table_row_count(Primitive, vertex_attributes, "vertex", );
 

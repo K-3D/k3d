@@ -299,10 +299,8 @@ const_primitive* validate(const mesh::primitive& Primitive)
       + std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
       - std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0);
 
-		require_table_row_count(Primitive, constant_attributes, "constant", constant_structure.row_count());
 		require_table_row_count(Primitive, uniform_attributes, "uniform", u_segments * v_segments);
 		require_table_row_count(Primitive, varying_attributes, "varying", 4 * (u_segments * v_segments));
-		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 	return new const_primitive(
 		patch_first_points,
@@ -419,10 +417,8 @@ primitive* validate(mesh::primitive& Primitive)
       + std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
       - std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0);
 
-		require_table_row_count(Primitive, constant_attributes, "constant", constant_structure.row_count());
 		require_table_row_count(Primitive, uniform_attributes, "uniform", u_segments * v_segments);
 		require_table_row_count(Primitive, varying_attributes, "varying", 4 * (u_segments * v_segments));
-		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 	return new primitive(
 		patch_first_points,

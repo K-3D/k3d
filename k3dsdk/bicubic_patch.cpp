@@ -128,7 +128,6 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_table_row_count(Primitive, vertex_structure, "vertex", uniform_structure.row_count() * 16);
 
 		require_table_row_count(Primitive, constant_attributes, "constant", 1);
-		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
 		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
 		require_table_row_count(Primitive, vertex_attributes, "vertex", uniform_structure.row_count() * 16);
 
@@ -169,7 +168,6 @@ primitive* validate(mesh::primitive& Primitive)
 		require_table_row_count(Primitive, vertex_structure, "vertex", uniform_structure.row_count() * 16);
 
 		require_table_row_count(Primitive, constant_attributes, "constant", 1);
-		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
 		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
 		require_table_row_count(Primitive, vertex_attributes, "vertex", uniform_structure.row_count() * 16);
 

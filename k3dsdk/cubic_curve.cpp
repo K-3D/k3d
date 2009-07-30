@@ -148,10 +148,8 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		require_table_row_count(Primitive, vertex_structure, "vertex", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
 		require_table_row_count(Primitive, constant_attributes, "constant", 1);
-		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
 		/** \todo Calculate the varying size here */
 //		require_table_row_count(Primitive, varying_attributes, "varying", );
-		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 		return new const_primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
 	}
@@ -195,10 +193,8 @@ primitive* validate(mesh::primitive& Primitive)
 		require_table_row_count(Primitive, vertex_structure, "vertex", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
 		require_table_row_count(Primitive, constant_attributes, "constant", 1);
-		require_table_row_count(Primitive, uniform_attributes, "uniform", uniform_structure.row_count());
 		/** \todo Calculate the varying size here */
 //		require_table_row_count(Primitive, varying_attributes, "varying", );
-		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
 		return new primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
 	}
