@@ -7,7 +7,7 @@
 		<primitives>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="constant">
+					<table type="shell">
 						<array name="shell_face_counts" type="k3d::uint_t">1</array>
 						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>

@@ -151,9 +151,9 @@ primitive* create(mesh::primitive& GenericPrimitive)
 	GenericPrimitive.attributes.clear();
 
 	primitive* const result = new primitive(
-		GenericPrimitive.structure["constant"].create<mesh::indices_t>("shell_first_faces"),
-		GenericPrimitive.structure["constant"].create<mesh::counts_t>("shell_face_counts"),
-		GenericPrimitive.structure["constant"].create<typed_array<int32_t> >("shell_types"),
+		GenericPrimitive.structure["shell"].create<mesh::indices_t>("shell_first_faces"),
+		GenericPrimitive.structure["shell"].create<mesh::counts_t>("shell_face_counts"),
+		GenericPrimitive.structure["shell"].create<typed_array<int32_t> >("shell_types"),
 		GenericPrimitive.structure["uniform"].create<mesh::indices_t>("face_first_loops"),
 		GenericPrimitive.structure["uniform"].create<mesh::counts_t>("face_loop_counts"),
 		GenericPrimitive.structure["uniform"].create<mesh::selection_t>("face_selections"),
@@ -422,7 +422,7 @@ const_primitive* validate(const mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Primitive);
 
-		const mesh::table_t& constant_structure = require_structure(Primitive, "constant");
+		const mesh::table_t& shell_structure = require_structure(Primitive, "shell");
 		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
 		const mesh::table_t& loop_structure = require_structure(Primitive, "loop");
 		const mesh::table_t& face_varying_structure = require_structure(Primitive, "face_varying");
@@ -432,9 +432,9 @@ const_primitive* validate(const mesh::primitive& Primitive)
 		const mesh::table_t& face_varying_attributes = require_attributes(Primitive, "face_varying");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		const mesh::indices_t& shell_first_faces = require_array<mesh::indices_t>(Primitive, constant_structure, "shell_first_faces");
-		const mesh::counts_t& shell_face_counts = require_array<mesh::counts_t>(Primitive, constant_structure, "shell_face_counts");
-		const typed_array<int32_t>& shell_types = require_array<typed_array<int32_t> >(Primitive, constant_structure, "shell_types");
+		const mesh::indices_t& shell_first_faces = require_array<mesh::indices_t>(Primitive, shell_structure, "shell_first_faces");
+		const mesh::counts_t& shell_face_counts = require_array<mesh::counts_t>(Primitive, shell_structure, "shell_face_counts");
+		const typed_array<int32_t>& shell_types = require_array<typed_array<int32_t> >(Primitive, shell_structure, "shell_types");
 		const mesh::indices_t& face_first_loops = require_array<mesh::indices_t>(Primitive, uniform_structure, "face_first_loops");
 		const mesh::counts_t& face_loop_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "face_loop_counts");
 		const mesh::selection_t& face_selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "face_selections");
@@ -501,7 +501,7 @@ primitive* validate(mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Primitive);
 
-		mesh::table_t& constant_structure = require_structure(Primitive, "constant");
+		mesh::table_t& shell_structure = require_structure(Primitive, "shell");
 		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
 		mesh::table_t& loop_structure = require_structure(Primitive, "loop");
 		mesh::table_t& face_varying_structure = require_structure(Primitive, "face_varying");
@@ -511,9 +511,9 @@ primitive* validate(mesh::primitive& Primitive)
 		mesh::table_t& face_varying_attributes = require_attributes(Primitive, "face_varying");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		mesh::indices_t& shell_first_faces = require_array<mesh::indices_t>(Primitive, constant_structure, "shell_first_faces");
-		mesh::counts_t& shell_face_counts = require_array<mesh::counts_t>(Primitive, constant_structure, "shell_face_counts");
-		typed_array<int32_t>& shell_types = require_array<typed_array<int32_t> >(Primitive, constant_structure, "shell_types");
+		mesh::indices_t& shell_first_faces = require_array<mesh::indices_t>(Primitive, shell_structure, "shell_first_faces");
+		mesh::counts_t& shell_face_counts = require_array<mesh::counts_t>(Primitive, shell_structure, "shell_face_counts");
+		typed_array<int32_t>& shell_types = require_array<typed_array<int32_t> >(Primitive, shell_structure, "shell_types");
 		mesh::indices_t& face_first_loops = require_array<mesh::indices_t>(Primitive, uniform_structure, "face_first_loops");
 		mesh::counts_t& face_loop_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "face_loop_counts");
 		mesh::selection_t& face_selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "face_selections");
