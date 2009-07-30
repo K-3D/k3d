@@ -53,6 +53,16 @@ static void delete_1(named_tables_wrapper& Self, const string_t& Name)
 	Self.wrapped().erase(Name);	
 }
 
+static list keys(named_tables_wrapper& Self)
+{
+	list results;
+
+	for(k3d::named_tables::const_iterator table = Self.wrapped().begin(); table != Self.wrapped().end(); ++table)
+		results.append(table->first);
+
+	return results;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // define_class_named_tables 
 
@@ -62,8 +72,8 @@ void define_class_named_tables()
 		.def("__len__", &utility::wrapped_len<named_tables_wrapper>)
 		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<named_tables_wrapper>)
 		.def("create", &named_tables_create)
-		.def("delete", &delete_1,
-			"Deletes a set of attribute arrays with the given name, if any.")
+		.def("delete", &delete_1, "Deletes a set of attribute arrays with the given name, if any.")
+		.def("keys", &keys, "Returns a list containing names for all the tables in the collection.")
 		;
 }
 
