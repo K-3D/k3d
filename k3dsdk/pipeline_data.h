@@ -25,6 +25,7 @@
 */
 
 #include <k3dsdk/log.h>
+#include <k3dsdk/result.h>
 #include <k3dsdk/types.h>
 
 #include <boost/shared_ptr.hpp>
@@ -80,6 +81,7 @@ public:
 
 	T& create(T* Instance)
 	{
+		assert_critical(Instance);
 		storage.reset(Instance);
 		originator = storage.get() ? true : false;
 		return *storage;
