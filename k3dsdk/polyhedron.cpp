@@ -831,8 +831,6 @@ class create_triangles :
 public:
 	mesh::primitive* process(const mesh& Input, const const_primitive& Polyhedron, mesh& Output)
 	{
-return 0;
-/*
 		// Allocate new data structures for our output ...
 		input_polyhedron = &Polyhedron;
 
@@ -881,7 +879,6 @@ return 0;
 		output_polyhedron->shell_types.push_back(POLYGONS);
 
 		return result;
-*/
 	}
 	
 private:
@@ -897,7 +894,7 @@ private:
 		output_points->push_back(Coordinates);
 		output_point_selection->push_back(0.0);
 
-		vertex_attributes_copier->push_back(4, Vertices, Weights);
+		point_attributes_copier->push_back(4, Vertices, Weights);
 
 		new_face_varying_attributes[NewVertex] = new_face_varying_record(Edges, Weights);
 	}
@@ -970,7 +967,7 @@ private:
 
 	boost::shared_ptr<table_copier> uniform_attributes_copier;
 	boost::shared_ptr<table_copier> face_varying_attributes_copier;
-	boost::shared_ptr<table_copier> vertex_attributes_copier;
+	boost::shared_ptr<table_copier> point_attributes_copier;
 
 	uint_t current_face;
 
@@ -991,7 +988,7 @@ private:
 	};
 
 	std::map<uint_t, new_face_varying_record> new_face_varying_attributes;
-}; // class create_triangles
+};
 
 } // namespace detail
 
