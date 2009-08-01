@@ -23,7 +23,6 @@
 
 #include "nurbs_patch_modifier.h"
 
-#include <k3dsdk/table_copier.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
@@ -39,6 +38,7 @@
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/point3.h>
 #include <k3dsdk/selection.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -213,7 +213,6 @@ void add_patch(k3d::mesh& Mesh,
 	NurbsPatches.patch_v_orders.push_back(VOrder);
 	NurbsPatches.patch_u_point_counts.push_back(UKnots.size() - UOrder);
 	NurbsPatches.patch_v_point_counts.push_back(VKnots.size() - VOrder);
-	NurbsPatches.patch_materials.push_back(0);
 	NurbsPatches.patch_trim_loop_counts.push_back(0);
 	NurbsPatches.patch_first_trim_loops.push_back(0);
 	NurbsPatches.patch_point_weights.insert(NurbsPatches.patch_point_weights.end(), Weights.begin(), Weights.end());
@@ -267,7 +266,7 @@ void create_cap(k3d::mesh& Mesh, k3d::nurbs_patch::primitive& Patches, const k3d
 }
 
 /// Traverse each selected curve in SourceCurves along each selected curve in CurvesToTraverse
-void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTraverse, k3d::nurbs_patch::primitive& OutputPatches, k3d::mesh& OutputMesh, const k3d::bool_t CreateCaps)
+void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTraverse, k3d::mesh& OutputMesh, const k3d::bool_t CreateCaps)
 {
 	k3d::uint_t source_prim_idx = 0;
 	for(k3d::mesh::primitives_t::const_iterator primitive = SourceCurves.primitives.begin(); primitive != SourceCurves.primitives.end(); ++primitive)
@@ -275,6 +274,10 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> source_curves(k3d::nurbs_curve::validate(**primitive));
 		if(!source_curves)
 			continue;
+
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> output_patches(k3d::nurbs_patch::create(OutputMesh));
+		output_patches->uniform_attributes = source_curves->uniform_attributes.clone_types();
+		k3d::table_copier uniform_copier(source_curves->uniform_attributes, output_patches->uniform_attributes);
 
 		// Get the loops that exist in the source_curves primitive
 		k3d::mesh::bools_t is_in_loop, loop_selections;
@@ -341,14 +344,18 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 							new_weights.push_back(w_u * w_v);
 						}
 					}
-					add_patch(OutputMesh, OutputPatches, new_points, new_weights, u_knots, v_knots, source_curves->curve_orders[source_curve], curves_to_traverse->curve_orders[curve_to_traverse]);
+					add_patch(OutputMesh, *output_patches, new_points, new_weights, u_knots, v_knots, source_curves->curve_orders[source_curve], curves_to_traverse->curve_orders[curve_to_traverse]);
+					uniform_copier.push_back(source_curve);
+					output_patches->patch_materials.push_back(source_curves->material[0]);
 					if(CreateCaps)
 					{
 						if(is_in_loop[source_curve] && loop_selections[curve_loops[source_curve]])
 						{
 							const k3d::point3& centroid = loop_centroids[curve_loops[source_curve]];
 							// Cap over the original curve
-							detail::create_cap(OutputMesh, OutputPatches, *SourceCurves.points, *source_curves, source_curve, centroid);
+							detail::create_cap(OutputMesh, *output_patches, *SourceCurves.points, *source_curves, source_curve, centroid);
+							uniform_copier.push_back(source_curve);
+							output_patches->patch_materials.push_back(source_curves->material[0]);
 
 							// Cap over the opposite curve
 							k3d::mesh tempmesh(SourceCurves);
@@ -369,7 +376,9 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 							}
 
 							boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_tempcurve(k3d::nurbs_curve::validate(*tempmesh.primitives[source_prim_idx]));
-							detail::create_cap(OutputMesh, OutputPatches, temp_points, *const_tempcurve, source_curve, centroid + delta_u);
+							detail::create_cap(OutputMesh, *output_patches, temp_points, *const_tempcurve, source_curve, centroid + delta_u);
+							uniform_copier.push_back(source_curve);
+							output_patches->patch_materials.push_back(source_curves->material[0]);
 						}
 					}
 				}
@@ -481,6 +490,8 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
+		k3d::mesh input_with_selections = Input;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), input_with_selections);
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		double distance = m_distance.pipeline_value();
@@ -513,9 +524,7 @@ public:
 		extrusion_vector_primitive->curve_selections[0] = 1.0;
 		extrusion_vector_primitive->material.push_back(0);
 
-		boost::scoped_ptr<k3d::nurbs_patch::primitive> output_patch(k3d::nurbs_patch::create(Output));
-
-		detail::traverse_curve(Output, extrusion_vector_mesh, *output_patch, Output, m_cap.pipeline_value());
+		detail::traverse_curve(input_with_selections, extrusion_vector_mesh, Output, m_cap.pipeline_value());
 
 		if(m_delete_original.pipeline_value())
 		{
