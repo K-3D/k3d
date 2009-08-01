@@ -71,7 +71,7 @@ ADD_LIBRARY(k3dsdk-python-values SHARED
 K3D_GENERATE_DEF_FILE(k3dsdk-python-values)
 TARGET_LINK_LIBRARIES(k3dsdk-python-values k3dsdk)
 TARGET_LINK_LIBRARIES(k3dsdk-python-values ${K3D_BOOST_PYTHON_LIBS})
-TARGET_LINK_LIBRARIES(k3dsdk-python-values ${PYTHON_LIBRARIES})
+TARGET_LINK_LIBRARIES(k3dsdk-python-values ${K3D_PYTHON_LIBS})
 
 ADD_LIBRARY(k3dsdk-python-mesh SHARED
 	mesh_python.cpp

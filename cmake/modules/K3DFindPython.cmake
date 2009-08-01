@@ -7,36 +7,37 @@ IF(APPLE)
 
 	IF(PYTHON_EXECUTABLE)
 		EXECUTE_PROCESS(
-			COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print sys.prefix + '/include/python' + sys.version[:3]"
+			COMMAND ${PYTHON_EXECUTABLE} -c "import sys; sys.stdout.write(sys.prefix + '/include/python' + sys.version[:3])"
 			OUTPUT_VARIABLE PYTHON_INCLUDE_PATH
 			)
 		EXECUTE_PROCESS(
-			COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print sys.exec_prefix + '/Python'"
+			COMMAND ${PYTHON_EXECUTABLE} -c "import sys; sys.stdout.write(sys.exec_prefix + '/Python')"
 			OUTPUT_VARIABLE PYTHON_LIBRARY
 			)
 
 		SET(K3D_PYTHON_INCLUDE_PATH
-			${PYTHON_INCLUDE_PATH}
-			CACHE PATH "Path to the Python header files."
+			${PYTHON_INCLUDE_PATH} CACHE PATH "Path to the directory containg Python header files."
 			)
 
 		SET(K3D_PYTHON_LIBRARY
-			${PYTHON_LIBRARY}
-			CACHE FILEPATH "Path to the Python library."
-			)
-
-		SET(K3D_PYTHON_INCLUDE_DIRS
-			${K3D_PYTHON_INCLUDE_PATH}
-			)
-
-		SET(K3D_PYTHON_LIBS
-			${K3D_PYTHON_LIBRARY}
+			${PYTHON_LIBRARY} CACHE FILEPATH "Path to the Python link library."
 			)
 
 		MARK_AS_ADVANCED(K3D_PYTHON_INCLUDE_PATH)
 		MARK_AS_ADVANCED(K3D_PYTHON_LIBRARY)
+		MARK_AS_ADVANCED(PYTHON_EXECUTABLE)
 
-		SET(K3D_PYTHON_FOUND 1)
+		IF(K3D_PYTHON_INCLUDE_PATH AND K3D_PYTHON_LIBRARY)
+			SET(K3D_PYTHON_INCLUDE_DIRS
+				${K3D_PYTHON_INCLUDE_PATH}
+				)
+
+			SET(K3D_PYTHON_LIBS
+				${K3D_PYTHON_LIBRARY}
+				)
+
+			SET(K3D_PYTHON_FOUND 1)
+		ENDIF()
 	ENDIF()
 ELSE(APPLE)
 	INCLUDE(FindPythonLibs)
@@ -50,7 +51,6 @@ ELSE(APPLE)
 			${PYTHON_LIBRARY}
 			)
 
-MESSAGE("BAR")
 		MARK_AS_ADVANCED(PYTHON_INCLUDE_PATH)
 		MARK_AS_ADVANCED(PYTHON_LIBRARY)
 		MARK_AS_ADVANCED(PYTHON_DEBUG_LIBRARIES)
