@@ -12,7 +12,7 @@ points = mesh.create_points()
 point_selection = mesh.create_point_selection()
 
 polyhedron = k3d.polyhedron.create(mesh)
-Cs = polyhedron.face_varying_data().create("Cs", "k3d::color")
+Cs = polyhedron.face_varying_attributes().create("Cs", "k3d::color")
 
 positions = [(0, 0, 1), (1, 0, 1), (2, 0, 0), (2, 0, 1), (1, 0, 0), (0, 0, 0)]
 for position in positions:
