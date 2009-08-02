@@ -136,13 +136,6 @@ JAVADOC_AUTOBRIEF      = NO
 
 MULTILINE_CPP_IS_BRIEF = NO
 
-# If the DETAILS_AT_TOP tag is set to YES then Doxygen 
-# will output the detailed description near the top, like JavaDoc.
-# If set to NO, the detailed description appears after the member 
-# documentation.
-
-DETAILS_AT_TOP         = NO
-
 # If the INHERIT_DOCS tag is set to YES (the default) then an undocumented 
 # member inherits the documentation from any documented member that it 
 # re-implements.
@@ -415,8 +408,7 @@ INPUT                  = @k3d_SOURCE_DIR@
 # *.c *.cc *.cxx *.cpp *.c++ *.java *.ii *.ixx *.ipp *.i++ *.inl *.h *.hh *.hxx *.hpp 
 # *.h++ *.idl *.odl *.cs *.php *.php3 *.inc *.m *.mm
 
-FILE_PATTERNS          = *.h \
-                         *.cpp
+FILE_PATTERNS          = 
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories 
 # should be searched for input files as well. Possible values are YES and NO. 
@@ -428,9 +420,14 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                =	@k3d_SOURCE_DIR@/po \
+EXCLUDE                =	@k3d_SOURCE_DIR@/.hg \
+				@k3d_SOURCE_DIR@/k3dsdk/ftgl \
+				@k3d_SOURCE_DIR@/k3dsdk/gil \
 				@k3d_SOURCE_DIR@/k3dsdk/glew \
 				@k3d_SOURCE_DIR@/k3dsdk/gmm \
+				@k3d_SOURCE_DIR@/k3dsdk/Half \
+				@k3d_SOURCE_DIR@/k3dsdk/tests \
+				@k3d_SOURCE_DIR@/po \
 				@k3d_SOURCE_DIR@/share
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or directories 
@@ -442,7 +439,7 @@ EXCLUDE_SYMLINKS       = NO
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude 
 # certain files from those directories.
 
-EXCLUDE_PATTERNS       =
+EXCLUDE_PATTERNS       = @k3d_SOURCE_DIR@/modules/qslim/Mx*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
