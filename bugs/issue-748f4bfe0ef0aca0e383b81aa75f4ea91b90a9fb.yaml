@@ -3,7 +3,7 @@ title: Use the solar position data in other parts of the pipeline.
 desc: A means of connecting a Sun Position (Vector3 ?) to a Matrix (rotation in particular) so I can point things at the sun, or calculate a building's roof overhang by intersecting a line along a vector from the base of it's wall to the sun, with another line from the top of the wall.  e.g. say I want to let the (mid day) winter/fall sun into the windows of my house from a given date onwards, I need to plot the height of the sun at that time. Having what we know about the sun drive the geometry of the building is the key to energy efficient solar oriented design.
 type: :feature
 component: K-3D
-release: 
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -19,4 +19,8 @@ log_events:
 - - 2009-06-27 15:32:43.574722 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - edited title, description
+  - ""
+- - 2009-08-02 22:47:03.999068 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from unassigned
   - ""

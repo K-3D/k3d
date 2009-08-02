@@ -11,7 +11,7 @@ desc: |-
   3. Click on Modify|Mesh|CatmullClark
 type: :bugfix
 component: K-3D
-release: 
+release: 0.8.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -23,4 +23,8 @@ log_events:
 - - 2009-05-19 03:29:42.536589 Z
   - Beverly L. Shead <bshead@k-3d.com>
   - created
+  - ""
+- - 2009-08-02 22:52:21.471071 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.0.0 from unassigned
   - ""

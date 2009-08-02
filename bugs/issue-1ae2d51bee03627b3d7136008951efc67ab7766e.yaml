@@ -9,7 +9,7 @@ desc: |-
   it's orientation.
 type: :feature
 component: K-3D
-release: 
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -21,4 +21,8 @@ log_events:
 - - 2009-06-27 15:33:52.232586 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2009-08-02 22:46:56.006937 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from unassigned
   - ""

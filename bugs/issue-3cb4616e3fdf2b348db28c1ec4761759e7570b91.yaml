@@ -177,7 +177,7 @@ desc: |-
   makemakemakemakemakemakemakemakemakemakemakemakemakemakemakemakemamake: *** [check-recursive] Error 1
 type: :bugfix
 component: K-3D
-release: 
+release: 0.8.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -189,4 +189,8 @@ log_events:
 - - 2009-05-19 03:47:18.928081 Z
   - Beverly L. Shead <bshead@k-3d.com>
   - created
+  - ""
+- - 2009-08-02 22:49:12.119165 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.0.0 from unassigned
   - ""
