@@ -24,6 +24,8 @@
 	\author Bart Janssens
 */
 
+#include <k3dsdk/types.h>
+
 #include "instance_wrapper_python.h"
 #include <atk/atk.h>
 
