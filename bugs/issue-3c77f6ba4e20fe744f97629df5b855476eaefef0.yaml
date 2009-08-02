@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Separate cuda bitmap functionality from cuda mesh functionality that doesn't build.
+desc: In theory, the bitmap stuff works fine, just needs to be moved into a separate module.
+type: :bugfix
+component: K-3D
+release: 1.0.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-02 21:19:56.399190 Z
+references: []
+
+id: 3c77f6ba4e20fe744f97629df5b855476eaefef0
+log_events: 
+- - 2009-08-02 21:19:56.895141 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
