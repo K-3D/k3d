@@ -20,14 +20,14 @@
 #include "atk_python.h"
 #include "utility_python.h"
 
+#include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/result.h>
+#include <k3dsdk/user_interface.h>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/range_c.hpp>
 #include <boost/python.hpp>
-
-#include <k3dsdk/type_registry.h> // for demangle
 
 using namespace boost::python;
 
@@ -70,7 +70,9 @@ k3d::bool_t do_named_action(atk_object_wrapper& Self, const k3d::string_t& Actio
 	AtkAction* action = ATK_ACTION(atk_object);
 	k3d::int32_t action_idx = action_index(action, ActionName);
 	return_val_if_fail(action_idx > -1, false);
-	return atk_action_do_action(action, action_idx);
+	k3d::bool_t result = atk_action_do_action(action, action_idx);
+	k3d::user_interface().synchronize();
+	return result;
 }
 
 /// Proxy for click action
