@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Rubber band selection not visible on OSX.
+desc: It seems that graphic XOR operations just aren't available on OSX at all, we likely have to completely revisit how we render rubber-band selections.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-03 14:52:24.626335 Z
+references: []
+
+id: c3ec9bb8e635c2592d8ee6f80f29b56e939c7be4
+log_events: 
+- - 2009-08-03 14:52:25.403251 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
