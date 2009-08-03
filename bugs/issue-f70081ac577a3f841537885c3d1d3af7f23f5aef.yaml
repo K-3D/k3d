@@ -12,8 +12,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :wontfix
 creation_time: 2009-05-06 03:54:28.096410 Z
 references: []
 
@@ -27,3 +27,7 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 0.8.0.0 from unassigned
   - ""
+- - 2009-08-03 00:16:14.526852 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition wontfix
+  - Can't find anyplace in the code where there's a hard-coded path as described by the OP.  Either it's already cleaned-up, or some other issue.

@@ -8,7 +8,7 @@ desc: |-
   leiget at gmail
 type: :bugfix
 component: K-3D
-release: 0.8.0.0
+release: 1.0.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -24,4 +24,8 @@ log_events:
 - - 2009-08-02 22:52:04.559088 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 0.8.0.0 from unassigned
+  - ""
+- - 2009-08-03 00:23:56.838746 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
   - ""
