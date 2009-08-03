@@ -26,8 +26,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-05-07 04:10:55.493673 Z
 references: []
 
@@ -41,3 +41,7 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 0.8.0.0 from unassigned
   - ""
+- - 2009-08-03 03:58:53.103151 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - Should be fixed in mercurial.

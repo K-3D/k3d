@@ -31,8 +31,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :reorg
 creation_time: 2009-05-06 04:04:37.984268 Z
 references: []
 
@@ -46,3 +46,7 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 0.8.0.0 from unassigned
   - ""
+- - 2009-08-03 03:48:25.623078 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition reorg
+  - This may be a duplicate of {issue da8965ea23097589e5b98a3b8c42580329dad12c}.
