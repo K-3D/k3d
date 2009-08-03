@@ -129,7 +129,6 @@ public:
 			"      <menuitem action='save'/>"
 			"      <menuitem action='save_as'/>"
 			"      <menuitem action='revert'/>"
-			"      <menuitem action='commit'/>"
 			"      <separator/>"
 			"      <menuitem action='close'/>"
 			"    </menu>"
