@@ -23,41 +23,30 @@
 namespace k3d
 {
 
-void require_valid_primitive(const mesh::primitive& Primitive)
+static void require_valid_table(const string_t& Name, const table& Table)
+{
+	if(Name == "constant" && Table.column_count() && Table.row_count() != 1)
+		throw std::runtime_error("'constant' table must have length 1.");
+
+	for(mesh::table_t::const_iterator array_iterator = Table.begin(); array_iterator != Table.end(); ++array_iterator)
+	{
+		const array* const current_array = array_iterator->second.get();
+		if(!current_array)
+			throw std::runtime_error("NULL table array.");
+
+		const array* const first_array = Table.begin()->second.get();
+		if(current_array->size() != first_array->size())
+			throw std::runtime_error("Table array length mismatch.");
+	}
+}
+
+void require_valid_primitive(/*const mesh& Mesh, */const mesh::primitive& Primitive)
 {
 	for(mesh::named_tables_t::const_iterator structure = Primitive.structure.begin(); structure != Primitive.structure.end(); ++structure)
-	{
-		if(structure->first == "constant" && structure->second.column_count() && structure->second.row_count() != 1)
-			throw std::runtime_error("'constant' structure must have length 1.");
-
-		for(mesh::table_t::const_iterator array_iterator = structure->second.begin(); array_iterator != structure->second.end(); ++array_iterator)
-		{
-			const array* const current_array = array_iterator->second.get();
-			if(!current_array)
-				throw std::runtime_error("NULL structure array.");
-
-			const array* const first_array = structure->second.begin()->second.get();
-			if(current_array->size() != first_array->size())
-				throw std::runtime_error("Structure array length mismatch.");
-		}
-	}
+		require_valid_table(structure->first, structure->second);
 
 	for(mesh::named_tables_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
-	{
-		if(attributes->first == "constant" && attributes->second.column_count() && attributes->second.row_count() != 1)
-			throw std::runtime_error("'constant' attributes must have length 1.");
-
-		for(mesh::table_t::const_iterator array_iterator = attributes->second.begin(); array_iterator != attributes->second.end(); ++array_iterator)
-		{
-			const array* const current_array = array_iterator->second.get();
-			if(!current_array)
-				throw std::runtime_error("NULL attributes array.");
-
-			const array* const first_array = attributes->second.begin()->second.get();
-			if(current_array->size() != first_array->size())
-				throw std::runtime_error("Attribute array length mismatch.");
-		}
-	}
+		require_valid_table(attributes->first, attributes->second);
 
 	for(mesh::named_tables_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
 	{

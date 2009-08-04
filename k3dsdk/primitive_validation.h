@@ -34,9 +34,12 @@ namespace k3d
 
 /// Performs automated validation of the structure of a mesh primitive:
 ///
-/// 1. Validates that matching structure and attribute tables contain the same number of rows.
-/// 2. Validates that every array in a given table is the same length.
-void require_valid_primitive(const mesh::primitive& Primitive);
+/// * Validates that "constant" tables have length 1.
+/// * Validates that the mesh has point data if the primitive contains point indices.
+/// * Validates that primitive point indices are within bounds.
+/// * Validates that every array in a given table is the same length.
+/// * Validates that matching structure and attribute tables contain the same number of rows.
+void require_valid_primitive(/*const mesh& Mesh,*/ const mesh::primitive& Primitive);
 
 /// Tests a primitive to verify that it contains the named structure table, throws an exception otherwise.
 const mesh::table_t& require_structure(const mesh::primitive& Primitive, const string_t& Name);
