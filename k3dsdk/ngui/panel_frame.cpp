@@ -163,6 +163,7 @@ void control::grab_panel_focus()
 
 void control::mount_panel(panel::control& Panel, const k3d::string_t& Type)
 {
+	get_accessible()->set_name(Type);
 	unmount();
 
 	m_grab_focus_connection = Panel.connect_focus_signal(sigc::mem_fun(*this, &control::on_grab_focus));
@@ -175,6 +176,7 @@ void control::mount_panel(panel::control& Panel, const k3d::string_t& Type)
 
 void control::mount_panel(const k3d::string_t& Type, bool RequestCamera)
 {
+	get_accessible()->set_name(Type);
 	if("NGUIViewportPanel" == Type)
 	{
 		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_viewport>(m_document_state.document().nodes());

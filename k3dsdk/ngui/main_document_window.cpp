@@ -243,6 +243,7 @@ public:
 		m_document_state.clear_cursor_signal().connect(sigc::mem_fun(*this, &main_document_window::on_clear_cursor));
 
 		Gtk::MenuBar* const menubar = new Gtk::MenuBar();
+		menubar->get_accessible()->set_name("main");
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_File"), *manage(create_file_menu())));
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Edit"), *manage(create_edit_menu())));
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Select"), *manage(create_select_menu())));
@@ -256,10 +257,12 @@ public:
 		menubar->items().push_back(Gtk::Menu_Helpers::MenuElem(_("_Help"), *manage(create_help_menu())));
 		menubar->show_all();
 
+		m_panel_frame.get_accessible()->set_name("main");
 		m_panel_frame.show_all();
 
 		// Setup main box with menubar, panel frame and status bar
 		Gtk::VBox* const vbox1 = new Gtk::VBox(false);
+		vbox1->get_accessible()->set_name("vbox");
 		vbox1->pack_start(*Gtk::manage(menubar), Gtk::PACK_SHRINK);
 		vbox1->pack_start(m_panel_frame, Gtk::PACK_EXPAND_WIDGET);
 //		vbox1->pack_start(*Gtk::manage(hbox1), Gtk::PACK_SHRINK);
@@ -368,6 +371,7 @@ public:
 		if(glengine1 && camera1)
 		{
 			viewport::control* const control = new viewport::control(m_document_state);
+			control->get_accessible()->set_name("viewport");
 			control->set_camera(camera1);
 			control->set_gl_engine(glengine1);
 			panel_frame4->mount_panel(*Gtk::manage(control), "NGUIViewportPanel");
@@ -1924,6 +1928,7 @@ private:
 	{
 		if(Panel.get_parent() == &m_panel_frame)
 		{
+			NewPaned.get_accessible()->set_name(Panel.get_parent()->get_accessible()->get_name());
 			// Move Panel inside NewPaned
 			Panel.reparent(NewPaned);
 			// Replace Panel with NewPaned
@@ -1935,18 +1940,28 @@ private:
 			Gtk::Paned* const parent_paned = dynamic_cast<Gtk::Paned*>(Panel.get_parent());
 			return_val_if_fail(parent_paned, 0);
 
+			const k3d::bool_t horizontal = dynamic_cast<Gtk::HPaned*>(parent_paned) ? true : false;
+
 			// Move Panel inside NewPaned, and put NewPaned instead
 			if(parent_paned->get_child1() == &Panel)
 			{
 				// Panel is parent_paned's child 1
 				Panel.reparent(NewPaned);
 				parent_paned->pack1(NewPaned, Gtk::EXPAND);
+				if(horizontal)
+					NewPaned.get_accessible()->set_name("left");
+				else
+					NewPaned.get_accessible()->set_name("top");
 			}
 			else
 			{
 				// Panel is parent_paned's child 2
 				Panel.reparent(NewPaned);
 				parent_paned->pack2(NewPaned, Gtk::EXPAND);
+				if(horizontal)
+					NewPaned.get_accessible()->set_name("right");
+				else
+					NewPaned.get_accessible()->set_name("bottom");
 			}
 		}
 
@@ -2485,7 +2500,9 @@ private:
 
 	void on_document_title_changed(k3d::iunknown*)
 	{
-		set_title(boost::any_cast<k3d::ustring>(document().title().property_internal_value()).raw() + " - K-3D");
+		k3d::ustring doctitle = boost::any_cast<k3d::ustring>(document().title().property_internal_value());
+		set_title(doctitle.raw() + " - K-3D");
+		get_accessible()->set_name(doctitle.raw());
 	}
 
 	void on_panel_focus_changed(panel_frame::control* Panel)
