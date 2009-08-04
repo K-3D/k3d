@@ -49,6 +49,7 @@
 #include <gtkmm/stock.h>
 #include <gtkmm/textbuffer.h>
 #include <gtkmm/textview.h>
+#include <gtkmm/toggleaction.h>
 #include <gtkmm/uimanager.h>
 
 #include <gtk/gtk.h>
@@ -101,6 +102,7 @@ public:
 	dialog() : m_document(0),
 		m_running(false),
 		m_saving(false),
+		m_recording(false),
 		m_view(new Gtk::TextView())
 	{
 		// Set up the UI
@@ -109,6 +111,7 @@ public:
 		m_actions->add(Gtk::Action::create("file", _("_File")));
 		m_actions->add(Gtk::Action::create("new", Gtk::Stock::NEW), sigc::mem_fun(*this, &dialog::on_new));
 		m_actions->add(Gtk::Action::create("open", Gtk::Stock::OPEN), sigc::mem_fun(*this, &dialog::on_open));
+		m_actions->add(Gtk::ToggleAction::create("record", Gtk::Stock::MEDIA_RECORD, _("Record"), _("Toggle the recording of actions"), false), sigc::mem_fun(*this, &dialog::on_record_toggle));
 		m_actions->add(Gtk::Action::create("save", Gtk::Stock::SAVE), sigc::mem_fun(*this, &dialog::on_save));
 		m_actions->add(Gtk::Action::create("save_as", Gtk::Stock::SAVE_AS), sigc::hide_return(sigc::mem_fun(*this, &dialog::on_save_as)));
 		m_actions->add(Gtk::Action::create("revert", Gtk::Stock::REVERT_TO_SAVED), sigc::mem_fun(*this, &dialog::on_revert));
@@ -126,6 +129,7 @@ public:
 			"    <menu action='file'>"
 			"      <menuitem action='new'/>"
 			"      <menuitem action='open'/>"
+			"      <menuitem action='record'/>"
 			"      <menuitem action='save'/>"
 			"      <menuitem action='save_as'/>"
 			"      <menuitem action='revert'/>"
@@ -140,9 +144,9 @@ public:
 			"    <toolitem action='new'/>"
 			"    <toolitem action='open'/>"
 			"    <toolitem action='save'/>"
-			"    <toolitem action='commit'/>"
 			"    <separator/>"
 			"    <toolitem action='execute'/>"
+			"    <toolitem action='record'/>"
 			"  </toolbar>"
 			"</ui>"
 			);
@@ -244,6 +248,11 @@ public:
 
 		set_text(filepath);
 		set_path(filepath);
+	}
+
+	void on_record_toggle()
+	{
+		m_recording = !m_recording;
 	}
 
 	void on_save()
@@ -427,6 +436,8 @@ private:
 
 	void on_action_recorded(click_trace_t& Trace, const k3d::string_t& ActionName)
 	{
+		if(!m_recording)
+			return;
 		if(Trace.empty())
 			return;
 		if(m_running)
@@ -457,7 +468,7 @@ private:
 	/// (Optional) file path source for the current text (could be empty)
 	k3d::filesystem::path m_path;
 	/// Set to true iff script playback is in progress
-	bool m_running, m_saving;
+	bool m_running, m_saving, m_recording;
 
 	// Menu items
 	Glib::RefPtr<Gtk::ActionGroup> m_actions;
