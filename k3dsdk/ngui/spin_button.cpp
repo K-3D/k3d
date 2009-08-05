@@ -298,6 +298,11 @@ void control::setup_arrow_button(Gtk::Button* Button, const Gtk::ArrowType Arrow
 	Button->signal_pressed().connect(sigc::bind(sigc::mem_fun(*this, &control::on_drag_pressed), Up));
 	Button->signal_released().connect(sigc::mem_fun(*this, &control::on_drag_released));
 
+	if(Up)
+		Button->signal_clicked().connect(sigc::mem_fun(*this, &control::increment));
+	else
+		Button->signal_clicked().connect(sigc::mem_fun(*this, &control::decrement));
+
 	Button->add_events(Gdk::BUTTON_MOTION_MASK | Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK);
 	Button->signal_motion_notify_event().connect(sigc::mem_fun(*this, &control::on_drag_motion_notify_event));
 	Button->signal_key_press_event().connect(sigc::mem_fun(*this, &control::on_drag_key_press_event));
@@ -531,25 +536,6 @@ bool control::on_drag_timeout()
 
 void control::on_drag_released()
 {
-	// If the user really didn't drag anywhere and value wasn't changed yet
-	if(m_implementation->m_dragging)
-	{
-	}
-	else if(!m_implementation->m_dragging && m_implementation->m_drag_first_timeout)
-	{
-		if(m_implementation->m_up_button_pressed)
-		{
-			increment();
-		}
-		else
-		{
-			decrement();
-		}
-	}
-	else
-	{
-	}
-
 	// Disconnect idle timeout
 	m_implementation->m_drag_timeout.disconnect();
 
