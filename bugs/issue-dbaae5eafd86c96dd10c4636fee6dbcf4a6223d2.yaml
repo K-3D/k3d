@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Paint-deselection broken.
+desc: Although paint *selection* works, paint *deselection* seems to be broken.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-03 15:28:25.625127 Z
+references: []
+
+id: dbaae5eafd86c96dd10c4636fee6dbcf4a6223d2
+log_events: 
+- - 2009-08-03 15:28:26.945147 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""

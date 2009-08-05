@@ -177,10 +177,10 @@ desc: |-
   makemakemakemakemakemakemakemakemakemakemakemakemakemakemakemakemamake: *** [check-recursive] Error 1
 type: :bugfix
 component: K-3D
-release: 
+release: 0.8.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :wontfix
 creation_time: 2009-05-19 03:47:18.127477 Z
 references: []
 
@@ -190,3 +190,11 @@ log_events:
   - Beverly L. Shead <bshead@k-3d.com>
   - created
   - ""
+- - 2009-08-02 22:49:12.119165 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.0.0 from unassigned
+  - ""
+- - 2009-08-03 03:37:46.415099 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition wontfix
+  - From the OP, 'make check' implies a really out-of-date version of K-3D.

@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Fix (non-VBO) SDS painter.
+desc: ""
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-02 21:17:24.375092 Z
+references: []
+
+id: 8e23f26186d044718dee4d0c597684d194ebb3ab
+log_events: 
+- - 2009-08-02 21:17:25.359020 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""

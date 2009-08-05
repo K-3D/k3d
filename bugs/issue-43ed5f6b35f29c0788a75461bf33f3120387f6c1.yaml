@@ -10,7 +10,7 @@ desc: |-
   similar to your design of K-3D's architecture.
 type: :feature
 component: K-3D
-release: 
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -22,4 +22,8 @@ log_events:
 - - 2009-06-27 15:35:20.466978 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2009-08-02 22:46:45.047080 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from unassigned
   - ""

@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Edge selection broken.
+desc: Currently, interactive selection of polyhedron edges does nothing.  Point and face selection still seem to work fine.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-03 03:25:39.263237 Z
+references: []
+
+id: c88402eb19c30deba7254e8583c5554e169b4ee2
+log_events: 
+- - 2009-08-03 03:25:39.807127 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""

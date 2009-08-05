@@ -12,7 +12,7 @@ desc: |-
   geometry instancing.
 type: :feature
 component: K-3D
-release: 
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -24,4 +24,8 @@ log_events:
 - - 2009-07-14 03:55:01.277314 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2009-08-02 22:46:31.191045 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from unassigned
   - ""

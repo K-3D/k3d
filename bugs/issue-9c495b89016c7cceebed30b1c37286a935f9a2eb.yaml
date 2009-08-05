@@ -3,7 +3,7 @@ title: Update regression tests to use CMake labels
 desc: Recent versions of CMake allow assignment of user-defined labels to tests, and filtering of tests based on those labels.  Update the current tests to use labels for categorization so we don't have to rely on test names for running categories of tests.
 type: :task
 component: K-3D
-release: 
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,12 @@ log_events:
 - - 2009-05-17 06:02:46.135798 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2009-08-02 22:52:15.703064 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.0.0 from unassigned
+  - ""
+- - 2009-08-03 00:36:21.503067 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
   - ""

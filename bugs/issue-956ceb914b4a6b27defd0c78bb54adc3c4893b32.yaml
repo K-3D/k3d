@@ -3,7 +3,7 @@ title: Create a test to validate copyright notices.
 desc: ""
 type: :task
 component: K-3D
-release: 
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,12 @@ log_events:
 - - 2009-05-08 21:50:28.887157 Z
   - Beverly L. Shead <bshead@k-3d.com>
   - created
+  - ""
+- - 2009-08-02 22:52:15.262689 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.0.0 from unassigned
+  - ""
+- - 2009-08-03 00:36:10.495025 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
   - ""

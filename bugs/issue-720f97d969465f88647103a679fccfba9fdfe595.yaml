@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Interactive node selection doesn't update node properties panel.
+desc: When selecting nodes interactively, the node properties panel no longer updates to display properties for the selected node.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-03 15:29:18.385155 Z
+references: []
+
+id: 720f97d969465f88647103a679fccfba9fdfe595
+log_events: 
+- - 2009-08-03 15:29:19.233178 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
