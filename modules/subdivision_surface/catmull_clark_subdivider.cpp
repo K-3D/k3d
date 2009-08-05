@@ -67,7 +67,7 @@ public:
 		const k3d::uint_t level = m_level.pipeline_value();
 		for(k3d::mesh::primitives_t::const_iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Output, **primitive));
 			if(!polyhedron.get())
 				continue;
 			m_subdividers[primitive->get()].set_levels(level);
@@ -81,10 +81,10 @@ public:
 		k3d::mesh::primitives_t::const_iterator input_primitive = Input.primitives.begin();
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
 			if(!polyhedron.get())
 				continue;
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(**input_primitive));
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input, **input_primitive));
 			polyhedron->face_selections = input_polyhedron->face_selections;
 			++input_primitive;
 		}
@@ -92,7 +92,7 @@ public:
 		Output.points = Input.points;
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
 			if(!polyhedron.get())
 				continue;
 			m_subdividers[primitive->get()].update_mesh(*Output.points, *polyhedron, Output.point_attributes, polyhedron->face_selections, this);

@@ -90,7 +90,7 @@ public:
 			k3d::geometry::point_selection::append(Storage.wrapped(), Begin, End, Weight);
 		}
 
-		static void merge(const_storage::wrapper& Storage, python::mesh& Mesh)
+		static void merge(const_storage::wrapper& Storage, mesh_wrapper& Mesh)
 		{
 			k3d::geometry::point_selection::merge(Storage.wrapped(), Mesh.wrapped());
 		}
@@ -174,7 +174,7 @@ public:
 			k3d::geometry::primitive_selection::append(Storage.wrapped(), Weight);
 		}
 
-		static void merge(const_storage::wrapper& Storage, python::mesh& Mesh)
+		static void merge(const_storage::wrapper& Storage, mesh_wrapper& Mesh)
 		{
 			k3d::geometry::primitive_selection::merge(Storage.wrapped(), Mesh.wrapped());
 		}

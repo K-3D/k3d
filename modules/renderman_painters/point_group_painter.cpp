@@ -68,7 +68,7 @@ public:
 
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::point_group::const_primitive> point_group(k3d::point_group::validate(**primitive));
+			boost::scoped_ptr<k3d::point_group::const_primitive> point_group(k3d::point_group::validate(Mesh, **primitive));
 			if(!point_group)
 				continue;
 

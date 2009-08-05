@@ -116,14 +116,14 @@ primitive* create(mesh& Mesh)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-const_primitive* validate(const mesh::primitive& Primitive)
+const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 {
 	if(Primitive.type != "cubic_curve")
 		return 0;
 
 	try
 	{
-		require_valid_primitive(Primitive);
+		require_valid_primitive(Mesh, Primitive);
 
 		const mesh::table_t& constant_structure = require_structure(Primitive, "constant");
 		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
@@ -158,14 +158,14 @@ const_primitive* validate(const mesh::primitive& Primitive)
 	return 0;
 }
 
-primitive* validate(mesh::primitive& Primitive)
+primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 {
 	if(Primitive.type != "cubic_curve")
 		return 0;
 
 	try
 	{
-		require_valid_primitive(Primitive);
+		require_valid_primitive(Mesh, Primitive);
 
 		mesh::table_t& constant_structure = require_structure(Primitive, "constant");
 		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
@@ -200,7 +200,7 @@ primitive* validate(mesh::primitive& Primitive)
 	return 0;
 }
 
-primitive* validate(pipeline_data<mesh::primitive>& Primitive)
+primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& Primitive)
 {
   if(!Primitive.get())
     return 0;
@@ -208,7 +208,7 @@ primitive* validate(pipeline_data<mesh::primitive>& Primitive)
 	if(Primitive->type != "cubic_curve")
 		return 0;
 
-  return validate(Primitive.writable());
+  return validate(Mesh, Primitive.writable());
 }
 
 } // namespace cubic_curve

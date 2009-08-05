@@ -12,7 +12,7 @@ k3d::nurbs_patch::primitive* get_first_nurbs_patch(k3d::mesh& Mesh)
 	{
 		if(primitive->get() && primitive->get()->type == "nurbs_patch")
 		{
-			return k3d::nurbs_patch::validate(primitive->writable());
+			return k3d::nurbs_patch::validate(Mesh, primitive->writable());
 		}
 	}
 	return 0;
@@ -24,7 +24,7 @@ k3d::nurbs_patch::const_primitive* get_first_nurbs_patch(const k3d::mesh& Mesh)
 	{
 		if(primitive->get() && primitive->get()->type == "nurbs_patch")
 		{
-			return k3d::nurbs_patch::validate(**primitive);
+			return k3d::nurbs_patch::validate(Mesh, **primitive);
 		}
 	}
 	return 0;

@@ -70,13 +70,13 @@ public:
 		k3d::mesh::primitives_t::iterator output_primitive = Output.primitives.begin();
 		for(k3d::mesh::primitives_t::const_iterator input_primitive = Input.primitives.begin(); input_primitive != Input.primitives.end(); ++input_primitive)
 		{
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(**input_primitive));
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input, **input_primitive));
 			if(!input_polyhedron)
 			{
 				++output_primitive;
 				continue;
 			}
-			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::validate(*output_primitive));
+			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::validate(Output, *output_primitive));
 			++output_primitive;
 			k3d::mesh::selection_t input_edge_selection = output_polyhedron->edge_selections;
 		

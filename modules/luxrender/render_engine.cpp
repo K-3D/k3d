@@ -643,63 +643,63 @@ private:
 
 		for(k3d::mesh::primitives_t::const_iterator primitive = mesh->primitives.begin(); primitive != mesh->primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::cone::const_primitive> cone(k3d::cone::validate(**primitive));
+			boost::scoped_ptr<k3d::cone::const_primitive> cone(k3d::cone::validate(*mesh, **primitive));
 			if(cone)
 			{
 				render_cone(MaterialNames, MeshInstance, *mesh, *cone, Stream);
 				continue;
 			}
 
-			boost::scoped_ptr<k3d::cylinder::const_primitive> cylinder(k3d::cylinder::validate(**primitive));
+			boost::scoped_ptr<k3d::cylinder::const_primitive> cylinder(k3d::cylinder::validate(*mesh, **primitive));
 			if(cylinder)
 			{
 				render_cylinder(MaterialNames, MeshInstance, *mesh, *cylinder, Stream);
 				continue;
 			}
 
-			boost::scoped_ptr<k3d::disk::const_primitive> disk(k3d::disk::validate(**primitive));
+			boost::scoped_ptr<k3d::disk::const_primitive> disk(k3d::disk::validate(*mesh, **primitive));
 			if(disk)
 			{
 				render_disk(MaterialNames, MeshInstance, *mesh, *disk, Stream);
 				continue;
 			}
 
-			boost::scoped_ptr<k3d::hyperboloid::const_primitive> hyperboloid(k3d::hyperboloid::validate(**primitive));
+			boost::scoped_ptr<k3d::hyperboloid::const_primitive> hyperboloid(k3d::hyperboloid::validate(*mesh, **primitive));
 			if(hyperboloid)
 			{
 				render_hyperboloid(MaterialNames, MeshInstance, *mesh, *hyperboloid, Stream);
 				continue;
 			}
 
-			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs_patch(k3d::nurbs_patch::validate(**primitive));
+			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs_patch(k3d::nurbs_patch::validate(*mesh, **primitive));
 			if(nurbs_patch)
 			{
 				render_nurbs_patch(MaterialNames, MeshInstance, *mesh, *nurbs_patch, Stream);
 				continue;
 			}
 
-			boost::scoped_ptr<k3d::paraboloid::const_primitive> paraboloid(k3d::paraboloid::validate(**primitive));
+			boost::scoped_ptr<k3d::paraboloid::const_primitive> paraboloid(k3d::paraboloid::validate(*mesh, **primitive));
 			if(paraboloid)
 			{
 				render_paraboloid(MaterialNames, MeshInstance, *mesh, *paraboloid, Stream);
 				continue;
 			}
 
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(**primitive));
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh, **primitive));
 			if(polyhedron)
 			{
 				render_polyhedron(MaterialNames, MeshInstance, *mesh, *polyhedron, Stream);
 				continue;
 			}
 
-			boost::scoped_ptr<k3d::sphere::const_primitive> sphere(k3d::sphere::validate(**primitive));
+			boost::scoped_ptr<k3d::sphere::const_primitive> sphere(k3d::sphere::validate(*mesh, **primitive));
 			if(sphere)
 			{
 				render_sphere(MaterialNames, MeshInstance, *mesh, *sphere, Stream);
 				continue;
 			}
 
-			boost::scoped_ptr<k3d::torus::const_primitive> torus(k3d::torus::validate(**primitive));
+			boost::scoped_ptr<k3d::torus::const_primitive> torus(k3d::torus::validate(*mesh, **primitive));
 			if(torus)
 			{
 				render_torus(MaterialNames, MeshInstance, *mesh, *torus, Stream);

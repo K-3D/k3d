@@ -152,13 +152,13 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 
 /// Tests the given mesh primitive to see if it is a valid polyhedron, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
-const_primitive* validate(const mesh::primitive& GenericPrimitive);
+const_primitive* validate(const mesh& Mesh, const mesh::primitive& GenericPrimitive);
 /// Tests the given mesh primitive to see if it is a valid polyhedron, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
-primitive* validate(mesh::primitive& GenericPrimitive);
+primitive* validate(const mesh& Mesh, mesh::primitive& GenericPrimitive);
 /// Tests the given mesh primitive to see if it is a valid polyhedron, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
-primitive* validate(pipeline_data<mesh::primitive>& GenericPrimitive);
+primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& GenericPrimitive);
 
 /// Adds a face to an existing primitive.
 void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, imaterial* const Material);

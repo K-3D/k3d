@@ -64,7 +64,7 @@ public:
 		if(primitive >= Output.primitives.size())
 			return;
 
-		boost::scoped_ptr<k3d::bilinear_patch::primitive> patches(k3d::bilinear_patch::validate(Output.primitives[primitive]));
+		boost::scoped_ptr<k3d::bilinear_patch::primitive> patches(k3d::bilinear_patch::validate(Output, Output.primitives[primitive]));
 		if(!patches)
 			return;
 		

@@ -131,26 +131,16 @@ const object any_to_python(const boost::any& Value)
 		return object(boost::any_cast<k3d::bounding_box3>(Value));
 
 	if(type == typeid(k3d::mesh*))
-	{
-		k3d::mesh* const value = boost::any_cast<k3d::mesh*>(Value);
-		return value ? object(mesh(value)) : object();
-	}
+		return wrap(boost::any_cast<k3d::mesh*>(Value));
 
-	if(type == typeid(const k3d::mesh* const))
-		{
-			const k3d::mesh* const value = boost::any_cast<const k3d::mesh* const>(Value);
-			return value ? object(const_mesh(value)) : object();
-		}
-
-	if(type == typeid(const k3d::bitmap*))
-	{
-		return wrap(boost::any_cast<const k3d::bitmap*>(Value));
-	}
+	if(type == typeid(const k3d::mesh*))
+		return wrap(boost::any_cast<const k3d::mesh*>(Value));
 
 	if(type == typeid(k3d::bitmap*))
-	{
 		return wrap(boost::any_cast<k3d::bitmap*>(Value));
-	}
+
+	if(type == typeid(const k3d::bitmap*))
+		return wrap(boost::any_cast<const k3d::bitmap*>(Value));
 
 	if(type == typeid(k3d::inode*))
 	{

@@ -70,19 +70,19 @@ public:
 	};
 
 
-	static object create(mesh& Mesh)
+	static object create(mesh_wrapper& Mesh)
 	{
 		return wrap_owned(k3d::disk::create(Mesh.wrapped()));
 	}
 
-	static object validate(mesh_primitive_wrapper& Primitive)
+	static object validate(mesh_wrapper& Mesh, mesh_primitive_wrapper& Primitive)
 	{
-		return wrap_owned(k3d::disk::validate(Primitive.wrapped()));
+		return wrap_owned(k3d::disk::validate(Mesh.wrapped(), Primitive.wrapped()));
 	}
 
-	static object validate_const(const_mesh_primitive_wrapper& Primitive)
+	static object validate_const(const_mesh_wrapper& Mesh, const_mesh_primitive_wrapper& Primitive)
 	{
-		return wrap_owned(k3d::disk::validate(Primitive.wrapped()));
+		return wrap_owned(k3d::disk::validate(Mesh.wrapped(), Primitive.wrapped()));
 	}
 };
 

@@ -65,7 +65,7 @@ public:
 			if((*primitive)->type != "polyhedron")
 				continue;
 
-			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*primitive));
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
 			if(!polyhedron)
 				continue;
 			const k3d::uint_t face_begin = 0;

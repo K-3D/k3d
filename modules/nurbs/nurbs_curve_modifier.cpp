@@ -18,7 +18,7 @@ k3d::nurbs_curve::primitive* get_first_nurbs_curve(k3d::mesh& Mesh)
 	{
 		if(primitive->get() && primitive->get()->type == "nurbs_curve")
 		{
-			return k3d::nurbs_curve::validate(primitive->writable());
+			return k3d::nurbs_curve::validate(Mesh, primitive->writable());
 		}
 	}
 }
@@ -29,7 +29,7 @@ k3d::nurbs_curve::const_primitive* get_first_nurbs_curve(const k3d::mesh& Mesh)
 	{
 		if(primitive->get() && primitive->get()->type == "nurbs_curve")
 		{
-			return k3d::nurbs_curve::validate(**primitive);
+			return k3d::nurbs_curve::validate(Mesh, **primitive);
 		}
 	}
 }

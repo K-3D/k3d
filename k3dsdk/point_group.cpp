@@ -83,14 +83,14 @@ primitive* create(mesh& Mesh)
 /////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
-const_primitive* validate(const mesh::primitive& Primitive)
+const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 {
 	if(Primitive.type != "point_group")
 		return 0;
 
 	try
 	{
-		require_valid_primitive(Primitive);
+		require_valid_primitive(Mesh, Primitive);
 
 		const table& constant_structure = require_structure(Primitive, "constant");
 		const table& vertex_structure = require_structure(Primitive, "vertex");
@@ -115,14 +115,14 @@ const_primitive* validate(const mesh::primitive& Primitive)
 	return 0;
 }
 
-primitive* validate(mesh::primitive& Primitive)
+primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 {
 	if(Primitive.type != "point_group")
 		return 0;
 
 	try
 	{
-		require_valid_primitive(Primitive);
+		require_valid_primitive(Mesh, Primitive);
 
 		table& constant_structure = require_structure(Primitive, "constant");
 		table& vertex_structure = require_structure(Primitive, "vertex");
@@ -147,7 +147,7 @@ primitive* validate(mesh::primitive& Primitive)
 	return 0;
 }
 
-primitive* validate(pipeline_data<mesh::primitive>& Primitive)
+primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& Primitive)
 {
   if(!Primitive.get())
     return 0;
@@ -155,7 +155,7 @@ primitive* validate(pipeline_data<mesh::primitive>& Primitive)
 	if(Primitive->type != "point_group")
 		return 0;
 
-  return validate(Primitive.writable());
+  return validate(Mesh, Primitive.writable());
 }
 
 } // namespace point_group

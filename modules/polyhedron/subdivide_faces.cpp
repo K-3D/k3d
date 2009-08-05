@@ -867,10 +867,10 @@ public:
 
 		for(k3d::uint_t i = 0; i != Input.primitives.size(); ++i)
 		{
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(*Input.primitives[i]));
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input, *Input.primitives[i]));
 			if(!input_polyhedron)
 				continue;
-			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::validate(Output.primitives[i]));
+			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::validate(Output, Output.primitives[i]));
 			return_if_fail(output_polyhedron);
 
 			const k3d::mesh::selection_t input_face_selection = output_polyhedron->face_selections; // copy this, so we can keep using it
@@ -1122,7 +1122,7 @@ public:
 		subdivision_t subdivision_type = m_subdivision_type.pipeline_value();
 		for(k3d::uint_t i = 0; i != Input.primitives.size(); ++i)
 		{
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(*Input.primitives[i]));
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input, *Input.primitives[i]));
 			if(!input_polyhedron)
 				continue;
 

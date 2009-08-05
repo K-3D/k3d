@@ -38,20 +38,20 @@ namespace k3d
 namespace python
 {
 
-static k3d::python::mesh create_mesh(iunknown_wrapper& Self)
+static object create_mesh(iunknown_wrapper& Self)
 {
 	k3d::mesh* const mesh = new k3d::mesh();
 	Self.wrapped<k3d::imesh_storage>().reset_mesh(mesh);
 
-	return k3d::python::mesh(mesh);
+	return wrap(mesh);
 }
 
-static k3d::python::mesh set_mesh(iunknown_wrapper& Self, mesh& Mesh)
+static object set_mesh(iunknown_wrapper& Self, mesh_wrapper& Mesh)
 {
 	k3d::mesh* const mesh = new k3d::mesh(Mesh.wrapped());
 	Self.wrapped<k3d::imesh_storage>().reset_mesh(mesh);
 
-	return k3d::python::mesh(mesh);
+	return wrap(mesh);
 }
 
 static void clear_mesh(iunknown_wrapper& Self)

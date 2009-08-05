@@ -18,12 +18,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3dsdk/array.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/primitive_validation.h>
 
 namespace k3d
 {
 
-static void require_valid_table(const string_t& Name, const table& Table)
+static void require_valid_table(const mesh& Mesh, const string_t& Name, const table& Table)
 {
 	if(Name == "constant" && Table.column_count() && Table.row_count() != 1)
 		throw std::runtime_error("'constant' table must have length 1.");
@@ -37,16 +38,33 @@ static void require_valid_table(const string_t& Name, const table& Table)
 		const array* const first_array = Table.begin()->second.get();
 		if(current_array->size() != first_array->size())
 			throw std::runtime_error("Table array length mismatch.");
+
+		if(current_array->get_metadata_value(metadata::key::domain()) == metadata::value::mesh_point_indices_domain())
+		{
+			if(!Mesh.points)
+				throw std::runtime_error("Mesh missing points array.");
+
+			if(!Mesh.point_selection)
+				throw std::runtime_error("Mesh missing point selections array.");
+
+			const mesh::indices_t* const indices = dynamic_cast<const mesh::indices_t*>(current_array);
+			if(!indices)
+				throw std::runtime_error("Point indices array must be an index type.");
+
+			const mesh::indices_t::const_iterator max = std::max_element(indices->begin(), indices->end());
+			if(max != indices->end() && *max >= Mesh.points->size())
+				throw std::runtime_error("Point indices array out-of-bounds.");
+		}
 	}
 }
 
-void require_valid_primitive(/*const mesh& Mesh, */const mesh::primitive& Primitive)
+void require_valid_primitive(const mesh& Mesh, const mesh::primitive& Primitive)
 {
 	for(mesh::named_tables_t::const_iterator structure = Primitive.structure.begin(); structure != Primitive.structure.end(); ++structure)
-		require_valid_table(structure->first, structure->second);
+		require_valid_table(Mesh, structure->first, structure->second);
 
 	for(mesh::named_tables_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
-		require_valid_table(attributes->first, attributes->second);
+		require_valid_table(Mesh, attributes->first, attributes->second);
 
 	for(mesh::named_tables_t::const_iterator attributes = Primitive.attributes.begin(); attributes != Primitive.attributes.end(); ++attributes)
 	{

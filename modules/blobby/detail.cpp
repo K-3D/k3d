@@ -49,7 +49,7 @@ void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const 
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = (*mesh)->primitives.begin(); primitive != (*mesh)->primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::blobby::const_primitive> source_blobby(k3d::blobby::validate(**primitive));
+			boost::scoped_ptr<k3d::blobby::const_primitive> source_blobby(k3d::blobby::validate(**mesh, **primitive));
 			if(!source_blobby)
 				continue;
 
@@ -77,7 +77,7 @@ void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const 
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = (*mesh)->primitives.begin(); primitive != (*mesh)->primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::blobby::const_primitive> source_blobby(k3d::blobby::validate(**primitive));
+			boost::scoped_ptr<k3d::blobby::const_primitive> source_blobby(k3d::blobby::validate(**mesh, **primitive));
 			if(!source_blobby)
 				continue;
 

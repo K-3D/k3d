@@ -115,22 +115,20 @@ public:
 	};
 
 
-	static object create(mesh& Mesh)
+	static object create(mesh_wrapper& Mesh)
 	{
 		return wrap_owned(k3d::nurbs_patch::create(Mesh.wrapped()));
 	}
 
-/*
-	static object validate(mesh_primitive_wrapper& Primitive)
+	static object validate(mesh_wrapper& Mesh, mesh_primitive_wrapper& Primitive)
 	{
-		return wrap_owned(k3d::nurbs_patch::validate(Primitive.wrapped()));
+		return wrap_owned(k3d::nurbs_patch::validate(Mesh.wrapped(), Primitive.wrapped()));
 	}
 
-	static object validate_const(const_mesh_primitive_wrapper& Primitive)
+	static object validate_const(const_mesh_wrapper& Mesh, const_mesh_primitive_wrapper& Primitive)
 	{
-		return wrap_owned(k3d::nurbs_patch::validate(Primitive.wrapped()));
+		return wrap_owned(k3d::nurbs_patch::validate(Mesh.wrapped(), Primitive.wrapped()));
 	}
-*/
 };
 
 void define_namespace_nurbs_patch()
@@ -138,11 +136,9 @@ void define_namespace_nurbs_patch()
 	scope outer = class_<nurbs_patch>("nurbs_patch", no_init)
 		.def("create", &nurbs_patch::create)
 		.staticmethod("create")
-/*
 		.def("validate", &nurbs_patch::validate)
 		.def("validate", &nurbs_patch::validate_const)
 		.staticmethod("validate")
-*/
 		;
 
 	class_<nurbs_patch::const_primitive::wrapper>("const_primitive", no_init)

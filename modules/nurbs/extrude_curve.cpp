@@ -271,7 +271,7 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 	k3d::uint_t source_prim_idx = 0;
 	for(k3d::mesh::primitives_t::const_iterator primitive = SourceCurves.primitives.begin(); primitive != SourceCurves.primitives.end(); ++primitive)
 	{
-		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> source_curves(k3d::nurbs_curve::validate(**primitive));
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> source_curves(k3d::nurbs_curve::validate(SourceCurves, **primitive));
 		if(!source_curves)
 			continue;
 
@@ -290,7 +290,7 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 
 		for(k3d::mesh::primitives_t::const_iterator trav_primitive = CurvesToTraverse.primitives.begin(); trav_primitive != CurvesToTraverse.primitives.end(); ++trav_primitive)
 		{
-			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves_to_traverse(k3d::nurbs_curve::validate(**trav_primitive));
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves_to_traverse(k3d::nurbs_curve::validate(CurvesToTraverse, **trav_primitive));
 			if(!curves_to_traverse)
 				continue;
 
@@ -359,7 +359,7 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 
 							// Cap over the opposite curve
 							k3d::mesh tempmesh(SourceCurves);
-							boost::scoped_ptr<k3d::nurbs_curve::primitive> tempcurve(k3d::nurbs_curve::validate(tempmesh.primitives[source_prim_idx]));
+							boost::scoped_ptr<k3d::nurbs_curve::primitive> tempcurve(k3d::nurbs_curve::validate(tempmesh, tempmesh.primitives[source_prim_idx]));
 							return_if_fail(tempcurve); // shouldn't happen
 
 							k3d::vector3 delta_u = traverse_mesh_points[curves_to_traverse->curve_points[curve_points_end[1] - 1]] - traverse_mesh_points[curves_to_traverse->curve_points[curve_points_begin[1]]];
@@ -375,7 +375,7 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 								temp_points[point] += delta_u;
 							}
 
-							boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_tempcurve(k3d::nurbs_curve::validate(*tempmesh.primitives[source_prim_idx]));
+							boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_tempcurve(k3d::nurbs_curve::validate(tempmesh, *tempmesh.primitives[source_prim_idx]));
 							detail::create_cap(OutputMesh, *output_patches, temp_points, *const_tempcurve, source_curve, centroid + delta_u);
 							uniform_copier.push_back(source_curve);
 							output_patches->patch_materials.push_back(source_curves->material[0]);
@@ -530,7 +530,7 @@ public:
 		{
 			for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end();)
 			{
-				boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(*primitive));
+				boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(Output, *primitive));
 				if(!curves)
 				{
 					++primitive;

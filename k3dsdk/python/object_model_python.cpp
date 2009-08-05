@@ -310,7 +310,12 @@ object module_open_document(const string_t& Path)
 	return wrap(document);
 }
 
-const bool_t module_almost_equal_mesh(const mesh& A, const mesh& B, const uint64_t Threshold)
+const bool_t module_almost_equal_mesh(const_mesh_wrapper& A, const_mesh_wrapper& B, const uint64_t Threshold)
+{
+	return k3d::almost_equal<k3d::mesh>(Threshold)(A.wrapped(), B.wrapped());
+}
+
+const bool_t module_almost_equal_mesh2(mesh_wrapper& A, mesh_wrapper& B, const uint64_t Threshold)
 {
 	return k3d::almost_equal<k3d::mesh>(Threshold)(A.wrapped(), B.wrapped());
 }
@@ -399,6 +404,8 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_torus();
 
 	def("almost_equal", module_almost_equal_mesh,
+		"Tests two meshes for equality using fuzzy-comparisons for floating-point types.");
+	def("almost_equal", module_almost_equal_mesh2,
 		"Tests two meshes for equality using fuzzy-comparisons for floating-point types.");
 	def("batch_mode", k3d::batch_mode,
 		"Returns True if batch (no user intervention) mode is enabled for the user interface.\n"

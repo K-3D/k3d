@@ -117,44 +117,27 @@ object create_array(pipeline_data<array_type>& Data)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // mesh
 
-mesh::mesh() :
-	base()
+static void mesh_copy_const(mesh_wrapper& Self, const_mesh_wrapper& RHS)
 {
+	Self.wrapped() = RHS.wrapped();
 }
 
-mesh::mesh(k3d::mesh* Mesh) :
-	base(Mesh)
+static void mesh_copy_non_const(mesh_wrapper& Self, mesh_wrapper& RHS)
 {
+	Self.wrapped() = RHS.wrapped();
 }
 
-void mesh::copy_const(const_mesh& RHS)
-{
-	wrapped() = RHS.wrapped();
-}
+static object mesh_create_point_selection(mesh_wrapper& Self) { return detail::create_array(Self.wrapped().point_selection); }
+static object mesh_create_points(mesh_wrapper& Self) { return detail::create_array(Self.wrapped().points); }
+static object mesh_point_selection(mesh_wrapper& Self) { return detail::wrap_non_const_array(Self.wrapped().point_selection); }
+static object mesh_points(mesh_wrapper& Self) { return detail::wrap_non_const_array(Self.wrapped().points); }
+static object mesh_point_attributes(mesh_wrapper& Self) { return wrap(Self.wrapped().point_attributes); }
+static object mesh_primitives(mesh_wrapper& Self) { return wrap(Self.wrapped().primitives); }
 
-void mesh::copy_non_const(mesh& RHS)
-{
-	wrapped() = RHS.wrapped();
-}
-
-object mesh::create_point_selection() { return detail::create_array(wrapped().point_selection); }
-object mesh::create_points() { return detail::create_array(wrapped().points); }
-object mesh::point_selection() { return detail::wrap_non_const_array(wrapped().point_selection); }
-object mesh::points() { return detail::wrap_non_const_array(wrapped().points); }
-object mesh::point_attributes() { return wrap(wrapped().point_attributes); }
-object mesh::primitives() { return wrap(wrapped().primitives); }
-
-const string_t mesh::repr()
+static const string_t mesh_str(mesh_wrapper& Self)
 {
 	std::ostringstream buffer;
-	buffer << "<k3d.mesh object wrapping mesh " << &wrapped() << ">";
-	return buffer.str();
-}
-
-const string_t mesh::str()
-{
-	std::ostringstream buffer;
-	buffer << wrapped();
+	buffer << Self.wrapped();
 	return buffer.str();
 }
 
@@ -162,32 +145,15 @@ const string_t mesh::str()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // const_mesh
 
-const_mesh::const_mesh() :
-	base()
-{
-}
+static object const_mesh_point_selection(const_mesh_wrapper& Self) { return detail::wrap_const_array(Self.wrapped().point_selection); }
+static object const_mesh_points(const_mesh_wrapper& Self) { return detail::wrap_const_array(Self.wrapped().points); }
+static object const_mesh_point_attributes(const_mesh_wrapper& Self) { return wrap(Self.wrapped().point_attributes); }
+static object const_mesh_primitives(const_mesh_wrapper& Self) { return wrap(Self.wrapped().primitives); }
 
-const_mesh::const_mesh(const k3d::mesh* const Mesh) :
-	base(Mesh)
-{
-}
-
-object const_mesh::point_selection() { return detail::wrap_const_array(wrapped().point_selection); }
-object const_mesh::points() { return detail::wrap_const_array(wrapped().points); }
-object const_mesh::point_attributes() { return wrap(wrapped().point_attributes); }
-object const_mesh::primitives() { return wrap(wrapped().primitives); }
-
-const string_t const_mesh::repr()
+static const string_t const_mesh_str(const_mesh_wrapper& Self)
 {
 	std::ostringstream buffer;
-	buffer << "<k3d.const_mesh object wrapping mesh " << &wrapped() << ">";
-	return buffer.str();
-}
-
-const string_t const_mesh::str()
-{
-	std::ostringstream buffer;
-	buffer << wrapped();
+	buffer << Self.wrapped();
 	return buffer.str();
 }
 
@@ -268,26 +234,25 @@ static object mesh_primitives_t_create(mesh_primitives_t_wrapper& Self, const st
 
 void define_class_mesh()
 {
-	scope outer = class_<mesh>("mesh", 
+	scope outer = class_<mesh_wrapper>("mesh", 
 		"Stores a heterogeneous collection of geometric mesh primitives.", no_init)
-		.def("point_attributes", &mesh::point_attributes,
+		.def("point_attributes", &mesh_point_attributes,
 			"Returns a L{table} object containing a collection of mutable per-vertex data, or None.")
-		.def("point_selection", &mesh::point_selection,
+		.def("point_selection", &mesh_point_selection,
 			"Returns an mutable L{double_array} object containing the selection state of every vertex in the mesh, or None.")
-		.def("points", &mesh::points,
+		.def("points", &mesh_points,
 			"Returns an mutable L{const_point3_array} object containing the geometric coordinates of every vertex in the mesh, or None.")
-		.def("copy", &mesh::copy_non_const,
+		.def("copy", &mesh_copy_non_const,
 			"Store a shallow copy of the given L{mesh}.")
-		.def("copy", &mesh::copy_const,
+		.def("copy", &mesh_copy_const,
 			"Store a shallow copy of the given L{const_mesh}.")
-		.def("create_point_selection", &mesh::create_point_selection,
+		.def("create_point_selection", &mesh_create_point_selection,
 			"Creates and returns a new L{double_array} object used to store the selection state of every vertex in the mesh.")
-		.def("create_points", &mesh::create_points,
+		.def("create_points", &mesh_create_points,
 			"Creates and returns a new L{point3_array} object used to store the geometric coordinates of every vertex in the mesh.")
-		.def("primitives", &mesh::primitives,
+		.def("primitives", &mesh_primitives,
 			"Returns the set of L{primitive} objects in the mesh.")
-		.def("__repr__", &mesh::repr)
-		.def("__str__", &mesh::str);
+		.def("__str__", &mesh_str);
 
 	class_<mesh_primitive_wrapper>("primitive", no_init)
 		.def("type", &mesh_primitive_get_type)
@@ -307,18 +272,17 @@ void define_class_mesh()
 
 void define_class_const_mesh()
 {
-	scope outer = class_<const_mesh>("mesh",
+	scope outer = class_<const_mesh_wrapper>("const_mesh",
 		"Stores a heterogeneous, immutable collection of geometric mesh primitives.", no_init)
-		.def("point_attributes", &const_mesh::point_attributes,
+		.def("point_attributes", &const_mesh_point_attributes,
 			"Returns a L{const_named_arrays} object containing a collection of immutable (read-only) per-vertex data, or None.")
-		.def("point_selection", &const_mesh::point_selection,
+		.def("point_selection", &const_mesh_point_selection,
 			"Returns an immutable (read-only) L{const_double_array} object containing the selection state of every vertex in the mesh, or None.")
-		.def("points", &const_mesh::points,
+		.def("points", &const_mesh_points,
 			"Returns an immutable (read-only) L{const_point3_array} object containing the geometric coordinates of every vertex in the mesh, or None.")
-		.def("primitives", &const_mesh::primitives,
+		.def("primitives", &const_mesh_primitives,
 			"Returns the set of L{const_primitive} objects in the mesh.")
-		.def("__repr__", &const_mesh::repr)
-		.def("__str__", &const_mesh::str);
+		.def("__str__", &const_mesh_str);
 
 	class_<const_mesh_primitive_wrapper>("const_primitive", no_init)
 		.def("type", &const_mesh_primitive_get_type)

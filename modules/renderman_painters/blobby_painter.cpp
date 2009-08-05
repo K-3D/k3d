@@ -63,7 +63,7 @@ public:
 	{
 		for(k3d::mesh::primitives_t::const_iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
 		{
-			boost::scoped_ptr<k3d::blobby::const_primitive> primitive(k3d::blobby::validate(**p));
+			boost::scoped_ptr<k3d::blobby::const_primitive> primitive(k3d::blobby::validate(Mesh, **p));
 			if(!primitive)
 				continue;
 

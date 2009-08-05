@@ -40,46 +40,6 @@ typedef instance_wrapper<const k3d::mesh> const_mesh_wrapper;
 typedef instance_wrapper<k3d::mesh::primitive> mesh_primitive_wrapper;
 typedef instance_wrapper<const k3d::mesh::primitive> const_mesh_primitive_wrapper;
 
-class const_mesh :
-	public instance_wrapper<const k3d::mesh>
-{
-	typedef instance_wrapper<const k3d::mesh> base;
-public:
-	const_mesh();
-	const_mesh(const k3d::mesh* const Mesh);
-
-	boost::python::object point_attributes();
-	boost::python::object point_selection();
-	boost::python::object points();
-	boost::python::object primitives();
-
-	const std::string repr();
-	const std::string str();
-};
-
-class mesh :
-	public instance_wrapper<k3d::mesh>
-{
-	typedef instance_wrapper<k3d::mesh> base;
-public:
-	mesh();
-	mesh(k3d::mesh* Mesh);
-
-	void copy_const(const_mesh& RHS);
-	void copy_non_const(mesh& RHS);
-
-	boost::python::object create_point_selection();
-	boost::python::object create_points();
-
-	boost::python::object point_attributes();
-	boost::python::object point_selection();
-	boost::python::object points();
-	boost::python::object primitives();
-
-	const std::string repr();
-	const std::string str();
-};
-
 void define_class_mesh();
 void define_class_const_mesh();
 

@@ -62,7 +62,7 @@ public:
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::cylinder::const_primitive> cylinder(k3d::cylinder::validate(**primitive));
+			boost::scoped_ptr<k3d::cylinder::const_primitive> cylinder(k3d::cylinder::validate(Mesh, **primitive));
 			if(!cylinder)
 				continue;
 

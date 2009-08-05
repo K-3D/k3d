@@ -62,7 +62,7 @@ public:
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::torus::const_primitive> torus(k3d::torus::validate(**primitive));
+			boost::scoped_ptr<k3d::torus::const_primitive> torus(k3d::torus::validate(Mesh, **primitive));
 			if(!torus)
 				continue;
 

@@ -83,12 +83,12 @@ public:
 	};
 
 
-	static object create(mesh& Mesh)
+	static object create(mesh_wrapper& Mesh)
 	{
 		return wrap_owned(k3d::polyhedron::create(Mesh.wrapped()));
 	}
 
-	static object create2(mesh& Mesh, list Vertices, list VertexCounts, list VertexIndices, object Material)
+	static object create2(mesh_wrapper& Mesh, list Vertices, list VertexCounts, list VertexIndices, object Material)
 	{
 		k3d::mesh::points_t vertices;
 		k3d::mesh::counts_t vertex_counts;
@@ -102,14 +102,14 @@ public:
 		return wrap_owned(k3d::polyhedron::create(Mesh.wrapped(), vertices, vertex_counts, vertex_indices, material));
 	}
 
-	static object validate(mesh_primitive_wrapper& Primitive)
+	static object validate(mesh_wrapper& Mesh, mesh_primitive_wrapper& Primitive)
 	{
-		return wrap_owned(k3d::polyhedron::validate(Primitive.wrapped()));
+		return wrap_owned(k3d::polyhedron::validate(Mesh.wrapped(), Primitive.wrapped()));
 	}
 
-	static object validate_const(const_mesh_primitive_wrapper& Primitive)
+	static object validate_const(const_mesh_wrapper& Mesh, const_mesh_primitive_wrapper& Primitive)
 	{
-		return wrap_owned(k3d::polyhedron::validate(Primitive.wrapped()));
+		return wrap_owned(k3d::polyhedron::validate(Mesh.wrapped(), Primitive.wrapped()));
 	}
 
 	static bool_t is_triangles(polyhedron::const_primitive::wrapper& Polyhedron)
