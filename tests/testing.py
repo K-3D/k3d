@@ -293,6 +293,7 @@ def mesh_comparison_to_reference(document, input_mesh, reference_mesh_name, thre
 	reference = document.new_node("K3DMeshReader")
 	reference.center = False
 	reference.scale_to_size = False
+	reference.material = document.get_node("Material")
 
 	difference = get_mesh_difference(document, input_mesh, reference.get_property("output_mesh"), threshold)
 
