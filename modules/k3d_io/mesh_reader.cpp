@@ -28,6 +28,7 @@
 #include <k3dsdk/file_helpers.h>
 #include <k3dsdk/gzstream.h>
 #include <k3dsdk/imaterial.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/persistent_lookup.h>
@@ -39,18 +40,40 @@ namespace module
 namespace k3d_io
 {
 
+class set_default_material
+{
+public:
+	set_default_material(k3d::imaterial* Material) : m_material(Material) {}
+
+	void operator()(const k3d::string_t&, const k3d::table&, const k3d::string_t& ArrayName, k3d::pipeline_data<k3d::array>& Array)
+	{
+		k3d::mesh::materials_t* const materials = dynamic_cast<k3d::mesh::materials_t*>(&Array.writable());
+		if(!materials)
+		{
+			return;
+		}
+
+		materials->assign(materials->size(), m_material);
+	}
+
+private:
+	k3d::imaterial* m_material;
+};
+
 /////////////////////////////////////////////////////////////////////////////
 // mesh_reader
 
 class mesh_reader :
-	public k3d::mesh_reader<k3d::node >
+	public k3d::material_sink<k3d::mesh_reader<k3d::node > >
 {
-	typedef k3d::mesh_reader<k3d::node > base;
+	typedef k3d::material_sink<k3d::mesh_reader<k3d::node > > base;
 
 public:
 	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
+		m_material.changed_signal().connect(k3d::hint::converter<
+				k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reload_mesh_slot()));
 	}
 
 	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
@@ -82,6 +105,8 @@ public:
 			Output = k3d::mesh();
 			return;
 		}
+		// Assign a default material
+		k3d::mesh::visit_arrays(Output, set_default_material(m_material.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
