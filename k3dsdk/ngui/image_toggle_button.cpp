@@ -43,6 +43,7 @@ control::control(imodel* const Model, k3d::istate_recorder* const StateRecorder,
 	m_active_image(Image),
 	m_inactive_image(Image)
 {
+	get_accessible()->set_name(Model->label());
 	add(*manage(m_image));
 	on_update();
 }

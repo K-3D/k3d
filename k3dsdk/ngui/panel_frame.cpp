@@ -97,7 +97,7 @@ control::control(document_state& DocumentState, panel_focus_signal_t& PanelFocus
 
 	image_toggle_button::control* const pinned_control =
 		new image_toggle_button::control(
-			image_toggle_button::model(pinned), 0, load_icon("pinned", Gtk::ICON_SIZE_BUTTON),
+			image_toggle_button::model(pinned, pinned.name()), 0, load_icon("pinned", Gtk::ICON_SIZE_BUTTON),
 			load_icon("unpinned", Gtk::ICON_SIZE_BUTTON)) <<
 		set_tooltip(_("Pin Panel"));
 
@@ -114,6 +114,7 @@ control::control(document_state& DocumentState, panel_focus_signal_t& PanelFocus
 	m_panel_type.set_model(m_model);
 	m_panel_type.pack_start(m_columns.icon, false);
 	m_panel_type.pack_start(m_columns.label);
+	m_panel_type.get_accessible()->set_name("panel_type");
 
 	m_panel_type_connection = m_panel_type.signal_changed().connect(sigc::mem_fun(*this, &control::on_panel_type_changed));
 
@@ -123,7 +124,11 @@ control::control(document_state& DocumentState, panel_focus_signal_t& PanelFocus
 
 	m_frame.set_shadow_type(Gtk::SHADOW_NONE);
 
+	m_decorations.get_accessible()->set_name("decorations");
+	m_frame.get_accessible()->set_name("content");
+
 	Gtk::VBox* const vbox1 = new Gtk::VBox(false);
+	vbox1->get_accessible()->set_name("vbox");
 	vbox1->pack_start(m_decorations, Gtk::PACK_SHRINK);
 	vbox1->pack_start(m_frame, Gtk::PACK_EXPAND_WIDGET);
 

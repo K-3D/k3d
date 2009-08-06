@@ -188,6 +188,8 @@ public:
 		m_tap_started(false)
 	{
 		assert(m_model.get());
+		m_up_button->get_accessible()->set_name("up");
+		m_down_button->get_accessible()->set_name("down");
 	}
 
 	/// Stores a reference to the underlying data object

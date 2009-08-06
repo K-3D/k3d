@@ -69,6 +69,7 @@ public:
 		m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 		m_scrolled_window.add(m_object_properties.get_widget());
 
+		m_vbox.get_accessible()->set_name("vbox");
 		m_vbox.pack_start(m_label, Gtk::PACK_SHRINK);
 		m_vbox.pack_start(m_scrolled_window, Gtk::PACK_EXPAND_WIDGET);
 
@@ -95,6 +96,7 @@ public:
 			m_label.set_text("");
 */
 		m_object_properties.set_properties(m_tool ? m_tool->properties() : 0);
+		m_object_properties.get_widget().get_accessible()->set_name(m_tool ? m_tool->tool_type() : "");
 
 		m_vbox.show();
 	}

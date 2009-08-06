@@ -168,6 +168,7 @@ public:
 		for(iproperty_group_collection::groups_t::const_iterator group = PropertyGroups.begin(); group != PropertyGroups.end(); ++group)
 		{
 			collapsible_frame::control* const frame = new collapsible_frame::control(group->name, m_collapsible_frame_group);
+			frame->get_accessible()->set_name(group->name);
 			m_vbox.pack_start(*manage(frame), Gtk::PACK_SHRINK);
 
 			Gtk::Table* const table = new Gtk::Table(group->properties.size(), 5, false);
@@ -359,6 +360,7 @@ public:
 				// Pack the new control into the rest of the UI
 				if(control)
 				{
+					control->get_accessible()->set_name(property_name + "_control");
 					table->attach(*manage(control), prop_control_begin, prop_control_end, row, row + 1, Gtk::FILL | Gtk::SHRINK, Gtk::FILL | Gtk::SHRINK);
 					entry_list.push_back(control);
 				}

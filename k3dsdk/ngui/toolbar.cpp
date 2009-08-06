@@ -46,7 +46,13 @@ control::control() :
 Gtk::HBox& control::row(const unsigned int Row)
 {
 	while(get_children().size() < Row + 1)
-		base::pack_start(*Gtk::manage(new Gtk::HBox(false, 0)));
+	{
+		Gtk::HBox* hbox = new Gtk::HBox(false, 0);
+		std::stringstream atk_name;
+		atk_name << "row" << get_children().size();
+		hbox->get_accessible()->set_name(atk_name.str());
+		base::pack_start(*Gtk::manage(hbox));
+	}
 
 	std::vector<Gtk::Widget*> rows = get_children();
 	Gtk::HBox* const row = dynamic_cast<Gtk::HBox*>(rows[Row]);

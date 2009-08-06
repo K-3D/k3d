@@ -118,7 +118,7 @@ public:
 
 	const Glib::ustring label()
 	{
-		return _("Active Tool");
+		return m_choice.tool_type();
 	}
 
 	const k3d::bool_t value()
@@ -154,7 +154,7 @@ public:
 
 	const Glib::ustring label()
 	{
-		return _("Active Tool");
+		return m_tool;
 	}
 
 	const k3d::bool_t value()
@@ -189,7 +189,9 @@ struct implementation
 		m_document_state(DocumentState),
 		m_toolbox(false, 0)
 	{
+		m_toolbox.get_accessible()->set_name("toolbox");
 		k3d::ngui::toolbar::control* const main_toolbar = new k3d::ngui::toolbar::control();
+		main_toolbar->get_accessible()->set_name("main_toolbar");
 		main_toolbar->row(0).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
 				new detail::builtin_tool_model(m_document_state, m_document_state.selection_tool()), 0,
@@ -534,6 +536,7 @@ public:
 		base(false, 0),
 		m_implementation(0)
 	{
+		get_accessible()->set_name("vbox");
 	}
 
 	~panel()
