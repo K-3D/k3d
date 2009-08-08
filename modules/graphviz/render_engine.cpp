@@ -32,7 +32,6 @@
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/irender_preview.h>
-#include <k3dsdk/module.h>
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
@@ -286,11 +285,12 @@ private:
 	}
 };
 
+k3d::iplugin_factory& render_engine_factory()
+{
+	return render_engine::get_factory();
+}
+
 } // namespace graphviz
 
 } // namespace module
-
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::graphviz::render_engine::get_factory());
-K3D_MODULE_END
 
