@@ -41,12 +41,12 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 		continue
 
 	print """Creating main article for """ + plugin.name() + """ ..."""
-	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/articles/" + plugin.name(), "w")
+	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/articles/" + plugin.name(), "w")
 	article.write("<plugin>{{PAGENAME}}</plugin>\n")
 
 # Create an article listing every plugin category ...
 print """Creating plugin categories article ..."""
-article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/categories/Plugin Categories", "w")
+article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/categories/Plugin Categories", "w")
 article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
 
 article.write("""<table border="1" cellpadding="5" cellspacing="0">\n""")
@@ -62,7 +62,7 @@ article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
 # Create an article for each plugin category ...
 for category in sorted(categories.keys()):
 	print """Creating plugin category article """ + category + """ ..."""
-	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/categories/" + category + " Plugins", "w")
+	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/categories/" + category + " Plugins", "w")
 	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
 
 	article.write("""<table border="0" cellpadding="5" cellspacing="0">\n""")
@@ -103,7 +103,7 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 	elif plugin.quality() == "deprecated":
 		plugin_quality = "Deprecated"
 
-	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/plugins/reference/" + plugin.name(), "w")
+	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/templates/" + plugin.name(), "w")
 	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
 
 	article.write("== Description == " + "\n")
@@ -145,26 +145,27 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 	if plugin.is_document_plugin():
 		node = doc.new_node(plugin.name())
 
-		article.write("== Properties == " + "\n")
+		if node:
+			article.write("== Properties == " + "\n")
 
-		article.write("{| border=\"1\" cellpadding=\"5\" cellspacing=\"0\"\n")
-		article.write("! Label\n")
-		article.write("! Description\n")
-		article.write("! Type\n")
-		article.write("! Script Name\n")
+			article.write("{| border=\"1\" cellpadding=\"5\" cellspacing=\"0\"\n")
+			article.write("! Label\n")
+			article.write("! Description\n")
+			article.write("! Type\n")
+			article.write("! Script Name\n")
 
-		for property in node.properties():
-			# Skip the "name" property, which is a special-case ...
-			if property.name() == "name":
-				continue
+			for property in node.properties():
+				# Skip the "name" property, which is a special-case ...
+				if property.name() == "name":
+					continue
 
-			article.write("|-\n")
-			article.write("|'''" + property.label() + "'''\n")
-			article.write("|" + property.description() + "\n")
-			article.write("|[[Property Types#" + property.type() + "|" + property.type() + "]]\n")
-			article.write("|" + property.name() + "\n")
+				article.write("|-\n")
+				article.write("|'''" + property.label() + "'''\n")
+				article.write("|" + property.description() + "\n")
+				article.write("|[[Property Types#" + property.type() + "|" + property.type() + "]]\n")
+				article.write("|" + property.name() + "\n")
 
-		article.write("|}\n")
+			article.write("|}\n")
 
 	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
 

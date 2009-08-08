@@ -3,32 +3,17 @@ PROJECT(wiki)
 IF(NOT WIN32)
 	SET(K3D_NUI_BINARY ${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-nui.module)
 
-	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/make-wiki-docs.py ${CMAKE_CURRENT_BINARY_DIR}/make-wiki-docs.py)
-	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/make-wiki-primitives.py ${CMAKE_CURRENT_BINARY_DIR}/make-wiki-primitives.py)
-	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext)
-	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/articles)
-	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/categories)
-	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/reference)
-	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext/primitives/articles)
-	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext/primitives/categories)
-	FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/wikitext/primitives/reference)
+	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/make-wiki-docs-plugins.py ${CMAKE_CURRENT_BINARY_DIR}/make-wiki-docs-plugins.py)
+	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/make-wiki-docs-primitives.py ${CMAKE_CURRENT_BINARY_DIR}/make-wiki-docs-primitives.py)
 
 	ADD_CUSTOM_TARGET(docs-wiki
 		COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/articles
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/categories
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/plugins/reference
-		COMMAND ${k3d_BINARY_DIR}/bin/k3d --log-level=debug --color --plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins --share=${k3d_SOURCE_DIR}/share --script=${CMAKE_CURRENT_BINARY_DIR}/make-wiki-docs.py --ui=${K3D_NUI_BINARY}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		)
-
-	ADD_CUSTOM_TARGET(docs-wiki-primitives
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/primitives/articles
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/primitives/categories
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/primitives/reference
-		COMMAND ${k3d_BINARY_DIR}/bin/k3d --log-level=debug --color --plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins --share=${k3d_SOURCE_DIR}/share --script=${CMAKE_CURRENT_BINARY_DIR}/make-wiki-primitives.py --ui=${K3D_NUI_BINARY}
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/articles
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/categories
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/wikitext/templates
+		COMMAND ${k3d_BINARY_DIR}/bin/k3d --log-level=debug --color --plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins --share=${k3d_SOURCE_DIR}/share --script=${CMAKE_CURRENT_BINARY_DIR}/make-wiki-docs-plugins.py --ui=${K3D_NUI_BINARY}
+		COMMAND ${k3d_BINARY_DIR}/bin/k3d --log-level=debug --color --plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins --share=${k3d_SOURCE_DIR}/share --script=${CMAKE_CURRENT_BINARY_DIR}/make-wiki-docs-primitives.py --ui=${K3D_NUI_BINARY}
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		)
 ENDIF(NOT WIN32)

@@ -7,9 +7,9 @@ import os
 primitive_types = [k3d.bezier_triangle_patch, k3d.bicubic_patch, k3d.bilinear_patch, k3d.blobby, k3d.cone, k3d.cubic_curve, k3d.cylinder, k3d.disk, k3d.hyperboloid, k3d.linear_curve, k3d.nurbs_curve, k3d.nurbs_patch, k3d.paraboloid, k3d.point_group, k3d.polyhedron, k3d.sphere, k3d.teapot, k3d.torus]
 primitive_names = ["Bezier Triangle Patch", "Bicubic Patch", "Bilinear Patch", "Blobby", "Cone", "Cubic Curve", "Cylinder", "Disk", "Hyperboloid", "Linear Curve", "NURBS Curve", "NURBS Patch", "Paraboloid", "Point Group", "Polyhedron", "Sphere", "Teapot", "Torus"]
 
-# Create an article listing primitive components ...
-print """Creating primitive components reference ..."""
-article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/primitives/reference/Primitive Components", "w")
+# Create a table listing primitive components ...
+print """Creating primitive components table ..."""
+article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/templates/Primitive Components Table", "w")
 article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
 article.write("""<table frame="box" rules="all" cellpadding="5">\n""")
 article.write("""<tr><th>Primitive Type</th><th>Structure</th><th>Attributes</th></tr>\n""")
@@ -36,17 +36,22 @@ article.write("""</table>\n""")
 article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
 
 # Create the main article for each primitive type ...
-for primitive in primitive_names:
-	print """Creating main article for """ + primitive + """ Primitive ..."""
-	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/primitives/articles/" + primitive + " Primitive", "w")
-	article.write("""{{""" + primitive + """}}\n""")
+for primitive_name in primitive_names:
+	print """Creating main article for """ + primitive_name + """ Primitive ..."""
+	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/articles/" + primitive_name + " Primitive", "w")
+	article.write("""{{""" + primitive_name + """ Primitive}}\n""")
 
-# Create a diagram for each primitive type ...
+# Create the reference material for each primitive type ...
 for i in range(len(primitive_types)):
 	primitive_type = primitive_types[i]
 	primitive_name = primitive_names[i]
 
-	print """Creating diagram for """ + primitive_name + """ ..."""
+	print """Creating reference documentation for """ + primitive_name + """ Primitive ..."""
+	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/templates/" + primitive_name + " Primitive", "w")
+	article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
+
+	article.write("""== Data Structure ==\n""")
+	article.write("<graphviz>\n")
 
 	document = k3d.new_document()
 	source = document.new_node("FrozenMesh")
@@ -54,7 +59,12 @@ for i in range(len(primitive_types)):
 	primitive_type.create(mesh)
 
 	writer = document.new_node("GraphVizMeshWriter")
-	writer.file = k3d.filesystem.native_path("@CMAKE_CURRENT_BINARY_DIR@/wikitext/primitives/reference/" + primitive_name + ".dot")
+#	writer.file = k3d.filesystem.native_path("@CMAKE_CURRENT_BINARY_DIR@/wikitext/templates/" + primitive_name + ".dot")
 	document.set_dependency(writer.get_property("input_mesh"), source.get_property("output_mesh"))
+	article.write(writer.output_string)
 
 	k3d.close_document(document)
+
+	article.write("</graphviz>\n")
+	article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
+
