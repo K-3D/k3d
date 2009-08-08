@@ -29,6 +29,7 @@
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
+#include <k3dsdk/string_source.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -42,7 +43,8 @@ namespace graphviz
 // mesh_writer
 
 class mesh_writer :
-	public k3d::mesh_writer<k3d::node >
+	public k3d::mesh_writer<k3d::node >,
+	public k3d::string_source<mesh_writer>
 {
 	typedef k3d::mesh_writer<k3d::node > base;
 
@@ -50,6 +52,8 @@ public:
 	mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
+		m_input_mesh.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_string_slot()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -132,7 +136,7 @@ private:
 		return buffer.str();
 	}
 
-	void on_write_mesh(const k3d::mesh& Input, const k3d::filesystem::path& OutputPath, std::ostream& Output)
+	static void write_mesh(const k3d::mesh& Input, std::ostream& Output)
 	{
 		Output << "// Written by K-3D " << K3D_VERSION << ", http://www.k-3d.org\n\n";
 
@@ -140,7 +144,7 @@ private:
 		Output << k3d::standard_indent << "{\n";
 		Output << k3d::push_indent;
 
-		Output << k3d::standard_indent << "graph [rankdir=\"LR\" ranksep=\"1.5\"]\n";
+		Output << k3d::standard_indent << "graph [rankdir=\"LR\" ranksep=\"1.0\"]\n";
 		Output << k3d::standard_indent << "node [shape=\"record\" fontname=\"Helvetica\" fontsize=12 height=0 width=0]\n";
 		Output << k3d::standard_indent << "edge [fontname=\"Helvetica\" fontsize=10]\n";
 
@@ -213,6 +217,21 @@ private:
 		Output << k3d::pop_indent;
 		Output << k3d::pop_indent;
 		Output << k3d::standard_indent << "}\n";
+	}
+
+	void on_write_mesh(const k3d::mesh& Input, const k3d::filesystem::path& OutputPath, std::ostream& Output)
+	{
+		write_mesh(Input, Output);
+	}
+
+	void on_update_string(k3d::string_t& Output)
+	{
+		std::ostringstream buffer;
+
+		if(const k3d::mesh* const mesh = m_input_mesh.pipeline_value())
+			write_mesh(*mesh, buffer);
+
+		Output = buffer.str();	
 	}
 };
 
