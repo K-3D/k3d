@@ -175,6 +175,13 @@ static object const_mesh_primitive_get_attributes(const_mesh_primitive_wrapper& 
 	return wrap(Self.wrapped().attributes);
 }
 
+static const string_t const_mesh_primitive_str(const_mesh_primitive_wrapper& Self)
+{
+	std::ostringstream buffer;
+	buffer << Self.wrapped();
+	return buffer.str();
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // mesh_primitive 
 
@@ -196,6 +203,13 @@ static object mesh_primitive_get_structure(mesh_primitive_wrapper& Self)
 static object mesh_primitive_get_attributes(mesh_primitive_wrapper& Self)
 {
 	return wrap(Self.wrapped().attributes);
+}
+
+static const string_t mesh_primitive_str(mesh_primitive_wrapper& Self)
+{
+	std::ostringstream buffer;
+	buffer << Self.wrapped();
+	return buffer.str();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,6 +272,7 @@ void define_class_mesh()
 		.def("type", &mesh_primitive_get_type)
 		.def("structure", &mesh_primitive_get_structure)
 		.def("attributes", &mesh_primitive_get_attributes)
+		.def("__str__", &mesh_primitive_str)
 		;
 
 	class_<mesh_primitives_t_wrapper>("primitives_t", no_init)
@@ -288,6 +303,7 @@ void define_class_const_mesh()
 		.def("type", &const_mesh_primitive_get_type)
 		.def("structure", &const_mesh_primitive_get_structure)
 		.def("attributes", &const_mesh_primitive_get_attributes)
+		.def("__str__", &const_mesh_primitive_str)
 		;
 
 	class_<const_mesh_primitives_t_wrapper>("const_primitives_t", no_init)
