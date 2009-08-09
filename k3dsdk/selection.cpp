@@ -75,6 +75,9 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case POINT:
 			Stream << "point";
 			break;
+		case CURVE:
+			Stream << "curve";
+			break;
 		default:
 			Stream << RHS;
 			break;
@@ -130,6 +133,8 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = SPLIT_EDGE;
 	else if(buffer == "point")
 		RHS = POINT;
+	else if(buffer == "curve")
+		RHS = CURVE;
 	else
 		log() << error << k3d_file_reference << ": could not extract value [" << buffer << "]" << std::endl;
 
@@ -287,207 +292,6 @@ mesh* get_mesh(const record& Record)
 
 	return boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_internal_value());
 }
-
-/*
-///////////////////////////////////////////////////////////////////////////////////
-// get_point_group
-
-legacy::point_group* get_point_group(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(POINT_GROUP);
-	if(id == null_id())
-		return 0;
-	return_val_if_fail(id < Mesh.point_groups.size(), 0);
-
-	return Mesh.point_groups[id];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_polyhedron
-
-legacy::polyhedron* get_polyhedron(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(POLYHEDRON);
-	if(id == null_id())
-		return 0;
-	return_val_if_fail(id < Mesh.polyhedra.size(), 0);
-
-	return Mesh.polyhedra[id];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_split_edge
-
-legacy::split_edge* get_split_edge(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id edge_id = Record.get_id(SPLIT_EDGE);
-	if(edge_id == null_id())
-		return 0;
-
-	k3d::legacy::face* const face = get_face(Mesh, Record);
-	if(!face)
-		return 0;
-
-	const selection::id hole_id = Record.get_id(FACE_HOLE);
-	if(hole_id == null_id())
-	{
-		selection::id id = 0;
-		for(legacy::split_edge* edge = face->first_edge; edge; edge = edge->face_clockwise)
-		{
-			if(edge_id == id++)
-				return edge;
-
-			if(edge->face_clockwise == face->first_edge)
-				break;
-		}
-	}
-	else
-	{
-		return_val_if_fail(hole_id < face->holes.size(), 0);
-
-		selection::id id = 0;
-		for(legacy::split_edge* edge = face->holes[hole_id]; edge; edge = edge->face_clockwise)
-		{
-			if(edge_id == id++)
-				return edge;
-
-			if(edge->face_clockwise == face->holes[hole_id])
-				break;
-		}
-	}
-
-	return 0;
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_linear_curve_group
-
-legacy::linear_curve_group* get_linear_curve_group(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(LINEAR_CURVE_GROUP);
-	if(id == null_id())
-		return 0;
-	return_val_if_fail(id < Mesh.linear_curve_groups.size(), 0);
-
-	return Mesh.linear_curve_groups[id];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_linear_curve
-
-legacy::linear_curve* get_linear_curve(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(LINEAR_CURVE);
-	if(id == null_id())
-		return 0;
-
-	legacy::linear_curve_group* const group = get_linear_curve_group(Mesh, Record);
-	if(!group)
-		return 0;
-	return_val_if_fail(id < group->curves.size(), 0);
-
-	return group->curves[id];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_cubic_curve_group
-
-legacy::cubic_curve_group* get_cubic_curve_group(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(CUBIC_CURVE_GROUP);
-	if(id == null_id())
-		return 0;
-	return_val_if_fail(id < Mesh.cubic_curve_groups.size(), 0);
-
-	return Mesh.cubic_curve_groups[id];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_cubic_curve
-
-legacy::cubic_curve* get_cubic_curve(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(CUBIC_CURVE);
-	if(id == null_id())
-		return 0;
-
-	legacy::cubic_curve_group* const group = get_cubic_curve_group(Mesh, Record);
-	if(!group)
-		return 0;
-	return_val_if_fail(id < group->curves.size(), 0);
-
-	return group->curves[id];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_nucurve_group
-
-legacy::nucurve_group* get_nucurve_group(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(NUCURVE_GROUP);
-	if(id == null_id())
-		return 0;
-
-	return_val_if_fail(id < Mesh.nucurve_groups.size(), 0);
-	return Mesh.nucurve_groups[id];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_nucurve
-
-legacy::nucurve* get_nucurve(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(NUCURVE);
-	if(id == null_id())
-		return 0;
-
-	legacy::nucurve_group* const group = get_nucurve_group(Mesh, Record);
-	if(!group)
-		return 0;
-	return_val_if_fail(id < group->curves.size(), 0);
-
-	return group->curves[id];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_bilinear_patch
-
-legacy::bilinear_patch* get_bilinear_patch(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(BILINEAR_PATCH);
-	if(id == null_id())
-		return 0;
-	return_val_if_fail(id < Mesh.bilinear_patches.size(), 0);
-
-	return Mesh.bilinear_patches[id];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_bicubic_patch
-
-legacy::bicubic_patch* get_bicubic_patch(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(BICUBIC_PATCH);
-	if(id == null_id())
-		return 0;
-	return_val_if_fail(id < Mesh.bicubic_patches.size(), 0);
-
-	return Mesh.bicubic_patches[id];
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-// get_nupatch
-
-legacy::nupatch* get_nupatch(legacy::mesh& Mesh, const record& Record)
-{
-	const selection::id id = Record.get_id(NUPATCH);
-	if(id == null_id())
-		return 0;
-	return_val_if_fail(id < Mesh.nupatches.size(), 0);
-
-	return Mesh.nupatches[id];
-}
-*/
 
 } // namespace selection
 

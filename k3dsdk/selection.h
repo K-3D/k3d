@@ -106,6 +106,8 @@ FACE_VARYING = 29,
 SPLIT_EDGE = 30,
 /// Storage for a zero-based point index (relative to a mesh)
 POINT = 31,
+/// Storage for a zero-based curve index (relative to a primitive)
+CURVE = 32,
 
 };
 
