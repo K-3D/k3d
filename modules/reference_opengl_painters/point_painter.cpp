@@ -92,7 +92,7 @@ public:
 
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!SelectionState.select_points)
+		if(!SelectionState.select_component.count(k3d::selection::POINT))
 			return;
 
 		if(!Mesh.points)

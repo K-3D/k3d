@@ -52,7 +52,9 @@ enum mode
 	/// Select polyhedron split-edges
 	SPLIT_EDGES,
 	/// Select uniform components
-	UNIFORM
+	UNIFORM,
+	/// Select curve components
+	CURVES,
 };
 
 std::ostream& operator<<(std::ostream& Stream, const mode& Value);

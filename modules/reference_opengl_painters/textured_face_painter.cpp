@@ -198,7 +198,7 @@ public:
 		if(!has_non_sds_polyhedra(Mesh))
 			return;
 			
-		if (!SelectionState.select_uniform)
+		if(!SelectionState.select_component.count(k3d::selection::UNIFORM))
 			return;
 
 		k3d::gl::store_attributes attributes;

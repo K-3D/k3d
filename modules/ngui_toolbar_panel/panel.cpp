@@ -300,6 +300,15 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
+				new detail::selection_mode_model(m_document_state.document(), selection::CURVES, _("Select Curves")),
+				&m_document_state.document().state_recorder(),
+				load_icon("select_curve", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+			<< set_tooltip(_("Select Curves"))
+			<< make_toolbar_button()
+			), Gtk::PACK_SHRINK);
+
+		main_toolbar->row(1).pack_start(*Gtk::manage(
+			new image_toggle_button::control(
 				new detail::selection_mode_model(m_document_state.document(), selection::UNIFORM, _("Select Uniform")),
 				&m_document_state.document().state_recorder(),
 				load_icon("face", Gtk::ICON_SIZE_SMALL_TOOLBAR))

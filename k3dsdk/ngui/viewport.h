@@ -118,10 +118,8 @@ public:
 	k3d::selection::records get_node_selectables(const k3d::rectangle& SelectionRegion);
 	/// Returns all points contained in the given rectangle in widget coordinates
 	k3d::selection::records get_point_selectables(const k3d::rectangle& SelectionRegion, k3d::bool_t Backfacing);
-	/// Returns all polyhedron split-edges that intersect the given rectangle in widget coordinates
-	k3d::selection::records get_split_edge_selectables(const k3d::rectangle& SelectionRegion, k3d::bool_t Backfacing);
-	/// Returns all uniform components that intersect the given rectangle in widget coordinates
-	k3d::selection::records get_uniform_selectables(const k3d::rectangle& SelectionRegion, k3d::bool_t Backfacing);
+	/// Returns all components that intersect the given rectangle in widget coordinates
+	k3d::selection::records get_component_selectables(const k3d::selection::type Component, const k3d::rectangle& SelectionRegion, k3d::bool_t Backfacing);
 	/// Returns all objects (point, split-edge, uniform components, or nodes, depending on selection mode) that intersect the given rectangle in widget coordinates
 	k3d::selection::records get_object_selectables(const k3d::rectangle& SelectionRegion, k3d::bool_t Backfacing);
 
@@ -131,8 +129,8 @@ public:
 	k3d::selection::record pick_point(const k3d::point2& Coordinates, k3d::bool_t Backfacing);
 	/// Returns the closest polyhedron split-edge at the given widget coordinates (may return an empty record)
 	k3d::selection::record pick_split_edge(const k3d::point2& Coordinates, k3d::bool_t Backfacing);
-	/// Returns the closest uniform component at the given widget coordinates (may return an empty record)
-	k3d::selection::record pick_uniform(const k3d::point2& Coordinates, k3d::bool_t Backfacing);
+	/// Returns the closest component at the given widget coordinates (may return an empty record)
+	k3d::selection::record pick_component(const k3d::selection::type Component, const k3d::point2& Coordinates, k3d::bool_t Backfacing);
 	/// Returns the closest object (point, split-edge, uniform component, or node, depending on selection mode) at the given coordinates (may return an empty record)
 	k3d::selection::record pick_object(const k3d::point2& Coordinates, k3d::bool_t Backfacing);
 
@@ -143,7 +141,7 @@ public:
 	/// Returns the closest polyhedron split-edge at the given widget coordinates (may return an empty record)
 	k3d::selection::record pick_split_edge(const k3d::point2& Coordinates, k3d::selection::records& Records, k3d::bool_t Backfacing);
 	/// Returns the closest uniform component at the given widget coordinates (may return an empty record)
-	k3d::selection::record pick_uniform(const k3d::point2& Coordinates, k3d::selection::records& Records, k3d::bool_t Backfacing);
+	k3d::selection::record pick_component(const k3d::selection::type Component, const k3d::point2& Coordinates, k3d::selection::records& Records, k3d::bool_t Backfacing);
 	/// Returns the closest object (point, split-edge, uniform component, or node, depending on selection mode) at the given coordinates (may return an empty record)
 	k3d::selection::record pick_object(const k3d::point2& Coordinates, k3d::selection::records& Records, k3d::bool_t Backfacing);
 

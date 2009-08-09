@@ -504,6 +504,7 @@ k3d::selection::set create(const double_t Weight)
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::VARYING, Weight);
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::FACE_VARYING, Weight);
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::SPLIT_EDGE, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::CURVE, Weight);
 
 	return result;
 }

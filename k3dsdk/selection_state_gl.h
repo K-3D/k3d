@@ -24,7 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "types.h"
+#include <k3dsdk/selection.h>
+#include <set>
 
 namespace k3d
 {
@@ -32,26 +33,19 @@ namespace k3d
 namespace gl
 {
 
-/// Used to pass selection bitmask for any combination of primitives
+/// Used to pass selection-related state to OpenGL painters.
 class selection_state
 {
 public:
 	selection_state() :
 		exclude_unselected_nodes(false),
-		select_points(false),
-		select_uniform(false),
-		select_curves(false),
-		select_split_edges(false),
 		select_backfacing(false)
 	{
 	}
 
 	bool_t exclude_unselected_nodes;
-	bool_t select_points;
-	bool_t select_uniform;
-	bool_t select_curves;
-	bool_t select_split_edges;
 	bool_t select_backfacing;
+	std::set<selection::type> select_component;
 };
 
 } // namespace gl

@@ -80,47 +80,15 @@ namespace detail
 /// Defines storage for a collection of OpenGL hit records
 typedef std::vector<GLuint> gl_selection_buffer_t;
 
-const k3d::gl::selection_state select_points(bool Backfacing)
-{
-	k3d::gl::selection_state result;
-
-	result.exclude_unselected_nodes = true;
-	result.select_points = true;
-	result.select_backfacing = Backfacing;
-
-	return result;
-}
-
-const k3d::gl::selection_state select_split_edges(bool Backfacing)
-{
-	k3d::gl::selection_state result;
-
-	result.exclude_unselected_nodes = true;
-	result.select_split_edges = true;
-	result.select_backfacing = Backfacing;
-
-	return result;
-}
-
-const k3d::gl::selection_state select_uniform(bool Backfacing)
-{
-	k3d::gl::selection_state result;
-
-	result.exclude_unselected_nodes = true;
-	result.select_backfacing = Backfacing;
-	result.select_uniform = true;
-
-	return result;
-}
-
 const k3d::gl::selection_state select_nodes()
 {
 	k3d::gl::selection_state result;
 
-	result.select_points = true;
 	result.select_backfacing = true;
-	result.select_uniform = true;
-	result.select_split_edges = true;
+	result.select_component.insert(k3d::selection::POINT);
+	result.select_component.insert(k3d::selection::SPLIT_EDGE);
+	result.select_component.insert(k3d::selection::UNIFORM);
+	result.select_component.insert(k3d::selection::CURVE);
 
 	return result;
 }
@@ -732,19 +700,14 @@ k3d::selection::records control::get_node_selectables(const k3d::rectangle& Sele
 	return get_selection(detail::select_nodes(), SelectionRegion);
 }
 
-k3d::selection::records control::get_point_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
+k3d::selection::records control::get_component_selectables(const k3d::selection::type Component, const k3d::rectangle& SelectionRegion, bool Backfacing)
 {
-	return get_selection(detail::select_points(Backfacing), SelectionRegion);
-}
+	k3d::gl::selection_state selection_state;
+	selection_state.exclude_unselected_nodes = true;
+	selection_state.select_backfacing = Backfacing;
+	selection_state.select_component.insert(Component);
 
-k3d::selection::records control::get_split_edge_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
-{
-	return get_selection(detail::select_split_edges(Backfacing), SelectionRegion);
-}
-
-k3d::selection::records control::get_uniform_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
-{
-	return get_selection(detail::select_uniform(Backfacing), SelectionRegion);
+	return get_selection(selection_state, SelectionRegion);
 }
 
 k3d::selection::records control::get_object_selectables(const k3d::rectangle& SelectionRegion, bool Backfacing)
@@ -755,13 +718,16 @@ k3d::selection::records control::get_object_selectables(const k3d::rectangle& Se
 			return get_node_selectables(SelectionRegion);
 			break;
 		case selection::POINTS:
-			return get_point_selectables(SelectionRegion, Backfacing);
+			return get_component_selectables(k3d::selection::POINT, SelectionRegion, Backfacing);
 			break;
 		case selection::SPLIT_EDGES:
-			return get_split_edge_selectables(SelectionRegion, Backfacing);
+			return get_component_selectables(k3d::selection::SPLIT_EDGE, SelectionRegion, Backfacing);
 			break;
 		case selection::UNIFORM:
-			return get_uniform_selectables(SelectionRegion, Backfacing);
+			return get_component_selectables(k3d::selection::UNIFORM, SelectionRegion, Backfacing);
+			break;
+		case selection::CURVES:
+			return get_component_selectables(k3d::selection::CURVE, SelectionRegion, Backfacing);
 			break;
 	}
 
@@ -787,10 +753,10 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	return pick_split_edge(Coordinates, records, Backfacing);
 }
 
-k3d::selection::record control::pick_uniform(const k3d::point2& Coordinates, bool Backfacing)
+k3d::selection::record control::pick_component(const k3d::selection::type Component, const k3d::point2& Coordinates, bool Backfacing)
 {
 	k3d::selection::records records;
-	return pick_uniform(Coordinates, records, Backfacing);
+	return pick_component(Component, Coordinates, records, Backfacing);
 }
 
 k3d::selection::record control::pick_object(const k3d::point2& Coordinates, bool Backfacing)
@@ -826,10 +792,10 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	// Draw everything (will find nearest point if another component is picked)
 	k3d::gl::selection_state selection_state;
 	selection_state.exclude_unselected_nodes = true;
-	selection_state.select_points = true;
 	selection_state.select_backfacing = Backfacing;
-	selection_state.select_uniform = true;
-	selection_state.select_split_edges = true;
+	selection_state.select_component.insert(k3d::selection::POINT);
+	selection_state.select_component.insert(k3d::selection::SPLIT_EDGE);
+	selection_state.select_component.insert(k3d::selection::UNIFORM);
 
 	const double sensitivity = 5;
 	const k3d::rectangle selection_region(
@@ -1095,8 +1061,8 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	// Draw everything (will find nearest line if some other component type is picked)
 	k3d::gl::selection_state selection_state;
 	selection_state.exclude_unselected_nodes = true;
-	selection_state.select_split_edges = true;
 	selection_state.select_backfacing = Backfacing;
+	selection_state.select_component.insert(k3d::selection::SPLIT_EDGE);
 
 	const double sensitivity = 5;
 	const k3d::rectangle selection_region(
@@ -1188,7 +1154,7 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 	return k3d::selection::record::empty_record();
 }
 
-k3d::selection::record control::pick_uniform(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
+k3d::selection::record control::pick_component(const k3d::selection::type Component, const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
 {
 	const double sensitivity = 3;
 	const k3d::rectangle selection_region(
@@ -1197,18 +1163,20 @@ k3d::selection::record control::pick_uniform(const k3d::point2& Coordinates, k3d
 		Coordinates[1] - sensitivity,
 		Coordinates[1] + sensitivity);
 
-	Records = get_selection(detail::select_uniform(Backfacing), selection_region);
+	k3d::gl::selection_state selection_state;
+	selection_state.exclude_unselected_nodes = true;
+	selection_state.select_backfacing = Backfacing;
+	selection_state.select_component.insert(Component);
+
+	Records = get_selection(selection_state, selection_region);
 	std::sort(Records.begin(), Records.end(), detail::sort_by_zmin());
 
 	for(k3d::selection::records::const_iterator record = Records.begin(); record != Records.end(); ++record)
 	{
 		for(k3d::selection::record::tokens_t::const_iterator token = record->tokens.begin(); token != record->tokens.end(); ++token)
 		{
-			switch(token->type)
-			{
-				case k3d::selection::UNIFORM:
-					return *record;
-			}
+			if(token->type == Component)
+				return *record;
 		}
 	}
 
@@ -1229,7 +1197,10 @@ k3d::selection::record control::pick_object(const k3d::point2& Coordinates, k3d:
 			return pick_split_edge(Coordinates, Records, Backfacing);
 			break;
 		case selection::UNIFORM:
-			return pick_uniform(Coordinates, Records, Backfacing);
+			return pick_component(k3d::selection::UNIFORM, Coordinates, Records, Backfacing);
+			break;
+		case selection::CURVES:
+			return pick_component(k3d::selection::CURVE, Coordinates, Records, Backfacing);
 			break;
 	}
 

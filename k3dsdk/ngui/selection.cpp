@@ -105,14 +105,20 @@ struct select_all_points
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, 0.0);
 
 		return results;
 	}
 };
 
-/// Update policy for use with replace_selection() that selects all split edges in a mesh.
-struct select_all_split_edges
+/// Update policy for use with replace_selection() that selects all components of a given type in a mesh.
+struct select_all_components
 {
+	select_all_components(const k3d::selection::type Component) :
+		component(Component)
+	{
+	}
+
 	const k3d::selection::set operator()(const mesh& Mesh, const k3d::selection::set& CurrentSelection) const
 	{
 		k3d::selection::set results;
@@ -121,35 +127,17 @@ struct select_all_split_edges
 		geometry::point_selection::append(*point_selection, 0.0);
 
 		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::UNIFORM, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, 1.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, component == k3d::selection::CONSTANT ? 1.0 : 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::UNIFORM, component == k3d::selection::UNIFORM ? 1.0 : 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, component == k3d::selection::VARYING ? 1.0 : 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE_VARYING, component == k3d::selection::FACE_VARYING ? 1.0 : 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, component == k3d::selection::SPLIT_EDGE ? 1.0 : 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, component == k3d::selection::CURVE ? 1.0 : 0.0);
 
 		return results;
 	}
-};
 
-/// Update policy for use with replace_selection() that selects all uniform primitives in a mesh.
-struct select_all_uniform
-{
-	const k3d::selection::set operator()(const mesh& Mesh, const k3d::selection::set& CurrentSelection) const
-	{
-		k3d::selection::set results;
-
-		boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(results));
-		geometry::point_selection::append(*point_selection, 0.0);
-
-		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::UNIFORM, 1.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
-
-		return results;
-	}
+	const k3d::selection::type component;
 };
 
 /// Update policy for use with replace_selection() that inverts the selection of all points in a mesh.
@@ -257,6 +245,8 @@ struct deselect_all
 template<typename UpdatePolicyT>
 void merge_interactive_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePolicy, const k3d::selection::records& InteractiveSelection)
 {
+std::copy(InteractiveSelection.begin(), InteractiveSelection.end(), std::ostream_iterator<k3d::selection::record>(k3d::log(), "\n"));
+
 	for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
 	{
 		if(classes::MeshInstance() != (*node)->factory().factory_id())
@@ -324,10 +314,11 @@ struct select_points
 	const double_t weight;
 };
 
-/// Policy class that updates a mesh_selection to select the given lines
-struct select_split_edges
+/// Policy class that updates a mesh_selection to select the given components
+struct select_component
 {
-	select_split_edges(const double_t Weight) :
+	select_component(const k3d::selection::type& Component, const double_t Weight) :
+		component(Component),
 		weight(Weight)
 	{
 	}
@@ -348,32 +339,29 @@ struct select_split_edges
 			bool_t found_primitive = false;
 			for(k3d::selection::record::tokens_t::const_iterator token = record->tokens.begin(); token != record->tokens.end(); ++token)
 			{
-				switch(token->type)
+				if(token->type == k3d::selection::PRIMITIVE)
 				{
-					case k3d::selection::PRIMITIVE:
-						found_primitive = true;
-						if(primitive_selection->primitive_begin.empty() || primitive_selection->primitive_begin.back() != token->id)
-						{
-							primitive_selection->primitive_begin.push_back(token->id);
-							primitive_selection->primitive_end.push_back(token->id + 1);
-							primitive_selection->primitive_selection_type.push_back(k3d::selection::SPLIT_EDGE);
-							primitive_selection->primitive_first_range.push_back(primitive_selection->index_begin.size());
-							primitive_selection->primitive_range_count.push_back(0);
-						}
+					found_primitive = true;
+					if(primitive_selection->primitive_begin.empty() || primitive_selection->primitive_begin.back() != token->id)
+					{
+						primitive_selection->primitive_begin.push_back(token->id);
+						primitive_selection->primitive_end.push_back(token->id + 1);
+						primitive_selection->primitive_selection_type.push_back(component);
+						primitive_selection->primitive_first_range.push_back(primitive_selection->index_begin.size());
+						primitive_selection->primitive_range_count.push_back(0);
+					}
+				}
+				else if(token->type == component)
+				{
+					if(!found_primitive)
+					{
+						log() << error << "Selection records missing primitive token" << std::endl;
 						break;
-					case k3d::selection::SPLIT_EDGE:
-						if(!found_primitive)
-						{
-							log() << error << "Selection records missing primitive token" << std::endl;
-							break;
-						}
-						primitive_selection->primitive_range_count.back() += 1;
-						primitive_selection->index_begin.push_back(token->id);
-						primitive_selection->index_end.push_back(token->id + 1);
-						primitive_selection->weight.push_back(weight);
-						break;
-					default:
-						break;
+					}
+					primitive_selection->primitive_range_count.back() += 1;
+					primitive_selection->index_begin.push_back(token->id);
+					primitive_selection->index_end.push_back(token->id + 1);
+					primitive_selection->weight.push_back(weight);
 				}
 			}
 		}
@@ -381,66 +369,7 @@ struct select_split_edges
 		return results;
 	}
 
-	const double_t weight;
-};
-
-/// Policy class that updates a mesh_selection to select the given uniform components
-struct select_uniform
-{
-	select_uniform(const double_t Weight) :
-		weight(Weight)
-	{
-	}
-
-	const k3d::selection::set operator()(k3d::inode* const Node, const k3d::mesh& Mesh, const k3d::selection::set& CurrentSelection, const k3d::selection::records& InteractiveSelection) const
-	{
-		k3d::selection::set results = CurrentSelection;
-
-		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection;
-		for(k3d::selection::records::const_iterator record = InteractiveSelection.begin(); record != InteractiveSelection.end(); ++record)
-		{
-			if(k3d::selection::get_node(*record) != Node)
-				continue;
-
-			if(!primitive_selection)
-				primitive_selection.reset(geometry::primitive_selection::create(results));				
-
-			bool_t found_primitive = false;
-			for(k3d::selection::record::tokens_t::const_iterator token = record->tokens.begin(); token != record->tokens.end(); ++token)
-			{
-				switch(token->type)
-				{
-					case k3d::selection::PRIMITIVE:
-						found_primitive = true;
-						if(primitive_selection->primitive_begin.empty() || primitive_selection->primitive_begin.back() != token->id)
-						{
-							primitive_selection->primitive_begin.push_back(token->id);
-							primitive_selection->primitive_end.push_back(token->id + 1);
-							primitive_selection->primitive_selection_type.push_back(k3d::selection::UNIFORM);
-							primitive_selection->primitive_first_range.push_back(primitive_selection->index_begin.size());
-							primitive_selection->primitive_range_count.push_back(0);
-						}
-						break;
-					case k3d::selection::UNIFORM:
-						if(!found_primitive)
-						{
-							log() << error << "Selection records missing primitive token" << std::endl;
-							break;
-						}
-						primitive_selection->primitive_range_count.back() += 1;
-						primitive_selection->index_begin.push_back(token->id);
-						primitive_selection->index_end.push_back(token->id + 1);
-						primitive_selection->weight.push_back(weight);
-						break;
-					default:
-						break;
-				}
-			}
-		}
-
-		return results;
-	}
-
+	const k3d::selection::type component;
 	const double_t weight;
 };
 
@@ -465,6 +394,9 @@ std::ostream& operator<<(std::ostream& Stream, const mode& RHS)
 		case UNIFORM:
 			Stream << "uniform";
 			break;
+		case CURVES:
+			Stream << "curves";
+			break;
 	}
 
         return Stream;
@@ -483,6 +415,8 @@ std::istream& operator>>(std::istream& Stream, mode& RHS)
                 RHS = SPLIT_EDGES;
         else if(text == "uniform")
                 RHS = UNIFORM;
+        else if(text == "curves")
+                RHS = CURVES;
         else
                 log() << error << "Unknown enumeration [" << text << "]"<< std::endl;
 
@@ -497,8 +431,9 @@ static const ienumeration_property::enumeration_values_t& mode_values()
 	{
 		values.push_back(ienumeration_property::enumeration_value_t(_("Nodes"), "nodes", _("Select Nodes")));
 		values.push_back(ienumeration_property::enumeration_value_t(_("Points"), "points", _("Select Points")));
-		values.push_back(ienumeration_property::enumeration_value_t(_("Lines"), "lines", _("Select Lines")));
-		values.push_back(ienumeration_property::enumeration_value_t(_("Faces"), "faces", _("Select Faces")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Split Edges"), "split_edges", _("Select Split Edges")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Uniform"), "uniform", _("Select Uniform")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Curves"), "curves", _("Select Curves")));
 	}
 
 	return values;
@@ -645,10 +580,13 @@ void state::select(const k3d::selection::records& Selection)
 			detail::merge_interactive_selection(selected_nodes(), detail::select_points(1.0), Selection);
 			break;
 		case SPLIT_EDGES:
-			detail::merge_interactive_selection(selected_nodes(), detail::select_split_edges(1.0), Selection);
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::SPLIT_EDGE, 1.0), Selection);
 			break;
 		case UNIFORM:
-			detail::merge_interactive_selection(selected_nodes(), detail::select_uniform(1.0), Selection);
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::UNIFORM, 1.0), Selection);
+			break;
+		case CURVES:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::CURVE, 1.0), Selection);
 			break;
 	}
 
@@ -699,10 +637,13 @@ void state::select_all()
 			detail::replace_selection(selected_nodes(), detail::select_all_points(), true);
 			break;
 		case SPLIT_EDGES:
-			detail::replace_selection(selected_nodes(), detail::select_all_split_edges(), true);
+			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::SPLIT_EDGE), true);
 			break;
 		case UNIFORM:
-			detail::replace_selection(selected_nodes(), detail::select_all_uniform(), true);
+			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::UNIFORM), true);
+			break;
+		case CURVES:
+			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::CURVE), true);
 			break;
 	}
 
@@ -731,6 +672,9 @@ void state::invert_selection()
 			break;
 		case UNIFORM:
 			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::UNIFORM), true);
+			break;
+		case CURVES:
+			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::CURVE), true);
 			break;
 	}
 
@@ -776,10 +720,13 @@ void state::deselect(const k3d::selection::records& Selection)
 			detail::merge_interactive_selection(selected_nodes(), detail::select_points(0.0), Selection);
 			break;
 		case SPLIT_EDGES:
-			detail::merge_interactive_selection(selected_nodes(), detail::select_split_edges(0.0), Selection);
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::SPLIT_EDGE, 0.0), Selection);
 			break;
 		case UNIFORM:
-			detail::merge_interactive_selection(selected_nodes(), detail::select_uniform(0.0), Selection);
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::UNIFORM, 0.0), Selection);
+			break;
+		case CURVES:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::CURVE, 0.0), Selection);
 			break;
 	}
 
@@ -811,6 +758,7 @@ void state::deselect_all()
 		case POINTS:
 		case SPLIT_EDGES:
 		case UNIFORM:
+		case CURVES:
 			detail::replace_selection(internal.document.nodes().collection(), detail::deselect_all(), false);
 			break;
 	}

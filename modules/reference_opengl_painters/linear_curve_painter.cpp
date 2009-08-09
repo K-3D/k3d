@@ -91,7 +91,7 @@ public:
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!SelectionState.select_curves)
+		if(!SelectionState.select_component.count(k3d::selection::CURVE))
 			return;
 
 		k3d::uint_t primitive_index = 0;
