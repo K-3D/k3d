@@ -44,11 +44,22 @@ static list keys(const_table_wrapper& Self)
 	return results;
 }
 
-static object get_item(const_table_wrapper& Self, const string_t& Key)
+static object get_item1(const_table_wrapper& Self, const string_t& Key)
 {
 	k3d::table::const_iterator iterator = Self.wrapped().find(Key);
 	if(iterator == Self.wrapped().end())
 		throw std::runtime_error("unknown key: " + Key);
+
+	return wrap_array(iterator->second.get());
+}
+
+static object get_item2(const_table_wrapper& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.wrapped().column_count())
+		throw std::out_of_range("index out-of-range");
+
+	k3d::table::const_iterator iterator = Self.wrapped().begin();
+	std::advance(iterator, Item);
 
 	return wrap_array(iterator->second.get());
 }
@@ -65,7 +76,9 @@ void define_class_const_table()
 		.def("keys", &keys,
 			"Returns a list containing names for all the arrays in the collection.")
 		.def("__len__", &row_count)
-		.def("__getitem__", &get_item);
+		.def("__getitem__", &get_item1)
+		.def("__getitem__", &get_item2)
+		;
 }
 
 } // namespace python

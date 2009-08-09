@@ -33,6 +33,17 @@ namespace k3d
 namespace python
 {
 
+static object const_named_tables_get_item(const_named_tables_wrapper& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.wrapped().size())
+		throw std::out_of_range("index out-of-range");
+
+	k3d::named_tables::const_iterator item(Self.wrapped().begin());
+	std::advance(item, Item);
+
+	return wrap(item->second);
+}
+
 static list keys(const_named_tables_wrapper& Self)
 {
 	list results;
@@ -51,6 +62,7 @@ void define_class_const_named_tables()
 	class_<const_named_tables_wrapper>("const_named_tables", no_init)
 		.def("__len__", &utility::wrapped_len<const_named_tables_wrapper>)
 		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<const_named_tables_wrapper>)
+		.def("__getitem__", &const_named_tables_get_item)
 		.def("keys", &keys, "Returns a list containing names for all the tables in the collection.")
 		;
 }

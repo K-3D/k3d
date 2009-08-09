@@ -36,6 +36,17 @@ namespace python
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // named_tables
 
+static object named_tables_get_item(named_tables_wrapper& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.wrapped().size())
+		throw std::out_of_range("index out-of-range");
+
+	k3d::named_tables::iterator item(Self.wrapped().begin());
+	std::advance(item, Item);
+
+	return wrap(item->second);
+}
+
 static object named_tables_create(named_tables_wrapper& Self, const string_t& Name)
 {
 	if(Name.empty())
@@ -71,6 +82,7 @@ void define_class_named_tables()
 	class_<named_tables_wrapper>("named_tables", no_init)
 		.def("__len__", &utility::wrapped_len<named_tables_wrapper>)
 		.def("__getitem__", &utility::wrapped_get_wrapped_item_by_key<named_tables_wrapper>)
+		.def("__getitem__", &named_tables_get_item)
 		.def("create", &named_tables_create)
 		.def("delete", &delete_1, "Deletes a set of attribute arrays with the given name, if any.")
 		.def("keys", &keys, "Returns a list containing names for all the tables in the collection.")

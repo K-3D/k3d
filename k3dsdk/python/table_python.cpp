@@ -116,11 +116,22 @@ static void set_row_count(table_wrapper& Self, const uint_t NewSize)
 	Self.wrapped().set_row_count(NewSize);
 }
 
-static object get_item(table_wrapper& Self, const string_t& Key)
+static object get_item1(table_wrapper& Self, const string_t& Key)
 {
 	k3d::table::iterator iterator = Self.wrapped().find(Key);
 	if(iterator == Self.wrapped().end())
 		throw std::runtime_error("unknown key: " + Key);
+
+	return wrap_array(iterator->second.writable());
+}
+
+static object get_item2(table_wrapper& Self, int Item)
+{
+	if(Item < 0 || Item >= Self.wrapped().column_count())
+		throw std::out_of_range("index out-of-range");
+
+	k3d::table::iterator iterator = Self.wrapped().begin();
+	std::advance(iterator, Item);
 
 	return wrap_array(iterator->second.writable());
 }
@@ -140,7 +151,9 @@ void define_class_table()
 		.def("set_row_count", &set_row_count,
 			"Sets the size of every array in the collection.")
 		.def("__len__", &row_count)
-		.def("__getitem__", &get_item);
+		.def("__getitem__", &get_item1)
+		.def("__getitem__", &get_item2)
+		;
 }
 
 } // namespace python
