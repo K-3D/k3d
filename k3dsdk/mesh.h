@@ -193,6 +193,7 @@ public:
 
 /// Stream serialization
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS);
+std::ostream& operator<<(std::ostream& Stream, const mesh::primitive& RHS);
 
 /// Specialization of almost_equal that tests k3d::mesh for equality
 template<>

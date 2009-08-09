@@ -554,14 +554,22 @@ std::ostream& operator<<(std::ostream& Stream, const mesh& RHS)
 
 	Stream << standard_indent << "primitives (" << RHS.primitives.size() << "):\n" << push_indent;
 	for(mesh::primitives_t::const_iterator primitive = RHS.primitives.begin(); primitive != RHS.primitives.end(); ++primitive)
-	{
-		Stream << standard_indent << "primitive \"" << (*primitive)->type << "\"\n" << push_indent;
-		Stream << standard_indent << "structure (" << (*primitive)->structure.size() << "):\n";
-		Stream << push_indent << (*primitive)->structure << pop_indent;
-		Stream << standard_indent << "attributes (" << (*primitive)->attributes.size() << "):\n";
-		Stream << push_indent << (*primitive)->attributes << pop_indent;
-		Stream << pop_indent;
-	}
+		Stream << **primitive;
+	Stream << pop_indent;
+
+	return Stream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// operator<<
+
+std::ostream& operator<<(std::ostream& Stream, const mesh::primitive& RHS)
+{
+	Stream << standard_indent << "primitive \"" << RHS.type << "\"\n" << push_indent;
+	Stream << standard_indent << "structure (" << RHS.structure.size() << "):\n";
+	Stream << push_indent << RHS.structure << pop_indent;
+	Stream << standard_indent << "attributes (" << RHS.attributes.size() << "):\n";
+	Stream << push_indent << RHS.attributes << pop_indent;
 	Stream << pop_indent;
 
 	return Stream;
