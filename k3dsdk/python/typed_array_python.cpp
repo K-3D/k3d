@@ -278,6 +278,9 @@ public:
 		output(Output)
 	{
 		output = boost::python::object();
+
+		if(k3d::uint_t_array* const array = dynamic_cast<k3d::uint_t_array*>(&input))
+			output = wrap(array);
 	}
 
 	template<typename T>
