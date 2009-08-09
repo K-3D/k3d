@@ -14,7 +14,7 @@ curves = k3d.linear_curve.create(Output)
 constantwidth = curves.constant_attributes().create("constantwidth", "k3d::double_t")
 
 # Create an (optional) array to store per-curve curve colors
-Cs = curves.uniform_attributes().create("Cs", "k3d::color")
+Cs = curves.curve_attributes().create("Cs", "k3d::color")
 
 # Add curves ...
 curves.periodic().append(False)

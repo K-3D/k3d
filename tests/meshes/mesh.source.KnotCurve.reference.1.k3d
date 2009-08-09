@@ -11,7 +11,7 @@
 						<array name="material" type="k3d::imaterial*">0</array>
 						<array name="periodic" type="k3d::bool_t">1</array>
 					</table>
-					<table type="uniform">
+					<table type="curve">
 						<array name="curve_first_points" type="k3d::uint_t">0</array>
 						<array name="curve_point_counts" type="k3d::uint_t">100</array>
 						<array name="curve_selections" type="k3d::double_t">0
@@ -32,7 +32,7 @@
 					<table type="constant">
 						<array name="width" type="k3d::double_t">0.10000000000000001</array>
 					</table>
-					<table type="uniform"/>
+					<table type="curve"/>
 					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>

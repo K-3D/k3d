@@ -11,7 +11,7 @@
 						<array name="material" type="k3d::imaterial*">0</array>
 						<array name="periodic" type="k3d::bool_t">0</array>
 					</table>
-					<table type="uniform">
+					<table type="curve">
 						<array name="curve_first_points" type="k3d::uint_t">0 3 6 9 12</array>
 						<array name="curve_point_counts" type="k3d::uint_t">3 3 3 3 3</array>
 						<array name="curve_selections" type="k3d::double_t">0 0 0 0 0
@@ -32,7 +32,7 @@
 					<table type="constant">
 						<array name="constantwidth" type="k3d::double_t">0.5</array>
 					</table>
-					<table type="uniform">
+					<table type="curve">
 						<array name="Cs" type="k3d::color">1 1 0 1 1 0.20000000000000001 1 1 0.40000000000000002 1 1 0.60000000000000009 1 1 0.80000000000000004</array>
 					</table>
 					<table type="varying"/>

@@ -2,7 +2,7 @@
 #define K3DSDK_LINEAR_CURVE_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -40,7 +40,7 @@ public:
 		const mesh::selection_t& CurveSelections,
 		const mesh::indices_t& CurvePoints,
 		const mesh::table_t& ConstantAttributes,
-		const mesh::table_t& UniformAttributes,
+		const mesh::table_t& CurveAttributes,
 		const mesh::table_t& VaryingAttributes,
 		const mesh::table_t& VertexAttributes
 		);
@@ -52,7 +52,7 @@ public:
 	const mesh::selection_t& curve_selections;
 	const mesh::indices_t& curve_points;
 	const mesh::table_t& constant_attributes;
-	const mesh::table_t& uniform_attributes;
+	const mesh::table_t& curve_attributes;
 	const mesh::table_t& varying_attributes;
 	const mesh::table_t& vertex_attributes;
 };
@@ -69,7 +69,7 @@ public:
 		mesh::selection_t& CurveSelections,
 		mesh::indices_t& CurvePoints,
 		mesh::table_t& ConstantAttributes,
-		mesh::table_t& UniformAttributes,
+		mesh::table_t& CurveAttributes,
 		mesh::table_t& VaryingAttributes,
 		mesh::table_t& VertexAttributes
 		);
@@ -81,7 +81,7 @@ public:
 	mesh::selection_t& curve_selections;
 	mesh::indices_t& curve_points;
 	mesh::table_t& constant_attributes;
-	mesh::table_t& uniform_attributes;
+	mesh::table_t& curve_attributes;
 	mesh::table_t& varying_attributes;
 	mesh::table_t& vertex_attributes;
 };
