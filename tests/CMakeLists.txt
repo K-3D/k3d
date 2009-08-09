@@ -368,6 +368,7 @@ K3D_ADD_TEST(python.api.renderman.options.py PYTHON)
 K3D_ADD_TEST(python.api.user_properties.py PYTHON)
 
 K3D_ADD_TEST(ngui.tools.move.py PYTHON NGUI)
+K3D_ADD_TEST(ngui.tools.rotate.py PYTHON NGUI)
 
 K3D_ADD_TEST(bitmap.modifier.CUDABitmapAdd.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE REQUIRES K3D_BUILD_CUDA_MODULE)
 K3D_ADD_TEST(bitmap.modifier.CUDABitmapMultiply.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE REQUIRES K3D_BUILD_CUDA_MODULE)
