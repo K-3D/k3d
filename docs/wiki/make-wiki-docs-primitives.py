@@ -58,8 +58,20 @@ for i in range(len(primitive_types)):
 	mesh = source.create_mesh()
 	primitive_type.create(mesh)
 
+	need_points = False
+	primitive = mesh.primitives()[0]
+	for table_name in primitive.structure().keys():
+		table = primitive.structure()[table_name]
+		for array_name in table.keys():
+			array = table[array_name]
+			if array.get_metadata_value("k3d:domain") == "/points/indices()":
+				need_points = True
+
+	if need_points:
+		mesh.create_points()
+		mesh.create_point_selection()
+
 	writer = document.new_node("GraphVizMeshWriter")
-#	writer.file = k3d.filesystem.native_path("@CMAKE_CURRENT_BINARY_DIR@/wikitext/templates/" + primitive_name + ".dot")
 	document.set_dependency(writer.get_property("input_mesh"), source.get_property("output_mesh"))
 	article.write(writer.output_string)
 
