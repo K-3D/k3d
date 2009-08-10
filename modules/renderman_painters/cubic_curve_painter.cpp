@@ -76,7 +76,7 @@ public:
 			ri_constant_attributes.add_arrays(cubic_curve->constant_attributes);
 
 			array_copier ri_uniform_attributes;
-			ri_uniform_attributes.add_arrays(cubic_curve->uniform_attributes);
+			ri_uniform_attributes.add_arrays(cubic_curve->curve_attributes);
 			
 			array_copier ri_varying_attributes;
 			ri_varying_attributes.add_arrays(cubic_curve->varying_attributes);
