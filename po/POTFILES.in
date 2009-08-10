@@ -356,7 +356,6 @@ modules/polyhedron_sources/poly_torus.cpp
 modules/polyhedron_sources/polyhedron.cpp
 modules/python/engine.cpp
 modules/qslim/quadric_decimation.cpp
-modules/qtui/user_interface.cpp
 modules/quadrics/cone.cpp
 modules/quadrics/cylinder.cpp
 modules/quadrics/detail.h
