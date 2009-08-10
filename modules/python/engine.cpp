@@ -177,33 +177,6 @@ public:
 		return false;
 	}
 
-	void bless_script(std::ostream& Script)
-	{
-		Script << magic_token << "\n\n";
-		Script << "import k3d\n\n";
-	}
-
-	void append_comment(std::ostream& Script, const k3d::string_t& Comment)
-	{
-		// Ensure that the comment doesn't contain any newlines ...
-		k3d::string_t comment(Comment);
-		std::replace(comment.begin(), comment.end(), '\r', ' ');
-		std::replace(comment.begin(), comment.end(), '\n', ' ');
-
-		Script << "# " << comment << "\n";
-	};
-
-	void append_command(std::ostream& Script, k3d::icommand_node& CommandNode, const k3d::string_t& Command, const k3d::string_t& Arguments)
-	{
-		Script << "k3d.get_command_node(\"";
-		Script << k3d::command_node::path(CommandNode);
-		Script << "\").execute_command(\"";
-		Script << Command;
-		Script << "\", \"";
-		Script << k3d::replace_all("\"", "\\\"", Arguments); // Make sure arguments are properly escaped
-		Script << "\")\n";
-	}
-
 	const completions_t complete(const k3d::string_t& Command)
 	{
 		completions_t tokens_equal_token;

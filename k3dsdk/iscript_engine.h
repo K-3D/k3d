@@ -85,24 +85,6 @@ public:
 	*/
 	virtual bool_t halt() = 0;
 
-	/**	\brief Writes a token to a script stream so that it can be recognized by this engine
-	*/
-	virtual void bless_script(std::ostream& Script) = 0;
-
-	/**	\brief Appends the given text to a script as a comment that will be ignored by this engine
-		\param Comment A string to be appended to the script as a comment
-		\note The comment may be single- or multi-line, and can contain any text.  The engine is responsible for ensuring that the comment text does not introduce syntactically-incorrect code.
-	*/
-	virtual void append_comment(std::ostream& Script, const string_t& Comment) = 0;
-
-	/** Converts a command-node command into source code appropriate to this language and adds it to the given script
-		\param CommandNode The command node executing the command to be appended
-		\param Command The name of the command to be appended
-		\param Arguments The command arguments to be appended
-		\note The engine is responsible for ensuring that the appended command does not introduce syntactically-incorrect code, e.g. quoting issues or escaped characters with special meanings.
-	*/
-	virtual void append_command(std::ostream& Script, icommand_node& CommandNode, const string_t& Command, const string_t& Arguments) = 0;
-
 	/// Lists the possible completions for the given command
 	virtual const completions_t complete(const string_t& Command) = 0;
 

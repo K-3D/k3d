@@ -151,36 +151,6 @@ public:
 		return true;
 	}
 
-	void bless_script(std::ostream& Script)
-	{
-		Script << magic_token << "\n\n";
-	}
-
-	void append_comment(std::ostream& Script, const k3d::string_t& Comment)
-	{
-		std::stringstream buffer(Comment);
-		while(true)
-		{
-			k3d::string_t line;
-			k3d::getline(buffer, line);
-			Script << "# " << line << "\n";
-
-			if(!buffer)
-				break;
-		}
-	}
-
-	void append_command(std::ostream& Script, k3d::icommand_node& Node, const k3d::string_t& Command, const k3d::string_t& Arguments)
-	{
-		k3d::xml::element command(
-			"command",
-			k3d::xml::attribute("node", k3d::command_node::path(Node)),
-			k3d::xml::attribute("command", Command),
-			k3d::xml::attribute("arguments", Arguments));
-
-		Script << k3d::xml::single_line() << command << "\n";
-	}
-
 	const completions_t complete(const k3d::string_t& Command)
 	{
 		return completions_t();
