@@ -846,7 +846,7 @@ static void parse_graphics(const k3d::xml::element& SVG, transform_stack& Transf
 			Transformation.pop();
 	}
 	if(colors.size() == Primitive.curve_first_points.size())
-		Primitive.uniform_attributes.create("Cs", new k3d::mesh::colors_t(colors));
+		Primitive.curve_attributes.create("Cs", new k3d::mesh::colors_t(colors));
 }
 
 /////////////////////////////////////////////////////////////////////////////

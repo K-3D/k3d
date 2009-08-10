@@ -53,7 +53,7 @@ public:
 		static object curve_point_weights(wrapper& Self) { return wrap(Self.wrapped().curve_point_weights); }
 		static object curve_knots(wrapper& Self) { return wrap(Self.wrapped().curve_knots); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object curve_attributes(wrapper& Self) { return wrap(Self.wrapped().curve_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -72,7 +72,7 @@ public:
 		static object curve_point_weights(wrapper& Self) { return wrap(Self.wrapped().curve_point_weights); }
 		static object curve_knots(wrapper& Self) { return wrap(Self.wrapped().curve_knots); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object curve_attributes(wrapper& Self) { return wrap(Self.wrapped().curve_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -114,7 +114,7 @@ void define_namespace_nurbs_curve()
 		.def("curve_point_weights", &nurbs_curve::const_primitive::curve_point_weights)
 		.def("curve_knots", &nurbs_curve::const_primitive::curve_knots)
 		.def("constant_attributes", &nurbs_curve::const_primitive::constant_attributes)
-		.def("uniform_attributes", &nurbs_curve::const_primitive::uniform_attributes)
+		.def("curve_attributes", &nurbs_curve::const_primitive::curve_attributes)
 		.def("varying_attributes", &nurbs_curve::const_primitive::varying_attributes)
 		;
 
@@ -129,7 +129,7 @@ void define_namespace_nurbs_curve()
 		.def("curve_point_weights", &nurbs_curve::primitive::curve_point_weights)
 		.def("curve_knots", &nurbs_curve::primitive::curve_knots)
 		.def("constant_attributes", &nurbs_curve::primitive::constant_attributes)
-		.def("uniform_attributes", &nurbs_curve::primitive::uniform_attributes)
+		.def("curve_attributes", &nurbs_curve::primitive::curve_attributes)
 		.def("varying_attributes", &nurbs_curve::primitive::varying_attributes)
 		;
 }

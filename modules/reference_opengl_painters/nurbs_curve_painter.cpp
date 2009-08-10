@@ -142,7 +142,7 @@ public:
 
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!SelectionState.select_component.count(k3d::selection::UNIFORM))
+		if(!SelectionState.select_component.count(k3d::selection::CURVE))
 			return;
 
 		k3d::uint_t primitive_index = 0;
@@ -172,7 +172,7 @@ public:
 			k3d::uint_t curve_index = 0;
 			for(k3d::uint_t curve = curve_begin; curve != curve_end; ++curve, ++curve_index)
 			{
-				k3d::gl::push_selection_token(k3d::selection::UNIFORM, curve_index);
+				k3d::gl::push_selection_token(k3d::selection::CURVE, curve_index);
 
 				const k3d::uint_t curve_point_count = nurbs_curve->curve_point_counts[curve];
 				const k3d::uint_t curve_point_begin = nurbs_curve->curve_first_points[curve];
@@ -199,7 +199,7 @@ public:
 				gluNurbsCurve(nurbs_renderer, gl_knot_vector.size(), &gl_knot_vector[0], 4, &gl_control_points[0], curve_order, GL_MAP1_VERTEX_4);
 				gluEndCurve(nurbs_renderer);
 
-				k3d::gl::pop_selection_token(); // UNIFORM
+				k3d::gl::pop_selection_token(); // CURVE
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE

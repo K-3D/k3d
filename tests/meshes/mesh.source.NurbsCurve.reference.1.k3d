@@ -10,10 +10,7 @@
 					<table type="constant">
 						<array name="material" type="k3d::imaterial*">0</array>
 					</table>
-					<table type="knot">
-						<array name="curve_knots" type="k3d::double_t">0 0 0 1 2 2 2</array>
-					</table>
-					<table type="uniform">
+					<table type="curve">
 						<array name="curve_first_knots" type="k3d::uint_t">0</array>
 						<array name="curve_first_points" type="k3d::uint_t">0</array>
 						<array name="curve_orders" type="k3d::uint_t">3</array>
@@ -23,6 +20,9 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+					</table>
+					<table type="knot">
+						<array name="curve_knots" type="k3d::double_t">0 0 0 1 2 2 2</array>
 					</table>
 					<table type="vertex">
 						<array name="curve_point_weights" type="k3d::double_t">1 1 1 1</array>
@@ -35,7 +35,7 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="uniform"/>
+					<table type="curve"/>
 					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>

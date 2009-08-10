@@ -10,10 +10,7 @@
 					<table type="constant">
 						<array name="material" type="k3d::imaterial*">0</array>
 					</table>
-					<table type="knot">
-						<array name="curve_knots" type="k3d::double_t">0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 0 1 1 1 0 0 1 1 0 0 0 1 1 1 0 0 1 1 0 0 0 1 1 1 0 0 1 1 0 0 0 1 1 1 0 0 1 1 0 0 1 1 0 0 0 1 1 2 2 3 3 4 4 4 0 0 0 1 1 2 2 3 3 4 4 4 0 0 1 2 2 0 0 1 2 3 3 0 0 1 1 0 0 1 1 0 0 1 1 0 0 0 0 1 1 1 1 0 0 1 1 0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1 0 0 1 1</array>
-					</table>
-					<table type="uniform">
+					<table type="curve">
 						<array name="curve_first_knots" type="k3d::uint_t">0 4 8 12 16 20 24 28 32 38 42 48 52 58 62 68 72 76 88 100 105 111 115 119 123 131 135 143 151</array>
 						<array name="curve_first_points" type="k3d::uint_t">0 2 4 6 8 10 12 14 16 19 21 24 26 29 31 34 36 38 47 56 59 63 65 67 69 73 75 79 83</array>
 						<array name="curve_orders" type="k3d::uint_t">2 2 2 2 2 2 2 2 3 2 3 2 3 2 3 2 2 3 3 2 2 2 2 2 4 2 4 4 2</array>
@@ -23,6 +20,9 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+					</table>
+					<table type="knot">
+						<array name="curve_knots" type="k3d::double_t">0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 0 1 1 1 0 0 1 1 0 0 0 1 1 1 0 0 1 1 0 0 0 1 1 1 0 0 1 1 0 0 0 1 1 1 0 0 1 1 0 0 1 1 0 0 0 1 1 2 2 3 3 4 4 4 0 0 0 1 1 2 2 3 3 4 4 4 0 0 1 2 2 0 0 1 2 3 3 0 0 1 1 0 0 1 1 0 0 1 1 0 0 0 0 1 1 1 1 0 0 1 1 0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1 0 0 1 1</array>
 					</table>
 					<table type="vertex">
 						<array name="curve_point_weights" type="k3d::double_t">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0.70710678118654757 1 1 1 1 0.70710678118654757 1 1 1 1 0.70710678118654757 1 1 1 1 0.70710678118654757 1 1 1 1 1 1 0.70710678118654757 1 0.70710678118654757 1 0.70710678118654757 1 0.70710678118654757 1 1 0.70710678118654757 1 0.70710678118654757 1 0.70710678118654757 1 0.70710678118654757 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</array>
@@ -35,7 +35,7 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="uniform"/>
+					<table type="curve"/>
 					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>

@@ -276,8 +276,8 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 			continue;
 
 		boost::scoped_ptr<k3d::nurbs_patch::primitive> output_patches(k3d::nurbs_patch::create(OutputMesh));
-		output_patches->uniform_attributes = source_curves->uniform_attributes.clone_types();
-		k3d::table_copier uniform_copier(source_curves->uniform_attributes, output_patches->uniform_attributes);
+		output_patches->uniform_attributes = source_curves->curve_attributes.clone_types();
+		k3d::table_copier uniform_copier(source_curves->curve_attributes, output_patches->uniform_attributes);
 
 		// Get the loops that exist in the source_curves primitive
 		k3d::mesh::bools_t is_in_loop, loop_selections;
@@ -422,8 +422,8 @@ void delete_curve(k3d::nurbs_curve::primitive& Curves, const k3d::uint_t Curve)
 {
 	const k3d::uint_t curve_count = Curves.curve_first_points.size();
 
-	k3d::table uniform_attributes = Curves.uniform_attributes.clone_types();
-	k3d::table_copier uniform_copier(Curves.uniform_attributes, uniform_attributes);
+	k3d::table curve_attributes = Curves.curve_attributes.clone_types();
+	k3d::table_copier uniform_copier(Curves.curve_attributes, curve_attributes);
 	for(k3d::uint_t i = 0; i != Curve; ++i)
 		uniform_copier.push_back(i);
 	for(k3d::uint_t i = Curve + 1; i != curve_count; ++i)
