@@ -398,7 +398,7 @@ private:
 	{
 		if (!m_record)
 			return;
-		
+
 		time_property_t* time_property = dynamic_cast<time_property_t*>(TimeProperty);
 		value_property_t* value_property = m_keyframes[time_property];
 		std::string keynumber = time_property->property_name().substr(9, time_property->property_name().size() - 8);
