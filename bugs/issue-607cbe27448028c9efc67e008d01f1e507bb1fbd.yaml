@@ -1,0 +1,26 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Review plugin names
+desc: |-
+  Among other proposals:
+  
+  Should JoinPoints be changed to FusePoints, or UnitePoints, because
+  join points means form a line between two points (or more if there is
+  sequence data in the selection set)?
+  
+  "Join" has also been misused elsewhere so if we change join to a more
+  appropriate word it should be done consistently.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-10 05:20:59.666799 Z
+references: []
+
+id: 607cbe27448028c9efc67e008d01f1e507bb1fbd
+log_events: 
+- - 2009-08-10 05:21:00.458739 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
