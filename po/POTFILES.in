@@ -183,6 +183,7 @@ modules/freetype2/poly_text.cpp
 modules/glx/camera_to_bitmap.cpp
 modules/gnome/mime_type_handler.cpp
 modules/gnome/uri_handler.cpp
+modules/graphviz/mesh_writer.cpp
 modules/graphviz/render_engine.cpp
 modules/gts/mesh_area.cpp
 modules/gts/mesh_volume.cpp
@@ -326,6 +327,7 @@ modules/opencascade/opencascade_mesh_reader.cpp
 modules/openexr_io/bitmap_importer.cpp
 modules/opengl/render_engine.cpp
 modules/osx/uri_handler.cpp
+modules/particle/make_particles.cpp
 modules/pdiff/perceptual_difference.cpp
 modules/pixie/raytrace_map.cpp
 modules/plot/least_squares_plot.cpp
@@ -335,7 +337,6 @@ modules/ply_io/mesh_writer.cpp
 modules/png_io/bitmap_importer.cpp
 modules/png_io/bitmap_reader.cpp
 modules/png_io/bitmap_writer.cpp
-modules/point_group/make_point_group.cpp
 modules/polyhedron/bevel_points.cpp
 modules/polyhedron/extrude_faces.cpp
 modules/polyhedron/make_sds.cpp
@@ -441,7 +442,7 @@ modules/renderman_painters/linear_curve_painter.cpp
 modules/renderman_painters/multi_painter.cpp
 modules/renderman_painters/nurbs_patch_painter.cpp
 modules/renderman_painters/paraboloid_painter.cpp
-modules/renderman_painters/point_group_painter.cpp
+modules/renderman_painters/particle_painter.cpp
 modules/renderman_painters/polyhedron_painter.cpp
 modules/renderman_painters/scripted_painter.cpp
 modules/renderman_painters/sphere_painter.cpp
