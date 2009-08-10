@@ -1,5 +1,5 @@
-#ifndef K3DSDK_POINT_GROUP_H
-#define K3DSDK_POINT_GROUP_H
+#ifndef K3DSDK_PARTICLE_H
+#define K3DSDK_PARTICLE_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -25,10 +25,10 @@
 namespace k3d
 {
 
-namespace point_group
+namespace particle
 {
 
-/// Gathers the member arrays of a point_group primitive into a convenient package
+/// Gathers the member arrays of a particle primitive into a convenient package
 class const_primitive
 {
 public:
@@ -45,7 +45,7 @@ public:
 	const table& vertex_attributes;
 };
 
-/// Gathers the member arrays of a point_group primitive into a convenient package
+/// Gathers the member arrays of a particle primitive into a convenient package
 class primitive
 {
 public:
@@ -62,23 +62,23 @@ public:
 	table& vertex_attributes;
 };
 
-/// Creates a new point_group mesh primitive, returning references to its member arrays.
+/// Creates a new particle mesh primitive, returning references to its member arrays.
 /// The caller is responsible for the lifetime of the returned object.
 primitive* create(mesh& Mesh);
 
-/// Tests the given mesh primitive to see if it is a valid point_group primitive, returning references to its member arrays, or NULL.
+/// Tests the given mesh primitive to see if it is a valid particle primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 const_primitive* validate(const mesh& Mesh, const mesh::primitive& GenericPrimitive);
-/// Tests the given mesh primitive to see if it is a valid point_group primitive, returning references to its member arrays, or NULL.
+/// Tests the given mesh primitive to see if it is a valid particle primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 primitive* validate(const mesh& Mesh, mesh::primitive& GenericPrimitive);
-/// Tests the given mesh primitive to see if it is a valid point_group primitive, returning references to its member arrays, or NULL.
+/// Tests the given mesh primitive to see if it is a valid particle primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& GenericPrimitive);
 
-} // namespace point_group
+} // namespace particle
 
 } // namespace k3d
 
-#endif // !K3DSDK_POINT_GROUP_H
+#endif // !K3DSDK_PARTICLE_H
 

@@ -28,7 +28,7 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/point_group.h>
+#include <k3dsdk/particle.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>
 
@@ -44,16 +44,16 @@ namespace painters
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// point_group_painter
+// particle_painter
 
-class point_group_painter :
+class particle_painter :
 	public k3d::node,
 	public k3d::ri::imesh_painter
 {
 	typedef k3d::node base;
 
 public:
-	point_group_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	particle_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -68,24 +68,24 @@ public:
 
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-			boost::scoped_ptr<k3d::point_group::const_primitive> point_group(k3d::point_group::validate(Mesh, **primitive));
-			if(!point_group)
+			boost::scoped_ptr<k3d::particle::const_primitive> particle(k3d::particle::validate(Mesh, **primitive));
+			if(!particle)
 				continue;
 
 			array_copier ri_constant_attributes;
-			ri_constant_attributes.add_arrays(point_group->constant_attributes);
+			ri_constant_attributes.add_arrays(particle->constant_attributes);
 
 			array_copier ri_varying_attributes;
-			ri_varying_attributes.add_arrays(point_group->vertex_attributes);
+			ri_varying_attributes.add_arrays(particle->vertex_attributes);
 
 			array_copier ri_vertex_attributes;
 			ri_vertex_attributes.add_arrays(vertex_attributes);
 			ri_vertex_attributes.add_array(k3d::ri::RI_P(), points);
 
 			const k3d::uint_t point_begin = 0;
-			const k3d::uint_t point_end = point_begin + point_group->points.size();
+			const k3d::uint_t point_end = point_begin + particle->points.size();
 			for(k3d::uint_t point = point_begin; point != point_end; ++point)
-				ri_vertex_attributes.push_back(point_group->points[point]);
+				ri_vertex_attributes.push_back(particle->points[point]);
 
 			ri_constant_attributes.push_back(0);
 			ri_varying_attributes.insert(point_begin, point_end);
@@ -95,8 +95,8 @@ public:
 			ri_varying_attributes.copy_to(k3d::ri::VARYING, ri_parameters);
 			ri_vertex_attributes.copy_to(k3d::ri::VERTEX, ri_parameters);
 
-			k3d::ri::setup_material(point_group->material[0], RenderState);
-			RenderState.stream.RiPointsV(point_group->points.size(), ri_parameters);
+			k3d::ri::setup_material(particle->material[0], RenderState);
+			RenderState.stream.RiPointsV(particle->points.size(), ri_parameters);
 		}
 	}
 
@@ -106,10 +106,10 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<point_group_painter, k3d::interface_list<k3d::ri::imesh_painter > > factory(
+		static k3d::document_plugin_factory<particle_painter, k3d::interface_list<k3d::ri::imesh_painter > > factory(
 			k3d::uuid(0x06fab90b, 0x2f034d69, 0xb4a1cb9f, 0xb9864144),
-			"RenderManPointGroupPainter",
-			_("Renders mesh point groups"),
+			"RenderManParticlePainter",
+			_("Renders particle primitives."),
 			"RenderMan Painter",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -118,11 +118,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// point_group_painter_factory
+// particle_painter_factory
 
-k3d::iplugin_factory& point_group_painter_factory()
+k3d::iplugin_factory& particle_painter_factory()
 {
-	return point_group_painter::get_factory();
+	return particle_painter::get_factory();
 }
 
 } // namespace painters

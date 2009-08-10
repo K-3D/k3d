@@ -19,9 +19,9 @@
 
 #include "mesh_python.h"
 #include "owned_instance_wrapper_python.h"
-#include "point_group_python.h"
+#include "particle_python.h"
 
-#include <k3dsdk/point_group.h>
+#include <k3dsdk/particle.h>
 
 #include <boost/python.hpp>
 #include <boost/python/detail/api_placeholder.hpp>
@@ -34,13 +34,13 @@ namespace k3d
 namespace python
 {
 
-class point_group
+class particle
 {
 public:
 	class const_primitive
 	{
 	public:
-		typedef owned_instance_wrapper<k3d::point_group::const_primitive> wrapper;
+		typedef owned_instance_wrapper<k3d::particle::const_primitive> wrapper;
 
 		static object material(wrapper& Self) { return wrap(Self.wrapped().material); }
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
@@ -51,7 +51,7 @@ public:
 	class primitive
 	{
 	public:
-		typedef owned_instance_wrapper<k3d::point_group::primitive> wrapper;
+		typedef owned_instance_wrapper<k3d::particle::primitive> wrapper;
 
 		static object material(wrapper& Self) { return wrap(Self.wrapped().material); }
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
@@ -62,42 +62,42 @@ public:
 
 	static object create(mesh_wrapper& Mesh)
 	{
-		return wrap_owned(k3d::point_group::create(Mesh.wrapped()));
+		return wrap_owned(k3d::particle::create(Mesh.wrapped()));
 	}
 
 	static object validate(mesh_wrapper& Mesh, mesh_primitive_wrapper& Primitive)
 	{
-		return wrap_owned(k3d::point_group::validate(Mesh.wrapped(), Primitive.wrapped()));
+		return wrap_owned(k3d::particle::validate(Mesh.wrapped(), Primitive.wrapped()));
 	}
 
 	static object validate_const(const_mesh_wrapper& Mesh, const_mesh_primitive_wrapper& Primitive)
 	{
-		return wrap_owned(k3d::point_group::validate(Mesh.wrapped(), Primitive.wrapped()));
+		return wrap_owned(k3d::particle::validate(Mesh.wrapped(), Primitive.wrapped()));
 	}
 };
 
-void define_namespace_point_group()
+void define_namespace_particle()
 {
-	scope outer = class_<point_group>("point_group", no_init)
-		.def("create", &point_group::create)
+	scope outer = class_<particle>("particle", no_init)
+		.def("create", &particle::create)
 		.staticmethod("create")
-		.def("validate", &point_group::validate)
-		.def("validate", &point_group::validate_const)
+		.def("validate", &particle::validate)
+		.def("validate", &particle::validate_const)
 		.staticmethod("validate")
 		;
 
-	class_<point_group::const_primitive::wrapper>("const_primitive", no_init)
-		.def("material", &point_group::const_primitive::material)
-		.def("points", &point_group::const_primitive::points)
-		.def("constant_attributes", &point_group::const_primitive::constant_attributes)
-		.def("vertex_attributes", &point_group::const_primitive::vertex_attributes)
+	class_<particle::const_primitive::wrapper>("const_primitive", no_init)
+		.def("material", &particle::const_primitive::material)
+		.def("points", &particle::const_primitive::points)
+		.def("constant_attributes", &particle::const_primitive::constant_attributes)
+		.def("vertex_attributes", &particle::const_primitive::vertex_attributes)
 		;
 
-	class_<point_group::primitive::wrapper>("primitive", no_init)
-		.def("material", &point_group::primitive::material)
-		.def("points", &point_group::primitive::points)
-		.def("constant_attributes", &point_group::primitive::constant_attributes)
-		.def("vertex_attributes", &point_group::primitive::vertex_attributes)
+	class_<particle::primitive::wrapper>("primitive", no_init)
+		.def("material", &particle::primitive::material)
+		.def("points", &particle::primitive::points)
+		.def("constant_attributes", &particle::primitive::constant_attributes)
+		.def("vertex_attributes", &particle::primitive::vertex_attributes)
 		;
 }
 

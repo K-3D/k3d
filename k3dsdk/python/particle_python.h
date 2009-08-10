@@ -1,5 +1,8 @@
+#ifndef K3DSDK_PYTHON_PARTICLE_PYTHON_H
+#define K3DSDK_PYTHON_PARTICLE_PYTHON_H
+
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,24 +21,20 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/module.h>
-
-namespace module
+namespace k3d
 {
 
-namespace point_group
+namespace python
 {
 
-extern k3d::iplugin_factory& make_point_group_factory();
+void define_namespace_particle();
 
-} // namespace point_group
+} // namespace python
 
-} // namespace module
+} // namespace k3d
 
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::point_group::make_point_group_factory());
-K3D_MODULE_END
+#endif // !K3DSDK_PYTHON_PARTICLE_PYTHON_H
 

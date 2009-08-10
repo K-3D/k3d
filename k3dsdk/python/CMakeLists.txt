@@ -185,8 +185,8 @@ ADD_LIBRARY(k3dsdk-python-primitives SHARED
 	nurbs_patch_python.h
 	paraboloid_python.cpp
 	paraboloid_python.h
-	point_group_python.cpp
-	point_group_python.h
+	particle_python.cpp
+	particle_python.h
 	polyhedron_python.cpp
 	polyhedron_python.h
 	sphere_python.cpp

@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "metadata_keys.h"
-#include "point_group.h"
+#include "particle.h"
 #include "primitive_validation.h"
 
 #include <numeric>
@@ -26,7 +26,7 @@
 namespace k3d
 {
 
-namespace point_group
+namespace particle
 {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@ primitive::primitive(
 
 primitive* create(mesh& Mesh)
 {
-	mesh::primitive& generic_primitive = Mesh.primitives.create("point_group");
+	mesh::primitive& generic_primitive = Mesh.primitives.create("particle");
 
 	primitive* const result = new primitive(
 		generic_primitive.structure["constant"].create<typed_array<imaterial*> >("material"),
@@ -85,7 +85,7 @@ primitive* create(mesh& Mesh)
 
 const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 {
-	if(Primitive.type != "point_group")
+	if(Primitive.type != "particle")
 		return 0;
 
 	try
@@ -117,7 +117,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 {
-	if(Primitive.type != "point_group")
+	if(Primitive.type != "particle")
 		return 0;
 
 	try
@@ -152,13 +152,13 @@ primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& Primitive)
   if(!Primitive.get())
     return 0;
 
-	if(Primitive->type != "point_group")
+	if(Primitive->type != "particle")
 		return 0;
 
   return validate(Mesh, Primitive.writable());
 }
 
-} // namespace point_group
+} // namespace particle
 
 } // namespace k3d
 

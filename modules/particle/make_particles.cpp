@@ -29,26 +29,26 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/point_group.h>
+#include <k3dsdk/particle.h>
 
 #include <boost/scoped_ptr.hpp>
 
 namespace module
 {
 
-namespace point_group
+namespace particle
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// make_point_group
+// make_particles
 
-class make_point_group :
+class make_particles :
 	public k3d::material_sink<k3d::mesh_modifier<k3d::node> >
 {
 	typedef k3d::material_sink<k3d::mesh_modifier<k3d::node> > base;
 
 public:
-	make_point_group(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	make_particles(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Controls the width of the output points.")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
@@ -67,7 +67,7 @@ public:
 		Output.point_selection = Input.point_selection;
 		Output.point_attributes = Input.point_attributes;
 
-		boost::scoped_ptr<k3d::point_group::primitive> primitive(k3d::point_group::create(Output));
+		boost::scoped_ptr<k3d::particle::primitive> primitive(k3d::particle::create(Output));
 		k3d::typed_array<k3d::double_t>& width = primitive->constant_attributes.create<k3d::typed_array<k3d::double_t> >("constantwidth");
 
 		primitive->material.push_back(m_material.pipeline_value());
@@ -83,12 +83,12 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<make_point_group,
+		static k3d::document_plugin_factory<make_particles,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink> > > factory(
 				k3d::uuid(0x3e4086fe, 0x0246f9ab, 0xeef01f8a, 0xf5cf5cff),
-				"MakePointGroup",
-				_("Converts input gprims into a single point group"),
+				"MakeParticles",
+				_("Converts input geometric points into a single group of particles."),
 				"Mesh",
 				k3d::iplugin_factory::STABLE);
 
@@ -99,14 +99,14 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// make_point_group_factory
+// make_particles_factory
 
-k3d::iplugin_factory& make_point_group_factory()
+k3d::iplugin_factory& make_particles_factory()
 {
-	return make_point_group::get_factory();
+	return make_particles::get_factory();
 }
 
-} // namespace point_group
+} // namespace particle
 
 } // namespace module
 

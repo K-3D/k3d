@@ -8,21 +8,21 @@ points = Output.create_points()
 point_selection = Output.create_point_selection()
 
 # Construct a point group mesh primitive ...
-point_group = k3d.point_group.create(Output)
+particles = k3d.particle.create(Output)
 
 # Create an (optional) array to store per-group point widths
-constantwidth = point_group.constant_attributes().create("constantwidth", "k3d::double_t")
+constantwidth = particles.constant_attributes().create("constantwidth", "k3d::double_t")
 
 # Create an (optional) array to store per-point point colors
-Cs = point_group.vertex_attributes().create("Cs", "k3d::color")
+Cs = particles.vertex_attributes().create("Cs", "k3d::color")
 
 # Add some points ...
-point_group.material().append(None)
+particles.material().append(None)
 constantwidth.append(0.5)
 
 for x in range(-5, 6):
 	for z in range (-5, 6):
-		point_group.points().append(len(points))
+		particles.points().append(len(points))
 
 		points.append(k3d.point3(x, 0, z))
 		point_selection.append(0.0)

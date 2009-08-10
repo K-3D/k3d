@@ -7,7 +7,7 @@ doc = k3d.new_document()
 # Create a point group ...
 poly_source = doc.new_node("PolyCube")
 
-source = doc.new_node("MakePointGroup")
+source = doc.new_node("MakeParticles")
 doc.set_dependency(source.get_property("input_mesh"), poly_source.get_property("output_mesh"))
 
 # Select some geometry ...
