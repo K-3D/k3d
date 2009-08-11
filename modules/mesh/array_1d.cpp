@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -23,12 +23,11 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/itransform_array_1d.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
-
-#include <iterator>
 
 namespace module
 {
@@ -40,9 +39,9 @@ namespace mesh
 // array_1d_implementation
 
 class array_1d_implementation :
-	public k3d::legacy::mesh_modifier<k3d::node >
+	public k3d::mesh_modifier<k3d::node >
 {
-	typedef k3d::legacy::mesh_modifier<k3d::node > base;
+	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
 	array_1d_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -50,38 +49,41 @@ public:
 		m_layout(init_owner(*this) + init_name("layout") + init_label(_("Layout")) + init_description(_("Layout")) + init_value<k3d::itransform_array_1d*>(0)),
 		m_count(init_owner(*this) + init_name("count") + init_label(_("Count")) + init_description(_("Number of mesh copies")) + init_value(5) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0)))
 	{
-		m_layout.changed_signal().connect(make_reset_mesh_slot());
-		m_count.changed_signal().connect(make_reset_mesh_slot());
+		m_layout.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reset_mesh_slot()));
+		m_count.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reset_mesh_slot()));
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
-	}
+		Output = k3d::mesh();
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		if(k3d::itransform_array_1d* const layout = m_layout.pipeline_value())
+		k3d::itransform_array_1d* const layout = m_layout.pipeline_value();
+		if(!layout)
+			return;
+
+		const k3d::int32_t count = m_count.pipeline_value();
+		for(k3d::int32_t i = 0; i != count; ++i)
 		{
-			const unsigned long count = m_count.pipeline_value();
+			// Merge input geometry into our output ...
+			k3d::uint_t point_begin = 0;
+			k3d::uint_t point_end = 0;
+			k3d::mesh::append(Input, Output, &point_begin, &point_end);
 
-			for(unsigned long i = 0; i != count; ++i)
+			// Transform the corresponding output points ...
+			if(Output.points)
 			{
-				// Make a copy of the input geometry ...
-				const unsigned long first_new_point = Mesh.points.size();
-				k3d::legacy::deep_copy(InputMesh, Mesh);
+				k3d::mesh::points_t& output_points = Output.points.writable();
 
-				// Apply offsets ...
 				const k3d::matrix4 matrix = layout->get_element(i, count);
-				for(unsigned long i = first_new_point; i != Mesh.points.size(); ++i)
-					Mesh.points[i]->position = matrix * Mesh.points[i]->position;
+				for(k3d::uint_t point = point_begin; point != point_end; ++point)
+					output_points[point] = matrix * output_points[point];
 			}
 		}
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 
