@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -26,9 +26,7 @@
 #include <k3dsdk/table_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/hints.h>
-#include <k3dsdk/imaterial.h>
 #include <k3dsdk/imulti_mesh_sink.h>
-#include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/metadata_keys.h>
@@ -54,9 +52,9 @@ namespace mesh
 
 class merge_mesh :
 	public k3d::imulti_mesh_sink,
-	public k3d::material_sink<k3d::mesh_source<k3d::node > >
+	public k3d::mesh_source<k3d::node >
 {
-	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
+	typedef k3d::mesh_source<k3d::node > base;
 
 public:
 	merge_mesh(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
