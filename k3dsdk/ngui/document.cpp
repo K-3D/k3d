@@ -108,7 +108,7 @@ void setup_renderman_document(k3d::idocument& Document)
 	return_if_fail(k3d::plugin::factory::lookup("RenderManMaterial"));
 	return_if_fail(k3d::plugin::factory::lookup("RenderManMultiPainter"));
 	return_if_fail(k3d::plugin::factory::lookup("RenderManNURBSPatchPainter"));
-	return_if_fail(k3d::plugin::factory::lookup("RenderManPointGroupPainter"));
+	return_if_fail(k3d::plugin::factory::lookup("RenderManParticlePainter"));
 	return_if_fail(k3d::plugin::factory::lookup("RenderManPolyhedronPainter"));
 	return_if_fail(k3d::plugin::factory::lookup("RenderManSubdivisionSurfacePainter"));
 	return_if_fail(k3d::plugin::factory::lookup("RenderManSurfaceShader"));
@@ -117,7 +117,7 @@ void setup_renderman_document(k3d::idocument& Document)
 	k3d::inode* const multi_painter = k3d::plugin::create<k3d::inode>("RenderManMultiPainter", Document, "RenderMan Default Painter");
 	return_if_fail(multi_painter);
 
-	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "point_groups", "Point Groups", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManPointGroupPainter", Document, "RenderMan Point Group Painter"));
+	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "particles", "Particles", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManParticlePainter", Document, "RenderMan Particle Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "polyhedra", "Polyhedra", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManPolyhedronPainter", Document, "RenderMan Polyhedron Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "subdivision_surfaces", "Subdivision Surfaces", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManSubdivisionSurfacePainter", Document, "RenderMan Subdivision Surface Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "linear_curves", "Linear Curves", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManLinearCurvePainter", Document, "RenderMan Linear Curve Painter"));
