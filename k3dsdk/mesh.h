@@ -2,7 +2,7 @@
 #define K3DSDK_MESH_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -189,6 +189,10 @@ public:
 		for(mesh::primitives_t::iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
 			visit_arrays(p->writable(), Functor);
 	}
+
+	/// Combines two meshes by appending every point / primitive from one to the other.  Primitive point indices are automatically
+	/// offset to reflect the new position(s) of points in the combined mesh.  Returns the range of point and primitive indices that were appended.
+	static void append(const mesh& Source, mesh& Target, uint_t* const PointBegin = 0, uint_t* const PointEnd = 0, uint_t* const PrimitiveBegin = 0, uint_t* const PrimitiveEnd = 0);
 };
 
 /// Stream serialization

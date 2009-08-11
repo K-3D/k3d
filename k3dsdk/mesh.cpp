@@ -503,6 +503,77 @@ void mesh::delete_unused_points(mesh& Mesh)
 	point_selection.resize(points_remaining);
 }
 
+namespace detail
+{
+
+class offset_point_indices
+{
+public:
+	offset_point_indices(const uint_t Offset) :
+		offset(Offset)
+	{
+	}
+
+	void operator()(const string_t&, const table&, const string_t& ArrayName, pipeline_data<array>& Array)
+	{
+		if(Array->get_metadata_value(metadata::key::domain()) != metadata::value::mesh_point_indices_domain())
+			return;
+
+		uint_t_array* const array = dynamic_cast<uint_t_array*>(&Array.writable());
+		if(!array)
+		{
+			log() << error << "array [" << ArrayName << "] must be a k3d::uint_t_array." << std::endl;
+			return;
+		}
+
+		std::transform(array->begin(), array->end(), array->begin(), std::bind2nd(std::plus<uint_t>(), offset));
+	}
+
+private:
+	const uint_t offset;	
+};
+
+} // namespace detail
+
+void mesh::append(const mesh& Source, mesh& Target, uint_t* const PointBegin, uint_t* const PointEnd, uint_t* const PrimitiveBegin, uint_t* const PrimitiveEnd)
+{
+	const uint_t point_begin = Target.points ? Target.points->size() : 0;
+	if(PointBegin)
+		*PointBegin = point_begin;
+
+	if(PrimitiveBegin)
+		*PrimitiveBegin = Target.primitives.size();
+
+	// Append source points to the target ...
+	if(Source.points)
+	{
+		mesh::points_t& target_points = Target.points ? Target.points.writable() : Target.points.create();
+		target_points.insert(target_points.end(), Source.points->begin(), Source.points->end());
+	}
+
+	if(Source.point_selection)
+	{
+		mesh::selection_t& target_point_selection = Target.point_selection ? Target.point_selection.writable() : Target.point_selection.create();
+		target_point_selection.insert(target_point_selection.end(), Source.point_selection->begin(), Source.point_selection->end());
+	}
+
+	// Append source primitives to the target ...
+	for(mesh::primitives_t::const_iterator primitive = Source.primitives.begin(); primitive != Source.primitives.end(); ++primitive)
+	{
+		Target.primitives.push_back(*primitive);
+		mesh::primitive& new_primitive = Target.primitives.back().writable();
+
+		if(point_begin)
+			mesh::visit_arrays(new_primitive, detail::offset_point_indices(point_begin));
+	}
+
+	if(PointEnd)
+		*PointEnd = Target.points ? Target.points->size() : 0;
+
+	if(PrimitiveEnd)
+		*PrimitiveEnd = Target.primitives.size();
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh::primitive
 
