@@ -69,22 +69,18 @@ public:
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);
 	
-			const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-			const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-			
-			enable_blending();
+			const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+			const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 			
 			glBegin(GL_LINES);
 			const k3d::uint_t edge_count = polyhedron->edge_points.size();
 			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
-				color4d(polyhedron->edge_selections[edge] ? selected_color : color);
+				k3d::gl::color3d(polyhedron->edge_selections[edge] ? selected_color : color);
 				k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
 				k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
 			}
 			glEnd();
-			
-			disable_blending();
 		}
 	}
 	

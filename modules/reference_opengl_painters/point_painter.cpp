@@ -72,22 +72,18 @@ public:
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
-		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-
-		enable_blending();
+		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 
 		glBegin(GL_POINTS);
 		const k3d::uint_t point_begin = 0;
 		const k3d::uint_t point_end = points.size();
 		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			color4d(point_selection[point] ? selected_color : color);
+			k3d::gl::color3d(point_selection[point] ? selected_color : color);
 			k3d::gl::vertex3d(points[point]);
 		}
 		glEnd();
-
-		disable_blending();
 	}
 
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
