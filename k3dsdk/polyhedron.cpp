@@ -742,6 +742,25 @@ const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& C
 	return 0.5 * result;
 }
 
+const normal3 normal(const point3& i, const point3& j, const point3& k)
+{
+	normal3 result(0, 0, 0);
+
+	result[0] += (i[1] + j[1]) * (j[2] - i[2]);
+	result[1] += (i[2] + j[2]) * (j[0] - i[0]);
+	result[2] += (i[0] + j[0]) * (j[1] - i[1]);
+
+	result[0] += (j[1] + k[1]) * (k[2] - j[2]);
+	result[1] += (j[2] + k[2]) * (k[0] - j[0]);
+	result[2] += (j[0] + k[0]) * (k[1] - j[1]);
+
+	result[0] += (k[1] + i[1]) * (i[2] - k[2]);
+	result[1] += (k[2] + i[2]) * (i[0] - k[0]);
+	result[2] += (k[0] + i[0]) * (i[1] - k[1]);
+
+	return 0.5 * result;
+}
+
 namespace detail
 {
 

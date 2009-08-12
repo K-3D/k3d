@@ -178,6 +178,8 @@ bool_t is_sds(const const_primitive& Polyhedron);
 const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
 /// Calculates the normal for an edge loop (returns a zero-length normal for degenerate cases).
 const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
+/// Calculates the normal for a triangle (returns a zero-length normal for degenerate cases).
+const normal3 normal(const point3& A, const point3& B, const point3& C);
 
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
 void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
