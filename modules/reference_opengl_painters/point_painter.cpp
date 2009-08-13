@@ -22,8 +22,6 @@
 */
 
 #include "colored_selection_painter_gl.h"
-#include "normal_cache.h"
-#include "utility.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -96,8 +94,6 @@ public:
 
 		const k3d::mesh::points_t& points = *Mesh.points;
 
-		bool valid_polyhedra = has_non_empty_polyhedra(Mesh);
-
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
@@ -105,24 +101,18 @@ public:
 		const k3d::uint_t point_end = points.size();
 		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			if (!valid_polyhedra || SelectionState.select_backfacing ||
-					(!SelectionState.select_backfacing &&
-							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
-			{
-				k3d::gl::push_selection_token(k3d::selection::POINT, point);
+      k3d::gl::push_selection_token(k3d::selection::POINT, point);
 
-				glBegin(GL_POINTS);
-				k3d::gl::vertex3d(points[point]);
-				glEnd();
+      glBegin(GL_POINTS);
+      k3d::gl::vertex3d(points[point]);
+      glEnd();
 
-				k3d::gl::pop_selection_token(); // k3d::selection::POINT
-			}
+      k3d::gl::pop_selection_token(); // k3d::selection::POINT
 		}
 	}
 
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -151,5 +141,4 @@ k3d::iplugin_factory& point_painter_factory()
 } // namespace opengl
 
 } // namespace module
-
 

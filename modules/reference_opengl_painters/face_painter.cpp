@@ -146,10 +146,6 @@ public:
 		{
 		}
 
-		void start_processing(const k3d::mesh& SourceMesh)
-		{
-		}
-
 		void start_face(const k3d::uint_t Face)
 		{
 			k3d::gl::push_selection_token(k3d::selection::UNIFORM, Face);
@@ -173,10 +169,6 @@ public:
 		{
 			glEnd(); // GL_TRIANGLES
 			k3d::gl::pop_selection_token(); // UNIFORM
-		}
-
-		void finish_processing(const k3d::mesh& SourceMesh)
-		{
 		}
 
 	private:
