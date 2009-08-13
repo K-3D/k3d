@@ -335,7 +335,6 @@ modules/ply_io/mesh_writer.cpp
 modules/png_io/bitmap_importer.cpp
 modules/png_io/bitmap_reader.cpp
 modules/png_io/bitmap_writer.cpp
-modules/point_group/make_point_group.cpp
 modules/polyhedron/bevel_points.cpp
 modules/polyhedron/extrude_faces.cpp
 modules/polyhedron/make_sds.cpp
@@ -442,7 +441,6 @@ modules/renderman_painters/linear_curve_painter.cpp
 modules/renderman_painters/multi_painter.cpp
 modules/renderman_painters/nurbs_patch_painter.cpp
 modules/renderman_painters/paraboloid_painter.cpp
-modules/renderman_painters/point_group_painter.cpp
 modules/renderman_painters/polyhedron_painter.cpp
 modules/renderman_painters/scripted_painter.cpp
 modules/renderman_painters/sphere_painter.cpp
