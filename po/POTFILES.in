@@ -382,9 +382,7 @@ modules/reference_opengl_painters/face_normal_painter.cpp
 modules/reference_opengl_painters/face_numbering_painter.cpp
 modules/reference_opengl_painters/face_orientation_painter.cpp
 modules/reference_opengl_painters/face_painter.cpp
-modules/reference_opengl_painters/face_varying_painter.cpp
 modules/reference_opengl_painters/half_edge_painter.cpp
-modules/reference_opengl_painters/hidden_line_painter.cpp
 modules/reference_opengl_painters/hyperboloid_painter.cpp
 modules/reference_opengl_painters/linear_curve_painter.cpp
 modules/reference_opengl_painters/multi_painter.cpp
@@ -394,12 +392,10 @@ modules/reference_opengl_painters/nurbs_curve_painter.cpp
 modules/reference_opengl_painters/nurbs_patch_numbering_painter.cpp
 modules/reference_opengl_painters/nurbs_patch_painter.cpp
 modules/reference_opengl_painters/paraboloid_painter.cpp
-modules/reference_opengl_painters/point_normal_painter.cpp
 modules/reference_opengl_painters/point_numbering_painter.cpp
 modules/reference_opengl_painters/point_painter.cpp
 modules/reference_opengl_painters/sphere_painter.cpp
 modules/reference_opengl_painters/teapot_painter.cpp
-modules/reference_opengl_painters/textured_face_painter.cpp
 modules/reference_opengl_painters/torus_painter.cpp
 modules/reference_opengl_painters/varying_data_painter.cpp
 modules/reference_opengl_painters/vertex_data_painter.cpp
@@ -539,3 +535,7 @@ modules/yafray/spot_light.cpp
 modules/yafray/sun_light.cpp
 share/scripts/scripted_plugins/ac3d_exporter.py
 share/scripts/scripted_plugins/ogre_exporter.py
+modules/advanced_opengl_painters/face_varying_painter.cpp
+modules/advanced_opengl_painters/hidden_line_painter.cpp
+modules/advanced_opengl_painters/point_normal_painter.cpp
+modules/advanced_opengl_painters/textured_face_painter.cpp
