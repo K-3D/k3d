@@ -1,8 +1,8 @@
-#ifndef K3DSDK_IRENDER_CAMERA_PREVIEW_H
-#define K3DSDK_IRENDER_CAMERA_PREVIEW_H
+#ifndef K3DSDK_PYTHON_IRENDER_CAMERA_PREVIEW_PYTHON_H
+#define K3DSDK_PYTHON_IRENDER_CAMERA_PREVIEW_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2009, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,31 +21,24 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include <boost/python/object_fwd.hpp>
 
 namespace k3d
 {
 
-class icamera;
-	
-/// Abstract interface implemented by objects that can create a "preview" render of a scene using a camera
-class irender_camera_preview :
-	public virtual iunknown
-{
-public:
-	virtual bool_t render_camera_preview(icamera& Camera) = 0;
+class iunknown;
 
-protected:
-	irender_camera_preview() {}
-	irender_camera_preview(const irender_camera_preview& Other) : iunknown(Other) {}
-	irender_camera_preview& operator = (const irender_camera_preview&) { return *this; }
-	virtual ~irender_camera_preview() {}
-};
+namespace python
+{
+
+void define_methods_irender_camera_preview(iunknown& Interface, boost::python::object& Instance);
+
+} // namespace python
 
 } // namespace k3d
 
-#endif // !K3DSDK_IRENDER_CAMERA_PREVIEW_H
+#endif // !K3DSDK_PYTHON_IRENDER_CAMERA_PREVIEW_PYTHON_H
 
