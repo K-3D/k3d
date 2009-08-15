@@ -119,6 +119,18 @@ inline const point3 operator+(const vector3& a, const point3& b)
 	return point3(a.n[0] + b.n[0], a.n[1] + b.n[1], a.n[2] + b.n[2]);
 }
 
+/// Add a point and a normal, returning the modified point
+inline const point3 operator+(const point3& a, const normal3& b)
+{
+	return point3(a.n[0] + b.n[0], a.n[1] + b.n[1], a.n[2] + b.n[2]);
+}
+
+/// Adds a normal and a point, returning the modified point
+inline const point3 operator+(const normal3& a, const point3& b)
+{
+	return point3(a.n[0] + b.n[0], a.n[1] + b.n[1], a.n[2] + b.n[2]);
+}
+
 /// Subtracts a vector from a point, returning the modified point
 inline const point3 operator-(const point3& a, const vector3& b)
 {
