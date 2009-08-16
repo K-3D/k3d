@@ -995,7 +995,7 @@ void snap_tool_detail::get_current_selection()
 
 	const k3d::nodes_t nodes = selection::state(m_document_state.document()).selected_nodes();
 
-	if(selection::NODES == selection::state(m_document_state.document()).current_mode())
+	if(selection::NODE == selection::state(m_document_state.document()).current_mode())
 	{
 		// Save transformable nodes as targets
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)

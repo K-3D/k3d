@@ -52,7 +52,7 @@ public:
 	color_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_color_array(init_owner(*this) + init_name("color_array") + init_label(_("Color Array")) + init_description(_("Specifies the array to be used for face colors")) + init_value(std::string("Cs"))),
-		m_array_type(init_owner(*this) + init_name("array_type") + init_label(_("Array Type")) + init_description(_("Type of array to use")) + init_value(UNIFORM) + init_enumeration(array_type_values()))
+		m_array_type(init_owner(*this) + init_name("array_type") + init_label(_("Array Type")) + init_description(_("Type of array to use")) + init_value(FACE) + init_enumeration(array_type_values()))
 	{
 		m_color_array.changed_signal().connect(make_async_redraw_slot());
 		m_array_type.changed_signal().connect(make_async_redraw_slot());
@@ -121,7 +121,7 @@ public:
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!SelectionState.select_component.count(k3d::selection::UNIFORM))
+		if(!SelectionState.select_component.count(k3d::selection::FACE))
 			return;
 
 		k3d::uint_t primitive_index = 0;
@@ -149,7 +149,7 @@ public:
 	
 			for(k3d::uint_t face = 0; face != face_count; ++face)
 			{
-				k3d::gl::push_selection_token(k3d::selection::UNIFORM, face);
+				k3d::gl::push_selection_token(k3d::selection::FACE, face);
 	
 				glBegin(GL_POLYGON);
 				const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
@@ -162,7 +162,7 @@ public:
 				}
 				glEnd();
 	
-				k3d::gl::pop_selection_token(); // UNIFORM
+				k3d::gl::pop_selection_token(); // FACE
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE
@@ -185,7 +185,7 @@ private:
 	typedef enum
 	{
 		CONSTANT,
-		UNIFORM,
+		FACE,
 		VARYING,
 		VERTEX
 		
@@ -197,7 +197,7 @@ private:
 		if(values.empty())
 		{
 			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Constant"), "constant", _("Use an array of constant data")));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Uniform"), "uniform", _("Use an array of uniform data")));
+			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Face"), "face", _("Use an array of face data")));
 			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Varying"), "varying", _("Use an array of varying data")));
 			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Vertex"), "vertex", _("Use an array of vertex data")));
 		}
@@ -212,8 +212,8 @@ private:
 			case CONSTANT:
 				Stream << "constant";
 				break;
-			case UNIFORM:
-				Stream << "uniform";
+			case FACE:
+				Stream << "face";
 				break;
 			case VARYING:
 				Stream << "varying";
@@ -233,8 +233,8 @@ private:
 
 		if(text == "constant")
 			Value = CONSTANT;
-		else if(text == "uniform")
-			Value = UNIFORM;
+		else if(text == "face")
+			Value = FACE;
 		else if(text == "varying")
 			Value = VARYING;
 		else if(text == "vertex")
@@ -261,11 +261,11 @@ private:
 			case CONSTANT:
 				m_color_array = Polyhedron.constant_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
-			case UNIFORM:
-				m_color_array = Polyhedron.uniform_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
+			case FACE:
+				m_color_array = Polyhedron.face_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
 			case VARYING:
-				m_color_array = Polyhedron.face_varying_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
+				m_color_array = Polyhedron.varying_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
 			case VERTEX:
 				m_color_array = VertexData.lookup<k3d::mesh::colors_t>(ArrayName);
@@ -280,7 +280,7 @@ private:
 			{
 			case CONSTANT:
 				return m_color_array->at(Shell);
-			case UNIFORM:
+			case FACE:
 				return m_color_array->at(Face);
 			case VARYING:
 				return m_color_array->at(Edge);

@@ -11,8 +11,8 @@ point_selection = Output.create_point_selection()
 for i in range(2):
 	polyhedron = k3d.polyhedron.create(Output)
 
-	# Create an (optional) array to store uniform (per-face) colors ...
-	Cs = polyhedron.uniform_attributes().create("Cs", "k3d::color")
+	# Create an (optional) array to store per-face colors ...
+	Cs = polyhedron.face_attributes().create("Cs", "k3d::color")
 
 	polyhedron.shell_first_faces().append(len(polyhedron.face_first_loops()))
 	polyhedron.shell_face_counts().append(3)

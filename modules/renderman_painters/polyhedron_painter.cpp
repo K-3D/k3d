@@ -101,10 +101,10 @@ public:
           ri_constant_attributes.add_arrays(polyhedron->constant_attributes);
 
           array_copier ri_uniform_attributes;
-          ri_uniform_attributes.add_arrays(polyhedron->uniform_attributes);
+          ri_uniform_attributes.add_arrays(polyhedron->face_attributes);
 
           array_copier ri_facevarying_attributes;
-          ri_facevarying_attributes.add_arrays(polyhedron->face_varying_attributes);
+          ri_facevarying_attributes.add_arrays(polyhedron->varying_attributes);
 
           array_copier ri_vertex_attributes;
           ri_vertex_attributes.add_arrays(vertex_attributes);

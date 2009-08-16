@@ -97,9 +97,10 @@ void define_namespace_selection()
 		.value("CONSTANT", k3d::selection::CONSTANT)
 		.value("UNIFORM", k3d::selection::UNIFORM)
 		.value("VARYING", k3d::selection::VARYING)
-		.value("FACE_VARYING", k3d::selection::FACE_VARYING)
 		.value("SPLIT_EDGE", k3d::selection::SPLIT_EDGE)
 		.value("POINT", k3d::selection::POINT)
+		.value("CURVE", k3d::selection::CURVE)
+		.value("FACE", k3d::selection::FACE)
 		.attr("__module__") = "k3d";
 
 	class_<selection_storage_wrapper>("storage", no_init)

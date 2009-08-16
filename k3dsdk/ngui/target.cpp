@@ -161,7 +161,7 @@ bool selection_position(const selection::mode& SelectionMode, const k3d::nodes_t
 		const k3d::matrix4 transformation = k3d::node_to_world_matrix(**node);
 		point_visitor visitor(BoundingBox, Points, transformation);
 
-		if(SelectionMode == selection::NODES)
+		if(SelectionMode == selection::NODE)
 		{
 			if(k3d::ibounded* bounded = dynamic_cast<k3d::ibounded*>(*node))
 			{
@@ -179,21 +179,21 @@ bool selection_position(const selection::mode& SelectionMode, const k3d::nodes_t
 			continue;
 		if(!mesh->points)
 			continue;
-		if(SelectionMode == selection::NODES)
+		if(SelectionMode == selection::NODE)
 		{
 			const k3d::mesh::points_t& points = *mesh->points;
 			for (k3d::uint_t point = 0; point != points.size(); ++point)
 				Points.push_back(transformation * points[point]);
 		}
-		if(SelectionMode == selection::POINTS)
+		if(SelectionMode == selection::POINT)
 		{
 			traverse_selected_points(*mesh, visitor);
 		}
-		if(SelectionMode == selection::SPLIT_EDGES)
+		if(SelectionMode == selection::SPLIT_EDGE)
 		{
 			traverse_selected_edge_points(*mesh, visitor);
 		}
-		if(SelectionMode == selection::UNIFORM)
+		if(SelectionMode == selection::FACE)
 		{
 			traverse_selected_face_points(*mesh, visitor);
 		}

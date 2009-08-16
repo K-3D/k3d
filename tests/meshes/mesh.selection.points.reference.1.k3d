@@ -12,7 +12,7 @@
 						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
-					<table type="face_varying">
+					<table type="varying">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0</array>
 						<array name="edge_points" type="k3d::uint_t">0 1 3 2
 							<metadata>
@@ -28,7 +28,7 @@
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0</array>
 					</table>
-					<table type="uniform">
+					<table type="face">
 						<array name="face_first_loops" type="k3d::uint_t">0</array>
 						<array name="face_loop_counts" type="k3d::uint_t">1</array>
 						<array name="face_materials" type="k3d::imaterial*">0</array>
@@ -41,8 +41,8 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="face_varying"/>
-					<table type="uniform"/>
+					<table type="varying"/>
+					<table type="face"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>

@@ -773,7 +773,7 @@ public:
 	implementation(k3d::idocument& Document) :
 		m_document(Document),
 		m_gdkgl_share_list(0),
-		m_last_selection_mode(selection::NODES),
+		m_last_selection_mode(selection::NODE),
 		m_active_tool(0),
 		m_selection_tool(0),
 		m_move_tool(0),
@@ -1083,8 +1083,8 @@ assert_not_implemented();
 		return_val_if_fail(Factory, 0);
 
 		// Switch to node selection mode
-		if(selection::NODES != selection::state(document()).current_mode())
-			selection::state(document()).set_current_mode(selection::NODES);
+		if(selection::NODE != selection::state(document()).current_mode())
+			selection::state(document()).set_current_mode(selection::NODE);
 
 		// Create the requested node ...
 		k3d::record_state_change_set changeset(m_document, k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), K3D_CHANGE_SET_CONTEXT);

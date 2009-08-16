@@ -714,20 +714,23 @@ k3d::selection::records control::get_object_selectables(const k3d::rectangle& Se
 {
 	switch(selection::state(m_implementation->m_document_state.document()).current_mode())
 	{
-		case selection::NODES:
+		case selection::CURVE:
+			return get_component_selectables(k3d::selection::CURVE, SelectionRegion, Backfacing);
+			break;
+		case selection::FACE:
+			return get_component_selectables(k3d::selection::FACE, SelectionRegion, Backfacing);
+			break;
+		case selection::NODE:
 			return get_node_selectables(SelectionRegion);
 			break;
-		case selection::POINTS:
+		case selection::POINT:
 			return get_component_selectables(k3d::selection::POINT, SelectionRegion, Backfacing);
 			break;
-		case selection::SPLIT_EDGES:
+		case selection::SPLIT_EDGE:
 			return get_component_selectables(k3d::selection::SPLIT_EDGE, SelectionRegion, Backfacing);
 			break;
 		case selection::UNIFORM:
 			return get_component_selectables(k3d::selection::UNIFORM, SelectionRegion, Backfacing);
-			break;
-		case selection::CURVES:
-			return get_component_selectables(k3d::selection::CURVE, SelectionRegion, Backfacing);
 			break;
 	}
 
@@ -1187,20 +1190,23 @@ k3d::selection::record control::pick_object(const k3d::point2& Coordinates, k3d:
 {
 	switch(selection::state(m_implementation->m_document_state.document()).current_mode())
 	{
-		case selection::NODES:
+		case selection::CURVE:
+			return pick_component(k3d::selection::CURVE, Coordinates, Records, Backfacing);
+			break;
+		case selection::FACE:
+			return pick_component(k3d::selection::FACE, Coordinates, Records, Backfacing);
+			break;
+		case selection::NODE:
 			return pick_node(Coordinates, Records);
 			break;
-		case selection::POINTS:
+		case selection::POINT:
 			return pick_point(Coordinates, Records, Backfacing);
 			break;
-		case selection::SPLIT_EDGES:
+		case selection::SPLIT_EDGE:
 			return pick_split_edge(Coordinates, Records, Backfacing);
 			break;
 		case selection::UNIFORM:
 			return pick_component(k3d::selection::UNIFORM, Coordinates, Records, Backfacing);
-			break;
-		case selection::CURVES:
-			return pick_component(k3d::selection::CURVE, Coordinates, Records, Backfacing);
 			break;
 	}
 

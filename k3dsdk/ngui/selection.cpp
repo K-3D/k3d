@@ -101,11 +101,11 @@ struct select_all_points
 
 		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::UNIFORM, 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE_VARYING, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, 0.0);
 
 		return results;
 	}
@@ -128,11 +128,11 @@ struct select_all_components
 
 		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, component == k3d::selection::CONSTANT ? 1.0 : 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, component == k3d::selection::CURVE ? 1.0 : 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE, component == k3d::selection::FACE ? 1.0 : 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, component == k3d::selection::SPLIT_EDGE ? 1.0 : 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::UNIFORM, component == k3d::selection::UNIFORM ? 1.0 : 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, component == k3d::selection::VARYING ? 1.0 : 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE_VARYING, component == k3d::selection::FACE_VARYING ? 1.0 : 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SPLIT_EDGE, component == k3d::selection::SPLIT_EDGE ? 1.0 : 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, component == k3d::selection::CURVE ? 1.0 : 0.0);
 
 		return results;
 	}
@@ -382,20 +382,23 @@ std::ostream& operator<<(std::ostream& Stream, const mode& RHS)
 {
         switch(RHS)
 	{
-		case NODES:
-			Stream << "nodes";
+		case CURVE:
+			Stream << "curve";
 			break;
-		case POINTS:
-			Stream << "points";
+		case FACE:
+			Stream << "face";
 			break;
-		case SPLIT_EDGES:
-			Stream << "split_edges";
+		case NODE:
+			Stream << "node";
+			break;
+		case POINT:
+			Stream << "point";
+			break;
+		case SPLIT_EDGE:
+			Stream << "split_edge";
 			break;
 		case UNIFORM:
 			Stream << "uniform";
-			break;
-		case CURVES:
-			Stream << "curves";
 			break;
 	}
 
@@ -407,16 +410,18 @@ std::istream& operator>>(std::istream& Stream, mode& RHS)
         std::string text;
         Stream >> text;
 
-        if(text == "nodes")
-                RHS = NODES;
-        else if(text == "points")
-                RHS = POINTS;
-        else if(text == "split_edges")
-                RHS = SPLIT_EDGES;
+        if(text == "curve")
+                RHS = CURVE;
+        else if(text == "face")
+                RHS = FACE;
+        else if(text == "node")
+                RHS = NODE;
+        else if(text == "point")
+                RHS = POINT;
+        else if(text == "split_edge")
+                RHS = SPLIT_EDGE;
         else if(text == "uniform")
                 RHS = UNIFORM;
-        else if(text == "curves")
-                RHS = CURVES;
         else
                 log() << error << "Unknown enumeration [" << text << "]"<< std::endl;
 
@@ -429,11 +434,12 @@ static const ienumeration_property::enumeration_values_t& mode_values()
 	static ienumeration_property::enumeration_values_t values;
 	if(values.empty())
 	{
-		values.push_back(ienumeration_property::enumeration_value_t(_("Nodes"), "nodes", _("Select Nodes")));
-		values.push_back(ienumeration_property::enumeration_value_t(_("Points"), "points", _("Select Points")));
-		values.push_back(ienumeration_property::enumeration_value_t(_("Split Edges"), "split_edges", _("Select Split Edges")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Curves"), "curve", _("Select Curves")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Faces"), "face", _("Select Faces")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Nodes"), "node", _("Select Nodes")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Points"), "point", _("Select Points")));
+		values.push_back(ienumeration_property::enumeration_value_t(_("Split Edges"), "split_edge", _("Select Split Edges")));
 		values.push_back(ienumeration_property::enumeration_value_t(_("Uniform"), "uniform", _("Select Uniform")));
-		values.push_back(ienumeration_property::enumeration_value_t(_("Curves"), "curves", _("Select Curves")));
 	}
 
 	return values;
@@ -510,7 +516,7 @@ assert_not_implemented();
 private:
 	implementation(idocument& Document) :
 		document(Document),
-		current_mode(init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(selection::NODES) + init_values(mode_values())),
+		current_mode(init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(selection::NODE) + init_values(mode_values())),
 		m_node_selection(0)
 	{
 	}
@@ -573,20 +579,23 @@ void state::select(const k3d::selection::records& Selection)
 {
 	switch(internal.current_mode.internal_value())
 	{
-		case NODES:
+		case CURVE:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::CURVE, 1.0), Selection);
+			break;
+		case FACE:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::FACE, 1.0), Selection);
+			break;
+		case NODE:
 			select_nodes(Selection);
 			break;
-		case POINTS:
+		case POINT:
 			detail::merge_interactive_selection(selected_nodes(), detail::select_points(1.0), Selection);
 			break;
-		case SPLIT_EDGES:
+		case SPLIT_EDGE:
 			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::SPLIT_EDGE, 1.0), Selection);
 			break;
 		case UNIFORM:
 			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::UNIFORM, 1.0), Selection);
-			break;
-		case CURVES:
-			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::CURVE, 1.0), Selection);
 			break;
 	}
 
@@ -630,20 +639,23 @@ void state::select_all()
 {
 	switch(internal.current_mode.internal_value())
 	{
-		case NODES:
+		case CURVE:
+			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::CURVE), true);
+			break;
+		case FACE:
+			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::FACE), true);
+			break;
+		case NODE:
 			select_all_nodes();
 			break;
-		case POINTS:
+		case POINT:
 			detail::replace_selection(selected_nodes(), detail::select_all_points(), true);
 			break;
-		case SPLIT_EDGES:
+		case SPLIT_EDGE:
 			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::SPLIT_EDGE), true);
 			break;
 		case UNIFORM:
 			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::UNIFORM), true);
-			break;
-		case CURVES:
-			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::CURVE), true);
 			break;
 	}
 
@@ -661,20 +673,23 @@ void state::invert_selection()
 {
 	switch(internal.current_mode.internal_value())
 	{
-		case NODES:
+		case CURVE:
+			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::CURVE), true);
+			break;
+		case FACE:
+			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::FACE), true);
+			break;
+		case NODE:
 			invert_all_nodes();
 			break;
-		case POINTS:
+		case POINT:
 			detail::replace_selection(internal.document.nodes().collection(), detail::invert_points(), true);
 			break;
-		case SPLIT_EDGES:
+		case SPLIT_EDGE:
 			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::SPLIT_EDGE), true);
 			break;
 		case UNIFORM:
 			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::UNIFORM), true);
-			break;
-		case CURVES:
-			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::CURVE), true);
 			break;
 	}
 
@@ -713,20 +728,23 @@ void state::deselect(const k3d::selection::records& Selection)
 {
 	switch(internal.current_mode.internal_value())
 	{
-		case NODES:
+		case CURVE:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::CURVE, 0.0), Selection);
+			break;
+		case FACE:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::FACE, 0.0), Selection);
+			break;
+		case NODE:
 			deselect_nodes(Selection);
 			break;
-		case POINTS:
+		case POINT:
 			detail::merge_interactive_selection(selected_nodes(), detail::select_points(0.0), Selection);
 			break;
-		case SPLIT_EDGES:
+		case SPLIT_EDGE:
 			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::SPLIT_EDGE, 0.0), Selection);
 			break;
 		case UNIFORM:
 			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::UNIFORM, 0.0), Selection);
-			break;
-		case CURVES:
-			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::CURVE, 0.0), Selection);
 			break;
 	}
 
@@ -752,13 +770,14 @@ void state::deselect_all()
 {
 	switch(internal.current_mode.internal_value())
 	{
-		case NODES:
+		case NODE:
 			deselect_all_nodes();
 			break;
-		case POINTS:
-		case SPLIT_EDGES:
+		case CURVE:
+		case FACE:
+		case POINT:
+		case SPLIT_EDGE:
 		case UNIFORM:
-		case CURVES:
 			detail::replace_selection(internal.document.nodes().collection(), detail::deselect_all(), false);
 			break;
 	}

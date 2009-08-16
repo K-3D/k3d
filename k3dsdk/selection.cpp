@@ -66,9 +66,6 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case VARYING:
 			Stream << "varying";
 			break;
-		case FACE_VARYING:
-			Stream << "face_varying";
-			break;
 		case SPLIT_EDGE:
 			Stream << "split_edge";
 			break;
@@ -77,6 +74,9 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 			break;
 		case CURVE:
 			Stream << "curve";
+			break;
+		case FACE:
+			Stream << "face";
 			break;
 		default:
 			Stream << RHS;
@@ -97,26 +97,6 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = NODE;
 	else if(buffer == "mesh")
 		RHS = MESH;
-/*
-	else if(buffer == "absolute_point")
-		RHS = ABSOLUTE_POINT;
-	else if(buffer == "absolute_face")
-		RHS = ABSOLUTE_FACE;
-	else if(buffer == "absolute_split_edge")
-		RHS = ABSOLUTE_SPLIT_EDGE;
-	else if(buffer == "absolute_linear_curve")
-		RHS = ABSOLUTE_LINEAR_CURVE;
-	else if(buffer == "absolute_cubic_curve")
-		RHS = ABSOLUTE_CUBIC_CURVE;
-	else if(buffer == "absolute_nurbs_curve" || buffer == "absolute_nucurve")
-		RHS = ABSOLUTE_NURBS_CURVE;
-	else if(buffer == "absolute_bilinear_patch")
-		RHS = ABSOLUTE_BILINEAR_PATCH;
-	else if(buffer == "absolute_bicubic_patch")
-		RHS = ABSOLUTE_BICUBIC_PATCH;
-	else if(buffer == "absolute_nurbs_patch" || buffer == "absolute_nupatch")
-		RHS = ABSOLUTE_NURBS_PATCH;
-*/
 	else if(buffer == "user1")
 		RHS = USER1;
 	else if(buffer == "primitive")
@@ -127,14 +107,14 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = UNIFORM;
 	else if(buffer == "varying")
 		RHS = VARYING;
-	else if(buffer == "face_varying")
-		RHS = FACE_VARYING;
 	else if(buffer == "split_edge")
 		RHS = SPLIT_EDGE;
 	else if(buffer == "point")
 		RHS = POINT;
 	else if(buffer == "curve")
 		RHS = CURVE;
+	else if(buffer == "face")
+		RHS = FACE;
 	else
 		log() << error << k3d_file_reference << ": could not extract value [" << buffer << "]" << std::endl;
 

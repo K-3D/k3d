@@ -482,7 +482,7 @@ struct mesh_arrays
 				output_face_loop_counts(OutputFaceLoopCounts),
 				output_face_materials(OutputFaceMaterials),
 				output_face_selection(OutputFaceSelection),
-				uniform_copier(UniformCopier),
+				face_copier(UniformCopier),
 				varying_copier(VaryingCopier)
 				{}
 
@@ -533,8 +533,8 @@ struct mesh_arrays
 		output_face_materials[first_new_face] = input_face_materials[Face];
 		output_face_selection[first_new_face] = input_face_selection[Face];
 
-		// Copy uniform data.
-		uniform_copier.copy(Face, first_new_face);
+		// Copy face data.
+		face_copier.copy(Face, first_new_face);
 	}
 
 	const k3d::mesh::indices_t& input_first_faces;
@@ -564,7 +564,7 @@ struct mesh_arrays
 	k3d::mesh::counts_t& output_face_loop_counts;
 	k3d::mesh::materials_t& output_face_materials;
 	k3d::mesh::selection_t& output_face_selection;
-	k3d::table_copier& uniform_copier;
+	k3d::table_copier& face_copier;
 	k3d::table_copier& varying_copier;
 };
 
@@ -600,7 +600,7 @@ public:
 			m_mesh_arrays.output_face_materials[newface] = m_mesh_arrays.input_face_materials[Face];
 			m_mesh_arrays.output_face_selection[newface] = m_mesh_arrays.input_face_selection[Face];
 
-			// Store all corner indices for facevarying data copy
+			// Store all corner indices for varying data copy
 			k3d::mesh::indices_t face_indices;
 			for(k3d::uint_t edge = first_edge; ; )
 			{
@@ -648,7 +648,7 @@ public:
 					m_mesh_arrays.output_face_materials[first_new_face + edgenumber - 1] = m_mesh_arrays.input_face_materials[Face];
 					m_mesh_arrays.output_face_selection[first_new_face + edgenumber - 1] = m_mesh_arrays.input_face_selection[Face];
 				}
-				m_mesh_arrays.uniform_copier.copy(Face, first_new_face + edgenumber - 1);
+				m_mesh_arrays.face_copier.copy(Face, first_new_face + edgenumber - 1);
 
 				first_new_edge = m_mesh_arrays.first_new_edges[last_old_face] + m_mesh_arrays.face_edge_counts[last_old_face] + 4 * (edgenumber + new_face_number);
 
@@ -695,7 +695,7 @@ public:
 			m_mesh_arrays.output_face_first_loops[newface] = first_new_loop;
 			m_mesh_arrays.output_face_materials[newface] = m_mesh_arrays.input_face_materials[Face];
 			m_mesh_arrays.output_face_selection[newface] = m_mesh_arrays.input_face_selection[Face];
-			m_mesh_arrays.uniform_copier.copy(Face, newface);
+			m_mesh_arrays.face_copier.copy(Face, newface);
 			for(k3d::uint_t edge = first_edge; ; )
 			{
 				first_new_edge = m_mesh_arrays.first_new_edges[last_old_face] + m_mesh_arrays.face_edge_counts[last_old_face] + 3 * (edgenumber + new_face_number);
@@ -728,7 +728,7 @@ public:
 				m_mesh_arrays.output_face_first_loops[first_new_face + edgenumber] = newloop;
 				m_mesh_arrays.output_face_materials[first_new_face + edgenumber] = m_mesh_arrays.input_face_materials[Face];
 				m_mesh_arrays.output_face_selection[first_new_face + edgenumber] = m_mesh_arrays.input_face_selection[Face];
-				m_mesh_arrays.uniform_copier.copy(Face, first_new_face + edgenumber);
+				m_mesh_arrays.face_copier.copy(Face, first_new_face + edgenumber);
 
 				edge = m_mesh_arrays.input_clockwise_edges[edge];
 				if(edge == first_edge)
@@ -776,7 +776,7 @@ public:
 			m_mesh_arrays.output_face_materials[newface] = m_mesh_arrays.input_face_materials[Face];
 			m_mesh_arrays.output_face_selection[newface] = m_mesh_arrays.input_face_selection[Face];
 
-			// Store all corner indices for facevarying data copy
+			// Store all corner indices for varying data copy
 			k3d::mesh::indices_t face_indices;
 			for(k3d::uint_t edge = first_edge; ; )
 			{
@@ -815,7 +815,7 @@ public:
 					m_mesh_arrays.output_face_materials[first_new_face + edgenumber - 1] = m_mesh_arrays.input_face_materials[Face];
 					m_mesh_arrays.output_face_selection[first_new_face + edgenumber - 1] = m_mesh_arrays.input_face_selection[Face];
 				}
-				m_mesh_arrays.uniform_copier.copy(Face, first_new_face + edgenumber - 1);
+				m_mesh_arrays.face_copier.copy(Face, first_new_face + edgenumber - 1);
 
 				first_new_edge = m_mesh_arrays.first_new_edges[last_old_face] + m_mesh_arrays.face_edge_counts[last_old_face] + 3 * (edgenumber + new_face_number);
 
@@ -884,11 +884,11 @@ public:
 
 			// Copy the unaffected constant data
 			output_polyhedron->constant_attributes = input_polyhedron->constant_attributes;
-			// Create copiers for the uniform and varying data
-			output_polyhedron->uniform_attributes = input_polyhedron->uniform_attributes.clone_types();
-			k3d::table_copier uniform_attributes_copier(input_polyhedron->uniform_attributes, output_polyhedron->uniform_attributes);
-			output_polyhedron->face_varying_attributes = input_polyhedron->face_varying_attributes.clone_types();
-			k3d::table_copier face_varying_attributes_copier(input_polyhedron->face_varying_attributes, output_polyhedron->face_varying_attributes);
+			// Create copiers for the face and varying data
+			output_polyhedron->face_attributes = input_polyhedron->face_attributes.clone_types();
+			k3d::table_copier face_attributes_copier(input_polyhedron->face_attributes, output_polyhedron->face_attributes);
+			output_polyhedron->varying_attributes = input_polyhedron->varying_attributes.clone_types();
+			k3d::table_copier varying_attributes_copier(input_polyhedron->varying_attributes, output_polyhedron->varying_attributes);
 
 			// Face-related arrays can not be appended to because of the possibility of multiple polyhedron,
 			// so we will rebuild them from scratch in the new order
@@ -1031,8 +1031,8 @@ public:
 			output_face_loop_counts.resize(face_edge_counter.face_count, 1);
 			output_face_selection.resize(face_edge_counter.face_count, 0.0);
 			output_face_materials.resize(face_edge_counter.face_count);
-			output_polyhedron->face_varying_attributes.set_row_count(face_edge_counter.edge_count);
-			output_polyhedron->uniform_attributes.set_row_count(face_edge_counter.face_count);
+			output_polyhedron->varying_attributes.set_row_count(face_edge_counter.edge_count);
+			output_polyhedron->face_attributes.set_row_count(face_edge_counter.face_count);
 			document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
 			detail::mesh_arrays mesh_arrays(
@@ -1063,8 +1063,8 @@ public:
 							output_face_loop_counts,
 							output_face_materials,
 							output_face_selection,
-							uniform_attributes_copier,
-							face_varying_attributes_copier);
+							face_attributes_copier,
+							varying_attributes_copier);
 
 			if(subdivision_type == CENTERTOMIDPOINTS)
 			{

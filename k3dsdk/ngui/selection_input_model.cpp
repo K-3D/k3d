@@ -112,7 +112,7 @@ struct selection_input_model::implementation :
 				bool extended_mode;
 				switch(selection::state(m_document_state.document()).current_mode())
 				{
-					case selection::NODES:
+					case selection::NODE:
 						// Extended selection
 						extended_mode = m_extended_mode;
 					break;
@@ -163,7 +163,7 @@ struct selection_input_model::implementation :
 
 		switch(selection::state(m_document_state.document()).current_mode())
 		{
-			case selection::NODES:
+			case selection::NODE:
 			{
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Deselect All"), K3D_CHANGE_SET_CONTEXT);
 				selection::state(m_document_state.document()).deselect_all();
@@ -173,7 +173,7 @@ struct selection_input_model::implementation :
 			default:
 			{
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Node Selection"), K3D_CHANGE_SET_CONTEXT);
-				selection::state(m_document_state.document()).set_current_mode(selection::NODES);
+				selection::state(m_document_state.document()).set_current_mode(selection::NODE);
 				break;
 			}
 		}

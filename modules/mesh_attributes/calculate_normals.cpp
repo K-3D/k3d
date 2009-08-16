@@ -53,23 +53,23 @@ public:
 	calculate_normals(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_max_angle(init_owner(*this) + init_name("max_angle") + init_label(_("Maximum Angle")) + init_description(_("Normals will not be smoothed across points sharper than this angle (only applies to Face-Varying Normals).")) + init_value(k3d::radians(89.0)) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
-		m_uniform(init_owner(*this) + init_name("uniform") + init_label(_("Uniform Normals")) + init_description(_("Generate uniform (per-face) normals.")) + init_value(false)),
-		m_face_varying(init_owner(*this) + init_name("face_varying") + init_label(_("Face-Varying Normals")) + init_description(_("Generate face-varying (per-edge) normals.")) + init_value(true)),
+		m_face(init_owner(*this) + init_name("face") + init_label(_("Face Normals")) + init_description(_("Generate per-face normals.")) + init_value(false)),
+		m_varying(init_owner(*this) + init_name("varying") + init_label(_("Varying Normals")) + init_description(_("Generate varying (per-vertex) normals.")) + init_value(true)),
 		m_vertex(init_owner(*this) + init_name("vertex") + init_label(_("Vertex Normals")) + init_description(_("Generate vertex normals.")) + init_value(false)),
-		m_uniform_array(init_owner(*this) + init_name("uniform_array") + init_label(_("Uniform Array Name")) + init_description(_("Uniform output array name.")) + init_value(k3d::string_t("N"))),
-		m_face_varying_array(init_owner(*this) + init_name("face_varying_array") + init_label(_("Face-Varying Array Name")) + init_description(_("Face-varying output array name.")) + init_value(k3d::string_t("N"))),
+		m_face_array(init_owner(*this) + init_name("face_array") + init_label(_("Uniform Array Name")) + init_description(_("Face output array name.")) + init_value(k3d::string_t("N"))),
+		m_varying_array(init_owner(*this) + init_name("varying_array") + init_label(_("Face-Varying Array Name")) + init_description(_("Varying output array name.")) + init_value(k3d::string_t("N"))),
 		m_vertex_array(init_owner(*this) + init_name("vertex_array") + init_label(_("Vertex Array Name")) + init_description(_("Vertex output array name.")) + init_value(k3d::string_t("N")))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 
 		m_max_angle.changed_signal().connect(make_update_mesh_slot());
 
-		m_uniform.changed_signal().connect(make_update_mesh_slot());
-		m_face_varying.changed_signal().connect(make_update_mesh_slot());
+		m_face.changed_signal().connect(make_update_mesh_slot());
+		m_varying.changed_signal().connect(make_update_mesh_slot());
 		m_vertex.changed_signal().connect(make_update_mesh_slot());
 		
-		m_uniform_array.changed_signal().connect(make_update_mesh_slot());
-		m_face_varying_array.changed_signal().connect(make_update_mesh_slot());
+		m_face_array.changed_signal().connect(make_update_mesh_slot());
+		m_varying_array.changed_signal().connect(make_update_mesh_slot());
 		m_vertex_array.changed_signal().connect(make_update_mesh_slot());
 	}
 
@@ -83,8 +83,8 @@ public:
 
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		const k3d::bool_t store_uniform = m_uniform.pipeline_value();
-		const k3d::bool_t store_face_varying = m_face_varying.pipeline_value();
+		const k3d::bool_t store_face = m_face.pipeline_value();
+		const k3d::bool_t store_varying = m_varying.pipeline_value();
 		const k3d::bool_t store_vertex = m_vertex.pipeline_value();
 
 		const k3d::mesh::points_t& points = *Output.points;
@@ -103,21 +103,21 @@ public:
 			const k3d::uint_t face_begin = 0;
 			const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
 
-			// Compute uniform (per-face) normals (used for all subsequent calculations) ...
-			k3d::mesh::normals_t uniform_normals(polyhedron->face_first_loops.size());
+			// Compute face (per-face) normals (used for all subsequent calculations) ...
+			k3d::mesh::normals_t face_normals(polyhedron->face_first_loops.size());
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
-				uniform_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
+				face_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
 
-			// Optionally store the uniform normals ...
-			if(store_uniform)
-				polyhedron->uniform_attributes.create(m_uniform_array.pipeline_value(), new k3d::mesh::normals_t(uniform_normals));
+			// Optionally store the face normals ...
+			if(store_face)
+				polyhedron->face_attributes.create(m_face_array.pipeline_value(), new k3d::mesh::normals_t(face_normals));
 
 			// Optionally compute face-varying (per-edge) normals ...
-			if(store_face_varying)
+			if(store_varying)
 			{
 				const k3d::double_t cos_max_angle = std::cos(std::max(0.0, m_max_angle.pipeline_value()));
 
-				k3d::mesh::normals_t& face_varying_normals = polyhedron->face_varying_attributes.create(m_face_varying_array.pipeline_value(), new k3d::mesh::normals_t(polyhedron->edge_points.size()));
+				k3d::mesh::normals_t& varying_normals = polyhedron->varying_attributes.create(m_varying_array.pipeline_value(), new k3d::mesh::normals_t(polyhedron->edge_points.size()));
 
 				k3d::mesh::indices_t point_first_faces;
 				k3d::mesh::counts_t point_face_counts;
@@ -126,7 +126,7 @@ public:
 
 				for(k3d::uint_t face = face_begin; face != face_end; ++face)
 				{
-					const k3d::normal3 face_normal = uniform_normals[face];
+					const k3d::normal3 face_normal = face_normals[face];
 
 					const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
 					const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
@@ -135,7 +135,7 @@ public:
 						const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
 						for(k3d::uint_t edge = first_edge; ;)
 						{
-							face_varying_normals[edge] += face_normal;
+							varying_normals[edge] += face_normal;
 
 							if(polyhedron->face_selections[face])
 							{
@@ -150,13 +150,13 @@ public:
 									if(!polyhedron->face_selections[adjacent_face])
 										continue;
 
-									const k3d::normal3 adjacent_normal = uniform_normals[adjacent_face];
+									const k3d::normal3 adjacent_normal = face_normals[adjacent_face];
 
 									const k3d::double_t cos_angle = adjacent_normal * face_normal;
 									if(cos_angle < cos_max_angle)
 										continue;
 
-									face_varying_normals[edge] += adjacent_normal;
+									varying_normals[edge] += adjacent_normal;
 								}
 							}
 
@@ -180,7 +180,7 @@ public:
 						const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
 						for(k3d::uint_t edge = first_edge; ;)
 						{
-							(*point_normals)[polyhedron->edge_points[edge]] += uniform_normals[face];
+							(*point_normals)[polyhedron->edge_points[edge]] += face_normals[face];
 
 							edge = polyhedron->clockwise_edges[edge];
 							if(edge == first_edge)
@@ -208,11 +208,11 @@ public:
 
 private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_max_angle;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_uniform;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_face_varying;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_face;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_varying;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_vertex;
-	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_uniform_array;
-	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_face_varying_array;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_face_array;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_varying_array;
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_vertex_array;
 };
 

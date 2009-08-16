@@ -439,8 +439,8 @@ public:
 			detail::delete_elements(edges_to_remove, edge_selection, output_polyhedron->edge_selections);
 			detail::delete_elements(m_points_to_remove, point_selection, Output.point_selection.writable());
 			detail::delete_elements(m_points_to_remove, Input.point_attributes, Output.point_attributes);
-			detail::delete_elements(edges_to_remove, input_polyhedron->face_varying_attributes, output_polyhedron->face_varying_attributes);
-			detail::delete_elements(faces_to_remove, input_polyhedron->uniform_attributes, output_polyhedron->uniform_attributes);
+			detail::delete_elements(edges_to_remove, input_polyhedron->varying_attributes, output_polyhedron->varying_attributes);
+			detail::delete_elements(faces_to_remove, input_polyhedron->face_attributes, output_polyhedron->face_attributes);
 			
 			// Update the per-polyhedra arrays
 			output_polyhedron->shell_face_counts.clear();

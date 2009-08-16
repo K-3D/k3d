@@ -69,27 +69,6 @@ NONE = 0,
 NODE = 1,
 /// Storage for a zero-based mesh index (relative to a node)
 MESH = 2,
-//POINT_GROUP = 3,
-//POINT = 4,
-//ABSOLUTE_POINT = 5,
-//POLYHEDRON = 6,
-//FACE = 7,
-//ABSOLUTE_FACE = 8,
-//FACE_HOLE = 9,
-//SPLIT_EDGE = 10,
-//ABSOLUTE_SPLIT_EDGE = 11,
-//LINEAR_CURVE_GROUP = 12,
-//LINEAR_CURVE = 13,
-//ABSOLUTE_LINEAR_CURVE = 14,
-//CUBIC_CURVE_GROUP = 15,
-//CUBIC_CURVE = 16,
-//ABSOLUTE_CUBIC_CURVE = 17,
-//NUCURVE_GROUP = 18,
-//NUCURVE = 19,
-//ABSOLUTE_NURBS_CURVE = 20,
-//ABSOLUTE_BILINEAR_PATCH = 21,
-//ABSOLUTE_BICUBIC_PATCH = 22,
-//ABSOLUTE_NURBS_PATCH = 23,
 /// Storage for a user-defined index
 USER1 = 24,
 /// Storage for a zero-based primitive index (relative to a mesh)
@@ -100,14 +79,14 @@ CONSTANT = 26,
 UNIFORM = 27,
 /// Storage for a zero-based varying index (relative to a primitive)
 VARYING = 28,
-/// Storage for a zero-based face-varying index (relative to a primitive)
-FACE_VARYING = 29,
 /// Storage for a zero-based split-edge index (relative to a primitive)
 SPLIT_EDGE = 30,
 /// Storage for a zero-based point index (relative to a mesh)
 POINT = 31,
 /// Storage for a zero-based curve index (relative to a primitive)
 CURVE = 32,
+/// Storage for a zero-based face index (relative to a primitive)
+FACE = 33,
 
 };
 

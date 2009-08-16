@@ -685,13 +685,23 @@ private:
 
 		menu->items().push_back(*Gtk::manage(
 			new Gtk::MenuItem(_("_Edges"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_edges))
-			<< set_accelerator_path("<k3d-document>/actions/select/select_lines", get_accel_group())));
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_split_edges))
+			<< set_accelerator_path("<k3d-document>/actions/select/select_split_edges", get_accel_group())));
+
+		menu->items().push_back(*Gtk::manage(
+			new Gtk::MenuItem(_("Curves"), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_curves))
+			<< set_accelerator_path("<k3d-document>/actions/select/select_curves", get_accel_group())));
+
+		menu->items().push_back(*Gtk::manage(
+			new Gtk::MenuItem(_("Faces"), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_faces))
+			<< set_accelerator_path("<k3d-document>/actions/select/select_faces", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
 			new Gtk::MenuItem(_("_Uniform"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_uniform))
-			<< set_accelerator_path("<k3d-document>/actions/select/select_faces", get_accel_group())));
+			<< set_accelerator_path("<k3d-document>/actions/select/select_uniform", get_accel_group())));
 		
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 		
@@ -1747,22 +1757,34 @@ private:
 		std::for_each(siblings.begin(), siblings.end(), detail::select(m_document_state.document()));
 	}
 
+	void on_select_curves()
+	{
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Curves"), K3D_CHANGE_SET_CONTEXT);
+		selection::state(m_document_state.document()).set_current_mode(selection::CURVE);
+	}
+
+	void on_select_faces()
+	{
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Polygon Faces"), K3D_CHANGE_SET_CONTEXT);
+		selection::state(m_document_state.document()).set_current_mode(selection::FACE);
+	}
+
 	void on_select_nodes()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Nodes"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::NODES);
+		selection::state(m_document_state.document()).set_current_mode(selection::NODE);
 	}
 
 	void on_select_vertices()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Points"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::POINTS);
+		selection::state(m_document_state.document()).set_current_mode(selection::POINT);
 	}
 
-	void on_select_edges()
+	void on_select_split_edges()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Polygon Edges"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::SPLIT_EDGES);
+		selection::state(m_document_state.document()).set_current_mode(selection::SPLIT_EDGE);
 	}
 
 	void on_select_uniform()

@@ -59,8 +59,8 @@ public:
 		const mesh::indices_t& ClockwiseEdges,
 		const mesh::selection_t& EdgeSelections,
 		const mesh::table_t& ConstantAttributes,
-		const mesh::table_t& UniformAttributes,
-		const mesh::table_t& FaceVaryingAttributes,
+		const mesh::table_t& FaceAttributes,
+		const mesh::table_t& VaryingAttributes,
 		const mesh::table_t& VertexAttributes
 		);
 
@@ -79,8 +79,8 @@ public:
 	const mesh::indices_t& clockwise_edges;
 	const mesh::selection_t& edge_selections;
 	const mesh::table_t& constant_attributes;
-	const mesh::table_t& uniform_attributes;
-	const mesh::table_t& face_varying_attributes;
+	const mesh::table_t& face_attributes;
+	const mesh::table_t& varying_attributes;
 	const mesh::table_t& vertex_attributes;
 };
 
@@ -101,8 +101,8 @@ public:
 		mesh::indices_t& ClockwiseEdges,
 		mesh::selection_t& EdgeSelections,
 		mesh::table_t& ConstantAttributes,
-		mesh::table_t& UniformAttributes,
-		mesh::table_t& FaceVaryingAttributes,
+		mesh::table_t& FaceAttributes,
+		mesh::table_t& VaryingAttributes,
 		mesh::table_t& VertexAttributes
 		);
 
@@ -118,8 +118,8 @@ public:
 	mesh::indices_t& clockwise_edges;
 	mesh::selection_t& edge_selections;
 	mesh::table_t& constant_attributes;
-	mesh::table_t& uniform_attributes;
-	mesh::table_t& face_varying_attributes;
+	mesh::table_t& face_attributes;
+	mesh::table_t& varying_attributes;
 	mesh::table_t& vertex_attributes;
 };
 

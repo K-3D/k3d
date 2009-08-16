@@ -1477,7 +1477,7 @@ public:
 		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> primitive(k3d::polyhedron::create(Output));
-		k3d::mesh::colors_t& colors = primitive->uniform_attributes.create<k3d::mesh::colors_t>("Cs");
+		k3d::mesh::colors_t& colors = primitive->face_attributes.create<k3d::mesh::colors_t>("Cs");
 
 		for(k3d::uint_t i = 0; i != m_PolyhedronPoints.size(); ++i)
 		{	
