@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -22,7 +22,6 @@
 */
 
 #include "colored_selection_painter_gl.h"
-#include "normal_cache.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -69,22 +68,18 @@ public:
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);
 	
-			const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-			const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-			
-			enable_blending();
+			const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+			const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 			
 			glBegin(GL_LINES);
 			const k3d::uint_t edge_count = polyhedron->edge_points.size();
 			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
-				color4d(polyhedron->edge_selections[edge] ? selected_color : color);
+				k3d::gl::color3d(polyhedron->edge_selections[edge] ? selected_color : color);
 				k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
 				k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
 			}
 			glEnd();
-			
-			disable_blending();
 		}
 	}
 	
@@ -110,20 +105,14 @@ public:
 			const k3d::uint_t edge_count = polyhedron->edge_points.size();
 			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
-				if(SelectionState.select_backfacing || 
-					(!SelectionState.select_backfacing && 
-					!backfacing(points[polyhedron->edge_points[edge]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(polyhedron->edge_points[edge]))
-											&& !backfacing(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]] * RenderState.matrix, RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(polyhedron->edge_points[polyhedron->clockwise_edges[edge]]))))
-				{
-					k3d::gl::push_selection_token(k3d::selection::SPLIT_EDGE, edge);
-		
-					glBegin(GL_LINES);
-					k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
-					k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
-					glEnd();
-		
-					k3d::gl::pop_selection_token(); // SPLIT_EDGE
-				}
+				k3d::gl::push_selection_token(k3d::selection::SPLIT_EDGE, edge);
+
+				glBegin(GL_LINES);
+				k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
+				k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
+				glEnd();
+
+				k3d::gl::pop_selection_token(); // SPLIT_EDGE
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE
@@ -132,7 +121,6 @@ public:
 	
 	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
 	{
-		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 	
 	static k3d::iplugin_factory& get_factory()

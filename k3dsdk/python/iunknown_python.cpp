@@ -34,6 +34,8 @@
 #include "iplugin_factory_python.h"
 #include "iproperty_python.h"
 #include "iproperty_collection_python.h"
+#include "irender_camera_frame_python.h"
+#include "irender_camera_preview_python.h"
 #include "isnappable_python.h"
 #include "iunknown_python.h"
 #include "iuser_interface_python.h"
@@ -75,6 +77,8 @@ object wrap_unknown(iunknown& Unknown)
 	define_methods_iplugin_factory(Unknown, result);
 	define_methods_iproperty(Unknown, result);
 	define_methods_iproperty_collection(Unknown, result);
+	define_methods_irender_camera_frame(Unknown, result);
+	define_methods_irender_camera_preview(Unknown, result);
 	define_methods_isnappable(Unknown, result);
 	define_methods_iuser_interface(Unknown, result);
 	

@@ -59,8 +59,8 @@ public:
 		const mesh::indices_t& ClockwiseEdges,
 		const mesh::selection_t& EdgeSelections,
 		const mesh::table_t& ConstantAttributes,
-		const mesh::table_t& UniformAttributes,
-		const mesh::table_t& FaceVaryingAttributes,
+		const mesh::table_t& FaceAttributes,
+		const mesh::table_t& VaryingAttributes,
 		const mesh::table_t& VertexAttributes
 		);
 
@@ -79,8 +79,8 @@ public:
 	const mesh::indices_t& clockwise_edges;
 	const mesh::selection_t& edge_selections;
 	const mesh::table_t& constant_attributes;
-	const mesh::table_t& uniform_attributes;
-	const mesh::table_t& face_varying_attributes;
+	const mesh::table_t& face_attributes;
+	const mesh::table_t& varying_attributes;
 	const mesh::table_t& vertex_attributes;
 };
 
@@ -101,8 +101,8 @@ public:
 		mesh::indices_t& ClockwiseEdges,
 		mesh::selection_t& EdgeSelections,
 		mesh::table_t& ConstantAttributes,
-		mesh::table_t& UniformAttributes,
-		mesh::table_t& FaceVaryingAttributes,
+		mesh::table_t& FaceAttributes,
+		mesh::table_t& VaryingAttributes,
 		mesh::table_t& VertexAttributes
 		);
 
@@ -118,8 +118,8 @@ public:
 	mesh::indices_t& clockwise_edges;
 	mesh::selection_t& edge_selections;
 	mesh::table_t& constant_attributes;
-	mesh::table_t& uniform_attributes;
-	mesh::table_t& face_varying_attributes;
+	mesh::table_t& face_attributes;
+	mesh::table_t& varying_attributes;
 	mesh::table_t& vertex_attributes;
 };
 
@@ -178,6 +178,8 @@ bool_t is_sds(const const_primitive& Polyhedron);
 const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
 /// Calculates the normal for an edge loop (returns a zero-length normal for degenerate cases).
 const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
+/// Calculates the normal for a triangle (returns a zero-length normal for degenerate cases).
+const normal3 normal(const point3& A, const point3& B, const point3& C);
 
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
 void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);

@@ -23,7 +23,7 @@
 					<array name="face_materials" type="k3d::imaterial*">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</array>
 					<array name="face_selections" type="k3d::double_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 						<metadata>
-							<pair name="k3d:selection-component">uniform</pair>
+							<pair name="k3d:selection-component">face</pair>
 						</metadata>
 					</array>
 					<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180 184 188 192 196 200 204 208 212 216 220 224 228 232 236 240 244 248 252 256 260</array>
@@ -33,8 +33,8 @@
 				</structure>
 				<attributes>
 					<arrays type="constant"/>
-					<arrays type="face_varying"/>
-					<arrays type="uniform"/>
+					<arrays type="varying"/>
+					<arrays type="face"/>
 				</attributes>
 			</primitive>
 		</primitives>

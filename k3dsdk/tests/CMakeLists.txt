@@ -39,9 +39,6 @@ ADD_TEST(k3dsdk.float-to-string.003 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-stri
 ADD_TEST(k3dsdk.float-to-string.004 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-string 123.456789012)
 ADD_TEST(k3dsdk.float-to-string.005 ${EXECUTABLE_OUTPUT_PATH}/test-float-to-string 123.4567890123456)
 
-ADD_EXECUTABLE(test-mesh-sizes mesh_sizes.cpp)
-ADD_TEST(k3dsdk.mesh-sizes ${EXECUTABLE_OUTPUT_PATH}/test-mesh-sizes)
-
 ADD_EXECUTABLE(test-path-decomposition path_decomposition.cpp)
 ADD_TEST(k3dsdk.path.decomposition ${EXECUTABLE_OUTPUT_PATH}/test-path-decomposition)
 

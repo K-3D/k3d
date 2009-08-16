@@ -292,10 +292,8 @@ object module_get_command_node(const string_t& Path)
 	return wrap_unknown(k3d::command_node::lookup(Path));
 }
 
-object module_open_document(const string_t& Path)
+object module_open_document(const k3d::filesystem::path& Path)
 {
-	const filesystem::path document_path = filesystem::native_path(ustring::from_utf8(Path));
-
 	boost::scoped_ptr<k3d::idocument_importer> importer(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
 	if(!importer)
 		throw std::runtime_error("no importer plugin available");
@@ -304,7 +302,7 @@ object module_open_document(const string_t& Path)
 	if(!document)
 		throw std::runtime_error("couldn't create empty document");
 
-	if(!importer->read_file(*document, document_path))
+	if(!importer->read_file(*document, Path))
 		throw std::runtime_error("error loading document");
 
 	return wrap(document);

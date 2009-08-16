@@ -110,6 +110,10 @@ ADD_LIBRARY(k3dsdk-python-interfaces SHARED
 	iproperty_collection_python.h
 	iproperty_python.cpp
 	iproperty_python.h
+	irender_camera_frame_python.cpp
+	irender_camera_frame_python.h
+	irender_camera_preview_python.cpp
+	irender_camera_preview_python.h
 	isnappable_python.cpp
 	isnappable_python.h
 	iunknown_python.cpp

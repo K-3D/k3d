@@ -4,8 +4,8 @@ import k3d
 import sys
 import os
 
-primitive_types = [k3d.bezier_triangle_patch, k3d.bicubic_patch, k3d.bilinear_patch, k3d.blobby, k3d.cone, k3d.cubic_curve, k3d.cylinder, k3d.disk, k3d.hyperboloid, k3d.linear_curve, k3d.nurbs_curve, k3d.nurbs_patch, k3d.paraboloid, k3d.point_group, k3d.polyhedron, k3d.sphere, k3d.teapot, k3d.torus]
-primitive_names = ["Bezier Triangle Patch", "Bicubic Patch", "Bilinear Patch", "Blobby", "Cone", "Cubic Curve", "Cylinder", "Disk", "Hyperboloid", "Linear Curve", "NURBS Curve", "NURBS Patch", "Paraboloid", "Point Group", "Polyhedron", "Sphere", "Teapot", "Torus"]
+primitive_types = [k3d.bezier_triangle_patch, k3d.bicubic_patch, k3d.bilinear_patch, k3d.blobby, k3d.cone, k3d.cubic_curve, k3d.cylinder, k3d.disk, k3d.hyperboloid, k3d.linear_curve, k3d.nurbs_curve, k3d.nurbs_patch, k3d.paraboloid, k3d.particle, k3d.polyhedron, k3d.sphere, k3d.teapot, k3d.torus]
+primitive_names = ["Bezier Triangle Patch", "Bicubic Patch", "Bilinear Patch", "Blobby", "Cone", "Cubic Curve", "Cylinder", "Disk", "Hyperboloid", "Linear Curve", "NURBS Curve", "NURBS Patch", "Paraboloid", "Particle", "Polyhedron", "Sphere", "Teapot", "Torus"]
 
 # Create a table listing primitive components ...
 print """Creating primitive components table ..."""

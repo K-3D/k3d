@@ -50,7 +50,7 @@ def test_property(value, expected_value):
 	if value != expected_value:
 		raise "property value doesn't match: ", value, expected_value
 
-document2 = k3d.open_document(path)
+document2 = k3d.open_document(k3d.filesystem.native_path(path))
 test_container2 = document.get_node("test_container")
 
 test_property(test_container2.get_property("k3d::bool_t").internal_value(), True)

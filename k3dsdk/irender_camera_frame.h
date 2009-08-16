@@ -2,7 +2,7 @@
 #define K3DSDK_IRENDER_CAMERA_FRAME_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include "iunknown.h"
@@ -37,7 +37,7 @@ class irender_camera_frame :
 	public virtual k3d::iunknown
 {
 public:
-	virtual bool render_camera_frame(icamera& Camera, const filesystem::path& OutputImage, const bool ViewCompletedImage) = 0;
+	virtual bool_t render_camera_frame(icamera& Camera, const filesystem::path& OutputImage, const bool_t ViewCompletedImage) = 0;
 
 protected:
 	irender_camera_frame() {}

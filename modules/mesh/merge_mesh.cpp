@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -26,9 +26,7 @@
 #include <k3dsdk/table_copier.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/hints.h>
-#include <k3dsdk/imaterial.h>
 #include <k3dsdk/imulti_mesh_sink.h>
-#include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/metadata_keys.h>
@@ -54,9 +52,9 @@ namespace mesh
 
 class merge_mesh :
 	public k3d::imulti_mesh_sink,
-	public k3d::material_sink<k3d::mesh_source<k3d::node > >
+	public k3d::mesh_source<k3d::node >
 {
-	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
+	typedef k3d::mesh_source<k3d::node > base;
 
 public:
 	merge_mesh(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -67,38 +65,9 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	class offset_point_indices
-	{
-	public:
-		offset_point_indices(const k3d::uint_t Offset) :
-			offset(Offset)
-		{
-		}
-
-		void operator()(const k3d::string_t&, const k3d::table&, const k3d::string_t& ArrayName, k3d::pipeline_data<k3d::array>& Array)
-		{
-			if(Array->get_metadata_value(k3d::metadata::key::domain()) != k3d::metadata::value::mesh_point_indices_domain())
-				return;
-
-			k3d::uint_t_array* const array = dynamic_cast<k3d::uint_t_array*>(&Array.writable());
-			if(!array)
-			{
-				k3d::log() << error << "array [" << ArrayName << "] must be a k3d::uint_t_array." << std::endl;
-				return;
-			}
-
-			std::transform(array->begin(), array->end(), array->begin(), std::bind2nd(std::plus<k3d::uint_t>(), offset));
-		}
-
-	private:
-		const k3d::uint_t offset;	
-	};
-
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
-		k3d::mesh::points_t& output_points = Output.points.create();
-		k3d::mesh::selection_t& output_point_selection = Output.point_selection.create();
 
 		// For each input mesh ...
 		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
@@ -112,21 +81,7 @@ public:
 			if(!mesh)
 				continue;
 
-			// Merge points into the output ...
-			const k3d::uint_t point_offset = output_points.size();
-			if(mesh->points && mesh->point_selection)
-			{
-				output_points.insert(output_points.end(), mesh->points->begin(), mesh->points->end());
-				output_point_selection.insert(output_point_selection.end(), mesh->point_selection->begin(), mesh->point_selection->end());
-			}
-
-			// Merge primitives into the output ...
-			for(k3d::mesh::primitives_t::const_iterator primitive = mesh->primitives.begin(); primitive != mesh->primitives.end(); ++primitive)
-			{
-				Output.primitives.push_back(*primitive);
-				k3d::mesh::primitive& new_primitive = Output.primitives.back().writable();
-				k3d::mesh::visit_arrays(new_primitive, offset_point_indices(point_offset));
-			}
+			k3d::mesh::append(*mesh, Output);
 		}
 	}
 

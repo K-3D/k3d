@@ -183,7 +183,7 @@ inode* modify_mesh(document_state& DocumentState, inode& Node, iplugin_factory* 
 		imesh_selection_sink* const downstream_mesh_selection_sink = dynamic_cast<imesh_selection_sink*>(&Node);
 		if(modifier_mesh_selection_sink && downstream_mesh_selection_sink)
 		{
-			if(selection::NODES == selection::state(DocumentState.document()).current_mode())
+			if(selection::NODE == selection::state(DocumentState.document()).current_mode())
 			{
 				property::set_internal_value(
 					modifier_mesh_selection_sink->mesh_selection_sink_input(),

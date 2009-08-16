@@ -26,6 +26,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/nurbs_patch.h>
@@ -46,14 +47,16 @@ namespace io
 // mesh_reader
 
 class mesh_reader :
-	public k3d::mesh_reader<k3d::node >
+	public k3d::material_sink<k3d::mesh_reader<k3d::node > >
 {
-	typedef k3d::mesh_reader<k3d::node > base;
+	typedef k3d::material_sink<k3d::mesh_reader<k3d::node > > base;
 
 public:
 	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reload_mesh_slot()));
 	}
 
 	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
@@ -68,7 +71,7 @@ public:
 			return;
 		}
 
-		my_parser parser(Output);
+		my_parser parser(Output, m_material.pipeline_value());
 		parser.parse(file);
 	}
 
@@ -91,8 +94,9 @@ private:
 		public obj_parser
 	{
 	public:
-		my_parser(k3d::mesh& Mesh) :
+		my_parser(k3d::mesh& Mesh, k3d::imaterial* const Material) :
 			mesh(Mesh),
+			material(Material),
 			points(0),
 			point_selection(0),
 			u_order(0),
@@ -106,6 +110,7 @@ private:
 
 	private:
 		k3d::mesh& mesh;
+		k3d::imaterial* const material;
 		k3d::mesh::points_t* points;
 		k3d::mesh::selection_t* point_selection;
 		boost::scoped_ptr<k3d::mesh::weights_t> point_weights; // Note: *not* part of the mesh!
@@ -155,7 +160,7 @@ private:
 			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(0.0);
-			polyhedron->face_materials.push_back(static_cast<k3d::imaterial*>(0));
+			polyhedron->face_materials.push_back(material);
 			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
 
 			const k3d::uint_t point_begin = 0;

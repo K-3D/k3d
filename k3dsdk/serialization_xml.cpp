@@ -992,7 +992,7 @@ void upgrade_painters(element& XMLDocument)
 	if (!has_ri_painter)
 	{
 		return_if_fail(plugin::factory::lookup("RenderManMultiPainter"));
-		return_if_fail(plugin::factory::lookup("RenderManPointGroupPainter"));
+		return_if_fail(plugin::factory::lookup("RenderManParticlePainter"));
 		return_if_fail(plugin::factory::lookup("RenderManPolyhedronPainter"));
 		return_if_fail(plugin::factory::lookup("RenderManSubdivisionSurfacePainter"));
 		return_if_fail(plugin::factory::lookup("RenderManLinearCurvePainter"));
@@ -1068,7 +1068,7 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Point Group Painter"),
-				attribute("factory", plugin::factory::lookup("RenderManPointGroupPainter")->factory_id()),
+				attribute("factory", plugin::factory::lookup("RenderManParticlePainter")->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(

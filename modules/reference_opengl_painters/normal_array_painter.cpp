@@ -38,9 +38,8 @@ namespace k3d
 enum storage_class_t
 {
 	STORAGE_CLASS_CONSTANT,
-	STORAGE_CLASS_UNIFORM,
+	STORAGE_CLASS_FACE,
 	STORAGE_CLASS_VARYING,
-	STORAGE_CLASS_FACEVARYING,
 	STORAGE_CLASS_VERTEX,
 };
 
@@ -51,9 +50,8 @@ const ienumeration_property::enumeration_values_t& storage_class_values()
 	if(values.empty())
 	{
 		values.push_back(ienumeration_property::enumeration_value_t("Constant", "constant", ""));
-		values.push_back(ienumeration_property::enumeration_value_t("Uniform", "uniform", ""));
+		values.push_back(ienumeration_property::enumeration_value_t("Face", "face", ""));
 		values.push_back(ienumeration_property::enumeration_value_t("Varying", "varying", ""));
-		values.push_back(ienumeration_property::enumeration_value_t("Face-Varying", "facevarying", ""));
 		values.push_back(ienumeration_property::enumeration_value_t("Vertex", "vertex", ""));
 	}
 	
@@ -68,14 +66,11 @@ std::ostream& operator<<(std::ostream& Stream, const storage_class_t& Value)
 		case STORAGE_CLASS_CONSTANT:
 			Stream << "constant";
 			break;
-		case STORAGE_CLASS_UNIFORM:
-			Stream << "uniform";
+		case STORAGE_CLASS_FACE:
+			Stream << "face";
 			break;
 		case STORAGE_CLASS_VARYING:
 			Stream << "varying";
-			break;
-		case STORAGE_CLASS_FACEVARYING:
-			Stream << "facevarying";
 			break;
 		case STORAGE_CLASS_VERTEX:
 			Stream << "vertex";
@@ -93,12 +88,10 @@ std::istream& operator>>(std::istream& Stream, storage_class_t& Value)
 
 	if("constant" == c)
 		Value = STORAGE_CLASS_CONSTANT;
-	else if("uniform" == c)
-		Value = STORAGE_CLASS_UNIFORM;
+	else if("face" == c)
+		Value = STORAGE_CLASS_FACE;
 	else if("varying" == c)
 		Value = STORAGE_CLASS_VARYING;
-	else if("facevarying" == c)
-		Value = STORAGE_CLASS_FACEVARYING;
 	else if("vertex" == c)
 		Value = STORAGE_CLASS_VERTEX;
 	else
@@ -129,7 +122,7 @@ class normal_array_painter :
 public:
 	normal_array_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_storage_class(init_owner(*this) + init_name("storage_class") + init_label(_("Storage Class")) + init_description(_("Array storage class")) + init_value(k3d::STORAGE_CLASS_FACEVARYING) + init_enumeration(k3d::storage_class_values())),
+		m_storage_class(init_owner(*this) + init_name("storage_class") + init_label(_("Storage Class")) + init_description(_("Array storage class")) + init_value(k3d::STORAGE_CLASS_VARYING) + init_enumeration(k3d::storage_class_values())),
 		m_array_name(init_owner(*this) + init_name("array_name") + init_label(_("Array Name")) + init_description(_("Name of the array to visualize.")) + init_value(k3d::string_t("N"))),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Color")) + init_value(k3d::color(1, 0, 0))),
 		m_normalize(init_owner(*this) + init_name("normalize") + init_label(_("Normalize")) + init_description(_("Normalize vectors for display")) + init_value(true)),
@@ -161,14 +154,14 @@ public:
 
 		switch(storage_class)
 		{
-			case k3d::STORAGE_CLASS_UNIFORM:
+			case k3d::STORAGE_CLASS_FACE:
 			{
 				for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 				{
 					boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **primitive));
 					if(!polyhedron.get())
 						continue;
-					if(const k3d::mesh::normals_t* const array = polyhedron->uniform_attributes.lookup<k3d::mesh::normals_t>(array_name))
+					if(const k3d::mesh::normals_t* const array = polyhedron->face_attributes.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);
@@ -187,14 +180,14 @@ public:
 				break;
 			}
 
-			case k3d::STORAGE_CLASS_FACEVARYING:
+			case k3d::STORAGE_CLASS_VARYING:
 			{
 				for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 				{
 					boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **primitive));
 					if(!polyhedron.get())
 						continue;
-					if(const k3d::mesh::normals_t* const array = polyhedron->face_varying_attributes.lookup<k3d::mesh::normals_t>(array_name))
+					if(const k3d::mesh::normals_t* const array = polyhedron->varying_attributes.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);

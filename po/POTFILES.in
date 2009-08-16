@@ -183,6 +183,7 @@ modules/freetype2/poly_text.cpp
 modules/glx/camera_to_bitmap.cpp
 modules/gnome/mime_type_handler.cpp
 modules/gnome/uri_handler.cpp
+modules/graphviz/mesh_writer.cpp
 modules/graphviz/render_engine.cpp
 modules/gts/mesh_area.cpp
 modules/gts/mesh_volume.cpp
@@ -326,6 +327,7 @@ modules/opencascade/opencascade_mesh_reader.cpp
 modules/openexr_io/bitmap_importer.cpp
 modules/opengl/render_engine.cpp
 modules/osx/uri_handler.cpp
+modules/particle/make_particles.cpp
 modules/pdiff/perceptual_difference.cpp
 modules/pixie/raytrace_map.cpp
 modules/plot/least_squares_plot.cpp
@@ -355,7 +357,6 @@ modules/polyhedron_sources/poly_torus.cpp
 modules/polyhedron_sources/polyhedron.cpp
 modules/python/engine.cpp
 modules/qslim/quadric_decimation.cpp
-modules/qtui/user_interface.cpp
 modules/quadrics/cone.cpp
 modules/quadrics/cylinder.cpp
 modules/quadrics/detail.h
@@ -381,9 +382,7 @@ modules/reference_opengl_painters/face_normal_painter.cpp
 modules/reference_opengl_painters/face_numbering_painter.cpp
 modules/reference_opengl_painters/face_orientation_painter.cpp
 modules/reference_opengl_painters/face_painter.cpp
-modules/reference_opengl_painters/face_varying_painter.cpp
 modules/reference_opengl_painters/half_edge_painter.cpp
-modules/reference_opengl_painters/hidden_line_painter.cpp
 modules/reference_opengl_painters/hyperboloid_painter.cpp
 modules/reference_opengl_painters/linear_curve_painter.cpp
 modules/reference_opengl_painters/multi_painter.cpp
@@ -393,12 +392,10 @@ modules/reference_opengl_painters/nurbs_curve_painter.cpp
 modules/reference_opengl_painters/nurbs_patch_numbering_painter.cpp
 modules/reference_opengl_painters/nurbs_patch_painter.cpp
 modules/reference_opengl_painters/paraboloid_painter.cpp
-modules/reference_opengl_painters/point_normal_painter.cpp
 modules/reference_opengl_painters/point_numbering_painter.cpp
 modules/reference_opengl_painters/point_painter.cpp
 modules/reference_opengl_painters/sphere_painter.cpp
 modules/reference_opengl_painters/teapot_painter.cpp
-modules/reference_opengl_painters/textured_face_painter.cpp
 modules/reference_opengl_painters/torus_painter.cpp
 modules/reference_opengl_painters/varying_data_painter.cpp
 modules/reference_opengl_painters/vertex_data_painter.cpp
@@ -441,6 +438,7 @@ modules/renderman_painters/linear_curve_painter.cpp
 modules/renderman_painters/multi_painter.cpp
 modules/renderman_painters/nurbs_patch_painter.cpp
 modules/renderman_painters/paraboloid_painter.cpp
+modules/renderman_painters/particle_painter.cpp
 modules/renderman_painters/polyhedron_painter.cpp
 modules/renderman_painters/scripted_painter.cpp
 modules/renderman_painters/sphere_painter.cpp
@@ -537,3 +535,7 @@ modules/yafray/spot_light.cpp
 modules/yafray/sun_light.cpp
 share/scripts/scripted_plugins/ac3d_exporter.py
 share/scripts/scripted_plugins/ogre_exporter.py
+modules/advanced_opengl_painters/face_varying_painter.cpp
+modules/advanced_opengl_painters/hidden_line_painter.cpp
+modules/advanced_opengl_painters/point_normal_painter.cpp
+modules/advanced_opengl_painters/textured_face_painter.cpp

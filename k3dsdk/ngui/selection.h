@@ -45,16 +45,18 @@ namespace selection
 /// Enumerates available interactive selection modes
 enum mode
 {
+	/// Select curve components
+	CURVE,
+	/// Select face components
+	FACE,
 	/// Select individual nodes
-	NODES,
+	NODE,
 	/// Select points
-	POINTS,
+	POINT,
 	/// Select polyhedron split-edges
-	SPLIT_EDGES,
+	SPLIT_EDGE,
 	/// Select uniform components
 	UNIFORM,
-	/// Select curve components
-	CURVES,
 };
 
 std::ostream& operator<<(std::ostream& Stream, const mode& Value);
