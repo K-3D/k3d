@@ -188,7 +188,7 @@ public:
 			detail::adjust_orientation(points, vertex_indices, face_normals);
 			k3d::polyhedron::primitive* polyhedron = k3d::polyhedron::create(Output, points, vertex_counts, vertex_indices, static_cast<k3d::imaterial*>(0));
 			if(m_store_normals.pipeline_value())
-				polyhedron->uniform_attributes.create("N", new k3d::mesh::normals_t(face_normals));
+				polyhedron->face_attributes.create("N", new k3d::mesh::normals_t(face_normals));
 		}
 		catch(std::runtime_error& E)
 		{
