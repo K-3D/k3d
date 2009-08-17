@@ -16,13 +16,7 @@ FOREACH(module ${K3D_EXTERNAL_MODULES})
 
 		IF(EXISTS ${MODULE_DIRECTORY})
 			ADD_SUBDIRECTORY(${MODULE_DIRECTORY} "${CMAKE_CURRENT_BINARY_DIR}/${module}")
-#			SET(MODULE_MAKEFILE ${MODULE_DIRECTORY}/${module}.cmake)
-#
-#			IF(EXISTS ${MODULE_MAKEFILE})
-#				INCLUDE(${MODULE_MAKEFILE})
-#			ELSE(EXISTS ${MODULE_MAKEFILE})
-#				MESSAGE(SEND_ERROR "Cannot find required \"${module}\" module makefile \"${MODULE_MAKEFILE}\"")
-#			ENDIF(EXISTS ${MODULE_MAKEFILE})
+			SET(K3D_PLUGINS ${K3D_PLUGINS} PARENT_SCOPE)
 		ELSE(EXISTS ${MODULE_DIRECTORY})
 			MESSAGE(SEND_ERROR "The \"${module}\" module source directory \"${MODULE_DIRECTORY}\" does not exist.
 				Specify a different directory using ${module}_EXTERNAL_SOURCE_DIR")
