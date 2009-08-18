@@ -2,7 +2,7 @@
 #define K3DSDK_SELECTION_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -20,15 +20,15 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "gl.h"
-#include "inode_collection.h"
-#include "inode_selection.h"
-#include "ipersistent.h"
-#include "iselectable.h"
-#include "named_arrays.h"
-#include "nodes.h"
-#include "serialization_xml.h"
-#include "xml.h"
+#include <k3dsdk/gl.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/inode_selection.h>
+#include <k3dsdk/ipersistent.h>
+#include <k3dsdk/iselectable.h>
+#include <k3dsdk/named_arrays.h>
+#include <k3dsdk/nodes.h>
+#include <k3dsdk/serialization_xml.h>
+#include <k3dsdk/xml.h>
 
 #include <vector>
 
@@ -87,6 +87,8 @@ POINT = 31,
 CURVE = 32,
 /// Storage for a zero-based face index (relative to a primitive)
 FACE = 33,
+/// Storage for a zero-based patch index (relative to a primitive)
+PATCH = 34,
 
 };
 

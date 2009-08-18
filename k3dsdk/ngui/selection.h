@@ -51,6 +51,8 @@ enum mode
 	FACE,
 	/// Select individual nodes
 	NODE,
+	/// Select patches
+	PATCH,
 	/// Select points
 	POINT,
 	/// Select polyhedron split-edges

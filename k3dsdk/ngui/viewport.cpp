@@ -85,10 +85,12 @@ const k3d::gl::selection_state select_nodes()
 	k3d::gl::selection_state result;
 
 	result.select_backfacing = true;
+	result.select_component.insert(k3d::selection::CURVE);
+	result.select_component.insert(k3d::selection::FACE);
+	result.select_component.insert(k3d::selection::PATCH);
 	result.select_component.insert(k3d::selection::POINT);
 	result.select_component.insert(k3d::selection::SPLIT_EDGE);
 	result.select_component.insert(k3d::selection::UNIFORM);
-	result.select_component.insert(k3d::selection::CURVE);
 
 	return result;
 }
@@ -723,6 +725,9 @@ k3d::selection::records control::get_object_selectables(const k3d::rectangle& Se
 		case selection::NODE:
 			return get_node_selectables(SelectionRegion);
 			break;
+		case selection::PATCH:
+			return get_component_selectables(k3d::selection::PATCH, SelectionRegion, Backfacing);
+			break;
 		case selection::POINT:
 			return get_component_selectables(k3d::selection::POINT, SelectionRegion, Backfacing);
 			break;
@@ -1198,6 +1203,9 @@ k3d::selection::record control::pick_object(const k3d::point2& Coordinates, k3d:
 			break;
 		case selection::NODE:
 			return pick_node(Coordinates, Records);
+			break;
+		case selection::PATCH:
+			return pick_component(k3d::selection::PATCH, Coordinates, Records, Backfacing);
 			break;
 		case selection::POINT:
 			return pick_point(Coordinates, Records, Backfacing);

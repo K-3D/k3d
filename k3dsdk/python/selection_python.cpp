@@ -101,6 +101,7 @@ void define_namespace_selection()
 		.value("POINT", k3d::selection::POINT)
 		.value("CURVE", k3d::selection::CURVE)
 		.value("FACE", k3d::selection::FACE)
+		.value("PATCH", k3d::selection::PATCH)
 		.attr("__module__") = "k3d";
 
 	class_<selection_storage_wrapper>("storage", no_init)

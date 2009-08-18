@@ -36,11 +36,11 @@
       <stop
          id="stop3241"
          offset="0"
-         style="stop-color:#ff917d;stop-opacity:1;" />
+         style="stop-color:#ffa87d;stop-opacity:1;" />
       <stop
          id="stop3243"
          offset="1"
-         style="stop-color:#f42600;stop-opacity:1;" />
+         style="stop-color:#ca3900;stop-opacity:1;" />
     </radialGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
@@ -315,10 +315,10 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="13.893067"
-     inkscape:cx="-2.8961871"
-     inkscape:cy="6.9382507"
-     inkscape:current-layer="layer1"
+     inkscape:zoom="24.9"
+     inkscape:cx="7.7710843"
+     inkscape:cy="15"
+     inkscape:current-layer="g2449"
      inkscape:window-width="1280"
      inkscape:window-height="972"
      inkscape:window-x="0"

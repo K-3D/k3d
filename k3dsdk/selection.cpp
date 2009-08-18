@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -78,6 +78,9 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case FACE:
 			Stream << "face";
 			break;
+		case PATCH:
+			Stream << "patch";
+			break;
 		default:
 			Stream << RHS;
 			break;
@@ -115,6 +118,8 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = CURVE;
 	else if(buffer == "face")
 		RHS = FACE;
+	else if(buffer == "patch")
+		RHS = PATCH;
 	else
 		log() << error << k3d_file_reference << ": could not extract value [" << buffer << "]" << std::endl;
 
