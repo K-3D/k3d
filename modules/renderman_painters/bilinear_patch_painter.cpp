@@ -70,7 +70,7 @@ public:
 			const k3d::mesh::materials_t& patch_materials = bilinear_patch->patch_materials;
 			const k3d::mesh::indices_t& patch_points = bilinear_patch->patch_points;
 			const k3d::mesh::table_t& constant_attributes = bilinear_patch->constant_attributes;
-			const k3d::mesh::table_t& uniform_attributes = bilinear_patch->uniform_attributes;
+			const k3d::mesh::table_t& patch_attributes = bilinear_patch->patch_attributes;
 			const k3d::mesh::table_t& varying_attributes = bilinear_patch->varying_attributes;
 
 			const k3d::mesh::points_t& points = *Mesh.points;
@@ -84,7 +84,7 @@ public:
 				ri_constant_attributes.add_arrays(constant_attributes);
 
 				array_copier ri_uniform_attributes;
-				ri_uniform_attributes.add_arrays(uniform_attributes);
+				ri_uniform_attributes.add_arrays(patch_attributes);
 
 				array_copier ri_varying_attributes;
 				ri_varying_attributes.add_arrays(varying_attributes);

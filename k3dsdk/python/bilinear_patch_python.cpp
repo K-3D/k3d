@@ -46,7 +46,7 @@ public:
 		static object patch_materials(wrapper& Self) { return wrap(Self.wrapped().patch_materials); }
 		static object patch_points(wrapper& Self) { return wrap(Self.wrapped().patch_points); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -59,7 +59,7 @@ public:
 		static object patch_materials(wrapper& Self) { return wrap(Self.wrapped().patch_materials); }
 		static object patch_points(wrapper& Self) { return wrap(Self.wrapped().patch_points); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -95,7 +95,7 @@ void define_namespace_bilinear_patch()
 		.def("patch_materials", &bilinear_patch::const_primitive::patch_materials)
 		.def("patch_points", &bilinear_patch::const_primitive::patch_points)
 		.def("constant_attributes", &bilinear_patch::const_primitive::constant_attributes)
-		.def("uniform_attributes", &bilinear_patch::const_primitive::uniform_attributes)
+		.def("patch_attributes", &bilinear_patch::const_primitive::patch_attributes)
 		.def("varying_attributes", &bilinear_patch::const_primitive::varying_attributes)
 		;
 
@@ -104,7 +104,7 @@ void define_namespace_bilinear_patch()
 		.def("patch_materials", &bilinear_patch::primitive::patch_materials)
 		.def("patch_points", &bilinear_patch::primitive::patch_points)
 		.def("constant_attributes", &bilinear_patch::primitive::constant_attributes)
-		.def("uniform_attributes", &bilinear_patch::primitive::uniform_attributes)
+		.def("patch_attributes", &bilinear_patch::primitive::patch_attributes)
 		.def("varying_attributes", &bilinear_patch::primitive::varying_attributes)
 		;
 }
