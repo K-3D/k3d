@@ -7,7 +7,7 @@
 		<primitives>
 			<primitive type="bezier_triangle_patch">
 				<structure>
-					<table type="uniform">
+					<table type="patch">
 						<array name="patch_first_points" type="k3d::uint_t">0 10</array>
 						<array name="patch_materials" type="k3d::imaterial*">0 0</array>
 						<array name="patch_orders" type="k3d::uint_t">4 4</array>
@@ -28,7 +28,7 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="uniform"/>
+					<table type="patch"/>
 					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>

@@ -49,7 +49,7 @@ public:
 		static object patch_points(wrapper& Self) { return wrap(Self.wrapped().patch_points); }
 		static object patch_point_weights(wrapper& Self) { return wrap(Self.wrapped().patch_point_weights); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
@@ -66,7 +66,7 @@ public:
 		static object patch_points(wrapper& Self) { return wrap(Self.wrapped().patch_points); }
 		static object patch_point_weights(wrapper& Self) { return wrap(Self.wrapped().patch_point_weights); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
@@ -106,7 +106,7 @@ void define_namespace_bezier_triangle_patch()
 		.def("patch_points", &bezier_triangle_patch::const_primitive::patch_points)
 		.def("patch_point_weights", &bezier_triangle_patch::const_primitive::patch_point_weights)
 		.def("constant_attributes", &bezier_triangle_patch::const_primitive::constant_attributes)
-		.def("uniform_attributes", &bezier_triangle_patch::const_primitive::uniform_attributes)
+		.def("patch_attributes", &bezier_triangle_patch::const_primitive::patch_attributes)
 		.def("varying_attributes", &bezier_triangle_patch::const_primitive::varying_attributes)
 		.def("vertex_attributes", &bezier_triangle_patch::const_primitive::vertex_attributes)
 		;
@@ -119,7 +119,7 @@ void define_namespace_bezier_triangle_patch()
 		.def("patch_points", &bezier_triangle_patch::primitive::patch_points)
 		.def("patch_point_weights", &bezier_triangle_patch::primitive::patch_point_weights)
 		.def("constant_attributes", &bezier_triangle_patch::primitive::constant_attributes)
-		.def("uniform_attributes", &bezier_triangle_patch::primitive::uniform_attributes)
+		.def("patch_attributes", &bezier_triangle_patch::primitive::patch_attributes)
 		.def("varying_attributes", &bezier_triangle_patch::primitive::varying_attributes)
 		.def("vertex_attributes", &bezier_triangle_patch::primitive::vertex_attributes)
 		;
