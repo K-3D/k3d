@@ -32,6 +32,8 @@
 
 #include <boost/scoped_ptr.hpp>
 
+#include <set>
+
 namespace module
 {
 
@@ -48,19 +50,21 @@ namespace detail
 void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::mesh::counts_t& VertexCounts, k3d::mesh::indices_t& VertexIndices, k3d::mesh::normals_t& Normals, const k3d::double_t Threshold = 1e-12)
 {
 	const k3d::double_t threshold = Threshold*Threshold;
-	
+
 	k3d::string_t line_buffer;
 	k3d::uint_t line_number = 0;
-	k3d::uint_t face_number = 0;
+	k3d::mesh::indices_t face_points;
+	k3d::normal3 face_normal;
+	std::set<k3d::string_t> added_faces; // stores a unique ID for each added face
 	for(k3d::getline(Stream, line_buffer); Stream; k3d::getline(Stream, line_buffer))
 	{
+		++line_number;
 		k3d::string_t keyword;
 		std::istringstream line_stream(line_buffer);
 		line_stream >> keyword;
-		
+
 		if(keyword == "facet")
 		{
-			VertexCounts.push_back(0);
 			k3d::string_t keyword2;
 			line_stream >> keyword2;
 			assert_warning(keyword2 == "normal");
@@ -68,7 +72,7 @@ void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::me
 			line_stream >> x;
 			line_stream >> y;
 			line_stream >> z;
-			Normals.push_back(k3d::normalize(k3d::normal3(x,y,z)));
+			face_normal = k3d::normalize(k3d::normal3(x,y,z));
 		}
 		if(keyword == "vertex")
 		{
@@ -80,7 +84,8 @@ void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::me
 			k3d::uint_t point_index = Points.size();
 			for(k3d::uint_t point = 0; point != Points.size(); ++point)
 			{
-				if((Points[point] - new_point).length2() < threshold)
+				const k3d::double_t len2 = (Points[point] - new_point).length2();
+				if(len2 < threshold)
 				{
 					point_index = point;
 					break;
@@ -90,15 +95,32 @@ void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::me
 			{
 				Points.push_back(new_point);
 			}
-			VertexIndices.push_back(point_index);
-			++VertexCounts.back();
+			face_points.push_back(point_index);
+			if(face_points.size() == 3)
+			{
+				std::stringstream face_id_stream;
+				face_id_stream << face_points[0] << face_points[1] << face_points[2];
+				k3d::string_t face_id = face_id_stream.str();
+				if(added_faces.count(face_id))
+				{
+					k3d::log() << warning << "Skipping duplicate face on line " << line_number - 4 << std::endl;
+				}
+				else
+				{
+					VertexIndices.insert(VertexIndices.end(), face_points.begin(), face_points.end());
+					VertexCounts.push_back(3);
+					Normals.push_back(face_normal);
+					added_faces.insert(face_id);
+				}
+				face_points.clear();
+			}
 		}
 		if(keyword == "endfacet")
 		{
-			if(VertexCounts.back() != 3)
+			if(face_points.size())
 			{
-				std::stringstream error_stream("Error: STL file had less than 3 vertices for face ending on line ");
-				error_stream << line_number;  
+				std::stringstream error_stream;
+				error_stream << "Error: STL file had less than 3 vertices for face ending on line " << line_number;
 				throw std::runtime_error(error_stream.str());
 			}
 		}
