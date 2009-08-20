@@ -276,8 +276,8 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTrav
 			continue;
 
 		boost::scoped_ptr<k3d::nurbs_patch::primitive> output_patches(k3d::nurbs_patch::create(OutputMesh));
-		output_patches->uniform_attributes = source_curves->curve_attributes.clone_types();
-		k3d::table_copier uniform_copier(source_curves->curve_attributes, output_patches->uniform_attributes);
+		output_patches->patch_attributes = source_curves->curve_attributes.clone_types();
+		k3d::table_copier uniform_copier(source_curves->curve_attributes, output_patches->patch_attributes);
 
 		// Get the loops that exist in the source_curves primitive
 		k3d::mesh::bools_t is_in_loop, loop_selections;
