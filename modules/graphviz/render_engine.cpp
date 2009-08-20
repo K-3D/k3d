@@ -80,7 +80,7 @@ public:
 		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
-		const k3d::filesystem::path output_image_path = frame.add_file("world.ps");
+		const k3d::filesystem::path output_image_path = frame.add_file("world.svg");
 
 		// Render it ...
 		return_val_if_fail(render(frame, output_image_path), false);
@@ -106,7 +106,7 @@ public:
 		k3d::inetwork_render_frame& frame = job.create_frame("frame");
 
 		// Create an output image path ...
-		const k3d::filesystem::path output_image_path = frame.add_file("world.ps");
+		const k3d::filesystem::path output_image_path = frame.add_file("world.svg");
 
 		// Render it ...
 		return_val_if_fail(render(frame, output_image_path), false);
@@ -140,13 +140,10 @@ public:
 
 private:
 	template<typename T>
-	static const k3d::string_t pointer_id(const T RHS)
+	static const k3d::string_t pointer_id(const T* RHS)
 	{
-		// If this fails, it means that a pointer can't fit in a long int on your platform - you need to adjust the return type of this function
-		BOOST_STATIC_ASSERT(sizeof(T) <= sizeof(k3d::uint64_t));
-
 		std::stringstream buffer;
-		buffer << reinterpret_cast<k3d::uint64_t>(RHS);
+		buffer << "v" << RHS;
 		return buffer.str();
 	}
 
@@ -176,17 +173,18 @@ private:
 		k3d::inetwork_render_frame::environment environment;
 
 		k3d::inetwork_render_frame::arguments arguments;
-		arguments.push_back(k3d::inetwork_render_frame::argument("-Tps"));
+		arguments.push_back(k3d::inetwork_render_frame::argument("-Tsvg"));
 		arguments.push_back(k3d::inetwork_render_frame::argument(dot_file.native_filesystem_string()));
 		arguments.push_back(k3d::inetwork_render_frame::argument("-o"));
-		arguments.push_back(k3d::inetwork_render_frame::argument("world.ps"));
+		arguments.push_back(k3d::inetwork_render_frame::argument("world.svg"));
 
 		Frame.add_exec_command(m_render_command.pipeline_value(), environment, arguments);
 
 		stream << "digraph \"" << boost::any_cast<k3d::ustring>(document().title().property_internal_value()).raw() << "\"\n";
 		stream << "{\n\n";
-		stream << "rankdir=LR\n\n";
-		stream << "node [shape=box,style=filled,width=0,height=0]\n\n";
+		stream << "graph [rankdir=\"LR\"]\n\n";
+		stream << "node [fontname=\"Helvetica\" fontsize=\"12\" shape=\"box\" style=\"filled\" fillcolor=\"white\" width=\"0\" height=\"0\"]\n\n";
+		stream << "edge [fontname=\"Helvetica\" fontsize=\"8\"]\n\n";
 
 		// Create a mapping of properties-to-nodes as we go ...
 		typedef std::map<k3d::iproperty*, k3d::inode*> property_node_map_t;
@@ -225,13 +223,12 @@ private:
 				if((source_node == target_node) && !show_property_loops)
 					continue;
 
-				stream << pointer_id(source_node) << " -> " << pointer_id(target_node);
+				stream << pointer_id(source_node) << ":e -> " << pointer_id(target_node) << ":w";
 				stream << " [";
 
 				if(show_property_labels)
 				{
-					stream << " headlabel=\"" << escaped_string(target_property->property_name()) << "\"";
-					stream << " taillabel=\"" << escaped_string(source_property->property_name()) << "\"";
+					stream << " label=\"" << escaped_string(source_property->property_name()) << " > " << escaped_string(target_property->property_name()) << "\"";
 				}
 
 				stream << " ]\n";
@@ -248,12 +245,12 @@ private:
 				{
 					if(std::count(visible_nodes.begin(), visible_nodes.end(), referenced_node))
 					{
-						stream << pointer_id(referenced_node) << " -> " << pointer_id(property->second);
-						stream << " [";
+						stream << pointer_id(referenced_node) << ":e -> " << pointer_id(property->second) << ":w";
+						stream << " [ color=\"gray\"";
 
 						if(show_property_labels)
 						{
-							stream << " style=dotted,label=\"" << escaped_string(property->first->property_name()) << "\"";
+							stream << " label=\"" << escaped_string(property->first->property_name()) << "\"";
 						}
 
 						stream << " ]\n";
