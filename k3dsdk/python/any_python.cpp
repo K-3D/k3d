@@ -143,10 +143,7 @@ const object any_to_python(const boost::any& Value)
 		return wrap(boost::any_cast<const k3d::bitmap*>(Value));
 
 	if(type == typeid(k3d::inode*))
-	{
-		k3d::inode* const value = boost::any_cast<k3d::inode*>(Value);
-		return wrap_unknown(value);
-	}
+		return wrap_unknown(boost::any_cast<k3d::inode*>(Value));
 
 	if(type == typeid(k3d::idocument*))
 	{
@@ -165,7 +162,7 @@ const object any_to_python(const boost::any& Value)
 
 		boost::python::list results;
 		for(k3d::uint_t i = 0; i != nodes.size(); ++i)
-			results.append(wrap(nodes[i]));
+			results.append(wrap_unknown(nodes[i]));
 
 		return results;
 	}
