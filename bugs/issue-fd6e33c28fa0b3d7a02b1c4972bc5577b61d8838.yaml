@@ -16,7 +16,7 @@ desc: |-
   5. Click on the cube and the mouse jumps to the right border of your screen
 type: :bugfix
 component: K-3D
-release: 0.8.0.0
+release: 1.0.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -32,4 +32,8 @@ log_events:
 - - 2009-08-02 22:52:20.230708 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 0.8.0.0 from unassigned
+  - ""
+- - 2009-08-20 06:32:25.281472 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
   - ""
