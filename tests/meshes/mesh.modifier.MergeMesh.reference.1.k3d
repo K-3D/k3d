@@ -144,7 +144,7 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="uniform"/>
+					<table type="patch"/>
 					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>
@@ -208,7 +208,7 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="uniform"/>
+					<table type="patch"/>
 					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>
@@ -317,7 +317,7 @@
 			</primitive>
 			<primitive type="bicubic_patch">
 				<structure>
-					<table type="uniform">
+					<table type="patch">
 						<array name="patch_materials" type="k3d::imaterial*">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</array>
 						<array name="patch_selections" type="k3d::double_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 							<metadata>
@@ -335,14 +335,14 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="uniform"/>
+					<table type="patch"/>
 					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="bicubic_patch">
 				<structure>
-					<table type="uniform">
+					<table type="patch">
 						<array name="patch_materials" type="k3d::imaterial*">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</array>
 						<array name="patch_selections" type="k3d::double_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 							<metadata>
@@ -360,7 +360,7 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="uniform"/>
+					<table type="patch"/>
 					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>

@@ -64,7 +64,7 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="uniform"/>
+					<table type="patch"/>
 					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>
