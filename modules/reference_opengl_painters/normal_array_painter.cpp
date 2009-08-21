@@ -187,7 +187,7 @@ public:
 					boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **primitive));
 					if(!polyhedron.get())
 						continue;
-					if(const k3d::mesh::normals_t* const array = polyhedron->varying_attributes.lookup<k3d::mesh::normals_t>(array_name))
+					if(const k3d::mesh::normals_t* const array = polyhedron->edge_attributes.lookup<k3d::mesh::normals_t>(array_name))
 					{
 						k3d::gl::store_attributes attributes;
 						glDisable(GL_LIGHTING);

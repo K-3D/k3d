@@ -80,7 +80,7 @@ UNIFORM = 27,
 /// Storage for a zero-based varying index (relative to a primitive)
 VARYING = 28,
 /// Storage for a zero-based split-edge index (relative to a primitive)
-SPLIT_EDGE = 30,
+EDGE = 30,
 /// Storage for a zero-based point index (relative to a mesh)
 POINT = 31,
 /// Storage for a zero-based curve index (relative to a primitive)

@@ -1035,7 +1035,7 @@ public:
 			output_polyhedron.face_loop_counts.resize(topology_data.face_subface_counts.back(), 1);
 			output_polyhedron.face_selections.resize(topology_data.face_subface_counts.back(), 0.0);
 			output_polyhedron.face_materials.resize(topology_data.face_subface_counts.back());
-			output_polyhedron.varying_attributes.set_row_count(face_edge_counts.back());
+			output_polyhedron.edge_attributes.set_row_count(face_edge_counts.back());
 			output_polyhedron.face_attributes.set_row_count(topology_data.face_subface_counts.back());
 			allocate_memory_time += timer.elapsed();
 			
@@ -1115,7 +1115,7 @@ public:
 		k3d::double_t edge_midpoint_time = 0;
 		k3d::double_t point_position_time = 0;
 		k3d::double_t face_position_time = 0;
-		k3d::double_t varying_attributes_time = 0;
+		k3d::double_t edge_attributes_time = 0;
 		k3d::double_t face_vertex_data_time = 0;
 		k3d::timer timer;
 		
@@ -1149,13 +1149,13 @@ public:
 			
 			// Create copiers for the uniform and varying data
 			output_polyhedron.face_attributes = input_polyhedron.face_attributes.clone_types();
-			output_polyhedron.varying_attributes = input_polyhedron.varying_attributes.clone_types();
+			output_polyhedron.edge_attributes = input_polyhedron.edge_attributes.clone_types();
 			output_vertex_data = input_vertex_data.clone_types();
 			output_polyhedron.face_attributes.set_row_count(output_polyhedron.face_first_loops.size());
-			output_polyhedron.varying_attributes.set_row_count(output_polyhedron.edge_points.size());
+			output_polyhedron.edge_attributes.set_row_count(output_polyhedron.edge_points.size());
 			output_vertex_data.set_row_count(output_points.size());
 			k3d::table_copier face_attributes_copier(input_polyhedron.face_attributes, output_polyhedron.face_attributes);
-			k3d::table_copier varying_attributes_copier(input_polyhedron.varying_attributes, output_polyhedron.varying_attributes);
+			k3d::table_copier edge_attributes_copier(input_polyhedron.edge_attributes, output_polyhedron.edge_attributes);
 			k3d::table_copier vertex_data_copier(input_vertex_data, output_vertex_data);
 			k3d::table_copier vertex_data_mixer(output_vertex_data, output_vertex_data);
 	
@@ -1174,12 +1174,12 @@ public:
 					input_points,
 					output_points,
 					face_attributes_copier,
-					varying_attributes_copier,
+					edge_attributes_copier,
 					vertex_data_copier);
 			for(k3d::uint_t face = 0; face != face_count; ++face) face_center_calculator(face);
 			face_center_time += timer.elapsed();
 			face_position_time += face_center_calculator.position_update_time;
-			varying_attributes_time += face_center_calculator.varying_and_face_attributes_time;
+			edge_attributes_time += face_center_calculator.varying_and_face_attributes_time;
 			face_vertex_data_time += face_center_calculator.vertex_data_time;
 	
 			// Calculate edge midpoints
@@ -1195,7 +1195,7 @@ public:
 					topology_data.face_subface_counts,
 					input_points,
 					output_points,
-					varying_attributes_copier,
+					edge_attributes_copier,
 					vertex_data_copier,
 					vertex_data_mixer);
 			for(k3d::uint_t face = 0; face != face_count; ++face) edge_midpoint_calculator(face);
@@ -1388,7 +1388,7 @@ private:
 		k3d::mesh::selection_t edge_selections;
 		k3d::mesh::table_t constant_attributes;
 		k3d::mesh::table_t face_attributes;
-		k3d::mesh::table_t varying_attributes;
+		k3d::mesh::table_t edge_attributes;
 		k3d::mesh::table_t vertex_attributes;
 	};
 	
@@ -1407,8 +1407,8 @@ private:
 				Polyhedron.edge_selections,
 				Polyhedron.constant_attributes,
 				Polyhedron.face_attributes,
-				Polyhedron.varying_attributes,
-				Polyhedron.vertex_attributes);
+				Polyhedron.edge_attributes
+				);
 	}
 	
 	template<typename ArrayT>
@@ -1435,7 +1435,7 @@ private:
 		copy_array(Input.edge_selections, Output.edge_selections);
 		Output.constant_attributes = Input.constant_attributes;
 		Output.face_attributes = Input.face_attributes;
-		Output.varying_attributes = Input.varying_attributes;
+		Output.edge_attributes = Input.edge_attributes;
 	}
 	
 	const k3d::uint_t m_levels; // The number of SDS levels to create

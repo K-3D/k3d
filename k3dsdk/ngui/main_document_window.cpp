@@ -1795,7 +1795,7 @@ private:
 	void on_select_split_edges()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Polygon Edges"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::SPLIT_EDGE);
+		selection::state(m_document_state.document()).set_current_mode(selection::EDGE);
 	}
 
 	void on_select_uniform()

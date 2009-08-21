@@ -56,7 +56,7 @@ enum mode
 	/// Select points
 	POINT,
 	/// Select polyhedron split-edges
-	SPLIT_EDGE,
+	EDGE,
 	/// Select uniform components
 	UNIFORM,
 };

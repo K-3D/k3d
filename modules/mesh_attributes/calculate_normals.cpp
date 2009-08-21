@@ -117,7 +117,7 @@ public:
 			{
 				const k3d::double_t cos_max_angle = std::cos(std::max(0.0, m_max_angle.pipeline_value()));
 
-				k3d::mesh::normals_t& varying_normals = polyhedron->varying_attributes.create(m_varying_array.pipeline_value(), new k3d::mesh::normals_t(polyhedron->edge_points.size()));
+				k3d::mesh::normals_t& varying_normals = polyhedron->edge_attributes.create(m_varying_array.pipeline_value(), new k3d::mesh::normals_t(polyhedron->edge_points.size()));
 
 				k3d::mesh::indices_t point_first_faces;
 				k3d::mesh::counts_t point_face_counts;

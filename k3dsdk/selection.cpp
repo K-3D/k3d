@@ -66,8 +66,8 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case VARYING:
 			Stream << "varying";
 			break;
-		case SPLIT_EDGE:
-			Stream << "split_edge";
+		case EDGE:
+			Stream << "edge";
 			break;
 		case POINT:
 			Stream << "point";
@@ -110,8 +110,8 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = UNIFORM;
 	else if(buffer == "varying")
 		RHS = VARYING;
-	else if(buffer == "split_edge")
-		RHS = SPLIT_EDGE;
+	else if(buffer == "edge")
+		RHS = EDGE;
 	else if(buffer == "point")
 		RHS = POINT;
 	else if(buffer == "curve")

@@ -7,7 +7,7 @@
 		<primitives>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">0 2 3 1 0 1 7 4 2 0 4 5 3 2 5 6 1 3 6 7 5 4 7 6
 							<metadata>
@@ -41,14 +41,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">8 10 11 9 8 9 15 12 10 8 12 13 11 10 13 14 9 11 14 15 13 12 15 14
 							<metadata>
@@ -82,14 +81,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">16 18 19 17 16 17 23 20 18 16 20 21 19 18 21 22 17 19 22 23 21 20 23 22
 							<metadata>
@@ -123,14 +121,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">24 26 27 25 24 25 31 28 26 24 28 29 27 26 29 30 25 27 30 31 29 28 31 30
 							<metadata>
@@ -164,14 +161,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">32 34 35 33 32 33 39 36 34 32 36 37 35 34 37 38 33 35 38 39 37 36 39 38
 							<metadata>
@@ -205,14 +201,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">40 42 43 41 40 41 47 44 42 40 44 45 43 42 45 46 41 43 46 47 45 44 47 46
 							<metadata>
@@ -246,14 +241,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">48 50 51 49 48 49 55 52 50 48 52 53 51 50 53 54 49 51 54 55 53 52 55 54
 							<metadata>
@@ -287,14 +281,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">56 58 59 57 56 57 63 60 58 56 60 61 59 58 61 62 57 59 62 63 61 60 63 62
 							<metadata>
@@ -328,14 +321,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">64 66 67 65 64 65 71 68 66 64 68 69 67 66 69 70 65 67 70 71 69 68 71 70
 							<metadata>
@@ -369,14 +361,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">72 74 75 73 72 73 79 76 74 72 76 77 75 74 77 78 73 75 78 79 77 76 79 78
 							<metadata>
@@ -410,14 +401,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">80 82 83 81 80 81 87 84 82 80 84 85 83 82 85 86 81 83 86 87 85 84 87 86
 							<metadata>
@@ -451,14 +441,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">88 90 91 89 88 89 95 92 90 88 92 93 91 90 93 94 89 91 94 95 93 92 95 94
 							<metadata>
@@ -492,14 +481,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">96 98 99 97 96 97 103 100 98 96 100 101 99 98 101 102 97 99 102 103 101 100 103 102
 							<metadata>
@@ -533,14 +521,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">104 106 107 105 104 105 111 108 106 104 108 109 107 106 109 110 105 107 110 111 109 108 111 110
 							<metadata>
@@ -574,14 +561,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">112 114 115 113 112 113 119 116 114 112 116 117 115 114 117 118 113 115 118 119 117 116 119 118
 							<metadata>
@@ -615,14 +601,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">120 122 123 121 120 121 127 124 122 120 124 125 123 122 125 126 121 123 126 127 125 124 127 126
 							<metadata>
@@ -656,14 +641,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">128 130 131 129 128 129 135 132 130 128 132 133 131 130 133 134 129 131 134 135 133 132 135 134
 							<metadata>
@@ -697,14 +681,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">136 138 139 137 136 137 143 140 138 136 140 141 139 138 141 142 137 139 142 143 141 140 143 142
 							<metadata>
@@ -738,14 +721,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">144 146 147 145 144 145 151 148 146 144 148 149 147 146 149 150 145 147 150 151 149 148 151 150
 							<metadata>
@@ -779,14 +761,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">152 154 155 153 152 153 159 156 154 152 156 157 155 154 157 158 153 155 158 159 157 156 159 158
 							<metadata>
@@ -820,14 +801,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">160 162 163 161 160 161 167 164 162 160 164 165 163 162 165 166 161 163 166 167 165 164 167 166
 							<metadata>
@@ -861,14 +841,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">168 170 171 169 168 169 175 172 170 168 172 173 171 170 173 174 169 171 174 175 173 172 175 174
 							<metadata>
@@ -902,14 +881,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">176 178 179 177 176 177 183 180 178 176 180 181 179 178 181 182 177 179 182 183 181 180 183 182
 							<metadata>
@@ -943,14 +921,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">184 186 187 185 184 185 191 188 186 184 188 189 187 186 189 190 185 187 190 191 189 188 191 190
 							<metadata>
@@ -984,14 +961,13 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 3 0 5 6 7 4 9 10 11 8 13 14 15 12 17 18 19 16 21 22 23 20</array>
 						<array name="edge_points" type="k3d::uint_t">192 194 195 193 192 193 199 196 194 192 196 197 195 194 197 198 193 195 198 199 197 196 199 198
 							<metadata>
@@ -1025,9 +1001,8 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 		</primitives>

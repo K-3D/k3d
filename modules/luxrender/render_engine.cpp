@@ -255,7 +255,7 @@ private:
 			const k3d::mesh::points_t& FacePoints,
 			const k3d::mesh::normals_t* VertexNormals,
 			const k3d::mesh::normals_t* FaceNormals,
-			const k3d::mesh::normals_t* VaryingNormals,
+			const k3d::mesh::normals_t* EdgeNormals,
 			const k3d::mesh::materials_t& FaceMaterials,
 			k3d::mesh::points_t& TrianglePoints,
 			k3d::mesh::normals_t& TriangleNormals,
@@ -264,7 +264,7 @@ private:
 			m_face_points(FacePoints),
 			m_vertex_normals(VertexNormals),
 			m_face_normals(FaceNormals),
-			m_varying_normals(VaryingNormals),
+			m_edge_normals(EdgeNormals),
 			m_face_materials(FaceMaterials),
 			m_triangle_points(TrianglePoints),
 			m_triangle_normals(TriangleNormals),
@@ -290,11 +290,11 @@ private:
 			m_triangle_points.push_back(m_face_points[Vertices[1]]);
 			m_triangle_points.push_back(m_face_points[Vertices[2]]);
 
-			if(m_varying_normals)
+			if(m_edge_normals)
 			{
-				m_triangle_normals.push_back((*m_varying_normals)[Edges[0]]);
-				m_triangle_normals.push_back((*m_varying_normals)[Edges[1]]);
-				m_triangle_normals.push_back((*m_varying_normals)[Edges[2]]);
+				m_triangle_normals.push_back((*m_edge_normals)[Edges[0]]);
+				m_triangle_normals.push_back((*m_edge_normals)[Edges[1]]);
+				m_triangle_normals.push_back((*m_edge_normals)[Edges[2]]);
 			}
 			else if(m_vertex_normals)
 			{
@@ -315,7 +315,7 @@ private:
 		k3d::mesh::points_t m_face_points;
 		const k3d::mesh::normals_t* const m_vertex_normals;
 		const k3d::mesh::normals_t* const m_face_normals;
-		const k3d::mesh::normals_t* const m_varying_normals;
+		const k3d::mesh::normals_t* const m_edge_normals;
 		const k3d::mesh::materials_t& m_face_materials;
 		k3d::mesh::points_t& m_triangle_points;
 		k3d::mesh::normals_t& m_triangle_normals;
@@ -529,13 +529,13 @@ private:
 		// Triangulate the polyhedron faces ...
 		const k3d::mesh::normals_t* const vertex_normals = Mesh.point_attributes.lookup<k3d::mesh::normals_t>("N");
 		const k3d::mesh::normals_t* const face_normals = Polyhedron.face_attributes.lookup<k3d::mesh::normals_t>("N");
-		const k3d::mesh::normals_t* const varying_normals = Polyhedron.varying_attributes.lookup<k3d::mesh::normals_t>("N");
+		const k3d::mesh::normals_t* const edge_normals = Polyhedron.edge_attributes.lookup<k3d::mesh::normals_t>("N");
 
 		k3d::mesh::points_t triangle_points; // Receives the list of triangle vertices
 		k3d::mesh::normals_t triangle_normals; // Receives the (optional) list of triangle normals
 		std::vector<k3d::imaterial*> triangle_materials; // Recieves the list of triangle materials
 
-		create_triangles(*Mesh.points, vertex_normals, face_normals, varying_normals, Polyhedron.face_materials, triangle_points, triangle_normals, triangle_materials).process(Mesh, Polyhedron);
+		create_triangles(*Mesh.points, vertex_normals, face_normals, edge_normals, Polyhedron.face_materials, triangle_points, triangle_normals, triangle_materials).process(Mesh, Polyhedron);
 
 		// Get the set of unique materials ...
 		std::set<k3d::imaterial*> material_list(triangle_materials.begin(), triangle_materials.end());

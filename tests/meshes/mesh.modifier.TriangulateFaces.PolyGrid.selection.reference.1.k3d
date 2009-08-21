@@ -7,7 +7,7 @@
 		<primitives>
 			<primitive type="polyhedron">
 				<structure>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 0 4 5 3 7 8 6 10 11 9 13 14 12 16 17 15 19 20 21 18 23 24 25 22 27 28 29 26 31 32 33 30 35 36 37 34 39 40 41 38</array>
 						<array name="edge_points" type="k3d::uint_t">0 1 5 0 5 4 1 2 6 1 6 5 2 3 7 2 7 6 4 5 9 8 5 6 10 9 6 7 11 10 8 9 13 12 9 10 14 13 10 11 15 14
 							<metadata>
@@ -41,9 +41,8 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 		</primitives>
