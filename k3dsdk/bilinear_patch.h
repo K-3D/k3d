@@ -37,7 +37,7 @@ public:
 		const mesh::materials_t& PatchMaterials,
 		const mesh::indices_t& PatchPoints,
 		const mesh::table_t& ConstantAttributes,
-		const mesh::table_t& UniformAttributes,
+		const mesh::table_t& PatchAttributes,
 		const mesh::table_t& VaryingAttributes,
 		const mesh::table_t& VertexAttributes
 		);
@@ -46,7 +46,7 @@ public:
 	const mesh::materials_t& patch_materials;
 	const mesh::indices_t& patch_points;
 	const mesh::table_t& constant_attributes;
-	const mesh::table_t& uniform_attributes;
+	const mesh::table_t& patch_attributes;
 	const mesh::table_t& varying_attributes;
 	const mesh::table_t& vertex_attributes;
 };
@@ -60,7 +60,7 @@ public:
 		mesh::materials_t& PatchMaterials,
 		mesh::indices_t& PatchPoints,
 		mesh::table_t& ConstantAttributes,
-		mesh::table_t& UniformAttributes,
+		mesh::table_t& PatchAttributes,
 		mesh::table_t& VaryingAttributes,
 		mesh::table_t& VertexAttributes
 		);
@@ -69,7 +69,7 @@ public:
 	mesh::materials_t& patch_materials;
 	mesh::indices_t& patch_points;
 	mesh::table_t& constant_attributes;
-	mesh::table_t& uniform_attributes;
+	mesh::table_t& patch_attributes;
 	mesh::table_t& varying_attributes;
 	mesh::table_t& vertex_attributes;
 };

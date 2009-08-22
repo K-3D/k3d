@@ -887,8 +887,8 @@ public:
 			// Create copiers for the face and varying data
 			output_polyhedron->face_attributes = input_polyhedron->face_attributes.clone_types();
 			k3d::table_copier face_attributes_copier(input_polyhedron->face_attributes, output_polyhedron->face_attributes);
-			output_polyhedron->varying_attributes = input_polyhedron->varying_attributes.clone_types();
-			k3d::table_copier varying_attributes_copier(input_polyhedron->varying_attributes, output_polyhedron->varying_attributes);
+			output_polyhedron->edge_attributes = input_polyhedron->edge_attributes.clone_types();
+			k3d::table_copier edge_attributes_copier(input_polyhedron->edge_attributes, output_polyhedron->edge_attributes);
 
 			// Face-related arrays can not be appended to because of the possibility of multiple polyhedron,
 			// so we will rebuild them from scratch in the new order
@@ -1031,7 +1031,7 @@ public:
 			output_face_loop_counts.resize(face_edge_counter.face_count, 1);
 			output_face_selection.resize(face_edge_counter.face_count, 0.0);
 			output_face_materials.resize(face_edge_counter.face_count);
-			output_polyhedron->varying_attributes.set_row_count(face_edge_counter.edge_count);
+			output_polyhedron->edge_attributes.set_row_count(face_edge_counter.edge_count);
 			output_polyhedron->face_attributes.set_row_count(face_edge_counter.face_count);
 			document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
@@ -1064,7 +1064,7 @@ public:
 							output_face_materials,
 							output_face_selection,
 							face_attributes_copier,
-							varying_attributes_copier);
+							edge_attributes_copier);
 
 			if(subdivision_type == CENTERTOMIDPOINTS)
 			{

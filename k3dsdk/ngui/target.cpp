@@ -189,7 +189,7 @@ bool selection_position(const selection::mode& SelectionMode, const k3d::nodes_t
 		{
 			traverse_selected_points(*mesh, visitor);
 		}
-		if(SelectionMode == selection::SPLIT_EDGE)
+		if(SelectionMode == selection::EDGE)
 		{
 			traverse_selected_edge_points(*mesh, visitor);
 		}

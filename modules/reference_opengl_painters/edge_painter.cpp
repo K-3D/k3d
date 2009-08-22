@@ -85,7 +85,7 @@ public:
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!SelectionState.select_component.count(k3d::selection::SPLIT_EDGE))
+		if(!SelectionState.select_component.count(k3d::selection::EDGE))
 			return;
 
 		k3d::uint_t primitive_index = 0;
@@ -105,14 +105,14 @@ public:
 			const k3d::uint_t edge_count = polyhedron->edge_points.size();
 			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
-				k3d::gl::push_selection_token(k3d::selection::SPLIT_EDGE, edge);
+				k3d::gl::push_selection_token(k3d::selection::EDGE, edge);
 
 				glBegin(GL_LINES);
 				k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
 				k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
 				glEnd();
 
-				k3d::gl::pop_selection_token(); // SPLIT_EDGE
+				k3d::gl::pop_selection_token(); // EDGE
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE

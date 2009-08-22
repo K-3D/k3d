@@ -361,8 +361,8 @@ public:
 			const k3d::uint_t new_point_count = m_edge_list.size() * split_point_count + Input.points->size();
 			output_points.resize(new_point_count);
 			output_point_selection.resize(new_point_count, 1.0);
-			output_polyhedron->varying_attributes.set_row_count(edge_index_calculator.edge_count);
-			k3d::table_copier varying_attributes_copier(input_polyhedron->varying_attributes, output_polyhedron->varying_attributes);
+			output_polyhedron->edge_attributes.set_row_count(edge_index_calculator.edge_count);
+			k3d::table_copier edge_attributes_copier(input_polyhedron->edge_attributes, output_polyhedron->edge_attributes);
 			document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
 			document().pipeline_profiler().start_execution(*this, "Update indices");
@@ -371,7 +371,7 @@ public:
 					index_map,
 					output_polyhedron->edge_points,
 					output_polyhedron->clockwise_edges,
-					varying_attributes_copier);
+					edge_attributes_copier);
 			for(k3d::uint_t edge = 0; edge != index_map.size(); ++edge) edge_index_updater(edge);
 			for(k3d::uint_t loop = 0; loop != output_polyhedron->loop_first_edges.size(); ++loop)
 				output_polyhedron->loop_first_edges[loop] = index_map[output_polyhedron->loop_first_edges[loop]];
@@ -387,7 +387,7 @@ public:
 						split_point_count,
 						output_polyhedron->edge_points,
 						output_polyhedron->clockwise_edges,
-						varying_attributes_copier);
+						edge_attributes_copier);
 			for(k3d::uint_t edge_index = 0; edge_index != m_edge_list.size(); ++edge_index) edge_splitter(edge_index);
 			document().pipeline_profiler().finish_execution(*this, "Split edges");
 		}

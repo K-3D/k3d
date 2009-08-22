@@ -81,7 +81,7 @@ public:
 				ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
 
 				array_copier ri_uniform_attributes;
-				ri_uniform_attributes.add_arrays(disk->uniform_attributes);
+				ri_uniform_attributes.add_arrays(disk->surface_attributes);
 				ri_uniform_attributes.push_back(i);
 				ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
 

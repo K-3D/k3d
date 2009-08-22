@@ -46,7 +46,7 @@ public:
 		static object materials(wrapper& Self) { return wrap(Self.wrapped().materials); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 	};
 
 	class primitive
@@ -58,7 +58,7 @@ public:
 		static object materials(wrapper& Self) { return wrap(Self.wrapped().materials); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 	};
 
 
@@ -93,7 +93,7 @@ void define_namespace_teapot()
 		.def("materials", &teapot::const_primitive::materials)
 		.def("selections", &teapot::const_primitive::selections)
 		.def("constant_attributes", &teapot::const_primitive::constant_attributes)
-		.def("uniform_attributes", &teapot::const_primitive::uniform_attributes)
+		.def("surface_attributes", &teapot::const_primitive::surface_attributes)
 		;
 
 	class_<teapot::primitive::wrapper>("primitive", no_init)
@@ -101,7 +101,7 @@ void define_namespace_teapot()
 		.def("materials", &teapot::primitive::materials)
 		.def("selections", &teapot::primitive::selections)
 		.def("constant_attributes", &teapot::primitive::constant_attributes)
-		.def("uniform_attributes", &teapot::primitive::uniform_attributes)
+		.def("surface_attributes", &teapot::primitive::surface_attributes)
 		;
 }
 

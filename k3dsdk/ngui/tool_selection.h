@@ -122,8 +122,8 @@ protected:
 				case selection::CURVE:
 				case selection::FACE:
 				case selection::POINT:
-				case selection::SPLIT_EDGE:
-				case selection::UNIFORM:
+				case selection::EDGE:
+				case selection::SURFACE:
 					if(!selection::state(m_document_state.document()).is_selected(*node))
 						m_mouse_down_selection = k3d::selection::record::empty_record();;
 					break;

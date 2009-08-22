@@ -12,7 +12,7 @@
 						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
-					<table type="varying">
+					<table type="edge">
 						<array name="clockwise_edges" type="k3d::uint_t">1 2 0 4 5 3</array>
 						<array name="edge_points" type="k3d::uint_t">0 1 3 1 2 3
 							<metadata>
@@ -41,9 +41,8 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="varying"/>
+					<table type="edge"/>
 					<table type="face"/>
-					<table type="vertex"/>
 				</attributes>
 			</primitive>
 		</primitives>

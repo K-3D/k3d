@@ -187,10 +187,10 @@ public:
 			// Try some different types for the array to print
 			const k3d::string_t array_name = m_array_name.pipeline_value();
 			detail::strings_t string_array;
-			detail::named_array_to_strings<k3d::mesh::colors_t>(polyhedron->varying_attributes, array_name, string_array);
-			detail::named_array_to_strings<k3d::mesh::normals_t>(polyhedron->varying_attributes, array_name, string_array);
-			detail::named_array_to_strings<k3d::mesh::indices_t>(polyhedron->varying_attributes, array_name, string_array);
-			detail::named_array_to_strings<k3d::mesh::weights_t>(polyhedron->varying_attributes, array_name, string_array);
+			detail::named_array_to_strings<k3d::mesh::colors_t>(polyhedron->edge_attributes, array_name, string_array);
+			detail::named_array_to_strings<k3d::mesh::normals_t>(polyhedron->edge_attributes, array_name, string_array);
+			detail::named_array_to_strings<k3d::mesh::indices_t>(polyhedron->edge_attributes, array_name, string_array);
+			detail::named_array_to_strings<k3d::mesh::weights_t>(polyhedron->edge_attributes, array_name, string_array);
 			
 			draw(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, normals, m_color.pipeline_value(), edge_offset, face_offset, *m_font, string_array);
 		}

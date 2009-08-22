@@ -84,7 +84,8 @@ public:
 				ri_constant_attributes.add_arrays(nurbs->constant_attributes);
 
 				array_copier ri_uniform_attributes;
-				ri_uniform_attributes.add_arrays(nurbs->uniform_attributes);
+        // K-3D NURBS patch attributes do not have the same cardinality as RenderMan NURBS uniform attributes!
+//				ri_uniform_attributes.add_arrays(nurbs->uniform_attributes);
 
 				array_copier ri_varying_attributes;
 				ri_varying_attributes.add_arrays(nurbs->varying_attributes);

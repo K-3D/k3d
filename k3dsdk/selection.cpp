@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -60,14 +60,14 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case CONSTANT:
 			Stream << "constant";
 			break;
-		case UNIFORM:
-			Stream << "uniform";
+		case SURFACE:
+			Stream << "surface";
 			break;
 		case VARYING:
 			Stream << "varying";
 			break;
-		case SPLIT_EDGE:
-			Stream << "split_edge";
+		case EDGE:
+			Stream << "edge";
 			break;
 		case POINT:
 			Stream << "point";
@@ -77,6 +77,9 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 			break;
 		case FACE:
 			Stream << "face";
+			break;
+		case PATCH:
+			Stream << "patch";
 			break;
 		default:
 			Stream << RHS;
@@ -103,18 +106,20 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = PRIMITIVE;
 	else if(buffer == "constant")
 		RHS = CONSTANT;
-	else if(buffer == "uniform")
-		RHS = UNIFORM;
+	else if(buffer == "surface")
+		RHS = SURFACE;
 	else if(buffer == "varying")
 		RHS = VARYING;
-	else if(buffer == "split_edge")
-		RHS = SPLIT_EDGE;
+	else if(buffer == "edge")
+		RHS = EDGE;
 	else if(buffer == "point")
 		RHS = POINT;
 	else if(buffer == "curve")
 		RHS = CURVE;
 	else if(buffer == "face")
 		RHS = FACE;
+	else if(buffer == "patch")
+		RHS = PATCH;
 	else
 		log() << error << k3d_file_reference << ": could not extract value [" << buffer << "]" << std::endl;
 

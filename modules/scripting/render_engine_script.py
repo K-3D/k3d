@@ -23,7 +23,7 @@ k3d.check_node_environment(locals(), "RenderEngineScript")
 output = open(str(OutputImage), "w")
 
 for node in VisibleNodes:
-	output.write(k3d.dynamic_cast(node, "iproperty_collection").name + "\n")
+	output.write(node.name + "\n")
 
 output.close()
 

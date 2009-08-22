@@ -136,7 +136,7 @@ public:
 
 			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
 			k3d::gl::push_selection_token(k3d::selection::CONSTANT, 0);
-			k3d::gl::push_selection_token(k3d::selection::UNIFORM, 0);
+			k3d::gl::push_selection_token(k3d::selection::SURFACE, 0);
 
 			const k3d::uint_t primitives_begin = 0;
 			const k3d::uint_t primitives_end = primitives_begin + blobby->primitives.size();
@@ -197,7 +197,7 @@ public:
 
 			}
 
-			k3d::gl::pop_selection_token(); // UNIFORM
+			k3d::gl::pop_selection_token(); // SURFACE
 			k3d::gl::pop_selection_token(); // CONSTANT
 			k3d::gl::pop_selection_token(); // PRIMITIVE
 

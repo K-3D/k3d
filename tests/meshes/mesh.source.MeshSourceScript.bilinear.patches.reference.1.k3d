@@ -7,7 +7,7 @@
 		<primitives>
 			<primitive type="bilinear_patch">
 				<structure>
-					<table type="uniform">
+					<table type="patch">
 						<array name="patch_materials" type="k3d::imaterial*">0 0</array>
 						<array name="patch_selections" type="k3d::double_t">0 0
 							<metadata>
@@ -25,7 +25,7 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="uniform"/>
+					<table type="patch"/>
 					<table type="varying">
 						<array name="Cs" type="k3d::color">1 0 0 0 1 0 0 0 1 1 1 1 1 0 0 0 1 0 0 0 1 1 1 1</array>
 					</table>

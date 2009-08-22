@@ -64,7 +64,7 @@ const_primitive::const_primitive(
 	const mesh::points_2d_t& Points,
 	const mesh::selection_t& PointSelections,
 	const mesh::table_t& ConstantAttributes,
-	const mesh::table_t& UniformAttributes,
+	const mesh::table_t& PatchAttributes,
 	const mesh::table_t& VaryingAttributes,
 	const mesh::table_t& VertexAttributes
 		) :
@@ -97,7 +97,7 @@ const_primitive::const_primitive(
 	points(Points),
 	point_selections(PointSelections),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes),
+	patch_attributes(PatchAttributes),
 	varying_attributes(VaryingAttributes),
 	vertex_attributes(VertexAttributes)
 {
@@ -136,7 +136,7 @@ primitive::primitive(
 	mesh::points_2d_t& Points,
 	mesh::selection_t& PointSelections,
 	mesh::table_t& ConstantAttributes,
-	mesh::table_t& UniformAttributes,
+	mesh::table_t& PatchAttributes,
 	mesh::table_t& VaryingAttributes,
 	mesh::table_t& VertexAttributes
 		) :
@@ -169,7 +169,7 @@ primitive::primitive(
 	points(Points),
 	point_selections(PointSelections),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes),
+	patch_attributes(PatchAttributes),
 	varying_attributes(VaryingAttributes),
 	vertex_attributes(VertexAttributes)
 {
@@ -212,7 +212,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.structure["trim_point"].create<mesh::points_2d_t>("points"),
 		generic_primitive.structure["trim_point"].create<mesh::selection_t>("point_selections"),
 		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["uniform"],
+		generic_primitive.attributes["patch"],
 		generic_primitive.attributes["varying"],
 		generic_primitive.attributes["vertex"]
 		);
@@ -246,7 +246,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		const mesh::table_t& trim_point_structure = require_structure(Primitive, "trim_point");
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		const mesh::table_t& patch_attributes = require_attributes(Primitive, "patch");
 		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
@@ -299,7 +299,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 			+ std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			- std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0);
 
-		require_table_row_count(Primitive, uniform_attributes, "uniform", u_segments * v_segments);
+		require_table_row_count(Primitive, patch_attributes, "patch", u_segments * v_segments);
 		require_table_row_count(Primitive, varying_attributes, "varying", 4 * (u_segments * v_segments));
 
 	return new const_primitive(
@@ -332,7 +332,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		points,
 		point_selections,
 		constant_attributes,
-		uniform_attributes,
+		patch_attributes,
 		varying_attributes,
 		vertex_attributes);
 	}
@@ -364,7 +364,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		mesh::table_t& trim_point_structure = require_structure(Primitive, "trim_point");
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		mesh::table_t& patch_attributes = require_attributes(Primitive, "patch");
 		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
@@ -417,7 +417,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 			+ std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			- std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0);
 
-		require_table_row_count(Primitive, uniform_attributes, "uniform", u_segments * v_segments);
+		require_table_row_count(Primitive, patch_attributes, "patch", u_segments * v_segments);
 		require_table_row_count(Primitive, varying_attributes, "varying", 4 * (u_segments * v_segments));
 
 	return new primitive(
@@ -450,7 +450,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		points,
 		point_selections,
 		constant_attributes,
-		uniform_attributes,
+		patch_attributes,
 		varying_attributes,
 		vertex_attributes);
 	}

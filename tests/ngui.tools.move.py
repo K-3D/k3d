@@ -6,8 +6,8 @@ import testing
 k3d.atk.root().frame("Untitled Document 1").filler("vbox").panel("main").split_pane("main").panel("NGUIToolbarPanel").filler(0).panel(0).filler(0).filler(0).page_tab_list(0).page_tab("Create").filler(0).filler(0).push_button(0).click()
 
 # Switch to point selection mode
-k3d.atk.root().frame("Untitled Document 1").filler("vbox").panel("main").split_pane("main").panel("NGUIToolbarPanel").filler("vbox").panel("content").filler("vbox").filler("toolbox").filler("main_toolbar").filler("row1").toggle_button("Select Nodes mode").click()
-k3d.atk.root().frame("Untitled Document 1").filler("vbox").panel("main").split_pane("main").panel("NGUIToolbarPanel").filler("vbox").panel("content").filler("vbox").filler("toolbox").filler("main_toolbar").filler("row1").toggle_button("Select Points mode").click()
+k3d.atk.root().frame("Untitled Document 1").filler("vbox").panel("main").split_pane("main").panel("NGUIToolbarPanel").filler("vbox").panel("content").filler("vbox").filler("toolbox").filler("main_toolbar").filler("row1").toggle_button("Select Nodes").click()
+k3d.atk.root().frame("Untitled Document 1").filler("vbox").panel("main").split_pane("main").panel("NGUIToolbarPanel").filler("vbox").panel("content").filler("vbox").filler("toolbox").filler("main_toolbar").filler("row1").toggle_button("Select Points").click()
 
 doc = k3d.documents()[0]
 cube_instance = doc.get_node("PolyCube Instance")

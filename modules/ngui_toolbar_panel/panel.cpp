@@ -275,7 +275,7 @@ struct implementation
 			new image_toggle_button::control(
 				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::NODE, _("Select Nodes")),
 				&m_document_state.document().state_recorder(),
-				load_icon("node", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+				load_icon("select_node", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Nodes"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
@@ -284,16 +284,16 @@ struct implementation
 			new image_toggle_button::control(
 				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::POINT, _("Select Points")),
 				&m_document_state.document().state_recorder(),
-				load_icon("vertex", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+				load_icon("select_vertex", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Points"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::SPLIT_EDGE, _("Select Polygon Edges")),
+				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::EDGE, _("Select Polygon Edges")),
 				&m_document_state.document().state_recorder(),
-				load_icon("edge", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+				load_icon("select_split_edge", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Polygon Edges"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
@@ -302,7 +302,7 @@ struct implementation
 			new image_toggle_button::control(
 				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::FACE, _("Select Polygons")),
 				&m_document_state.document().state_recorder(),
-				load_icon("face", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+				load_icon("select_face", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Polygons"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
@@ -318,10 +318,19 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::UNIFORM, _("Select Uniform")),
+				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::PATCH, _("Select Patches")),
+				&m_document_state.document().state_recorder(),
+				load_icon("select_patch", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+			<< set_tooltip(_("Select Patches"))
+			<< make_toolbar_button()
+			), Gtk::PACK_SHRINK);
+
+		main_toolbar->row(1).pack_start(*Gtk::manage(
+			new image_toggle_button::control(
+				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::SURFACE, _("Select Surface")),
 				&m_document_state.document().state_recorder(),
 				load_icon("select_uniform", Gtk::ICON_SIZE_SMALL_TOOLBAR))
-			<< set_tooltip(_("Select Uniform"))
+			<< set_tooltip(_("Select Surface"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 

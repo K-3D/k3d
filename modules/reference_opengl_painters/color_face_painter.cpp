@@ -265,7 +265,7 @@ private:
 				m_color_array = Polyhedron.face_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
 			case VARYING:
-				m_color_array = Polyhedron.varying_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
+				m_color_array = Polyhedron.edge_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
 				break;
 			case VERTEX:
 				m_color_array = VertexData.lookup<k3d::mesh::colors_t>(ArrayName);

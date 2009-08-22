@@ -193,7 +193,7 @@ public:
 
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!SelectionState.select_component.count(k3d::selection::UNIFORM))
+		if(!SelectionState.select_component.count(k3d::selection::PATCH))
 			return;
 
 		k3d::uint_t primitive_index = 0;
@@ -252,7 +252,7 @@ public:
 					gl_control_points.push_back(static_cast<GLfloat>(patch_point_weight));
 				}
 
-				k3d::gl::push_selection_token(k3d::selection::UNIFORM, patch);
+				k3d::gl::push_selection_token(k3d::selection::PATCH, patch);
 
 				gluBeginSurface(nurbs_renderer);
 				gluNurbsSurface(nurbs_renderer, gl_u_knot_vector.size(), &gl_u_knot_vector[0], gl_v_knot_vector.size(), &gl_v_knot_vector[0], gl_u_stride, gl_v_stride, &gl_control_points[0], patch_u_order, patch_v_order, GL_MAP2_VERTEX_4);
@@ -287,7 +287,7 @@ public:
 				}
 				gluEndSurface(nurbs_renderer);
 
-				k3d::gl::pop_selection_token(); // UNIFORM
+				k3d::gl::pop_selection_token(); // PATCH
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE

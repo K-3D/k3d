@@ -58,7 +58,7 @@ public:
 		static object edge_selections(wrapper& Self) { return wrap(Self.wrapped().edge_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object face_attributes(wrapper& Self) { return wrap(Self.wrapped().face_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object edge_attributes(wrapper& Self) { return wrap(Self.wrapped().edge_attributes); }
 	};
 
 	class primitive
@@ -79,7 +79,7 @@ public:
 		static object edge_selections(wrapper& Self) { return wrap(Self.wrapped().edge_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object face_attributes(wrapper& Self) { return wrap(Self.wrapped().face_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object edge_attributes(wrapper& Self) { return wrap(Self.wrapped().edge_attributes); }
 	};
 
 
@@ -172,7 +172,7 @@ void define_namespace_polyhedron()
 		.def("edge_selections", &polyhedron::const_primitive::edge_selections)
 		.def("constant_attributes", &polyhedron::const_primitive::constant_attributes)
 		.def("face_attributes", &polyhedron::const_primitive::face_attributes)
-		.def("varying_attributes", &polyhedron::const_primitive::varying_attributes)
+		.def("edge_attributes", &polyhedron::const_primitive::edge_attributes)
 		;
 
 	class_<polyhedron::primitive::wrapper>("primitive", no_init)
@@ -189,7 +189,7 @@ void define_namespace_polyhedron()
 		.def("edge_selections", &polyhedron::primitive::edge_selections)
 		.def("constant_attributes", &polyhedron::primitive::constant_attributes)
 		.def("face_attributes", &polyhedron::primitive::face_attributes)
-		.def("varying_attributes", &polyhedron::primitive::varying_attributes)
+		.def("edge_attributes", &polyhedron::primitive::edge_attributes)
 		;
 }
 

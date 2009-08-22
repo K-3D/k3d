@@ -319,12 +319,6 @@ def mesh_comparison_to_reference(document, input_mesh, reference_mesh_name, thre
 	difference_file.write(difflib.HtmlDiff().make_file(str(input_mesh.pipeline_value()).splitlines(1), str(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry"))
 	difference_file.close()
 
-	print "**** Test Mesh ****"
-	print input_mesh.pipeline_value()
-
-	print "**** Reference Mesh ****"
-	print reference.output_mesh
-
 	output_mesh_difference(input_mesh.pipeline_value(), reference.output_mesh, threshold)
 	raise Exception("output mesh differs from reference")
 

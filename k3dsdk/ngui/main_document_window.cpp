@@ -689,14 +689,19 @@ private:
 			<< set_accelerator_path("<k3d-document>/actions/select/select_split_edges", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
+			new Gtk::MenuItem(_("Faces"), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_faces))
+			<< set_accelerator_path("<k3d-document>/actions/select/select_faces", get_accel_group())));
+
+		menu->items().push_back(*Gtk::manage(
 			new Gtk::MenuItem(_("Curves"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_curves))
 			<< set_accelerator_path("<k3d-document>/actions/select/select_curves", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
-			new Gtk::MenuItem(_("Faces"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_faces))
-			<< set_accelerator_path("<k3d-document>/actions/select/select_faces", get_accel_group())));
+			new Gtk::MenuItem(_("Patches"), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_patches))
+			<< set_accelerator_path("<k3d-document>/actions/select/select_patches", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
 			new Gtk::MenuItem(_("_Uniform"), true)
@@ -1763,6 +1768,12 @@ private:
 		selection::state(m_document_state.document()).set_current_mode(selection::CURVE);
 	}
 
+	void on_select_patches()
+	{
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Patches"), K3D_CHANGE_SET_CONTEXT);
+		selection::state(m_document_state.document()).set_current_mode(selection::PATCH);
+	}
+
 	void on_select_faces()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Polygon Faces"), K3D_CHANGE_SET_CONTEXT);
@@ -1784,13 +1795,13 @@ private:
 	void on_select_split_edges()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Polygon Edges"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::SPLIT_EDGE);
+		selection::state(m_document_state.document()).set_current_mode(selection::EDGE);
 	}
 
 	void on_select_uniform()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Uniform"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::UNIFORM);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Surface"), K3D_CHANGE_SET_CONTEXT);
+		selection::state(m_document_state.document()).set_current_mode(selection::SURFACE);
 	}
 
 	void on_layout_maximize_panel()

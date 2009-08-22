@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Restore robust picking.
+desc: Robust primitive picking by looking at nearby components was commented-out during the transition to generic primitives / selections.  Restore it.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-21 05:52:31.977624 Z
+references: []
+
+id: 20c18a2b4fe16b8e1a3982d83be136220b4cf863
+log_events: 
+- - 2009-08-21 05:52:32.593544 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""

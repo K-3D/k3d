@@ -72,7 +72,7 @@ public:
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
 		static object point_selections(wrapper& Self) { return wrap(Self.wrapped().point_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -110,7 +110,7 @@ public:
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
 		static object point_selections(wrapper& Self) { return wrap(Self.wrapped().point_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -171,7 +171,7 @@ void define_namespace_nurbs_patch()
 		.def("points", &nurbs_patch::const_primitive::points)
 		.def("point_selections", &nurbs_patch::const_primitive::point_selections)
 		.def("constant_attributes", &nurbs_patch::const_primitive::constant_attributes)
-		.def("uniform_attributes", &nurbs_patch::const_primitive::uniform_attributes)
+		.def("patch_attributes", &nurbs_patch::const_primitive::patch_attributes)
 		.def("varying_attributes", &nurbs_patch::const_primitive::varying_attributes)
 		;
 
@@ -205,7 +205,7 @@ void define_namespace_nurbs_patch()
 		.def("points", &nurbs_patch::primitive::points)
 		.def("point_selections", &nurbs_patch::primitive::point_selections)
 		.def("constant_attributes", &nurbs_patch::primitive::constant_attributes)
-		.def("uniform_attributes", &nurbs_patch::primitive::uniform_attributes)
+		.def("patch_attributes", &nurbs_patch::primitive::patch_attributes)
 		.def("varying_attributes", &nurbs_patch::primitive::varying_attributes)
 		;
 }

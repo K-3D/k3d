@@ -16,7 +16,7 @@
 						<array name="operator_operand_counts" type="k3d::uint_t">6</array>
 						<array name="operators" type="k3d::int32_t">0</array>
 					</table>
-					<table type="uniform">
+					<table type="surface">
 						<array name="first_operators" type="k3d::uint_t">0</array>
 						<array name="first_primitives" type="k3d::uint_t">0</array>
 						<array name="materials" type="k3d::imaterial*">0</array>
@@ -31,7 +31,7 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="uniform"/>
+					<table type="surface"/>
 					<table type="varying">
 						<array name="Cs" type="k3d::color">1 0 0 0 1 0 0 0 1 1 1 0 1 1 1</array>
 					</table>

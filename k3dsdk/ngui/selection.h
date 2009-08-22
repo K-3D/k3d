@@ -51,12 +51,14 @@ enum mode
 	FACE,
 	/// Select individual nodes
 	NODE,
+	/// Select patches
+	PATCH,
 	/// Select points
 	POINT,
 	/// Select polyhedron split-edges
-	SPLIT_EDGE,
-	/// Select uniform components
-	UNIFORM,
+	EDGE,
+	/// Select surface components
+	SURFACE,
 };
 
 std::ostream& operator<<(std::ostream& Stream, const mode& Value);
