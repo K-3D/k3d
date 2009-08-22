@@ -1,7 +1,7 @@
 // K-3D
-// Copyright (c) 2005-2006, Romain Behar
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
-// Contact: romainbehar@yahoo.com
+// Contact: tshead@k-3d.com
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -19,16 +19,21 @@
 
 /** \file
 		\author Romain Behar (romainbehar@yahoo.com)
+		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
-#include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
-#include <k3dsdk/measurement.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/selection.h>
+#include <k3dsdk/utility.h>
+#include <k3dsdk/vectors.h>
 
 #include <list>
 #include <set>
@@ -42,181 +47,29 @@ namespace selection
 namespace detail
 {
 
-// Selects adjacent faces
-typedef std::set<k3d::legacy::split_edge*> edge_set_t;
-class select_adjacent_faces
+// Selects all edges adjacent to the given point
+void select_adjacent_edges(k3d::mesh::selection_t& OutputEdgeSelections, const k3d::mesh::indices_t& PointEdges, const k3d::mesh::indices_t& PointFirstEdges, const k3d::mesh::counts_t& PointEdgeCounts, const k3d::uint_t Point, const k3d::double_t EdgeSelection)
 {
-public:
-	select_adjacent_faces(edge_set_t& SelectedEdges) :
-		selected_edges(SelectedEdges)
+	const k3d::uint_t first_idx = PointFirstEdges[Point];
+	const k3d::uint_t last_idx = first_idx + PointEdgeCounts[Point];
+	for(k3d::uint_t i = first_idx; i != last_idx; ++i)
 	{
+		const k3d::uint_t point_edge = PointEdges[i];
+		OutputEdgeSelections[point_edge] = EdgeSelection;
 	}
+}
 
-	void operator()(k3d::legacy::face* Face)
-	{
-		for(k3d::legacy::split_edge* edge = Face->first_edge; edge; edge = edge->face_clockwise)
-		{
-			// Save companion
-			if(edge->companion)
-				selected_edges.insert(edge->companion);
-
-			// Loop end
-			if(edge->face_clockwise == Face->first_edge)
-				break;
-		}
-	}
-
-private:
-	edge_set_t& selected_edges;
-};
-
-typedef std::list<k3d::legacy::split_edge*> edges_t;
-typedef std::set<k3d::legacy::point*> points_t;
-
-struct get_selected_edges
+void select_adjacent_points(k3d::mesh::selection_t& PointSelections, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::indices_t& PointEdges, const k3d::mesh::indices_t& PointFirstEdges, const k3d::mesh::counts_t& PointEdgeCounts, const k3d::uint_t Point, const k3d::double_t PointSelection)
 {
-	get_selected_edges(edges_t& SelectedEdges) :
-		selected_edges(SelectedEdges)
+	const k3d::uint_t first_idx = PointFirstEdges[Point];
+	const k3d::uint_t last_idx = first_idx + PointEdgeCounts[Point];
+	for(k3d::uint_t i = first_idx; i != last_idx; ++i)
 	{
+		const k3d::uint_t edge = PointEdges[i];
+		PointSelections[EdgePoints[ClockwiseEdges[edge]]] = PointSelection;
+		PointSelections[EdgePoints[edge]] = PointSelection;
 	}
-
-	void operator()(k3d::legacy::split_edge& Edge)
-	{
-		// Save selected edges
-		if(Edge.selection_weight)
-		{
-			selected_edges.push_back(&Edge);
-
-			// Reset selection state
-			Edge.selection_weight = 1.0;
-		}
-	}
-
-	edges_t& selected_edges;
-};
-
-// Selects adjacent edges
-class grow_edge_selection
-{
-public:
-	grow_edge_selection(const bool VisibleSelection, points_t& Points) :
-		border_points(Points)
-	{
-	}
-
-	void operator()(k3d::legacy::split_edge* Edge)
-	{
-		if(select_edges(Edge) && select_edges(Edge->face_clockwise))
-			return;
-
-		// It's a border edge, save its ends
-		border_points.insert(Edge->vertex);
-		border_points.insert(Edge->face_clockwise->vertex);
-	}
-
-	// Select all edges around Edge's vertex
-	bool select_edges(k3d::legacy::split_edge* Edge)
-	{
-		k3d::legacy::split_edge* current_edge = Edge;
-		do
-		{
-			current_edge->selection_weight = 1.0;
-
-			if(!current_edge->companion)
-				return false;
-
-			current_edge = current_edge->companion->face_clockwise;
-		}
-		while(current_edge != Edge);
-
-		return true;
-	}
-
-private:
-	points_t& border_points;
-};
-
-class select_border_edges
-{
-public:
-	select_border_edges(points_t& BorderPoints, const bool VisibleSelection) :
-		border_points(BorderPoints)
-	{
-	}
-
-	void operator()(k3d::legacy::split_edge& Edge)
-	{
-		points_t::iterator vertex;
-
-		// Select border edges
-		vertex = border_points.find(Edge.vertex);
-		if(vertex != border_points.end())
-		{
-			Edge.selection_weight = 1.0;
-		}
-
-		vertex = border_points.find(Edge.face_clockwise->vertex);
-		if(vertex != border_points.end())
-		{
-			Edge.selection_weight = 1.0;
-		}
-	}
-
-private:
-	points_t& border_points;
-};
-
-struct get_selected_points
-{
-	get_selected_points(points_t& SelectedPoints) :
-		selected_points(SelectedPoints)
-	{
-	}
-
-	void operator()(k3d::legacy::point& Point)
-	{
-		if(Point.selection_weight)
-		{
-			selected_points.insert(&Point);
-
-			// Reset selection state
-			Point.selection_weight = 1.0;
-		}
-	}
-
-private:
-	points_t& selected_points;
-};
-
-class select_border_points
-{
-public:
-	select_border_points(points_t& SelectedPoints, const bool VisibleSelection) :
-		selected_points(SelectedPoints)
-	{
-	}
-
-	void operator()(k3d::legacy::split_edge& Edge)
-	{
-		points_t::iterator vertex;
-
-		// Select border points
-		vertex = selected_points.find(Edge.vertex);
-		if(vertex != selected_points.end())
-		{
-			Edge.face_clockwise->vertex->selection_weight = 1.0;
-		}
-
-		vertex = selected_points.find(Edge.face_clockwise->vertex);
-		if(vertex != selected_points.end())
-		{
-			Edge.vertex->selection_weight = 1.0;
-		}
-	}
-
-private:
-	points_t& selected_points;
-};
+}
 
 } // namespace detail
 
@@ -224,85 +77,93 @@ private:
 // grow_selection
 
 class grow_selection :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_modifier<k3d::mesh_selection_sink<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_modifier<k3d::mesh_selection_sink<k3d::node > > base;
 
 public:
 	grow_selection(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Mesh);
+		Output = Input;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
 
-		// Grow face selection
-		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
+		for(k3d::uint_t i = 0; i != Output.primitives.size(); ++i)
 		{
-			// Get selected face companions
-			typedef std::list<k3d::legacy::face*> faces_t;
-			faces_t selected_faces;
+			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::validate(Output, Output.primitives[i]));
+			if(!output_polyhedron)
+				continue;
 
-			for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
+			const k3d::uint_t edge_count = output_polyhedron->edge_points.size();
+
+			// Get point-to-edge lookup data for outgoing edges
+			k3d::mesh::indices_t point_edges_out;
+			k3d::mesh::indices_t point_first_edges_out;
+			k3d::mesh::indices_t point_edge_counts_out;
+			k3d::polyhedron::create_vertex_edge_lookup(output_polyhedron->edge_points, point_edges_out, point_first_edges_out, point_edge_counts_out);
+
+			// Get point-to-edge lookup data for incoming edges
+			k3d::mesh::indices_t edge_points_in(edge_count);
+			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
-				if((*face)->selection_weight)
-				{
-					selected_faces.push_back(*face);
+				edge_points_in[edge] = output_polyhedron->edge_points[output_polyhedron->clockwise_edges[edge]];
+			}
+			k3d::mesh::indices_t point_edges_in;
+			k3d::mesh::indices_t point_first_edges_in;
+			k3d::mesh::indices_t point_edge_counts_in;
+			k3d::polyhedron::create_vertex_edge_lookup(edge_points_in, point_edges_in, point_first_edges_in, point_edge_counts_in);
 
-					// Set proper selection for output
-					(*face)->selection_weight = 1.0;
+			// Get face-to-edge data
+			k3d::mesh::indices_t edge_faces;
+			k3d::polyhedron::create_edge_face_lookup(output_polyhedron->face_first_loops, output_polyhedron->face_loop_counts, output_polyhedron->loop_first_edges, output_polyhedron->clockwise_edges, edge_faces);
+
+			// Get edge companions
+			k3d::mesh::indices_t adjacent_edges;
+			k3d::mesh::bools_t boundary_edges;
+			k3d::polyhedron::create_edge_adjacency_lookup(output_polyhedron->edge_points, output_polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
+
+			// copies, since we're modifying these in the output. They don't exist in Input since the selection was not merged
+			const k3d::mesh::selection_t input_point_selections = *Output.point_selection;
+			const k3d::mesh::selection_t input_edge_selections = output_polyhedron->edge_selections;
+			const k3d::mesh::selection_t input_face_selections = output_polyhedron->face_selections;
+
+			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
+			{
+				// Grow edge selections
+				const k3d::double_t edge_selection = input_edge_selections[edge];
+				if(edge_selection)
+				{
+					const k3d::uint_t start_point = output_polyhedron->edge_points[edge];
+					const k3d::uint_t end_point = output_polyhedron->edge_points[output_polyhedron->clockwise_edges[edge]];
+					detail::select_adjacent_edges(output_polyhedron->edge_selections, point_edges_out, point_first_edges_out, point_edge_counts_out, start_point, edge_selection);
+					detail::select_adjacent_edges(output_polyhedron->edge_selections, point_edges_out, point_first_edges_out, point_edge_counts_out, end_point, edge_selection);
+					detail::select_adjacent_edges(output_polyhedron->edge_selections, point_edges_in, point_first_edges_in, point_edge_counts_in, start_point, edge_selection);
+					detail::select_adjacent_edges(output_polyhedron->edge_selections, point_edges_in, point_first_edges_in, point_edge_counts_in, end_point, edge_selection);
+				}
+
+				// Grow face selections
+				if(input_face_selections[edge_faces[edge]])
+				{
+					output_polyhedron->face_selections[edge_faces[adjacent_edges[edge]]] = input_face_selections[edge_faces[edge]];
 				}
 			}
 
-			detail::edge_set_t selected_edges;
-			std::for_each(selected_faces.begin(), selected_faces.end(),
-				detail::select_adjacent_faces(selected_edges));
-
-			for(k3d::legacy::polyhedron::faces_t::iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
+			// Grow point selections
+			for(k3d::uint_t point = 0; point != input_point_selections.size(); ++point)
 			{
-				// Select faces containing an edge from previous edge set
-				k3d::legacy::split_edge* edge = (*face)->first_edge;
-				do
+				if(input_point_selections[point])
 				{
-					// If edge (or its companion) or its vertex is selected, delete face
-					detail::edge_set_t::const_iterator selected_edge = selected_edges.find(edge);
-					if(selected_edge != selected_edges.end())
-					{
-						(*face)->selection_weight = 1.0;
-						break;
-					}
-
-					edge = edge->face_clockwise;
+					detail::select_adjacent_points(Output.point_selection.writable(), output_polyhedron->clockwise_edges, output_polyhedron->edge_points, point_edges_out, point_first_edges_out, point_edge_counts_out, point, input_point_selections[point]);
+					detail::select_adjacent_points(Output.point_selection.writable(), output_polyhedron->clockwise_edges, output_polyhedron->edge_points, point_edges_in, point_first_edges_in, point_edge_counts_in, point, input_point_selections[point]);
 				}
-				while(edge != (*face)->first_edge);
 			}
 		}
-
-		// Grow edge selections
-		detail::edges_t selected_edges;
-		k3d::legacy::for_each_edge(Mesh, detail::get_selected_edges(selected_edges));
-
-		detail::points_t border_points;
-		std::for_each(selected_edges.begin(), selected_edges.end(),
-			detail::grow_edge_selection(true, border_points));
-
-		if(border_points.size())
-			k3d::legacy::for_each_edge(Mesh, detail::select_border_edges(border_points, true));
-
-		// Grow point selections
-		detail::points_t selected_points;
-		k3d::legacy::for_each_point(Mesh, detail::get_selected_points(selected_points));
-
-		if(selected_points.size())
-			k3d::legacy::for_each_edge(Mesh, detail::select_border_points(selected_points, true));
-	}
-
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
 	}
 
 	static k3d::iplugin_factory& get_factory()
