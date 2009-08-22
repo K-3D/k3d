@@ -12,7 +12,7 @@ modifier = document.new_node("Delete")
 # select some faces, distributed along polyhedra
 selection = k3d.geometry.selection.create(0)
 
-face_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.UNIFORM)
+face_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.FACE)
 k3d.geometry.primitive_selection.append(face_selection, 12, 13, 1)
 
 modifier.mesh_selection = selection
