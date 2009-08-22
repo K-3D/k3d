@@ -49,7 +49,7 @@ public:
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -65,7 +65,7 @@ public:
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -104,7 +104,7 @@ void define_namespace_cone()
 		.def("sweep_angles", &cone::const_primitive::sweep_angles)
 		.def("selections", &cone::const_primitive::selections)
 		.def("constant_attributes", &cone::const_primitive::constant_attributes)
-		.def("uniform_attributes", &cone::const_primitive::uniform_attributes)
+		.def("surface_attributes", &cone::const_primitive::surface_attributes)
 		.def("varying_attributes", &cone::const_primitive::varying_attributes)
 		;
 
@@ -116,7 +116,7 @@ void define_namespace_cone()
 		.def("sweep_angles", &cone::primitive::sweep_angles)
 		.def("selections", &cone::primitive::selections)
 		.def("constant_attributes", &cone::primitive::constant_attributes)
-		.def("uniform_attributes", &cone::primitive::uniform_attributes)
+		.def("surface_attributes", &cone::primitive::surface_attributes)
 		.def("varying_attributes", &cone::primitive::varying_attributes)
 		;
 }

@@ -123,7 +123,7 @@ protected:
 				case selection::FACE:
 				case selection::POINT:
 				case selection::EDGE:
-				case selection::UNIFORM:
+				case selection::SURFACE:
 					if(!selection::state(m_document_state.document()).is_selected(*node))
 						m_mouse_down_selection = k3d::selection::record::empty_record();;
 					break;

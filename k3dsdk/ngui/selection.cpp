@@ -105,7 +105,7 @@ struct select_all_points
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE, 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::PATCH, 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::EDGE, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::UNIFORM, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SURFACE, 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
 
 		return results;
@@ -133,7 +133,7 @@ struct select_all_components
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE, component == k3d::selection::FACE ? 1.0 : 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::PATCH, component == k3d::selection::PATCH ? 1.0 : 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::EDGE, component == k3d::selection::EDGE ? 1.0 : 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::UNIFORM, component == k3d::selection::UNIFORM ? 1.0 : 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SURFACE, component == k3d::selection::SURFACE ? 1.0 : 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, component == k3d::selection::VARYING ? 1.0 : 0.0);
 
 		return results;
@@ -402,8 +402,8 @@ std::ostream& operator<<(std::ostream& Stream, const mode& RHS)
 		case EDGE:
 			Stream << "edge";
 			break;
-		case UNIFORM:
-			Stream << "uniform";
+		case SURFACE:
+			Stream << "surface";
 			break;
 	}
 
@@ -427,8 +427,8 @@ std::istream& operator>>(std::istream& Stream, mode& RHS)
                 RHS = POINT;
         else if(text == "edge")
                 RHS = EDGE;
-        else if(text == "uniform")
-                RHS = UNIFORM;
+        else if(text == "surface")
+                RHS = SURFACE;
         else
                 log() << error << "Unknown enumeration [" << text << "]"<< std::endl;
 
@@ -605,8 +605,8 @@ void state::select(const k3d::selection::records& Selection)
 		case EDGE:
 			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::EDGE, 1.0), Selection);
 			break;
-		case UNIFORM:
-			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::UNIFORM, 1.0), Selection);
+		case SURFACE:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::SURFACE, 1.0), Selection);
 			break;
 	}
 
@@ -668,8 +668,8 @@ void state::select_all()
 		case EDGE:
 			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::EDGE), true);
 			break;
-		case UNIFORM:
-			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::UNIFORM), true);
+		case SURFACE:
+			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::SURFACE), true);
 			break;
 	}
 
@@ -705,8 +705,8 @@ void state::invert_selection()
 		case EDGE:
 			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::EDGE), true);
 			break;
-		case UNIFORM:
-			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::UNIFORM), true);
+		case SURFACE:
+			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::SURFACE), true);
 			break;
 	}
 
@@ -763,8 +763,8 @@ void state::deselect(const k3d::selection::records& Selection)
 		case EDGE:
 			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::EDGE, 0.0), Selection);
 			break;
-		case UNIFORM:
-			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::UNIFORM, 0.0), Selection);
+		case SURFACE:
+			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::SURFACE, 0.0), Selection);
 			break;
 	}
 
@@ -798,7 +798,7 @@ void state::deselect_all()
 		case PATCH:
 		case POINT:
 		case EDGE:
-		case UNIFORM:
+		case SURFACE:
 			detail::replace_selection(internal.document.nodes().collection(), detail::deselect_all(), false);
 			break;
 	}

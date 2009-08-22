@@ -49,7 +49,7 @@ public:
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -65,7 +65,7 @@ public:
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -104,7 +104,7 @@ void define_namespace_hyperboloid()
 		.def("sweep_angles", &hyperboloid::const_primitive::sweep_angles)
 		.def("selections", &hyperboloid::const_primitive::selections)
 		.def("constant_attributes", &hyperboloid::const_primitive::constant_attributes)
-		.def("uniform_attributes", &hyperboloid::const_primitive::uniform_attributes)
+		.def("surface_attributes", &hyperboloid::const_primitive::surface_attributes)
 		.def("varying_attributes", &hyperboloid::const_primitive::varying_attributes)
 		;
 
@@ -116,7 +116,7 @@ void define_namespace_hyperboloid()
 		.def("sweep_angles", &hyperboloid::primitive::sweep_angles)
 		.def("selections", &hyperboloid::primitive::selections)
 		.def("constant_attributes", &hyperboloid::primitive::constant_attributes)
-		.def("uniform_attributes", &hyperboloid::primitive::uniform_attributes)
+		.def("surface_attributes", &hyperboloid::primitive::surface_attributes)
 		.def("varying_attributes", &hyperboloid::primitive::varying_attributes)
 		;
 }

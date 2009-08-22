@@ -60,8 +60,8 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case CONSTANT:
 			Stream << "constant";
 			break;
-		case UNIFORM:
-			Stream << "uniform";
+		case SURFACE:
+			Stream << "surface";
 			break;
 		case VARYING:
 			Stream << "varying";
@@ -106,8 +106,8 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = PRIMITIVE;
 	else if(buffer == "constant")
 		RHS = CONSTANT;
-	else if(buffer == "uniform")
-		RHS = UNIFORM;
+	else if(buffer == "surface")
+		RHS = SURFACE;
 	else if(buffer == "varying")
 		RHS = VARYING;
 	else if(buffer == "edge")

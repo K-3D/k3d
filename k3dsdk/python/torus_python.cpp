@@ -51,7 +51,7 @@ public:
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -69,7 +69,7 @@ public:
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -110,7 +110,7 @@ void define_namespace_torus()
 		.def("sweep_angles", &torus::const_primitive::sweep_angles)
 		.def("selections", &torus::const_primitive::selections)
 		.def("constant_attributes", &torus::const_primitive::constant_attributes)
-		.def("uniform_attributes", &torus::const_primitive::uniform_attributes)
+		.def("surface_attributes", &torus::const_primitive::surface_attributes)
 		.def("varying_attributes", &torus::const_primitive::varying_attributes)
 		;
 
@@ -124,7 +124,7 @@ void define_namespace_torus()
 		.def("sweep_angles", &torus::primitive::sweep_angles)
 		.def("selections", &torus::primitive::selections)
 		.def("constant_attributes", &torus::primitive::constant_attributes)
-		.def("uniform_attributes", &torus::primitive::uniform_attributes)
+		.def("surface_attributes", &torus::primitive::surface_attributes)
 		.def("varying_attributes", &torus::primitive::varying_attributes)
 		;
 }

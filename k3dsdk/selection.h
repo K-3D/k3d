@@ -75,8 +75,8 @@ USER1 = 24,
 PRIMITIVE = 25,
 /// Storage for a zero-based constant index (relative to a primitive)
 CONSTANT = 26,
-/// Storage for a zero-based uniform index (relative to a primitive)
-UNIFORM = 27,
+/// Storage for a zero-based surface index (relative to a primitive)
+SURFACE = 27,
 /// Storage for a zero-based varying index (relative to a primitive)
 VARYING = 28,
 /// Storage for a zero-based split-edge index (relative to a primitive)

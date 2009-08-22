@@ -27,7 +27,7 @@
 				</structure>
 				<attributes>
 					<arrays type="constant"/>
-					<arrays type="uniform"/>
+					<arrays type="surface"/>
 					<arrays type="varying"/>
 				</attributes>
 			</primitive>

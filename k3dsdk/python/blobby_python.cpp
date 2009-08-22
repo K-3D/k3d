@@ -56,7 +56,7 @@ public:
 		static object floats(wrapper& Self) { return wrap(Self.wrapped().floats); }
 		static object operands(wrapper& Self) { return wrap(Self.wrapped().operands); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
@@ -80,7 +80,7 @@ public:
 		static object floats(wrapper& Self) { return wrap(Self.wrapped().floats); }
 		static object operands(wrapper& Self) { return wrap(Self.wrapped().operands); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
@@ -144,7 +144,7 @@ void define_namespace_blobby()
 		.def("floats", &blobby::const_primitive::floats)
 		.def("operands", &blobby::const_primitive::operands)
 		.def("constant_attributes", &blobby::const_primitive::constant_attributes)
-		.def("uniform_attributes", &blobby::const_primitive::uniform_attributes)
+		.def("surface_attributes", &blobby::const_primitive::surface_attributes)
 		.def("varying_attributes", &blobby::const_primitive::varying_attributes)
 		.def("vertex_attributes", &blobby::const_primitive::vertex_attributes)
 		;
@@ -164,7 +164,7 @@ void define_namespace_blobby()
 		.def("floats", &blobby::primitive::floats)
 		.def("operands", &blobby::primitive::operands)
 		.def("constant_attributes", &blobby::primitive::constant_attributes)
-		.def("uniform_attributes", &blobby::primitive::uniform_attributes)
+		.def("surface_attributes", &blobby::primitive::surface_attributes)
 		.def("varying_attributes", &blobby::primitive::varying_attributes)
 		.def("vertex_attributes", &blobby::primitive::vertex_attributes)
 		;

@@ -87,7 +87,7 @@ public:
 
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
 	{
-		if(!SelectionState.select_component.count(k3d::selection::UNIFORM))
+		if(!SelectionState.select_component.count(k3d::selection::SURFACE))
 			return;
 
 		k3d::uint_t primitive_index = 0;
@@ -104,14 +104,14 @@ public:
 			glMatrixMode(GL_MODELVIEW);
 			for(k3d::uint_t i = 0; i != sphere->matrices.size(); ++i)
 			{
-				k3d::gl::push_selection_token(k3d::selection::UNIFORM, i);
+				k3d::gl::push_selection_token(k3d::selection::SURFACE, i);
 
 				glPushMatrix();
 				k3d::gl::push_matrix(sphere->matrices[i]);
 				draw_solid(RenderState, sphere->radii[i], sphere->z_min[i], sphere->z_max[i], sphere->sweep_angles[i]);
 				glPopMatrix();
 
-				k3d::gl::pop_selection_token(); // UNIFORM
+				k3d::gl::pop_selection_token(); // SURFACE
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE

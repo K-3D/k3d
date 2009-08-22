@@ -42,7 +42,7 @@ const_primitive::const_primitive(
 	const mesh::doubles_t& SweepAngles,
 	const mesh::selection_t& Selections,
 	const mesh::table_t& ConstantAttributes,
-	const mesh::table_t& UniformAttributes,
+	const mesh::table_t& SurfaceAttributes,
 	const mesh::table_t& VaryingAttributes
 		) :
 	matrices(Matrices),
@@ -54,7 +54,7 @@ const_primitive::const_primitive(
 	sweep_angles(SweepAngles),
 	selections(Selections),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes),
+	surface_attributes(SurfaceAttributes),
 	varying_attributes(VaryingAttributes)
 {
 }
@@ -72,7 +72,7 @@ primitive::primitive(
 	mesh::doubles_t& SweepAngles,
 	mesh::selection_t& Selections,
 	mesh::table_t& ConstantAttributes,
-	mesh::table_t& UniformAttributes,
+	mesh::table_t& SurfaceAttributes,
 	mesh::table_t& VaryingAttributes
 		) :
 	matrices(Matrices),
@@ -84,7 +84,7 @@ primitive::primitive(
 	sweep_angles(SweepAngles),
 	selections(Selections),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes),
+	surface_attributes(SurfaceAttributes),
 	varying_attributes(VaryingAttributes)
 {
 }
@@ -97,16 +97,16 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("torus");
 
 	primitive* const result = new primitive(
-		generic_primitive.structure["uniform"].create<mesh::matrices_t >("matrices"),
-		generic_primitive.structure["uniform"].create<mesh::materials_t >("materials"),
-		generic_primitive.structure["uniform"].create<mesh::doubles_t >("major_radii"),
-		generic_primitive.structure["uniform"].create<mesh::doubles_t >("minor_radii"),
-		generic_primitive.structure["uniform"].create<mesh::doubles_t >("phi_min"),
-		generic_primitive.structure["uniform"].create<mesh::doubles_t >("phi_max"),
-		generic_primitive.structure["uniform"].create<mesh::doubles_t >("sweep_angles"),
-		generic_primitive.structure["uniform"].create<mesh::selection_t>("selections"),
+		generic_primitive.structure["surface"].create<mesh::matrices_t >("matrices"),
+		generic_primitive.structure["surface"].create<mesh::materials_t >("materials"),
+		generic_primitive.structure["surface"].create<mesh::doubles_t >("major_radii"),
+		generic_primitive.structure["surface"].create<mesh::doubles_t >("minor_radii"),
+		generic_primitive.structure["surface"].create<mesh::doubles_t >("phi_min"),
+		generic_primitive.structure["surface"].create<mesh::doubles_t >("phi_max"),
+		generic_primitive.structure["surface"].create<mesh::doubles_t >("sweep_angles"),
+		generic_primitive.structure["surface"].create<mesh::selection_t>("selections"),
 		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["uniform"],
+		generic_primitive.attributes["surface"],
 		generic_primitive.attributes["varying"]
 		);
 
@@ -127,26 +127,26 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Mesh, Primitive);
 
-		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		const mesh::table_t& surface_structure = require_structure(Primitive, "surface");
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		const mesh::table_t& surface_attributes = require_attributes(Primitive, "surface");
 		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 
-		const mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, uniform_structure, "matrices");
-		const mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "materials");
-		const mesh::doubles_t& major_radii = require_array<mesh::doubles_t >(Primitive, uniform_structure, "major_radii");
-		const mesh::doubles_t& minor_radii = require_array<mesh::doubles_t >(Primitive, uniform_structure, "minor_radii");
-		const mesh::doubles_t& phi_min = require_array<mesh::doubles_t >(Primitive, uniform_structure, "phi_min");
-		const mesh::doubles_t& phi_max = require_array<mesh::doubles_t >(Primitive, uniform_structure, "phi_max");
-		const mesh::doubles_t& sweep_angles = require_array<mesh::doubles_t >(Primitive, uniform_structure, "sweep_angles");
-		const mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
+		const mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, surface_structure, "matrices");
+		const mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, surface_structure, "materials");
+		const mesh::doubles_t& major_radii = require_array<mesh::doubles_t >(Primitive, surface_structure, "major_radii");
+		const mesh::doubles_t& minor_radii = require_array<mesh::doubles_t >(Primitive, surface_structure, "minor_radii");
+		const mesh::doubles_t& phi_min = require_array<mesh::doubles_t >(Primitive, surface_structure, "phi_min");
+		const mesh::doubles_t& phi_max = require_array<mesh::doubles_t >(Primitive, surface_structure, "phi_max");
+		const mesh::doubles_t& sweep_angles = require_array<mesh::doubles_t >(Primitive, surface_structure, "sweep_angles");
+		const mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, surface_structure, "selections");
 
 		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
-		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
+		require_table_row_count(Primitive, varying_attributes, "varying", surface_structure.row_count() * 4);
 
-		return new const_primitive(matrices, materials, major_radii, minor_radii, phi_min, phi_max, sweep_angles, selections, constant_attributes, uniform_attributes, varying_attributes);
+		return new const_primitive(matrices, materials, major_radii, minor_radii, phi_min, phi_max, sweep_angles, selections, constant_attributes, surface_attributes, varying_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -165,26 +165,26 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Mesh, Primitive);
 
-		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		mesh::table_t& surface_structure = require_structure(Primitive, "surface");
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		mesh::table_t& surface_attributes = require_attributes(Primitive, "surface");
 		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
 
-		mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, uniform_structure, "matrices");
-		mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "materials");
-		mesh::doubles_t& major_radii = require_array<mesh::doubles_t >(Primitive, uniform_structure, "major_radii");
-		mesh::doubles_t& minor_radii = require_array<mesh::doubles_t >(Primitive, uniform_structure, "minor_radii");
-		mesh::doubles_t& phi_min = require_array<mesh::doubles_t >(Primitive, uniform_structure, "phi_min");
-		mesh::doubles_t& phi_max = require_array<mesh::doubles_t >(Primitive, uniform_structure, "phi_max");
-		mesh::doubles_t& sweep_angles = require_array<mesh::doubles_t >(Primitive, uniform_structure, "sweep_angles");
-		mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
+		mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, surface_structure, "matrices");
+		mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, surface_structure, "materials");
+		mesh::doubles_t& major_radii = require_array<mesh::doubles_t >(Primitive, surface_structure, "major_radii");
+		mesh::doubles_t& minor_radii = require_array<mesh::doubles_t >(Primitive, surface_structure, "minor_radii");
+		mesh::doubles_t& phi_min = require_array<mesh::doubles_t >(Primitive, surface_structure, "phi_min");
+		mesh::doubles_t& phi_max = require_array<mesh::doubles_t >(Primitive, surface_structure, "phi_max");
+		mesh::doubles_t& sweep_angles = require_array<mesh::doubles_t >(Primitive, surface_structure, "sweep_angles");
+		mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, surface_structure, "selections");
 
 		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
-		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
+		require_table_row_count(Primitive, varying_attributes, "varying", surface_structure.row_count() * 4);
 
-		return new primitive(matrices, materials, major_radii, minor_radii, phi_min, phi_max, sweep_angles, selections, constant_attributes, uniform_attributes, varying_attributes);
+		return new primitive(matrices, materials, major_radii, minor_radii, phi_min, phi_max, sweep_angles, selections, constant_attributes, surface_attributes, varying_attributes);
 	}
 	catch(std::exception& e)
 	{

@@ -57,8 +57,8 @@ enum mode
 	POINT,
 	/// Select polyhedron split-edges
 	EDGE,
-	/// Select uniform components
-	UNIFORM,
+	/// Select surface components
+	SURFACE,
 };
 
 std::ostream& operator<<(std::ostream& Stream, const mode& Value);

@@ -50,7 +50,7 @@ public:
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -67,7 +67,7 @@ public:
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
 		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
 	};
 
@@ -107,7 +107,7 @@ void define_namespace_paraboloid()
 		.def("sweep_angles", &paraboloid::const_primitive::sweep_angles)
 		.def("selections", &paraboloid::const_primitive::selections)
 		.def("constant_attributes", &paraboloid::const_primitive::constant_attributes)
-		.def("uniform_attributes", &paraboloid::const_primitive::uniform_attributes)
+		.def("surface_attributes", &paraboloid::const_primitive::surface_attributes)
 		.def("varying_attributes", &paraboloid::const_primitive::varying_attributes)
 		;
 
@@ -120,7 +120,7 @@ void define_namespace_paraboloid()
 		.def("sweep_angles", &paraboloid::primitive::sweep_angles)
 		.def("selections", &paraboloid::primitive::selections)
 		.def("constant_attributes", &paraboloid::primitive::constant_attributes)
-		.def("uniform_attributes", &paraboloid::primitive::uniform_attributes)
+		.def("surface_attributes", &paraboloid::primitive::surface_attributes)
 		.def("varying_attributes", &paraboloid::primitive::varying_attributes)
 		;
 }

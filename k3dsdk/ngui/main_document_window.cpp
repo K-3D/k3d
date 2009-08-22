@@ -1800,8 +1800,8 @@ private:
 
 	void on_select_uniform()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Uniform"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::UNIFORM);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Surface"), K3D_CHANGE_SET_CONTEXT);
+		selection::state(m_document_state.document()).set_current_mode(selection::SURFACE);
 	}
 
 	void on_layout_maximize_panel()

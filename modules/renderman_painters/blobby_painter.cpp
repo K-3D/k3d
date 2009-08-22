@@ -75,7 +75,7 @@ public:
 				ri_constant_attributes.add_arrays(primitive->constant_attributes);
 
 				array_copier ri_uniform_attributes;
-				ri_uniform_attributes.add_arrays(primitive->uniform_attributes);
+				ri_uniform_attributes.add_arrays(primitive->surface_attributes);
 
 				array_copier ri_varying_attributes;
 				ri_varying_attributes.add_arrays(primitive->varying_attributes);
