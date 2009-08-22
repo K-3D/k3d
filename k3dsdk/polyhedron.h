@@ -189,6 +189,8 @@ void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::
 
 /// Initialize arrays for fast lookup from a vertex to its adjacent faces
 void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces);
+/// Initialize arrays for fast lookup from a point index to all edges that start from it. If PointEdgeCounts is filled (by create_vertex_valence_lookup) it is used, otherwise it is created
+void create_vertex_edge_lookup(const mesh::indices_t& EdgePoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts);
 
 /// Initialize Valences array for constant time lookup of vertex valence (number of incoming edges)
 /**

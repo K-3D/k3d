@@ -1018,26 +1018,15 @@ void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh:
 {
 	mesh::counts_t valences;
 	create_vertex_valence_lookup(0, EdgePoints, valences);
-	mesh::counts_t found_edges(valences.size(), 0);
-	mesh::indices_t first_edges(valences.size(), 0); // first edge in point_edges for each point
-	mesh::indices_t point_edges(EdgePoints.size(), 0);
-	uint_t count = 0;
-	for(uint_t point = 0; point != valences.size(); ++point)
-	{
-		first_edges[point] = count;
-		count += valences[point];
-	}
+	mesh::indices_t first_edges; // first edge in point_edges for each point
+	mesh::indices_t point_edges;
+	create_vertex_edge_lookup(EdgePoints, point_edges, first_edges, valences);
+
 	BoundaryEdges.assign(EdgePoints.size(), true);
 	AdjacentEdges.assign(EdgePoints.size(), 0);
 
 	const uint_t edge_begin = 0;
 	const uint_t edge_end = edge_begin + EdgePoints.size();
-	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
-	{
-		const uint_t point = EdgePoints[edge];
-		point_edges[first_edges[point] + found_edges[point]] = edge;
-		++found_edges[point];
-	}
 	
 	// Making this parallel decreases running time by 20 % on a Pentium D. 
 	k3d::parallel::parallel_for(
@@ -1111,6 +1100,34 @@ void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh
 		PointFirstFaces[point] = PointFaces.size();
 		PointFaceCounts[point] = adjacency_list[point].size();
 		PointFaces.insert(PointFaces.end(), adjacency_list[point].begin(), adjacency_list[point].end());
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_vertex_edge_lookup
+
+void create_vertex_edge_lookup(const mesh::indices_t& EdgePoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts)
+{
+	if(PointEdgeCounts.empty())
+		create_vertex_valence_lookup(0, EdgePoints, PointEdgeCounts);
+	const k3d::uint_t point_count = PointEdgeCounts.size();
+	mesh::counts_t found_edges(point_count, 0);
+	PointFirstEdges.assign(point_count, 0); // first edge in point_edges for each point
+	PointEdges.assign(EdgePoints.size(), 0);
+	uint_t count = 0;
+	for(uint_t point = 0; point != point_count; ++point)
+	{
+		PointFirstEdges[point] = count;
+		count += PointEdgeCounts[point];
+	}
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + EdgePoints.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		const uint_t point = EdgePoints[edge];
+		PointEdges[PointFirstEdges[point] + found_edges[point]] = edge;
+		++found_edges[point];
 	}
 }
 
