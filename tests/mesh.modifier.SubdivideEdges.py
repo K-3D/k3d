@@ -25,7 +25,7 @@ document.set_dependency(varying_colors.get_property("input_mesh"), reader.get_pr
 modifier = document.new_node("SubdivideEdges")
 # select some edges, distributed along polyhedra
 selection = k3d.geometry.selection.create(0)
-edge_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.VARYING)
+edge_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.EDGE)
 k3d.geometry.primitive_selection.append(edge_selection, 0, 4294967295, 0)
 k3d.geometry.primitive_selection.append(edge_selection, 0, 4, 1)
 k3d.geometry.primitive_selection.append(edge_selection, 52, 65, 1)

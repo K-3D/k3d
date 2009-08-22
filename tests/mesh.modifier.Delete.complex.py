@@ -38,7 +38,7 @@ k3d.geometry.primitive_selection.append(face_selection, 17, 19, 0)
 k3d.geometry.primitive_selection.append(face_selection, 19, 20, 1)
 k3d.geometry.primitive_selection.append(face_selection, 20, 23, 0)
 
-edge_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.VARYING)
+edge_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.EDGE)
 k3d.geometry.primitive_selection.append(edge_selection, 0, 25, 0)
 k3d.geometry.primitive_selection.append(edge_selection, 25, 26, 1)
 k3d.geometry.primitive_selection.append(edge_selection, 26, 10000, 0)
