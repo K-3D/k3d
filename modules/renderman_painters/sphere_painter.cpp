@@ -93,8 +93,8 @@ public:
 				
 				RenderState.stream.RiSphereV(
 					sphere->radii[i],
-					sphere->radii[i] * sphere->z_min[i],
-					sphere->radii[i] * sphere->z_max[i],
+					std::max(-sphere->radii[i], sphere->radii[i] * sphere->z_min[i]),
+					std::min(sphere->radii[i], sphere->radii[i] * sphere->z_max[i]),
 					k3d::degrees(sphere->sweep_angles[i]),
 					ri_parameters);
 
