@@ -387,6 +387,12 @@ private:
 		/// Inserts a tweak modifier
 		void create_mesh_modifier(const std::string& Name);
 
+		/// Updates the mesh modifier with the new tweaks
+		void update_mesh_modifier();
+
+		/// Initialize the transformation
+		void init_transformation();
+
 		/// Stores the owning document_state
 		document_state& m_document_state;
 		/// Stores the mesh_source property instead of the mesh itself because the k3d::mesh pointer can change
@@ -396,6 +402,10 @@ private:
 		k3d::point3 component_center;
 		/// Stores the list of selected points with their index
 		detail::component_points_t selected_points;
+		/// Stores the new point positions, for each selected point
+		k3d::mesh::points_t point_positions;
+		/// Initial positions
+		k3d::mesh::points_t initial_positions;
 
 		/// Mesh change signal
 		sigc::connection m_mesh_change_signal;

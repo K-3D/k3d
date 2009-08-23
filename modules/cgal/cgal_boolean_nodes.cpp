@@ -134,7 +134,7 @@ public:
 			for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 			{
 				// We only get the first polyhedron
-				output_polyhedron.reset(k3d::polyhedron::validate(primitive->writable()));
+				output_polyhedron.reset(k3d::polyhedron::validate(Output, primitive->writable()));
 				if(output_polyhedron.get())
 					break;
 			}
@@ -199,7 +199,7 @@ private:
 				for(k3d::mesh::primitives_t::iterator primitive = mesh_all_faces_selected.primitives.begin(); primitive != mesh_all_faces_selected.primitives.end(); ++primitive)
 				{
 					// We only get the first polyhedron
-					polyhedron.reset(k3d::polyhedron::validate(primitive->writable()));
+					polyhedron.reset(k3d::polyhedron::validate(mesh_all_faces_selected, primitive->writable()));
 					if(polyhedron.get())
 						break;
 				}
@@ -216,7 +216,7 @@ private:
 				
 				m_node.document().pipeline_profiler().start_execution(m_node, "Triangulate input " + sequence_string);
 				const k3d::mesh::primitive* triangulated_prim = k3d::polyhedron::triangulate(mesh_all_faces_selected, *polyhedron, triangulated_mesh);
-				boost::scoped_ptr<k3d::polyhedron::const_primitive> triangulated_polyhedron(k3d::polyhedron::validate(*triangulated_prim));
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> triangulated_polyhedron(k3d::polyhedron::validate(triangulated_mesh, *triangulated_prim));
 				m_node.document().pipeline_profiler().finish_execution(m_node, "Triangulate input " + sequence_string);
 				
 				m_node.document().pipeline_profiler().start_execution(m_node, "Convert input " + sequence_string + " to Nef");

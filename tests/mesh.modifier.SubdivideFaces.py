@@ -19,7 +19,7 @@ modifier = document.new_node("SubdivideFaces")
 
 # select some faces, distributed along polyhedra
 selection = k3d.geometry.selection.create(0)
-face_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.UNIFORM)
+face_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.FACE)
 k3d.geometry.primitive_selection.append(face_selection, 0, 6, 0)
 k3d.geometry.primitive_selection.append(face_selection, 6, 7, 1)
 k3d.geometry.primitive_selection.append(face_selection, 7, 8, 0)

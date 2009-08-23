@@ -32,6 +32,8 @@
 
 #include <boost/scoped_ptr.hpp>
 
+#include <set>
+
 namespace module
 {
 
@@ -45,22 +47,32 @@ namespace detail
 {
 
 /// Extracts the STL topology information, merging points that are less than threshold apart
-void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::mesh::counts_t& VertexCounts, k3d::mesh::indices_t& VertexIndices, const k3d::double_t Threshold = 1e-12)
+void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::mesh::counts_t& VertexCounts, k3d::mesh::indices_t& VertexIndices, k3d::mesh::normals_t& Normals, const k3d::double_t Threshold = 1e-12)
 {
 	const k3d::double_t threshold = Threshold*Threshold;
-	
+
 	k3d::string_t line_buffer;
 	k3d::uint_t line_number = 0;
-	k3d::uint_t face_number = 0;
+	k3d::mesh::indices_t face_points;
+	k3d::normal3 face_normal;
+	std::set<k3d::string_t> added_faces; // stores a unique ID for each added face
 	for(k3d::getline(Stream, line_buffer); Stream; k3d::getline(Stream, line_buffer))
 	{
+		++line_number;
 		k3d::string_t keyword;
 		std::istringstream line_stream(line_buffer);
 		line_stream >> keyword;
-		
+
 		if(keyword == "facet")
 		{
-			VertexCounts.push_back(0);
+			k3d::string_t keyword2;
+			line_stream >> keyword2;
+			assert_warning(keyword2 == "normal");
+			k3d::double_t x, y, z;
+			line_stream >> x;
+			line_stream >> y;
+			line_stream >> z;
+			face_normal = k3d::normalize(k3d::normal3(x,y,z));
 		}
 		if(keyword == "vertex")
 		{
@@ -72,7 +84,8 @@ void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::me
 			k3d::uint_t point_index = Points.size();
 			for(k3d::uint_t point = 0; point != Points.size(); ++point)
 			{
-				if((Points[point] - new_point).length2() < threshold)
+				const k3d::double_t len2 = (Points[point] - new_point).length2();
+				if(len2 < threshold)
 				{
 					point_index = point;
 					break;
@@ -82,22 +95,77 @@ void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::me
 			{
 				Points.push_back(new_point);
 			}
-			VertexIndices.push_back(point_index);
-			++VertexCounts.back();
+			face_points.push_back(point_index);
+			if(face_points.size() == 3)
+			{
+				std::stringstream face_id_stream;
+				face_id_stream << face_points[0] << face_points[1] << face_points[2];
+				k3d::string_t face_id = face_id_stream.str();
+				if(added_faces.count(face_id))
+				{
+					k3d::log() << warning << "Skipping duplicate face on line " << line_number - 4 << std::endl;
+				}
+				else
+				{
+					VertexIndices.insert(VertexIndices.end(), face_points.begin(), face_points.end());
+					VertexCounts.push_back(3);
+					Normals.push_back(face_normal);
+					added_faces.insert(face_id);
+				}
+				face_points.clear();
+			}
 		}
 		if(keyword == "endfacet")
 		{
-			if(VertexCounts.back() != 3)
+			if(face_points.size())
 			{
-				std::stringstream error_stream("Error: STL file had less than 3 vertices for face ending on line ");
-				error_stream << line_number;  
+				std::stringstream error_stream;
+				error_stream << "Error: STL file had less than 3 vertices for face ending on line " << line_number;
 				throw std::runtime_error(error_stream.str());
 			}
 		}
 	}
 }
 
+const k3d::normal3 normal(const k3d::mesh::points_t Points, k3d::mesh::indices_t& VertexIndices, const k3d::uint_t FaceIndex)
+{
+	// Calculates the normal for an edge loop using the summation method, which is more robust than the three-point methods (handles zero-length edges)
+	k3d::normal3 result(0, 0, 0);
+
+	const k3d::uint_t face_start = 3*FaceIndex;
+	const k3d::uint_t face_end = face_start + 3;
+	for(k3d::uint_t point = face_start; point != face_end; ++point)
+	{
+		const k3d::point3& i = Points[VertexIndices[point]];
+		const k3d::point3& j = Points[VertexIndices[(point+1) == face_end ? face_start : point + 1]];
+
+		result[0] += (i[1] + j[1]) * (j[2] - i[2]);
+		result[1] += (i[2] + j[2]) * (j[0] - i[0]);
+		result[2] += (i[0] + j[0]) * (j[1] - i[1]);
+	}
+
+	return 0.5 * result;
 }
+
+/// Make the face orientation consistent with the normal stored on file
+void adjust_orientation(const k3d::mesh::points_t Points, k3d::mesh::indices_t& VertexIndices, const k3d::mesh::normals_t& Normals)
+{
+	for(k3d::uint_t face = 0; face != Normals.size(); ++face)
+	{
+		const k3d::normal3 calculated_normal = k3d::normalize(normal(Points, VertexIndices, face));
+		const k3d::normal3& stored_normal = Normals[face];
+		const k3d::uint_t face_start = face * 3;
+		if((calculated_normal * stored_normal) < 0)
+		{
+			// stored normal is opposite to face rientation, so we flip face orientation
+			const k3d::uint_t old_first_point = VertexIndices[face_start];
+			VertexIndices[face_start] = VertexIndices[face_start + 1];
+			VertexIndices[face_start + 1] = old_first_point;
+		}
+	}
+}
+
+} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // mesh_reader
@@ -110,8 +178,13 @@ class mesh_reader :
 public:
 	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_threshold(init_owner(*this) + init_name("threshold") + init_label(_("Threshold")) + init_description(_("Controls the sensitivity for deciding when two edges are collinear.")) + init_value(1e-8) + init_step_increment(1e-8) + init_units(typeid(k3d::measurement::scalar)))
+		m_threshold(init_owner(*this) + init_name("threshold") + init_label(_("Threshold")) + init_description(_("Controls the sensitivity for deciding when two edges are collinear.")) + init_value(1e-8) + init_step_increment(1e-8) + init_units(typeid(k3d::measurement::scalar))),
+		m_store_normals(init_owner(*this) + init_name("store_normals") + init_label(_("Store Normals")) + init_description(_("If true, the normals from the STL file are read into a face attribute array")) + init_value(false))
 	{
+		m_threshold.changed_signal().connect(k3d::hint::converter<
+						k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reload_mesh_slot()));
+		m_store_normals.changed_signal().connect(k3d::hint::converter<
+						k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reload_mesh_slot()));
 	}
 
 	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
@@ -129,11 +202,15 @@ public:
 		k3d::mesh::points_t points;
 		k3d::mesh::counts_t vertex_counts;
 		k3d::mesh::indices_t vertex_indices;
+		k3d::mesh::normals_t face_normals;
 		
 		try
 		{
-			detail::get_stl_topology(file, points, vertex_counts, vertex_indices, m_threshold.pipeline_value());
-			k3d::polyhedron::create(Output, points, vertex_counts, vertex_indices, static_cast<k3d::imaterial*>(0));
+			detail::get_stl_topology(file, points, vertex_counts, vertex_indices, face_normals, m_threshold.pipeline_value());
+			detail::adjust_orientation(points, vertex_indices, face_normals);
+			k3d::polyhedron::primitive* polyhedron = k3d::polyhedron::create(Output, points, vertex_counts, vertex_indices, static_cast<k3d::imaterial*>(0));
+			if(m_store_normals.pipeline_value())
+				polyhedron->face_attributes.create("N", new k3d::mesh::normals_t(face_normals));
 		}
 		catch(std::runtime_error& E)
 		{
@@ -156,6 +233,7 @@ public:
 
 private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_threshold;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_store_normals;
 };
 
 k3d::iplugin_factory& mesh_reader_factory()
