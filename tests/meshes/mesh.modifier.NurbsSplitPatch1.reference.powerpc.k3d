@@ -21,7 +21,7 @@
 					<array name="patch_point_weights" type="k3d::double_t">1 1 1 0.99999996709823624 1 1 1 0.99999996709823624 1 1 1 0.99999996709823624 1 1 1 0.99999996709823624 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</array>
 					<array name="patch_points" type="k3d::uint_t">0 4 5 6 1 7 8 9 2 10 11 12 3 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
 						<metadata>
-							<pair name="k3d:domain">/points/indices()</pair>
+							<pair name="k3d:domain">k3d:point-indices</pair>
 						</metadata>
 					</array>
 					<array name="patch_selections" type="k3d::double_t">1 0

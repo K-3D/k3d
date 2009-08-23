@@ -39,7 +39,7 @@ static void require_valid_table(const mesh& Mesh, const string_t& Name, const ta
 		if(current_array->size() != first_array->size())
 			throw std::runtime_error("Table array length mismatch.");
 
-		if(current_array->get_metadata_value(metadata::key::domain()) == metadata::value::mesh_point_indices_domain())
+		if(current_array->get_metadata_value(metadata::key::domain()) == metadata::value::point_indices_domain())
 		{
 			if(!Mesh.points)
 				throw std::runtime_error("Mesh missing points array.");

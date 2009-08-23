@@ -75,7 +75,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.attributes["vertex"]
 		);
 
-	result->points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+	result->points.set_metadata_value(metadata::key::domain(), metadata::value::point_indices_domain());
 
 	return result;
 }
@@ -101,7 +101,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		const table& constant_attributes = require_attributes(Primitive, "constant");
 		const table& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		require_metadata(Primitive, points, "points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, points, "points", metadata::key::domain(), metadata::value::point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 
@@ -133,7 +133,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		table& constant_attributes = require_attributes(Primitive, "constant");
 		table& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		require_metadata(Primitive, points, "points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, points, "points", metadata::key::domain(), metadata::value::point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_attributes, "vertex", vertex_structure.row_count());
 

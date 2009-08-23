@@ -93,7 +93,7 @@ primitive* create(mesh& Mesh)
 		);
 
 	result->patch_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
-	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::point_indices_domain());
 
 	return result;
 }
@@ -123,7 +123,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		const table& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_structure, "vertex", patch_structure.row_count() * 4);
 		require_table_row_count(Primitive, varying_attributes, "varying", patch_structure.row_count() * 4);
@@ -160,7 +160,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		table& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_structure, "vertex", patch_structure.row_count() * 4);
 		require_table_row_count(Primitive, varying_attributes, "varying", patch_structure.row_count() * 4);

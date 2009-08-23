@@ -218,7 +218,7 @@ primitive* create(mesh& Mesh)
 		);
 
 	result->patch_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
-	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::point_indices_domain());
 
 	return result;
 }
@@ -280,7 +280,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		const mesh::selection_t& point_selections = require_array<mesh::selection_t>(Primitive, trim_point_structure, "point_selections");
 
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::point_indices_domain());
 
 		require_table_row_count(Primitive, u_knot_structure, "u_knot",
 			std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)
@@ -398,7 +398,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		mesh::selection_t& point_selections = require_array<mesh::selection_t>(Primitive, trim_point_structure, "point_selections");
 
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::point_indices_domain());
 
 		require_table_row_count(Primitive, u_knot_structure, "u_knot",
 			std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)

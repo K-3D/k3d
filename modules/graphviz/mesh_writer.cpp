@@ -85,7 +85,7 @@ private:
 			buffer << " color=\"#00dd00\"";
 		else if(Container->get_metadata_value(k3d::metadata::key::role()) == k3d::metadata::value::selection_role())
 			buffer << " color=\"#0000dd\"";
-		else if(Container->get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::mesh_point_indices_domain())
+		else if(Container->get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::point_indices_domain())
 			buffer << " color=\"#dd0000\"";
 		buffer << ">";
 		buffer << Container->type_string() << " array";

@@ -54,7 +54,7 @@ namespace value
 {
 
 /// Metadata value for use with "k3d:domain" that specifies the mesh point array.
-const string_t mesh_point_indices_domain();
+const string_t point_indices_domain();
 /// Metadata value for use with "k3d:domain" that specifies that an array of floating-point values is a NURBS knot vector.
 const string_t nurbs_knot_vector_domain();
 

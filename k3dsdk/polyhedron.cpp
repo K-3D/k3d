@@ -177,7 +177,7 @@ primitive* create(mesh::primitive& GenericPrimitive)
 
 	result->face_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 	result->edge_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
-	result->vertex_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+	result->vertex_points.set_metadata_value(metadata::key::domain(), metadata::value::point_indices_domain());
 	result->vertex_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 
 	return result;
@@ -459,7 +459,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		require_metadata(Primitive, face_selections, "face_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, vertex_points, "vertex_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, vertex_points, "vertex_points", metadata::key::domain(), metadata::value::point_indices_domain());
 		require_metadata(Primitive, vertex_selections, "vertex_selections", metadata::key::role(), metadata::value::selection_role());
 
 		require_table_row_count(Primitive, face_structure, "face", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
@@ -560,7 +560,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		require_metadata(Primitive, face_selections, "face_selections", metadata::key::role(), metadata::value::selection_role());
 		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, vertex_points, "vertex_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, vertex_points, "vertex_points", metadata::key::domain(), metadata::value::point_indices_domain());
 		require_metadata(Primitive, vertex_selections, "vertex_selections", metadata::key::role(), metadata::value::selection_role());
 
 		require_table_row_count(Primitive, face_structure, "face", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));

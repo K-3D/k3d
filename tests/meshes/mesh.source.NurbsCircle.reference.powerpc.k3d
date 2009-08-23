@@ -28,7 +28,7 @@
 						<array name="curve_point_weights" type="k3d::double_t">1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1</array>
 						<array name="curve_points" type="k3d::uint_t">0 1 2 3 4 5 6 7 8
 							<metadata>
-								<pair name="k3d:domain">/points/indices()</pair>
+								<pair name="k3d:domain">k3d:point-indices</pair>
 							</metadata>
 						</array>
 					</table>

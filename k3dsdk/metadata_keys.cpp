@@ -57,9 +57,9 @@ const string_t role()
 namespace value
 {
 
-const string_t mesh_point_indices_domain()
+const string_t point_indices_domain()
 {
-	return "/points/indices()";
+	return "k3d:point-indices";
 }
 
 const string_t nurbs_knot_vector_domain()
