@@ -53,12 +53,14 @@ public:
 		static object face_selections(wrapper& Self) { return wrap(Self.wrapped().face_selections); }
 		static object face_materials(wrapper& Self) { return wrap(Self.wrapped().face_materials); }
 		static object loop_first_edges(wrapper& Self) { return wrap(Self.wrapped().loop_first_edges); }
-		static object edge_points(wrapper& Self) { return wrap(Self.wrapped().edge_points); }
 		static object clockwise_edges(wrapper& Self) { return wrap(Self.wrapped().clockwise_edges); }
 		static object edge_selections(wrapper& Self) { return wrap(Self.wrapped().edge_selections); }
+		static object vertex_points(wrapper& Self) { return wrap(Self.wrapped().vertex_points); }
+		static object vertex_selections(wrapper& Self) { return wrap(Self.wrapped().vertex_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object face_attributes(wrapper& Self) { return wrap(Self.wrapped().face_attributes); }
 		static object edge_attributes(wrapper& Self) { return wrap(Self.wrapped().edge_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 	class primitive
@@ -74,12 +76,14 @@ public:
 		static object face_selections(wrapper& Self) { return wrap(Self.wrapped().face_selections); }
 		static object face_materials(wrapper& Self) { return wrap(Self.wrapped().face_materials); }
 		static object loop_first_edges(wrapper& Self) { return wrap(Self.wrapped().loop_first_edges); }
-		static object edge_points(wrapper& Self) { return wrap(Self.wrapped().edge_points); }
 		static object clockwise_edges(wrapper& Self) { return wrap(Self.wrapped().clockwise_edges); }
 		static object edge_selections(wrapper& Self) { return wrap(Self.wrapped().edge_selections); }
+		static object vertex_points(wrapper& Self) { return wrap(Self.wrapped().vertex_points); }
+		static object vertex_selections(wrapper& Self) { return wrap(Self.wrapped().vertex_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object face_attributes(wrapper& Self) { return wrap(Self.wrapped().face_attributes); }
 		static object edge_attributes(wrapper& Self) { return wrap(Self.wrapped().edge_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 
@@ -167,12 +171,14 @@ void define_namespace_polyhedron()
 		.def("face_selections", &polyhedron::const_primitive::face_selections)
 		.def("face_materials", &polyhedron::const_primitive::face_materials)
 		.def("loop_first_edges", &polyhedron::const_primitive::loop_first_edges)
-		.def("edge_points", &polyhedron::const_primitive::edge_points)
 		.def("clockwise_edges", &polyhedron::const_primitive::clockwise_edges)
 		.def("edge_selections", &polyhedron::const_primitive::edge_selections)
+		.def("vertex_points", &polyhedron::const_primitive::vertex_points)
+		.def("vertex_selections", &polyhedron::const_primitive::vertex_selections)
 		.def("constant_attributes", &polyhedron::const_primitive::constant_attributes)
 		.def("face_attributes", &polyhedron::const_primitive::face_attributes)
 		.def("edge_attributes", &polyhedron::const_primitive::edge_attributes)
+		.def("vertex_attributes", &polyhedron::const_primitive::vertex_attributes)
 		;
 
 	class_<polyhedron::primitive::wrapper>("primitive", no_init)
@@ -184,12 +190,14 @@ void define_namespace_polyhedron()
 		.def("face_selections", &polyhedron::primitive::face_selections)
 		.def("face_materials", &polyhedron::primitive::face_materials)
 		.def("loop_first_edges", &polyhedron::primitive::loop_first_edges)
-		.def("edge_points", &polyhedron::primitive::edge_points)
 		.def("clockwise_edges", &polyhedron::primitive::clockwise_edges)
 		.def("edge_selections", &polyhedron::primitive::edge_selections)
+		.def("vertex_points", &polyhedron::primitive::vertex_points)
+		.def("vertex_selections", &polyhedron::primitive::vertex_selections)
 		.def("constant_attributes", &polyhedron::primitive::constant_attributes)
 		.def("face_attributes", &polyhedron::primitive::face_attributes)
 		.def("edge_attributes", &polyhedron::primitive::edge_attributes)
+		.def("vertex_attributes", &polyhedron::primitive::vertex_attributes)
 		;
 }
 

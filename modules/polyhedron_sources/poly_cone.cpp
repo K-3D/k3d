@@ -97,13 +97,14 @@ public:
 		primitive->face_loop_counts.push_back(1);
 		primitive->face_selections.push_back(0);
 		primitive->face_materials.push_back(material);
-		primitive->loop_first_edges.push_back(primitive->edge_points.size());
+		primitive->loop_first_edges.push_back(primitive->clockwise_edges.size());
 
 		for(k3d::int32_t u = u_segments; u != 0; --u)
 		{
-			primitive->edge_points.push_back(u % u_segments);
+			primitive->clockwise_edges.push_back(primitive->clockwise_edges.size() + 1);
 			primitive->edge_selections.push_back(0);
-			primitive->clockwise_edges.push_back(primitive->edge_points.size());
+			primitive->vertex_points.push_back(u % u_segments);
+			primitive->vertex_selections.push_back(0);
 		}
 		primitive->clockwise_edges.back() = primitive->loop_first_edges.back();
 
@@ -115,14 +116,15 @@ public:
 			primitive->face_loop_counts.push_back(1);
 			primitive->face_selections.push_back(0);
 			primitive->face_materials.push_back(material);
-			primitive->loop_first_edges.push_back(primitive->edge_points.size());
+			primitive->loop_first_edges.push_back(primitive->clockwise_edges.size());
 
 			const k3d::uint_t offset = v_segments * u_segments;
 			for(k3d::int32_t u = 0; u != u_segments; ++u)
 			{
-				primitive->edge_points.push_back(offset + u);
+				primitive->clockwise_edges.push_back(primitive->clockwise_edges.size() + 1);
 				primitive->edge_selections.push_back(0);
-				primitive->clockwise_edges.push_back(primitive->edge_points.size());
+				primitive->vertex_points.push_back(offset + u);
+				primitive->vertex_selections.push_back(0);
 			}
 			primitive->clockwise_edges.back() = primitive->loop_first_edges.back();
 		}

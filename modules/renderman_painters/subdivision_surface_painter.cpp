@@ -108,7 +108,7 @@ public:
             for(k3d::uint_t edge = first_edge; ; )
             {
               ++vertex_count;
-              vertex_ids.push_back(polyhedron->edge_points[edge]);
+              vertex_ids.push_back(polyhedron->vertex_points[edge]);
 
               edge = polyhedron->clockwise_edges[edge];
               if(edge == first_edge)

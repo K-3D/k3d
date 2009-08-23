@@ -133,7 +133,7 @@ public:
                 ri_facevarying_attributes.push_back(edge);
 
                 ++vertex_count;
-                vertex_ids.push_back(polyhedron->edge_points[edge]);
+                vertex_ids.push_back(polyhedron->vertex_points[edge]);
 
                 edge = polyhedron->clockwise_edges[edge];
                 if(edge == first_edge)

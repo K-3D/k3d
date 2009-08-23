@@ -475,7 +475,7 @@ struct mesh_arrays
 				output_first_faces(OutputFirstFaces),
 				loops_per_polyhedron(LoopsPerPolyhedron),
 				face_edge_counts(FaceEdgeCounts),
-				output_edge_points(OutputEdgePoints),
+				output_vertex_points(OutputEdgePoints),
 				output_clockwise_edges(OutputClockwiseEdges),
 				output_loop_first_edges(OutputLoopFirstEdges),
 				output_face_first_loops(OutputFaceFirstLoops),
@@ -504,7 +504,7 @@ struct mesh_arrays
 			for(k3d::uint_t edge = first_edge; ; )
 			{
 				const k3d::uint_t newedge = first_new_edge + edgenumber + loopedgenumber;
-				output_edge_points[newedge] = input_edge_points[edge];
+				output_vertex_points[newedge] = input_edge_points[edge];
 				// Copy varying data.
 				varying_copier.copy(edge, newedge);
 				output_clockwise_edges[newedge] = newedge + 1;
@@ -513,7 +513,7 @@ struct mesh_arrays
 					const k3d::double_t weights[] = {0.5, 0.5};
 					const k3d::uint_t indices[] = {edge, input_clockwise_edges[edge]};
 					varying_copier.copy(2, indices, weights, newedge + 1);
-					output_edge_points[newedge + 1] = edge_midpoints[companions[edge]];
+					output_vertex_points[newedge + 1] = edge_midpoints[companions[edge]];
 					output_clockwise_edges[newedge + 1] = newedge + 2;
 					++loopedgenumber;
 				}
@@ -557,7 +557,7 @@ struct mesh_arrays
 	const k3d::mesh::indices_t& output_first_faces;
 	const k3d::mesh::counts_t& loops_per_polyhedron;
 	const k3d::mesh::counts_t& face_edge_counts;
-	k3d::mesh::indices_t& output_edge_points;
+	k3d::mesh::indices_t& output_vertex_points;
 	k3d::mesh::indices_t& output_clockwise_edges;
 	k3d::mesh::indices_t& output_loop_first_edges;
 	k3d::mesh::indices_t& output_face_first_loops;
@@ -622,10 +622,10 @@ public:
 				const k3d::uint_t corner_to_mid2 = mid1_to_corner + 1;
 				const k3d::uint_t mid2_to_center = corner_to_mid2 + 1;
 				const k3d::uint_t center_to_mid1 = mid2_to_center + 1;
-				m_mesh_arrays.output_edge_points[mid1_to_corner] = mid1;
-				m_mesh_arrays.output_edge_points[corner_to_mid2] = m_mesh_arrays.input_edge_points[clockwise];
-				m_mesh_arrays.output_edge_points[mid2_to_center] = mid2;
-				m_mesh_arrays.output_edge_points[center_to_mid1] = face_center;
+				m_mesh_arrays.output_vertex_points[mid1_to_corner] = mid1;
+				m_mesh_arrays.output_vertex_points[corner_to_mid2] = m_mesh_arrays.input_edge_points[clockwise];
+				m_mesh_arrays.output_vertex_points[mid2_to_center] = mid2;
+				m_mesh_arrays.output_vertex_points[center_to_mid1] = face_center;
 				m_mesh_arrays.output_clockwise_edges[mid1_to_corner] = corner_to_mid2;
 				m_mesh_arrays.output_clockwise_edges[corner_to_mid2] = mid2_to_center;
 				m_mesh_arrays.output_clockwise_edges[mid2_to_center] = center_to_mid1;
@@ -705,10 +705,10 @@ public:
 				const k3d::uint_t mid1_to_corner = first_new_edge;
 				const k3d::uint_t corner_to_mid2 = mid1_to_corner + 1;
 				const k3d::uint_t mid2_to_mid1 = corner_to_mid2 + 1;
-				m_mesh_arrays.output_edge_points[center_first_edge + edgenumber] = mid1;
-				m_mesh_arrays.output_edge_points[mid1_to_corner] = mid1;
-				m_mesh_arrays.output_edge_points[corner_to_mid2] = m_mesh_arrays.input_edge_points[clockwise];
-				m_mesh_arrays.output_edge_points[mid2_to_mid1] = mid2;
+				m_mesh_arrays.output_vertex_points[center_first_edge + edgenumber] = mid1;
+				m_mesh_arrays.output_vertex_points[mid1_to_corner] = mid1;
+				m_mesh_arrays.output_vertex_points[corner_to_mid2] = m_mesh_arrays.input_edge_points[clockwise];
+				m_mesh_arrays.output_vertex_points[mid2_to_mid1] = mid2;
 				m_mesh_arrays.output_clockwise_edges[center_first_edge + edgenumber] = center_first_edge + edgenumber + 1;
 				m_mesh_arrays.output_clockwise_edges[mid1_to_corner] = corner_to_mid2;
 				m_mesh_arrays.output_clockwise_edges[corner_to_mid2] = mid2_to_mid1;
@@ -795,9 +795,9 @@ public:
 				const k3d::uint_t corner1_to_corner2 = first_new_edge;
 				const k3d::uint_t corner2_to_center = corner1_to_corner2 + 1;
 				const k3d::uint_t center_to_corner1 = corner2_to_center + 1;
-				m_mesh_arrays.output_edge_points[corner1_to_corner2] = m_mesh_arrays.input_edge_points[edge];
-				m_mesh_arrays.output_edge_points[corner2_to_center] = m_mesh_arrays.input_edge_points[clockwise];
-				m_mesh_arrays.output_edge_points[center_to_corner1] = face_center;
+				m_mesh_arrays.output_vertex_points[corner1_to_corner2] = m_mesh_arrays.input_edge_points[edge];
+				m_mesh_arrays.output_vertex_points[corner2_to_center] = m_mesh_arrays.input_edge_points[clockwise];
+				m_mesh_arrays.output_vertex_points[center_to_corner1] = face_center;
 				m_mesh_arrays.output_clockwise_edges[corner1_to_corner2] = corner2_to_center;
 				m_mesh_arrays.output_clockwise_edges[corner2_to_center] = center_to_corner1;
 				m_mesh_arrays.output_clockwise_edges[center_to_corner1] = corner1_to_corner2;
@@ -878,7 +878,7 @@ public:
 			// Make writeable copies of the arrays we intend to modify
 			document().pipeline_profiler().start_execution(*this, "Copy input");
 			k3d::mesh::indices_t& output_loop_first_edges = output_polyhedron->loop_first_edges;
-			k3d::mesh::indices_t& output_edge_points = output_polyhedron->edge_points;
+			k3d::mesh::indices_t& output_vertex_points = output_polyhedron->vertex_points;
 			k3d::mesh::indices_t& output_clockwise_edges = output_polyhedron->clockwise_edges;
 			k3d::mesh::selection_t& output_edge_selection = output_polyhedron->edge_selections;
 
@@ -927,18 +927,18 @@ public:
 			k3d::mesh::bools_t boundary_edges;
 			if(subdivision_type == CENTERTOMIDPOINTS || subdivision_type == CONTIGUOUSMIDPOINTS)
 			{
-				k3d::polyhedron::create_edge_adjacency_lookup(output_edge_points, output_clockwise_edges, boundary_edges, companions);
+				k3d::polyhedron::create_edge_adjacency_lookup(output_vertex_points, output_clockwise_edges, boundary_edges, companions);
 			}
 			else
 			{ // We don't need companions if no midpoints are being calculated
-				companions.resize(output_edge_points.size());
-				boundary_edges.resize(output_edge_points.size(), true);
+				companions.resize(output_vertex_points.size());
+				boundary_edges.resize(output_vertex_points.size(), true);
 			}
 			document().pipeline_profiler().finish_execution(*this, "Calculate companions");
 
 			document().pipeline_profiler().start_execution(*this, "Count components");
-			k3d::mesh::indices_t edge_midpoints(output_edge_points.size());
-			k3d::mesh::bools_t has_midpoint(output_edge_points.size(), false);
+			k3d::mesh::indices_t edge_midpoints(output_vertex_points.size());
+			k3d::mesh::bools_t has_midpoint(output_vertex_points.size(), false);
 			k3d::mesh::indices_t face_centers(input_face_first_loops.size());
 			// Get the indices of the midpoints, the number of midpoints to calculate and the indices of face centers, if they are needed
 			detail::midpoint_index_calculator midpoint_index_calculator(*input_polyhedron,
@@ -1024,7 +1024,7 @@ public:
 			const k3d::uint_t center_count = subdivision_type == CONTIGUOUSMIDPOINTS ? 0 : m_affected_faces.size();
 			const k3d::uint_t midpoint_count = subdivision_type == CENTERTOPOINTS ? 0 : m_affected_edges.size();
 			output_points.resize(output_points.size() + center_count + midpoint_count, k3d::point3(0,0,0));
-			output_edge_points.resize(face_edge_counter.edge_count, 0);
+			output_vertex_points.resize(face_edge_counter.edge_count, 0);
 			output_clockwise_edges.resize(face_edge_counter.edge_count, 0);
 			output_loop_first_edges.resize(face_edge_counter.loop_count);
 			output_face_first_loops.resize(face_edge_counter.face_count);
@@ -1038,7 +1038,7 @@ public:
 			detail::mesh_arrays mesh_arrays(
 							input_first_faces,
 							input_face_counts,
-							input_polyhedron->edge_points,
+							input_polyhedron->vertex_points,
 							input_polyhedron->clockwise_edges,
 							input_polyhedron->loop_first_edges,
 							input_face_first_loops,
@@ -1056,7 +1056,7 @@ public:
 							output_first_faces,
 							loops_per_polyhedron,
 							face_edge_counts,
-							output_edge_points,
+							output_vertex_points,
 							output_clockwise_edges,
 							output_loop_first_edges,
 							output_face_first_loops,
@@ -1112,7 +1112,7 @@ public:
 			}
 
 			// Update selection arrays
-			output_edge_selection.assign(output_edge_points.size(), 0.0);
+			output_edge_selection.assign(output_vertex_points.size(), 0.0);
 		}
 		output_point_selection.resize(output_points.size(), 0.0);
 	}
@@ -1129,7 +1129,7 @@ public:
 			const k3d::mesh::indices_t& input_face_first_loops = input_polyhedron->face_first_loops;
 			const k3d::mesh::indices_t& input_loop_first_edges = input_polyhedron->loop_first_edges;
 			const k3d::mesh::indices_t& input_clockwise_edges = input_polyhedron->clockwise_edges;
-			const k3d::mesh::indices_t& input_edge_points = input_polyhedron->edge_points;
+			const k3d::mesh::indices_t& input_vertex_points = input_polyhedron->vertex_points;
 
 			k3d::mesh::points_t& output_points = Output.points.writable();
 
@@ -1141,7 +1141,7 @@ public:
 				detail::face_center_calculator face_center_functor(input_face_first_loops,
 						input_loop_first_edges,
 						input_clockwise_edges,
-						input_edge_points,
+						input_vertex_points,
 						m_affected_faces,
 						m_face_centers,
 						output_points);
@@ -1155,7 +1155,7 @@ public:
 				// Calculate edge midpoints
 				document().pipeline_profiler().start_execution(*this, "Edge midpoints");
 				detail::edge_midpoint_calculator midpoint_functor(output_points,
-						input_edge_points,
+						input_vertex_points,
 						input_clockwise_edges,
 						m_affected_edges,
 						m_edge_midpoints,

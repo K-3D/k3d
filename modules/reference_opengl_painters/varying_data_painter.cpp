@@ -170,8 +170,8 @@ public:
 			const k3d::mesh::indices_t& face_first_loops = polyhedron->face_first_loops;
 			const k3d::mesh::counts_t& face_loop_counts = polyhedron->face_loop_counts;
 			const k3d::mesh::indices_t& loop_first_edges = polyhedron->loop_first_edges;
-			const k3d::mesh::indices_t& edge_points = polyhedron->edge_points;
 			const k3d::mesh::indices_t& clockwise_edges = polyhedron->clockwise_edges;
+			const k3d::mesh::indices_t& vertex_points = polyhedron->vertex_points;
 			const k3d::mesh::points_t& points = *Mesh.points;
 
 			const size_t face_count = face_first_loops.size();
@@ -179,7 +179,7 @@ public:
 			// Calculate face normals ...
 			k3d::typed_array<k3d::normal3> normals(face_count);
 			for(size_t face = 0; face != face_count; ++face)
-				normals[face] = k3d::polyhedron::normal(edge_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
+				normals[face] = k3d::polyhedron::normal(vertex_points, clockwise_edges, points, loop_first_edges[face_first_loops[face]]);
 	
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);
@@ -192,7 +192,7 @@ public:
 			detail::named_array_to_strings<k3d::mesh::indices_t>(polyhedron->edge_attributes, array_name, string_array);
 			detail::named_array_to_strings<k3d::mesh::weights_t>(polyhedron->edge_attributes, array_name, string_array);
 			
-			draw(face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, points, normals, m_color.pipeline_value(), edge_offset, face_offset, *m_font, string_array);
+			draw(face_first_loops, face_loop_counts, loop_first_edges, vertex_points, clockwise_edges, points, normals, m_color.pipeline_value(), edge_offset, face_offset, *m_font, string_array);
 		}
 	}
 	

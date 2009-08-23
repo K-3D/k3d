@@ -81,6 +81,9 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case PATCH:
 			Stream << "patch";
 			break;
+		case VERTEX:
+			Stream << "vertex";
+			break;
 		default:
 			Stream << RHS;
 			break;
@@ -120,6 +123,8 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = FACE;
 	else if(buffer == "patch")
 		RHS = PATCH;
+	else if(buffer == "vertex")
+		RHS = VERTEX;
 	else
 		log() << error << k3d_file_reference << ": could not extract value [" << buffer << "]" << std::endl;
 

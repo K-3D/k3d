@@ -80,7 +80,7 @@ public:
 	template<typename FunctorT>
 	void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::mesh::points_t& Points, const k3d::color& Color, const FunctorT& EdgeTest)
 	{
-		const size_t edge_count = Polyhedron.edge_points.size();
+		const size_t edge_count = Polyhedron.clockwise_edges.size();
 
 		k3d::gl::color3d(Color);
 
@@ -89,10 +89,10 @@ public:
 		{
 			if(EdgeTest(Polyhedron.edge_selections, edge))
 			{
-				const k3d::point3 first_point = Points[Polyhedron.edge_points[edge]];
-				const k3d::point3 second_point = Points[Polyhedron.edge_points[Polyhedron.clockwise_edges[edge]]];
+				const k3d::point3 first_point = Points[Polyhedron.vertex_points[edge]];
+				const k3d::point3 second_point = Points[Polyhedron.vertex_points[Polyhedron.clockwise_edges[edge]]];
 				k3d::vector3 edge_vector = k3d::normalize(second_point - first_point);
-				k3d::normal3 normal_vector = k3d::normalize(k3d::polyhedron::normal(Polyhedron.edge_points, Polyhedron.clockwise_edges, Points, edge));
+				k3d::normal3 normal_vector = k3d::normalize(k3d::polyhedron::normal(Polyhedron.vertex_points, Polyhedron.clockwise_edges, Points, edge));
 				k3d::vector3 offset_vector = normal_vector ^ edge_vector;
 
 				const k3d::point3 glyph_point1 = first_point + (offset_vector + edge_vector) * m_offset.pipeline_value();

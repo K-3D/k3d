@@ -173,7 +173,7 @@ public:
 						const k3d::uint_t face_begin = 0;
 						const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
 						for(k3d::uint_t face = face_begin; face != face_end; ++face)
-							draw_line(k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]), (*array)[face], normalize, scale);
+							draw_line(k3d::polyhedron::center(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]), (*array)[face], normalize, scale);
 						glEnd();
 					}
 				}
@@ -207,7 +207,7 @@ public:
 								const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
 								for(k3d::uint_t edge = first_edge; ;)
 								{
-									draw_line(points[polyhedron->edge_points[edge]], (*array)[edge], normalize, scale);
+									draw_line(points[polyhedron->vertex_points[edge]], (*array)[edge], normalize, scale);
 
 									edge = polyhedron->clockwise_edges[edge];
 									if(edge == first_edge)

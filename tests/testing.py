@@ -3,6 +3,7 @@
 import k3d
 import difflib
 import os
+import platform
 import sys
 import time
 
@@ -284,38 +285,40 @@ def bitmap_size_comparison(bitmap, width, height):
 	if bitmap.width() != width or bitmap.height() != height:
 		raise "bitmap dimensions incorrect"
 
-def mesh_comparison_to_reference(document, input_mesh, reference_mesh_name, threshold):
+def mesh_comparison_to_reference(document, input_mesh, base_mesh_name, threshold, platform_specific = False):
+
+	mesh_name = base_mesh_name
+	mesh_name += ".reference"
+	if platform_specific:
+		mesh_name += "." + str(platform.machine())
+
+	output_path = k3d.filesystem.generic_path(binary_path() + "/meshes/" + mesh_name + ".k3d")
+	reference_path = k3d.filesystem.generic_path(source_path() + "/meshes/" + mesh_name + ".k3d")
+	difference_path = k3d.filesystem.generic_path(binary_path() + "/meshes/differences/" + mesh_name + ".html")
+
+	if not os.path.exists(str(reference_path)):
+		raise Exception("missing reference file: " + str(reference_path))
 
 	mesh_writer = document.new_node("K3DMeshWriter")
-	mesh_writer.file = k3d.filesystem.generic_path(binary_path() + "/" + reference_mesh_name + ".output.k3d")
+	mesh_writer.file = output_path
 	document.set_dependency(mesh_writer.get_property("input_mesh"), input_mesh)
 
 	reference = document.new_node("K3DMeshReader")
 	reference.center = False
 	reference.scale_to_size = False
 	reference.material = document.get_node("Material")
+	reference.file = reference_path
 
 	difference = get_mesh_difference(document, input_mesh, reference.get_property("output_mesh"), threshold)
 
-	for index in range(1, 100):
-		reference_file = k3d.filesystem.generic_path(source_path() + "/meshes/" + reference_mesh_name + ".reference." + str(index) + ".k3d")
+	if not difference.get_property("input_a").pipeline_value() or not difference.get_property("input_b").pipeline_value():
+		raise Exception("missing mesh comparison input")
 
-		if not os.path.exists(str(reference_file)):
-			if index == 1:
-				raise Exception("missing reference file: " + str(reference_file))
-			else:
-				break
-
-		reference.file = reference_file
-
-		if not difference.get_property("input_a").pipeline_value() or not difference.get_property("input_b").pipeline_value():
-			raise Exception("missing mesh comparison input")
-
-		if difference.equal:
-			return
+	if difference.equal:
+		return
 	
 	# if there is a difference, output it
-	difference_file = open(str(k3d.filesystem.generic_path(binary_path() + "/" + reference_mesh_name + ".difference.html")), "w")
+	difference_file = open(str(difference_path), "w")
 	difference_file.write(difflib.HtmlDiff().make_file(str(input_mesh.pipeline_value()).splitlines(1), str(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry"))
 	difference_file.close()
 

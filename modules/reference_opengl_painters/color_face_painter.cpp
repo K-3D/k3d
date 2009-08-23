@@ -76,7 +76,7 @@ public:
 			// Calculate face normals ...
 			k3d::typed_array<k3d::normal3> normals(face_count, k3d::normal3(0, 0, 1));
 			for(k3d::uint_t face = 0; face != face_count; ++face)
-				normals[face] = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+				normals[face] = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 	
 			// Define a default face color array (in case the user's choice of color array doesn't exist) ...
 			k3d::typed_array<k3d::color> default_color_array;
@@ -108,7 +108,7 @@ public:
 					for(k3d::uint_t edge = first_edge; ; )
 					{
 						k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, color(shell, face, edge));
-						k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
+						k3d::gl::vertex3d(points[polyhedron->vertex_points[edge]]);
 						edge = polyhedron->clockwise_edges[edge];
 						if(edge == first_edge)
 							break;
@@ -155,7 +155,7 @@ public:
 				const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
 				for(k3d::uint_t edge = first_edge; ; )
 				{
-					k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
+					k3d::gl::vertex3d(points[polyhedron->vertex_points[edge]]);
 					edge = polyhedron->clockwise_edges[edge];
 					if(edge == first_edge)
 						break;
@@ -253,7 +253,7 @@ private:
 				const k3d::polyhedron::const_primitive& Polyhedron,
 				const k3d::table& VertexData) :
 					m_array_type(ArrayType),
-					m_edge_points(Polyhedron.edge_points)
+					m_edge_points(Polyhedron.vertex_points)
 		{
 			m_color_array = 0;
 			switch(m_array_type)

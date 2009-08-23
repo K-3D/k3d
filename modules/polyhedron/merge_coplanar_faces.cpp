@@ -88,13 +88,13 @@ public:
 			
 			k3d::mesh::bools_t boundary_edges;
 			k3d::mesh::indices_t companions;
-			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, boundary_edges, companions);
+			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->vertex_points, input_polyhedron->clockwise_edges, boundary_edges, companions);
 			
 			// Calculate the face normals
 			k3d::mesh::normals_t face_normals(input_polyhedron->face_first_loops.size());
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				face_normals[face] = k3d::normalize(k3d::polyhedron::normal(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, points, input_polyhedron->loop_first_edges[input_polyhedron->face_first_loops[face]]));
+				face_normals[face] = k3d::normalize(k3d::polyhedron::normal(input_polyhedron->vertex_points, input_polyhedron->clockwise_edges, points, input_polyhedron->loop_first_edges[input_polyhedron->face_first_loops[face]]));
 			}
 			
 			k3d::mesh::indices_t edge_faces;

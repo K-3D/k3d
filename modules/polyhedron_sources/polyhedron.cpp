@@ -1495,13 +1495,14 @@ public:
 			primitive->face_loop_counts.push_back(1);
 			primitive->face_selections.push_back(0);
 			primitive->face_materials.push_back(material);
-			primitive->loop_first_edges.push_back(primitive->edge_points.size());
+			primitive->loop_first_edges.push_back(primitive->clockwise_edges.size());
 
 			for(k3d::uint_t j = 0; j != m_PolyhedronPaths[i].size(); ++j)
 			{
-				primitive->edge_points.push_back(m_PolyhedronPaths[i][j]);
-				primitive->clockwise_edges.push_back(primitive->edge_points.size());
+				primitive->clockwise_edges.push_back(primitive->clockwise_edges.size() + 1);
 				primitive->edge_selections.push_back(0);
+				primitive->vertex_points.push_back(m_PolyhedronPaths[i][j]);
+				primitive->vertex_selections.push_back(0);
 			}
 			primitive->clockwise_edges.back() = primitive->loop_first_edges.back();
 

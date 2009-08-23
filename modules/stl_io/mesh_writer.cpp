@@ -60,7 +60,7 @@ void extract_solids(const k3d::polyhedron::const_primitive& Polyhedron, const k3
 		const k3d::uint_t first_edge = Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]; 
 		for(k3d::uint_t edge = first_edge; ; )
 		{
-			indices.push_back(Polyhedron.edge_points[edge]);
+			indices.push_back(Polyhedron.vertex_points[edge]);
 
 			edge = Polyhedron.clockwise_edges[edge];
 			if(edge == first_edge)

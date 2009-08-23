@@ -108,7 +108,7 @@ private:
             const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
             for(k3d::uint_t edge = first_edge; ; )
             {
-              Output << " " << polyhedron->edge_points[edge] + 1; //specs want indices starting with 1
+              Output << " " << polyhedron->vertex_points[edge] + 1; //specs want indices starting with 1
 
               edge = polyhedron->clockwise_edges[edge];
               if(edge == first_edge)

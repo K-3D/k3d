@@ -2,7 +2,7 @@
 #define K3DSDK_POLYHEDRON_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file Declares structures to add extra "convenience" data to a mesh
+/** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
@@ -55,12 +55,14 @@ public:
 		const mesh::selection_t& FaceSelections,
 		const mesh::materials_t& FaceMaterials,
 		const mesh::indices_t& LoopFirstEdges,
-		const mesh::indices_t& EdgePoints,
 		const mesh::indices_t& ClockwiseEdges,
 		const mesh::selection_t& EdgeSelections,
+		const mesh::indices_t& VertexPoints,
+		const mesh::selection_t& VertexSelections,
 		const mesh::table_t& ConstantAttributes,
 		const mesh::table_t& FaceAttributes,
-		const mesh::table_t& EdgeAttributes
+		const mesh::table_t& EdgeAttributes,
+		const mesh::table_t& VertexAttributes
 		);
 
 	/// Implicit conversion
@@ -74,12 +76,14 @@ public:
 	const mesh::selection_t& face_selections;
 	const mesh::materials_t& face_materials;
 	const mesh::indices_t& loop_first_edges;
-	const mesh::indices_t& edge_points;
 	const mesh::indices_t& clockwise_edges;
 	const mesh::selection_t& edge_selections;
+	const mesh::indices_t& vertex_points;
+	const mesh::selection_t& vertex_selections;
 	const mesh::table_t& constant_attributes;
 	const mesh::table_t& face_attributes;
 	const mesh::table_t& edge_attributes;
+	const mesh::table_t& vertex_attributes;
 };
 
 /// Gathers the member arrays of a polyhedron primitive into a convenient package
@@ -95,12 +99,14 @@ public:
 		mesh::selection_t& FaceSelections,
 		mesh::materials_t& FaceMaterials,
 		mesh::indices_t& LoopFirstEdges,
-		mesh::indices_t& EdgePoints,
 		mesh::indices_t& ClockwiseEdges,
 		mesh::selection_t& EdgeSelections,
+		mesh::indices_t& VertexPoints,
+		mesh::selection_t& VertexSelections,
 		mesh::table_t& ConstantAttributes,
 		mesh::table_t& FaceAttributes,
-		mesh::table_t& EdgeAttributes
+		mesh::table_t& EdgeAttributes,
+		mesh::table_t& VertexAttributes
 		);
 
 	mesh::indices_t& shell_first_faces;
@@ -111,12 +117,14 @@ public:
 	mesh::selection_t& face_selections;
 	mesh::materials_t& face_materials;
 	mesh::indices_t& loop_first_edges;
-	mesh::indices_t& edge_points;
 	mesh::indices_t& clockwise_edges;
 	mesh::selection_t& edge_selections;
+	mesh::indices_t& vertex_points;
+	mesh::selection_t& vertex_selections;
 	mesh::table_t& constant_attributes;
 	mesh::table_t& face_attributes;
 	mesh::table_t& edge_attributes;
+	mesh::table_t& vertex_attributes;
 };
 
 /// Creates a new polyhedron mesh primitive, returning references to its member arrays.

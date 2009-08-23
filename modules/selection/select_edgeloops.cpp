@@ -96,8 +96,8 @@ private:
 			m_valences.clear();
 			m_boundary_edges.clear();
 
-			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, m_boundary_edges, m_companions);
-			k3d::polyhedron::create_vertex_valence_lookup(Output.points->size(), polyhedron->edge_points, m_valences);
+			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, m_boundary_edges, m_companions);
+			k3d::polyhedron::create_vertex_valence_lookup(Output.points->size(), polyhedron->vertex_points, m_valences);
 			
 			const k3d::mesh::selection_t original_edge_selections = polyhedron->edge_selections;
 		
@@ -115,7 +115,7 @@ private:
 						{
 							polyhedron->edge_selections[loopedge] = selection_weight;
 							
-							if(m_valences[polyhedron->edge_points[polyhedron->clockwise_edges[loopedge]]] != 4) // Next edge in loop is ambiguous
+							if(m_valences[polyhedron->vertex_points[polyhedron->clockwise_edges[loopedge]]] != 4) // Next edge in loop is ambiguous
 								break;
 							
 							if(m_boundary_edges[polyhedron->clockwise_edges[loopedge]]) // No companion

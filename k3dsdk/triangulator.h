@@ -45,7 +45,7 @@ public:
 		const mesh::indices_t& FaceFirstLoops,
 		const mesh::counts_t& FaceLoopCounts,
 		const mesh::indices_t& LoopFirstEdges,
-		const mesh::indices_t& EdgePoints,
+		const mesh::indices_t& VertexPoints,
 		const mesh::indices_t& ClockwiseEdges,
 		const uint_t Face);
 

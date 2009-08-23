@@ -88,10 +88,11 @@ public:
 				primitive->patch_selections.push_back(polyhedron->face_selections[face]);
 				primitive->patch_materials.push_back(polyhedron->face_materials[face]);
 
-				primitive->patch_points.push_back(polyhedron->edge_points[edges[0]]);
-				primitive->patch_points.push_back(polyhedron->edge_points[edges[1]]);
-				primitive->patch_points.push_back(polyhedron->edge_points[edges[3]]); // Bilinear patch control points *aren't* in clockwise order!
-				primitive->patch_points.push_back(polyhedron->edge_points[edges[2]]);
+				// Note: Bilinear patch control points *aren't* in clockwise order!
+				primitive->patch_points.push_back(polyhedron->vertex_points[edges[0]]);
+				primitive->patch_points.push_back(polyhedron->vertex_points[edges[1]]);
+				primitive->patch_points.push_back(polyhedron->vertex_points[edges[3]]); 
+				primitive->patch_points.push_back(polyhedron->vertex_points[edges[2]]);
 			}
 		}
 	}

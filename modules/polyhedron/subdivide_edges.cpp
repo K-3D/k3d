@@ -330,13 +330,13 @@ public:
 			document().pipeline_profiler().start_execution(*this, "Calculate companions");
 			k3d::mesh::bools_t boundary_edges;
 			k3d::mesh::indices_t companions;
-			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, boundary_edges, companions);
+			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->vertex_points, input_polyhedron->clockwise_edges, boundary_edges, companions);
 			document().pipeline_profiler().finish_execution(*this, "Calculate companions");
 
 			const k3d::uint_t split_point_count = m_vertices.pipeline_value();
 
 			document().pipeline_profiler().start_execution(*this, "Calculate indices");
-			const k3d::uint_t old_edge_count = input_polyhedron->edge_points.size();
+			const k3d::uint_t old_edge_count = input_polyhedron->clockwise_edges.size();
 			k3d::mesh::indices_t index_map(old_edge_count);
 			k3d::mesh::indices_t first_midpoint(old_edge_count);
 			k3d::mesh::bools_t has_midpoint(old_edge_count);
@@ -353,9 +353,10 @@ public:
 			document().pipeline_profiler().finish_execution(*this, "Calculate indices");
 
 			document().pipeline_profiler().start_execution(*this, "Allocate memory");
-			output_polyhedron->edge_points.resize(edge_index_calculator.edge_count);
 			output_polyhedron->clockwise_edges.resize(edge_index_calculator.edge_count);
 			output_polyhedron->edge_selections.resize(edge_index_calculator.edge_count, 0.0);
+			output_polyhedron->vertex_points.resize(edge_index_calculator.edge_count);
+			output_polyhedron->vertex_selections.resize(edge_index_calculator.edge_count, 0.0);
 			k3d::mesh::points_t& output_points = Output.points.writable();
 			k3d::mesh::selection_t& output_point_selection = Output.point_selection.writable();
 			const k3d::uint_t new_point_count = m_edge_list.size() * split_point_count + Input.points->size();
@@ -366,10 +367,10 @@ public:
 			document().pipeline_profiler().finish_execution(*this, "Allocate memory");
 
 			document().pipeline_profiler().start_execution(*this, "Update indices");
-			detail::edge_index_updater edge_index_updater(input_polyhedron->edge_points,
+			detail::edge_index_updater edge_index_updater(input_polyhedron->vertex_points,
 					input_polyhedron->clockwise_edges,
 					index_map,
-					output_polyhedron->edge_points,
+					output_polyhedron->vertex_points,
 					output_polyhedron->clockwise_edges,
 					edge_attributes_copier);
 			for(k3d::uint_t edge = 0; edge != index_map.size(); ++edge) edge_index_updater(edge);
@@ -385,7 +386,7 @@ public:
 						companions,
 						boundary_edges,
 						split_point_count,
-						output_polyhedron->edge_points,
+						output_polyhedron->vertex_points,
 						output_polyhedron->clockwise_edges,
 						edge_attributes_copier);
 			for(k3d::uint_t edge_index = 0; edge_index != m_edge_list.size(); ++edge_index) edge_splitter(edge_index);
@@ -405,7 +406,7 @@ public:
 
 			document().pipeline_profiler().start_execution(*this, "Calculate positions");
 			detail::split_point_calculator split_point_calculator(m_edge_list,
-					input_polyhedron->edge_points,
+					input_polyhedron->vertex_points,
 					input_polyhedron->clockwise_edges,
 					m_vertices.pipeline_value(),
 					Input.points->size(),

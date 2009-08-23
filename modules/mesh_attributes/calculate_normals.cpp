@@ -106,7 +106,7 @@ public:
 			// Compute face (per-face) normals (used for all subsequent calculations) ...
 			k3d::mesh::normals_t face_normals(polyhedron->face_first_loops.size());
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
-				face_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
+				face_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
 
 			// Optionally store the face normals ...
 			if(store_face)
@@ -117,12 +117,12 @@ public:
 			{
 				const k3d::double_t cos_max_angle = std::cos(std::max(0.0, m_max_angle.pipeline_value()));
 
-				k3d::mesh::normals_t& varying_normals = polyhedron->edge_attributes.create(m_varying_array.pipeline_value(), new k3d::mesh::normals_t(polyhedron->edge_points.size()));
+				k3d::mesh::normals_t& varying_normals = polyhedron->edge_attributes.create(m_varying_array.pipeline_value(), new k3d::mesh::normals_t(polyhedron->vertex_points.size()));
 
 				k3d::mesh::indices_t point_first_faces;
 				k3d::mesh::counts_t point_face_counts;
 				k3d::mesh::indices_t point_faces;
-				k3d::polyhedron::create_vertex_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->edge_points, polyhedron->clockwise_edges, points, point_first_faces, point_face_counts, point_faces);
+				k3d::polyhedron::create_vertex_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->vertex_points, polyhedron->clockwise_edges, points, point_first_faces, point_face_counts, point_faces);
 
 				for(k3d::uint_t face = face_begin; face != face_end; ++face)
 				{
@@ -139,8 +139,8 @@ public:
 
 							if(polyhedron->face_selections[face])
 							{
-								const k3d::uint_t point_face_begin = point_first_faces[polyhedron->edge_points[edge]];
-								const k3d::uint_t point_face_end = point_face_begin + point_face_counts[polyhedron->edge_points[edge]];
+								const k3d::uint_t point_face_begin = point_first_faces[polyhedron->vertex_points[edge]];
+								const k3d::uint_t point_face_end = point_face_begin + point_face_counts[polyhedron->vertex_points[edge]];
 								for(k3d::uint_t point_face = point_face_begin; point_face != point_face_end; ++point_face)
 								{
 									const k3d::uint_t adjacent_face = point_faces[point_face];
@@ -180,7 +180,7 @@ public:
 						const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
 						for(k3d::uint_t edge = first_edge; ;)
 						{
-							(*point_normals)[polyhedron->edge_points[edge]] += face_normals[face];
+							(*point_normals)[polyhedron->vertex_points[edge]] += face_normals[face];
 
 							edge = polyhedron->clockwise_edges[edge];
 							if(edge == first_edge)

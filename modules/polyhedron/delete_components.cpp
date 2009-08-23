@@ -397,7 +397,7 @@ public:
 					input_polyhedron->face_loop_counts,
 					input_polyhedron->loop_first_edges,
 					input_polyhedron->clockwise_edges,
-					input_polyhedron->edge_points,
+					input_polyhedron->vertex_points,
 					detail::selected(point_selection),
 					detail::selected(edge_selection),
 					detail::selected(face_selection),
@@ -408,9 +408,9 @@ public:
 			for(k3d::uint_t face = 0; face != face_count; ++face) marker(face);
 			
 			k3d::mesh::counts_t valences;
-			k3d::polyhedron::create_vertex_valence_lookup(Input.points->size(), input_polyhedron->edge_points, valences);
+			k3d::polyhedron::create_vertex_valence_lookup(Input.points->size(), input_polyhedron->vertex_points, valences);
 			k3d::mesh::indices_t point_first_edges, point_edges;
-			detail::create_vertex_edge_lookup(input_polyhedron->edge_points, valences, point_first_edges, point_edges);
+			detail::create_vertex_edge_lookup(input_polyhedron->vertex_points, valences, point_first_edges, point_edges);
 			
 			detail::point_marker point_marker(valences, point_first_edges, point_edges, edges_to_remove, m_points_to_remove);
 			for(k3d::uint_t point = 0; point != Input.points->size(); ++point) point_marker(point);
@@ -425,16 +425,17 @@ public:
 			output_polyhedron->face_loop_counts.clear();
 			output_polyhedron->face_materials.clear();
 			output_polyhedron->loop_first_edges.clear();
-			output_polyhedron->edge_points.clear();
 			output_polyhedron->clockwise_edges.clear();
 			output_polyhedron->edge_selections.clear();
+			output_polyhedron->vertex_points.clear();
+			output_polyhedron->vertex_selections.clear();
 			
 			detail::update_indices(faces_to_remove, loops_to_remove, input_polyhedron->face_first_loops, output_polyhedron->face_first_loops);
 			detail::delete_elements(faces_to_remove, face_selection, output_polyhedron->face_selections);
 			detail::delete_elements(faces_to_remove, adjusted_face_loop_counts, output_polyhedron->face_loop_counts);
 			detail::delete_elements(faces_to_remove, input_polyhedron->face_materials, output_polyhedron->face_materials);
 			detail::update_indices(loops_to_remove, edges_to_remove, input_polyhedron->loop_first_edges, output_polyhedron->loop_first_edges);
-			detail::update_indices(edges_to_remove, m_points_to_remove, input_polyhedron->edge_points, output_polyhedron->edge_points);
+			detail::update_indices(edges_to_remove, m_points_to_remove, input_polyhedron->vertex_points, output_polyhedron->vertex_points);
 			detail::update_indices(edges_to_remove, edges_to_remove, input_polyhedron->clockwise_edges, output_polyhedron->clockwise_edges);
 			detail::delete_elements(edges_to_remove, edge_selection, output_polyhedron->edge_selections);
 			detail::delete_elements(m_points_to_remove, point_selection, Output.point_selection.writable());

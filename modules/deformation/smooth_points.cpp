@@ -67,14 +67,14 @@ public:
         continue;
 
       const k3d::uint_t edge_begin = 0;
-      const k3d::uint_t edge_end = edge_begin + polyhedron->edge_points.size();
+      const k3d::uint_t edge_end = edge_begin + polyhedron->clockwise_edges.size();
       for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
       {
-        sums[polyhedron->edge_points[edge]] += k3d::to_vector(InputPoints[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
-        counts[polyhedron->edge_points[edge]] += 1;
+        sums[polyhedron->vertex_points[edge]] += k3d::to_vector(InputPoints[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]]);
+        counts[polyhedron->vertex_points[edge]] += 1;
 
-        sums[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]] += k3d::to_vector(InputPoints[polyhedron->edge_points[edge]]);
-        counts[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]] += 1;
+        sums[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]] += k3d::to_vector(InputPoints[polyhedron->vertex_points[edge]]);
+        counts[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]] += 1;
       }
     }
 

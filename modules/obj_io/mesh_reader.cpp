@@ -161,16 +161,17 @@ private:
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(0.0);
 			polyhedron->face_materials.push_back(material);
-			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
+			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
 			const k3d::uint_t point_begin = 0;
 			const k3d::uint_t point_end = point_begin + Points.size();
-			const k3d::uint_t first_edge = polyhedron->edge_points.size();
+			const k3d::uint_t first_edge = polyhedron->clockwise_edges.size();
 			for(k3d::uint_t point = point_begin; point != point_end; ++point)
 			{
-				polyhedron->edge_points.push_back(Points[point]);
-				polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 				polyhedron->edge_selections.push_back(0.0);
+				polyhedron->vertex_points.push_back(Points[point]);
+				polyhedron->vertex_selections.push_back(0.0);
 			}
 			polyhedron->clockwise_edges.back() = first_edge;
 

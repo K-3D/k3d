@@ -91,9 +91,10 @@ public:
 		polyhedron->face_selections.reserve(triangle_count);
 		polyhedron->face_materials.reserve(triangle_count);
 		polyhedron->loop_first_edges.reserve(triangle_count);
-		polyhedron->edge_points.reserve(3 * triangle_count);
 		polyhedron->clockwise_edges.reserve(3 * triangle_count);
 		polyhedron->edge_selections.reserve(3 * triangle_count);
+		polyhedron->vertex_points.reserve(3 * triangle_count);
+		polyhedron->vertex_selections.reserve(3 * triangle_count);
 
 		for(k3d::int32_t i = 0; i != triangle_count; ++i)
 		{
@@ -101,13 +102,14 @@ public:
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(0);
 			polyhedron->face_materials.push_back(0);
-			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
+			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
 			for(k3d::uint_t j = 0; j != 3; ++j)
 			{
-				polyhedron->edge_points.push_back(model->get_index(i, j));
-				polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 				polyhedron->edge_selections.push_back(0);
+				polyhedron->vertex_points.push_back(model->get_index(i, j));
+				polyhedron->vertex_selections.push_back(0);
 			}
 			polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
 		}

@@ -94,8 +94,8 @@ public:
 					if(!polyhedron->face_selections[face])
 						continue;
 
-					k3d::point3 center = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
-					k3d::normal3 normal = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+					k3d::point3 center = k3d::polyhedron::center(polyhedron->vertex_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+					k3d::normal3 normal = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 
 					k3d::gl::vertex3d(center);
 					k3d::gl::vertex3d(center + normal);
@@ -113,8 +113,8 @@ public:
 					if(polyhedron->face_selections[face])
 						continue;
 
-					k3d::point3 center = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
-					k3d::normal3 normal = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+					k3d::point3 center = k3d::polyhedron::center(polyhedron->vertex_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+					k3d::normal3 normal = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 
 					k3d::gl::vertex3d(center);
 					k3d::gl::vertex3d(center + normal);

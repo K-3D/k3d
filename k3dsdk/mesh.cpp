@@ -308,15 +308,16 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 				uint_t face_first_loop = polyhedron->loop_first_edges.size();
 				uint_t face_loop_count = 1 + (*legacy_face)->holes.size();
 
-				const uint_t first_edge = polyhedron->edge_points.size();
+				const uint_t first_edge = polyhedron->vertex_points.size();
 
 				polyhedron->loop_first_edges.push_back(first_edge);
 				for(legacy::split_edge* edge = (*legacy_face)->first_edge; edge; edge = edge->face_clockwise)
 				{
 					if(edge->vertex && edge->face_clockwise)
 					{
-						polyhedron->edge_points.push_back(point_map[edge->vertex]);
-						polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+						polyhedron->vertex_points.push_back(point_map[edge->vertex]);
+						polyhedron->vertex_selections.push_back(edge->selection_weight);
+						polyhedron->clockwise_edges.push_back(polyhedron->vertex_points.size());
 						polyhedron->edge_selections.push_back(edge->selection_weight);
 					}
 
@@ -329,15 +330,16 @@ mesh& mesh::operator=(const legacy::mesh& RHS)
 
 				for(legacy::face::holes_t::iterator hole = (*legacy_face)->holes.begin(); hole != (*legacy_face)->holes.end(); ++hole)
 				{
-					const uint_t first_edge = polyhedron->edge_points.size();
+					const uint_t first_edge = polyhedron->vertex_points.size();
 
 					polyhedron->loop_first_edges.push_back(first_edge);
 					for(legacy::split_edge* edge = *hole; edge; edge = edge->face_clockwise)
 					{
 						if(edge->vertex && edge->face_clockwise && edge->face_clockwise->vertex)
 						{
-							polyhedron->edge_points.push_back(point_map[edge->vertex]);
-							polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+							polyhedron->vertex_points.push_back(point_map[edge->vertex]);
+							polyhedron->vertex_selections.push_back(edge->selection_weight);
+							polyhedron->clockwise_edges.push_back(polyhedron->vertex_points.size());
 							polyhedron->edge_selections.push_back(edge->selection_weight);
 						}
 

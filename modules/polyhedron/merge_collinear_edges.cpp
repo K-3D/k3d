@@ -87,12 +87,12 @@ public:
 			
 			k3d::mesh::bools_t boundary_edges;
 			k3d::mesh::indices_t companions;
-			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, boundary_edges, companions);
+			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->vertex_points, input_polyhedron->clockwise_edges, boundary_edges, companions);
 			
 			k3d::mesh::counts_t vertex_valences;
-			k3d::polyhedron::create_vertex_valence_lookup(Output.points->size(), output_polyhedron->edge_points, vertex_valences);
+			k3d::polyhedron::create_vertex_valence_lookup(Output.points->size(), output_polyhedron->vertex_points, vertex_valences);
 			k3d::mesh::indices_t redundant_edges;
-			k3d::polyhedron::mark_collinear_edges(redundant_edges, input_edge_selection, points, input_polyhedron->edge_points, input_polyhedron->clockwise_edges, vertex_valences, boundary_edges, companions, m_threshold.pipeline_value());
+			k3d::polyhedron::mark_collinear_edges(redundant_edges, input_edge_selection, points, input_polyhedron->vertex_points, input_polyhedron->clockwise_edges, vertex_valences, boundary_edges, companions, m_threshold.pipeline_value());
 			
 			k3d::euler::kill_edge_and_vertex(*output_polyhedron, redundant_edges, boundary_edges, companions, points.size());
 		}

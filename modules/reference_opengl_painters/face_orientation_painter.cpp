@@ -83,8 +83,8 @@ public:
 		{
 			if(FaceTest(Polyhedron.face_selections, face))
 			{
-				const k3d::point3 first_point = Points[Polyhedron.edge_points[Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]]];
-				const k3d::point3 second_point = Points[Polyhedron.edge_points[Polyhedron.clockwise_edges[Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]]]];
+				const k3d::point3 first_point = Points[Polyhedron.vertex_points[Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]]];
+				const k3d::point3 second_point = Points[Polyhedron.vertex_points[Polyhedron.clockwise_edges[Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]]]];
 				const k3d::point3 center_point = Centers[face];
 
 				const k3d::point3 glyph_point1 = ((first_point - center_point) * 0.9) + center_point;
@@ -119,7 +119,7 @@ public:
 			// Calculate face centers ...
 			k3d::typed_array<k3d::point3> centers(face_count);
 			for(k3d::uint_t face = 0; face != face_count; ++face)
-				centers[face] = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+				centers[face] = k3d::polyhedron::center(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 	
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);

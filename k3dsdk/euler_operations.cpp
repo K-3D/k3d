@@ -126,6 +126,8 @@ void remove_deleted_geometry(polyhedron::primitive& Output,
 		const mesh::indices_t& LoopFaces,
 		const mesh::selection_t& FaceSelection)
 {
+assert_not_implemented();
+/*
 	const uint_t edge_count = EdgePoints.size();
 	const uint_t face_count = FaceFirstLoops.size();
 	mesh::counts_t edges_to_delete_sum(edge_count);
@@ -210,6 +212,7 @@ void remove_deleted_geometry(polyhedron::primitive& Output,
 			new_first_face += new_face_count; 
 		}
 	}
+*/
 }
 
 /// Creates lookup arrays linking edges to their loops, and loops to their faces
@@ -247,6 +250,8 @@ void create_edge_loop_face_lookup(const mesh::indices_t& FaceFirstLoops,
 
 void kill_edge_make_loop(polyhedron::primitive& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const mesh::points_t& Points, const mesh::normals_t& FaceNormals)
 {
+assert_not_implemented();
+/*
 	// Copies, so we can use them as temp storage between the individiual KEML operations
 	const mesh::indices_t face_first_loops = Output.face_first_loops;
 	mesh::counts_t face_loop_counts = Output.face_loop_counts;
@@ -406,10 +411,13 @@ void kill_edge_make_loop(polyhedron::primitive& Output, const mesh::indices_t& E
 	detail::remove_deleted_geometry(Output, face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, faces_to_delete, loops_to_delete, edges_to_delete, loop_faces, face_selection);
 	Output.face_materials.assign(Output.face_first_loops.size(), static_cast<imaterial*>(0));
 	Output.edge_selections.assign(Output.edge_points.size(), 0.0);
+*/
 }
 
 void kill_edge_and_vertex(polyhedron::primitive& Output, const mesh::indices_t& EdgeList, const mesh::bools_t BoundaryEdges, const mesh::indices_t& AdjacentEdges, const uint_t PointCount)
 {
+assert_not_implemented();
+/*
 	const mesh::indices_t face_first_loops = Output.face_first_loops;
 	mesh::counts_t face_loop_counts = Output.face_loop_counts;
 	mesh::indices_t loop_first_edges = Output.loop_first_edges;
@@ -524,6 +532,7 @@ void kill_edge_and_vertex(polyhedron::primitive& Output, const mesh::indices_t& 
 	detail::remove_deleted_geometry(Output,face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, faces_to_delete, loops_to_delete, edges_to_delete, loop_faces, face_selection);
 	Output.face_materials.assign(Output.face_first_loops.size(), static_cast<imaterial*>(0));
 	Output.edge_selections.assign(Output.clockwise_edges.size(), 0.0);
+*/
 }
 
 } // namespace euler

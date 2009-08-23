@@ -72,12 +72,12 @@ public:
 			const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 			
 			glBegin(GL_LINES);
-			const k3d::uint_t edge_count = polyhedron->edge_points.size();
+			const k3d::uint_t edge_count = polyhedron->clockwise_edges.size();
 			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
 				k3d::gl::color3d(polyhedron->edge_selections[edge] ? selected_color : color);
-				k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
-				k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
+				k3d::gl::vertex3d(points[polyhedron->vertex_points[edge]]);
+				k3d::gl::vertex3d(points[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]]);
 			}
 			glEnd();
 		}
@@ -102,14 +102,14 @@ public:
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);
 	
-			const k3d::uint_t edge_count = polyhedron->edge_points.size();
+			const k3d::uint_t edge_count = polyhedron->clockwise_edges.size();
 			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
 				k3d::gl::push_selection_token(k3d::selection::EDGE, edge);
 
 				glBegin(GL_LINES);
-				k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
-				k3d::gl::vertex3d(points[polyhedron->edge_points[polyhedron->clockwise_edges[edge]]]);
+				k3d::gl::vertex3d(points[polyhedron->vertex_points[edge]]);
+				k3d::gl::vertex3d(points[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]]);
 				glEnd();
 
 				k3d::gl::pop_selection_token(); // EDGE

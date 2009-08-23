@@ -110,8 +110,8 @@ public:
 				{
 					if(EdgeTest(Polyhedron.edge_selections, edge))
 					{
-						const k3d::point3 vertex1 = Points[Polyhedron.edge_points[edge]];
-						const k3d::point3 vertex2 = Points[Polyhedron.edge_points[Polyhedron.clockwise_edges[edge]]];
+						const k3d::point3 vertex1 = Points[Polyhedron.vertex_points[edge]];
+						const k3d::point3 vertex2 = Points[Polyhedron.vertex_points[Polyhedron.clockwise_edges[edge]]];
 						const k3d::vector3 edge_vector = vertex2 - vertex1;
 
 						const k3d::point3 position = vertex1 + (0.5 * edge_vector) + (EdgeOffset * k3d::normalize(FaceNormals[face] ^ edge_vector)) + (FaceOffset * k3d::to_vector(k3d::normalize(FaceNormals[face])));
@@ -167,7 +167,7 @@ public:
 			// Calculate face normals ...
 			k3d::typed_array<k3d::normal3> normals(face_count);
 			for(k3d::uint_t face = 0; face != face_count; ++face)
-				normals[face] = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+				normals[face] = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 	
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);

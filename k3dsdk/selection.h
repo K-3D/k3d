@@ -89,6 +89,8 @@ CURVE = 32,
 FACE = 33,
 /// Storage for a zero-based patch index (relative to a primitive)
 PATCH = 34,
+/// Storage for a zero-based vertex index (relative to a primitive)
+VERTEX = 35,
 
 };
 

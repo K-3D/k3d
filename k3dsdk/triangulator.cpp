@@ -62,7 +62,7 @@ public:
 				Polyhedron.face_first_loops,
 				Polyhedron.face_loop_counts,
 				Polyhedron.loop_first_edges,
-				Polyhedron.edge_points,
+				Polyhedron.vertex_points,
 				Polyhedron.clockwise_edges,
 				face);
 		}
