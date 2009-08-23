@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: NurbsEditCurveKnotVector segfaults when created.
+desc: ""
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-23 20:49:00.397697 Z
+references: []
+
+id: 637f683833589ed1b5cd3f5028206c80ec97d3e9
+log_events: 
+- - 2009-08-23 20:49:01.117777 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
