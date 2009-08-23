@@ -62,14 +62,14 @@ const string_t point_indices_domain()
 	return "k3d:point-indices";
 }
 
-const string_t nurbs_knot_vector_domain()
-{
-	return "k3d:nurbs-knot-vector";
-}
-
 const string_t selection_role()
 {
 	return "k3d:selection";
+}
+
+const string_t nurbs_knot_vector_role()
+{
+	return "k3d:nurbs-knot-vector";
 }
 
 } // namespace value

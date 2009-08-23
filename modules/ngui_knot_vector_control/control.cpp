@@ -19,6 +19,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/custom_property_control.h>
 #include <k3dsdk/ngui/document_state.h>
@@ -146,7 +147,7 @@ public:
 			_("Provides a custom property control for NURBS knot vectors."),
 			"NGUI Control",
 			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("ngui:component-type", "property-control")("ngui:property-type", "k3d:nurbs-knot-vector"));
+			boost::assign::map_list_of("ngui:component-type", "property-control")("ngui:property-type", k3d::metadata::value::nurbs_knot_vector_role().c_str()));
 
 		return factory;
 	}

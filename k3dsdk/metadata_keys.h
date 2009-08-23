@@ -55,11 +55,11 @@ namespace value
 
 /// Metadata value for use with "k3d:domain" that specifies the mesh point array.
 const string_t point_indices_domain();
-/// Metadata value for use with "k3d:domain" that specifies that an array of floating-point values is a NURBS knot vector.
-const string_t nurbs_knot_vector_domain();
 
 /// Metadata value for use with "k3d:role" that specifies that an array of floating-point values is a selection state.
 const string_t selection_role();
+/// Metadata value for use with "k3d:role" that specifies that an array of floating-point values is a NURBS knot vector.
+const string_t nurbs_knot_vector_role();
 
 } // namespace value
 

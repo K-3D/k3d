@@ -126,7 +126,7 @@ public:
 		base(Factory, Document),
 		m_knot_vector(init_owner(*this) + init_name("knot_vector") + init_label(_("Knot Vector")) + init_description(_("Enter a new knot vector containing knot values separated with spaces.")) + init_value(k3d::mesh::knots_t()))
 	{
-		m_knot_vector.set_metadata_value(k3d::metadata::key::domain(), k3d::metadata::value::nurbs_knot_vector_domain());
+		m_knot_vector.set_metadata_value(k3d::metadata::key::role(), k3d::metadata::value::nurbs_knot_vector_role());
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 		m_knot_vector.changed_signal().connect(make_update_mesh_slot());
 	}
