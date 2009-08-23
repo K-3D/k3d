@@ -64,7 +64,7 @@ for i in range(len(primitive_types)):
 		table = primitive.structure()[table_name]
 		for array_name in table.keys():
 			array = table[array_name]
-			if array.get_metadata_value("k3d:domain") == "/points/indices()":
+			if array.get_metadata_value("k3d:domain") == "k3d:point-indices":
 				need_points = True
 
 	if need_points:
