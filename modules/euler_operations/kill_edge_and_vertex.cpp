@@ -85,7 +85,7 @@ public:
       
       k3d::mesh::bools_t boundary_edges;
       k3d::mesh::indices_t companions;
-      k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, boundary_edges, companions);
+      k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, companions);
       
       k3d::euler::kill_edge_and_vertex(*polyhedron, edge_list, boundary_edges, companions, points.size());
     }

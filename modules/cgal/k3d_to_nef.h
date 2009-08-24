@@ -105,7 +105,7 @@ public:
 		size_t first_edge = m_polyhedron.loop_first_edges[FirstLoop];
 		for(size_t edge = first_edge; ; )
 		{
-			size_t point = m_polyhedron.edge_points[edge];
+			size_t point = m_polyhedron.vertex_points[edge];
 			corner_points.push_back(m_points[point]);
 			
 			edge = m_polyhedron.clockwise_edges[edge];
@@ -174,7 +174,7 @@ void k3d_to_nef(const k3d::mesh::points_t& Points, const k3d::polyhedron::const_
 	// Calculate companions
 	k3d::mesh::indices_t companions;
 	k3d::mesh::bools_t boundary_edges;
-	k3d::polyhedron::create_edge_adjacency_lookup(Polyhedron.edge_points, Polyhedron.clockwise_edges, boundary_edges, companions);
+	k3d::polyhedron::create_edge_adjacency_lookup(Polyhedron.vertex_points, Polyhedron.clockwise_edges, boundary_edges, companions);
 	
 	// Provide an edge-to-face link
 	k3d::mesh::indices_t face_for_edge;
@@ -182,11 +182,11 @@ void k3d_to_nef(const k3d::mesh::points_t& Points, const k3d::polyhedron::const_
 	
 	// Store an incoming edge for each point
 	k3d::mesh::indices_t first_in_edges(points.size());
-	size_t edge_count = Polyhedron.edge_points.size();
+	size_t edge_count = Polyhedron.vertex_points.size();
 	for (size_t edge = 0; edge != edge_count; ++edge)
-		first_in_edges[Polyhedron.edge_points[Polyhedron.clockwise_edges[edge]]] = edge;
+		first_in_edges[Polyhedron.vertex_points[Polyhedron.clockwise_edges[edge]]] = edge;
 	
-	indices_t indices(Polyhedron.edge_points.size()); // for indexed items
+	indices_t indices(Polyhedron.vertex_points.size()); // for indexed items
   for (size_t point = 0; point != points.size(); ++point)
   {
 	  Vertex_handle nv = S.new_vertex();
@@ -198,7 +198,7 @@ void k3d_to_nef(const k3d::mesh::points_t& Points, const k3d::polyhedron::const_
 		size_t prev_edge = first_in_edges[point];
 		size_t edge = prev_edge;
 		size_t first_edge = prev_edge;
-		Point_3 pe_target_0 = points[Polyhedron.edge_points[first_edge]];
+		Point_3 pe_target_0 = points[Polyhedron.vertex_points[first_edge]];
 		Point_3 sp_point_0(CGAL::ORIGIN+(pe_target_0-pvpoint));
 		Sphere_point sp_0(sp_point_0);
 		SVertex_handle sv_0 = SM.new_svertex(sp_0);
@@ -208,7 +208,7 @@ void k3d_to_nef(const k3d::mesh::points_t& Points, const k3d::polyhedron::const_
 		SVertex_handle sv_prev = sv_0;
 
     do {
-      Point_3 pe_target = points[Polyhedron.edge_points[edge]]; 
+      Point_3 pe_target = points[Polyhedron.vertex_points[edge]];
       Point_3 sp_point = CGAL::ORIGIN+(pe_target-pvpoint);
       Sphere_point sp(sp_point);
       SVertex_handle sv = SM.new_svertex(sp);
