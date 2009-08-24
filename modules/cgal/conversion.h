@@ -79,11 +79,11 @@ public:
 		return_if_fail(se!=0);
 		SHalfedge_around_facet_const_circulator hc_start(se);
 		SHalfedge_around_facet_const_circulator hc_end(hc_start);
-		const k3d::uint_t face_first_edge = m_polyhedron.edge_points.size();
+		const k3d::uint_t face_first_edge = m_polyhedron.vertex_points.size();
 		CGAL_For_all(hc_start,hc_end)
 		{
-			m_polyhedron.edge_points.push_back(m_vertex_indices[hc_start->source()->center_vertex()]);
-			m_polyhedron.clockwise_edges.push_back(m_polyhedron.edge_points.size());
+			m_polyhedron.vertex_points.push_back(m_vertex_indices[hc_start->source()->center_vertex()]);
+			m_polyhedron.clockwise_edges.push_back(m_polyhedron.vertex_points.size());
 			m_polyhedron.edge_selections.push_back(0.0);
 		}
 		m_polyhedron.clockwise_edges.back() = face_first_edge;
@@ -100,11 +100,11 @@ public:
 			return_if_fail(se!=0);
 			SHalfedge_around_facet_const_circulator hole_start(se);
 			SHalfedge_around_facet_const_circulator hole_end(hole_start);
-			const k3d::uint_t hole_first_edge = m_polyhedron.edge_points.size();
+			const k3d::uint_t hole_first_edge = m_polyhedron.vertex_points.size();
 			CGAL_For_all(hole_start,hole_end)
 			{
-				m_polyhedron.edge_points.push_back(m_vertex_indices[hole_start->source()->center_vertex()]);
-				m_polyhedron.clockwise_edges.push_back(m_polyhedron.edge_points.size());
+				m_polyhedron.vertex_points.push_back(m_vertex_indices[hole_start->source()->center_vertex()]);
+				m_polyhedron.clockwise_edges.push_back(m_polyhedron.vertex_points.size());
 				m_polyhedron.edge_selections.push_back(0.0);
 			}
 			m_polyhedron.clockwise_edges.back() = hole_first_edge;

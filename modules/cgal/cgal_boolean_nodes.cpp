@@ -63,13 +63,13 @@ void merge_coplanar_faces(const k3d::mesh::points_t& Points, k3d::polyhedron::pr
 	
 	k3d::mesh::bools_t boundary_edges;
 	k3d::mesh::indices_t companions;
-	k3d::polyhedron::create_edge_adjacency_lookup(Polyhedron.edge_points, Polyhedron.clockwise_edges, boundary_edges, companions);
+	k3d::polyhedron::create_edge_adjacency_lookup(Polyhedron.vertex_points, Polyhedron.clockwise_edges, boundary_edges, companions);
 	
 	// Calculate the face normals
 	k3d::mesh::normals_t face_normals(Polyhedron.face_first_loops.size());
 	for(k3d::uint_t face = face_begin; face != face_end; ++face)
 	{
-		face_normals[face] = k3d::normalize(k3d::polyhedron::normal(Polyhedron.edge_points, Polyhedron.clockwise_edges, Points, Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]));
+		face_normals[face] = k3d::normalize(k3d::polyhedron::normal(Polyhedron.vertex_points, Polyhedron.clockwise_edges, Points, Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]));
 	}
 	
 	k3d::mesh::indices_t edge_faces;
@@ -84,16 +84,16 @@ void merge_collinear_edges(const k3d::mesh::points_t& Points, k3d::polyhedron::p
 {
 	const k3d::uint_t face_begin = 0;
 	const k3d::uint_t face_end = Polyhedron.face_first_loops.size();
-	k3d::mesh::selection_t input_edge_selection(Polyhedron.edge_points.size(), 1.0);
+	k3d::mesh::selection_t input_edge_selection(Polyhedron.vertex_points.size(), 1.0);
 	
 	k3d::mesh::bools_t boundary_edges;
 	k3d::mesh::indices_t companions;
-	k3d::polyhedron::create_edge_adjacency_lookup(Polyhedron.edge_points, Polyhedron.clockwise_edges, boundary_edges, companions);
+	k3d::polyhedron::create_edge_adjacency_lookup(Polyhedron.vertex_points, Polyhedron.clockwise_edges, boundary_edges, companions);
 	
 	k3d::mesh::counts_t vertex_valences;
-	k3d::polyhedron::create_vertex_valence_lookup(Points.size(), Polyhedron.edge_points, vertex_valences);
+	k3d::polyhedron::create_vertex_valence_lookup(Points.size(), Polyhedron.vertex_points, vertex_valences);
 	k3d::mesh::indices_t redundant_edges;
-	k3d::polyhedron::mark_collinear_edges(redundant_edges, input_edge_selection, Points, Polyhedron.edge_points, Polyhedron.clockwise_edges, vertex_valences, boundary_edges, companions, Threshold);
+	k3d::polyhedron::mark_collinear_edges(redundant_edges, input_edge_selection, Points, Polyhedron.vertex_points, Polyhedron.clockwise_edges, vertex_valences, boundary_edges, companions, Threshold);
 
 	k3d::euler::kill_edge_and_vertex(Polyhedron, redundant_edges, boundary_edges, companions, Points.size());
 }
