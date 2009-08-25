@@ -50,13 +50,14 @@ static void add_nodes(k3d::mesh& Mesh, Lib3dsFile* file, Lib3dsNode* node, k3d::
 			polyhedron.face_loop_counts.push_back(1);
 			polyhedron.face_selections.push_back(0);
 			polyhedron.face_materials.push_back(Material);
-			polyhedron.loop_first_edges.push_back(polyhedron.edge_points.size());
+			polyhedron.loop_first_edges.push_back(polyhedron.clockwise_edges.size());
 
 			for(int j = 0; j != 3; ++j)
 			{
-				polyhedron.edge_points.push_back(f->points[j] + offset);
-				polyhedron.clockwise_edges.push_back(polyhedron.edge_points.size());
+				polyhedron.clockwise_edges.push_back(polyhedron.clockwise_edges.size() + 1);
 				polyhedron.edge_selections.push_back(0);
+				polyhedron.vertex_points.push_back(f->points[j] + offset);
+				polyhedron.vertex_selections.push_back(0);
 			}
 			polyhedron.clockwise_edges.back() = polyhedron.loop_first_edges.back();
 		}
