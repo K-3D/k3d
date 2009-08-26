@@ -27,7 +27,8 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/mesh_simple_deformation_modifier.h>
+#include "mesh_modifier.h"
+#include <k3dsdk/node.h>
 #include <k3dsdk/properties.h>
 
 namespace module
@@ -40,9 +41,9 @@ namespace deformation
 // tweak_points
 
 class tweak_points :
-	public k3d::mesh_simple_deformation_modifier
+	public _k3d::mesh_modifier<k3d::node>
 {
-	typedef k3d::mesh_simple_deformation_modifier base;
+	typedef _k3d::mesh_modifier<k3d::node> base;
 	typedef std::pair<k3d::mesh::indices_t, k3d::mesh::points_t> tweaks_t;
 
 public:
@@ -50,14 +51,32 @@ public:
 		base(Factory, Document),
 		m_tweaks(init_owner(*this) + init_name("tweaks") + init_label(_("Tweaks")) + init_description(_("A pair of indices_t and points_t arrays, indicating which positions to set")) + init_value(tweaks_t()))
 	{
-		m_tweaks.changed_signal().connect(make_update_mesh_slot());
+		m_tweaks.changed_signal().connect(k3d::hint::converter<
+				k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
 	}
 
-	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
+	void on_execute(const std::vector<k3d::ihint*>& Hints, const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		k3d::bool_t reset = Hints.empty();
+		for(k3d::uint_t i = 0; i != Hints.size(); ++i)
+		{
+			if(!dynamic_cast<k3d::hint::mesh_geometry_changed*>(Hints[i]) && !dynamic_cast<k3d::hint::selection_changed*>(Hints[i]))
+				reset = true;
+		}
+
+		if(reset)
+		{
+			Output = Input;
+			if(!m_tweaked_points || m_tweaked_points->size() != Output.points->size())
+				m_tweaked_points = Output.points;
+		}
+
+		k3d::mesh::points_t& output_points = m_tweaked_points.writable();
+
 		const tweaks_t tweaks = m_tweaks.pipeline_value();
 		const k3d::uint_t tweaks_begin = 0;
 		const k3d::uint_t tweaks_end = tweaks.first.size();
+		const k3d::uint_t point_count = output_points.size();
 		return_if_fail(tweaks_end == tweaks.second.size());
 		k3d::state_change_set* change_set = document().state_recorder().current_change_set();
 		if(change_set)
@@ -65,7 +84,9 @@ public:
 			k3d::mesh::points_t old_positions;
 			for(k3d::uint_t i = tweaks_begin; i != tweaks_end; ++i)
 			{
-				old_positions.push_back(OutputPoints[tweaks.first[i]]);
+				const k3d::uint_t point_idx = tweaks.first[i];
+				if(point_idx < point_count)
+					old_positions.push_back(output_points[point_idx]);
 			}
 			// If undo/redo is being recorded, we need to store the old positions at the new tweak indices for the old state:
 			change_set->record_old_state(new tweaks_container(m_tweaks, tweaks.first, old_positions));
@@ -75,8 +96,11 @@ public:
 
 		for(k3d::uint_t i = tweaks_begin; i != tweaks_end; ++i)
 		{
-			OutputPoints[tweaks.first[i]] = tweaks.second[i];
+			const k3d::uint_t point_idx = tweaks.first[i];
+			if(point_idx < point_count)
+				output_points[point_idx] = tweaks.second[i];
 		}
+		Output.points = m_tweaked_points;
 	}
 
 	void save(k3d::xml::element& Element, const k3d::ipersistent::save_context& Context)
@@ -145,6 +169,8 @@ public:
 
 private:
 	k3d_data(tweaks_t, immutable_name, change_signal, no_undo, local_storage, no_constraint, writable_property, no_serialization) m_tweaks;
+	/// Stores the cumulative result of all the tweaks
+	k3d::pipeline_data<k3d::mesh::points_t> m_tweaked_points;
 
 	class tweaks_container :
 		public k3d::istate_container
