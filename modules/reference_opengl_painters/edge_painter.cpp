@@ -70,15 +70,29 @@ public:
 	
 			const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
 			const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+			const k3d::uint_t edge_count = polyhedron->clockwise_edges.size();
 			
 			glBegin(GL_LINES);
-			const k3d::uint_t edge_count = polyhedron->clockwise_edges.size();
+
+			// Render selected split-edges before unselected, so the selection is always visible
+			k3d::gl::color3d(selected_color);
 			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 			{
-				k3d::gl::color3d(polyhedron->edge_selections[edge] ? selected_color : color);
+				if(!polyhedron->edge_selections[edge])
+					continue;
 				k3d::gl::vertex3d(points[polyhedron->vertex_points[edge]]);
 				k3d::gl::vertex3d(points[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]]);
 			}
+
+			k3d::gl::color3d(color);
+			for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
+			{
+				if(polyhedron->edge_selections[edge])
+					continue;
+				k3d::gl::vertex3d(points[polyhedron->vertex_points[edge]]);
+				k3d::gl::vertex3d(points[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]]);
+			}
+
 			glEnd();
 		}
 	}
