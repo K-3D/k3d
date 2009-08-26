@@ -257,10 +257,10 @@ void select_nearest_point(const k3d::mesh::points_t& Points, const k3d::selectio
 }
 
 /// Convenience function used to choose whichever edge is closest to the given window coordinates
-void select_nearest_edge(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::points_t& Points, const k3d::selection::id Edge, const k3d::point2& Coordinates, const double ScreenHeight, const GLdouble ModelViewMatrix[16], const GLdouble ProjectionMatrix[16], const GLint Viewport[4], k3d::selection::id& OutputEdge, double& OutputDistance)
+void select_nearest_edge(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::points_t& Points, const k3d::selection::id Edge, const k3d::point2& Coordinates, const k3d::double_t ScreenHeight, const GLdouble ModelViewMatrix[16], const GLdouble ProjectionMatrix[16], const GLint Viewport[4], k3d::selection::id& OutputEdge, k3d::double_t& OutputDistance)
 {
-	double x1, y1, x2, y2;
-	double unused;
+	k3d::double_t x1, y1, x2, y2;
+	k3d::double_t unused;
 
 	// First edge end : S1
 	gluProject(
@@ -291,22 +291,22 @@ void select_nearest_edge(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh
 	const k3d::point2 S2(x2, ScreenHeight - y2);
 
 	// Coordinates to segment distance
-	double distance = 0;
+	k3d::double_t distance = 0;
 
 	const k3d::vector2 edge = S2 - S1;
 	const k3d::vector2 w = Coordinates - S1;
 
-	const double c1 = w * edge;
+	const k3d::double_t c1 = w * edge;
 	if(c1 <= 0)
 		distance = k3d::distance(Coordinates, S1);
 	else
 	{
-		const double c2 = edge * edge;
+		const k3d::double_t c2 = edge * edge;
 		if(c2 <= c1)
 			distance = k3d::distance(Coordinates, S2);
 		else
 		{
-			const double b = c1 / c2;
+			const k3d::double_t b = c1 / c2;
 			const k3d::point2 middlepoint = S1 + b * edge;
 			distance = k3d::distance(Coordinates, middlepoint);
 		}
@@ -759,10 +759,10 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, bool 
 	return pick_point(Coordinates, records, Backfacing);
 }
 
-k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, bool Backfacing)
+k3d::selection::record control::pick_edge(const k3d::point2& Coordinates, bool Backfacing)
 {
 	k3d::selection::records records;
-	return pick_split_edge(Coordinates, records, Backfacing);
+	return pick_edge(Coordinates, records, Backfacing);
 }
 
 k3d::selection::record control::pick_component(const k3d::selection::type Component, const k3d::point2& Coordinates, bool Backfacing)
@@ -1089,15 +1089,16 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 	return k3d::selection::record::empty_record();
 }
 
-k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
+k3d::selection::record control::pick_edge(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
 {
 	// Draw everything (will find nearest line if some other component type is picked)
 	k3d::gl::selection_state selection_state;
 	selection_state.exclude_unselected_nodes = true;
 	selection_state.select_backfacing = Backfacing;
 	selection_state.select_component.insert(k3d::selection::EDGE);
+	selection_state.select_component.insert(k3d::selection::FACE);
 
-	const double sensitivity = 5;
+	const k3d::double_t sensitivity = 5;
 	const k3d::rectangle selection_region(
 		Coordinates[0] - sensitivity,
 		Coordinates[0] + sensitivity,
@@ -1110,80 +1111,111 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 
 	Records = get_selection(selection_state, selection_region, view_matrix, projection_matrix, viewport);
 	std::sort(Records.begin(), Records.end(), detail::sort_by_zmin());
+
+k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+std::copy(Records.begin(), Records.end(), std::ostream_iterator<k3d::selection::record>(k3d::log(), "\n"));
+k3d::log() << std::endl;
+
 	if(Records.empty())
 		return k3d::selection::record::empty_record();
 
 	const k3d::selection::record& record = Records.front();
 
-	k3d::inode* const node = k3d::selection::get_node(record);
-	if(!node)
-		return k3d::selection::record::empty_record();
-
-	k3d::mesh* const mesh = k3d::selection::get_mesh(record);
-	if(!mesh)
-		return k3d::selection::record::empty_record();
-
+	k3d::selection::id node_id = k3d::selection::null_id();
+	k3d::inode* node = 0;
 	GLdouble model_view_matrix[16];
-	k3d::transpose(k3d::gl::matrix(view_matrix) * k3d::node_to_world_matrix(*node)).CopyArray(model_view_matrix);
+	k3d::selection::id mesh_id = k3d::selection::null_id();
+	k3d::mesh* mesh = 0;
+	k3d::selection::id primitive_id = k3d::selection::null_id();
+	const k3d::mesh::primitive* primitive = 0;
+	k3d::selection::id edge_id = k3d::selection::null_id();
+	k3d::double_t edge_distance = std::numeric_limits<k3d::double_t>::max();
 
-	std::map<k3d::selection::type, k3d::selection::id> tokens;
 	for(k3d::selection::record::tokens_t::const_iterator token = record.tokens.begin(); token != record.tokens.end(); ++token)
-		tokens.insert(std::make_pair(token->type, token->id));
-
-  assert_not_implemented();
-/*
-	if(tokens.count(k3d::selection::ABSOLUTE_SPLIT_EDGE))
 	{
-		return record;
-	}
-
-	double distance = std::numeric_limits<double>::max();
-	k3d::selection::id selected_edge;
-
-	if(tokens.count(k3d::selection::ABSOLUTE_FACE))
-	{
-		if(mesh->polyhedra && mesh->polyhedra->face_first_loops && mesh->polyhedra->face_loop_counts && mesh->polyhedra->loop_first_edges && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
+		switch(token->type)
 		{
-			const k3d::selection::id face = tokens[k3d::selection::ABSOLUTE_FACE];
-
-			const size_t face_loop_begin = (*mesh->polyhedra->face_first_loops)[face];
-			const size_t face_loop_end = face_loop_begin + (*mesh->polyhedra->face_loop_counts)[face];
-			for(size_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
+			case k3d::selection::NODE:
 			{
-				const size_t first_edge = (*mesh->polyhedra->loop_first_edges)[face_loop];
-				for(size_t edge = first_edge; ; )
-				{
-					detail::select_nearest_edge(
-						*mesh->polyhedra->edge_points,
-					*mesh->polyhedra->clockwise_edges,
-						*mesh->points,
-						edge,
-						Coordinates,
-						get_height(),
-						model_view_matrix,
-						projection_matrix,
-						viewport,
-						selected_edge,
-						distance);
+				node_id = token->id;
+				node = k3d::selection::get_node(record);
+				return_val_if_fail(node, k3d::selection::record::empty_record());
 
-					edge = (*mesh->polyhedra->clockwise_edges)[edge];
-					if(edge == first_edge)
-						break;
+				k3d::transpose(k3d::gl::matrix(view_matrix) * k3d::node_to_world_matrix(*node)).CopyArray(model_view_matrix);
+				break;
+			}
+			case k3d::selection::MESH:
+			{
+				mesh_id = token->id;
+				mesh = k3d::selection::get_mesh(record);
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(mesh->points, k3d::selection::record::empty_record());
+				break;
+			}
+			case k3d::selection::PRIMITIVE:
+			{
+				primitive_id = token->id;
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(primitive_id < mesh->primitives.size(), k3d::selection::record::empty_record());
+				primitive = mesh->primitives[primitive_id].get();
+				break;
+			}
+			case k3d::selection::EDGE:
+			{
+				return record;
+			}
+			case k3d::selection::FACE:
+			{
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(primitive, k3d::selection::record::empty_record());
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh, *primitive));
+				return_val_if_fail(polyhedron, k3d::selection::record::empty_record());
+
+				const k3d::selection::id face = token->id;
+
+				const k3d::uint_t face_loop_begin = polyhedron->face_first_loops[face];
+				const k3d::uint_t face_loop_end = face_loop_begin + polyhedron->face_loop_counts[face];
+				for(k3d::uint_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
+				{
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[face_loop];
+					for(k3d::uint_t edge = first_edge; ; )
+					{
+						detail::select_nearest_edge(
+							polyhedron->vertex_points,
+							polyhedron->clockwise_edges,
+							*mesh->points,
+							edge,
+							Coordinates,
+							get_height(),
+							model_view_matrix,
+							projection_matrix,
+							viewport,
+							edge_id,
+							edge_distance);
+
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
 				}
+				break;
 			}
 		}
 	}
 
-	if(distance < std::numeric_limits<double>::max())
+	if(edge_distance < std::numeric_limits<double>::max())
 	{
 		k3d::selection::record record = k3d::selection::record::empty_record();
-		record.tokens.push_back(k3d::selection::token(k3d::selection::NODE, tokens[k3d::selection::NODE]));
-		record.tokens.push_back(k3d::selection::token(k3d::selection::MESH, tokens[k3d::selection::MESH]));
-		record.tokens.push_back(k3d::selection::token(k3d::selection::ABSOLUTE_SPLIT_EDGE, selected_edge));
+		record.tokens.push_back(k3d::selection::token(k3d::selection::NODE, node_id));
+		record.tokens.push_back(k3d::selection::token(k3d::selection::MESH, mesh_id));
+		record.tokens.push_back(k3d::selection::token(k3d::selection::PRIMITIVE, primitive_id));
+		record.tokens.push_back(k3d::selection::token(k3d::selection::EDGE, edge_id));
+
+k3d::log() << debug << "got it: " << record << std::endl;
+
 		return record;
 	}
 
-*/
 	return k3d::selection::record::empty_record();
 }
 
@@ -1236,7 +1268,7 @@ k3d::selection::record control::pick_object(const k3d::point2& Coordinates, k3d:
 			return pick_point(Coordinates, Records, Backfacing);
 			break;
 		case selection::EDGE:
-			return pick_split_edge(Coordinates, Records, Backfacing);
+			return pick_edge(Coordinates, Records, Backfacing);
 			break;
 		case selection::SURFACE:
 			return pick_component(k3d::selection::SURFACE, Coordinates, Records, Backfacing);
