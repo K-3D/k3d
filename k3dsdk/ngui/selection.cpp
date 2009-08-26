@@ -247,8 +247,6 @@ struct deselect_all
 template<typename UpdatePolicyT>
 void merge_interactive_selection(const nodes_t& Nodes, const UpdatePolicyT& UpdatePolicy, const k3d::selection::records& InteractiveSelection)
 {
-std::copy(InteractiveSelection.begin(), InteractiveSelection.end(), std::ostream_iterator<k3d::selection::record>(k3d::log(), "\n"));
-
 	for(nodes_t::const_iterator node = Nodes.begin(); node != Nodes.end(); ++node)
 	{
 		if(classes::MeshInstance() != (*node)->factory().factory_id())
