@@ -78,7 +78,7 @@ public:
 	}
 
 	template<typename FunctorT>
-	void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::mesh::points_t& Points, const k3d::color& Color, const FunctorT& EdgeTest)
+	void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::mesh::points_t& Points, const k3d::color& Color, FunctorT EdgeTest)
 	{
 		const size_t edge_count = Polyhedron.clockwise_edges.size();
 

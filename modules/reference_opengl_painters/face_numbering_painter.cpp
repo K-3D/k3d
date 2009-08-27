@@ -91,7 +91,7 @@ public:
 	}
 
 	template<typename FunctorT>
-	static void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::typed_array<k3d::point3>& Centers, const k3d::typed_array<k3d::normal3>& Normals, const k3d::color& Color, const double Offset, const FunctorT& FaceTest, FTFont& Font)
+	static void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::typed_array<k3d::point3>& Centers, const k3d::typed_array<k3d::normal3>& Normals, const k3d::color& Color, const double Offset, FunctorT FaceTest, FTFont& Font)
 	{
 		k3d::gl::color3d(Color);
 

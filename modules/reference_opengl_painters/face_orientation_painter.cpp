@@ -72,7 +72,7 @@ public:
 	}
 
 	template<typename FunctorT>
-	static void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::mesh::points_t& Points, const k3d::typed_array<k3d::point3>& Centers, const k3d::color& Color, const FunctorT& FaceTest)
+	static void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::mesh::points_t& Points, const k3d::typed_array<k3d::point3>& Centers, const k3d::color& Color, FunctorT FaceTest)
 	{
 		const k3d::uint_t face_count = Polyhedron.face_first_loops.size();
 

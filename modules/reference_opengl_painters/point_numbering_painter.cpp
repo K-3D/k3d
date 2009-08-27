@@ -89,7 +89,7 @@ public:
 	}
 
 	template<typename FunctorT>
-	static void draw(const k3d::mesh& Mesh, const k3d::typed_array<k3d::point3>& Points, const k3d::color& Color, const FunctorT& PointTest, FTFont& Font)
+	static void draw(const k3d::mesh& Mesh, const k3d::typed_array<k3d::point3>& Points, const k3d::color& Color, FunctorT PointTest, FTFont& Font)
 	{
 		k3d::gl::color3d(Color);
 
