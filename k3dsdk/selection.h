@@ -37,8 +37,6 @@ namespace k3d
 
 class inode;
 
-class mesh;
-
 /// Functor object for deciding whether an object is selected (i.e. has a non-zero selection weight)
 struct is_selected
 {
@@ -137,7 +135,6 @@ typedef std::vector<record> records;
 const record make_record(inode*);
 
 inode* get_node(const record& Record);
-mesh* get_mesh(const record& Record);
 
 template<typename T>
 bool is_selected(T* Object)

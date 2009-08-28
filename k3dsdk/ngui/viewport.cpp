@@ -855,7 +855,7 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 			case k3d::selection::MESH:
 			{
 				mesh_id = token->id;
-				mesh = k3d::selection::get_mesh(record);
+				mesh = selection::get_mesh(node, mesh_id);
 				return_val_if_fail(mesh, k3d::selection::record::empty_record());
 				return_val_if_fail(mesh->points, k3d::selection::record::empty_record());
 				break;
@@ -1112,10 +1112,6 @@ k3d::selection::record control::pick_edge(const k3d::point2& Coordinates, k3d::s
 	Records = get_selection(selection_state, selection_region, view_matrix, projection_matrix, viewport);
 	std::sort(Records.begin(), Records.end(), detail::sort_by_zmin());
 
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-std::copy(Records.begin(), Records.end(), std::ostream_iterator<k3d::selection::record>(k3d::log(), "\n"));
-k3d::log() << std::endl;
-
 	if(Records.empty())
 		return k3d::selection::record::empty_record();
 
@@ -1147,7 +1143,7 @@ k3d::log() << std::endl;
 			case k3d::selection::MESH:
 			{
 				mesh_id = token->id;
-				mesh = k3d::selection::get_mesh(record);
+				mesh = selection::get_mesh(node, mesh_id);
 				return_val_if_fail(mesh, k3d::selection::record::empty_record());
 				return_val_if_fail(mesh->points, k3d::selection::record::empty_record());
 				break;
@@ -1210,8 +1206,6 @@ k3d::log() << std::endl;
 		record.tokens.push_back(k3d::selection::token(k3d::selection::MESH, mesh_id));
 		record.tokens.push_back(k3d::selection::token(k3d::selection::PRIMITIVE, primitive_id));
 		record.tokens.push_back(k3d::selection::token(k3d::selection::EDGE, edge_id));
-
-k3d::log() << debug << "got it: " << record << std::endl;
 
 		return record;
 	}

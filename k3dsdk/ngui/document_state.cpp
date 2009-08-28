@@ -101,68 +101,6 @@ const k3d::ienumeration_property::enumeration_values_t& selection_mode_values()
 }
 
 /*
-const bool is_point_selected(const k3d::selection::record& Record)
-{
-	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
-	if(!mesh)
-		return false;
-
-	if(mesh->point_selection)
-	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::POINT);
-		if(id < mesh->point_selection->size())
-			return (*mesh->point_selection)[id];
-	}
-
-	return false;
-}
-
-const bool is_split_edge_selected(const k3d::selection::record& Record)
-{
-	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
-	if(!mesh)
-		return false;
-
-	if(mesh->polyhedra && mesh->polyhedra->edge_selection)
-	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_SPLIT_EDGE);
-		if(id < mesh->polyhedra->edge_selection->size())
-			return (*mesh->polyhedra->edge_selection)[id];
-	}
-
-	if(mesh->linear_curve_groups && mesh->linear_curve_groups->curve_selection)
-	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_LINEAR_CURVE);
-		if(id < mesh->linear_curve_groups->curve_selection->size())
-			return (*mesh->linear_curve_groups->curve_selection)[id];
-	}
-
-	if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->curve_selection)
-	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_CUBIC_CURVE);
-		if(id < mesh->cubic_curve_groups->curve_selection->size())
-			return (*mesh->cubic_curve_groups->curve_selection)[id];
-	}
-
-	return false;
-}
-
-const bool is_uniform_selected(const k3d::selection::record& Record)
-{
-	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
-	if(!mesh)
-		return false;
-
-	if(mesh->polyhedra && mesh->polyhedra->face_selection)
-	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_FACE);
-		if(id < mesh->polyhedra->face_selection->size())
-			return (*mesh->polyhedra->face_selection)[id];
-	}
-
-	return false;
-}
-
 void deselect_gaps(k3d::mesh_selection::records_t& Records)
 {
     Records.insert(Records.begin(), k3d::mesh_selection::record(0, size_t(-1), 0.0));
@@ -945,23 +883,6 @@ assert_not_implemented();
 		return m_node_selection;
 	}
 	
-	const bool is_selected(const k3d::selection::record& Record)
-	{
-		switch(m_selection_mode.internal_value())
-		{
-			case SELECT_NODES:
-				return is_selected(k3d::selection::get_node(Record));
-			case SELECT_POINTS:
-				return detail::is_point_selected(Record);
-			case SELECT_SPLIT_EDGES:
-				return detail::is_split_edge_selected(Record);
-			case SELECT_UNIFORM:
-				return detail::is_uniform_selected(Record);
-		}
-
-		return false;
-	}
-
 	void selection_changed()
 	{
 		// Switch to node selection mode when there's no selected mesh in the document
@@ -1524,15 +1445,6 @@ tool& document_state::rotate_tool()
 tool& document_state::scale_tool()
 {
 	return *m_implementation->m_scale_tool;
-}
-
-const bool document_state::is_selected(const k3d::selection::record& Selection)
-{
-	assert_not_implemented();
-	return false;
-/*
-	return m_implementation->is_selected(Selection);
-*/
 }
 
 bool document_state::pick_backfacing()

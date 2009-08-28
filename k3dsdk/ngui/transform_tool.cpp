@@ -628,7 +628,7 @@ void transform_tool::lbutton_down(viewport::control& Viewport, const k3d::point2
 	// If a node was hit ...
 	if(k3d::selection::get_node(m_mouse_down_selection))
 	{
-		if(m_document_state.is_selected(m_mouse_down_selection))
+		if(selection::state(m_document_state.document()).is_selected(m_mouse_down_selection))
 			lmb_down_selected();
 		else
 			lmb_down_deselected();

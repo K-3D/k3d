@@ -102,8 +102,6 @@ public:
 	/// Returns a reference to the builtin Scale Tool that can be passed to set_active_tool()
 	tool& scale_tool();
 
-	const bool is_selected(const k3d::selection::record&);
-	
 	/// True if backfacing components are to be picked
 	bool pick_backfacing();
 	

@@ -265,6 +265,7 @@ inode* get_node(const record& Record)
 	return 0;
 }
 
+/*
 ///////////////////////////////////////////////////////////////////////////////////
 // get_mesh
 
@@ -282,6 +283,26 @@ mesh* get_mesh(const record& Record)
 
 	return boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_internal_value());
 }
+
+///////////////////////////////////////////////////////////////////////////////////
+// get_mesh
+
+const mesh::primitive* get_primitive(const record& Record)
+{
+	const mesh* const m = get_mesh(Record);
+	if(!mesh)
+		return 0;
+
+	const selection::id primitive_id = Record.get_id(PRIMITIVE);
+	if(primitive_id == null_id())
+		return 0;
+
+	primitive_id = token->id;
+	return_val_if_fail(mesh, 0);
+	return_val_if_fail(primitive_id < mesh->primitives.size(), 0);
+	return mesh->primitives[primitive_id].get();
+}
+*/
 
 } // namespace selection
 

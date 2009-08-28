@@ -24,6 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/selection.h>
 
@@ -102,6 +103,8 @@ public:
 
 	/// Returns true iff the given node is selected.
 	const bool_t is_selected(inode& Node);
+	/// Returns true iff the given component is already selected.
+	const bool_t is_selected(const k3d::selection::record& Record);
 
 	/// Deselects one node.
 	void deselect(inode& Node);
@@ -122,6 +125,8 @@ private:
 	class implementation;
 	implementation& internal;
 };
+
+mesh* get_mesh(inode* Node, const k3d::selection::id& MeshID);
 
 } // namespace selection
 

@@ -22,7 +22,10 @@
 */
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/bicubic_patch.h>
+#include <k3dsdk/bilinear_patch.h>
 #include <k3dsdk/classes.h>
+#include <k3dsdk/cubic_curve.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/geometry.h>
 #include <k3dsdk/idocument.h>
@@ -32,11 +35,15 @@
 #include <k3dsdk/imetadata.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/inode_selection.h>
+#include <k3dsdk/linear_curve.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/nodes.h>
+#include <k3dsdk/nurbs_curve.h>
+#include <k3dsdk/nurbs_patch.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/selection.h>
@@ -728,6 +735,315 @@ const bool_t state::is_selected(inode& Node)
 		return internal.node_selection()->selection_weight(Node);
 }
 
+static const bool_t is_curve_selected(const k3d::selection::record& Record)
+{
+	k3d::selection::id node_id = k3d::selection::null_id();
+	k3d::inode* node = 0;
+	k3d::selection::id mesh_id = k3d::selection::null_id();
+	k3d::mesh* mesh = 0;
+	k3d::selection::id primitive_id = k3d::selection::null_id();
+	const k3d::mesh::primitive* primitive = 0;
+
+	for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
+	{
+		switch(token->type)
+		{
+			case k3d::selection::NODE:
+			{
+				node_id = token->id;
+				node = k3d::selection::get_node(Record);
+				return_val_if_fail(node, false);
+				break;
+			}
+			case k3d::selection::MESH:
+			{
+				mesh_id = token->id;
+				mesh = selection::get_mesh(node, mesh_id);
+				return_val_if_fail(mesh, false);
+				break;
+			}
+			case k3d::selection::PRIMITIVE:
+			{
+				primitive_id = token->id;
+				return_val_if_fail(mesh, false);
+				return_val_if_fail(primitive_id < mesh->primitives.size(), false);
+				primitive = mesh->primitives[primitive_id].get();
+				break;
+			}
+			case k3d::selection::CURVE:
+			{
+				return_val_if_fail(mesh, false);
+				return_val_if_fail(primitive, false);
+
+				const k3d::selection::id curve = token->id;
+
+				boost::scoped_ptr<k3d::linear_curve::const_primitive> linear_curve(k3d::linear_curve::validate(*mesh, *primitive));
+				if(linear_curve)
+				{
+					return_val_if_fail(curve < linear_curve->curve_selections.size(), false);
+					return linear_curve->curve_selections[curve];
+				}
+
+				boost::scoped_ptr<k3d::cubic_curve::const_primitive> cubic_curve(k3d::cubic_curve::validate(*mesh, *primitive));
+				if(cubic_curve)
+				{
+					return_val_if_fail(curve < cubic_curve->curve_selections.size(), false);
+					return cubic_curve->curve_selections[curve];
+				}
+
+				boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(*mesh, *primitive));
+				if(nurbs_curve)
+				{
+					return_val_if_fail(curve < nurbs_curve->curve_selections.size(), false);
+					return nurbs_curve->curve_selections[curve];
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+static const bool_t is_edge_selected(const k3d::selection::record& Record)
+{
+	k3d::selection::id node_id = k3d::selection::null_id();
+	k3d::inode* node = 0;
+	k3d::selection::id mesh_id = k3d::selection::null_id();
+	k3d::mesh* mesh = 0;
+	k3d::selection::id primitive_id = k3d::selection::null_id();
+	const k3d::mesh::primitive* primitive = 0;
+
+	for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
+	{
+		switch(token->type)
+		{
+			case k3d::selection::NODE:
+			{
+				node_id = token->id;
+				node = k3d::selection::get_node(Record);
+				return_val_if_fail(node, false);
+				break;
+			}
+			case k3d::selection::MESH:
+			{
+				mesh_id = token->id;
+				mesh = selection::get_mesh(node, mesh_id);
+				return_val_if_fail(mesh, false);
+				break;
+			}
+			case k3d::selection::PRIMITIVE:
+			{
+				primitive_id = token->id;
+				return_val_if_fail(mesh, false);
+				return_val_if_fail(primitive_id < mesh->primitives.size(), false);
+				primitive = mesh->primitives[primitive_id].get();
+				break;
+			}
+			case k3d::selection::EDGE:
+			{
+				return_val_if_fail(mesh, false);
+				return_val_if_fail(primitive, false);
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh, *primitive));
+				return_val_if_fail(polyhedron, false);
+
+				const k3d::selection::id edge = token->id;
+				return_val_if_fail(edge < polyhedron->clockwise_edges.size(), false);
+				return polyhedron->edge_selections[edge];
+			}
+		}
+	}
+
+	return false;
+}
+
+static const bool_t is_face_selected(const k3d::selection::record& Record)
+{
+	k3d::selection::id node_id = k3d::selection::null_id();
+	k3d::inode* node = 0;
+	k3d::selection::id mesh_id = k3d::selection::null_id();
+	k3d::mesh* mesh = 0;
+	k3d::selection::id primitive_id = k3d::selection::null_id();
+	const k3d::mesh::primitive* primitive = 0;
+
+	for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
+	{
+		switch(token->type)
+		{
+			case k3d::selection::NODE:
+			{
+				node_id = token->id;
+				node = k3d::selection::get_node(Record);
+				return_val_if_fail(node, false);
+				break;
+			}
+			case k3d::selection::MESH:
+			{
+				mesh_id = token->id;
+				mesh = selection::get_mesh(node, mesh_id);
+				return_val_if_fail(mesh, false);
+				break;
+			}
+			case k3d::selection::PRIMITIVE:
+			{
+				primitive_id = token->id;
+				return_val_if_fail(mesh, false);
+				return_val_if_fail(primitive_id < mesh->primitives.size(), false);
+				primitive = mesh->primitives[primitive_id].get();
+				break;
+			}
+			case k3d::selection::FACE:
+			{
+				return_val_if_fail(mesh, false);
+				return_val_if_fail(primitive, false);
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh, *primitive));
+				return_val_if_fail(polyhedron, false);
+
+				const k3d::selection::id face = token->id;
+				return_val_if_fail(face < polyhedron->face_first_loops.size(), false);
+				return polyhedron->face_selections[face];
+			}
+		}
+	}
+
+	return false;
+}
+
+static const bool_t is_patch_selected(const k3d::selection::record& Record)
+{
+	k3d::selection::id node_id = k3d::selection::null_id();
+	k3d::inode* node = 0;
+	k3d::selection::id mesh_id = k3d::selection::null_id();
+	k3d::mesh* mesh = 0;
+	k3d::selection::id primitive_id = k3d::selection::null_id();
+	const k3d::mesh::primitive* primitive = 0;
+
+	for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
+	{
+		switch(token->type)
+		{
+			case k3d::selection::NODE:
+			{
+				node_id = token->id;
+				node = k3d::selection::get_node(Record);
+				return_val_if_fail(node, false);
+				break;
+			}
+			case k3d::selection::MESH:
+			{
+				mesh_id = token->id;
+				mesh = selection::get_mesh(node, mesh_id);
+				return_val_if_fail(mesh, false);
+				break;
+			}
+			case k3d::selection::PRIMITIVE:
+			{
+				primitive_id = token->id;
+				return_val_if_fail(mesh, false);
+				return_val_if_fail(primitive_id < mesh->primitives.size(), false);
+				primitive = mesh->primitives[primitive_id].get();
+				break;
+			}
+			case k3d::selection::PATCH:
+			{
+				return_val_if_fail(mesh, false);
+				return_val_if_fail(primitive, false);
+
+				const k3d::selection::id patch = token->id;
+
+				boost::scoped_ptr<k3d::bilinear_patch::const_primitive> bilinear_patch(k3d::bilinear_patch::validate(*mesh, *primitive));
+				if(bilinear_patch)
+				{
+					return_val_if_fail(patch < bilinear_patch->patch_selections.size(), false);
+					return bilinear_patch->patch_selections[patch];
+				}
+
+				boost::scoped_ptr<k3d::bicubic_patch::const_primitive> bicubic_patch(k3d::bicubic_patch::validate(*mesh, *primitive));
+				if(bicubic_patch)
+				{
+					return_val_if_fail(patch < bicubic_patch->patch_selections.size(), false);
+					return bicubic_patch->patch_selections[patch];
+				}
+
+				boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs_patch(k3d::nurbs_patch::validate(*mesh, *primitive));
+				if(nurbs_patch)
+				{
+					return_val_if_fail(patch < nurbs_patch->patch_selections.size(), false);
+					return nurbs_patch->patch_selections[patch];
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+static const bool_t is_point_selected(const k3d::selection::record& Record)
+{
+	k3d::selection::id node_id = k3d::selection::null_id();
+	k3d::inode* node = 0;
+	k3d::selection::id mesh_id = k3d::selection::null_id();
+	k3d::mesh* mesh = 0;
+
+	for(k3d::selection::record::tokens_t::const_iterator token = Record.tokens.begin(); token != Record.tokens.end(); ++token)
+	{
+		switch(token->type)
+		{
+			case k3d::selection::NODE:
+			{
+				node_id = token->id;
+				node = k3d::selection::get_node(Record);
+				return_val_if_fail(node, false);
+				break;
+			}
+			case k3d::selection::MESH:
+			{
+				mesh_id = token->id;
+				mesh = selection::get_mesh(node, mesh_id);
+				return_val_if_fail(mesh, false);
+				return_val_if_fail(mesh->point_selection, false);
+				break;
+			}
+			case k3d::selection::POINT:
+			{
+				return_val_if_fail(mesh, false);
+
+				const k3d::selection::id point = token->id;
+				return_val_if_fail(point < mesh->point_selection->size(), false);
+				return (*mesh->point_selection)[point];
+			}
+		}
+	}
+
+	return false;
+}
+
+const bool_t state::is_selected(const k3d::selection::record& Record)
+{
+	switch(internal.current_mode.internal_value())
+	{
+		case CURVE:
+			return is_curve_selected(Record);
+		case EDGE:
+			return is_edge_selected(Record);
+		case FACE:
+			return is_face_selected(Record);
+		case NODE:
+		{
+			k3d::inode* const node = k3d::selection::get_node(Record);
+			return node ? is_selected(*node) : false;
+		}
+		case PATCH:
+			return is_patch_selected(Record);
+		case POINT:
+			return is_point_selected(Record);
+		case SURFACE:
+			assert_not_implemented();
+			return false;
+	}
+
+	return false;
+}
+
 void state::deselect(inode& Node)
 {
 	if(internal.node_selection())
@@ -736,7 +1052,7 @@ void state::deselect(inode& Node)
 
 void state::deselect(const k3d::selection::record& Selection)
 {
-	select(k3d::selection::records(1, Selection));
+	deselect(k3d::selection::records(1, Selection));
 }
 
 void state::deselect(const k3d::selection::records& Selection)
@@ -808,6 +1124,17 @@ void state::deselect_all_nodes()
 {
 	if(internal.node_selection())
 		internal.node_selection()->deselect_all();
+}
+
+mesh* get_mesh(inode* Node, const k3d::selection::id& MeshID)
+{
+	return_val_if_fail(Node, 0);
+	return_val_if_fail(MeshID == 0, 0); // Should never get a node with more than one mesh!
+
+	imesh_source* const mesh_source = dynamic_cast<imesh_source*>(Node);
+	return_val_if_fail(mesh_source, 0);
+
+	return boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_internal_value());
 }
 
 } // namespace selection

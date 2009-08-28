@@ -123,7 +123,7 @@ struct selection_input_model::implementation :
 				}
 
 				if(extended_mode)
-					operation = m_document_state.is_selected(m_start_selection) ? DESELECT : SELECT;
+					operation = selection::state(m_document_state.document()).is_selected(m_start_selection) ? DESELECT : SELECT;
 			}
 		}
 
@@ -205,11 +205,11 @@ struct selection_input_model::implementation :
 			{
 				if(m_paint_mode)
 				{
-					m_motion_type = m_document_state.is_selected(m_start_selection) ? MOTION_PAINT_DESELECT : MOTION_PAINT_SELECT;
+					m_motion_type = selection::state(m_document_state.document()).is_selected(m_start_selection) ? MOTION_PAINT_DESELECT : MOTION_PAINT_SELECT;
 				}
 				else
 				{
-					m_motion_type = m_document_state.is_selected(m_start_selection) ? MOTION_RUBBER_BAND_DESELECT : MOTION_RUBBER_BAND_SELECT;
+					m_motion_type = selection::state(m_document_state.document()).is_selected(m_start_selection) ? MOTION_RUBBER_BAND_DESELECT : MOTION_RUBBER_BAND_SELECT;
 				}
 			}
 		}
@@ -274,7 +274,7 @@ struct selection_input_model::implementation :
 			case MOTION_PAINT_SELECT:
 			{
 				const k3d::selection::record selection = Viewport.pick_object(coordinates, m_paint_backfacing);
-				if(!m_document_state.is_selected(selection))
+				if(!selection::state(m_document_state.document()).is_selected(selection))
 				{
 					selection::state(m_document_state.document()).select(selection);
 				}
@@ -287,7 +287,7 @@ struct selection_input_model::implementation :
 			case MOTION_PAINT_DESELECT:
 			{
 				const k3d::selection::record selection = Viewport.pick_object(coordinates, m_paint_backfacing);
-				if(m_document_state.is_selected(selection))
+				if(selection::state(m_document_state.document()).is_selected(selection))
 				{
 					selection::state(m_document_state.document()).deselect(selection);
 				}

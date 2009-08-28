@@ -496,7 +496,7 @@ void snap_tool_detail::lbutton_down(viewport::control& Viewport, const k3d::poin
 	// If a node was hit ...
 	if(k3d::selection::get_node(m_mouse_down_selection))
 	{
-		if(m_document_state.is_selected(m_mouse_down_selection))
+		if(k3d::ngui::selection::state(m_document_state.document()).is_selected(m_mouse_down_selection))
 			lmb_down_selected();
 		else
 			lmb_down_deselected();
