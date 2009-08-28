@@ -239,6 +239,10 @@ const arguments_t parse_log_arguments(const arguments_t& Arguments, bool& Quit, 
 		{
 			g_color_level = true;
 		}
+		else if(argument->string_key == "no-color")
+		{
+			g_color_level = false;
+		}
 		else if(argument->string_key == "log-level")
 		{
 			if(argument->value[0] == "warning")
@@ -658,6 +662,7 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 			("locale", boost::program_options::value<k3d::string_t>(), "Overrides the path for loading locales")
 #endif // K3D_ENABLE_NLS
 			("log-level", boost::program_options::value<k3d::string_t>(), "Specifies the minimum message priority to log - valid values are \"warning\", \"information\", \"debug\" [default: warning].")
+			("no-color", "Disable color-coding of log messages based on their level.")
 			("options", boost::program_options::value<k3d::string_t>(), "Overrides the filepath for storing user options [default: /home/tshead/.k3d/options.k3d].")
 			("plugins", boost::program_options::value<k3d::string_t>(), "Overrides the path(s) for loading plugin libraries [default: /usr/local/k3d/lib/k3d].")
 			("script", boost::program_options::value<k3d::string_t>(), "Play the given script after startup (use - for stdin).")
