@@ -73,20 +73,15 @@ public:
 			
 		clean_vbo_state();
 		
-		bind_vertex_buffer(get_cached_data<vbo>(Mesh.points, ChangedSignal));
-
-		point_vbo& vbo = get_data<point_vbo>(&Mesh, this);
-		vbo.bind();
+		bind_vertex_buffer(get_cached_data<point_vbo>(Mesh.points, ChangedSignal).value(Mesh));
 		
-		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
-		
-		enable_blending();
 
-		color4d(color);
+		k3d::gl::color3d(color);
 		glDrawArrays(GL_POINTS, 0, Mesh.points->size());
 
 //assert_not_implemented();
@@ -113,7 +108,6 @@ public:
 		}
 */		
 		clean_vbo_state();
-		disable_blending();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
@@ -123,14 +117,12 @@ public:
 		if(!Mesh.points || Mesh.points->empty())
 			return;
 			
-		if (!SelectionState.select_points)
+		if (!SelectionState.select_component.count(k3d::selection::POINT))
 			return;
-		
-		bool valid_polyhedra = has_non_empty_polyhedra(Mesh);
 		
 		clean_vbo_state();
 
-		get_data<point_vbo>(&Mesh, this).bind();
+		bind_vertex_buffer(get_cached_data<point_vbo>(Mesh.points, ChangedSignal).value(Mesh));
 		
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
@@ -138,10 +130,11 @@ public:
 		const size_t point_count = Mesh.points->size();
 		for(size_t point = 0; point != point_count; ++point)
 		{
-			if (!valid_polyhedra || SelectionState.select_backfacing || 
-					(!SelectionState.select_backfacing && 
-							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
-			{
+			//TODO: restore backfacing selection
+//			if (!valid_polyhedra || SelectionState.select_backfacing ||
+//					(!SelectionState.select_backfacing &&
+//							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
+//			{
 				k3d::gl::push_selection_token(k3d::selection::POINT, point);
 	
 				glBegin(GL_POINTS);
@@ -149,7 +142,7 @@ public:
 				glEnd();
 	
 				k3d::gl::pop_selection_token(); // k3d::selection::POINT
-			}
+			//}
 		}
 
 		clean_vbo_state();
