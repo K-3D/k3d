@@ -21,8 +21,9 @@
  */
 
 #include "colored_selection_painter_gl.h"
-#include "normal_cache.h"
-#include "utility.h"
+//#include "normal_cache.h"
+//#include "utility.h"
+#include "painter_cache.h"
 #include "vbo.h"
 
 #include <k3d-i18n-config.h>
@@ -63,7 +64,7 @@ public:
 	{
 	}
 		
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -72,6 +73,8 @@ public:
 			
 		clean_vbo_state();
 		
+		bind_vertex_buffer(get_cached_data<vbo>(Mesh.points, ChangedSignal));
+
 		point_vbo& vbo = get_data<point_vbo>(&Mesh, this);
 		vbo.bind();
 		
@@ -83,7 +86,10 @@ public:
 		
 		enable_blending();
 
-assert_not_implemented();
+		color4d(color);
+		glDrawArrays(GL_POINTS, 0, Mesh.points->size());
+
+//assert_not_implemented();
 /*
 		size_t point_count = Mesh.points->size();
 		const selection_records_t& pselection = get_data<point_selection>(&Mesh, this).records(); // obtain selection data
@@ -110,7 +116,7 @@ assert_not_implemented();
 		disable_blending();
 	}
 	
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -147,18 +153,6 @@ assert_not_implemented();
 		}
 
 		clean_vbo_state();
-	}
-	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
-	{
-		return_if_fail(k3d::gl::extension::query_vbo());
-		
-		if (!Mesh.points || Mesh.points->empty())
-			return;
-		
-		schedule_data<point_vbo>(&Mesh, Hint, this);
-		schedule_data<point_selection>(&Mesh, Hint, this);
-		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 
 	static k3d::iplugin_factory& get_factory()

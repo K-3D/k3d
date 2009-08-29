@@ -108,7 +108,7 @@ public:
 		const k3d::color selected_color;
 	};
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
@@ -175,7 +175,7 @@ public:
 		std::vector<k3d::point3> points;
 	};
 
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		if(!SelectionState.select_component.count(k3d::selection::FACE))
 			return;
@@ -207,10 +207,6 @@ public:
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE
 		}
-	}
-	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
-	{
 	}
 	
 	static k3d::iplugin_factory& get_factory()

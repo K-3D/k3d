@@ -53,7 +53,7 @@ public:
 		set_script(k3d::resource::get_string("/module/scripting/mesh_painter_script.py"));
 	}
 
-	void paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
@@ -64,7 +64,7 @@ public:
 		execute_script(context);
 	}
 
-	void select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		k3d::gl::push_selection_token(this);
 

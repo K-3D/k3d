@@ -144,7 +144,7 @@ public:
 			k3d::gl::vertex3d(Point + k3d::to_vector(Scale * Normal));
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		const k3d::storage_class_t storage_class = m_storage_class.pipeline_value();
 		const k3d::string_t array_name = m_array_name.pipeline_value();

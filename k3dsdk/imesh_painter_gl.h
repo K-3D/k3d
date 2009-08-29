@@ -25,6 +25,7 @@
 */
 
 #include "iunknown.h"
+#include "iproperty.h"
 
 namespace k3d
 {
@@ -44,11 +45,13 @@ class imesh_painter :
 {
 public:
 	/// Called to render a mesh for on-screen display
-	virtual void paint_mesh(const mesh& Mesh, const painter_render_state& RenderState) = 0;
+	/**
+	 * The ChangedSignal argument is a signal that is emitted when the supplied mesh changes. It could be used by painters caching data
+	 * to notify them when the cache needs updating
+	 */
+	virtual void paint_mesh(const mesh& Mesh, const painter_render_state& RenderState, iproperty::changed_signal_t& ChangedSignal) = 0;
 	/// Called to render a mesh for interactive selection
-	virtual void select_mesh(const mesh& Mesh, const painter_render_state& RenderState, const painter_selection_state& SelectionState) = 0;
-	/// Called when a mesh changes to allow painters to clear any cached data
-	virtual void mesh_changed(const mesh& Mesh, ihint* Hint) = 0;
+	virtual void select_mesh(const mesh& Mesh, const painter_render_state& RenderState, const painter_selection_state& SelectionState, iproperty::changed_signal_t& ChangedSignal) = 0;
 };
 
 } // namespace gl

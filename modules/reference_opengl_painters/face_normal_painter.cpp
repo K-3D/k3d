@@ -61,7 +61,7 @@ public:
 		m_unselected_color.changed_signal().connect(make_async_redraw_slot());
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		if(!Mesh.points)
 			return;
@@ -122,10 +122,6 @@ public:
 				glEnd();
 			}
 		}
-	}
-	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
-	{		
 	}
 	
 	static k3d::iplugin_factory& get_factory()

@@ -51,22 +51,16 @@ public:
 		m_enabled.changed_signal().connect(make_async_redraw_slot());
 	}
 
-	void paint_mesh(const mesh& Mesh, const painter_render_state& RenderState)
+	void paint_mesh(const mesh& Mesh, const painter_render_state& RenderState, iproperty::changed_signal_t& ChangedSignal)
 	{
 		if(m_enabled.pipeline_value())
-			on_paint_mesh(Mesh, RenderState);
+			on_paint_mesh(Mesh, RenderState, ChangedSignal);
 	}
 
-	void select_mesh(const mesh& Mesh, const painter_render_state& RenderState, const painter_selection_state& SelectionState)
+	void select_mesh(const mesh& Mesh, const painter_render_state& RenderState, const painter_selection_state& SelectionState, iproperty::changed_signal_t& ChangedSignal)
 	{
 		if(m_enabled.pipeline_value())
-			on_select_mesh(Mesh, RenderState, SelectionState);
-	}
-
-	void mesh_changed(const mesh& Mesh, ihint* Hint)
-	{
-		// Note - on_mesh_changed() is always called whether we're enabled or not to prevent caching of stale data
-		on_mesh_changed(Mesh, Hint);
+			on_select_mesh(Mesh, RenderState, SelectionState, ChangedSignal);
 	}
 
 protected:
@@ -83,17 +77,12 @@ protected:
 	}
 
 	/// Implement this in derived classes to draw mesh components
-	virtual void on_paint_mesh(const mesh& Mesh, const painter_render_state& RenderState)
+	virtual void on_paint_mesh(const mesh& Mesh, const painter_render_state& RenderState, iproperty::changed_signal_t& ChangedSignal)
 	{
 	}
 
 	/// Implement this in derived classes to draw mesh components for selection
-	virtual void on_select_mesh(const mesh& Mesh, const painter_render_state& RenderState, const painter_selection_state& SelectionState)
-	{
-	}
-
-	/// Implement this in derived classes to clear cached data when a mesh changes
-	virtual void on_mesh_changed(const mesh& Mesh, ihint* Hint)
+	virtual void on_select_mesh(const mesh& Mesh, const painter_render_state& RenderState, const painter_selection_state& SelectionState, iproperty::changed_signal_t& ChangedSignal)
 	{
 	}
 

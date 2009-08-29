@@ -49,7 +49,7 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
@@ -59,13 +59,13 @@ public:
 			{
 				if(k3d::gl::imesh_painter* const painter = dynamic_cast<k3d::gl::imesh_painter*>(boost::any_cast<k3d::inode*>(k3d::property::pipeline_value(property))))
 				{
-					painter->paint_mesh(Mesh, RenderState);
+					painter->paint_mesh(Mesh, RenderState, ChangedSignal);
 				}
 			}
 		}
 	}
 	
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
@@ -75,23 +75,7 @@ public:
 			{
 				if(k3d::gl::imesh_painter* const painter = dynamic_cast<k3d::gl::imesh_painter*>(boost::any_cast<k3d::inode*>(k3d::property::pipeline_value(property))))
 				{
-					painter->select_mesh(Mesh, RenderState, SelectionState);
-				}
-			}
-		}
-	}
-	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
-	{
-		const k3d::iproperty_collection::properties_t& properties = node::properties();
-		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
-		{
-			k3d::iproperty& property = **prop;
-			if(property.property_type() == typeid(k3d::inode*))
-			{
-				if(k3d::gl::imesh_painter* const painter = dynamic_cast<k3d::gl::imesh_painter*>(boost::any_cast<k3d::inode*>(k3d::property::pipeline_value(property))))
-				{
-					painter->mesh_changed(Mesh, Hint);
+					painter->select_mesh(Mesh, RenderState, SelectionState, ChangedSignal);
 				}
 			}
 		}
