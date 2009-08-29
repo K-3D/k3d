@@ -21,8 +21,9 @@
  */
 
 #include "colored_selection_painter_gl.h"
-#include "normal_cache.h"
-#include "utility.h"
+//#include "normal_cache.h"
+//#include "utility.h"
+#include "painter_cache.h"
 #include "vbo.h"
 
 #include <k3d-i18n-config.h>
@@ -63,7 +64,7 @@ public:
 	{
 	}
 		
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -72,18 +73,18 @@ public:
 			
 		clean_vbo_state();
 		
-		point_vbo& vbo = get_data<point_vbo>(&Mesh, this);
-		vbo.bind();
+		bind_vertex_buffer(get_cached_data<point_vbo>(Mesh.points, ChangedSignal).value(Mesh));
 		
-		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
-		
-		enable_blending();
 
-assert_not_implemented();
+		k3d::gl::color3d(color);
+		glDrawArrays(GL_POINTS, 0, Mesh.points->size());
+
+//assert_not_implemented();
 /*
 		size_t point_count = Mesh.points->size();
 		const selection_records_t& pselection = get_data<point_selection>(&Mesh, this).records(); // obtain selection data
@@ -107,24 +108,21 @@ assert_not_implemented();
 		}
 */		
 		clean_vbo_state();
-		disable_blending();
 	}
 	
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
 		if(!Mesh.points || Mesh.points->empty())
 			return;
 			
-		if (!SelectionState.select_points)
+		if (!SelectionState.select_component.count(k3d::selection::POINT))
 			return;
-		
-		bool valid_polyhedra = has_non_empty_polyhedra(Mesh);
 		
 		clean_vbo_state();
 
-		get_data<point_vbo>(&Mesh, this).bind();
+		bind_vertex_buffer(get_cached_data<point_vbo>(Mesh.points, ChangedSignal).value(Mesh));
 		
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
@@ -132,10 +130,11 @@ assert_not_implemented();
 		const size_t point_count = Mesh.points->size();
 		for(size_t point = 0; point != point_count; ++point)
 		{
-			if (!valid_polyhedra || SelectionState.select_backfacing || 
-					(!SelectionState.select_backfacing && 
-							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
-			{
+			//TODO: restore backfacing selection
+//			if (!valid_polyhedra || SelectionState.select_backfacing ||
+//					(!SelectionState.select_backfacing &&
+//							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
+//			{
 				k3d::gl::push_selection_token(k3d::selection::POINT, point);
 	
 				glBegin(GL_POINTS);
@@ -143,22 +142,10 @@ assert_not_implemented();
 				glEnd();
 	
 				k3d::gl::pop_selection_token(); // k3d::selection::POINT
-			}
+			//}
 		}
 
 		clean_vbo_state();
-	}
-	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
-	{
-		return_if_fail(k3d::gl::extension::query_vbo());
-		
-		if (!Mesh.points || Mesh.points->empty())
-			return;
-		
-		schedule_data<point_vbo>(&Mesh, Hint, this);
-		schedule_data<point_selection>(&Mesh, Hint, this);
-		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 
 	static k3d::iplugin_factory& get_factory()

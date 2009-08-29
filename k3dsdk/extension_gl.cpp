@@ -78,7 +78,7 @@ std::set<k3d::string_t>& disabled()
 		// We are temporarily disabling VBOs by default, to simplify
 		// troubleshooting during the transition to generic polyhedron
 		// primitives - TMS
-		results.insert("GL_ARB_vertex_buffer_object");
+		//results.insert("GL_ARB_vertex_buffer_object");
 
 		initialized = true;
 	}
