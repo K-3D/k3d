@@ -73,6 +73,14 @@ void bind_vertex_buffer(const vbo& VBO)
 	glEnableClientState(GL_VERTEX_ARRAY);
 }
 
+void bind_texture_buffer(const vbo& VBO)
+{
+	validate(VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glTexCoordPointer(1, GL_DOUBLE, 0, 0);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
 void clean_vbo_state()
 {
 	glDisableClientState(GL_VERTEX_ARRAY);
@@ -91,20 +99,26 @@ void clean_vbo_state()
 // point_vbo
 ///////////////////////////////
 
-void point_vbo::on_topology_changed(vbo& Output, const k3d::mesh& InputMesh)
+void point_vbo::on_topology_changed(point_data& Output, const k3d::mesh& InputMesh)
 {
 	k3d::log() << debug << "topology changed" << std::endl;
 	const k3d::mesh::points_t& points = *InputMesh.points;
-	glBindBuffer(GL_ARRAY_BUFFER, Output);
+	glBindBuffer(GL_ARRAY_BUFFER, Output.points);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(points[0]) * points.size(), &points[0], GL_STATIC_DRAW);
 }
 
-void point_vbo::on_selection_changed(vbo& Output, const k3d::mesh& InputMesh) {k3d::log() << debug << "selection changed" << std::endl;}
+void point_vbo::on_selection_changed(point_data& Output, const k3d::mesh& InputMesh)
+{
+	k3d::log() << debug << "selection changed" << std::endl;
+	const k3d::mesh::selection_t& selection = *InputMesh.point_selection;
+	glBindBuffer(GL_ARRAY_BUFFER, Output.selection);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(selection[0]) * selection.size(), &selection[0], GL_STATIC_DRAW);
+}
 
-void point_vbo::on_geometry_changed(vbo& Output, const k3d::mesh& InputMesh, const k3d::mesh::indices_t& ChangedPoints)
+void point_vbo::on_geometry_changed(point_data& Output, const k3d::mesh& InputMesh, const k3d::mesh::indices_t& ChangedPoints)
 {
 	const k3d::mesh::points_t& points = *InputMesh.points;
-	glBindBuffer(GL_ARRAY_BUFFER, Output);
+	glBindBuffer(GL_ARRAY_BUFFER, Output.points);
 	if(ChangedPoints.empty()) // caller didn't tell which points changed, so update everything
 	{
 		k3d::log() << debug << "geometry changed, full rebuild" << std::endl;

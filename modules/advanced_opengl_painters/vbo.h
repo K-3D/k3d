@@ -69,6 +69,9 @@ private:
 /// Bind a vertex buffer VBO, and enable the required OpenGL state
 void bind_vertex_buffer(const vbo& VBO);
 
+/// Bind a texture coordinate VBO, and enable the required OpenGL state
+void bind_texture_buffer(const vbo& VBO);
+
 /// Disable all VBOs
 void clean_vbo_state();
 
@@ -76,17 +79,23 @@ void clean_vbo_state();
 // point_vbo
 //////////////////////////////////////////
 
-/// Cached object for point data stored in VBOs
-class point_vbo : public cached_polyhedron_data<vbo>
+struct point_data
 {
-	typedef cached_polyhedron_data<vbo> base;
+	vbo points;
+	vbo selection;
+};
+
+/// Cached object for point data stored in VBOs
+class point_vbo : public cached_polyhedron_data<point_data>
+{
+	typedef cached_polyhedron_data<point_data> base;
 public:
 	point_vbo(k3d::iproperty::changed_signal_t& ChangedSignal) : base(ChangedSignal) {}
 private:
 private:
-	void on_topology_changed(vbo& Output, const k3d::mesh& InputMesh);
-	void on_selection_changed(vbo& Output, const k3d::mesh& InputMesh);
-	void on_geometry_changed(vbo& Output, const k3d::mesh& InputMesh, const k3d::mesh::indices_t& ChangedPoints);
+	void on_topology_changed(point_data& Output, const k3d::mesh& InputMesh);
+	void on_selection_changed(point_data& Output, const k3d::mesh& InputMesh);
+	void on_geometry_changed(point_data& Output, const k3d::mesh& InputMesh, const k3d::mesh::indices_t& ChangedPoints);
 };
 
 } // namespace painters

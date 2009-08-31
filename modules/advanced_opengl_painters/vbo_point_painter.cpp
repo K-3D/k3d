@@ -20,7 +20,7 @@
 /** \file Paint points using a VBO
  */
 
-#include "colored_selection_painter_gl.h"
+#include "vbo_colored_selection_painter_gl.h"
 //#include "normal_cache.h"
 //#include "utility.h"
 #include "painter_cache.h"
@@ -54,9 +54,9 @@ namespace painters
 // vbo_point_painter
 
 class vbo_point_painter :
-	public colored_selection_painter
+	public vbo_colored_selection_painter
 {
-	typedef colored_selection_painter base;
+	typedef vbo_colored_selection_painter base;
 
 public:
 	vbo_point_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -70,44 +70,13 @@ public:
 
 		if(!Mesh.points || Mesh.points->empty())
 			return;
-			
-		clean_vbo_state();
 		
-		bind_vertex_buffer(get_cached_data<point_vbo>(Mesh.points, ChangedSignal).value(Mesh));
-		
-		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
+		const point_data& data = get_cached_data<point_vbo>(Mesh.points, ChangedSignal).value(Mesh);
+		bind_vertex_buffer(data.points);
+		bind_texture_buffer(data.selection);
 
-		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
-
-		k3d::gl::color3d(color);
 		glDrawArrays(GL_POINTS, 0, Mesh.points->size());
-
-//assert_not_implemented();
-/*
-		size_t point_count = Mesh.points->size();
-		const selection_records_t& pselection = get_data<point_selection>(&Mesh, this).records(); // obtain selection data
-		
-		if (!pselection.empty())
-		{
-			for (selection_records_t::const_iterator record = pselection.begin(); record != pselection.end(); ++record)
-			{ // color by selection
-				color4d(record->weight ? selected_color : color);
-				size_t start = record->begin;
-				size_t end = record->end;
-				end = end > point_count ? point_count : end;
-				size_t count = end - start;
-				glDrawArrays(GL_POINTS, start, count);
-			}
-		}
-		else
-		{ // empty selection, everything has the same color
-			color4d(color);
-			glDrawArrays(GL_POINTS, 0, Mesh.points->size());
-		}
-*/		
-		clean_vbo_state();
 	}
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
@@ -119,12 +88,9 @@ public:
 			
 		if (!SelectionState.select_component.count(k3d::selection::POINT))
 			return;
-		
-		clean_vbo_state();
 
-		bind_vertex_buffer(get_cached_data<point_vbo>(Mesh.points, ChangedSignal).value(Mesh));
+		bind_vertex_buffer(get_cached_data<point_vbo>(Mesh.points, ChangedSignal).value(Mesh).points);
 		
-		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 		
 		const size_t point_count = Mesh.points->size();
@@ -144,8 +110,6 @@ public:
 				k3d::gl::pop_selection_token(); // k3d::selection::POINT
 			//}
 		}
-
-		clean_vbo_state();
 	}
 
 	static k3d::iplugin_factory& get_factory()

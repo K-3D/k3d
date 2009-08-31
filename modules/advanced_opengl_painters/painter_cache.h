@@ -179,11 +179,16 @@ public:
 		m_input_mesh(0)
 	{
 		m_data.set_update_slot(sigc::mem_fun(*this, &cached_polyhedron_data<data_t>::execute));
-		ChangedSignal.connect(k3d::hint::converter<
+		m_changed_connection = ChangedSignal.connect(k3d::hint::converter<
 						k3d::hint::convert<k3d::hint::mesh_geometry_changed, k3d::hint::unchanged,
 						k3d::hint::convert<k3d::hint::mesh_topology_changed, k3d::hint::unchanged,
 						k3d::hint::convert<k3d::hint::selection_changed, k3d::hint::unchanged,
 						k3d::hint::convert<k3d::hint::any, k3d::hint::none> > > > >(m_data.make_slot()));
+	}
+
+	~cached_polyhedron_data()
+	{
+		m_changed_connection.disconnect();
 	}
 
 	/// Get the up-to-date value of the cache, using InputMesh as input data
@@ -235,6 +240,7 @@ private:
 
 	k3d_data(data_t*, immutable_name, change_signal, no_undo, pointer_demand_storage, no_constraint, no_property, no_serialization) m_data;
 	const k3d::mesh* m_input_mesh;
+	sigc::connection m_changed_connection;
 };
 
 
