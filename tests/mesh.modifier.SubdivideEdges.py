@@ -35,4 +35,4 @@ modifier.vertices = 2
 
 document.set_dependency(modifier.get_property("input_mesh"), varying_colors.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.SubdivideEdges", 1, True)
+testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.SubdivideEdges", 1)

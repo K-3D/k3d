@@ -7,6 +7,12 @@ import platform
 import sys
 import time
 
+def platform_agnostic():
+	return ""
+
+def platform_specific():
+	return "." + str(platform.system()) + "-" + str(platform.machine())
+
 class timer:
 	def __init__(self):
 		if sys.platform == "win32":
@@ -285,23 +291,20 @@ def bitmap_size_comparison(bitmap, width, height):
 	if bitmap.width() != width or bitmap.height() != height:
 		raise "bitmap dimensions incorrect"
 
-def mesh_comparison_to_reference(document, input_mesh, base_mesh_name, threshold, platform_specific = False):
+def mesh_comparison_to_reference(document, input_mesh, base_mesh_name, threshold, platform = platform_agnostic):
 
-	mesh_name = base_mesh_name
-	mesh_name += ".reference"
-	if platform_specific:
-		mesh_name += "." + str(platform.machine())
+	mesh_name = base_mesh_name + ".reference" + platform()
 
 	output_path = k3d.filesystem.generic_path(binary_path() + "/meshes/" + mesh_name + ".k3d")
 	reference_path = k3d.filesystem.generic_path(source_path() + "/meshes/" + mesh_name + ".k3d")
 	difference_path = k3d.filesystem.generic_path(binary_path() + "/meshes/differences/" + mesh_name + ".html")
 
+	output = document.new_node("K3DMeshWriter")
+	output.file = output_path
+	document.set_dependency(output.get_property("input_mesh"), input_mesh)
+
 	if not os.path.exists(str(reference_path)):
 		raise Exception("missing reference file: " + str(reference_path))
-
-	mesh_writer = document.new_node("K3DMeshWriter")
-	mesh_writer.file = output_path
-	document.set_dependency(mesh_writer.get_property("input_mesh"), input_mesh)
 
 	reference = document.new_node("K3DMeshReader")
 	reference.center = False
