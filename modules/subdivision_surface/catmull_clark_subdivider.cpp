@@ -61,6 +61,7 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		k3d::log() << debug << "rebuilding mesh" << std::endl;
 		m_subdividers.clear();
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
@@ -96,7 +97,7 @@ public:
 			if(!polyhedron.get())
 				continue;
 			m_subdividers[primitive->get()].update_mesh(*Output.points, *polyhedron, Output.point_attributes, polyhedron->face_selections, this);
-			m_subdividers[primitive->get()].copy_output(Output.points.writable(), *polyhedron, Output.point_attributes);
+			m_subdividers[primitive->get()].copy_output(Output.points.create(), *polyhedron, Output.point_attributes);
 			Output.point_selection.writable().resize(Output.points->size());
 		}
 	}
