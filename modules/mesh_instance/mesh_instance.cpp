@@ -78,6 +78,7 @@ public:
 		m_input_mesh.changed_signal().connect(k3d::hint::converter<k3d::hint::convert<k3d::hint::any, k3d::hint::unchanged> >(m_output_mesh.make_slot()));
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(m_output_mesh.make_slot()));
 
+		m_input_mesh.changed_signal().connect(make_async_redraw_slot());
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_gl_painter.changed_signal().connect(make_async_redraw_slot());
 		m_show_component_selection.changed_signal().connect(make_async_redraw_slot());
