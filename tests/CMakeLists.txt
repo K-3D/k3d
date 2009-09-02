@@ -122,7 +122,7 @@ K3D_ADD_TEST(document.stress.all_node_types.py PYTHON)
 
 K3D_ADD_TEST(document.serialization.properties.py PYTHON)
 
-K3D_ADD_TEST(document.importers.bogus_input.py PYTHON)
+K3D_ADD_TEST(document.importer.bogus_input.py PYTHON)
 
 K3D_ADD_TEST(mesh.validation.py PYTHON)
 
@@ -225,7 +225,7 @@ K3D_ADD_TEST(mesh.source.SVGMeshReader.py PYTHON REQUIRES K3D_BUILD_SVG_IO_MODUL
 K3D_ADD_TEST(mesh.source.Teapot.py PYTHON REQUIRES K3D_BUILD_QUADRICS_MODULE)
 K3D_ADD_TEST(mesh.source.Torus.py PYTHON REQUIRES K3D_BUILD_QUADRICS_MODULE)
 
-K3D_ADD_TEST(mesh.source.MeshReaders.bogus_input.py PYTHON)
+K3D_ADD_TEST(mesh.source.reader.bogus_input.py PYTHON)
 
 K3D_ADD_TEST(mesh.diff.py PYTHON)
 K3D_ADD_TEST(mesh.diff.MeshDiff.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
