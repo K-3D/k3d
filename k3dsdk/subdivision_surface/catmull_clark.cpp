@@ -1259,9 +1259,8 @@ public:
 		PointData = m_intermediate_point_data[m_levels - 1];
 	}
 	
-	void visit_surface(const k3d::uint_t Level, ipatch_surface_visitor& Visitor)
+	void visit_surface(const k3d::uint_t Level, ipatch_surface_visitor& Visitor) const
 	{
-		k3d::timer t;
 		k3d::uint_t last_count = 0;
 		for(k3d::uint_t face = 0; face != m_topology_data[0].face_subface_counts.size(); ++face)
 		{
@@ -1273,18 +1272,9 @@ public:
 			}
 			last_count = face_count;
 		}
-		
-		t.restart();
-		const k3d::mesh::points_t& points = m_intermediate_points[Level - 1];
-		const k3d::table& point_data = m_intermediate_point_data[Level - 1];
-		const k3d::mesh::normals_t* normals = point_data.lookup<k3d::mesh::normals_t>("sds_normals");
-		for(k3d::uint_t point = 0; point != points.size(); ++point)
-		{
-			Visitor.on_vertex(points[point], normals ? normals->at(point) : k3d::normal3(0,0,1));
-		}
 	}
 	
-	void visit_boundary(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor)
+	void visit_boundary(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor) const
 	{
 		k3d::timer t;
 		const k3d::uint_t edge_count = m_topology_data[0].edge_midpoints.size();
@@ -1336,7 +1326,7 @@ public:
 		}
 	}
 	
-	void visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor)
+	void visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor) const
 	{
 		const k3d::uint_t point_count = m_topology_data[0].corner_points.size();
 		for(k3d::uint_t point = 0; point != point_count; ++point)
@@ -1350,9 +1340,23 @@ public:
 		}
 	}
 	
+	const k3d::mesh::points_t& points(const k3d::uint_t Level) const
+	{
+		return m_intermediate_points[Level - 1];
+	}
+
+	const k3d::mesh::normals_t& point_normals(const k3d::uint_t Level) const
+	{
+		const k3d::table& point_data = m_intermediate_point_data[Level - 1];
+		const k3d::mesh::normals_t* normals = point_data.lookup<k3d::mesh::normals_t>("sds_normals");
+		if(!normals)
+			throw std::runtime_error("sds::catmull_clark_subdivider: mesh did not have normals");
+		return *normals;
+	}
+
 private:
 	/// Used to recurse through levels to associate an original face with its subfaces
-	void visit_subfacets(const k3d::uint_t MaxLevel, const k3d::uint_t Level, const k3d::uint_t Face, ipatch_surface_visitor& Visitor)
+	void visit_subfacets(const k3d::uint_t MaxLevel, const k3d::uint_t Level, const k3d::uint_t Face, ipatch_surface_visitor& Visitor) const
 	{
 		const k3d::uint_t face_begin = Face == 0 ? 0 : m_topology_data[Level].face_subface_counts[Face - 1];
 		const k3d::uint_t face_end = m_topology_data[Level].face_subface_counts[Face];
@@ -1505,19 +1509,29 @@ void catmull_clark_subdivider::copy_output(k3d::mesh::points_t& Points, k3d::pol
 	m_implementation->copy_output(Points, Polyhedron, PointData);
 }
 
-void catmull_clark_subdivider::visit_surface(const k3d::uint_t Level, ipatch_surface_visitor& Visitor)
+void catmull_clark_subdivider::visit_surface(const k3d::uint_t Level, ipatch_surface_visitor& Visitor) const
 {
 	m_implementation->visit_surface(Level, Visitor);
 }
 
-void catmull_clark_subdivider::visit_boundary(const k3d::polyhedron::const_primitive Polyhedron, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor)
+void catmull_clark_subdivider::visit_boundary(const k3d::polyhedron::const_primitive Polyhedron, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor) const
 {
 	m_implementation->visit_boundary(Polyhedron, Level, Visitor);
 }
 
-void catmull_clark_subdivider::visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor)
+void catmull_clark_subdivider::visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor) const
 {
 	m_implementation->visit_corners(Level, Visitor);
+}
+
+const k3d::mesh::points_t& catmull_clark_subdivider::points(const k3d::uint_t Level) const
+{
+	return m_implementation->points(Level);
+}
+
+const k3d::mesh::normals_t& catmull_clark_subdivider::point_normals(const k3d::uint_t Level) const
+{
+	return m_implementation->point_normals(Level);
 }
 
 } // namespace sds

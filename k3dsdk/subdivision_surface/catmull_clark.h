@@ -51,9 +51,6 @@ public:
 	/// Called for each edge that makes up a side of one of the quads on the subdivided surface
 	virtual void on_edge(const k3d::uint_t PointIndex) = 0;
 	
-	/// Called for each vertex on the subdivided surface
-	virtual void on_vertex(const k3d::point3& Point, const k3d::normal3& Normal) = 0;
-	
 protected:
 	ipatch_surface_visitor() {}
 	ipatch_surface_visitor(const ipatch_surface_visitor&) {}
@@ -122,14 +119,21 @@ public:
 	void copy_output(k3d::mesh::points_t& Points, k3d::polyhedron::primitive& Polyhedron, k3d::table& VertexData);
 	
 	/// Visit the data representing the SDS patch surface
-	void visit_surface(const k3d::uint_t Level, ipatch_surface_visitor& Visitor);
+	void visit_surface(const k3d::uint_t Level, ipatch_surface_visitor& Visitor) const;
 	
 	/// Visit the data representing the SDS patch boundaries, using the given source mesh (needed for topology info)
-	void visit_boundary(const k3d::polyhedron::const_primitive Polyhedron, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor);
+	void visit_boundary(const k3d::polyhedron::const_primitive Polyhedron, const k3d::uint_t Level, ipatch_boundary_visitor& Visitor) const;
 	
 	/// Visit the data representing the patch corners
-	void visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor);
+	void visit_corners(const k3d::uint_t Level, ipatch_corner_visitor& Visitor) const;
 	
+	/// Returns the array of surface points at the given level
+	const k3d::mesh::points_t& points(const k3d::uint_t Level) const;
+
+	/// Returns the array of point normals at the given level, or throws an exception if it doesn't exist
+	const k3d::mesh::normals_t& point_normals(const k3d::uint_t Level) const;
+
+
 private:
 	class implementation;
 	implementation* m_implementation;

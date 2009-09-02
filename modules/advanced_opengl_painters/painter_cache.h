@@ -65,7 +65,7 @@ public:
 			if(m_data.size() == MAX_CACHE_SIZE)
 				remove_data(m_stack.pop());
 
-			data = m_data.insert(std::make_pair(Key, new data_t(ChangedSignal))).first;
+			data = m_data.insert(std::make_pair(Key, new data_t(Key, ChangedSignal))).first;
 		}
 		return *(data->second);
 	}
@@ -170,15 +170,16 @@ template<class data_t, class key_t> data_t& get_cached_data(const key_t& Key, k3
 /**
  * Data that is to be stored in a painter cache can derive from this class.
  */
-template<class data_t>
+template<class key_t, class data_t>
 class cached_polyhedron_data
 {
 public:
-	cached_polyhedron_data(k3d::iproperty::changed_signal_t& ChangedSignal) :
+	cached_polyhedron_data(const key_t Key, k3d::iproperty::changed_signal_t& ChangedSignal) :
+		m_key(Key),
 		m_data(init_owner(*this) + init_name("data")),
 		m_input_mesh(0)
 	{
-		m_data.set_update_slot(sigc::mem_fun(*this, &cached_polyhedron_data<data_t>::execute));
+		m_data.set_update_slot(sigc::mem_fun(*this, &cached_polyhedron_data<key_t, data_t>::execute));
 		m_changed_connection = ChangedSignal.connect(k3d::hint::converter<
 						k3d::hint::convert<k3d::hint::mesh_geometry_changed, k3d::hint::unchanged,
 						k3d::hint::convert<k3d::hint::mesh_topology_changed, k3d::hint::unchanged,
@@ -232,7 +233,9 @@ protected:
 			on_selection_changed(Data, *m_input_mesh);
 		for(k3d::uint_t i = 0; i != changed_points.size(); ++i)
 			on_geometry_changed(Data, *m_input_mesh, changed_points[i]);
- }
+	}
+
+	const key_t m_key;
 private:
 	virtual void on_topology_changed(data_t& Output, const k3d::mesh& InputMesh) = 0;
 	virtual void on_selection_changed(data_t& Output, const k3d::mesh& InputMesh) = 0;

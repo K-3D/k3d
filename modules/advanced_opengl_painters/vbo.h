@@ -86,12 +86,12 @@ struct point_data
 };
 
 /// Cached object for point data stored in VBOs
-class point_vbo : public cached_polyhedron_data<point_data>
+class point_vbo : public cached_polyhedron_data<k3d::pipeline_data<k3d::mesh::points_t>, point_data>
 {
-	typedef cached_polyhedron_data<point_data> base;
+	typedef k3d::pipeline_data<k3d::mesh::points_t> key_t;
+	typedef cached_polyhedron_data<key_t, point_data> base;
 public:
-	point_vbo(k3d::iproperty::changed_signal_t& ChangedSignal) : base(ChangedSignal) {}
-private:
+	point_vbo(const key_t Key, k3d::iproperty::changed_signal_t& ChangedSignal) : base(Key, ChangedSignal) {}
 private:
 	void on_topology_changed(point_data& Output, const k3d::mesh& InputMesh);
 	void on_selection_changed(point_data& Output, const k3d::mesh& InputMesh);
