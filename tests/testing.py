@@ -458,3 +458,71 @@ def scalar_comparison(value, expected_value):
 	print """<DartMeasurement name="Expected Value" type="numeric/float">""" + str(expected_value) + """</DartMeasurement>"""
 	if value != expected_value:
 		raise Exception("value does not match expected value")
+
+def bitmap_modifier_benchmark(BitmapModifier):
+	sys.stdout.write("""<DartMeasurement name="Timing" type="text/html"><![CDATA[\n""")
+	sys.stdout.write("""<table>\n""")
+
+	sizes = [(640,480), (800,600), (1024,768), (1280,1024), (1600, 1200)]
+	runs = 3
+
+	first_row = True
+	for size in sizes:
+		for run in range(runs):
+			document = k3d.new_document()
+
+			profiler = document.new_node("PipelineProfiler")
+
+			image = document.new_node("BitmapSolid")
+			image.width = size[0];
+			image.height = size[1];
+
+			modifier = document.new_node(BitmapModifier)
+
+			document.set_dependency(modifier.get_property("input_bitmap"), image.get_property("output_bitmap"))
+			modifier.output_bitmap
+
+			if first_row:
+				first_row = False
+
+				sys.stdout.write("""<tr>""")
+				sys.stdout.write("""<th>Width</th>""")
+				sys.stdout.write("""<th>Height</th>""")
+				sys.stdout.write("""<th>Run</th>""")
+
+				records = profiler.records
+				for node in records:
+					if node != modifier:
+						continue
+
+					measurements = records[node]
+					for measurement in measurements:
+						sys.stdout.write("""<th>""")
+						sys.stdout.write(measurement)
+						sys.stdout.write("""</th>""")
+
+				sys.stdout.write("""</tr>\n""")
+
+			sys.stdout.write("""<tr>""")
+			sys.stdout.write("""<td>""" + str(size[0]) + """</td>""")
+			sys.stdout.write("""<td>""" + str(size[1]) + """</td>""")
+			sys.stdout.write("""<td>""" + str(run) + """</td>""")
+
+			records = profiler.records
+			for node in records:
+				if node != modifier:
+					continue
+
+				measurements = records[node]
+				for measurement in measurements:
+					sys.stdout.write("""<td>""")
+					sys.stdout.write(str(measurements[measurement]))
+					sys.stdout.write("""</td>""")
+
+			sys.stdout.write("""</tr>\n""")
+
+			k3d.close_document(document)
+
+	sys.stdout.write("""</table>\n""")
+	sys.stdout.write("""]]></DartMeasurement>\n""")
+

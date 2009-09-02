@@ -300,16 +300,6 @@ def mesh_modifier_benchmark(benchmarkPluginName, maxSize = 15, properties = {"in
         except:
             break
         
-def bitmap_modifier_benchmark(benchmarkPluginName, runsPerBenchmark = 10):
-    # benchmark benchmarkPluginName for various image sizes
-    sizes = [(640,480), (800,600), (1024,768), (1280,1024), (1600, 1200)]
-    append = True
-    for k in range(len(sizes)):
-        try:
-            run_bitmap_modifier_benchmark(benchmarkPluginName, sizes[k], runsPerBenchmark, append, k == 0)
-        except:
-            break
-
 def mesh_source_benchmark(benchmarkPluginName, properties = {}):
     num_runs = 10e10
     for p in properties.values():
@@ -429,29 +419,6 @@ def extract_data(benchmarkPluginName, ColumnTitle = "Total", operation = CALC_AV
     
     return (dimension_list, data_list)
         
-    
-"""
-    Run a benchmark for a specified bitmap_modifier
-"""
-def run_bitmap_modifier_benchmark(BitmapNodeName, imageDimensions, numberOfRuns = 1, appendToFile = False, firstInFile=False):
-    document = k3d.new_document()
-        
-    profiler = document.new_node("PipelineProfiler")
-    inputSolid = document.new_node("BitmapSolid")
-    inputSolid.width = imageDimensions[0];
-    inputSolid.height = imageDimensions[1];
-    
-    benchmarkNode = document.new_node(BitmapNodeName)
-    
-    profilingResults = k3dProfilingProcessor()
-    for n in range(numberOfRuns):
-        document.set_dependency(benchmarkNode.get_property("input_bitmap"), inputSolid.get_property("output_bitmap"))
-        benchmarkNode.output_bitmap
-        profilingResults.add_profiler_results_for_node(BitmapNodeName, profiler.records)
-    
-    description = '%dx%d' % (imageDimensions[0], imageDimensions[1])
-
-    profilingResults.output_and_save(BitmapNodeName, description, appendToFile, firstInFile)
     
 
 """

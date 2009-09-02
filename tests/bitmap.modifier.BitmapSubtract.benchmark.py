@@ -1,5 +1,5 @@
 #python
 
-import benchmarking
+import testing
 
-benchmarking.bitmap_modifier_benchmark("BitmapSubtract")
+testing.bitmap_modifier_benchmark("BitmapSubtract")

@@ -1,5 +1,5 @@
 #python
 
-import benchmarking
+import testing
 
-benchmarking.bitmap_modifier_benchmark("BitmapAdd")
+testing.bitmap_modifier_benchmark("BitmapAdd")
