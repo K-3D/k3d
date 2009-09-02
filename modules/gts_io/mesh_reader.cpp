@@ -81,8 +81,6 @@ public:
 		if(!file)
 			return;
 
-		k3d::log() << info << "Loading GNU Triangulated Surface file: " << Path.native_console_string() << std::endl;
-
 		// Read point, edge, and triangle counts ...
 		std::string buffer;
 		gts_line(file, buffer);
