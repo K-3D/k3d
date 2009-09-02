@@ -126,16 +126,17 @@ public:
 	
 private:
 	md2Header header;
-	md2Triangles *triangles;
-	md2Frames *frames;
-	md2TexCoords *texcoords;
-	md2Skins *skins;
-
+	md2Triangles* triangles;
+	md2Frames* frames;
+	md2TexCoords* texcoords;
+	md2Skins* skins;
 };
 
-}
-}
-}
+} // namespace io
+
+} // namespace md2
+
+} // namespace module
 
 #endif // !MODULES_MD2_IO_MD2_H
 

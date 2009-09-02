@@ -1,5 +1,8 @@
 #include "md2.h"
 
+#include <k3dsdk/log.h>
+#include <stdexcept>
+
 namespace module
 {
 
@@ -9,31 +12,29 @@ namespace md2
 namespace io
 {
 
-md2Model::md2Model(const char *f)
+md2Model::md2Model(const char *f) :
+	triangles(0),
+	frames(0),
+	texcoords(0),
+	skins(0)
 {
-//////////////////////////////////////////////////////////////
-///////////////////////Model Loading//////////////////////////
-//////////////////////////////////////////////////////////////
 	FILE *md2file = fopen(f, "rb");
 
-//Check if the file was loaded correctly
+	// Check if the file was loaded correctly
 	if(md2file == NULL)
-	{
-		printf("Could not load %s model!\n", f);
-		exit(0);
-	}
-//Extract Header and check if it is a valid md2 file
+		throw std::runtime_error("Error opening file.");
+	
+	// Extract Header and check if it is a valid md2 file
 	fread(&header, 1, sizeof(md2Header), md2file);	
 	
 	if((header.id != 844121161) || (header.version != 8))
-	{
-		printf("%s is not a valid md2 model!\n", f);
-	}
-//Extract Skin names
+		throw std::runtime_error("Not an MD2 model.");
+
+	// Extract Skin names
 	skins = new md2Skins[header.numSkins];
 	for(k3d::int32_t i=0; i<header.numSkins;i++)
 		fread(skins[i],1,sizeof(md2Skins), md2file);
-//Extract Texture coordinates
+	// Extract Texture coordinates
 	texcoords = new md2TexCoords[header.numTexCoords];
 	md2TmpTexCoords tmpcoords;
 	fseek(md2file, header.offsetTexCoords, SEEK_SET);
@@ -45,12 +46,14 @@ md2Model::md2Model(const char *f)
 		texcoords[i].val[1] = 1-(float)tmpcoords.y/(float)header.skinHeight;
 		//printf("%f \t %f \n", texcoords[i].val[0], texcoords[i].val[1]);
 	}
-//Extract triangle indices
+
+	// Extract triangle indices
 	triangles = new md2Triangles[header.numTriangles];
 	fseek(md2file, header.offsetTriangles, SEEK_SET);
 	for(k3d::int32_t i=0; i<header.numTriangles; i++)
 		fread(&triangles[i], 1, sizeof(md2Triangles), md2file);
-//Extract frames and vertices
+
+	// Extract frames and vertices
 	byte buffer[2048*4+128];
 	float a;
 	frames = new md2Frames[header.numFrames];
@@ -89,12 +92,15 @@ md2Model::md2Model(const char *f)
 
 md2Model::~md2Model()
 {
-	delete [] frames;
-	delete [] triangles;
-	delete [] texcoords;
-	delete [] skins;
+	delete[] frames;
+	delete[] triangles;
+	delete[] texcoords;
+	delete[] skins;
 }
 
-}
-}
-}
+} // namespace io
+
+} // namespace md2
+
+} // namespace module
+
