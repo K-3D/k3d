@@ -1337,7 +1337,7 @@ public:
 			{
 				corner = m_topology_data[level].corner_points[corner];
 			}
-			Visitor.on_corner(m_intermediate_points[Level-1].at(corner));
+			Visitor.add_vertex(m_intermediate_points[Level-1].at(corner));
 		}
 	}
 	

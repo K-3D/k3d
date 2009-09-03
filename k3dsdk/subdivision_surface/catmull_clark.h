@@ -86,7 +86,7 @@ class ipatch_corner_visitor
 {
 public:
 	/// Called for each patch corner, corresponding to a vertex of the original mesh
-	virtual void on_corner(const k3d::point3& Point) = 0;
+	virtual void add_vertex(const k3d::point3& Point) = 0;
 	
 protected:
 	ipatch_corner_visitor() {}
