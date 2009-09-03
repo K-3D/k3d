@@ -57,15 +57,25 @@ public:
 		m_face_selections(FaceSelections)
 		{}
 
-	void on_edge(const k3d::uint_t PointIndex)
+	void add_quad(const k3d::uint_t P1, const k3d::uint_t P2, const k3d::uint_t P3, const k3d::uint_t P4)
 	{
-		k3d::gl::normal3d(m_normals[PointIndex]);
-		k3d::gl::vertex3d(m_points[PointIndex]);
+		k3d::gl::normal3d(m_normals[P1]);
+		k3d::gl::vertex3d(m_points[P1]);
+		k3d::gl::normal3d(m_normals[P2]);
+		k3d::gl::vertex3d(m_points[P2]);
+		k3d::gl::normal3d(m_normals[P3]);
+		k3d::gl::vertex3d(m_points[P3]);
+		k3d::gl::normal3d(m_normals[P4]);
+		k3d::gl::vertex3d(m_points[P4]);
 	}
 
-	void on_patch(k3d::uint_t Face)
+	void start_face(const k3d::uint_t Face)
 	{
 		glTexCoord1d(m_face_selections[Face]);
+	}
+
+	void finish_face(const k3d::uint_t Face)
+	{
 	}
 
 private:
@@ -98,6 +108,7 @@ public:
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		glEnable(GL_LIGHTING);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 		const k3d::uint_t levels = m_levels.pipeline_value();
 

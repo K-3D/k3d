@@ -42,15 +42,21 @@ namespace sds
 {
 
 /// Visitor used to collect information about the SDS surface
+/**
+ * Note: required information about points and normals is available through k3d::sds::catmull_clark_subdivider::points and ...point_normals.
+ */
 class ipatch_surface_visitor
 {
 public:
 	/// Called at the start of each patch (corresponding to a face on the original mesh) traversal
-	virtual void on_patch(const k3d::uint_t Face) = 0;
+	virtual void start_face(const k3d::uint_t Face) = 0;
 	
-	/// Called for each edge that makes up a side of one of the quads on the subdivided surface
-	virtual void on_edge(const k3d::uint_t PointIndex) = 0;
+	/// Passes the corner indices for all quads that make up the subdivided surface
+	virtual void add_quad(const k3d::uint_t P1, const k3d::uint_t P2, const k3d::uint_t P3, const k3d::uint_t P4) = 0;
 	
+	/// Called when we are finished iterating through a face's subfacets
+	virtual void finish_face(const k3d::uint_t Face) = 0;
+
 protected:
 	ipatch_surface_visitor() {}
 	ipatch_surface_visitor(const ipatch_surface_visitor&) {}

@@ -1267,8 +1267,9 @@ public:
 			const k3d::uint_t face_count = m_topology_data[0].face_subface_counts[face]; 
 			if(face_count - last_count > 1)
 			{
-				Visitor.on_patch(face);
+				Visitor.start_face(face);
 				visit_subfacets(Level, 0, face, Visitor);
+				Visitor.finish_face(face);
 			}
 			last_count = face_count;
 		}
@@ -1367,18 +1368,22 @@ private:
 		}
 		else
 		{
+			k3d::uint_t corners[4];
 			const polyhedron& polyhedron_at_level = m_intermediate_polyhedra[Level];
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
 				const k3d::uint_t first_edge = polyhedron_at_level.loop_first_edges[polyhedron_at_level.face_first_loops[face]];
+				k3d::uint_t corner = 0;
 				for(k3d::uint_t edge = first_edge; ;)
 				{
-					Visitor.on_edge(polyhedron_at_level.vertex_points[edge]);
+					return_if_fail(corner < 4);
+					corners[corner++] = polyhedron_at_level.vertex_points[edge];
 					
 					edge = polyhedron_at_level.clockwise_edges[edge];
 					if(edge == first_edge)
 						break;
 				}
+				Visitor.add_quad(corners[0], corners[1], corners[2], corners[3]);
 			}
 		}
 	}
