@@ -48,43 +48,7 @@ namespace opengl
 namespace painters
 {
 
-class face_paint_visitor : public k3d::sds::ipatch_surface_visitor
-{
-public:
-	face_paint_visitor(const k3d::mesh::points_t& Points, const k3d::mesh::normals_t& Normals, const k3d::mesh::selection_t& FaceSelections) :
-		m_points(Points),
-		m_normals(Normals),
-		m_face_selections(FaceSelections)
-		{}
-
-	void add_quad(const k3d::uint_t P1, const k3d::uint_t P2, const k3d::uint_t P3, const k3d::uint_t P4)
-	{
-		k3d::gl::normal3d(m_normals[P1]);
-		k3d::gl::vertex3d(m_points[P1]);
-		k3d::gl::normal3d(m_normals[P2]);
-		k3d::gl::vertex3d(m_points[P2]);
-		k3d::gl::normal3d(m_normals[P3]);
-		k3d::gl::vertex3d(m_points[P3]);
-		k3d::gl::normal3d(m_normals[P4]);
-		k3d::gl::vertex3d(m_points[P4]);
-	}
-
-	void start_face(const k3d::uint_t Face)
-	{
-		glTexCoord1d(m_face_selections[Face]);
-	}
-
-	void finish_face(const k3d::uint_t Face)
-	{
-	}
-
-private:
-	const k3d::mesh::points_t& m_points;
-	const k3d::mesh::normals_t& m_normals;
-	const k3d::mesh::selection_t& m_face_selections;
-};
-
-	/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // sds_face_painter
 
 class sds_face_painter :
@@ -99,7 +63,43 @@ public:
 	{
 		m_levels.changed_signal().connect(make_async_redraw_slot());
 	}
-		
+
+	class painting_visitor : public k3d::sds::ipatch_surface_visitor
+	{
+	public:
+		painting_visitor(const k3d::mesh::points_t& Points, const k3d::mesh::normals_t& Normals, const k3d::mesh::selection_t& FaceSelections) :
+			m_points(Points),
+			m_normals(Normals),
+			m_face_selections(FaceSelections)
+			{}
+
+		void add_quad(const k3d::uint_t P1, const k3d::uint_t P2, const k3d::uint_t P3, const k3d::uint_t P4)
+		{
+			k3d::gl::normal3d(m_normals[P1]);
+			k3d::gl::vertex3d(m_points[P1]);
+			k3d::gl::normal3d(m_normals[P2]);
+			k3d::gl::vertex3d(m_points[P2]);
+			k3d::gl::normal3d(m_normals[P3]);
+			k3d::gl::vertex3d(m_points[P3]);
+			k3d::gl::normal3d(m_normals[P4]);
+			k3d::gl::vertex3d(m_points[P4]);
+		}
+
+		void start_face(const k3d::uint_t Face)
+		{
+			glTexCoord1d(m_face_selections[Face]);
+		}
+
+		void finish_face(const k3d::uint_t Face)
+		{
+		}
+
+	private:
+		const k3d::mesh::points_t& m_points;
+		const k3d::mesh::normals_t& m_normals;
+		const k3d::mesh::selection_t& m_face_selections;
+	};
+
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
@@ -119,17 +119,77 @@ public:
 				continue;
 
 			const k3d::sds::catmull_clark_subdivider& subdivider = get_cached_data<sds_cache>(std::make_pair(levels, *primitive), ChangedSignal).value(Mesh);
-			face_paint_visitor visitor(subdivider.points(levels), subdivider.point_normals(levels), polyhedron->face_selections);
+			painting_visitor visitor(subdivider.points(levels), subdivider.point_normals(levels), polyhedron->face_selections);
 
 			glBegin(GL_QUADS);
 			subdivider.visit_surface(levels, visitor);
 			glEnd();
 		}
 	}
+
+	class selecting_visitor : public k3d::sds::ipatch_surface_visitor
+	{
+	public:
+		selecting_visitor(const k3d::mesh::points_t& Points, const k3d::mesh::normals_t& Normals) :
+			m_points(Points),
+			m_normals(Normals)
+			{}
+
+		void add_quad(const k3d::uint_t P1, const k3d::uint_t P2, const k3d::uint_t P3, const k3d::uint_t P4)
+		{
+			k3d::gl::normal3d(m_normals[P1]);
+			k3d::gl::vertex3d(m_points[P1]);
+			k3d::gl::normal3d(m_normals[P2]);
+			k3d::gl::vertex3d(m_points[P2]);
+			k3d::gl::normal3d(m_normals[P3]);
+			k3d::gl::vertex3d(m_points[P3]);
+			k3d::gl::normal3d(m_normals[P4]);
+			k3d::gl::vertex3d(m_points[P4]);
+		}
+
+		void start_face(const k3d::uint_t Face)
+		{
+			k3d::gl::push_selection_token(k3d::selection::FACE, Face);
+			glBegin(GL_QUADS);
+		}
+
+		void finish_face(const k3d::uint_t Face)
+		{
+			glEnd(); // GL_QUADS
+			k3d::gl::pop_selection_token(); // FACE
+		}
+
+	private:
+		const k3d::mesh::points_t& m_points;
+		const k3d::mesh::normals_t& m_normals;
+	};
 	
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
-		assert_not_implemented();
+		glFrontFace(RenderState.inside_out ? GL_CCW : GL_CW);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		k3d::gl::set(GL_CULL_FACE, !SelectionState.select_backfacing);
+
+		glDisable(GL_LIGHTING);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1.0, 1.0);
+
+		const k3d::uint_t levels = m_levels.pipeline_value();
+
+		k3d::uint_t primitive_index = 0;
+		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive, ++primitive_index)
+		{
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **primitive));
+			if(!polyhedron || !k3d::polyhedron::is_sds(*polyhedron))
+				continue;
+
+			const k3d::sds::catmull_clark_subdivider& subdivider = get_cached_data<sds_cache>(std::make_pair(levels, *primitive), ChangedSignal).value(Mesh);
+			selecting_visitor visitor(subdivider.points(levels), subdivider.point_normals(levels));
+
+			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
+			subdivider.visit_surface(levels, visitor);
+			k3d::gl::pop_selection_token(); // PRIMITIVE
+		}
 	}
 
 	static k3d::iplugin_factory& get_factory()
