@@ -86,9 +86,9 @@ struct point_data
 };
 
 /// Cached object for point data stored in VBOs
-class point_vbo : public cached_polyhedron_data<k3d::pipeline_data<k3d::mesh::points_t>, point_data>
+class point_vbo : public cached_polyhedron_data<const k3d::mesh::points_t* const, point_data>
 {
-	typedef k3d::pipeline_data<k3d::mesh::points_t> key_t;
+	typedef const k3d::mesh::points_t* const key_t;
 	typedef cached_polyhedron_data<key_t, point_data> base;
 public:
 	point_vbo(const key_t Key, k3d::iproperty::changed_signal_t& ChangedSignal) : base(Key, ChangedSignal) {}

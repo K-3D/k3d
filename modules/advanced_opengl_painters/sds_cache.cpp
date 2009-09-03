@@ -65,12 +65,14 @@ const k3d::uint_t sds_cache::polyhedron_idx(const k3d::mesh& InputMesh)
 {
 	for(k3d::uint_t i = 0; i != InputMesh.primitives.size(); ++i)
 	{
-		if(InputMesh.primitives[i] == m_key.second)
+		if(InputMesh.primitives[i].get() == m_key.second)
 		{
 			return i;
 		}
 	}
-	throw std::runtime_error("polyhedron not found!");
+	std::stringstream msg;
+	msg << "polyhedron " << m_key.second << " not found for cache " << this << " and mesh " << &InputMesh;
+	throw std::runtime_error(msg.str());
 }
 
 void sds_cache::calculate_normals(k3d::mesh& Output, const k3d::mesh& Input)

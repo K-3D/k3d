@@ -70,8 +70,8 @@ public:
 
 		if(!Mesh.points || Mesh.points->empty())
 			return;
-		
-		const point_data& data = get_cached_data<point_vbo>(Mesh.points, ChangedSignal).value(Mesh);
+
+		const point_data& data = get_cached_data<point_vbo>(Mesh.points.get(), ChangedSignal).value(Mesh);
 		bind_vertex_buffer(data.points);
 		bind_texture_buffer(data.selection);
 
@@ -85,14 +85,14 @@ public:
 
 		if(!Mesh.points || Mesh.points->empty())
 			return;
-			
+
 		if (!SelectionState.select_component.count(k3d::selection::POINT))
 			return;
 
-		bind_vertex_buffer(get_cached_data<point_vbo>(Mesh.points, ChangedSignal).value(Mesh).points);
-		
+		bind_vertex_buffer(get_cached_data<point_vbo>(Mesh.points.get(), ChangedSignal).value(Mesh).points);
+
 		glDisable(GL_LIGHTING);
-		
+
 		const size_t point_count = Mesh.points->size();
 		for(size_t point = 0; point != point_count; ++point)
 		{
@@ -102,11 +102,11 @@ public:
 //							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
 //			{
 				k3d::gl::push_selection_token(k3d::selection::POINT, point);
-	
+
 				glBegin(GL_POINTS);
 				glArrayElement(point);
 				glEnd();
-	
+
 				k3d::gl::pop_selection_token(); // k3d::selection::POINT
 			//}
 		}

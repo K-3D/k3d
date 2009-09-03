@@ -101,7 +101,6 @@ void clean_vbo_state()
 
 void point_vbo::on_topology_changed(point_data& Output, const k3d::mesh& InputMesh)
 {
-	k3d::log() << debug << "topology changed" << std::endl;
 	const k3d::mesh::points_t& points = *InputMesh.points;
 	glBindBuffer(GL_ARRAY_BUFFER, Output.points);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(points[0]) * points.size(), &points[0], GL_STATIC_DRAW);
@@ -109,7 +108,6 @@ void point_vbo::on_topology_changed(point_data& Output, const k3d::mesh& InputMe
 
 void point_vbo::on_selection_changed(point_data& Output, const k3d::mesh& InputMesh)
 {
-	k3d::log() << debug << "selection changed" << std::endl;
 	const k3d::mesh::selection_t& selection = *InputMesh.point_selection;
 	glBindBuffer(GL_ARRAY_BUFFER, Output.selection);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(selection[0]) * selection.size(), &selection[0], GL_STATIC_DRAW);
@@ -121,12 +119,10 @@ void point_vbo::on_geometry_changed(point_data& Output, const k3d::mesh& InputMe
 	glBindBuffer(GL_ARRAY_BUFFER, Output.points);
 	if(ChangedPoints.empty()) // caller didn't tell which points changed, so update everything
 	{
-		k3d::log() << debug << "geometry changed, full rebuild" << std::endl;
 		glBufferData(GL_ARRAY_BUFFER, sizeof(points[0]) * points.size(), &points[0], GL_STATIC_DRAW);
 	}
 	else
 	{
-		k3d::log() << debug << "geometry changed, mapping points" << std::endl;
 		k3d::point3* opengl_points = static_cast<k3d::point3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 		for (size_t index = 0; index != ChangedPoints.size(); ++index)
 		{

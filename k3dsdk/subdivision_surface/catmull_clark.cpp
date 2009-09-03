@@ -1283,7 +1283,7 @@ public:
 		const k3d::mesh::indices_t& input_clockwise_edges = Polyhedron.clockwise_edges;
 		for(k3d::uint_t edge = 0; edge != edge_count; ++edge)
 		{
-			Visitor.on_boundary(edge);
+			Visitor.start_edge(edge);
 			k3d::uint_t c0 = input_edge_points[edge];
 			k3d::uint_t c1 = input_edge_points[input_clockwise_edges[edge]];
 			k3d::uint_t first_edge = edge;
@@ -1317,13 +1317,14 @@ public:
 			return_if_fail(edge_points[first_edge] == c0);
 			for(k3d::uint_t subedge = first_edge; ;)
 			{ 
-				Visitor.on_point(points[corner_points[edge_points[subedge]]]);
-				Visitor.on_point(points[edge_midpoints[subedge]]);
+				Visitor.add_vertex(points[corner_points[edge_points[subedge]]]);
+				Visitor.add_vertex(points[edge_midpoints[subedge]]);
 				
 				if(edge_points[clockwise_edges[subedge]] == c1)
 					break;
 				subedge = clockwise_edges[companions[clockwise_edges[subedge]]];
 			}
+			Visitor.finish_edge(edge);
 		}
 	}
 	

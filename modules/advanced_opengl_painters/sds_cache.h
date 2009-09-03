@@ -44,11 +44,11 @@ namespace opengl
 namespace painters
 {
 
-class sds_cache : public cached_polyhedron_data<std::pair<k3d::uint_t, k3d::pipeline_data<k3d::mesh::primitive> >, k3d::sds::catmull_clark_subdivider>
+class sds_cache : public cached_polyhedron_data<std::pair<k3d::uint_t, const k3d::mesh::primitive* const>, k3d::sds::catmull_clark_subdivider>
 {
-	typedef cached_polyhedron_data<std::pair<k3d::uint_t, k3d::pipeline_data<k3d::mesh::primitive> >, k3d::sds::catmull_clark_subdivider> base;
+	typedef cached_polyhedron_data<std::pair<k3d::uint_t, const k3d::mesh::primitive* const>, k3d::sds::catmull_clark_subdivider> base;
 public:
-	sds_cache(const std::pair<k3d::uint_t, k3d::pipeline_data<k3d::mesh::primitive> > Key, k3d::iproperty::changed_signal_t& ChangedSignal) : base(Key, ChangedSignal) {}
+	sds_cache(const std::pair<k3d::uint_t, const k3d::mesh::primitive* const> Key, k3d::iproperty::changed_signal_t& ChangedSignal) : base(Key, ChangedSignal) {}
 protected:
 	void on_topology_changed(k3d::sds::catmull_clark_subdivider& Output, const k3d::mesh& InputMesh);
 	void on_selection_changed(k3d::sds::catmull_clark_subdivider& Output, const k3d::mesh& InputMesh) {}
@@ -58,37 +58,6 @@ private:
 	void calculate_normals(k3d::mesh& Output, const k3d::mesh& Input);
 };
 
-/// Stores SDS patch border data in OpenGL-compatible arrays
-class edge_visitor : public k3d::sds::ipatch_boundary_visitor
-{
-public:
-	edge_visitor(const k3d::uint_t EdgeCount) : edge_starts(EdgeCount) {}
-
-	void on_point(const k3d::point3& Point)
-	{
-		points_array.push_back(Point);
-	}
-	void on_boundary(const k3d::uint_t Edge)
-	{
-		edge_starts[Edge] = points_array.size();
-	}
-	
-	k3d::mesh::points_t points_array;
-	k3d::mesh::indices_t edge_starts;
-};
-
-/// Stores SDS patch corner data in OpenGL-compatible arrays
-class point_visitor : public k3d::sds::ipatch_corner_visitor
-{
-public:
-	
-	void on_corner(const k3d::point3& Point)
-	{
-		points_array.push_back(Point);
-	}
-	
-	k3d::mesh::points_t points_array;
-};
 
 } // namespace opengl
 

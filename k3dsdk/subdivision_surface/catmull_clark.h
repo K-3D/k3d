@@ -69,10 +69,13 @@ class ipatch_boundary_visitor
 {
 public:
 	/// Called at the start of each boundary, corresponding to an edge on the original mesh
-	virtual void on_boundary(const k3d::uint_t Edge) = 0;
+	virtual void start_edge(const k3d::uint_t Edge) = 0;
+
+	/// Called at the end of each boundary, corresponding to an edge on the original mesh
+	virtual void finish_edge(const k3d::uint_t Edge) = 0;
 	
 	/// Called for each point on the patch boundaries
-	virtual void on_point(const k3d::point3& Point) = 0;
+	virtual void add_vertex(const k3d::point3& Point) = 0;
 	
 protected:
 	ipatch_boundary_visitor() {}

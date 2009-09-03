@@ -62,6 +62,7 @@ public:
 		base(Factory, Document),
 		m_levels(init_owner(*this) + init_name("levels") + init_label(_("Levels")) + init_description(_("Number of SDS levels")) + init_value(2) + init_constraint(constraint::minimum<k3d::int32_t>(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
+		m_levels.changed_signal().connect(make_async_redraw_slot());
 	}
 
 	class painting_visitor : public k3d::sds::ipatch_corner_visitor
@@ -90,7 +91,7 @@ public:
 			if(!polyhedron || !k3d::polyhedron::is_sds(*polyhedron))
 				continue;
 
-			const k3d::sds::catmull_clark_subdivider& subdivider = get_cached_data<sds_cache>(std::make_pair(levels, *primitive), ChangedSignal).value(Mesh);
+			const k3d::sds::catmull_clark_subdivider& subdivider = get_cached_data<sds_cache>(std::make_pair(levels, primitive->get()), ChangedSignal).value(Mesh);
 			painting_visitor visitor(*Mesh.point_selection);
 
 			glBegin(GL_POINTS);
@@ -119,6 +120,9 @@ public:
 
 	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
+		if(!SelectionState.select_component.count(k3d::selection::POINT))
+			return;
+
 		glDisable(GL_LIGHTING);
 		
 		const k3d::uint_t levels = m_levels.pipeline_value();
@@ -130,7 +134,7 @@ public:
 			if(!polyhedron || !k3d::polyhedron::is_sds(*polyhedron))
 				continue;
 
-			const k3d::sds::catmull_clark_subdivider& subdivider = get_cached_data<sds_cache>(std::make_pair(levels, *primitive), ChangedSignal).value(Mesh);
+			const k3d::sds::catmull_clark_subdivider& subdivider = get_cached_data<sds_cache>(std::make_pair(levels, primitive->get()), ChangedSignal).value(Mesh);
 			selecting_visitor visitor;
 
 			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
