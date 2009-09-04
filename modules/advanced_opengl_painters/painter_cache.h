@@ -211,6 +211,7 @@ protected:
 		{
 			if(k3d::hint::mesh_geometry_changed* hint = dynamic_cast<k3d::hint::mesh_geometry_changed*>(Hints[i]))
 			{
+				if(changed_points.empty() || hint->changed_points != changed_points.back())
 				changed_points.push_back(hint->changed_points);
 			}
 			else if(k3d::hint::selection_changed* hint = dynamic_cast<k3d::hint::selection_changed*>(Hints[i]))
