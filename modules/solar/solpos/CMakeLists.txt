@@ -3,11 +3,5 @@
 
 PROJECT(solpos)
 
-ADD_LIBRARY(k3d-solar-solpos SHARED solpos.cpp solpos.h)
-
-INSTALL(TARGETS k3d-solar-solpos
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION ${K3D_LIBDIR}
-	ARCHIVE DESTINATION ${K3D_LIBDIR}
-	)
+ADD_LIBRARY(k3d-solar-solpos STATIC solpos.cpp solpos.h)
 
