@@ -38,6 +38,7 @@
 #include <k3dsdk/painter_render_state_gl.h>
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/parentable.h>
+#include <k3dsdk/pointer_demand_storage.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/renderable_ri.h>
@@ -72,89 +73,48 @@ public:
 		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh"))),
 		m_gl_painter(init_owner(*this) + init_name("gl_painter") + init_label(_("OpenGL Mesh Painter")) + init_description(_("OpenGL Mesh Painter")) + init_value(static_cast<k3d::gl::imesh_painter*>(0))),
 		m_ri_painter(init_owner(*this) + init_name("ri_painter") + init_label(_("RenderMan Mesh Painter")) + init_description(_("RenderMan Mesh Painter")) + init_value(static_cast<k3d::ri::imesh_painter*>(0))),
-		m_show_component_selection(init_owner(*this) + init_name("show_component_selection") + init_label(_("Show Component Selection")) + init_description(_("Show component selection")) + init_value(false)),
-		m_output_mesh_pointer(0),
-		m_document_closed(false),
-		m_updating(false)
+		m_show_component_selection(init_owner(*this) + init_name("show_component_selection") + init_label(_("Show Component Selection")) + init_description(_("Show component selection")) + init_value(false))
 	{
-		m_input_mesh.changed_signal().connect(make_mesh_changed_slot());
-		m_mesh_selection.changed_signal().connect(make_selection_changed_slot());
+		m_input_mesh.changed_signal().connect(k3d::hint::converter<k3d::hint::convert<k3d::hint::any, k3d::hint::unchanged> >(m_output_mesh.make_slot()));
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(m_output_mesh.make_slot()));
 
+		m_input_mesh.changed_signal().connect(make_async_redraw_slot());
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_gl_painter.changed_signal().connect(make_async_redraw_slot());
 		m_show_component_selection.changed_signal().connect(make_async_redraw_slot());
 		
-		m_output_mesh.set_initialize_slot(sigc::mem_fun(*this, &mesh_instance::create_mesh));
-		m_output_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_instance::update_mesh));
-		
-		m_delete_connection = deleted_signal().connect(sigc::mem_fun(*this, &mesh_instance::on_instance_delete));
-		document().close_signal().connect(sigc::mem_fun(*this, &mesh_instance::disconnect));
-	}
-
-	sigc::slot<void, k3d::ihint*> make_mesh_changed_slot()
-	{
-		return sigc::mem_fun(*this, &mesh_instance::mesh_changed);
+		m_output_mesh.set_update_slot(sigc::mem_fun(*this, &mesh_instance::execute));
 	}
 	
-	sigc::slot<void, k3d::ihint*> make_selection_changed_slot()
+	void execute(const std::vector<k3d::ihint*>& Hints, k3d::mesh& Output)
 	{
-		return sigc::mem_fun(*this, &mesh_instance::selection_changed);
-	}
-	
-	/// Disconnect the delete signal to prevent signal propagation to deleted nodes during document close, and stop drawing
-	void disconnect()
-	{
-		m_delete_connection.disconnect();
-		m_document_closed = true;
-	}
-	
-	/// Executed when the input mesh changed
-	void mesh_changed(k3d::ihint* Hint)
-	{
-		if (m_document_closed)
-			return;
-		// Use stored pointer as key for the mesh painters, avoiding pipeline execution here...
-		if(m_output_mesh_pointer)
-		{
-			if(k3d::gl::imesh_painter* const painter = m_gl_painter.pipeline_value())
-				painter->mesh_changed(*m_output_mesh_pointer, Hint);
-		}
-		m_output_mesh.update(Hint);
-		async_redraw(0);
-	}
-	
-	/// Needed to notify caches that we are deleted
-	void on_instance_delete()
-	{
-		mesh_changed(k3d::hint::mesh_deleted::instance());
-	}
-
-	void selection_changed(k3d::ihint* const Hint)
-	{
-		mesh_changed(k3d::hint::selection_changed::instance());
-	}
-
-	void create_mesh(k3d::mesh& OutputMesh)
-	{
-		update_mesh(OutputMesh);
-	}
-	
-	void update_mesh(k3d::mesh& OutputMesh)
-	{
-		m_updating = true;
-		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Update mesh");
-		// we store this to avoid executing the pipeline in mesh_changed
-		m_output_mesh_pointer = &OutputMesh;
 		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
 		{
-			OutputMesh = *input_mesh;
-			k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), OutputMesh);
+			k3d::bool_t geometry_only = true;
+			k3d::bool_t selection_only = true;
+			k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Update mesh");
+			for(k3d::uint_t i = 0; i != Hints.size(); ++i)
+			{
+				if(!dynamic_cast<k3d::hint::mesh_geometry_changed*>(Hints[i]))
+					geometry_only = false;
+				if(!dynamic_cast<k3d::hint::selection_changed*>(Hints[i]))
+					selection_only = false;
+			}
+			if(!geometry_only && !selection_only)
+				Output = *input_mesh;
+			if(!geometry_only)
+			{
+				k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+			}
+			else
+			{
+				Output.points = input_mesh->points;
+			}
 		}
 		else
 		{
-			OutputMesh = k3d::mesh();
+			Output = k3d::mesh();
 		}
-		m_updating = false;
 	}
 
 	const k3d::bounding_box3 extents()
@@ -182,10 +142,6 @@ public:
 	
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
-		if (m_updating)
-			return;
-		if (m_document_closed)
-			return;
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Draw");
 		if(k3d::gl::imesh_painter* const painter = m_gl_painter.pipeline_value())
 		{
@@ -195,23 +151,17 @@ public:
 			k3d::gl::painter_render_state render_state(State, matrix(), m_show_component_selection.pipeline_value());
 			try
 			{
-				painter->paint_mesh(*output_mesh, render_state);
+				painter->paint_mesh(*output_mesh, render_state, m_output_mesh.changed_signal());
 			}
-			catch(std::runtime_error& E) // VBO painters throw an exception if the VBO state is corrupted. We force regeneration using mesh_changed.
+			catch(std::runtime_error& E) // VBO painters throw an exception if the VBO state is corrupted.
 			{
 				k3d::log() << error << E.what() << std::endl;
-				mesh_changed(0);
 			}
 		}
 	}
 
 	void on_gl_select(const k3d::gl::render_state& State, const k3d::gl::selection_state& SelectionState)
 	{
-		if (m_updating)
-			return;
-		if (m_document_closed)
-			return;
-
 		k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Select");
 		if(k3d::gl::imesh_painter* const painter = m_gl_painter.pipeline_value())
 		{
@@ -228,12 +178,11 @@ public:
 			// Now give the painters a chance ...
 			try
 			{
-				painter->select_mesh(*output_mesh, render_state, selection_state);
+				painter->select_mesh(*output_mesh, render_state, selection_state, m_output_mesh.changed_signal());
 			}
-			catch(std::runtime_error& E) // VBO painters throw an exception if the VBO state is corrupted. We force regeneration using mesh_changed.
+			catch(std::runtime_error& E) // VBO painters throw an exception if the VBO state is corrupted.
 			{
 				k3d::log() << error << E.what() << std::endl;
-				mesh_changed(0);
 			}
 
 			k3d::gl::pop_selection_token(); // mesh
@@ -292,14 +241,10 @@ public:
 
 private:
 	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input_mesh;
-	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output_mesh;
+	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_demand_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output_mesh;
 	k3d_data(k3d::gl::imesh_painter*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_gl_painter;
 	k3d_data(k3d::ri::imesh_painter*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::with_undo, k3d::data::node_storage, k3d::data::no_constraint, k3d::data::node_property, k3d::data::node_serialization) m_ri_painter;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_show_component_selection;
-	const k3d::mesh* m_output_mesh_pointer;
-	sigc::connection m_delete_connection;
-	bool m_document_closed;
-	bool m_updating;
 };
 
 /////////////////////////////////////////////////////////////////////////////

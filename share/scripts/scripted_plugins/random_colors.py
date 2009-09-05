@@ -22,7 +22,7 @@ for prim_idx, const_primitive in enumerate(Input.primitives()):
 		polyhedron = k3d.polyhedron.validate(Output, Output.primitives()[prim_idx])
 		if polyhedron:
 			Cs = polyhedron.edge_attributes().create("Cs", "k3d::color")
-			for i in range(len(polyhedron.edge_points())):
+			for i in range(len(polyhedron.vertex_points())):
 				Cs.append(colors[i % len(colors)])
 			Cs = polyhedron.face_attributes().create("Cs", "k3d::color")
 			for i in range(len(polyhedron.face_first_loops())):

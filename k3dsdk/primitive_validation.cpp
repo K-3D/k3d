@@ -37,7 +37,7 @@ static void require_valid_table(const mesh& Mesh, const string_t& Name, const ta
 
 		const array* const first_array = Table.begin()->second.get();
 		if(current_array->size() != first_array->size())
-			throw std::runtime_error("Table array length mismatch.");
+			throw std::runtime_error("Table array length mismatch for table " + Name);
 
 		if(current_array->get_metadata_value(metadata::key::domain()) == metadata::value::point_indices_domain())
 		{

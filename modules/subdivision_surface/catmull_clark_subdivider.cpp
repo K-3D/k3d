@@ -96,7 +96,7 @@ public:
 			if(!polyhedron.get())
 				continue;
 			m_subdividers[primitive->get()].update_mesh(*Output.points, *polyhedron, Output.point_attributes, polyhedron->face_selections, this);
-			m_subdividers[primitive->get()].copy_output(Output.points.writable(), *polyhedron, Output.point_attributes);
+			m_subdividers[primitive->get()].copy_output(Output.points.create(), *polyhedron, Output.point_attributes);
 			Output.point_selection.writable().resize(Output.points->size());
 		}
 	}

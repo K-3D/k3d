@@ -66,7 +66,7 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
@@ -135,7 +135,7 @@ assert_not_implemented();
 		disable_blending();
 	}
 	
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		return_if_fail(k3d::gl::extension::query_vbo());
 
