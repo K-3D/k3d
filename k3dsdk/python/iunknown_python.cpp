@@ -130,6 +130,9 @@ static void setattr(object& Self, const string_t& Name, const object& Value)
 
 static bool eq(const object& Self, const object& Other)
 {
+	if(Other == boost::python::object())
+		return false;
+
 	extract<iunknown_wrapper> self(Self);
 	extract<iunknown_wrapper> other(Other);
 
@@ -138,6 +141,9 @@ static bool eq(const object& Self, const object& Other)
 
 static bool ne(const object& Self, const object& Other)
 {
+	if(Other == boost::python::object())
+		return false;
+
 	extract<iunknown_wrapper> self(Self);
 	extract<iunknown_wrapper> other(Other);
 
