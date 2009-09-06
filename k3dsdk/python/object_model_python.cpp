@@ -256,6 +256,14 @@ static const k3d::matrix4 translate3_b(const double_t X, const double_t Y, const
 	return k3d::translate3(X, Y, Z);
 }
 
+static const k3d::matrix4 translate3_c(const boost::python::tuple& Tuple)
+{
+	if(len(Tuple) != 3)
+		throw std::invalid_argument("3-tuple required.");
+
+	return k3d::translate3(extract<double>(Tuple[0]), extract<double>(Tuple[1]), extract<double>(Tuple[2]));
+}
+
 object module_ui()
 {
 	return wrap_unknown(k3d::user_interface());
@@ -463,6 +471,8 @@ BOOST_PYTHON_MODULE(k3d)
 	def("translate3", translate3_a,
 		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
 	def("translate3", translate3_b,
+		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
+	def("translate3", translate3_c,
 		"Returns a L{matrix4} containing a three-dimensional translation matrix.");
 	def("ui", module_ui,
 		"Returns the singleton runtime user interface plugin instance.");
