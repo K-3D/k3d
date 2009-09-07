@@ -434,10 +434,12 @@ BOOST_PYTHON_MODULE(k3d)
 		"Request program exit (may be overridden by user input).");
 	def("get_command_node", module_get_command_node,
 		"Returns a command node by path.");
-	def("intersect_lines", k3d::intersect_lines,
-		"Find the point at which two infinite lines intersect.");
 	def("identity3", k3d::identity3,
 		"Returns a L{matrix4} containing a three-dimensional identity matrix.");
+	def("intersect_lines", k3d::intersect_lines,
+		"Find the point at which two infinite lines intersect.");
+	def("inverse", k3d::inverse,
+		"Computes the inverse of a matrix.");
 	def("length", module_length,
 		"Returns the length of a L{vector3}.");
 	def("log_critical", module_log_critical,
