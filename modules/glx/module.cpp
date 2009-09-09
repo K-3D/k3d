@@ -31,6 +31,7 @@ namespace glx
 {
 
 extern k3d::iplugin_factory& camera_to_bitmap_factory();
+extern k3d::iplugin_factory& mesa_version_check_factory();
 
 } // namespace glx
 
@@ -38,5 +39,6 @@ extern k3d::iplugin_factory& camera_to_bitmap_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::glx::camera_to_bitmap_factory());
+	Registry.register_factory(module::glx::mesa_version_check_factory());
 K3D_MODULE_END
 
