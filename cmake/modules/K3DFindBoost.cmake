@@ -10,8 +10,6 @@ IF(WIN32)
 	SET(BOOST_ROOT "C:/Program Files/Boost")
 ENDIF(WIN32)
 
-find_package(Boost)
-
 #components that are always needed
 SET(K3D_BOOST_COMPONENTS date_time program_options regex)
 
@@ -22,13 +20,7 @@ ENDIF()
 
 # libs needed by collada
 IF(${K3D_BUILD_COLLADA_IO_MODULE} STREQUAL "ON")
-	#Make sure we only search for the system libary after boost version 1.35, courtesy of Geir Erikstad
-	set(local_boost_version "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}")
-	if (${local_boost_version} VERSION_LESS "1.35")
-		SET(K3D_BOOST_COMPONENTS ${K3D_BOOST_COMPONENTS} filesystem)
-	else()
-		SET(K3D_BOOST_COMPONENTS ${K3D_BOOST_COMPONENTS} filesystem system)
-	endif()
+	SET(K3D_BOOST_COMPONENTS ${K3D_BOOST_COMPONENTS} filesystem system)
 ENDIF()
 
 #libs needed by CGAL
