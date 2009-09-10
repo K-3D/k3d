@@ -29,6 +29,7 @@
 #include "gzstream.h"
 #include "path.h"
 
+#include <libio.h>
 #include <zlib.h>
 #include <string.h>
 

@@ -24,6 +24,8 @@
 #include "result.h"
 #include "system.h"
 
+#include <cstdio>
+
 #include <glibmm/convert.h>
 
 #ifdef K3D_API_WIN32
