@@ -1,34 +1,43 @@
 <?xml version="1.0" ?>
 <k3dml>
 	<mesh_arrays>
-		<points>-2.778354663078042 0.6295049650826483 0 -2.4799026629429455 -2.8461715677273025 0 -0.77835466307804202 -1.3486259645959615 0 0.22164533692195798 -2.8461715677273025 0 2.4080883697413884 -1.9998088399239204 0 3.2051620219961245 1.0004452162688571 0 0.21340367945904126 0.81497509067575269 0</points>
-		<point_selection>0 0 0 0 0 0 0</point_selection>
-		<vertex_data/>
+		<points>5 5.0000000000255174 0 -2.5517059846396142e-11 5 0 -5.0000000000510338 4.9999999999744826 -0 -5 -5.1034119692792285e-11 -0 -4.9999999999489662 -5.0000000000765512 0 7.6551179539188427e-11 -5 0 5.0000000001020686 -4.9999999999234488 0 5 5.1034119692792285e-11 0</points>
+		<point_selection>0 0 0 0 0 0 0 0</point_selection>
+		<point_attributes/>
 		<primitives>
 			<primitive type="nurbs_curve">
 				<structure>
-					<array name="curve_first_knots" type="k3d::uint_t">0</array>
-					<array name="curve_first_points" type="k3d::uint_t">0</array>
-					<array name="curve_knots" type="k3d::double_t">0 0 0 0.16666666666666666 0.33333333333333331 0.5 0.66666666666666663 0.83333333333333337 1 1 1</array>
-					<array name="curve_orders" type="k3d::uint_t">3</array>
-					<array name="curve_point_counts" type="k3d::uint_t">8</array>
-					<array name="curve_point_weights" type="k3d::double_t">1 1 1 1 1 1 1 1</array>
-					<array name="curve_points" type="k3d::uint_t">6 0 1 2 3 4 5 6
-						<metadata>
-							<pair name="k3d:domain">k3d:point-indices</pair>
-						</metadata>
-					</array>
-					<array name="curve_selections" type="k3d::double_t">1
-						<metadata>
-							<pair name="k3d:selection-component">uniform</pair>
-						</metadata>
-					</array>
-					<array name="material" type="k3d::imaterial*">0</array>
+					<table type="constant">
+						<array name="material" type="k3d::imaterial*">0</array>
+					</table>
+					<table type="curve">
+						<array name="curve_first_knots" type="k3d::uint_t">0</array>
+						<array name="curve_first_points" type="k3d::uint_t">0</array>
+						<array name="curve_orders" type="k3d::uint_t">3</array>
+						<array name="curve_point_counts" type="k3d::uint_t">9</array>
+						<array name="curve_selections" type="k3d::double_t">1
+							<metadata>
+								<pair name="k3d:role">k3d:selection</pair>
+							</metadata>
+						</array>
+					</table>
+					<table type="knot">
+						<array name="curve_knots" type="k3d::double_t">0 0 0 1 1 2 2 3 3 4 4 4</array>
+					</table>
+					<table type="vertex">
+						<array name="curve_point_weights" type="k3d::double_t">1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1</array>
+						<array name="curve_points" type="k3d::uint_t">7 0 1 2 3 4 5 6 7
+							<metadata>
+								<pair name="k3d:domain">k3d:point-indices</pair>
+							</metadata>
+						</array>
+					</table>
 				</structure>
 				<attributes>
-					<arrays type="constant"/>
-					<arrays type="surface"/>
-					<arrays type="varying"/>
+					<table type="constant"/>
+					<table type="curve"/>
+					<table type="varying"/>
+					<table type="vertex"/>
 				</attributes>
 			</primitive>
 		</primitives>
