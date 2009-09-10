@@ -79,7 +79,7 @@ f3dsParser::f3dsParser(const char* filename, k3d::imaterial* const Material, k3d
 	Lib3dsFile* const file = lib3ds_file_load(filename);
 	if(!file) 
 	{
-		k3d::log() << debug << "3DS file could not be loaded correctly" << std::endl;
+		k3d::log() << error << "Not a 3DS file: " << filename << std::endl;
 		return;
 	}
 
@@ -94,7 +94,7 @@ f3dsParser::f3dsParser(const char* filename, k3d::imaterial* const Material, k3d
 	/* No nodes?  Fabricate nodes to display all the meshes. */
 	if(!file->nodes)
 	{
-		k3d::log() << error << "3ds file doesn't contain any nodes, creating virtual ones" << std::endl;
+		k3d::log() << warning << "3DS file doesn't contain any nodes, creating virtual nodes instead." << std::endl;
 	
 		for(Lib3dsMesh* mesh = file->meshes; mesh; mesh = mesh->next)
 		{

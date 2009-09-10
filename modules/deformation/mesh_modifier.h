@@ -1,5 +1,5 @@
-#ifndef _K3DSDK_MESH_MODIFIER_H
-#define _K3DSDK_MESH_MODIFIER_H
+#ifndef MODULES_DEFORMATION_MESH_MODIFIER_H
+#define MODULES_DEFORMATION_MESH_MODIFIER_H
 
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
@@ -97,4 +97,4 @@ private:
 
 } // namespace k3d
 
-#endif // !K3DSDK_MESH_MODIFIER_H
+#endif // !MODULES_DEFORMATION_MESH_MODIFIER_H

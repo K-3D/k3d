@@ -63,7 +63,6 @@ public:
 	{
 		Output = k3d::mesh();
 
-		k3d::log() << info << "Loading .obj file: " << Path.native_console_string() << std::endl;
 		k3d::filesystem::ifstream file(Path);
 		if(!file)
 		{

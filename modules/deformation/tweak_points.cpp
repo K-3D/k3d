@@ -23,11 +23,12 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
+#include "mesh_modifier.h"
+
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
-#include "mesh_modifier.h"
 #include <k3dsdk/node.h>
 #include <k3dsdk/properties.h>
 

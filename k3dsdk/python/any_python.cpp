@@ -225,6 +225,19 @@ const boost::any python_to_any(const object& Value)
 	throw std::invalid_argument("can't convert unrecognized python value");
 }
 
+template<typename DestinationT, typename ValueT, int Size>
+static DestinationT from_sequence(const object& Value)
+{
+	const k3d::uint_t size = boost::python::len(Value);
+	if(size != Size)
+		throw std::invalid_argument("Sequence must be of length " + k3d::string_cast(Size));
+
+	DestinationT destination;
+	for(k3d::uint_t i = 0; i != size; ++i)
+		destination[i] = boost::python::extract<ValueT>(Value[i]);
+	return destination;
+}
+
 const boost::any python_to_any(const object& Value, const std::type_info& TargetType)
 {
 	PyObject* const value = Value.ptr();
@@ -282,19 +295,19 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		return boost::any(extract<k3d::color>(Value)());
 
 	if(TargetType == typeid(k3d::point3))
-		return boost::any(extract<k3d::point3>(Value)());
+		return boost::any(from_sequence<k3d::point3, k3d::double_t, 3>(Value));
 
 	if(TargetType == typeid(k3d::point4))
-		return boost::any(extract<k3d::point4>(Value)());
+		return boost::any(from_sequence<k3d::point4, k3d::double_t, 4>(Value));
 
 	if(TargetType == typeid(k3d::normal3))
-		return boost::any(extract<k3d::normal3>(Value)());
+		return boost::any(from_sequence<k3d::normal3, k3d::double_t, 3>(Value));
 
 	if(TargetType == typeid(k3d::vector3))
-		return boost::any(extract<k3d::vector3>(Value)());
-
+		return boost::any(from_sequence<k3d::vector3, k3d::double_t, 3>(Value));
+	
 	if(TargetType == typeid(k3d::texture3))
-		return boost::any(extract<k3d::texture3>(Value)());
+		return boost::any(from_sequence<k3d::texture3, k3d::double_t, 3>(Value));
 
 	if(TargetType == typeid(k3d::matrix4))
 		return boost::any(extract<k3d::matrix4>(Value)());

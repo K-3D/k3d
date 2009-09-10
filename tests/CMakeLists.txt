@@ -122,7 +122,7 @@ K3D_ADD_TEST(document.stress.all_node_types.py PYTHON)
 
 K3D_ADD_TEST(document.serialization.properties.py PYTHON)
 
-K3D_ADD_TEST(document.importers.bogus_input.py PYTHON)
+K3D_ADD_TEST(document.importer.bogus_input.py PYTHON)
 
 K3D_ADD_TEST(mesh.validation.py PYTHON)
 
@@ -225,7 +225,7 @@ K3D_ADD_TEST(mesh.source.SVGMeshReader.py PYTHON REQUIRES K3D_BUILD_SVG_IO_MODUL
 K3D_ADD_TEST(mesh.source.Teapot.py PYTHON REQUIRES K3D_BUILD_QUADRICS_MODULE)
 K3D_ADD_TEST(mesh.source.Torus.py PYTHON REQUIRES K3D_BUILD_QUADRICS_MODULE)
 
-K3D_ADD_TEST(mesh.source.MeshReaders.bogus_input.py PYTHON)
+K3D_ADD_TEST(mesh.source.reader.bogus_input.py PYTHON)
 
 K3D_ADD_TEST(mesh.diff.py PYTHON)
 K3D_ADD_TEST(mesh.diff.MeshDiff.py PYTHON REQUIRES K3D_BUILD_TEST_MODULE)
@@ -417,7 +417,7 @@ K3D_ADD_TEST(mesh.modifier.TransformPoints.benchmark.py PYTHON REQUIRES K3D_BUIL
 
 K3D_ADD_TEST(bitmap.modifier.BenchmarkComparison.py PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE REQUIRES K3D_BUILD_CUDA_MODULE)
 K3D_ADD_TEST(mesh.modifier.BenchmarkComparison.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE REQUIRES K3D_BUILD_CUDA_MODULE)
-K3D_ADD_TEST(benchmark.CompareResults.py PYTHON REQUIRED K3D_BUILD_CUDA_MODULE)
+K3D_ADD_TEST(benchmark.CompareResults.py PYTHON REQUIRES K3D_BUILD_CUDA_MODULE)
 
 K3D_ADD_TEST(mesh.source.CUDAPolyGrid.py PYTHON REQUIRES K3D_BUILD_CUDA_MODULE)
 K3D_ADD_TEST(mesh.source.CUDAPolyGridAndTransformPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE REQUIRES K3D_BUILD_CUDA_MODULE)

@@ -14,7 +14,6 @@ SET(SKIP_FILES
 	"^k3dsdk/python/object_model_python.cpp$"
 	"^man/k3d.1.in$"
 	"^modules/inotify/inotify-cxx.h$"
-	"^modules/md2_io/md2.cpp$"
 	"^modules/ngui_python_shell/dialog.cpp$"
 	"^modules/obj_io/obj_specification.txt$"
 	"^modules/qslim/MxStdModel.cpp$"

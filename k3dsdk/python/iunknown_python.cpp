@@ -128,6 +128,28 @@ static void setattr(object& Self, const string_t& Name, const object& Value)
 	Self.attr("__dict__")[Name] = Value;
 }
 
+static bool eq(const object& Self, const object& Other)
+{
+	if(Other == boost::python::object())
+		return false;
+
+	extract<iunknown_wrapper> self(Self);
+	extract<iunknown_wrapper> other(Other);
+
+	return self == other;
+}
+
+static bool ne(const object& Self, const object& Other)
+{
+	if(Other == boost::python::object())
+		return false;
+
+	extract<iunknown_wrapper> self(Self);
+	extract<iunknown_wrapper> other(Other);
+
+	return !(self == other);
+}
+
 void define_class_iunknown()
 {
 	class_<iunknown_wrapper>("iunknown", 
@@ -136,6 +158,8 @@ void define_class_iunknown()
 		no_init)
 		.def("__getattr__", getattr)
 		.def("__setattr__", setattr)
+		.def("__eq__", eq)
+		.def("__ne__", ne)
 		;
 }
 

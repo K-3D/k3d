@@ -67,6 +67,8 @@ void define_class_matrix4()
 {
 	class_<k3d::matrix4>("matrix4",
 		"Stores a 4x4 transformation matrix.")
+		.def(init<const k3d::matrix4&>())
+		.def(init<const k3d::vector4&, const k3d::vector4&, const k3d::vector4&, const k3d::vector4&>())
 		.def("__len__", &utility::constant_len_len<k3d::matrix4, 4>)
 		.def("__getitem__", &utility::constant_len_get_item<k3d::matrix4, 4, k3d::vector4>)
 		.def("__setitem__", &utility::constant_len_set_item<k3d::matrix4, 4, k3d::vector4>)
