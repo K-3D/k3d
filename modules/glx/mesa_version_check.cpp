@@ -46,42 +46,49 @@ class mesa_version_check : public k3d::iunknown
 public:
 	mesa_version_check()
 	{
-		const k3d::string_t version(reinterpret_cast<const char*>(glGetString(GL_VERSION)));
-		const k3d::string_t vendor(reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
-		k3d::log() << debug << "OpenGL version: " << version << ", vendor: " << vendor << std::endl;
-		try
+		if(glewGetContext())
 		{
-			if(vendor == "Tungsten Graphics, Inc")
+			const k3d::string_t version(reinterpret_cast<const char*>(glGetString(GL_VERSION)));
+			const k3d::string_t vendor(reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
+			k3d::log() << debug << "OpenGL version: " << version << ", vendor: " << vendor << std::endl;
+			try
 			{
-				std::vector<k3d::string_t> tokens;
-				boost::split(tokens, version, boost::is_any_of(" "));
-				if(tokens.size() > 2 && tokens[1] == "Mesa")
+				if(vendor == "Tungsten Graphics, Inc")
 				{
-					const k3d::string_t version_number = tokens[2];
-					std::vector<k3d::string_t> bad_tokens; // Strip off any trailing '-devel' and so on
-					boost::split(bad_tokens, version_number, boost::is_any_of("-"));
-					std::vector<k3d::string_t> version_tokens;
-					boost::split(version_tokens, bad_tokens[0], boost::is_any_of("."));
-					if(version_tokens.size() > 1)
+					std::vector<k3d::string_t> tokens;
+					boost::split(tokens, version, boost::is_any_of(" "));
+					if(tokens.size() > 2 && tokens[1] == "Mesa")
 					{
-						const k3d::uint_t min_major = 7; // minimal major version
-						const k3d::uint_t min_minor = 5; // minimal minor version
-						const k3d::uint_t min_patch = 1; // minimal patch version
-						const k3d::uint_t major = boost::lexical_cast<k3d::uint_t>(version_tokens[0]);
-						const k3d::uint_t minor = boost::lexical_cast<k3d::uint_t>(version_tokens[1]);
-						if(major < min_major
-								|| (major == min_major && minor < min_minor)
-								|| (major == min_major && minor == min_minor && (version_tokens.size() == 2 || boost::lexical_cast<k3d::uint_t>(version_tokens[2]) < min_patch)))
+						const k3d::string_t version_number = tokens[2];
+						std::vector<k3d::string_t> bad_tokens; // Strip off any trailing '-devel' and so on
+						boost::split(bad_tokens, version_number, boost::is_any_of("-"));
+						std::vector<k3d::string_t> version_tokens;
+						boost::split(version_tokens, bad_tokens[0], boost::is_any_of("."));
+						if(version_tokens.size() > 1)
 						{
-							k3d::user_interface().warning_message("Your OpenGL version is " + version + ". On your platform, Mesa versions earlier than 7.5.1 are known to cause problems with face selection. If you experience this, please upgrade your Mesa library. See http://bugs.freedesktop.org/show_bug.cgi?id=16866 for detailed information.");
+							const k3d::uint_t min_major = 7; // minimal major version
+							const k3d::uint_t min_minor = 5; // minimal minor version
+							const k3d::uint_t min_patch = 1; // minimal patch version
+							const k3d::uint_t major = boost::lexical_cast<k3d::uint_t>(version_tokens[0]);
+							const k3d::uint_t minor = boost::lexical_cast<k3d::uint_t>(version_tokens[1]);
+							if(major < min_major
+									|| (major == min_major && minor < min_minor)
+									|| (major == min_major && minor == min_minor && (version_tokens.size() == 2 || boost::lexical_cast<k3d::uint_t>(version_tokens[2]) < min_patch)))
+							{
+								k3d::user_interface().warning_message("Your OpenGL version is " + version + ". On your platform, Mesa versions earlier than 7.5.1 are known to cause problems with face selection. If you experience this, please upgrade your Mesa library. See http://bugs.freedesktop.org/show_bug.cgi?id=16866 for detailed information.");
+							}
 						}
 					}
 				}
 			}
+			catch(std::runtime_error& E)
+			{
+				k3d::log() << warning << "error parsing mesa version: " << E.what() << std::endl;
+			}
 		}
-		catch(std::runtime_error& E)
+		else
 		{
-			k3d::log() << warning << "error parsing mesa version: " << E.what() << std::endl;
+			k3d::log() << warning << "No context defined to determine Mesa version" << std::endl;
 		}
 	}
 	
