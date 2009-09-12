@@ -22,7 +22,7 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_curve_modifier.h"
+#include "nurbs_curves.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -72,21 +72,24 @@ public:
 	{
 		Output = Input;
 
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		return_if_fail(nurbs);
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		nurbs_curve_modifier mod(Output, *nurbs);
-		int my_curve = mod.selected_curve();
-
-		if (my_curve < 0)
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			k3d::log() << error << "You need to select exactly one curve!" << std::endl;
-			return;
+			boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(Output, *primitive));
+			if(!curves)
+			{
+				continue;
+			}
+			for(k3d::uint_t curve = 0; curve != curves->curve_first_points.size(); ++curve)
+			{
+				if(curves->curve_selections[curve])
+				{
+					module::nurbs::close_curve(Output, *curves, curve, m_keep_ends.pipeline_value());
+				}
+			}
 		}
-
-		mod.close_curve(my_curve, m_keep_ends.pipeline_value());
+		k3d::mesh::delete_unused_points(Output);
 	}
 
 	static k3d::iplugin_factory& get_factory()
