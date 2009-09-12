@@ -251,10 +251,7 @@ void modify_selected_meshes(document_state& DocumentState, iplugin_factory* Modi
 					source_mesh = &transform_points_mesh_source->mesh_source_output();
 					imesh_selection_sink* selection_sink = dynamic_cast<imesh_selection_sink*>(transform_points);
 					return_if_fail(selection_sink);
-assert_not_implemented();
-/*
-					property::set_internal_value(selection_sink->mesh_selection_sink_input(), mesh_selection::select_all());
-*/
+					property::set_internal_value(selection_sink->mesh_selection_sink_input(), k3d::geometry::selection::create(1.0));
 				}
 			}
 			++count;
