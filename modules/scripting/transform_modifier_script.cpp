@@ -24,7 +24,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/itime_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
