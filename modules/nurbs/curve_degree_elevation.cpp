@@ -22,7 +22,7 @@
 		\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_curve_modifier.h"
+#include "nurbs_curves.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -34,6 +34,8 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/mesh_source.h>
+#include <k3dsdk/metadata.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/nurbs_curve.h>
@@ -71,27 +73,20 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
-
-		nurbs_curve_modifier mod(Output, *nurbs);
-
-		int my_curve = mod.selected_curve();
-
-
-		if (my_curve < 0)
+		for(k3d::uint_t prim = 0; prim != Output.primitives.size(); ++prim)
 		{
-			k3d::log() << error << "You need to select exactly curve!" << std::endl;
-			return;
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> input_curves(k3d::nurbs_curve::validate(Input, *Input.primitives[prim]));
+			if(!input_curves)
+				continue;
+			k3d::mesh::indices_t selected_curves;
+			k3d::mesh::visit_arrays(*Output.primitives[prim], selected_curves_extractor(selected_curves));
+			if(selected_curves.size())
+			{
+				boost::scoped_ptr<k3d::nurbs_curve::primitive> output_curves(k3d::nurbs_curve::create(Output.primitives[prim].create(new k3d::mesh::primitive("nurbs_curve"))));
+				elevate_curve_degree(Output, *output_curves, Input, *input_curves, selected_curves);
+			}
 		}
-
-		int t = m_degree.pipeline_value();
-		for (int i = 0; i < t; i++)
-			mod.curve_degree_elevate(my_curve);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -107,6 +102,27 @@ public:
 	}
 
 private:
+	/// Creates a list of the selected curves in a primitive
+	struct selected_curves_extractor
+	{
+		selected_curves_extractor(k3d::mesh::indices_t& SelectedCurves) : selected_curves(SelectedCurves) {}
+		void operator()(const k3d::string_t& StructureName, const k3d::table& Structure, const k3d::string_t& ArrayName, const k3d::pipeline_data<k3d::array>& Array)
+		{
+			if(StructureName == "curve" && Array->get_metadata_value(k3d::metadata::key::role()) == k3d::metadata::value::selection_role())
+			{
+				k3d::log() << debug << "found a selection array" << std::endl;
+				const k3d::mesh::selection_t* curve_selections = dynamic_cast<const k3d::mesh::selection_t*>(Array.get());
+				for(k3d::uint_t curve = 0; curve != curve_selections->size(); ++curve)
+				{
+					k3d::log() << debug << "curve " << curve << " has selection " << curve_selections->at(curve) << std::endl;
+					if(curve_selections->at(curve))
+						selected_curves.push_back(curve);
+				}
+			}
+		}
+		k3d::mesh::indices_t& selected_curves;
+	};
+
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_degree;
 };
 

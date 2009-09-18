@@ -6,7 +6,7 @@ import testing
 setup = testing.setup_mesh_modifier_test("NurbsCurve","NurbsCurveDegreeElevation")
 
 mesh_selection = k3d.geometry.selection.create(0)
-uniform_selection = k3d.geometry.primitive_selection.create(mesh_selection, k3d.selection.type.UNIFORM)
+uniform_selection = k3d.geometry.primitive_selection.create(mesh_selection, k3d.selection.type.CURVE)
 k3d.geometry.primitive_selection.append(uniform_selection, 1)
 
 setup.modifier.mesh_selection = mesh_selection

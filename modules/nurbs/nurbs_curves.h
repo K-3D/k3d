@@ -25,11 +25,11 @@
 */
 
 #include <k3dsdk/types.h>
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {
-class mesh;
-namespace nurbs_curve { class primitive; }
+namespace nurbs_curve { class primitive; class const_primitive; }
 }
 
 namespace module
@@ -37,6 +37,9 @@ namespace module
 
 namespace nurbs
 {
+
+/// Adds the given curve to the other primitive and mesh
+void add_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurve, const k3d::uint_t& Curve, k3d::mesh::indices_t& PointMap, k3d::mesh::bools_t& AddedPoints);
 
 /// Normalizes the knot vector of the given curve number in the given NURBS curve primitive
 void normalize_knot_vector(k3d::nurbs_curve::primitive& NurbsCurve, const k3d::uint_t Curve);
@@ -54,6 +57,12 @@ void replace_point(k3d::nurbs_curve::primitive& NurbsCurve, k3d::uint_t newIndex
  *  \param keep_ends If this is true then we're going to add a new point, otherwise the old end points get discarded
  **/
 void close_curve(k3d::mesh& Mesh, k3d::nurbs_curve::primitive& NurbsCurve, k3d::uint_t curve, bool keep_ends);
+
+/// Elevate the degree of the curves listed in Curves, storing the resulting mesh in OutputMesh and OutputCurves
+void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurve, const k3d::mesh::indices_t Curves);
+
+/// Connect the two input curves at their selected end points, storing the result in Output
+//void connect_curves(k3d::nurbs_curve::primitive& Output, const k3d::uint_t Curve1, const k3d::uint_t CurvePoint1, const k3d::uint_t Curve2, const k3d::uint_t CurvePoint2);
 
 } //namespace nurbs
 
