@@ -29,9 +29,9 @@
 #include "gzstream.h"
 #include "path.h"
 
-#include <libio.h>
 #include <zlib.h>
 #include <string.h>
+#include <cstdio> // for EOF
 
 namespace k3d
 {
