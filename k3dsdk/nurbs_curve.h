@@ -99,9 +99,13 @@ public:
 	mesh::table_t& vertex_attributes;
 };
 
-/// Creates a new nurbs_curve mesh primitive, returning references to its member arrays.
+/// Creates a new nurbs_curve mesh primitive inside the given mesh, returning references to its member arrays.
 /// The caller is responsible for the lifetime of the returned object.
 primitive* create(mesh& Mesh);
+
+/// Creates a new nurbs_curve mesh primitive inside the given primitive, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* create(mesh::primitive& Primitive);
 
 /// Tests the given mesh primitive to see if it is a valid nurbs_curve primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.

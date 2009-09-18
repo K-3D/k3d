@@ -106,22 +106,26 @@ primitive::primitive(
 
 primitive* create(mesh& Mesh)
 {
-	mesh::primitive& generic_primitive = Mesh.primitives.create("nurbs_curve");
+	return create(Mesh.primitives.create("nurbs_curve"));
+}
 
+primitive* create(mesh::primitive& Primitive)
+{
+	return_val_if_fail(Primitive.type == "nurbs_curve", 0);
 	primitive* const result = new primitive(
-		generic_primitive.structure["constant"].create<mesh::materials_t>("material"),
-		generic_primitive.structure["curve"].create<mesh::indices_t>("curve_first_points"),
-		generic_primitive.structure["curve"].create<mesh::counts_t>("curve_point_counts"),
-		generic_primitive.structure["curve"].create<mesh::orders_t>("curve_orders"),
-		generic_primitive.structure["curve"].create<mesh::indices_t>("curve_first_knots"),
-		generic_primitive.structure["curve"].create<mesh::selection_t>("curve_selections"),
-		generic_primitive.structure["vertex"].create<mesh::indices_t>("curve_points"),
-		generic_primitive.structure["vertex"].create<mesh::weights_t>("curve_point_weights"),
-		generic_primitive.structure["knot"].create<mesh::knots_t>("curve_knots"),
-		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["curve"],
-		generic_primitive.attributes["varying"],
-		generic_primitive.attributes["vertex"]
+		Primitive.structure["constant"].create<mesh::materials_t>("material"),
+		Primitive.structure["curve"].create<mesh::indices_t>("curve_first_points"),
+		Primitive.structure["curve"].create<mesh::counts_t>("curve_point_counts"),
+		Primitive.structure["curve"].create<mesh::orders_t>("curve_orders"),
+		Primitive.structure["curve"].create<mesh::indices_t>("curve_first_knots"),
+		Primitive.structure["curve"].create<mesh::selection_t>("curve_selections"),
+		Primitive.structure["vertex"].create<mesh::indices_t>("curve_points"),
+		Primitive.structure["vertex"].create<mesh::weights_t>("curve_point_weights"),
+		Primitive.structure["knot"].create<mesh::knots_t>("curve_knots"),
+		Primitive.attributes["constant"],
+		Primitive.attributes["curve"],
+		Primitive.attributes["varying"],
+		Primitive.attributes["vertex"]
 		);
 
 	result->curve_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
