@@ -55,6 +55,8 @@ public:
 		m_modified(false),
 		m_gravity(init_owner(*this) + init_name("gravity") + init_label(_("Gravity")) + init_description(_("Defines the gravity direction and magnitude (if any).")) + init_value(k3d::vector3(0, 0, -9.81)))
 	{
+		dInitODE();
+
 		m_time.changed_signal().connect(sigc::mem_fun(*this, &simulation::time_changed));
 	}
 
