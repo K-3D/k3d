@@ -42,7 +42,7 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 
 	print """Creating main article for """ + plugin.name() + """ ..."""
 	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/articles/" + plugin.name(), "w")
-	article.write("<plugin>{{PAGENAME}}</plugin>\n")
+	article.write("{{" + plugin.name() + "}}\n")
 
 # Create an article listing every plugin category ...
 print """Creating plugin categories article ..."""
