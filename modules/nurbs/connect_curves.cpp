@@ -21,7 +21,7 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_curve_modifier.h"
+#include "nurbs_curves.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -71,40 +71,61 @@ public:
 	{
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
-		assert_not_implemented();
 
-//		k3d::mesh::indices_t selected_primitives, selected_curves; // Keeps track of primitives and curves containing selected points
-//		k3d::mesh::bools_t first_point_selections; // True if the first point of a curve was selected, false otherwise
-//		for(k3d::uint_t prim_idx = 0; prim_idx != Input.primitives.size(); ++prim_idx)
-//		{
-//			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves(k3d::nurbs_curve::validate(Input, *Input.primitives[prim_idx]));
-//			if(!curves)
-//				continue;
-//			for(k3d::uint_t curve = 0; curve != curves->curve_first_points.size(); ++curve)
-//			{
-//				const k3d::uint_t first_curve_point = curves->curve_first_points[curve];
-//				const k3d::uint_t last_curve_point = first_curve_point + curves->curve_point_counts[curve] - 1;
-//				if(point_selections[curves->curve_points[first_curve_point]] && point_selecions[curves->curve_points[last_curve_point]])
-//				{
-//					k3d::log() << error << "NurbsConnectCurves: selected points must lie on different curves" << std::endl;
-//					return;
-//				}
-//				if(point_selections[curves->curve_points[first_curve_point]] || point_selecions[curves->curve_points[last_curve_point]])
-//				{
-//					selected_primitives.push_back(prim_idx);
-//					selected_curves.push_back(curve);
-//					first_point_selections.push_back(point_selecions[curves->curve_points[first_curve_point]]);
-//				}
-//			}
-//		}
-//
-//		if(selected_curves.size() != 2)
-//		{
-//			k3d::log() << error << "NurbsConnectCurves: you must select two end points on two different NURBS curves" << std::endl;
-//			return;
-//		}
+		k3d::mesh::indices_t selected_primitives, selected_curves; // Keeps track of primitives and curves containing selected points
+		k3d::mesh::bools_t first_point_selections; // True if the first point of a curve was selected, false otherwise
+		const k3d::mesh::selection_t point_selections = *Output.point_selection;
+		for(k3d::uint_t prim_idx = 0; prim_idx != Input.primitives.size(); ++prim_idx)
+		{
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves(k3d::nurbs_curve::validate(Input, *Input.primitives[prim_idx]));
+			if(!curves)
+				continue;
+			for(k3d::uint_t curve = 0; curve != curves->curve_first_points.size(); ++curve)
+			{
+				const k3d::uint_t first_curve_point = curves->curve_first_points[curve];
+				const k3d::uint_t last_curve_point = first_curve_point + curves->curve_point_counts[curve] - 1;
+				if(point_selections[curves->curve_points[first_curve_point]] && point_selections[curves->curve_points[last_curve_point]])
+				{
+					k3d::log() << error << "NurbsConnectCurves: selected points must lie on different curves" << std::endl;
+					return;
+				}
+				if(point_selections[curves->curve_points[first_curve_point]] || point_selections[curves->curve_points[last_curve_point]])
+				{
+					selected_primitives.push_back(prim_idx);
+					selected_curves.push_back(curve);
+					first_point_selections.push_back(point_selections[curves->curve_points[first_curve_point]]);
+				}
+			}
+		}
 
-		//module::nurbs::connect_curves(Output, output_curves, Input, selected_primitives[0], selected_curves[0], first_point_selections[0], selected_primitives[1], selected_curves[1], first_point_selections[1]);
+		if(selected_curves.size() != 2)
+		{
+			k3d::log() << error << "NurbsConnectCurves: you must select two end points on two different NURBS curves" << std::endl;
+			return;
+		}
+
+		// Create a new primitive if the original curves belonged to different primitives, or append to the existing primitive if they were the same.
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> output_curves;
+		if(selected_primitives[0] == selected_primitives[1])
+			output_curves.reset(k3d::nurbs_curve::validate(Output, Output.primitives[selected_primitives[0]]));
+		else
+			output_curves.reset(k3d::nurbs_curve::create(Output));
+		module::nurbs::connect_curves(Output, *output_curves, Input, selected_primitives[0], selected_curves[0], first_point_selections[0], selected_primitives[1], selected_curves[1], first_point_selections[1]);
+		if(selected_primitives[0] == selected_primitives[1])
+		{
+			delete_curve(*output_curves, selected_curves[0]);
+			delete_curve(*output_curves, selected_curves[1]);
+		}
+		else
+		{
+			boost::scoped_ptr<k3d::nurbs_curve::primitive> prim1(k3d::nurbs_curve::validate(Output, Output.primitives[selected_primitives[0]]));
+			boost::scoped_ptr<k3d::nurbs_curve::primitive> prim2(k3d::nurbs_curve::validate(Output, Output.primitives[selected_primitives[1]]));
+			output_curves->material.push_back(prim1->material.back());
+			delete_curve(*prim1, selected_curves[0]);
+			delete_curve(*prim2, selected_curves[1]);
+		}
+		delete_empty_primitives(Output);
+		k3d::mesh::delete_unused_points(Output);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -117,27 +138,6 @@ public:
 		  k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
-	}
-
-private:
-	/// Stores the curve point index each time one of the given points was encountered
-//	};
-
-	/// Get the curve the given CurvePoint belongs to, if it is an endpoint. Throw an exception otherwise
-	const k3d::uint_t get_curve_endpoint(const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t CurvePoint)
-	{
-		for(k3d::uint_t curve = 0; curve != NurbsCurves.curve_first_points.size(); ++curve)
-		{
-			const k3d::uint_t first_point = NurbsCurves.curve_first_points[curve];
-			const k3d::uint_t last_point = first_point + NurbsCurves.curve_point_counts[curve] - 1;
-			if(first_point == CurvePoint || last_point == CurvePoint)
-			{
-				return curve;
-			}
-		}
-		std::stringstream errormsg;
-		errormsg << "Curve point " << CurvePoint << " was not an end point of a curve";
-		throw std::runtime_error(errormsg.str());
 	}
 };
 

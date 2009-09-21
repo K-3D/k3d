@@ -41,6 +41,9 @@ namespace nurbs
 /// Adds the given curve to the other primitive and mesh
 void add_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve);
 
+/// Deletes a curve
+void delete_curve(k3d::nurbs_curve::primitive& Curves, const k3d::uint_t Curve);
+
 /// Normalizes the knot vector of the given curve number in the given NURBS curve primitive
 void normalize_knot_vector(k3d::nurbs_curve::primitive& NurbsCurve, const k3d::uint_t Curve);
 
@@ -113,6 +116,9 @@ void modifiy_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, 
 	replace_duplicate_points(OutputMesh);
 	k3d::mesh::delete_unused_points(OutputMesh);
 }
+
+/// TODO: Move to SDK
+void delete_empty_primitives(k3d::mesh& Mesh);
 
 } //namespace nurbs
 
