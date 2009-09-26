@@ -20,7 +20,7 @@ document.set_dependency(modifier.get_property("input1"), source2.get_property("o
 document.set_dependency(modifier.get_property("input2"), source3.get_property("output_mesh"))
 
 selection = k3d.geometry.selection.create(0)
-selection.points = k3d.geometry.point_selection.uniform(selection, 1)
+point_selection = k3d.geometry.point_selection.create(selection, 1)
 
 modifier.mesh_selection = selection
 
