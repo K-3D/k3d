@@ -71,25 +71,9 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
-		{
-			boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(Output, *primitive));
-			if(!curves)
-			{
-				continue;
-			}
-			for(k3d::uint_t curve = 0; curve != curves->curve_first_points.size(); ++curve)
-			{
-				if(curves->curve_selections[curve])
-				{
-					module::nurbs::close_curve(Output, *curves, curve, m_keep_ends.pipeline_value());
-				}
-			}
-		}
-		k3d::mesh::delete_unused_points(Output);
+		modifiy_selected_curves(Input, Output, curve_closer(m_keep_ends.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -105,6 +89,16 @@ public:
 	}
 
 private:
+	struct curve_closer
+	{
+		curve_closer(const k3d::bool_t KeepEnds) : keep_ends(KeepEnds) {}
+		void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
+		{
+			module::nurbs::close_curve(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve, keep_ends);
+		}
+		const k3d::bool_t keep_ends;
+	};
+
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_keep_ends;
 };
 

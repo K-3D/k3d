@@ -3,16 +3,14 @@
 import testing
 import k3d
 
-document = k3d.new_document()
-setup = testing.setup_mesh_reader_test("K3DMeshReader","mesh.modifier.NurbsCurveInsertKnotReference.k3d")
+setup = testing.setup_mesh_modifier_test("NurbsCircle", "NurbsCurveInsertKnot")
 
+setup.modifier.u_value = 0.1
 
-modifier = setup.document.new_node("NurbsCurveInsertKnot")
-modifier.u_value = 0.742
-modifier.multiplicity = 2
-modifier.normalize_all = False
+selection = k3d.geometry.selection.create(0)
+curve_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.CURVE)
+k3d.geometry.primitive_selection.append(curve_selection, 0, 10000, 1)
+setup.modifier.mesh_selection = selection
 
-document.set_dependency(modifier.get_property("input_mesh"), setup.reader.get_property("output_mesh"))
-
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsCurveInsertKnot", 1)
+testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsCurveInsertKnot", 1)
 

@@ -23,6 +23,8 @@
 
 #include "nurbs_patch_modifier.h"
 
+#include "nurbs_curves.h"
+
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
@@ -401,64 +403,6 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 	k3d::nurbs_curve::add_curve(OutputMesh, NurbsCurves, Order, points);
 }
 
-void update_indices(k3d::mesh::indices_t& Indices, const k3d::uint_t Start, const k3d::int32_t Offset)
-{
-	for(k3d::uint_t i = 0; i != Indices.size(); ++i)
-	{
-		if(Indices[i] >= Start)
-			Indices[i] += Offset;
-	}
-}
-
-// Remove the item at Index
-template<typename ArrayT>
-void erase(ArrayT& Array, const k3d::uint_t Index)
-{
-	return_if_fail(Index < Array.size());
-	Array.erase(Array.begin() + Index);
-}
-
-void delete_curve(k3d::nurbs_curve::primitive& Curves, const k3d::uint_t Curve)
-{
-	const k3d::uint_t curve_count = Curves.curve_first_points.size();
-
-	k3d::table curve_attributes = Curves.curve_attributes.clone_types();
-	k3d::table_copier uniform_copier(Curves.curve_attributes, curve_attributes);
-	for(k3d::uint_t i = 0; i != Curve; ++i)
-		uniform_copier.push_back(i);
-	for(k3d::uint_t i = Curve + 1; i != curve_count; ++i)
-		uniform_copier.push_back(i);
-	k3d::table varying_attributes = Curves.varying_attributes.clone_types();
-	k3d::table_copier varying_copier(Curves.varying_attributes, varying_attributes);
-	k3d::uint_t curve_start_index = Curves.curve_first_points[Curve];
-	k3d::uint_t curve_end_index = curve_start_index + Curves.curve_point_counts[Curve];
-	for(k3d::uint_t i = 0; i != curve_start_index; ++i)
-		varying_copier.push_back(i);
-	for(k3d::uint_t i = curve_end_index; i != Curves.curve_points.size(); ++i)
-		varying_copier.push_back(i);
-
-	return_if_fail(Curve < curve_count);
-	// Erase point indices and weights
-	k3d::mesh::indices_t::iterator points_begin = Curves.curve_points.begin() + Curves.curve_first_points[Curve];
-	k3d::mesh::indices_t::iterator points_end = points_begin + Curves.curve_point_counts[Curve];
-	Curves.curve_points.erase(points_begin, points_end);
-	update_indices(Curves.curve_first_points, Curves.curve_first_points[Curve] + Curves.curve_point_counts[Curve], -Curves.curve_point_counts[Curve]);
-	k3d::mesh::weights_t::iterator weights_begin = Curves.curve_point_weights.begin() + Curves.curve_first_points[Curve];
-	k3d::mesh::weights_t::iterator weights_end = weights_begin + Curves.curve_point_counts[Curve];
-	Curves.curve_point_weights.erase(weights_begin, weights_end);
-	// Erase knots
-	k3d::mesh::knots_t::iterator knots_begin = Curves.curve_knots.begin() + Curves.curve_first_knots[Curve];
-	k3d::mesh::knots_t::iterator knots_end = knots_begin + Curves.curve_point_counts[Curve] + Curves.curve_orders[Curve];
-	Curves.curve_knots.erase(knots_begin, knots_end);
-	update_indices(Curves.curve_first_knots, Curves.curve_first_knots[Curve] + Curves.curve_point_counts[Curve] + Curves.curve_orders[Curve], -(Curves.curve_point_counts[Curve] + Curves.curve_orders[Curve]));
-
-	erase(Curves.curve_first_knots, Curve);
-	erase(Curves.curve_first_points, Curve);
-	erase(Curves.curve_orders, Curve);
-	erase(Curves.curve_point_counts, Curve);
-	erase(Curves.curve_selections, Curve);
-}
-
 } // namespace detail
 
 class extrude_curve :
@@ -540,7 +484,7 @@ public:
 				{
 					if(curves->curve_selections[curve])
 					{
-						detail::delete_curve(*curves, curve);
+						delete_curve(*curves, curve);
 					}
 					else
 					{
