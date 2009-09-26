@@ -31,6 +31,7 @@
 #include <k3dsdk/nurbs_curve.h>
 
 #include <boost/scoped_ptr.hpp>
+#include <stdexcept>
 
 namespace module
 {
@@ -70,6 +71,14 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 /// Connect the two input curves at their selected end points, storing the result in Output
 void connect_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::uint_t Primitive1Index, const k3d::uint_t Curve1Index, const k3d::bool_t Curve1FirstPointSelection, const k3d::uint_t Primitive2Index, const k3d::uint_t Curve2Index, const k3d::bool_t Curve2FirstPointSelection);
 
+///Insert a knot into a curve, makes use of the algorithm in "The NURBS book" by A. Piegl and W. Tiller
+/**
+ * \param curve The curve
+ * \param u The u-value where to insert the knot
+ * \param r The multiplicity of the new knot
+ */
+void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u, const k3d::uint_t r);
+
 /// Visitor to get the selected curves
 struct selected_curves_extractor
 {
@@ -107,10 +116,24 @@ void modifiy_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, 
 			for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
 			{
 				if(curve_selections[curve])
-					Modifier(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
+				{
+					try
+					{
+						Modifier(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
+					}
+					catch(std::runtime_error& E)
+					{
+						k3d::log() << error << "Error modifiying curve " << curve << " of primitive " << prim_idx << ": " << E.what() << std::endl;
+						add_curve(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
+					}
+				}
 				else
+				{
 					add_curve(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
+				}
 			}
+			if(output_curves->material.empty())
+				output_curves->material = input_curves->material;
 		}
 	}
 	replace_duplicate_points(OutputMesh);
