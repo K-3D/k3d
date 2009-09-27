@@ -8,8 +8,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :wontfix
 creation_time: 2009-05-07 04:16:50.381733 Z
 references: []
 
@@ -23,3 +23,7 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 0.8.0.0 from unassigned
   - ""
+- - 2009-09-27 01:13:36.946174 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition wontfix
+  - Can't reproduce.
