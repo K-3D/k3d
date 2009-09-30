@@ -78,6 +78,13 @@ void connect_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCu
  * \param r The multiplicity of the new knot
  */
 void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u, const k3d::uint_t r);
+void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, const k3d::double_t u, const k3d::uint_t r, const k3d::uint_t Order);
+
+/// Returns the multiplicity of the given curve
+const k3d::uint_t multiplicity(const k3d::mesh::knots_t& Knots, const k3d::double_t u, const k3d::uint_t Begin, const k3d::uint_t Count);
+
+/// Extracts the points, knots and weights arrays from the given curve in the given mesh and curve primitive
+void extract_curve_arrays(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::bool_t NormalizeKnots = false);
 
 /// Visitor to get the selected curves
 struct selected_curves_extractor
@@ -98,9 +105,39 @@ struct selected_curves_extractor
 	k3d::mesh::indices_t& selected_curves;
 };
 
+/// Appends new knots found in the given curve to the given output knot vector.
+void append_common_knot_vector(k3d::mesh::knots_t& CommonKnotVector, const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
+
+/// Visit all selected curves
+template <typename FunctorT>
+void visit_selected_curves(const k3d::mesh& Mesh, FunctorT Modifier)
+{
+	for(k3d::uint_t prim_idx = 0; prim_idx != Mesh.primitives.size(); ++prim_idx)
+	{
+		k3d::mesh::indices_t selected_curves;
+		k3d::mesh::visit_arrays(*Mesh.primitives[prim_idx], selected_curves_extractor(selected_curves));
+		if(selected_curves.size())
+		{
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves(k3d::nurbs_curve::validate(Mesh, *Mesh.primitives[prim_idx]));
+			for(k3d::uint_t i = 0; i != selected_curves.size(); ++i)
+			{
+				const k3d::uint_t curve = selected_curves[i];
+				try
+				{
+					Modifier(Mesh, *curves, curve);
+				}
+				catch(std::runtime_error& E)
+				{
+					k3d::log() << error << "Error visiting curve " << curve << " of primitive " << prim_idx << ": " << E.what() << std::endl;
+				}
+			}
+		}
+	}
+}
+
 /// Apply a modifier to the selected curves in OutputMesh
 template <typename FunctorT>
-void modifiy_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, FunctorT Modifier)
+void modify_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, FunctorT Modifier)
 {
 	for(k3d::uint_t prim_idx = 0; prim_idx != InputMesh.primitives.size(); ++prim_idx)
 	{
@@ -120,6 +157,7 @@ void modifiy_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, 
 					try
 					{
 						Modifier(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
+						output_curves->curve_selections.back() = curve_selections[curve];
 					}
 					catch(std::runtime_error& E)
 					{

@@ -73,7 +73,7 @@ public:
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		modifiy_selected_curves(Input, Output, curve_closer(m_keep_ends.pipeline_value()));
+		modify_selected_curves(Input, Output, curve_closer(m_keep_ends.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()

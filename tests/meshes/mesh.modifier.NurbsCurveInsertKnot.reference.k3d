@@ -15,7 +15,7 @@
 						<array name="curve_first_points" type="k3d::uint_t">0</array>
 						<array name="curve_orders" type="k3d::uint_t">3</array>
 						<array name="curve_point_counts" type="k3d::uint_t">10</array>
-						<array name="curve_selections" type="k3d::double_t">0
+						<array name="curve_selections" type="k3d::double_t">1
 							<metadata>
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>

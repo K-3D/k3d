@@ -74,7 +74,7 @@ public:
 	{
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
-		modifiy_selected_curves(Input, Output, knot_inserter(m_u_value.pipeline_value(), m_multiplicity.pipeline_value()));
+		modify_selected_curves(Input, Output, knot_inserter(m_u_value.pipeline_value(), m_multiplicity.pipeline_value()));
 
 	}
 
