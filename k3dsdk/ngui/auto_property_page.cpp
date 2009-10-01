@@ -49,6 +49,7 @@
 #include <k3dsdk/application.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/imetadata.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/plugins.h>
@@ -214,7 +215,7 @@ public:
 					// Look for an explicit property control type ...
 					string_t property_control_type;
 					if(imetadata* const property_metadata = dynamic_cast<imetadata*>(&property))
-						property_control_type = property_metadata->get_metadata()["k3d:property-type"];
+						property_control_type = property_metadata->get_metadata()[k3d::metadata::key::role()];
 
 					// Otherwise, fall-back on the C++ property type ...
 					if(property_control_type.empty())
