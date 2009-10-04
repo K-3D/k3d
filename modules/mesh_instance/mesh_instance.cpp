@@ -79,6 +79,7 @@ public:
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(m_output_mesh.make_slot()));
 
 		m_input_mesh.changed_signal().connect(make_async_redraw_slot());
+		m_mesh_selection.changed_signal().connect(make_async_redraw_slot());
 		m_input_matrix.changed_signal().connect(make_async_redraw_slot());
 		m_gl_painter.changed_signal().connect(make_async_redraw_slot());
 		m_show_component_selection.changed_signal().connect(make_async_redraw_slot());
@@ -91,19 +92,15 @@ public:
 		if(const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value())
 		{
 			k3d::bool_t geometry_only = true;
-			k3d::bool_t selection_only = true;
 			k3d::ipipeline_profiler::profile profile(document().pipeline_profiler(), *this, "Update mesh");
 			for(k3d::uint_t i = 0; i != Hints.size(); ++i)
 			{
 				if(!dynamic_cast<k3d::hint::mesh_geometry_changed*>(Hints[i]))
 					geometry_only = false;
-				if(!dynamic_cast<k3d::hint::selection_changed*>(Hints[i]))
-					selection_only = false;
 			}
-			if(!geometry_only && !selection_only)
-				Output = *input_mesh;
 			if(!geometry_only)
 			{
+				Output = *input_mesh;
 				k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 			}
 			else
