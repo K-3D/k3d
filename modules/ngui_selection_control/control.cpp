@@ -89,6 +89,10 @@ public:
 		save_selection->signal_activate().connect(sigc::bind(sigc::mem_fun(*this, &control::on_save_selection), selection));
 		m_menu->items().push_back(*manage(save_selection));
 
+		Gtk::MenuItem* const reset_selection = new Gtk::MenuItem(_("Reset Selection"));
+		reset_selection->signal_activate().connect(sigc::bind(sigc::mem_fun(*this, &control::on_reset_selection), Property));
+		m_menu->items().push_back(*manage(reset_selection));
+
 		m_menu->show_all();
 		m_menu->popup(1, gtk_get_current_event_time());
 	}
@@ -113,6 +117,11 @@ public:
 
 		k3d::filesystem::ofstream stream(output_path);
 		stream << k3d::xml::declaration() << xml << std::endl;
+	}
+
+	void on_reset_selection(k3d::iproperty* const Property)
+	{
+		k3d::property::set_internal_value(*Property, k3d::selection::set());
 	}
 
 	static k3d::iplugin_factory& get_factory()
