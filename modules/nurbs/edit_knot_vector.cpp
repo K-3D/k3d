@@ -147,7 +147,6 @@ public:
 
 	void reset_properties()
 	{
-		k3d::log() << debug << "resetting knot vector property value" << std::endl;
 		const k3d::mesh* input_mesh = m_input_mesh.pipeline_value();
 		if(!input_mesh)
 			return;

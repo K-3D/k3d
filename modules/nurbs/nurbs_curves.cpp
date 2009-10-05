@@ -358,7 +358,6 @@ void close_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 
 		for (int i = first - 1; i >= static_cast<int>(curve_knots_begin); i--)
 		{
-			k3d::log() << i << std::endl;
 			OutputCurves.curve_knots[i] -= diff;
 		}
 
@@ -953,8 +952,6 @@ void knot_vector_merger::operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::pri
 		}
 		++i;
 	}
-	k3d::log() << "wanted knot vector:   " << unified_knots << std::endl;
-	k3d::log() << "replaced knot vector: " << knots << std::endl;
 	// Next, add the missing knots
 	for(k3d::uint_t knot_idx = 0; knot_idx != unified_knots.size(); ++knot_idx)
 	{
