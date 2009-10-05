@@ -181,20 +181,18 @@ private:
 	k3d::mesh::counts_t& m_faces_to_remove;
 };
 
-/// Marks the points to remove
-class point_marker
+/// Marks the edges to remove
+class edge_marker
 {
 public:
-	point_marker(const k3d::mesh::counts_t& Valences,
+	edge_marker(const k3d::mesh::counts_t& Valences,
 			const k3d::mesh::indices_t& PointFirstEdges,
 			const k3d::mesh::indices_t& PointEdges,
-			const k3d::mesh::counts_t& EdgesToRemove,
-			k3d::mesh::counts_t& PointsToRemove) :
+			const k3d::mesh::counts_t& EdgesToRemove) :
 				m_valences(Valences),
 				m_point_first_edges(PointFirstEdges),
 				m_point_edges(PointEdges),
-				m_edges_to_remove(EdgesToRemove),
-				m_points_to_remove(PointsToRemove)
+				m_edges_to_remove(EdgesToRemove)
 	{}
 	
 	void operator()(const k3d::uint_t Point)
@@ -204,8 +202,6 @@ public:
 		const k3d::uint_t edge_end = edge_begin + m_valences[Point];
 		for(k3d::uint_t edge_index = edge_begin; edge_index != edge_end; ++edge_index)
 			selected_edge_count += m_edges_to_remove[m_point_edges[edge_index]];
-		if(selected_edge_count == m_valences[Point])
-			m_points_to_remove[Point] = 1;
 	}
 
 private:
@@ -213,7 +209,6 @@ private:
 	const k3d::mesh::indices_t& m_point_first_edges;
 	const k3d::mesh::indices_t& m_point_edges;
 	const k3d::mesh::counts_t& m_edges_to_remove;
-	k3d::mesh::counts_t& m_points_to_remove;
 };
 
 /// Replace the elements of Array with their cumulative sum
@@ -381,14 +376,14 @@ public:
 			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::validate(Output, *output_primitive));
 			++output_primitive;
 
-			k3d::mesh::selection_t point_selection = *Output.point_selection;
+			const k3d::mesh::selection_t& point_selection = *Output.point_selection;
 			k3d::mesh::selection_t edge_selection = output_polyhedron->edge_selections;
+			k3d::mesh::selection_t vertex_selection = output_polyhedron->vertex_selections;
 			k3d::mesh::selection_t face_selection = output_polyhedron->face_selections;
-			const k3d::uint_t point_count = point_selection.size();
+			const k3d::uint_t point_count = Input.points->size();
 			const k3d::uint_t edge_count = edge_selection.size();
 			const k3d::uint_t face_count = face_selection.size();
 			const k3d::uint_t loop_count = input_polyhedron->loop_first_edges.size();
-			m_points_to_remove.assign(point_count, 0);
 			k3d::mesh::counts_t adjusted_face_loop_counts = input_polyhedron->face_loop_counts;
 			k3d::mesh::counts_t edges_to_remove(edge_count, 0);
 			k3d::mesh::counts_t loops_to_remove(loop_count, 0);
@@ -412,10 +407,9 @@ public:
 			k3d::mesh::indices_t point_first_edges, point_edges;
 			detail::create_vertex_edge_lookup(input_polyhedron->vertex_points, valences, point_first_edges, point_edges);
 			
-			detail::point_marker point_marker(valences, point_first_edges, point_edges, edges_to_remove, m_points_to_remove);
-			for(k3d::uint_t point = 0; point != Input.points->size(); ++point) point_marker(point);
+			detail::edge_marker edge_marker(valences, point_first_edges, point_edges, edges_to_remove);
+			for(k3d::uint_t point = 0; point != Input.points->size(); ++point) edge_marker(point);
 			
-			detail::cumulative_sum(m_points_to_remove);
 			detail::cumulative_sum(edges_to_remove);
 			detail::cumulative_sum(loops_to_remove);
 			detail::cumulative_sum(faces_to_remove);
@@ -435,11 +429,10 @@ public:
 			detail::delete_elements(faces_to_remove, adjusted_face_loop_counts, output_polyhedron->face_loop_counts);
 			detail::delete_elements(faces_to_remove, input_polyhedron->face_materials, output_polyhedron->face_materials);
 			detail::update_indices(loops_to_remove, edges_to_remove, input_polyhedron->loop_first_edges, output_polyhedron->loop_first_edges);
-			detail::update_indices(edges_to_remove, m_points_to_remove, input_polyhedron->vertex_points, output_polyhedron->vertex_points);
+			detail::delete_elements(edges_to_remove, input_polyhedron->vertex_points, output_polyhedron->vertex_points);
 			detail::update_indices(edges_to_remove, edges_to_remove, input_polyhedron->clockwise_edges, output_polyhedron->clockwise_edges);
 			detail::delete_elements(edges_to_remove, edge_selection, output_polyhedron->edge_selections);
-			detail::delete_elements(m_points_to_remove, point_selection, Output.point_selection.writable());
-			detail::delete_elements(m_points_to_remove, Input.point_attributes, Output.point_attributes);
+			detail::delete_elements(edges_to_remove, vertex_selection, output_polyhedron->vertex_selections);
 			detail::delete_elements(edges_to_remove, input_polyhedron->edge_attributes, output_polyhedron->edge_attributes);
 			detail::delete_elements(faces_to_remove, input_polyhedron->face_attributes, output_polyhedron->face_attributes);
 			
@@ -471,11 +464,11 @@ public:
 				new_first_face = output_first_faces.empty() ? 0 : output_first_faces.back() + output_face_counts.back();
 			}
 		}
+		k3d::mesh::delete_unused_points(Output);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		detail::delete_elements(m_points_to_remove, *Input.points, Output.points.writable());
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -491,8 +484,6 @@ public:
 
 		return factory;
 	}
-private:
-	k3d::mesh::counts_t m_points_to_remove;
 };
 
 /////////////////////////////////////////////////////////////////////////////

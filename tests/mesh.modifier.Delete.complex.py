@@ -11,9 +11,9 @@ reader.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/testm
 reader.center = False
 reader.scale_to_size = False
 
-varying_colors = document.new_node("RandomColors")
+# varying_colors = document.new_node("RandomColors")
 
-document.set_dependency(varying_colors.get_property("input_mesh"), reader.get_property("output_mesh"))
+# document.set_dependency(varying_colors.get_property("input_mesh"), reader.get_property("output_mesh"))
 
 modifier = document.new_node("Delete")
 
@@ -45,6 +45,6 @@ k3d.geometry.primitive_selection.append(edge_selection, 26, 10000, 0)
 
 modifier.mesh_selection = selection
 
-document.set_dependency(modifier.get_property("input_mesh"), varying_colors.get_property("output_mesh"))
+document.set_dependency(modifier.get_property("input_mesh"), reader.get_property("output_mesh"))
 
 testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.Delete.complex", 1)

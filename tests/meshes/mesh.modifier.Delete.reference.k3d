@@ -39,7 +39,7 @@
 								<pair name="k3d:domain">k3d:point-indices</pair>
 							</metadata>
 						</array>
-						<array name="vertex_selections" type="k3d::double_t">
+						<array name="vertex_selections" type="k3d::double_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 							<metadata>
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
