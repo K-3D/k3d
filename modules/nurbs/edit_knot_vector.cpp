@@ -134,9 +134,14 @@ public:
 	void reset_properties()
 	{
 		MY_DEBUG << "Reset Called" << std::endl;
-		const k3d::mesh& mesh = *m_input_mesh.pipeline_value();
-		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs(get_first_nurbs_curve(mesh));
-		return_if_fail(nurbs);
+		const k3d::mesh* const mesh = m_input_mesh.pipeline_value();
+		if(!mesh)
+			return;
+
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs(get_first_nurbs_curve(*mesh));
+		if(!nurbs)
+			return;
+
 		m_knot_vector.set_value(extract_knots(*nurbs, m_curve));
 	}
 
