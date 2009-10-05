@@ -90,66 +90,6 @@ public:
 
 		return factory;
 	}
-private:
-	struct max_order_calculator
-	{
-		max_order_calculator(k3d::double_t& Order) : order(Order)
-		{
-			order = 0;
-		}
-		void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
-		{
-			order = Curves.curve_orders[Curve] > order ? Curves.curve_orders[Curve] : order;
-		}
-		/// The maximum order of all curves visited
-		k3d::double_t& order;
-	};
-
-	struct knot_vector_calculator
-	{
-		knot_vector_calculator(k3d::mesh::knots_t& Knots) : knots(Knots) {}
-		void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
-		{
-			append_common_knot_vector(knots, Curves, Curve);
-		}
-		/// The common knot vector for the visited curves
-		k3d::mesh::knots_t& knots;
-	};
-
-	struct degree_elevator
-	{
-		degree_elevator(const k3d::uint_t Order) : order(Order) {}
-		const k3d::double_t order;
-		void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
-		{
-			elevate_curve_degree(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve, order - InputCurves.curve_orders[Curve]);
-		}
-	};
-
-	struct knot_vector_merger
-	{
-		knot_vector_merger(const k3d::mesh::knots_t& UnifiedKnots, const k3d::uint_t Order) : unified_knots(UnifiedKnots), order(Order) {}
-		const k3d::mesh::knots_t& unified_knots;
-		const k3d::uint_t order;
-		void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
-		{
-			k3d::mesh::points_t points;
-			k3d::mesh::knots_t knots;
-			k3d::mesh::weights_t weights;
-			extract_curve_arrays(points, knots, weights, InputMesh, InputCurves, Curve, true);
-			for(k3d::uint_t knot_idx = 0; knot_idx != unified_knots.size(); ++knot_idx)
-			{
-				const k3d::double_t u = unified_knots[knot_idx];
-				const k3d::uint_t old_mul = multiplicity(knots, u, 0, knots.size());
-				const k3d::uint_t new_mul = multiplicity(unified_knots, u, 0, unified_knots.size());
-				if(old_mul > new_mul)
-					throw std::runtime_error("Error inserting knots when creating a common knot vector");
-				if(old_mul < new_mul)
-					insert_knot(points, knots, weights, u, 1, order);
-			}
-			k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, order, points, weights, knots);
-		}
-	};
 };
 
 k3d::iplugin_factory& merge_curve_knot_vectors_factory()

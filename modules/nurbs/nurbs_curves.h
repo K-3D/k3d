@@ -108,6 +108,10 @@ struct selected_curves_extractor
 /// Appends new knots found in the given curve to the given output knot vector.
 void append_common_knot_vector(k3d::mesh::knots_t& CommonKnotVector, const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
 
+//////////////////////////////////////////////////////////////////
+// Curve visiting functions
+//////////////////////////////////////////////////////////////////
+
 /// Visit all selected curves
 template <typename FunctorT>
 void visit_selected_curves(const k3d::mesh& Mesh, FunctorT Modifier)
@@ -177,6 +181,57 @@ void modify_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, F
 	replace_duplicate_points(OutputMesh);
 	k3d::mesh::delete_unused_points(OutputMesh);
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// shared functors
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Calculates the maximum order of all visited curves
+struct max_order_calculator
+{
+	max_order_calculator(k3d::double_t& Order) : order(Order)
+	{
+		order = 0;
+	}
+	void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
+	{
+		order = Curves.curve_orders[Curve] > order ? Curves.curve_orders[Curve] : order;
+	}
+	/// The maximum order of all curves visited
+	k3d::double_t& order;
+};
+
+/// Calculates a common knot vector among the visited curves
+struct knot_vector_calculator
+{
+	knot_vector_calculator(k3d::mesh::knots_t& Knots) : knots(Knots) {}
+	void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
+	{
+		append_common_knot_vector(knots, Curves, Curve);
+	}
+	/// The common knot vector for the visited curves
+	k3d::mesh::knots_t& knots;
+};
+
+/// Applies NURBS curve degree elevation to reach the given order
+struct degree_elevator
+{
+	degree_elevator(const k3d::uint_t Order) : order(Order) {}
+	const k3d::double_t order;
+	void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
+	{
+		elevate_curve_degree(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve, order - InputCurves.curve_orders[Curve]);
+	}
+};
+
+/// Makes UnifiedKnots the knot vector of all given curves
+struct knot_vector_merger
+{
+	knot_vector_merger(const k3d::mesh::knots_t& UnifiedKnots, const k3d::uint_t Order);
+	void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve);
+	k3d::mesh::knots_t unified_knots;
+	const k3d::uint_t order;
+};
 
 /// TODO: Move to SDK
 void delete_empty_primitives(k3d::mesh& Mesh);

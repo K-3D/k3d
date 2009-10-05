@@ -21,7 +21,7 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_curve_modifier.h"
+#include "nurbs_curves.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -116,6 +116,20 @@ namespace module
 namespace nurbs
 {
 
+namespace detail
+{
+	k3d::bool_t validate_knot_vector(const k3d::mesh::knots_t& Knots, const k3d::uint_t Order)
+	{
+		const k3d::uint_t knot_count = Knots.size();
+		for(k3d::uint_t i = 0; i != (knot_count-1); ++i)
+		{
+			return_val_if_fail(Knots[i+1] >= Knots[i], false);
+			return_val_if_fail(multiplicity(Knots, Knots[i], 1, knot_count-2) < Order, false);
+		}
+		return true;
+	}
+} // namespace detail
+
 class edit_knot_vector :
 	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >,
 	public k3d::ireset_properties
@@ -133,73 +147,46 @@ public:
 
 	void reset_properties()
 	{
-		MY_DEBUG << "Reset Called" << std::endl;
-		const k3d::mesh* const mesh = m_input_mesh.pipeline_value();
-		if(!mesh)
+		k3d::log() << debug << "resetting knot vector property value" << std::endl;
+		const k3d::mesh* input_mesh = m_input_mesh.pipeline_value();
+		if(!input_mesh)
 			return;
+		k3d::mesh input_with_selections = *input_mesh;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), input_with_selections);
+		k3d::double_t order;
+		visit_selected_curves(input_with_selections, max_order_calculator(order));
+		k3d::mesh elevated_mesh = input_with_selections;
+		modify_selected_curves(input_with_selections, elevated_mesh, degree_elevator(order));
+		k3d::mesh::knots_t knots;
+		visit_selected_curves(elevated_mesh, knot_vector_calculator(knots));
 
-		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs(get_first_nurbs_curve(*mesh));
-		if(!nurbs)
-			return;
-
-		m_knot_vector.set_value(extract_knots(*nurbs, m_curve));
+		m_knot_vector.set_value(knots);
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		MY_DEBUG << "Create Called" << std::endl;
-		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
-
-		nurbs_curve_modifier mod(Output, *nurbs);
-
-		m_curve = mod.selected_curve();
-
-		if (m_curve < 0)
-		{
-			k3d::log() << error << "More than one curve or no curve selected! " << m_curve << std::endl;
-			return;
-		}
-
-		const k3d::mesh::knots_t& knots = m_knot_vector.pipeline_value();
-
-		if (!insert_knots(knots, *nurbs, m_curve))
-		{
-			k3d::log() << error << "Invalid Knot Vector on curve " << m_curve << std::endl;
-		}
 	}
 
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		MY_DEBUG << "Update Called" << std::endl;
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		const k3d::mesh::knots_t& knots = m_knot_vector.pipeline_value();
+		// Get the maximum order
+		k3d::double_t order;
+		visit_selected_curves(Output, max_order_calculator(order));
 
-		nurbs_curve_modifier mod(Output, *nurbs);
+		// Elevate all selected curves to the maximal order
+		k3d::mesh elevated_mesh = Output;
+		modify_selected_curves(Input, elevated_mesh, degree_elevator(order));
 
-		m_curve = mod.selected_curve();
+		// Validate the replacement knot vector
+		const k3d::mesh::knots_t knots = m_knot_vector.pipeline_value();
+		return_if_fail(detail::validate_knot_vector(knots, order));
 
-		if (m_curve < 0)
-		{
-			k3d::log() << error << "More than one curve or no curve selected! " << m_curve << std::endl;
-			return;
-		}
-
-		if (!insert_knots(knots, *nurbs, m_curve))
-			k3d::log() << error << "Invalid Knot Vector on curve " << m_curve << std::endl;
+		// Apply the new knot vector to all selected curves
+		modify_selected_curves(elevated_mesh, Output, knot_vector_merger(knots, order));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -216,37 +203,6 @@ public:
 
 private:
 	k3d::metadata::property< k3d_data(k3d::mesh::knots_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, array_serialization) > m_knot_vector;
-	int m_curve;
-
-	k3d::mesh::knots_t extract_knots(const k3d::nurbs_curve::const_primitive& NurbsCurves, int curve)
-	{
-		const k3d::mesh::knots_t& knots = NurbsCurves.curve_knots;
-		k3d::mesh::knots_t curve_knots;
-
-		const k3d::uint_t curve_knots_begin = NurbsCurves.curve_first_knots[curve];
-		const k3d::uint_t curve_knots_end = curve_knots_begin + NurbsCurves.curve_point_counts[curve] + NurbsCurves.curve_orders[curve];
-
-		for (k3d::uint_t i = curve_knots_begin; i < curve_knots_end; i++)
-			curve_knots.push_back(knots[i]);
-
-		return curve_knots;
-	}
-
-	bool insert_knots(const k3d::mesh::knots_t& curve_knots, k3d::nurbs_curve::primitive& NurbsCurves, int curve)
-	{
-		k3d::mesh::knots_t& knots = NurbsCurves.curve_knots;
-
-		const k3d::uint_t curve_knots_begin = NurbsCurves.curve_first_knots[curve];
-		const k3d::uint_t curve_knots_end = curve_knots_begin + NurbsCurves.curve_point_counts[curve] + NurbsCurves.curve_orders[curve];
-
-		if (curve_knots.size() != curve_knots_end - curve_knots_begin)
-			return false;
-
-		for (k3d::uint_t i = curve_knots_begin; i < curve_knots_end; i++)
-			knots[i] = curve_knots[i-curve_knots_begin];
-
-		return true;
-	}
 };
 
 k3d::iplugin_factory& edit_knot_vector_factory()
