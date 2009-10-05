@@ -209,41 +209,76 @@ public:
 				// Keep track of the control that's created (if any) ...
 				Gtk::Widget* control = 0;
 
-				// Allow custom property controls to override our defaults ...
+				// Look for custom property controls that match our property role ...
 				if(!control)
 				{
-					// Look for an explicit property control type ...
-					string_t property_control_type;
+					// Look for an explicit property role ...
 					if(imetadata* const property_metadata = dynamic_cast<imetadata*>(&property))
-						property_control_type = property_metadata->get_metadata()[k3d::metadata::key::role()];
-
-					// Otherwise, fall-back on the C++ property type ...
-					if(property_control_type.empty())
-						property_control_type = k3d::type_string(property_type);
-
-					static plugin::factory::collection_t control_factories = plugin::factory::lookup("ngui:component-type", "property-control");
-					for(plugin::factory::collection_t::const_iterator factory = control_factories.begin(); factory != control_factories.end(); ++factory)
 					{
-						if((**factory).metadata()["ngui:property-type"] != property_control_type)
-							continue;
-
-						if(custom_property::control* const custom_control = plugin::create<custom_property::control>(**factory))
+						const string_t property_control_role = property_metadata->get_metadata()[k3d::metadata::key::role()];
+						if(property_control_role.size())
 						{
-							if(control = dynamic_cast<Gtk::Widget*>(custom_control))
+							// Now see if we can find a custom property control that matches the role ...
+							static plugin::factory::collection_t control_factories = plugin::factory::lookup("ngui:component-type", "property-control");
+							for(plugin::factory::collection_t::const_iterator factory = control_factories.begin(); factory != control_factories.end(); ++factory)
 							{
-								custom_control->initialize(m_document_state, property);
+								if((**factory).metadata()["ngui:property-role"] != property_control_role)
+									continue;
+
+								if(custom_property::control* const custom_control = plugin::create<custom_property::control>(**factory))
+								{
+									if(control = dynamic_cast<Gtk::Widget*>(custom_control))
+									{
+										custom_control->initialize(m_document_state, property);
+									}
+									else
+									{
+										k3d::log() << error << "custom property control must derive from Gtk::Widget" << std::endl;
+									}
+								}
+								else
+								{
+									k3d::log() << error << "error creating custom property control" << std::endl;
+								}
+
+								break;
+							}
+						}
+					}
+				}
+
+				// Look for custom property controls that match our property type ...
+				if(!control)
+				{
+					// Get the C++ property type ...
+					const string_t property_control_type = k3d::type_string(property_type);
+					if(property_control_type.size())
+					{
+						// Now see if we can find a custom property control that matches the type ...
+						static plugin::factory::collection_t control_factories = plugin::factory::lookup("ngui:component-type", "property-control");
+						for(plugin::factory::collection_t::const_iterator factory = control_factories.begin(); factory != control_factories.end(); ++factory)
+						{
+							if((**factory).metadata()["ngui:property-type"] != property_control_type)
+								continue;
+
+							if(custom_property::control* const custom_control = plugin::create<custom_property::control>(**factory))
+							{
+								if(control = dynamic_cast<Gtk::Widget*>(custom_control))
+								{
+									custom_control->initialize(m_document_state, property);
+								}
+								else
+								{
+									k3d::log() << error << "custom property control must derive from Gtk::Widget" << std::endl;
+								}
 							}
 							else
 							{
-								k3d::log() << error << "custom property control must derive from Gtk::Widget" << std::endl;
+								k3d::log() << error << "error creating custom property control" << std::endl;
 							}
-						}
-						else
-						{
-							k3d::log() << error << "error creating custom property control" << std::endl;
-						}
 
-						break;
+							break;
+						}
 					}
 				}
 

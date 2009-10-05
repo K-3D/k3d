@@ -56,6 +56,8 @@ namespace value
 /// Metadata value for use with "k3d:domain" that specifies the mesh point array.
 const string_t point_indices_domain();
 
+/// Metadata value for use with "k3d:role" that specifies that a string can contain multiple lines of text.
+const string_t multi_line_text_role();
 /// Metadata value for use with "k3d:role" that specifies that an array of floating-point values is a selection state.
 const string_t selection_role();
 /// Metadata value for use with "k3d:role" that specifies that an array of floating-point values is a NURBS knot vector.

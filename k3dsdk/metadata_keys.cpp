@@ -62,6 +62,11 @@ const string_t point_indices_domain()
 	return "k3d:point-indices";
 }
 
+const string_t multi_line_text_role()
+{
+	return "k3d:multi-line-text";
+}
+
 const string_t selection_role()
 {
 	return "k3d:selection";
