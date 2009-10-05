@@ -21,6 +21,8 @@ k3d::nurbs_curve::primitive* get_first_nurbs_curve(k3d::mesh& Mesh)
 			return k3d::nurbs_curve::validate(Mesh, primitive->writable());
 		}
 	}
+
+	return 0;
 }
 
 k3d::nurbs_curve::const_primitive* get_first_nurbs_curve(const k3d::mesh& Mesh)
@@ -32,6 +34,8 @@ k3d::nurbs_curve::const_primitive* get_first_nurbs_curve(const k3d::mesh& Mesh)
 			return k3d::nurbs_curve::validate(Mesh, **primitive);
 		}
 	}
+
+	return 0;
 }
 
 nurbs_curve_modifier::nurbs_curve_modifier(k3d::mesh& input, k3d::nurbs_curve::primitive& Curve) : m_instance(input), m_nurbs_curve(Curve)
