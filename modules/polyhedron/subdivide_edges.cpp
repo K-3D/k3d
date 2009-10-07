@@ -396,6 +396,9 @@ public:
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		if(!Output.points)
+			return;
+
 		k3d::mesh::points_t& output_points = Output.points.writable();
 
 		for(k3d::uint_t i = 0; i != Input.primitives.size(); ++i)

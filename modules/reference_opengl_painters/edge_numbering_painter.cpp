@@ -130,6 +130,8 @@ public:
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
+		if(!Mesh.points)
+			return;
 		const k3d::bool_t draw_selected = m_draw_selected.pipeline_value();
 		const k3d::bool_t draw_unselected = m_draw_unselected.pipeline_value();
 		if(!draw_selected && !draw_unselected)
