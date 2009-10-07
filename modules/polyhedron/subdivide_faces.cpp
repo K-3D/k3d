@@ -1113,6 +1113,7 @@ public:
 
 			// Update selection arrays
 			output_edge_selection.assign(output_vertex_points.size(), 0.0);
+			output_polyhedron->vertex_selections.assign(output_vertex_points.size(), 0.0);
 		}
 		output_point_selection.resize(output_points.size(), 0.0);
 	}
