@@ -1,34 +1,43 @@
 <?xml version="1.0" ?>
 <k3dml>
 	<mesh_arrays>
-		<points>0 0 0 1 0 0 2 0 0 3 0 0 1.5 0 0 1.5 0 0</points>
-		<point_selection>1 1 1 1 0 0</point_selection>
-		<vertex_data/>
+		<points>0 0 0 1 0 0 1.5 0 0 1.5 0 0 2 0 0 3 0 0</points>
+		<point_selection>0 0 0 0 0 0</point_selection>
+		<point_attributes/>
 		<primitives>
 			<primitive type="nurbs_curve">
 				<structure>
-					<array name="curve_first_knots" type="k3d::uint_t">0 6</array>
-					<array name="curve_first_points" type="k3d::uint_t">0 3</array>
-					<array name="curve_knots" type="k3d::double_t">0 0 0 0.5 0.5 0.5 0.5 0.5 0.5 1 1 1</array>
-					<array name="curve_orders" type="k3d::uint_t">3 3</array>
-					<array name="curve_point_counts" type="k3d::uint_t">3 3</array>
-					<array name="curve_point_weights" type="k3d::double_t">1 1 1 1 1 1</array>
-					<array name="curve_points" type="k3d::uint_t">0 1 4 5 2 3
-						<metadata>
-							<pair name="k3d:domain">k3d:point-indices</pair>
-						</metadata>
-					</array>
-					<array name="curve_selections" type="k3d::double_t">1 0
-						<metadata>
-							<pair name="k3d:selection-component">uniform</pair>
-						</metadata>
-					</array>
-					<array name="material" type="k3d::imaterial*">2</array>
+					<table type="constant">
+						<array name="material" type="k3d::imaterial*">0</array>
+					</table>
+					<table type="curve">
+						<array name="curve_first_knots" type="k3d::uint_t">0 6</array>
+						<array name="curve_first_points" type="k3d::uint_t">0 3</array>
+						<array name="curve_orders" type="k3d::uint_t">3 3</array>
+						<array name="curve_point_counts" type="k3d::uint_t">3 3</array>
+						<array name="curve_selections" type="k3d::double_t">1 1
+							<metadata>
+								<pair name="k3d:role">k3d:selection</pair>
+							</metadata>
+						</array>
+					</table>
+					<table type="knot">
+						<array name="curve_knots" type="k3d::double_t">0 0 0 0.5 0.5 0.5 0.5 0.5 0.5 1 1 1</array>
+					</table>
+					<table type="vertex">
+						<array name="curve_point_weights" type="k3d::double_t">1 1 1 1 1 1</array>
+						<array name="curve_points" type="k3d::uint_t">0 1 2 3 4 5
+							<metadata>
+								<pair name="k3d:domain">k3d:point-indices</pair>
+							</metadata>
+						</array>
+					</table>
 				</structure>
 				<attributes>
-					<arrays type="constant"/>
-					<arrays type="uniform"/>
-					<arrays type="varying"/>
+					<table type="constant"/>
+					<table type="curve"/>
+					<table type="varying"/>
+					<table type="vertex"/>
 				</attributes>
 			</primitive>
 		</primitives>

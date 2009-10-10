@@ -80,6 +80,9 @@ void connect_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCu
 void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u, const k3d::uint_t r);
 void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, const k3d::double_t u, const k3d::uint_t r, const k3d::uint_t Order);
 
+/// Splits a curve at the given u parameter value
+void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u);
+
 /// Returns the multiplicity of the given curve
 const k3d::uint_t multiplicity(const k3d::mesh::knots_t& Knots, const k3d::double_t u, const k3d::uint_t Begin, const k3d::uint_t Count);
 
@@ -178,8 +181,8 @@ void modify_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, F
 				output_curves->material = input_curves->material;
 		}
 	}
-	replace_duplicate_points(OutputMesh);
-	k3d::mesh::delete_unused_points(OutputMesh);
+	if(OutputMesh.points)
+		k3d::mesh::delete_unused_points(OutputMesh);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

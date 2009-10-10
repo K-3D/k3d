@@ -74,6 +74,8 @@ public:
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		modify_selected_curves(Input, Output, curve_closer(m_keep_ends.pipeline_value()));
+		replace_duplicate_points(Output);
+		k3d::mesh::delete_unused_points(Output);
 	}
 
 	static k3d::iplugin_factory& get_factory()

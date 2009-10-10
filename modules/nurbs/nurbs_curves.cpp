@@ -840,6 +840,78 @@ void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::me
 	}
 }
 
+// Helper function to determin is a curve is closed
+k3d::bool_t is_closed(const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve)
+{
+	k3d::uint_t curve_points_begin = NurbsCurves.curve_first_points[Curve];
+	k3d::uint_t curve_points_end = curve_points_begin + NurbsCurves.curve_point_counts[Curve];
+
+	return (NurbsCurves.curve_points[curve_points_begin] == NurbsCurves.curve_points[curve_points_end - 1]);
+}
+
+void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u)
+{
+	// Can't split at end
+	if(u > 1 - 0.000001 || u < 0.000001)
+	{
+		add_curve(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve);
+		return;
+	}
+
+	// Curve arrays for the original curve
+	k3d::mesh::points_t points;
+	k3d::mesh::knots_t knots;
+	k3d::mesh::weights_t weights;
+	extract_curve_arrays(points, knots, weights, InputMesh, InputCurves, Curve, true);
+
+	// insert new knots at the requested u-value until the curve interpolates it
+	const k3d::uint_t order = InputCurves.curve_orders[Curve];
+	const k3d::uint_t mul = multiplicity(knots, u, 0, knots.size());
+	if(mul < (order - 1))
+	{
+		insert_knot(points, knots, weights, u, order - mul - 1, order);
+	}
+	// locate the first knot after the u-value
+	const k3d::mesh::knots_t::iterator split_knot = std::find_if(knots.begin(), knots.end(), find_first_knot_after(u));
+
+	if(is_closed(InputCurves, Curve))
+	{
+		k3d::mesh::points_t new_points;
+		k3d::mesh::weights_t new_weights;
+		const k3d::mesh::points_t::iterator split_point = points.begin() + (split_knot - knots.begin()) - order;
+		const k3d::mesh::weights_t::iterator split_weight = weights.begin() + (split_knot - knots.begin()) - order;
+		new_points.insert(new_points.end(), split_point, points.end());
+		new_weights.insert(new_weights.end(), split_weight, weights.end());
+		new_points.insert(new_points.end(), points.begin() + 1 , split_point + 1);
+		new_weights.insert(new_weights.end(), weights.begin() + 1, split_weight + 1);
+		k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, order, new_points, new_weights, knots);
+	}
+	else
+	{
+		// First curve: all knots up to and including the last knot with multiplicity u
+		k3d::mesh::knots_t first_knots;
+		k3d::mesh::points_t first_points;
+		k3d::mesh::weights_t first_weights;
+		first_knots.insert(first_knots.begin(), knots.begin(), split_knot);
+		first_knots.push_back(first_knots.back()); // Clamp knot vector by increasing the multiplicity to become equal to the order
+		first_points.insert(first_points.end(), points.begin(), points.begin() + first_knots.size() - order);
+		first_weights.insert(first_weights.end(), weights.begin(), weights.begin() + first_knots.size() - order);
+
+		// Second curve: start with order times the u-knot, then take all remaining knots
+		k3d::mesh::knots_t second_knots;
+		k3d::mesh::points_t second_points;
+		k3d::mesh::weights_t second_weights;
+		second_knots.insert(second_knots.end(), order, u);
+		second_knots.insert(second_knots.end(), split_knot, knots.end());
+		second_points.insert(second_points.end(), points.begin() + first_knots.size() - order - 1, points.end());
+		second_weights.insert(second_weights.end(), weights.begin() + first_knots.size() - order - 1, weights.end());
+
+		k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, order, first_points, first_weights, first_knots);
+		OutputCurves.curve_selections.back() = 1.0;
+		k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, order, second_points, second_weights, second_knots);
+	}
+}
+
 void extract_curve_arrays(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::bool_t NormalizeKnots)
 {
 	const k3d::uint_t order = Curves.curve_orders[Curve];
