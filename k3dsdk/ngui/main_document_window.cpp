@@ -65,6 +65,7 @@
 #include <k3dsdk/ngui/modifiers.h>
 #include <k3dsdk/ngui/node.h>
 #include <k3dsdk/ngui/panel_frame.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/render.h>
 #include <k3dsdk/ngui/savable_document_window.h>
 #include <k3dsdk/ngui/scripting.h>
@@ -2240,7 +2241,7 @@ private:
 
 		// Show the new modifier properties if only one was processed
 		if(selected_nodes.size() == 1)
-			m_document_state.view_node_properties_signal().emit(new_modifier);
+			panel::mediator(m_document_state.document()).set_focus(*new_modifier);
 
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
@@ -2258,7 +2259,7 @@ private:
 
 		// Show the new modifier properties if only one was processed
 		if(selected_nodes.size() == 1)
-			m_document_state.view_node_properties_signal().emit(new_modifier);
+			panel::mediator(m_document_state.document()).set_focus(*new_modifier);
 
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}

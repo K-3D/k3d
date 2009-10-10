@@ -47,6 +47,7 @@
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/keyboard.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
@@ -328,10 +329,7 @@ private:
 		}
 
 		if(selected_nodes.size() == 1)
-		{
-			m_document_state->view_node_properties_signal().emit(selected_nodes[0]);
-			m_document_state->view_node_history_signal().emit(selected_nodes[0]);
-		}
+			k3d::ngui::panel::mediator(m_document_state->document()).set_focus(*selected_nodes[0]);
 
 		m_selection_paths.clear();
 

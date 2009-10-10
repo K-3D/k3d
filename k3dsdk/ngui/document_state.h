@@ -70,14 +70,6 @@ public:
 	/// Returns a gdkgl context node that can be used to share display lists between viewports
 	GdkGLContext* gdkgl_share_list();
 
-	/// Defines a signal that can be emitted to request display of the history for an node
-	typedef sigc::signal1<bool, k3d::inode*, k3d::signal::consumable> view_node_history_signal_t;
-	/// Returns a signal that can be emitted to request display of the history for an node
-	view_node_history_signal_t& view_node_history_signal();
-	/// Defines a signal that can be emitted to request display of the properties for an node
-	typedef sigc::signal1<bool, k3d::inode*, k3d::signal::consumable> view_node_properties_signal_t;
-	/// Returns a signal that can be emitted to request display of the properties for an node
-	view_node_properties_signal_t& view_node_properties_signal();
 	/// Defines a signal that can be emitted to acknowledge of a document selection change
 	typedef sigc::signal<void> document_selection_change_signal_t;
 	/// Returns a signal that can be emitted to acknowledge of a document selection change

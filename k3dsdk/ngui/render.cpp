@@ -30,13 +30,6 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/stock.h>
 
-#include "document_state.h"
-#include "file_chooser_dialog.h"
-#include "icons.h"
-#include "menus.h"
-#include "messages.h"
-#include "viewport.h"
-
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/classes.h>
@@ -49,6 +42,13 @@
 #include <k3dsdk/irender_engine_ri.h>
 #include <k3dsdk/irender_frame.h>
 #include <k3dsdk/irender_preview.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/menus.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/panel_mediator.h>
+#include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
@@ -323,7 +323,8 @@ interface_t* pick_render_engine(document_state& DocumentState, const k3d::nodes_
 		if(k3d::iplugin_factory* const factory = combo.get_active()->get_value(columns.factory))
 		{
 			k3d::inode* const node = k3d::plugin::create<k3d::inode>(*factory, DocumentState.document(), k3d::unique_name(DocumentState.document().nodes(), factory->name()));
-			DocumentState.view_node_properties_signal().emit(node);
+			if(node)
+				panel::mediator(DocumentState.document()).set_focus(*node);
 			return dynamic_cast<interface_t*>(node);
 		}
 	}

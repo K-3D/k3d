@@ -14,14 +14,14 @@ try:
 	cone.create_property("k3d::string_t", "string", "String", "String user property")	
 	cone.create_property("k3d::point3", "point3", "Point3", "Point user property")
 
-	cone.add_ri_attribute("k3d::ri::integer", "render", "ri_attribute_integer", "RenderMan Integer", "RenderMan Integer Attribute")
-	cone.add_ri_attribute("k3d::ri::real", "render", "ri_attribute_real", "RenderMan Real", "RenderMan Real Attribute")
-	cone.add_ri_attribute("k3d::ri::string", "render", "ri_attribute_string", "RenderMan String", "RenderMan String Attribute")
-	cone.add_ri_attribute("k3d::ri::point", "render", "ri_attribute_point", "RenderMan Point", "RenderMan Point Attribute")
-	cone.add_ri_attribute("k3d::ri::vector", "render2", "ri_attribute_vector", "RenderMan Vector", "RenderMan Vector Attribute")
-	cone.add_ri_attribute("k3d::ri::color", "render2", "ri_attribute_color", "RenderMan Color", "RenderMan Color Attribute")
-	cone.add_ri_attribute("k3d::ri::hpoint", "render2", "ri_attribute_hpoint", "RenderMan HPoint", "RenderMan HPoint Attribute")
-	cone.add_ri_attribute("k3d::ri::matrix", "render2", "ri_attribute_matrix", "RenderMan Matrix", "RenderMan Matrix Attribute")
+	cone.create_renderman_attribute("k3d::int32_t", "render", "ri_attribute_integer", "RenderMan Integer", "RenderMan Integer Attribute")
+	cone.create_renderman_attribute("k3d::double_t", "render", "ri_attribute_real", "RenderMan Real", "RenderMan Real Attribute")
+	cone.create_renderman_attribute("k3d::string_t", "render", "ri_attribute_string", "RenderMan String", "RenderMan String Attribute")
+	cone.create_renderman_attribute("k3d::point3", "render", "ri_attribute_point", "RenderMan Point", "RenderMan Point Attribute")
+	cone.create_renderman_attribute("k3d::vector3", "render2", "ri_attribute_vector", "RenderMan Vector", "RenderMan Vector Attribute")
+	cone.create_renderman_attribute("k3d::color", "render2", "ri_attribute_color", "RenderMan Color", "RenderMan Color Attribute")
+	cone.create_renderman_attribute("k3d::point4", "render2", "ri_attribute_hpoint", "RenderMan HPoint", "RenderMan HPoint Attribute")
+	cone.create_renderman_attribute("k3d::matrix4", "render2", "ri_attribute_matrix", "RenderMan Matrix", "RenderMan Matrix Attribute")
 
 	cone.string = "Howdy, World!"
 
