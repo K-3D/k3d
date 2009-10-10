@@ -29,19 +29,19 @@
 #include <gtkmm/targetlist.h>
 #include <gtk/gtkmain.h>
 
-#include "document_state.h"
-#include "icons.h"
-#include "messages.h"
-#include "property_widget.h"
-#include "utility.h"
-#include "widget_manip.h"
-
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/itransform_source.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/panel_mediator.h>
+#include <k3dsdk/ngui/property_widget.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/state_change_set.h>
@@ -177,7 +177,7 @@ void control::on_show_connected(k3d::inode* Node)
 void control::show_connected(k3d::inode* Node)
 {
 	return_if_fail(Node);
-	m_data->document().view_node_properties_signal().emit(Node);
+	panel::mediator(m_data->document().document()).set_focus(*Node);
 }
 
 void control::on_connect_to(k3d::iproperty* Property)

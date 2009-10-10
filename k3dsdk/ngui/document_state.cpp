@@ -30,24 +30,9 @@
 
 #include <k3d-i18n-config.h>
 #include <k3d-platform-config.h>
-
-#include "application_state.h"
-#include "context_menu.h"
-#include "detail.h"
-#include "document_state.h"
-#include "move_tool.h"
-#include "rotate_tool.h"
-#include "safe_close_dialog.h"
-#include "scale_tool.h"
-#include "selection_tool.h"
-#include "unsaved_document.h"
-#include "utility.h"
-#include "viewport.h"
-
 #include <k3dsdk/application.h>
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/imaterial.h>
@@ -65,6 +50,20 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/context_menu.h>
+#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/move_tool.h>
+#include <k3dsdk/ngui/panel_mediator.h>
+#include <k3dsdk/ngui/rotate_tool.h>
+#include <k3dsdk/ngui/safe_close_dialog.h>
+#include <k3dsdk/ngui/scale_tool.h>
+#include <k3dsdk/ngui/selection_tool.h>
+#include <k3dsdk/ngui/unsaved_document.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/selection.h>
@@ -814,18 +813,6 @@ public:
 
 #endif
 
-	/// Returns a signal that can be emitted to request display of the history for an node
-	view_node_history_signal_t& view_node_history_signal()
-	{
-		return m_view_node_history_signal;
-	}
-
-	/// Returns a signal that can be emitted to request display of the properties for an node
-	view_node_properties_signal_t& view_node_properties_signal()
-	{
-		return m_view_node_properties_signal;
-	}
-
 	/// Returns a signal that can be emitted to acknowledge of a document selection change
 	document_selection_change_signal_t& document_selection_change_signal()
 	{
@@ -1102,7 +1089,7 @@ assert_not_implemented();
 		selection::state(document()).select(*to_be_selected);
 
 		// Make the newly-created node properties visible ...
-		view_node_properties_signal().emit(node);
+		panel::mediator(document()).set_focus(*node);
 
 		k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::ASYNCHRONOUS);
 
@@ -1194,10 +1181,6 @@ assert_not_implemented();
 	Glib::RefPtr<Gdk::Pixmap> m_gdkgl_share_pixmap;
 	/// Stores a gdkgl context that can be used to share display lists for the entire document
 	GdkGLContext* m_gdkgl_share_list;
-	/// A signal that can be emitted to request display of the history for an node
-	view_node_history_signal_t m_view_node_history_signal;
-	/// A signal that can be emitted to request display of the properties for an node
-	view_node_properties_signal_t m_view_node_properties_signal;
 	/// A signal that can be emitted to acknowledge of a document selection change
 	document_selection_change_signal_t m_document_selection_change_signal;
 	/// A signal that will be emitted whenever the active tool changes
@@ -1378,16 +1361,6 @@ bool document_state::safe_close(Gtk::Window& Parent)
 GdkGLContext* document_state::gdkgl_share_list()
 {
 	return m_implementation->gdkgl_share_list();
-}
-
-document_state::view_node_history_signal_t& document_state::view_node_history_signal()
-{
-	return m_implementation->view_node_history_signal();
-}
-
-document_state::view_node_properties_signal_t& document_state::view_node_properties_signal()
-{
-	return m_implementation->view_node_properties_signal();
 }
 
 document_state::document_selection_change_signal_t& document_state::document_selection_change_signal()

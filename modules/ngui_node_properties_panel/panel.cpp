@@ -32,6 +32,7 @@
 #include <k3dsdk/ngui/custom_property_page.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/widget_manip.h>
@@ -88,7 +89,7 @@ public:
 		m_main_widget.pack_start(m_label, Gtk::PACK_SHRINK);
 		m_main_widget.pack_start(m_auto_page, Gtk::PACK_EXPAND_WIDGET);
 
-		m_document_state.view_node_properties_signal().connect(sigc::mem_fun(*this, &implementation::on_view_node_properties));
+		panel::mediator(m_document_state.document()).connect_focus_node_signal(sigc::mem_fun(*this, &implementation::on_view_node_properties));
 		m_document_state.document().close_signal().connect(sigc::mem_fun(*this, &implementation::on_document_closed));
 
 		// Initial update ...

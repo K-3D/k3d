@@ -35,6 +35,7 @@
 #include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
@@ -113,7 +114,7 @@ public:
 		m_document_state.document().nodes().remove_nodes_signal().connect(sigc::mem_fun(*this, &implementation::on_nodes_removed));
 		m_document_state.document().nodes().rename_node_signal().connect(sigc::mem_fun(*this, &implementation::on_node_renamed));
 
-		m_document_state.view_node_history_signal().connect(sigc::mem_fun(*this, &implementation::on_view_node_history));
+		panel::mediator(m_document_state.document()).connect_focus_node_signal(sigc::mem_fun(*this, &implementation::on_view_node_history));
 
 		schedule_update();
 	}
@@ -303,7 +304,7 @@ public:
 		selection::state(m_document_state.document()).select(*node);
 
 		// Request that (somebody somewhere) show node details ...
-		m_document_state.view_node_properties_signal().emit(node);
+		panel::mediator(m_document_state.document()).set_focus(*node);
 	}
 
 	/// Stores a reference to the owning document

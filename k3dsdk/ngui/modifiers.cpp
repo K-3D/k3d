@@ -38,6 +38,7 @@
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/plugins.h>
@@ -272,7 +273,8 @@ void modify_selected_meshes(document_state& DocumentState, iplugin_factory* Modi
 		// Give nodes a chance to initialize their property values based on their inputs, if any ...
 		if(ireset_properties* const reset_properties = dynamic_cast<ireset_properties*>(multi_sink))
 			reset_properties->reset_properties();
-		DocumentState.view_node_properties_signal().emit(multi_sink);
+
+		panel::mediator(DocumentState.document()).set_focus(*multi_sink);
 	}
 	else
 	{ // Normal mesh modifier
@@ -288,7 +290,7 @@ void modify_selected_meshes(document_state& DocumentState, iplugin_factory* Modi
 		// Show the new modifier properties if only one was processed
 		if(selected_nodes.size() == 1)
 		{
-			DocumentState.view_node_properties_signal().emit(new_modifiers.front());
+			panel::mediator(DocumentState.document()).set_focus(*new_modifiers.front());
 		}
 		else // otherwise connect all parameter properties to the first node and show that one
 		{
@@ -327,7 +329,7 @@ void modify_selected_meshes(document_state& DocumentState, iplugin_factory* Modi
 					}
 				}
 				document.pipeline().set_dependencies(dependencies);
-				DocumentState.view_node_properties_signal().emit(new_modifiers.front());
+				panel::mediator(DocumentState.document()).set_focus(*new_modifiers.front());
 			}
 		}
 	}

@@ -620,28 +620,12 @@ void state::select(const k3d::selection::records& Selection)
 
 void state::select_nodes(const k3d::selection::records& Selection)
 {
-	unsigned long selected_nodes = 0;
-	inode* selected_node = 0;
-
 	for(k3d::selection::records::const_iterator record = Selection.begin(); record != Selection.end(); ++record)
 	{
 		if(inode* const node = k3d::selection::get_node(*record))
 		{
 			select(*node);
-
-			++selected_nodes;
-			selected_node = node;
 		}
-	}
-
-	// Iff one node was selected, send "view node" signals
-	if(1 == selected_nodes && selected_node)
-	{
-assert_not_implemented();
-/*
-		m_view_node_properties_signal.emit(selected_node);
-		m_view_node_history_signal.emit(selected_node);
-*/
 	}
 }
 

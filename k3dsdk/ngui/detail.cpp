@@ -23,27 +23,27 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "detail.h"
-#include "document_state.h"
-#include "modifiers.h"
-#include "transform.h"
-
 #include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/dependencies.h>
-#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/iparentable.h>
+#include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/transform.h>
 #include <k3dsdk/nodes.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/state_change_set.h>
@@ -228,7 +228,7 @@ void instantiate_selected_nodes(document_state& DocumentState)
 
 	// Show the new instance properties if only one was processed
 	if(new_nodes.size() == 1)
-		DocumentState.view_node_properties_signal().emit(*new_nodes.begin());
+		panel::mediator(DocumentState.document()).set_focus(**new_nodes.begin());
 }
 
 void duplicate_selected_nodes(document_state& DocumentState)
@@ -266,7 +266,7 @@ void duplicate_selected_nodes(document_state& DocumentState)
 
 	// Show duplicated node properties if only one was processed
 	if(new_nodes.size() == 1)
-		DocumentState.view_node_properties_signal().emit(*new_nodes.begin());
+		panel::mediator(DocumentState.document()).set_focus(**new_nodes.begin());
 }
 
 } // namespace ngui
