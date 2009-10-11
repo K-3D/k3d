@@ -55,7 +55,6 @@ namespace pipeline_profiler
 class panel :
 	public k3d::ngui::panel::control,
 	public k3d::ngui::asynchronous_update,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;

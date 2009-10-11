@@ -129,7 +129,6 @@ public:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -329,7 +328,7 @@ private:
 		}
 
 		if(selected_nodes.size() == 1)
-			k3d::ngui::panel::mediator(m_document_state->document()).set_focus(*selected_nodes[0]);
+			k3d::ngui::panel::mediator(m_document_state->document()).set_focus(*selected_nodes[0], *this);
 
 		m_selection_paths.clear();
 

@@ -1046,7 +1046,6 @@ void Implementation::propertySignalRender(k3d::iunknown* t)
      
 class Panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
   //baseContainer is the preview & ctrl container

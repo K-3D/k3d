@@ -553,8 +553,7 @@ struct implementation
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
-        public Gtk::VBox
+  public Gtk::VBox
 {
 	typedef Gtk::VBox base;
 
