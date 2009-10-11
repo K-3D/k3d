@@ -101,7 +101,6 @@ private:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
 public:
@@ -178,7 +177,7 @@ public:
 		m_document_state->document().nodes().remove_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::schedule_redraw)));
 
-		k3d::ngui::panel::mediator(m_document_state->document()).connect_focus_node_signal(sigc::bind_return(sigc::mem_fun(*this, &panel::selected_node_changed), false));
+		k3d::ngui::panel::mediator(m_document_state->document()).connect_focus_node_signal(sigc::mem_fun(*this, &panel::selected_node_changed));
 
 		show_all();
 	}
@@ -389,7 +388,7 @@ public:
 		m_create_graph->make_reset_graph_slot()(0);
 	}
 
-	void selected_node_changed(k3d::inode* Node)
+	void selected_node_changed(k3d::inode* const Node, k3d::iunknown* const Sender)
 	{
 		if(m_root_node == Node)
 			return;

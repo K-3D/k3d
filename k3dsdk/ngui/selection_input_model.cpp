@@ -25,21 +25,21 @@
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
-#include "document_state.h"
-#include "icons.h"
-#include "keyboard.h"
-#include "rubber_band.h"
-#include "selection_input_model.h"
-#include "utility.h"
-#include "viewport.h"
-
 #include <k3d-i18n-config.h>
 #include <k3dsdk/color.h>
 #include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/panel_mediator.h>
+#include <k3dsdk/ngui/rubber_band.h>
 #include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/selection_input_model.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/system.h>
@@ -136,6 +136,7 @@ struct selection_input_model::implementation :
 			{
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Select"), K3D_CHANGE_SET_CONTEXT);
 				selection::state(m_document_state.document()).select(m_start_selection);
+
 				break;
 			}
 
@@ -154,6 +155,23 @@ struct selection_input_model::implementation :
 				break;
 			}
 		}
+
+    switch(operation)
+    {
+      case SELECT:
+      case REPLACE:
+      {
+        if(selection::NODE == selection::state(m_document_state.document()).current_mode())
+        {
+          if(k3d::inode* const node = k3d::selection::get_node(m_start_selection))
+          {
+            panel::mediator(m_document_state.document()).set_focus(*node, *this);
+          }
+        }
+
+        break;
+      }
+    }
 	}
 
 	void on_button_double_click(viewport::control& Viewport, const GdkEventButton& Event)

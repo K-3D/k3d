@@ -36,12 +36,15 @@ namespace k3d
 
 class idocument;
 class inode;
+class iunknown;
 
 namespace ngui
 {
 
 namespace panel
 {
+
+class control;
 
 /// Mediates interaction between panels on a per-document basis.
 class mediator
@@ -53,8 +56,12 @@ public:
 	/// in one-or-more panels.
 	void set_focus(inode& Node);
 
+	/// Called to "focus" the given node.  Typically, this means that the node will be displayed
+	/// in one-or-more panels.
+	void set_focus(inode& Node, iunknown& Sender);
+
 	/// Connects a slot to a signal that will be emitted whenever a node receives the "focus".
-	sigc::connection connect_focus_node_signal(const sigc::slot<bool_t, inode*>& Slot);
+	sigc::connection connect_focus_node_signal(const sigc::slot<void, inode*, iunknown*>& Slot);
 
 private:
 	class implementation;

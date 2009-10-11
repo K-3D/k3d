@@ -100,14 +100,12 @@ public:
 		schedule_update();
 	}
 
-	bool on_view_node_properties(k3d::inode* const Node)
+	void on_view_node_properties(k3d::inode* const Node, k3d::iunknown* const Sender)
 	{
 		m_nodes = k3d::nodes_t(1, Node);
 		update_connections();
 		
 		schedule_update();
-
-		return false;
 	}
 
 	void on_document_closed()
@@ -311,7 +309,6 @@ public:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;

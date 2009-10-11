@@ -82,7 +82,8 @@ class implementation :
 	public k3d::ngui::asynchronous_update
 {
 public:
-	implementation(document_state& DocumentState) :
+	implementation(k3d::iunknown& Owner, document_state& DocumentState) :
+    m_owner(Owner),
 		m_document_state(DocumentState),
 		m_node(0)
 	{
@@ -188,8 +189,11 @@ public:
 		node->set_name(NewText);
 	}
 
-	bool on_view_node_history(k3d::inode* const Object)
+	void on_view_node_history(k3d::inode* const Object, k3d::iunknown* const Sender)
 	{
+    if(Sender == &m_owner)
+      return;
+
 		if(Object != m_node)
 		{
 			m_node = Object;
@@ -207,16 +211,12 @@ public:
 					m_node_properties_changed_connection = property_collection->connect_properties_changed_signal(sigc::hide(sigc::mem_fun(*this, &implementation::schedule_update)));
 
 			}
-
-			return true;
 		}
-
-		return false;
 	}
 
 	void on_node_deleted()
 	{
-		on_view_node_history(0);
+		on_view_node_history(0, 0);
 	}
 
 	/// Defines a mapping of properties to their owning node
@@ -304,9 +304,11 @@ public:
 		selection::state(m_document_state.document()).select(*node);
 
 		// Request that (somebody somewhere) show node details ...
-		panel::mediator(m_document_state.document()).set_focus(*node);
+		panel::mediator(m_document_state.document()).set_focus(*node, m_owner);
 	}
 
+  /// Stores a reference to the owner object
+  k3d::iunknown& m_owner;
 	/// Stores a reference to the owning document
 	document_state& m_document_state;
 	/// Stores a reference to the currently-selected node (if any)
@@ -350,7 +352,6 @@ public:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -369,7 +370,7 @@ public:
 
 	void initialize(document_state& DocumentState)
 	{
-		m_implementation = new detail::implementation(DocumentState);
+		m_implementation = new detail::implementation(*this, DocumentState);
 
 		m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 		

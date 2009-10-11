@@ -446,8 +446,7 @@ public:
 
 class panel :
 	public Gtk::VBox,
-	public k3d::ngui::panel::control,
-	public k3d::iunknown
+	public k3d::ngui::panel::control
 {
 	typedef Gtk::VBox base;
 

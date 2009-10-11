@@ -54,7 +54,7 @@ public:
 
 	idocument& document;
 
-	sigc::signal1<bool_t, inode*, k3d::signal::consumable> node_focus_signal;
+	sigc::signal<void, inode*, iunknown*> node_focus_signal;
 
 private:
 	implementation(idocument& Document) :
@@ -73,10 +73,15 @@ mediator::mediator(idocument& Document) :
 
 void mediator::set_focus(inode& Node)
 {
-	internal.node_focus_signal.emit(&Node);
+	internal.node_focus_signal.emit(&Node, 0);
 }
 
-sigc::connection mediator::connect_focus_node_signal(const sigc::slot<bool_t, inode*>& Slot)
+void mediator::set_focus(inode& Node, iunknown& Sender)
+{
+	internal.node_focus_signal.emit(&Node, &Sender);
+}
+
+sigc::connection mediator::connect_focus_node_signal(const sigc::slot<void, inode*, iunknown*>& Slot)
 {
 	return internal.node_focus_signal.connect(Slot);
 }
