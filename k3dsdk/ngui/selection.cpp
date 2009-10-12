@@ -491,34 +491,6 @@ public:
 		return m_node_selection;
 	}
 
-	void selection_changed()
-	{
-assert_not_implemented();
-/*
-		// Switch to node selection mode when there's no selected mesh in the document
-		if(SELECT_NODES != m_selection_mode.internal_value())
-		{
-			unsigned long selected_mesh_count = 0;
-
-			const nodes_t nodes = selected_nodes();
-			for(nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-			{
-//				if(dynamic_cast<imesh_source*>(*node))
-				{
-					++selected_mesh_count;
-					break;
-				}
-			}
-
-			if(!selected_mesh_count)
-				set_selection_mode(SELECT_NODES);
-		}
-
-		m_active_tool->document_selection_changed();
-		m_document_selection_change_signal.emit();
-*/
-	}
-	
 	idocument& document;
 
 	/// Defines storage for the current document-wide selection mode
@@ -614,8 +586,6 @@ void state::select(const k3d::selection::records& Selection)
 			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::SURFACE, 1.0), Selection);
 			break;
 	}
-
-	internal.selection_changed();
 }
 
 void state::select_nodes(const k3d::selection::records& Selection)
@@ -661,8 +631,6 @@ void state::select_all()
 			detail::replace_selection(selected_nodes(), detail::select_all_components(k3d::selection::SURFACE), true);
 			break;
 	}
-
-	internal.selection_changed();
 }
 
 void state::select_all_nodes()
@@ -698,8 +666,6 @@ void state::invert_selection()
 			detail::replace_selection(internal.document.nodes().collection(), detail::invert_components(k3d::selection::SURFACE), true);
 			break;
 	}
-
-	internal.selection_changed();
 }
 
 void state::invert_all_nodes()
@@ -1065,8 +1031,6 @@ void state::deselect(const k3d::selection::records& Selection)
 			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::SURFACE, 0.0), Selection);
 			break;
 	}
-
-	internal.selection_changed();
 }
 
 void state::deselect_nodes(const k3d::selection::records& Selection)
@@ -1100,8 +1064,6 @@ void state::deselect_all()
 			detail::replace_selection(internal.document.nodes().collection(), detail::deselect_all(), false);
 			break;
 	}
-
-	internal.selection_changed();
 }
 
 void state::deselect_all_nodes()
