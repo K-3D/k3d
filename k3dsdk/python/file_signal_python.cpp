@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "file_signal_python.h"
+#include <k3dsdk/python/file_signal_python.h>
 
 #include <k3dsdk/log.h>
 

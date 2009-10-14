@@ -21,9 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "isnappable_python.h"
-#include "iunknown_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/isnappable_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/explicit_snap_source.h>
 #include <k3dsdk/explicit_snap_target.h>

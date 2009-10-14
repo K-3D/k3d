@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "euler_angles_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/euler_angles_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/algebra.h>
 

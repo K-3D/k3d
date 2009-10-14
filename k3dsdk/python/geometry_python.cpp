@@ -17,11 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "instance_wrapper_python.h"
-#include "geometry_python.h"
-#include "mesh_python.h"
-#include "owned_instance_wrapper_python.h"
-#include "selection_python.h"
+#include <k3dsdk/python/instance_wrapper_python.h>
+#include <k3dsdk/python/geometry_python.h>
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/owned_instance_wrapper_python.h>
+#include <k3dsdk/python/selection_python.h>
 
 #include <k3dsdk/iomanip.h>
 #include <k3dsdk/geometry.h>

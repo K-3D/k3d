@@ -21,9 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "iplugin_factory_python.h"
-#include "iunknown_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/iplugin_factory_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/iapplication_plugin_factory.h>
 #include <k3dsdk/idocument_plugin_factory.h>

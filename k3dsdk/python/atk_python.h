@@ -26,7 +26,7 @@
 
 #include <k3dsdk/types.h>
 
-#include "instance_wrapper_python.h"
+#include <k3dsdk/python/instance_wrapper_python.h>
 #include <atk/atk.h>
 
 namespace k3d

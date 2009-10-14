@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "ri_python.h"
+#include <k3dsdk/python/ri_python.h>
 
 #include <k3dsdk/ishader_collection_ri.h>
 

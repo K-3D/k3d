@@ -21,9 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "icommand_node_python.h"
-#include "iunknown_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/icommand_node_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/types.h>

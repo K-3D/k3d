@@ -21,9 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "idocument_python.h"
-#include "iproperty_python.h"
-#include "iunknown_python.h"
+#include <k3dsdk/python/idocument_python.h>
+#include <k3dsdk/python/iproperty_python.h>
+#include <k3dsdk/python/iunknown_python.h>
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>

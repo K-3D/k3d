@@ -17,8 +17,8 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "iunknown_python.h"
-#include "plugin_python.h"
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/plugin_python.h>
 
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/mime_types.h>

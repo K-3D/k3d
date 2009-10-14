@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "const_typed_array_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/const_typed_array_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/named_array_types.h>

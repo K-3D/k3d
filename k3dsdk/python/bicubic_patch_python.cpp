@@ -17,9 +17,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh_python.h"
-#include "owned_instance_wrapper_python.h"
-#include "bicubic_patch_python.h"
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/owned_instance_wrapper_python.h>
+#include <k3dsdk/python/bicubic_patch_python.h>
 
 #include <k3dsdk/bicubic_patch.h>
 

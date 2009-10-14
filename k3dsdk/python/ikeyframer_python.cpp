@@ -21,10 +21,10 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "any_python.h"
-#include "iproperty_collection_python.h"
-#include "iunknown_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/any_python.h>
+#include <k3dsdk/python/iproperty_collection_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/ikeyframer.h>
 

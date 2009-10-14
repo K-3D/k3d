@@ -21,9 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "iuser_interface_python.h"
-#include "iunknown_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/iuser_interface_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/path.h>

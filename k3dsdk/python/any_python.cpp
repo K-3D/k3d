@@ -21,13 +21,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "any_python.h"
-#include "bitmap_python.h"
-#include "const_bitmap_python.h"
-#include "idocument_python.h"
-#include "iunknown_python.h"
-#include "mesh_python.h"
-#include "ri_python.h"
+#include <k3dsdk/python/any_python.h>
+#include <k3dsdk/python/bitmap_python.h>
+#include <k3dsdk/python/const_bitmap_python.h>
+#include <k3dsdk/python/idocument_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/ri_python.h>
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/bitmap.h>

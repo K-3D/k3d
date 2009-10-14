@@ -17,10 +17,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh_python.h"
-#include "owned_instance_wrapper_python.h"
-#include "nurbs_curve_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/owned_instance_wrapper_python.h>
+#include <k3dsdk/python/nurbs_curve_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/nurbs_curve.h>
 

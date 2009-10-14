@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "texture3_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/texture3_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/texture3.h>
 

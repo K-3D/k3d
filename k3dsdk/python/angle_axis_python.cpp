@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "angle_axis_python.h"
+#include <k3dsdk/python/angle_axis_python.h>
 
 #include <k3dsdk/algebra.h>
 

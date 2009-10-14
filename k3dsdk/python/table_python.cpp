@@ -21,9 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "table_python.h"
-#include "typed_array_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/table_python.h>
+#include <k3dsdk/python/typed_array_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/type_registry.h>

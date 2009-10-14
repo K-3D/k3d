@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "bounding_box3_python.h"
+#include <k3dsdk/python/bounding_box3_python.h>
 
 #include <k3dsdk/bounding_box3.h>
 

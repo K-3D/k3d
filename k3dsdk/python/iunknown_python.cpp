@@ -21,24 +21,24 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "any_python.h"
-#include "icommand_node_python.h"
-#include "idocument_exporter_python.h"
-#include "idocument_importer_python.h"
-#include "ifile_change_notifier_python.h"
-#include "ikeyframer_python.h"
-#include "imesh_storage_python.h"
-#include "imetadata_python.h"
-#include "inode_python.h"
-#include "inode_selection_python.h"
-#include "iplugin_factory_python.h"
-#include "iproperty_python.h"
-#include "iproperty_collection_python.h"
-#include "irender_camera_frame_python.h"
-#include "irender_camera_preview_python.h"
-#include "isnappable_python.h"
-#include "iunknown_python.h"
-#include "iuser_interface_python.h"
+#include <k3dsdk/python/any_python.h>
+#include <k3dsdk/python/icommand_node_python.h>
+#include <k3dsdk/python/idocument_exporter_python.h>
+#include <k3dsdk/python/idocument_importer_python.h>
+#include <k3dsdk/python/ifile_change_notifier_python.h>
+#include <k3dsdk/python/ikeyframer_python.h>
+#include <k3dsdk/python/imesh_storage_python.h>
+#include <k3dsdk/python/imetadata_python.h>
+#include <k3dsdk/python/inode_python.h>
+#include <k3dsdk/python/inode_selection_python.h>
+#include <k3dsdk/python/iplugin_factory_python.h>
+#include <k3dsdk/python/iproperty_python.h>
+#include <k3dsdk/python/iproperty_collection_python.h>
+#include <k3dsdk/python/irender_camera_frame_python.h>
+#include <k3dsdk/python/irender_camera_preview_python.h>
+#include <k3dsdk/python/isnappable_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/iuser_interface_python.h>
 
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/iproperty.h>
