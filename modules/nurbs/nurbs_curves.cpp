@@ -111,24 +111,23 @@ struct remap_primitive_points
 	mesh::indices_t& point_map;
 };
 
-/// Replace duplicate points (up to a threshold) with the first point of each series of duplicates in the index arrays
-// TODO: Move this to mesh
-template<typename ComparatorT>
-void replace_duplicate_points(mesh& Mesh, ComparatorT Equal)
+} // namespace detail
+
+void replace_duplicate_points(k3d::mesh& Mesh, const k3d::mesh::primitives_t::iterator Begin, const k3d::mesh::primitives_t::iterator End)
 {
 	// Create a mapping between duplicate points and their replacement
-	mesh::indices_t point_map;
-	lookup_duplicate_points(*Mesh.points, point_map, Equal);
+	k3d::mesh::indices_t point_map;
+	detail::lookup_duplicate_points(*Mesh.points, point_map, detail::inf_norm());
 
-	// Update generic mesh primitives so they use the correct indices ...
-	mesh::visit_arrays(Mesh, remap_primitive_points(point_map));
+	for(k3d::mesh::primitives_t::iterator prim = Begin; prim != End; ++prim)
+	{
+		k3d::mesh::visit_arrays(prim->writable(), detail::remap_primitive_points(point_map));
+	}
 }
-
-} // namespace detail
 
 void replace_duplicate_points(k3d::mesh& Mesh)
 {
-	detail::replace_duplicate_points(Mesh, detail::inf_norm());
+	replace_duplicate_points(Mesh, Mesh.primitives.begin(), Mesh.primitives.end());
 }
 
 void add_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve)
@@ -973,6 +972,109 @@ void append_common_knot_vector(k3d::mesh::knots_t& CommonKnotVector, const k3d::
 		}
 		knot += new_mul;
 	}
+}
+
+void find_loops(const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::const_primitive& Curves, k3d::mesh::bools_t& IsInLoop, k3d::mesh::indices_t& LoopFirstCurves, k3d::mesh::indices_t& CurveLoops, k3d::mesh::indices_t& NextCurves, k3d::mesh::bools_t& LoopSelections, k3d::mesh::points_t& LoopCentroids)
+{
+	const k3d::uint_t curve_count = Curves.curve_first_points.size();
+	k3d::mesh::indices_t curve_starts(curve_count);
+	k3d::mesh::indices_t curve_ends(curve_count);
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		curve_starts[curve] = Curves.curve_first_points[curve];
+		curve_ends[curve] = curve_starts[curve] + Curves.curve_point_counts[curve] - 1;
+	}
+
+	// Get curve endpoint valences, since only valence 2 points are allowed
+	k3d::mesh::counts_t valences(CurvePoints.size(), 0);
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		valences[Curves.curve_points[curve_starts[curve]]]++;
+		valences[Curves.curve_points[curve_ends[curve]]]++;
+	}
+
+	IsInLoop.assign(curve_count, false);
+	NextCurves.assign(curve_count, 0);
+	CurveLoops.assign(curve_count, 0);
+	k3d::mesh::bools_t has_next_curve(curve_count, false);
+
+	for(k3d::uint_t first_curve = 0; first_curve != curve_count; ++first_curve)
+	{
+		// check if there is a follow-on curve
+		for(k3d::uint_t second_curve = 0; second_curve != curve_count; ++second_curve)
+		{
+			if(Curves.curve_points[curve_ends[first_curve]] == Curves.curve_points[curve_starts[second_curve]] && valences[Curves.curve_points[curve_ends[first_curve]]] == 2)
+			{
+				NextCurves[first_curve] = second_curve;
+				has_next_curve[first_curve] = true;
+			}
+		}
+	}
+
+	// Find multi-curve loops
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		if(IsInLoop[curve])
+			continue;
+		k3d::bool_t is_loop = true;
+		k3d::point3 centroid(0,0,0);
+		k3d::uint_t count = 0;
+		k3d::uint_t selected_count = 0;
+		k3d::uint_t point_count = 0;
+		for(k3d::uint_t next_curve = curve; ;)
+		{
+			if(!has_next_curve[next_curve])
+			{
+				is_loop = false;
+				break;
+			}
+			++count;
+			if(Curves.curve_selections[next_curve])
+				++selected_count;
+
+			for(k3d::uint_t i = curve_starts[next_curve]; i != curve_ends[next_curve]; ++i)
+			{
+				const k3d::uint_t point = Curves.curve_points[i];
+				++point_count;
+				centroid += k3d::to_vector(CurvePoints[point]);
+			}
+
+			next_curve = NextCurves[next_curve];
+			if(next_curve == curve)
+				break;
+		}
+		if(is_loop)
+		{
+			for(k3d::uint_t next_curve = curve; ;)
+			{
+				IsInLoop[next_curve] = true;
+				CurveLoops[next_curve] = LoopFirstCurves.size();
+
+				next_curve = NextCurves[next_curve];
+				if(next_curve == curve)
+					break;
+			}
+			LoopCentroids.push_back(centroid / point_count);
+			LoopSelections.push_back(selected_count == count);
+			LoopFirstCurves.push_back(curve);
+		}
+	}
+}
+
+const k3d::point3 centroid(const k3d::mesh::points_t& Points, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve)
+{
+	k3d::point3 result(0,0,0);
+	const k3d::uint_t points_begin = Curves.curve_first_points[Curve];
+	const k3d::uint_t points_end = points_begin + Curves.curve_point_counts[Curve];
+	k3d::mesh::bools_t used_points(Points.size(), false);
+	for(k3d::uint_t point_idx = points_begin; point_idx != points_end; ++point_idx)
+	{
+		const k3d::uint_t point = Curves.curve_points[point_idx];
+		if(!used_points[point])
+			result += k3d::to_vector(Points[point]);
+		used_points[point] = true;
+	}
+	return result / (points_end - points_begin);
 }
 
 void delete_empty_primitives(k3d::mesh& Mesh)
