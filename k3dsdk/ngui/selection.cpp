@@ -30,6 +30,7 @@
 #include <k3dsdk/geometry.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
+#include <k3dsdk/imesh_selection_algorithm.h>
 #include <k3dsdk/imesh_selection_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imetadata.h>
@@ -43,6 +44,7 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
@@ -491,6 +493,13 @@ public:
 		return m_node_selection;
 	}
 
+  const nodes_t selected_nodes()
+  {
+    return_val_if_fail(node_selection(), nodes_t());
+    const inode_selection::selected_nodes_t nodes = node_selection()->selected_nodes();
+    return nodes_t(nodes.begin(), nodes.end());
+  }
+
 	idocument& document;
 
 	/// Defines storage for the current document-wide selection mode
@@ -504,6 +513,98 @@ private:
 		current_mode(init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(selection::NODE) + init_values(mode_values())),
 		m_node_selection(0)
 	{
+		current_mode.connect_explicit_change_signal(sigc::mem_fun(*this, &implementation::on_selection_mode_changed));
+	}
+
+	/// Called by the signal system when the selection mode changes
+	void on_selection_mode_changed(k3d::iunknown*)
+	{
+    const nodes_t nodes = selected_nodes();
+    for(nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
+    {
+      if(classes::MeshInstance() != (*node)->factory().factory_id())
+        continue;
+
+      imesh_selection_sink* const mesh_selection_sink = dynamic_cast<imesh_selection_sink*>(*node);
+      if(!mesh_selection_sink)
+        continue;
+
+      imesh_source* const mesh_source = dynamic_cast<imesh_source*>(*node);
+      if(!mesh_source)
+        continue;
+
+      const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_internal_value());
+      if(!mesh)
+        continue;
+
+      const k3d::selection::set current_selection =
+        boost::any_cast<k3d::selection::set>(mesh_selection_sink->mesh_selection_sink_input().property_internal_value());
+
+      k3d::selection::set new_selection;
+      switch(current_mode.internal_value())
+      {
+        case CURVE:
+        {
+          break;
+        }
+        case FACE:
+        {
+          break;
+        }
+        case NODE:
+        {
+          break;
+        }
+        case PATCH:
+        {
+          break;
+        }
+        case POINT:
+        {
+          static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakePointSelection");
+          return_if_fail(conversion);
+
+          new_selection = conversion->create_mesh_selection(*mesh, current_selection);
+          break;
+        }
+        case EDGE:
+        {
+          break;
+        }
+        case SURFACE:
+        {
+          break;
+        }
+      }
+
+      property::set_internal_value(mesh_selection_sink->mesh_selection_sink_input(), new_selection);
+      property::set_internal_value(**node, "show_component_selection", true);
+    }
+/*
+		if (!m_selection_tool->keep_selection() && !m_selection_tool->convert_selection())
+		{
+			detail::update_component_selection(selected_nodes(), detail::deselect_all(), true);
+		}
+		switch(m_selection_mode.internal_value())
+		{
+			case SELECT_NODES:
+				on_set_node_mode();
+				break;
+			case SELECT_POINTS:
+				on_set_point_mode();
+				break;
+			case SELECT_SPLIT_EDGES:
+				on_set_split_edge_mode();
+				break;
+			case SELECT_UNIFORM:
+				on_set_uniform_mode();
+				break;
+		}
+
+		m_last_selection_mode = m_selection_mode.internal_value();
+
+		selection_changed();
+*/
 	}
 
 	void on_node_selection_node_changed()
@@ -544,9 +645,7 @@ sigc::connection state::connect_current_mode_changed_signal(const sigc::slot<voi
 
 const nodes_t state::selected_nodes()
 {
-	return_val_if_fail(internal.node_selection(), nodes_t());
-	const inode_selection::selected_nodes_t nodes = internal.node_selection()->selected_nodes();
-	return nodes_t(nodes.begin(), nodes.end());
+  return internal.selected_nodes();
 }
 
 void state::select(inode& Node)
