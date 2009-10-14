@@ -20,14 +20,14 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "data.h"
-#include "hints.h"
-#include "k3d-i18n-config.h"
-#include "imesh_sink.h"
-#include "imesh_source.h"
-#include "ipipeline_profiler.h"
-#include "legacy_mesh.h"
-#include "mesh.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/hints.h>
+#include <k3dsdk/imesh_sink.h>
+#include <k3dsdk/imesh_source.h>
+#include <k3dsdk/ipipeline_profiler.h>
+#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {

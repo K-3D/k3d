@@ -25,9 +25,9 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "keyboard.h"
-#include "viewport.h"
-#include "transform_tool.h"
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/ngui/transform_tool.h>
 
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/value_demand_storage.h>

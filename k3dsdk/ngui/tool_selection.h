@@ -25,10 +25,10 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "document_state.h"
-#include "selection.h"
-#include "utility.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3d-i18n-config.h>
 

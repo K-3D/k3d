@@ -21,7 +21,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "messages.h"
+#include <k3dsdk/ngui/messages.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/plugins.h>

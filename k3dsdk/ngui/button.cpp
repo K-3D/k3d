@@ -21,8 +21,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "button.h"
-#include "utility.h"
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/utility.h>
 
 #include <k3dsdk/log.h>
 

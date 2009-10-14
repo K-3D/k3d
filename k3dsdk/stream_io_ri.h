@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "types_ri.h"
+#include <k3dsdk/types_ri.h>
 
 namespace k3d
 {

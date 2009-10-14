@@ -24,10 +24,10 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "almost_equal.h"
-#include "basic_math.h"
-#include "Half/half.h"
-#include "result.h"
+#include <k3dsdk/almost_equal.h>
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/Half/half.h>
+#include <k3dsdk/result.h>
 
 #include <algorithm>
 #include <cmath>

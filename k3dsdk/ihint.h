@@ -1,7 +1,7 @@
 #ifndef K3DSDK_IHINT_H
 #define K3DSDK_IHINT_H
 
-#include "iunknown.h"
+#include <k3dsdk/iunknown.h>
 #include <iosfwd>
 
 namespace k3d

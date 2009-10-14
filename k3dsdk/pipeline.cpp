@@ -21,14 +21,14 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iproperty.h"
-#include "istate_container.h"
-#include "istate_recorder.h"
-#include "log.h"
-#include "pipeline.h"
-#include "result.h"
-#include "signal_slots.h"
-#include "state_change_set.h"
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/istate_container.h>
+#include <k3dsdk/istate_recorder.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/pipeline.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/signal_slots.h>
+#include <k3dsdk/state_change_set.h>
 
 #include <cassert>
 #include <iostream>

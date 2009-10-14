@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iproperty_group_collection.h"
+#include <k3dsdk/iproperty_group_collection.h>
 
 namespace k3d
 {

@@ -21,10 +21,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "log.h"
-#include "result.h"
-#include "share_detail.h"
-#include "share.h"
+#include <k3dsdk/log.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/share_detail.h>
+#include <k3dsdk/share.h>
 
 namespace k3d
 {

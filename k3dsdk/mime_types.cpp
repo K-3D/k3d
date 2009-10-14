@@ -21,9 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "imime_type_handler.h"
-#include "mime_types.h"
-#include "plugins.h"
+#include <k3dsdk/imime_type_handler.h>
+#include <k3dsdk/mime_types.h>
+#include <k3dsdk/plugins.h>
 
 #include <map>
 

@@ -21,18 +21,18 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "idocument.h"
-#include "inode_collection_sink.h"
-#include "ipipeline.h"
-#include "iplugin_factory.h"
-#include "iproperty_collection.h"
-#include "istate_recorder.h"
-#include "nodes.h"
-#include "properties.h"
-#include "string_cast.h"
-#include "string_modifiers.h"
-#include "utility.h"
+#include <k3dsdk/data.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/inode_collection_sink.h>
+#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/istate_recorder.h>
+#include <k3dsdk/nodes.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/string_modifiers.h>
+#include <k3dsdk/utility.h>
 
 // The following includes are needed to compare typeinfo of properties in skip_nodes
 #include <k3dsdk/legacy_mesh.h>

@@ -22,7 +22,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "dependencies.h"
+#include <k3dsdk/dependencies.h>
 
 namespace k3d
 {

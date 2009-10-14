@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ishader_collection_ri.h"
+#include <k3dsdk/ishader_collection_ri.h>
 #include <set>
 
 namespace k3d

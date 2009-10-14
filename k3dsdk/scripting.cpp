@@ -21,14 +21,14 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iapplication_plugin_factory.h"
-#include "iplugin_factory.h"
-#include "iscript_engine.h"
-#include "mime_types.h"
-#include "plugins.h"
-#include "result.h"
-#include "scripting.h"
-#include "uuid.h"
+#include <k3dsdk/iapplication_plugin_factory.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iscript_engine.h>
+#include <k3dsdk/mime_types.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/scripting.h>
+#include <k3dsdk/uuid.h>
 
 #include <boost/scoped_ptr.hpp>
 

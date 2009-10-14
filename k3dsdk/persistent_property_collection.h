@@ -24,9 +24,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ipersistent.h"
-#include "ipersistent_collection.h"
-#include "types.h"
+#include <k3dsdk/ipersistent.h>
+#include <k3dsdk/ipersistent_collection.h>
+#include <k3dsdk/types.h>
 
 namespace k3d
 {

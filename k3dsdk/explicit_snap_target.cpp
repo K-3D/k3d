@@ -23,8 +23,8 @@
 
 #include <algorithm>
 
-#include "explicit_snap_target.h"
-#include "result.h"
+#include <k3dsdk/explicit_snap_target.h>
+#include <k3dsdk/result.h>
 
 namespace k3d
 {

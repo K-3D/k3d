@@ -21,8 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_state.h"
-#include "application_window.h"
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/application_window.h>
 
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/application.h>

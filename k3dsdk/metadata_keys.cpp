@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "metadata_keys.h"
+#include <k3dsdk/metadata_keys.h>
 
 namespace k3d
 {

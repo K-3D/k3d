@@ -22,7 +22,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "noise.h"
+#include <k3dsdk/noise.h>
 
 #pragma warning(disable : 4305)
 

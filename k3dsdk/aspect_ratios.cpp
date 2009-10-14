@@ -21,11 +21,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "aspect_ratios.h"
-#include "fstream.h"
-#include "log.h"
-#include "share.h"
-#include "xml.h"
+#include <k3dsdk/aspect_ratios.h>
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/share.h>
+#include <k3dsdk/xml.h>
 
 namespace k3d
 {

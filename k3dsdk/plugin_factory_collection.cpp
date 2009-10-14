@@ -21,22 +21,22 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "fstream.h"
-#include "iapplication_plugin_factory.h"
-#include "idocument_plugin_factory.h"
-#include "iplugin_factory.h"
-#include "iplugin_registry.h"
-#include "iscript_engine.h"
-#include "k3d-i18n-config.h"
-#include "log.h"
-#include "os_load_module.h"
-#include "plugin_factory_collection.h"
-#include "result.h"
-#include "string_cast.h"
-#include "string_modifiers.h"
-#include "system.h"
-#include "type_registry.h"
-#include "xml.h"
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/iapplication_plugin_factory.h>
+#include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iplugin_registry.h>
+#include <k3dsdk/iscript_engine.h>
+#include <k3d-i18n-config.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/os_load_module.h>
+#include <k3dsdk/plugin_factory_collection.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/string_modifiers.h>
+#include <k3dsdk/system.h>
+#include <k3dsdk/type_registry.h>
+#include <k3dsdk/xml.h>
 
 #include <iostream>
 

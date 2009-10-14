@@ -22,9 +22,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "enumeration_chooser.h"
-#include "options.h"
-#include "utility.h"
+#include <k3dsdk/ngui/enumeration_chooser.h>
+#include <k3dsdk/ngui/options.h>
+#include <k3dsdk/ngui/utility.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/inode.h>

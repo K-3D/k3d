@@ -21,10 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_state.h"
-#include "safe_close_dialog.h"
-#include "savable_document_window.h"
-#include "document_state.h"
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/safe_close_dialog.h>
+#include <k3dsdk/ngui/savable_document_window.h>
+#include <k3dsdk/ngui/document_state.h>
 
 #include <k3dsdk/batch_mode.h>
 

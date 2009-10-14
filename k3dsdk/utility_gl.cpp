@@ -21,17 +21,17 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "algebra.h"
-#include "bounding_box3.h"
-#include "extension_gl.h"
-#include "idocument.h"
-#include "imaterial.h"
-#include "inode.h"
-#include "inode_collection.h"
-#include "irender_viewport_gl.h"
-#include "material.h"
-#include "plane.h"
-#include "utility_gl.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/bounding_box3.h>
+#include <k3dsdk/extension_gl.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/irender_viewport_gl.h>
+#include <k3dsdk/material.h>
+#include <k3dsdk/plane.h>
+#include <k3dsdk/utility_gl.h>
 
 #include <boost/gil/extension/numeric/resample.hpp>
 #include <boost/gil/extension/numeric/sampler.hpp>

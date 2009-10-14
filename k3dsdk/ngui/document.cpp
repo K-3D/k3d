@@ -22,10 +22,10 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "document.h"
-#include "document_state.h"
-#include "main_document_window.h"
-#include "messages.h"
+#include <k3dsdk/ngui/document.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/main_document_window.h>
+#include <k3dsdk/ngui/messages.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>

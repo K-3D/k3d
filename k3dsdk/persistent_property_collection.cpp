@@ -21,17 +21,17 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "imetadata.h"
-#include "inode.h"
-#include "iproperty_collection.h"
-#include "iuser_property.h"
-#include "persistent_property_collection.h"
-#include "properties.h"
-#include "result.h"
-#include "tokens.h"
-#include "type_registry.h"
-#include "utility.h"
-#include "xml.h"
+#include <k3dsdk/imetadata.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/iuser_property.h>
+#include <k3dsdk/persistent_property_collection.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/tokens.h>
+#include <k3dsdk/type_registry.h>
+#include <k3dsdk/utility.h>
+#include <k3dsdk/xml.h>
 
 #include <iostream>
 #include <set>

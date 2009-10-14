@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "rectangle.h"
+#include <k3dsdk/rectangle.h>
 
 #include <cmath>
 

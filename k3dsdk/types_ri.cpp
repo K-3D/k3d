@@ -23,7 +23,7 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "types_ri.h"
+#include <k3dsdk/types_ri.h>
 
 namespace k3d
 {

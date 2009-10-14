@@ -27,14 +27,14 @@
 
 #include <k3d-i18n-config.h>
 
-#include "document_state.h"
-#include "modifiers.h"
-#include "icons.h"
-#include "interactive.h"
-#include "keyboard.h"
-#include "transform_tool.h"
-#include "utility.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/transform_tool.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>

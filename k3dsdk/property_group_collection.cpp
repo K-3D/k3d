@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "property_group_collection.h"
+#include <k3dsdk/property_group_collection.h>
 
 namespace k3d
 {

@@ -25,8 +25,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "color.h"
-#include "point3.h"
+#include <k3dsdk/color.h>
+#include <k3dsdk/point3.h>
 
 namespace k3d
 {

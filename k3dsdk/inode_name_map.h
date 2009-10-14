@@ -24,8 +24,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
-#include "signal_system.h"
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/signal_system.h>
 
 #include <string>
 #include <vector>

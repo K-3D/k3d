@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "entry.h"
+#include <k3dsdk/ngui/entry.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/inode.h>

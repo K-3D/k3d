@@ -24,12 +24,12 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "algebra.h"
-#include "data.h"
-#include "hints.h"
-#include "itransform_sink.h"
-#include "itransform_source.h"
-#include "value_demand_storage.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/hints.h>
+#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/value_demand_storage.h>
 
 namespace k3d
 {

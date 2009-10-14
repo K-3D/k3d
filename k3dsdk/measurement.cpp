@@ -22,9 +22,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "expression_grammar.h"
-#include "measurement.h"
-#include "result.h"
+#include <k3dsdk/expression_grammar.h>
+#include <k3dsdk/measurement.h>
+#include <k3dsdk/result.h>
 
 #include <stdexcept>
 

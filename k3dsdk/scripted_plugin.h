@@ -24,10 +24,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "k3d-i18n-config.h"
-#include "plugins.h"
-#include "scripting.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/plugins.h>
+#include <k3dsdk/scripting.h>
 
 #include <boost/scoped_ptr.hpp>
 

@@ -24,10 +24,10 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "algebra.h"
-#include "ihint.h"
-#include "mesh.h"
-#include "signal_system.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/ihint.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/signal_system.h>
 
 #include <boost/any.hpp>
 

@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3d-platform-config.h>
-#include "types.h"
+#include <k3dsdk/types.h>
 #include <boost/static_assert.hpp>
 
 namespace k3d

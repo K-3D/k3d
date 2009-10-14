@@ -21,19 +21,19 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "classes.h"
-#include "plugins.h"
-#include "k3d-i18n-config.h"
-#include "ipipeline.h"
-#include "idocument.h"
-#include "ikeyframer.h"
-#include "inode.h"
-#include "iparentable.h"
-#include "itransform_sink.h"
-#include "itransform_source.h"
-#include "properties.h"
-#include "result.h"
-#include "transform.h"
+#include <k3dsdk/classes.h>
+#include <k3dsdk/plugins.h>
+#include <k3d-i18n-config.h>
+#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/ikeyframer.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/iparentable.h>
+#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/transform.h>
 
 #include <iostream>
 

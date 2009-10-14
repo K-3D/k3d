@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "unsaved_document.h"
+#include <k3dsdk/ngui/unsaved_document.h>
 
 #include <gtkmm/window.h>
 

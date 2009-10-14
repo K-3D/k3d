@@ -22,13 +22,13 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "explicit_snap_source.h"
-#include "explicit_snap_target.h"
-#include "isnap_source.h"
-#include "isnap_target.h"
-#include "result.h"
-#include "snappable_detail.h"
-#include "xml.h"
+#include <k3dsdk/explicit_snap_source.h>
+#include <k3dsdk/explicit_snap_target.h>
+#include <k3dsdk/isnap_source.h>
+#include <k3dsdk/isnap_target.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/snappable_detail.h>
+#include <k3dsdk/xml.h>
 
 namespace k3d
 {

@@ -21,9 +21,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "high_res_timer.h"
-#include "log.h"
-#include "pipeline_profiler.h"
+#include <k3dsdk/high_res_timer.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/pipeline_profiler.h>
 
 #include <iomanip>
 #include <stack>

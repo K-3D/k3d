@@ -24,9 +24,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "mesh_selection_sink.h"
-#include "mesh_modifier.h"
-#include "node.h"
+#include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/node.h>
 
 namespace k3d
 {

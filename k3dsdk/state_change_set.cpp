@@ -22,12 +22,12 @@
 		\author Dan Erikson (derikson@montana.com)
 */
 
-#include "idocument.h"
-#include "istate_container.h"
-#include "istate_recorder.h"
-#include "result.h"
-#include "state_change_set.h"
-#include "utility.h"
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/istate_container.h>
+#include <k3dsdk/istate_recorder.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/state_change_set.h>
+#include <k3dsdk/utility.h>
 
 #include <algorithm>
 #include <functional>

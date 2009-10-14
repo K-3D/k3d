@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "bitmap_preview.h"
+#include <k3dsdk/ngui/bitmap_preview.h>
 
 #include <k3dsdk/properties.h>
 

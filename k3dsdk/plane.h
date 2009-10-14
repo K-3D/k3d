@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "vector3.h"
+#include <k3dsdk/vector3.h>
 
 namespace k3d
 {

@@ -21,10 +21,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "idocument.h"
-#include "nodes.h"
-#include "properties.h"
-#include "time_source.h"
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/nodes.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/time_source.h>
 
 namespace k3d
 {

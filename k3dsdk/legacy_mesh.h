@@ -20,11 +20,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "algebra.h"
-#include "bounding_box3.h"
-#include "mesh.h"
-#include "selectable.h"
-#include "utility.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/bounding_box3.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/selectable.h>
+#include <k3dsdk/utility.h>
 
 #include <boost/any.hpp>
 #include <boost/array.hpp>

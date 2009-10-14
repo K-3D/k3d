@@ -21,8 +21,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "safe_close_dialog.h"
-#include "unsaved_document.h"
+#include <k3dsdk/ngui/safe_close_dialog.h>
+#include <k3dsdk/ngui/unsaved_document.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/result.h>

@@ -21,7 +21,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "basic_input_model.h"
+#include <k3dsdk/ngui/basic_input_model.h>
 
 #include <k3dsdk/log.h>
 #include <k3dsdk/vectors.h>

@@ -21,8 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "line2.h"
-#include "vectors.h"
+#include <k3dsdk/line2.h>
+#include <k3dsdk/vectors.h>
 
 namespace k3d
 {

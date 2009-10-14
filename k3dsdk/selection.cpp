@@ -17,13 +17,13 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "imesh_source.h"
-#include "inode.h"
-#include "iomanip.h"
-#include "iproperty.h"
-#include "legacy_mesh.h"
-#include "persistent_lookup.h"
-#include "selection.h"
+#include <k3dsdk/imesh_source.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/iomanip.h>
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/persistent_lookup.h>
+#include <k3dsdk/selection.h>
 
 namespace k3d
 {

@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "imetadata.h"
+#include <k3dsdk/imetadata.h>
 
 namespace k3d
 {

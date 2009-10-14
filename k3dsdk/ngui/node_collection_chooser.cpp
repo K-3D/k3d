@@ -28,11 +28,11 @@
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/treeview.h>
 
-#include "application_window.h"
-#include "asynchronous_update.h"
-#include "icons.h"
-#include "node_collection_chooser.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/application_window.h>
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/node_collection_chooser.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/idocument.h>

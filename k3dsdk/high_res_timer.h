@@ -25,9 +25,9 @@
 		\author Ed Millard (emillard@direcway.com)
 */
 
-#include "k3d-platform-config.h"
+#include <k3d-platform-config.h>
 
-#include "result.h"
+#include <k3dsdk/result.h>
 
 #include <boost/utility.hpp>
 #include <iostream>
@@ -35,7 +35,7 @@
 
 
 #ifdef K3D_API_WIN32
-	#include "win32.h"
+	#include <k3dsdk/win32.h>
 #else
 	#include <sys/time.h>
 #endif // K3D_API_WIN32

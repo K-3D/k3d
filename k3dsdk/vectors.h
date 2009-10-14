@@ -47,14 +47,14 @@
 
 // Modified by Tim Shead for use with K-3D, January 1998
 
-#include "almost_equal.h"
-#include "normal3.h"
-#include "point2.h"
-#include "point3.h"
-#include "point4.h"
-#include "vector2.h"
-#include "vector3.h"
-#include "vector4.h"
+#include <k3dsdk/almost_equal.h>
+#include <k3dsdk/normal3.h>
+#include <k3dsdk/point2.h>
+#include <k3dsdk/point3.h>
+#include <k3dsdk/point4.h>
+#include <k3dsdk/vector2.h>
+#include <k3dsdk/vector3.h>
+#include <k3dsdk/vector4.h>
 
 #include <algorithm>
 #include <cmath>

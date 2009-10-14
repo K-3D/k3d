@@ -21,9 +21,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "file_chooser_dialog.h"
-#include "hotkey_entry.h"
-#include "path_chooser.h"
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/hotkey_entry.h>
+#include <k3dsdk/ngui/path_chooser.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/hints.h>

@@ -25,8 +25,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
-#include "uuid.h"
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/uuid.h>
 
 #include <iosfwd>
 #include <map>

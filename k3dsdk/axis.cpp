@@ -21,9 +21,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "axis.h"
-#include "log.h"
-#include "result.h"
+#include <k3dsdk/axis.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/result.h>
 
 #include <iostream>
 

@@ -24,16 +24,16 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "color.h"
-#include "imaterial.h"
-#include "imesh_painter_gl.h"
-#include "imesh_painter_ri.h"
-#include "inode.h"
-#include "itexture_ri.h"
-#include "legacy_mesh.h"
-#include "mesh.h"
-#include "path.h"
-#include "types.h"
+#include <k3dsdk/color.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/imesh_painter_gl.h>
+#include <k3dsdk/imesh_painter_ri.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/itexture_ri.h>
+#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/path.h>
+#include <k3dsdk/types.h>
 
 #include <boost/mpl/vector/vector20.hpp>
 

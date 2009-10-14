@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "point2.h"
-#include "vector2.h"
+#include <k3dsdk/point2.h>
+#include <k3dsdk/vector2.h>
 
 namespace k3d
 {

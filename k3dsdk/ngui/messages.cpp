@@ -23,9 +23,9 @@
 
 #include <k3d-i18n-config.h>
 
-#include "application_state.h"
-#include "options.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/options.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3dsdk/batch_mode.h>
 

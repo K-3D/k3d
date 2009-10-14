@@ -25,7 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "string_cast.h"
+#include <k3dsdk/string_cast.h>
 
 #include <iosfwd>
 #include <sstream>

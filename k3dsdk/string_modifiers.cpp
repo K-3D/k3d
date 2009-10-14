@@ -23,8 +23,8 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "result.h"
-#include "string_modifiers.h"
+#include <k3dsdk/result.h>
+#include <k3dsdk/string_modifiers.h>
 
 #include <algorithm>
 #include <cctype>

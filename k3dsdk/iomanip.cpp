@@ -21,8 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iomanip.h"
-#include "types.h"
+#include <k3dsdk/iomanip.h>
+#include <k3dsdk/types.h>
 
 #include <iostream>
 

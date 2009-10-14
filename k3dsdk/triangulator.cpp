@@ -17,10 +17,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "gl.h"
-#include "polyhedron.h"
-#include "sgi_tesselator.h"
-#include "triangulator.h"
+#include <k3dsdk/gl.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/sgi_tesselator.h>
+#include <k3dsdk/triangulator.h>
 #include <set>
 
 namespace k3d

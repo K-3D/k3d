@@ -25,9 +25,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "basic_math.h"
-#include "log.h"
-#include "vectors.h"
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/vectors.h>
 
 #include <cfloat>
 #include <cstring>

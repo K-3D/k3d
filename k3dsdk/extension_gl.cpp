@@ -21,9 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "extension_gl.h"
-#include "gl.h"
-#include "result.h"
+#include <k3dsdk/extension_gl.h>
+#include <k3dsdk/gl.h>
+#include <k3dsdk/result.h>
 
 #include <boost/tokenizer.hpp>
 

@@ -24,11 +24,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "algebra.h"
-#include "bitmap.h"
-#include "color.h"
-#include "gl.h"
-#include "irender_viewport_gl.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/bitmap.h>
+#include <k3dsdk/color.h>
+#include <k3dsdk/gl.h>
+#include <k3dsdk/irender_viewport_gl.h>
 
 namespace k3d
 {

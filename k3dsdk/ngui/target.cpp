@@ -24,9 +24,9 @@
 
 #include <gtkmm/widget.h>
 
-#include "document_state.h"
-#include "target.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/target.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/ibounded.h>

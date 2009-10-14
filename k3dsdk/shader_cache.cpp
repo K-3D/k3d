@@ -21,11 +21,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "log.h"
-#include "path.h"
-#include "result.h"
-#include "shader_cache_detail.h"
-#include "shader_cache.h"
+#include <k3dsdk/log.h>
+#include <k3dsdk/path.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/shader_cache_detail.h>
+#include <k3dsdk/shader_cache.h>
 
 namespace k3d
 {

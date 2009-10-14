@@ -17,11 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "array.h"
-#include "iomanip.h"
-#include "log.h"
-#include "named_arrays.h"
-#include "type_registry.h"
+#include <k3dsdk/array.h>
+#include <k3dsdk/iomanip.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/named_arrays.h>
+#include <k3dsdk/type_registry.h>
 
 namespace k3d
 {

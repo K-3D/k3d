@@ -24,14 +24,14 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "k3d-platform-config.h"
+#include <k3d-platform-config.h>
 
 #if defined K3D_API_WIN32
-	#include "win32.h"
+	#include <k3dsdk/win32.h>
 #endif // !K3D_API_WIN32
 
 #define GLEW_MX // multiple-context glew as per http://glew.sourceforge.net/advanced.html
-#include "glew/glew.h" // Needed for cross-platform OpenGL > 1.1
+#include <k3dsdk/glew/glew.h> // Needed for cross-platform OpenGL > 1.1
 
 // Keep track of current glew context. Viewport is responsible for setting this so glewGetContext works correctly
 class glew_context

@@ -20,7 +20,7 @@
 /** \author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "utility.h"
+#include <k3dsdk/ngui/utility.h>
 
 #include <k3dsdk/share.h>
 #include <k3dsdk/signal_system.h>

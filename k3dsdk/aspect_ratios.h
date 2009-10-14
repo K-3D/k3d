@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ienumeration_property.h"
+#include <k3dsdk/ienumeration_property.h>
 
 #include <string>
 #include <vector>

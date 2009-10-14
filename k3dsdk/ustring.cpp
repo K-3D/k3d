@@ -21,7 +21,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ustring.h"
+#include <k3dsdk/ustring.h>
 
 namespace k3d
 {

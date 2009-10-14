@@ -20,14 +20,14 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "bounding_box3.h"
-#include "named_arrays.h"
-#include "named_array_types.h"
-#include "named_tables.h"
-#include "pipeline_data.h"
-#include "table.h"
-#include "typed_array.h"
-#include "uint_t_array.h"
+#include <k3dsdk/bounding_box3.h>
+#include <k3dsdk/named_arrays.h>
+#include <k3dsdk/named_array_types.h>
+#include <k3dsdk/named_tables.h>
+#include <k3dsdk/pipeline_data.h>
+#include <k3dsdk/table.h>
+#include <k3dsdk/typed_array.h>
+#include <k3dsdk/uint_t_array.h>
 
 namespace k3d
 {

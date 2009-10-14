@@ -17,9 +17,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "metadata_keys.h"
-#include "particle.h"
-#include "primitive_validation.h"
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/particle.h>
+#include <k3dsdk/primitive_validation.h>
 
 #include <numeric>
 

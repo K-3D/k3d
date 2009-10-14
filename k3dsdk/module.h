@@ -24,10 +24,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "k3d-platform-config.h"
+#include <k3d-platform-config.h>
 
-#include "iplugin_registry.h"
-#include "uuid.h"
+#include <k3dsdk/iplugin_registry.h>
+#include <k3dsdk/uuid.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // K3D_MODULE_EXPORT

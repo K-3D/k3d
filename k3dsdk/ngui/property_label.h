@@ -26,7 +26,7 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "property_widget.h"
+#include <k3dsdk/ngui/property_widget.h>
 
 #include <gtkmm/eventbox.h>
 

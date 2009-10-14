@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "almost_equal.h"
-#include "iunknown.h"
+#include <k3dsdk/almost_equal.h>
+#include <k3dsdk/iunknown.h>
 
 namespace k3d
 {

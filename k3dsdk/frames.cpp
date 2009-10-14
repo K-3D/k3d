@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "frames.h"
+#include <k3dsdk/frames.h>
 
 #include <algorithm>
 #include <iterator>

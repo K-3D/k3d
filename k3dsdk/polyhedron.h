@@ -25,7 +25,7 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "mesh.h"
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {

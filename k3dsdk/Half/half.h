@@ -85,7 +85,7 @@
 #ifndef _HALF_H_
 #define _HALF_H_
 
-#include "k3d-platform-config.h" 
+#include <k3d-platform-config.h>
 #include <iostream>
 
 #ifdef K3D_COMPILER_MSVC

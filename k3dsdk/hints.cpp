@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "hints.h"
-#include "result.h"
+#include <k3dsdk/hints.h>
+#include <k3dsdk/result.h>
 
 #include <ostream>
 

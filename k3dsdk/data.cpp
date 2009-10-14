@@ -17,12 +17,12 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "base64.h"
-#include "data.h"
-#include "fstream.h"
-#include "path.h"
-#include "share.h"
-#include "system.h"
+#include <k3dsdk/base64.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/path.h>
+#include <k3dsdk/share.h>
+#include <k3dsdk/system.h>
 
 namespace k3d
 {

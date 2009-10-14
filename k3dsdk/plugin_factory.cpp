@@ -21,8 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "plugin_factory.h"
-#include "result.h"
+#include <k3dsdk/plugin_factory.h>
+#include <k3dsdk/result.h>
 
 #include <boost/tokenizer.hpp>
 

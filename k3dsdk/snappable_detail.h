@@ -24,8 +24,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ipersistent.h"
-#include "isnappable.h"
+#include <k3dsdk/ipersistent.h>
+#include <k3dsdk/isnappable.h>
 
 namespace k3d
 {

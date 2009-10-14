@@ -27,16 +27,16 @@
 
 #include <k3d-i18n-config.h>
 
-#include "document_state.h"
-#include "document_window.h"
-#include "icons.h"
-#include "image_toggle_button.h"
-#include "panel.h"
-#include "panel_frame.h"
-#include "render.h"
-#include "utility.h"
-#include "viewport.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/document_window.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/image_toggle_button.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/panel_frame.h>
+#include <k3dsdk/ngui/render.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/inode_collection.h>

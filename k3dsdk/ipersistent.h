@@ -25,8 +25,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
-#include "path.h"
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/path.h>
 
 /**
 

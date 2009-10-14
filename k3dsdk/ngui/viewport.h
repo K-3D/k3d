@@ -26,7 +26,7 @@
 
 #include <gtkmm/drawingarea.h>
 
-#include "panel.h"
+#include <k3dsdk/ngui/panel.h>
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/idocument.h>

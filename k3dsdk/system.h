@@ -25,8 +25,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "path.h"
-#include "types.h"
+#include <k3dsdk/path.h>
+#include <k3dsdk/types.h>
 
 #include <vector>
 

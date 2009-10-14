@@ -21,13 +21,13 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "k3d-platform-config.h"
-#include "result.h"
-#include "system.h"
-#include "uuid.h"
+#include <k3d-platform-config.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/system.h>
+#include <k3dsdk/uuid.h>
 
 #ifdef K3D_API_WIN32
-	#include "win32.h"
+	#include <k3dsdk/win32.h>
 #else // K3D_API_WIN32
 	#include <uuid/uuid.h>
 #endif // !K3D_API_WIN32

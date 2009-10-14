@@ -17,14 +17,14 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "color.h"
-#include "imaterial.h"
-#include "iomanip.h"
-#include "legacy_mesh.h"
-#include "mesh.h"
-#include "metadata_keys.h"
-#include "polyhedron.h"
-#include "type_registry.h"
+#include <k3dsdk/color.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/iomanip.h>
+#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/type_registry.h>
 
 #include <boost/scoped_ptr.hpp>
 

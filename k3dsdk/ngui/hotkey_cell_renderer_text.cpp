@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "hotkey_cell_renderer_text.h"
+#include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
 #include <gtkmm/window.h>
 
 namespace k3d

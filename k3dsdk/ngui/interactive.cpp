@@ -21,11 +21,11 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "collapsible_frame.h"
-#include "interactive.h"
-#include "options.h"
-#include "screen_overlay.h"
-#include "utility.h"
+#include <k3dsdk/ngui/collapsible_frame.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/options.h>
+#include <k3dsdk/ngui/screen_overlay.h>
+#include <k3dsdk/ngui/utility.h>
 
 #include <k3d-platform-config.h>
 

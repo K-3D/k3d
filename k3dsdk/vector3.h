@@ -47,8 +47,8 @@
 
 // Modified by Tim Shead for use with K-3D, January 1998
 
-#include "almost_equal.h"
-#include "result.h"
+#include <k3dsdk/almost_equal.h>
+#include <k3dsdk/result.h>
 
 #include <boost/io/ios_state.hpp>
 

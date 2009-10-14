@@ -21,10 +21,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "log.h"
-#include "result.h"
-#include "batch_mode_init.h"
-#include "batch_mode.h"
+#include <k3dsdk/log.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/batch_mode_init.h>
+#include <k3dsdk/batch_mode.h>
 
 namespace k3d
 {

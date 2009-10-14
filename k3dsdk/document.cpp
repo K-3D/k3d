@@ -23,37 +23,37 @@
 		\author Dan Erikson (derikson@montana.com)
 */
 
-#include "k3d-i18n-config.h"
-#include "k3d-version-config.h"
+#include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
 
-#include "application.h"
-#include "classes.h"
-#include "command_node.h"
-#include "command_tree.h"
-#include "data.h"
-#include "dependencies.h"
-#include "document.h"
-#include "idocument.h"
-#include "idocument_plugin_factory.h"
-#include "imaterial.h"
-#include "inode.h"
-#include "inode_collection.h"
-#include "iplugin_factory.h"
-#include "iselectable.h"
-#include "node_name_map.h"
-#include "pipeline.h"
-#include "pipeline_profiler.h"
-#include "property_collection.h"
-#include "signal_slots.h"
-#include "string_cast.h"
-#include "string_modifiers.h"
-#include "utility.h"
-#include "xml.h"
+#include <k3dsdk/application.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/command_node.h>
+#include <k3dsdk/command_tree.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/dependencies.h>
+#include <k3dsdk/document.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iselectable.h>
+#include <k3dsdk/node_name_map.h>
+#include <k3dsdk/pipeline.h>
+#include <k3dsdk/pipeline_profiler.h>
+#include <k3dsdk/property_collection.h>
+#include <k3dsdk/signal_slots.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/string_modifiers.h>
+#include <k3dsdk/utility.h>
+#include <k3dsdk/xml.h>
 using namespace k3d::xml;
 
 #include <sigc++/bind.h>
 
-#include "fstream.h"
+#include <k3dsdk/fstream.h>
 
 #include <fstream>
 #include <iterator>

@@ -24,13 +24,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "hints.h"
-#include "k3d-i18n-config.h"
-#include "ipipeline_profiler.h"
-#include "imesh_source.h"
-#include "mesh.h"
-#include "pointer_demand_storage.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/hints.h>
+#include <k3dsdk/ipipeline_profiler.h>
+#include <k3dsdk/imesh_source.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/pointer_demand_storage.h>
 
 namespace k3d
 {

@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iproperty.h"
+#include <k3dsdk/iproperty.h>
 #include <vector>
 
 namespace k3d

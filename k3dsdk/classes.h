@@ -25,7 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "uuid.h"
+#include <k3dsdk/uuid.h>
 
 namespace k3d
 {

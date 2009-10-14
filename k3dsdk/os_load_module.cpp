@@ -21,10 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "log.h"
-#include "os_load_module.h"
-#include "path.h"
-#include "result.h"
+#include <k3dsdk/log.h>
+#include <k3dsdk/os_load_module.h>
+#include <k3dsdk/path.h>
+#include <k3dsdk/result.h>
 
 namespace k3d
 {
@@ -34,7 +34,7 @@ namespace k3d
 
 #if defined K3D_API_WIN32
 
-	#include "win32.h"
+	#include <k3dsdk/win32.h>
 
 	void os_load_module(const filesystem::path& FilePath, register_plugins_entry_point& RegisterPlugins)
 	{

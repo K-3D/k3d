@@ -17,11 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "geometry.h"
-#include "metadata_keys.h"
-#include "selection_validation.h"
-#include "selection.h"
-#include "string_cast.h"
+#include <k3dsdk/geometry.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/selection_validation.h>
+#include <k3dsdk/selection.h>
+#include <k3dsdk/string_cast.h>
 
 #include <boost/scoped_ptr.hpp>
 

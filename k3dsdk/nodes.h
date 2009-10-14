@@ -24,12 +24,12 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "uuid.h"
-#include "imetadata.h"
-#include "inode_collection.h"
-#include "inode.h"
+#include <k3dsdk/uuid.h>
+#include <k3dsdk/imetadata.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/inode.h>
 
-#include "utility.h"
+#include <k3dsdk/utility.h>
 
 #include <vector>
 

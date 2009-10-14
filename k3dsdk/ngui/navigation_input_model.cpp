@@ -23,13 +23,13 @@
 
 #include <gdkmm/display.h>
 
-#include "context_menu.h"
-#include "document_state.h"
-#include "interactive.h"
-#include "navigation_input_model.h"
-#include "target.h"
-#include "utility.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/context_menu.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/navigation_input_model.h>
+#include <k3dsdk/ngui/target.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3dsdk/high_res_timer.h>
 #include <k3d-i18n-config.h>

@@ -22,16 +22,16 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "table_copier.h"
-#include "metadata_keys.h"
-#include "parallel/blocked_range.h"
-#include "parallel/parallel_for.h"
-#include "parallel/threads.h"
-#include "polyhedron.h"
-#include "primitive_validation.h"
-#include "selection.h"
-#include "string_cast.h"
-#include "triangulator.h"
+#include <k3dsdk/table_copier.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/parallel/blocked_range.h>
+#include <k3dsdk/parallel/parallel_for.h>
+#include <k3dsdk/parallel/threads.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/primitive_validation.h>
+#include <k3dsdk/selection.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/triangulator.h>
 
 #include <boost/scoped_ptr.hpp>
 

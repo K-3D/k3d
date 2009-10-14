@@ -21,9 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "k3d-i18n-config.h"
-#include "iplugin_factory.h"
-#include "node.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/node.h>
 
 #include <algorithm>
 #include <iostream>

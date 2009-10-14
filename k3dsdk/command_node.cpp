@@ -21,11 +21,11 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "command_node.h"
-#include "command_tree.h"
-#include "idocument.h"
-#include "inode.h"
-#include "result.h"
+#include <k3dsdk/command_node.h>
+#include <k3dsdk/command_tree.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/result.h>
 
 #include <algorithm>
 #include <functional>

@@ -25,7 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ihint.h"
+#include <k3dsdk/ihint.h>
 #include <boost/any.hpp>
 
 namespace k3d

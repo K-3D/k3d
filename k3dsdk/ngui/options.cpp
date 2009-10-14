@@ -22,7 +22,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "options.h"
+#include <k3dsdk/ngui/options.h>
 
 #include <k3dsdk/options.h>
 #include <k3dsdk/xml.h>

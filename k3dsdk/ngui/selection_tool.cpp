@@ -22,11 +22,11 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "basic_viewport_input_model.h"
-#include "document_state.h"
-#include "navigation_input_model.h"
-#include "selection_input_model.h"
-#include "selection_tool.h"
+#include <k3dsdk/ngui/basic_viewport_input_model.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/navigation_input_model.h>
+#include <k3dsdk/ngui/selection_input_model.h>
+#include <k3dsdk/ngui/selection_tool.h>
 
 #include <k3dsdk/data.h>
 #include <k3d-i18n-config.h>

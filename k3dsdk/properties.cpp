@@ -21,20 +21,20 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "iattribute_property_ri.h"
-#include "idocument.h"
-#include "inode.h"
-#include "ioption_property_ri.h"
-#include "ipipeline.h"
-#include "iuser_property.h"
-#include "metadata.h"
-#include "properties.h"
-#include "property_types.h"
-#include "property_types_ri.h"
-#include "result.h"
-#include "tokens.h"
-#include "type_registry.h"
+#include <k3dsdk/data.h>
+#include <k3dsdk/iattribute_property_ri.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/ioption_property_ri.h>
+#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/iuser_property.h>
+#include <k3dsdk/metadata.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/property_types.h>
+#include <k3dsdk/property_types_ri.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/tokens.h>
+#include <k3dsdk/type_registry.h>
 
 #include <boost/mpl/for_each.hpp>
 

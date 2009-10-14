@@ -24,15 +24,15 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "idocument.h"
-#include "inode.h"
-#include "inode_collection.h"
-#include "ipersistent.h"
-#include "metadata.h"
-#include "persistent_property_collection.h"
-#include "property_collection.h"
-#include "result.h"
+#include <k3dsdk/data.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/ipersistent.h>
+#include <k3dsdk/metadata.h>
+#include <k3dsdk/persistent_property_collection.h>
+#include <k3dsdk/property_collection.h>
+#include <k3dsdk/result.h>
 
 namespace k3d
 {

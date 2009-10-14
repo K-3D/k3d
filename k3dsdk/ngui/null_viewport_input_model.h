@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "viewport_input_model.h"
+#include <k3dsdk/ngui/viewport_input_model.h>
 
 namespace k3d
 {

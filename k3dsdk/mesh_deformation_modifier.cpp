@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "geometry.h"
-#include "mesh_deformation_modifier.h"
+#include <k3dsdk/geometry.h>
+#include <k3dsdk/mesh_deformation_modifier.h>
 
 namespace k3d
 {

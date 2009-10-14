@@ -24,11 +24,11 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ipath_property.h"
-#include "iunknown.h"
-#include "keyboard.h"
-#include "signal_system.h"
-#include "types.h"
+#include <k3dsdk/ipath_property.h>
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/keyboard.h>
+#include <k3dsdk/signal_system.h>
+#include <k3dsdk/types.h>
 
 #include <vector>
 

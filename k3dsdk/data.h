@@ -20,31 +20,31 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "idocument.h"
-#include "ienumeration_property.h"
-#include "ihint.h"
-#include "ilist_property.h"
-#include "imeasurement_property.h"
-#include "inode.h"
-#include "inode_change_signal.h"
-#include "inode_collection.h"
-#include "inode_collection_property.h"
-#include "inode_property.h"
-#include "ipath_property.h"
-#include "ipersistent.h"
-#include "ipersistent_collection.h"
-#include "ipersistent_lookup.h"
-#include "iplugin_factory.h"
-#include "iproperty.h"
-#include "iproperty_collection.h"
-#include "iscript_property.h"
-#include "istate_container.h"
-#include "istate_recorder.h"
-#include "iwritable_property.h"
-#include "nodes.h"
-#include "result.h"
-#include "state_change_set.h"
-#include "xml.h"
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/ienumeration_property.h>
+#include <k3dsdk/ihint.h>
+#include <k3dsdk/ilist_property.h>
+#include <k3dsdk/imeasurement_property.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/inode_change_signal.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/inode_collection_property.h>
+#include <k3dsdk/inode_property.h>
+#include <k3dsdk/ipath_property.h>
+#include <k3dsdk/ipersistent.h>
+#include <k3dsdk/ipersistent_collection.h>
+#include <k3dsdk/ipersistent_lookup.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/iscript_property.h>
+#include <k3dsdk/istate_container.h>
+#include <k3dsdk/istate_recorder.h>
+#include <k3dsdk/iwritable_property.h>
+#include <k3dsdk/nodes.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/state_change_set.h>
+#include <k3dsdk/xml.h>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/static_assert.hpp>

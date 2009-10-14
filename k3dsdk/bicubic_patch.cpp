@@ -17,11 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "bicubic_patch.h"
-#include "metadata_keys.h"
-#include "primitive_validation.h"
-#include "selection.h"
-#include "string_cast.h"
+#include <k3dsdk/bicubic_patch.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/primitive_validation.h>
+#include <k3dsdk/selection.h>
+#include <k3dsdk/string_cast.h>
 
 #include <numeric>
 

@@ -21,12 +21,12 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iproperty.h"
-#include "iproperty_collection.h"
-#include "iuser_property.h"
-#include "user_property_changed_signal.h"
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/iuser_property.h>
+#include <k3dsdk/user_property_changed_signal.h>
 
-#include "log.h"
+#include <k3dsdk/log.h>
 #include <iomanip>
 
 namespace k3d

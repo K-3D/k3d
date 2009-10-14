@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "image_toggle_button.h"
+#include <k3dsdk/ngui/image_toggle_button.h>
 
 #include <gtkmm/image.h>
 

@@ -17,14 +17,14 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "gl.h"
-#include "legacy_mesh.h"
-#include "mesh.h"
-#include "nurbs_curve.h"
-#include "nurbs_patch.h"
-#include "polyhedron.h"
-#include "result.h"
-#include "utility.h"
+#include <k3dsdk/gl.h>
+#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/nurbs_curve.h>
+#include <k3dsdk/nurbs_patch.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/utility.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -727,7 +727,7 @@ mesh& mesh::operator=(const k3d::mesh& Mesh)
 /////////////////////////////////////////////////////////////////////////////
 // triangulate
 
-#include "mesh_triangulate_detail.h"
+#include <k3dsdk/mesh_triangulate_detail.h>
 
 template<typename InputFaceIterator, typename OutputFaceIterator, typename OutputPointIterator>
 void triangulate(InputFaceIterator Begin, InputFaceIterator End, OutputFaceIterator OutputFaces, OutputPointIterator OutputPoints)

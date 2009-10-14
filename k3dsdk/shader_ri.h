@@ -24,11 +24,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "node.h"
-#include "node_change_signal.h"
-#include "sl.h"
-#include "types_ri.h"
-#include "user_property_changed_signal.h"
+#include <k3dsdk/node.h>
+#include <k3dsdk/node_change_signal.h>
+#include <k3dsdk/sl.h>
+#include <k3dsdk/types_ri.h>
+#include <k3dsdk/user_property_changed_signal.h>
 
 namespace k3d
 {

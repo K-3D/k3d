@@ -24,11 +24,11 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "imesh_painter_gl.h"
-#include "k3d-i18n-config.h"
-#include "node.h"
-#include "utility_gl.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/imesh_painter_gl.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/utility_gl.h>
 
 namespace k3d
 {

@@ -21,29 +21,29 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "angle_axis.h"
-#include "auto_property_page.h"
-#include "bitmap_preview.h"
-#include "bounding_box.h"
-#include "button.h"
-#include "check_button.h"
-#include "collapsible_frame.h"
-#include "color_chooser.h"
-#include "combo_box.h"
-#include "custom_property_control.h"
-#include "document_state.h"
-#include "entry.h"
-#include "enumeration_chooser.h"
-#include "node_chooser.h"
-#include "node_collection_chooser.h"
-#include "path_chooser.h"
-#include "point3.h"
-#include "property_button.h"
-#include "property_label.h"
-#include "script_button.h"
-#include "spin_button.h"
-#include "text.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/angle_axis.h>
+#include <k3dsdk/ngui/auto_property_page.h>
+#include <k3dsdk/ngui/bitmap_preview.h>
+#include <k3dsdk/ngui/bounding_box.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/check_button.h>
+#include <k3dsdk/ngui/collapsible_frame.h>
+#include <k3dsdk/ngui/color_chooser.h>
+#include <k3dsdk/ngui/combo_box.h>
+#include <k3dsdk/ngui/custom_property_control.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/entry.h>
+#include <k3dsdk/ngui/enumeration_chooser.h>
+#include <k3dsdk/ngui/node_chooser.h>
+#include <k3dsdk/ngui/node_collection_chooser.h>
+#include <k3dsdk/ngui/path_chooser.h>
+#include <k3dsdk/ngui/point3.h>
+#include <k3dsdk/ngui/property_button.h>
+#include <k3dsdk/ngui/property_label.h>
+#include <k3dsdk/ngui/script_button.h>
+#include <k3dsdk/ngui/spin_button.h>
+#include <k3dsdk/ngui/text.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>

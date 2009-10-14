@@ -24,9 +24,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
-#include "signal_system.h"
-#include "types.h"
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/signal_system.h>
+#include <k3dsdk/types.h>
 #include <map>
 
 namespace k3d

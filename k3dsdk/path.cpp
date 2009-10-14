@@ -19,10 +19,10 @@
 
 // This code leans heavily on boost::filesystem::path, most changes are to support ustring UTF-8 storage
 
-#include "path.h"
-#include "k3d-platform-config.h"
-#include "result.h"
-#include "system.h"
+#include <k3dsdk/path.h>
+#include <k3d-platform-config.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/system.h>
 
 #include <cstdio>
 
@@ -30,7 +30,7 @@
 
 #ifdef K3D_API_WIN32
 
-	#include "win32.h"
+	#include <k3dsdk/win32.h>
 
 #else // K3D_API_WIN32
 

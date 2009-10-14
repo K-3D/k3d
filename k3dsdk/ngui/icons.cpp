@@ -20,7 +20,7 @@
 /**		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "icons.h"
+#include <k3dsdk/ngui/icons.h>
 
 #include <k3dsdk/log.h>
 #include <k3dsdk/result.h>
@@ -56,7 +56,7 @@ const k3d::filesystem::path pixmap_path()
 	return k3d::share_path() / k3d::filesystem::generic_path("ngui/pixmap");
 }
 
-#include "unknown.xpm"
+#include <k3dsdk/ngui/unknown.xpm>
 
 } // namespace detail
 

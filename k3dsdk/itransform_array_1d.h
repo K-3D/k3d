@@ -24,8 +24,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "algebra.h"
-#include "iunknown.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/iunknown.h>
 
 namespace k3d
 {

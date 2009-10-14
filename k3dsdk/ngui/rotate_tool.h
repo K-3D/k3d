@@ -24,9 +24,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "keyboard.h"
-#include "viewport.h"
-#include "transform_tool.h"
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/ngui/transform_tool.h>
 
 #include <k3dsdk/property_collection.h>
 

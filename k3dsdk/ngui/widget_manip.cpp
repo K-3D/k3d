@@ -21,8 +21,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_state.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <gtkmm/accelmap.h>
 #include <gtkmm/imagemenuitem.h>

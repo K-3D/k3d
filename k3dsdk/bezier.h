@@ -25,8 +25,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "bezier_private.h"
-#include "vectors.h"
+#include <k3dsdk/bezier_private.h>
+#include <k3dsdk/vectors.h>
 
 #include <cassert>
 #include <iterator>

@@ -21,13 +21,13 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "button.h"
-#include "entry.h"
-#include "enumeration_chooser.h"
-#include "messages.h"
-#include "node_window.h"
-#include "properties.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/entry.h>
+#include <k3dsdk/ngui/enumeration_chooser.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/node_window.h>
+#include <k3dsdk/ngui/properties.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/data.h>

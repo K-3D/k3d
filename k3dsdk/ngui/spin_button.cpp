@@ -29,9 +29,9 @@
 #include <gtkmm/tooltips.h>
 #include <gtkmm/window.h>
 
-#include "hotkey_entry.h"
-#include "interactive.h"
-#include "spin_button.h"
+#include <k3dsdk/ngui/hotkey_entry.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/spin_button.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>

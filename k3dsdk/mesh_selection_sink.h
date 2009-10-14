@@ -20,10 +20,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "data.h"
-#include "k3d-i18n-config.h"
-#include "imesh_selection_sink.h"
-#include "selection.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/imesh_selection_sink.h>
+#include <k3dsdk/selection.h>
 
 namespace k3d
 {

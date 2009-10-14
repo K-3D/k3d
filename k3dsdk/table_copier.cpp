@@ -21,13 +21,13 @@
 	\author Timothy M. Shead
 */
 
-#include "array.h"
-#include "table_copier.h"
-#include "named_array_types.h"
-#include "result.h"
-#include "typed_array.h"
-#include "type_registry.h"
-#include "uint_t_array.h"
+#include <k3dsdk/array.h>
+#include <k3dsdk/table_copier.h>
+#include <k3dsdk/named_array_types.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/typed_array.h>
+#include <k3dsdk/type_registry.h>
+#include <k3dsdk/uint_t_array.h>
 
 #include <boost/bind.hpp>
 #include <boost/mpl/for_each.hpp>

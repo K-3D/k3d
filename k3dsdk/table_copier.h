@@ -24,7 +24,7 @@
 	\author Timothy M. Shead
 */
 
-#include "table.h"
+#include <k3dsdk/table.h>
 
 namespace k3d
 {

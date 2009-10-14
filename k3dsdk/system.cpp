@@ -23,12 +23,12 @@
 */
 
 #include <errno.h>
-#include "path.h"
-#include "k3d-path-config.h"
-#include "k3d-platform-config.h"
-#include "result.h"
-#include "string_modifiers.h"
-#include "system.h"
+#include <k3dsdk/path.h>
+#include <k3d-path-config.h>
+#include <k3d-platform-config.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/string_modifiers.h>
+#include <k3dsdk/system.h>
 
 #include <glibmm/spawn.h>
 
@@ -46,7 +46,7 @@
 	#define DEFAULT_HOME_DIRECTORY "c:\\"
 	#define popen _popen
 
-	#include "win32.h"
+	#include <k3dsdk/win32.h>
 	#include <io.h>
 
 #else // K3D_API_WIN32

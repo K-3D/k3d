@@ -22,7 +22,7 @@
  */
 
 #include <k3dsdk/geometry.h>
-#include "mesh_simple_deformation_modifier.h"
+#include <k3dsdk/mesh_simple_deformation_modifier.h>
 
 namespace k3d
 {

@@ -21,7 +21,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "persistent_lookup.h"
+#include <k3dsdk/persistent_lookup.h>
 
 namespace k3d
 {

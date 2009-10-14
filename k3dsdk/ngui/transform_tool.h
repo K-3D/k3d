@@ -25,13 +25,13 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "basic_viewport_input_model.h"
-#include "navigation_input_model.h"
-#include "selection.h"
-#include "tool.h"
-#include "tool_selection.h"
-#include "utility.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/basic_viewport_input_model.h>
+#include <k3dsdk/ngui/navigation_input_model.h>
+#include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/tool.h>
+#include <k3dsdk/ngui/tool_selection.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3dsdk/gl.h>
 #include <k3d-i18n-config.h>

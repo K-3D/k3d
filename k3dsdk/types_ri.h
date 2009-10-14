@@ -24,12 +24,12 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "algebra.h"
-#include "bounding_box3.h"
-#include "color.h"
-#include "path.h"
-#include "typed_array.h"
-#include "types.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/bounding_box3.h>
+#include <k3dsdk/color.h>
+#include <k3dsdk/path.h>
+#include <k3dsdk/typed_array.h>
+#include <k3dsdk/types.h>
 
 #include <boost/any.hpp>
 #include <boost/shared_ptr.hpp>

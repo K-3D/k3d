@@ -22,8 +22,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "screen_overlay.h"
-#include "utility.h"
+#include <k3dsdk/ngui/screen_overlay.h>
+#include <k3dsdk/ngui/utility.h>
 
 #include <gdkmm/bitmap.h>
 #include <gtkmm/window.h>

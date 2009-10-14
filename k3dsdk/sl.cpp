@@ -22,10 +22,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "path.h"
-#include "result.h"
-#include "sl.h"
-#include "xml.h"
+#include <k3dsdk/path.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/sl.h>
+#include <k3dsdk/xml.h>
 using namespace k3d::xml;
 
 #include <boost/lexical_cast.hpp>

@@ -22,16 +22,16 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "algebra.h"
-#include "basic_math.h"
-#include "geometric_operations.h"
-#include "line2.h"
-#include "line3.h"
-#include "log.h"
-#include "plane.h"
-#include "point2.h"
-#include "result.h"
-#include "vectors.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/geometric_operations.h>
+#include <k3dsdk/line2.h>
+#include <k3dsdk/line3.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/plane.h>
+#include <k3dsdk/point2.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/vectors.h>
 
 namespace k3d
 {

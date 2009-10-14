@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
-#include "iproperty.h"
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/iproperty.h>
 
 namespace k3d
 {

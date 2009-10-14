@@ -25,7 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "idependencies.h"
+#include <k3dsdk/idependencies.h>
 #include <map>
 
 namespace k3d

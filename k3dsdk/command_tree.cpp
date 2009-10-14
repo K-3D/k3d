@@ -21,9 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "icommand_tree.h"
-#include "result.h"
-#include "string_cast.h"
+#include <k3dsdk/icommand_tree.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/string_cast.h>
 
 #include <map>
 #include <vector>

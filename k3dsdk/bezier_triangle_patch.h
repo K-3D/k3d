@@ -24,7 +24,7 @@
 		\author Ashish Myles (marcianx@gmail.com)
 */
 
-#include "mesh.h"
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {

@@ -21,13 +21,13 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ipersistent.h"
-#include "ipersistent_collection.h"
-#include "iproperty_collection.h"
-#include "iuser_property.h"
-#include "properties.h"
-#include "result.h"
-#include "user_properties.h"
+#include <k3dsdk/ipersistent.h>
+#include <k3dsdk/ipersistent_collection.h>
+#include <k3dsdk/iproperty_collection.h>
+#include <k3dsdk/iuser_property.h>
+#include <k3dsdk/properties.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/user_properties.h>
 
 namespace k3d
 {

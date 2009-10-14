@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "shader_collection_ri.h"
+#include <k3dsdk/shader_collection_ri.h>
 
 namespace k3d
 {

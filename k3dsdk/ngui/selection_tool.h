@@ -25,7 +25,7 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "tool.h"
+#include <k3dsdk/ngui/tool.h>
 
 namespace k3d
 {

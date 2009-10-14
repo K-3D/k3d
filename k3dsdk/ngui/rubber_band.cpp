@@ -21,8 +21,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "rubber_band.h"
-#include "utility.h"
+#include <k3dsdk/ngui/rubber_band.h>
+#include <k3dsdk/ngui/utility.h>
 
 #include <k3dsdk/color.h>
 

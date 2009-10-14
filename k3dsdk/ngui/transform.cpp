@@ -21,8 +21,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "modifiers.h"
-#include "transform.h"
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/transform.h>
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/classes.h>

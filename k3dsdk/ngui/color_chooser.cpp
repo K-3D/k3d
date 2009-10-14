@@ -21,10 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "application_window.h"
-#include "color_chooser.h"
-#include "utility.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/application_window.h>
+#include <k3dsdk/ngui/color_chooser.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/types_ri.h>

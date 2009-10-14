@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "plugins_detail.h"
-#include "types.h"
+#include <k3dsdk/plugins_detail.h>
+#include <k3dsdk/types.h>
 
 #include <set>
 #include <typeinfo>

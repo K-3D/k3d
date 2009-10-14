@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iscript_engine.h"
-#include "types.h"
+#include <k3dsdk/iscript_engine.h>
+#include <k3dsdk/types.h>
 
 #include <iosfwd>
 

@@ -25,10 +25,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
-#include "signal_accumulators.h"
-#include "signal_system.h"
-#include "uuid.h"
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/signal_accumulators.h>
+#include <k3dsdk/signal_system.h>
+#include <k3dsdk/uuid.h>
 
 #include <map>
 #include <string>

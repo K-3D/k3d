@@ -21,11 +21,11 @@
 		\author Ashish Myles (marcianx@gmail.com)
 */
 
-#include "bezier_triangle_patch.h"
-#include "metadata_keys.h"
-#include "primitive_validation.h"
-#include "selection.h"
-#include "string_cast.h"
+#include <k3dsdk/bezier_triangle_patch.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/primitive_validation.h>
+#include <k3dsdk/selection.h>
+#include <k3dsdk/string_cast.h>
 
 #include <numeric>
 
