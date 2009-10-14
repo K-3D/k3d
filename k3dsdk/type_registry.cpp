@@ -48,6 +48,7 @@
 #include <k3dsdk/imaterial_yafray.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
+#include <k3dsdk/imesh_selection_algorithm.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imesh_storage.h>
@@ -186,6 +187,7 @@ void initialize_types()
 	register_type(typeid(k3d::ikeyframer), "k3d::ikeyframer");
 	register_type(typeid(k3d::imaterial), "k3d::imaterial");
 	register_type(typeid(k3d::imaterial*), "k3d::imaterial*");
+	register_type(typeid(k3d::imesh_selection_algorithm), "k3d::imesh_selection_algorithm");
 	register_type(typeid(k3d::imesh_sink), "k3d::imesh_sink");
 	register_type(typeid(k3d::imesh_source), "k3d::imesh_source");
 	register_type(typeid(k3d::imesh_storage), "k3d::imesh_storage");

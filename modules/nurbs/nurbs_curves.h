@@ -59,6 +59,9 @@ void replace_point(k3d::nurbs_curve::primitive& NurbsCurve, k3d::uint_t newIndex
 /// Replace duplicate point indices in the mesh
 void replace_duplicate_points(k3d::mesh& Mesh);
 
+/// Only affects the given range of primitives
+void replace_duplicate_points(k3d::mesh& Mesh, const k3d::mesh::primitives_t::iterator Begin, const k3d::mesh::primitives_t::iterator End);
+
 ///Close the selected curve either by adding a new point or by replacing the former end points by their average
 /** \param curve The curve to close
  *  \param keep_ends If this is true then we're going to add a new point, otherwise the old end points get discarded
@@ -79,6 +82,9 @@ void connect_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCu
  */
 void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u, const k3d::uint_t r);
 void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, const k3d::double_t u, const k3d::uint_t r, const k3d::uint_t Order);
+
+/// Splits a curve at the given u parameter value
+void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u);
 
 /// Returns the multiplicity of the given curve
 const k3d::uint_t multiplicity(const k3d::mesh::knots_t& Knots, const k3d::double_t u, const k3d::uint_t Begin, const k3d::uint_t Count);
@@ -107,6 +113,12 @@ struct selected_curves_extractor
 
 /// Appends new knots found in the given curve to the given output knot vector.
 void append_common_knot_vector(k3d::mesh::knots_t& CommonKnotVector, const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
+
+/// Creates lookup arrays to store connectivity between curves that are connected to form a loop
+void find_loops(const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::const_primitive& Curves, k3d::mesh::bools_t& IsInLoop, k3d::mesh::indices_t& LoopFirstCurves, k3d::mesh::indices_t& CurveLoops, k3d::mesh::indices_t& NextCurves, k3d::mesh::bools_t& LoopSelections, k3d::mesh::points_t& LoopCentroids);
+
+/// Find the centroid of all points in a curve
+const k3d::point3 centroid(const k3d::mesh::points_t& Points, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve);
 
 //////////////////////////////////////////////////////////////////
 // Curve visiting functions
@@ -178,8 +190,8 @@ void modify_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, F
 				output_curves->material = input_curves->material;
 		}
 	}
-	replace_duplicate_points(OutputMesh);
-	k3d::mesh::delete_unused_points(OutputMesh);
+	if(OutputMesh.points)
+		k3d::mesh::delete_unused_points(OutputMesh);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

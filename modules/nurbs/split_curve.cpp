@@ -21,7 +21,7 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_curve_modifier.h"
+#include "nurbs_curves.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -57,66 +57,22 @@ class split_curve :
 public:
 	split_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("U value (in [0,1])")) + init_description(_("Split Curve at u in ]0,1[")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5)),
-		m_normalize_all(init_owner(*this) + init_name(_("normalize_all")) + init_label(_("Share Degree and KnotVector?")) + init_description(_("Make all selected curves have same Degree and KnotVector?")) + init_value(false))
+		m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("U value (in [0,1])")) + init_description(_("Split Curve at u in ]0,1[")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_u_value.changed_signal().connect(make_update_mesh_slot());
-		m_normalize_all.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		Output = Input;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		nurbs_curve_modifier mod(Output, *nurbs);
-
-		std::vector<k3d::uint_t> my_curves = mod.selected_curves();
-
-		if (my_curves.size() == 0)
-		{
-			k3d::log() << error << "You need to select at least one curve!" << std::endl;
-			return;
-		}
-
-		double u = m_u_value.pipeline_value();
-
-		if (my_curves.size() > 1 && m_normalize_all.pipeline_value())
-		{
-			mod.knot_vector_adaption(my_curves);
-		}
-
-		for (int i = 0; i < my_curves.size(); i++)
-		{
-			if (u == 0.0 || u == 1.0)
-			{
-				if (mod.is_closed(my_curves.at(i) + i))
-				{
-					//need to open up curve, double the point..
-					mod.open_up_curve(my_curves.at(i) + i);
-				}
-				else
-				{
-					k3d::log() << error << "Cannot split a curve at its end point" << std::endl;
-					return;
-				}
-			}
-			else
-			{
-				mod.split_curve_at(my_curves.at(i) + i, u, mod.is_closed(my_curves.at(i) + i));
-			}
-		}
+		modify_selected_curves(Input, Output, curve_splitter(m_u_value.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -132,8 +88,16 @@ public:
 	}
 private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_value;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_normalize_all;
 
+	struct curve_splitter
+	{
+		curve_splitter(const k3d::double_t UValue) : u(UValue) {}
+		const k3d::double_t u;
+		void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
+		{
+			module::nurbs::split_curve(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve, u);
+		}
+	};
 };
 
 k3d::iplugin_factory& split_curve_factory()

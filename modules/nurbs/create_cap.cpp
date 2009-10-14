@@ -21,7 +21,8 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_patch_modifier.h"
+#include "nurbs_curves.h"
+#include "nurbs_patches.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -56,47 +57,65 @@ class create_cap :
 public:
 	create_cap(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the curve which was used to create the cap")) + init_value(false))
+		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the curve which was used to create the cap")) + init_value(false)),
+		m_radial_segments(init_owner(*this) + init_name("radial_segments") + init_label(_("Radial Segments")) + init_description(_("Number of segments in the radial (parametric 'v') direction")) + init_value(1) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_delete_original.changed_signal().connect(make_update_mesh_slot());
+		m_radial_segments.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		Output = Input;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-
-		nurbs_curve_modifier mod(Output, *nurbs);
-		int my_curve = mod.selected_curve();
-
-		if (my_curve < 0)
+		const k3d::uint_t prim_count = Input.primitives.size();
+		for(k3d::uint_t prim_idx = 0; prim_idx != prim_count; ++prim_idx)
 		{
-			k3d::log() << error << nurbs_debug << "You need to select exactly one curve!" << std::endl;
-			return;
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves(k3d::nurbs_curve::validate(Output, *Output.primitives[prim_idx]));
+			if(curves.get())
+			{
+				k3d::mesh::bools_t is_in_loop, loop_selections;
+				k3d::mesh::indices_t loop_first_curves, next_curves, curve_loops;
+				k3d::mesh::points_t loop_centroids;
+				find_loops(*Output.points, *curves, is_in_loop, loop_first_curves, curve_loops, next_curves, loop_selections, loop_centroids);
+				boost::scoped_ptr<k3d::nurbs_patch::primitive> patches(k3d::nurbs_patch::create(Output));
+				for(k3d::uint_t curve = 0; curve != curves->curve_selections.size(); ++curve)
+				{
+					const k3d::point3 centroid = is_in_loop[curve] ? loop_centroids[curve_loops[curve]] : module::nurbs::centroid(*Output.points, *curves, curve);
+					module::nurbs::create_cap(Output, *patches, *Input.points, *curves, curve, centroid, m_radial_segments.pipeline_value());
+					patches->patch_materials.push_back(curves->material.back());
+				}
+			}
 		}
 
-		if (!mod.create_cap(my_curve))
+		if(m_delete_original.pipeline_value())
 		{
-			k3d::log() << error << nurbs_debug << "The selected curve is no loop!" << std::endl;
-			return;
+			for(k3d::uint_t prim_idx = 0; prim_idx != prim_count; ++prim_idx)
+			{
+				boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(Output, Output.primitives[prim_idx]));
+				if(curves.get())
+				{
+					for(k3d::uint_t curve = 0; ;)
+					{
+						if(curves->curve_selections[curve])
+							delete_curve(*curves, curve);
+						else
+							++curve;
+						if(curve == curves->curve_selections.size())
+							break;
+					}
+				}
+			}
 		}
-
-		if (m_delete_original.pipeline_value())
-		{
-			mod.delete_curve(my_curve);
-		}
+		delete_empty_primitives(Output);
+		replace_duplicate_points(Output, Output.primitives.begin() + prim_count, Output.primitives.end());
+		k3d::mesh::delete_unused_points(Output);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -113,6 +132,7 @@ public:
 
 private:
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_radial_segments;
 };
 
 //Create connect_curve factory
