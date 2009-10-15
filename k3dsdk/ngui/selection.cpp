@@ -545,6 +545,10 @@ private:
       {
         case CURVE:
         {
+          static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakeCurveSelection");
+          return_if_fail(conversion);
+
+          new_selection = conversion->create_mesh_selection(*mesh, current_selection);
           break;
         }
         case EDGE:
