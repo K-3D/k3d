@@ -547,6 +547,14 @@ private:
         {
           break;
         }
+        case EDGE:
+        {
+          static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakeEdgeSelection");
+          return_if_fail(conversion);
+
+          new_selection = conversion->create_mesh_selection(*mesh, current_selection);
+          break;
+        }
         case FACE:
         {
           static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakeFaceSelection");
@@ -569,10 +577,6 @@ private:
           return_if_fail(conversion);
 
           new_selection = conversion->create_mesh_selection(*mesh, current_selection);
-          break;
-        }
-        case EDGE:
-        {
           break;
         }
         case SURFACE:
