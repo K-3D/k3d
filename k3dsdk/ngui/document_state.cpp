@@ -302,39 +302,6 @@ struct convert_to_uniform
 	convert_to_uniform(bool KeepSelection) : m_keep_selection(KeepSelection) {}
 	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
 	{
-		// Convert point and edge selections to face selections ...
-		if(Mesh.point_selection && Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges && Mesh.polyhedra->edge_selection)
-		{
-			const size_t face_begin = 0;
-			const size_t face_end = face_begin + Mesh.polyhedra->face_first_loops->size();
-			for(size_t face = face_begin; face != face_end; ++face)
-			{
-				if((*Mesh.polyhedra->face_selection)[face])
-				{
-					Selection.faces.push_back(k3d::mesh_selection::record(face, 1.0));
-					continue;
-				}
-
-				const size_t face_loop_begin = (*Mesh.polyhedra->face_first_loops)[face];
-				const size_t face_loop_end = face_loop_begin + (*Mesh.polyhedra->face_loop_counts)[face];
-				for(size_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
-				{
-					const size_t first_edge = (*Mesh.polyhedra->loop_first_edges)[face_loop];
-					for(size_t edge = first_edge; ; )
-					{
-						if((*Mesh.polyhedra->edge_selection)[edge] || (*Mesh.point_selection)[(*Mesh.polyhedra->edge_points)[edge]])
-						{
-							Selection.faces.push_back(k3d::mesh_selection::record(face, 1.0));
-							break;
-						}
-
-						edge = (*Mesh.polyhedra->clockwise_edges)[edge];
-						if(edge == first_edge)
-							break;
-					}
-				}
-			}
-		}
 
 		// Convert point selections to bilinear patch selections ...
 		if(Mesh.point_selection && Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection && Mesh.bilinear_patches->patch_points)

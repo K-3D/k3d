@@ -549,6 +549,10 @@ private:
         }
         case FACE:
         {
+          static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakeFaceSelection");
+          return_if_fail(conversion);
+
+          new_selection = conversion->create_mesh_selection(*mesh, current_selection);
           break;
         }
         case NODE:
