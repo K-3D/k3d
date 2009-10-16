@@ -1140,6 +1140,26 @@ void knot_vector_merger::operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::pri
 	k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, order, points, weights, knots);
 }
 
+void delete_selected_curves(k3d::mesh& Mesh)
+{
+	for(k3d::uint_t prim_idx = 0; prim_idx != Mesh.primitives.size(); ++prim_idx)
+	{
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(Mesh, Mesh.primitives[prim_idx]));
+		if(curves.get())
+		{
+			for(k3d::uint_t curve = 0; ;)
+			{
+				if(curves->curve_selections[curve])
+					delete_curve(*curves, curve);
+				else
+					++curve;
+				if(curve == curves->curve_selections.size())
+					break;
+			}
+		}
+	}
+}
+
 } //namespace nurbs
 
 } //namespace module

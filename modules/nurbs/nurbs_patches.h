@@ -53,6 +53,9 @@ void add_patch(k3d::mesh& Mesh,
 /// Create a cap over a curve, if it is closed
 void create_cap(k3d::mesh& Mesh, k3d::nurbs_patch::primitive& Patches, const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::point3& Centroid, const k3d::uint_t VSegments = 1);
 
+/// Traverse each selected curve in SourceCurves along each selected curve in CurvesToTraverse
+void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTraverse, k3d::mesh& OutputMesh, const k3d::bool_t CreateCaps);
+
 /// Apply a modifier to the selected curves in OutputMesh, outputting to patches
 template <typename FunctorT>
 void selected_curves_to_patches(k3d::mesh& OutputMesh, FunctorT Modifier)

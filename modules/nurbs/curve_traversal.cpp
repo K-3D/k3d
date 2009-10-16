@@ -21,7 +21,8 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_patch_modifier.h"
+#include "nurbs_curves.h"
+#include "nurbs_patches.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -73,38 +74,42 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		std::vector<k3d::uint_t> curves;
-
-		const k3d::uint_t curve_begin = 0;
-		const k3d::uint_t curve_end = nurbs->curve_first_points.size();
-		for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
+		// Find the two selected curves
+		k3d::mesh::indices_t selected_curves;
+		k3d::mesh::indices_t selected_prims;
+		for(k3d::uint_t prim_idx = 0; prim_idx != Output.primitives.size(); ++prim_idx)
 		{
-			if (nurbs->curve_selections[curve] > 0.0)
-				curves.push_back(curve);
-		}
-
-		if (curves.size() != 2)
-		{
-			k3d::log() << error << nurbs_debug << "You need to select 2 curves!\n" << std::endl;
-		}
-		else
-		{
-			nurbs_curve_modifier mod(Output, *nurbs);
-			mod.traverse_curve(curves[0], curves[1], m_create_caps.pipeline_value());
-
-			if (m_delete_original.pipeline_value())
+			k3d::uint_t selected_count = selected_curves.size();
+			if(Output.primitives[prim_idx]->type == "nurbs_curve")
 			{
-				mod.delete_curve(curves[0]);
-				mod.delete_curve(curves[1]);
+				k3d::mesh::visit_arrays(*Output.primitives[prim_idx], selected_curves_extractor(selected_curves));
+				if(selected_count < selected_curves.size())
+					selected_prims.push_back(prim_idx);
 			}
 		}
+		return_if_fail(selected_curves.size() == 2);
+		return_if_fail(selected_prims.size() == 2);
+
+		// Create two meshes, each one having one of the two curves selected
+		k3d::mesh to_traverse = Output;
+		k3d::mesh traverse_along = Output;
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(to_traverse, to_traverse.primitives[selected_prims.back()]));
+		curves->curve_selections[selected_curves.back()] = 0.0;
+		curves.reset(k3d::nurbs_curve::validate(to_traverse, traverse_along.primitives[selected_prims.front()]));
+		curves->curve_selections[selected_curves.front()] = 0.0;
+
+		// traverse the curves
+		traverse_curve(to_traverse, traverse_along, Output, m_create_caps.pipeline_value());
+
+		// clean up
+		if(m_delete_original.pipeline_value())
+		{
+			delete_selected_curves(Output);
+		}
+		delete_empty_primitives(Output);
+		k3d::mesh::delete_unused_points(Output);
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -245,6 +245,9 @@ struct knot_vector_merger
 	const k3d::uint_t order;
 };
 
+/// Deletes all selected curves from the mesh
+void delete_selected_curves(k3d::mesh& Mesh);
+
 /// TODO: Move to SDK
 void delete_empty_primitives(k3d::mesh& Mesh);
 

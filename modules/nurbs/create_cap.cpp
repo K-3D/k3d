@@ -96,22 +96,7 @@ public:
 
 		if(m_delete_original.pipeline_value())
 		{
-			for(k3d::uint_t prim_idx = 0; prim_idx != prim_count; ++prim_idx)
-			{
-				boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(Output, Output.primitives[prim_idx]));
-				if(curves.get())
-				{
-					for(k3d::uint_t curve = 0; ;)
-					{
-						if(curves->curve_selections[curve])
-							delete_curve(*curves, curve);
-						else
-							++curve;
-						if(curve == curves->curve_selections.size())
-							break;
-					}
-				}
-			}
+			delete_selected_curves(Output);
 		}
 		delete_empty_primitives(Output);
 		replace_duplicate_points(Output, Output.primitives.begin() + prim_count, Output.primitives.end());
