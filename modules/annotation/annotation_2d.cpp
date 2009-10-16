@@ -64,8 +64,8 @@ public:
 		m_alignment(init_owner(*this) + init_name("alignment") + init_label(_("Alignment")) + init_description(_("Controls the alignment of adjacent lines of text.")) + init_value(LEFT) + init_values(alignment_values())),
 		m_text(init_owner(*this) + init_name("text") + init_label(_("Text")) + init_description(_("Annotation text")) + init_value(k3d::string_t(_("Annotation")))),
 		m_color(init_owner(*this) + init_name("color") + init_label(_("Color")) + init_description(_("Annotation color")) + init_value(k3d::color(0, 0, 0))),
-		m_x(init_owner(*this) + init_name("x") + init_label(_("X")) + init_description(_("X Position")) + init_value(0.0)),
-		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y Position")) + init_value(0.0))
+		m_x(init_owner(*this) + init_name("x") + init_label(_("X")) + init_description(_("X Position")) + init_value(0.0) + init_units(typeid(k3d::measurement::scalar)) + init_step_increment(0.1)),
+		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y Position")) + init_value(0.0) + init_units(typeid(k3d::measurement::scalar)) + init_step_increment(0.1))
 	{
 		m_text.set_metadata_value("k3d:property-type", "k3d:multi-line-text");
 
@@ -189,8 +189,8 @@ private:
 	k3d_data(alignment_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_alignment;
 	k3d::metadata::property<k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization)> m_text;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_x;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_y;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y;
 };
 
 /////////////////////////////////////////////////////////////////////////////
