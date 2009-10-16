@@ -83,10 +83,12 @@ public:
 
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
+		if(!Output.points)
+			return;
+
 		const k3d::bool_t store_face = m_face.pipeline_value();
 		const k3d::bool_t store_varying = m_varying.pipeline_value();
 		const k3d::bool_t store_vertex = m_vertex.pipeline_value();
-
 		const k3d::mesh::points_t& points = *Output.points;
 
 		// Optionally store point normals ...
