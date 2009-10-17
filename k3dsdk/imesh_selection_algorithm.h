@@ -36,7 +36,7 @@ class imesh_selection_algorithm :
 	public virtual iunknown
 {
 public:
-	virtual const selection::set create_mesh_selection(const mesh& Mesh, const selection::set& CurrentSelection) = 0;
+	virtual const selection::set create_mesh_selection(const mesh& Mesh) = 0;
 
 protected:
 	imesh_selection_algorithm() {}

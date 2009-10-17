@@ -78,6 +78,20 @@ public:
 	/// Connect a slot to a signal that will be emitted whenever the selection mode changes.
 	sigc::connection connect_current_mode_changed_signal(const sigc::slot<void, ihint*>& Slot);
 
+	/// Returns whether the current selection should be retained when switching the selection mode
+	bool_t keep_selection();
+	/// Sets whether the current selection should be retained when switching the selection mode
+	void set_keep_selection(const bool_t Keep);
+	/// Connect a slot to a signal that will be emitted whenever the keep selection mode changes.
+	sigc::connection connect_keep_selection_changed_signal(const sigc::slot<void, ihint*>& Slot);
+
+	/// Returns whether the current selection should be converted when switching the selection mode
+	bool_t convert_selection();
+	/// Sets whether the current selection should be converted when switching the selection mode
+	void set_convert_selection(const bool_t Convert);
+	/// Connect a slot to a signal that will be emitted whenever the convert selection mode changes.
+	sigc::connection connect_convert_selection_changed_signal(const sigc::slot<void, ihint*>& Slot);
+
 	/// Returns the current set of selected nodes.
 	const nodes_t selected_nodes();
 

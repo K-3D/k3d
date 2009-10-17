@@ -211,6 +211,9 @@ public:
 
 	/// Compares two selection sets for equality using the fuzzy semantics of almost_equal.
 	bool_t almost_equal(const set& Other, const uint64_t Threshold) const;
+
+	/// Combines two selection sets by appending one to another.
+	static void append(const set& Source, set& Target);
 };
 
 /// Stream serialization

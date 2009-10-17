@@ -67,44 +67,6 @@ namespace toolbar
 namespace detail
 {
 
-/// Provides an implementation of k3d::toggle_button::imodel for visualizing the current selection mode
-class selection_mode_model :
-	public toggle_button::imodel
-{
-public:
-	selection_mode_model(k3d::idocument& Document, const selection::mode Mode, const Glib::ustring& Label) :
-		m_document(Document),
-		m_mode(Mode),
-		m_label(Label)
-	{
-	}
-
-	const Glib::ustring label()
-	{
-		return m_label;
-	}
-
-	const k3d::bool_t value()
-	{
-		return selection::state(m_document).current_mode() == m_mode;
-	}
-
-	void set_value(const k3d::bool_t Value)
-	{
-		selection::state(m_document).set_current_mode(m_mode);
-	}
-
-	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
-	{
-		return selection::state(m_document).connect_current_mode_changed_signal(sigc::hide(Slot));
-	}
-
-private:
-	k3d::idocument& m_document;
-	const selection::mode m_mode;
-	const Glib::ustring m_label;
-};
-
 /// \deprecated Provides an implementation of k3d::toggle_button::imodel for visualizing the active tool
 class builtin_tool_model :
 	public image_toggle_button::imodel
@@ -178,6 +140,112 @@ public:
 private:
 	document_state& m_document_state;
 	const k3d::string_t m_tool;
+};
+
+/// Provides an implementation of k3d::toggle_button::imodel for visualizing the current selection mode
+class selection_mode_model :
+	public toggle_button::imodel
+{
+public:
+	selection_mode_model(k3d::idocument& Document, const selection::mode Mode, const Glib::ustring& Label) :
+		m_document(Document),
+		m_mode(Mode),
+		m_label(Label)
+	{
+	}
+
+	const Glib::ustring label()
+	{
+		return m_label;
+	}
+
+	const k3d::bool_t value()
+	{
+		return selection::state(m_document).current_mode() == m_mode;
+	}
+
+	void set_value(const k3d::bool_t Value)
+	{
+		selection::state(m_document).set_current_mode(m_mode);
+	}
+
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
+	{
+		return selection::state(m_document).connect_current_mode_changed_signal(sigc::hide(Slot));
+	}
+
+private:
+	k3d::idocument& m_document;
+	const selection::mode m_mode;
+	const Glib::ustring m_label;
+};
+
+/// Provides an implementation of k3d::toggle_button::imodel for visualizing the current keep selection mode
+class keep_selection_model :
+	public toggle_button::imodel
+{
+public:
+	keep_selection_model(k3d::idocument& Document) :
+		m_document(Document)
+	{
+	}
+
+	const Glib::ustring label()
+	{
+		return _("Keep Selection");
+	}
+
+	const k3d::bool_t value()
+	{
+		return selection::state(m_document).keep_selection();
+	}
+
+	void set_value(const k3d::bool_t Value)
+	{
+		selection::state(m_document).set_keep_selection(Value);
+	}
+
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
+	{
+		return selection::state(m_document).connect_keep_selection_changed_signal(sigc::hide(Slot));
+	}
+
+private:
+	k3d::idocument& m_document;
+};
+
+/// Provides an implementation of k3d::toggle_button::imodel for visualizing the current convert selection mode
+class convert_selection_model :
+	public toggle_button::imodel
+{
+public:
+	convert_selection_model(k3d::idocument& Document) :
+		m_document(Document)
+	{
+	}
+
+	const Glib::ustring label()
+	{
+		return _("Convert Selection");
+	}
+
+	const k3d::bool_t value()
+	{
+		return selection::state(m_document).convert_selection();
+	}
+
+	void set_value(const k3d::bool_t Value)
+	{
+		selection::state(m_document).set_convert_selection(Value);
+	}
+
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
+	{
+		return selection::state(m_document).connect_convert_selection_changed_signal(sigc::hide(Slot));
+	}
+
+private:
+	k3d::idocument& m_document;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -331,6 +399,24 @@ struct implementation
 				&m_document_state.document().state_recorder(),
 				load_icon("select_uniform", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Surface"))
+			<< make_toolbar_button()
+			), Gtk::PACK_SHRINK);
+
+		main_toolbar->row(1).pack_start(*Gtk::manage(
+			new image_toggle_button::control(
+				new detail::keep_selection_model(m_document_state.document()),
+				0,
+				load_icon("keep_selection", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+			<< set_tooltip(_("Keep Selection"))
+			<< make_toolbar_button()
+			), Gtk::PACK_SHRINK);
+
+		main_toolbar->row(1).pack_start(*Gtk::manage(
+			new image_toggle_button::control(
+				new detail::convert_selection_model(m_document_state.document()),
+				0,
+				load_icon("convert_selection", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+			<< set_tooltip(_("Convert Selection"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 

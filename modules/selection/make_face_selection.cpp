@@ -10,15 +10,15 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -44,62 +44,52 @@ class make_face_selection :
 	typedef k3d::imesh_selection_algorithm base;
 
 public:
-	const k3d::selection::set create_mesh_selection(const k3d::mesh& Mesh, const k3d::selection::set& CurrentSelection)
+	const k3d::selection::set create_mesh_selection(const k3d::mesh& Mesh)
 	{
-    k3d::selection::set results;
-
-		boost::scoped_ptr<k3d::geometry::point_selection::storage> point_selection(k3d::geometry::point_selection::create(results));
-    k3d::geometry::point_selection::append(*point_selection, 0.0);
+		k3d::selection::set results;
 
 		boost::scoped_ptr<k3d::geometry::primitive_selection::storage> primitive_selection(k3d::geometry::primitive_selection::create(results));
-		k3d::geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, 0.0);
-		k3d::geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, 0.0);
-		k3d::geometry::primitive_selection::append(*primitive_selection, k3d::selection::EDGE, 0.0);
-		k3d::geometry::primitive_selection::append(*primitive_selection, k3d::selection::PATCH, 0.0);
-		k3d::geometry::primitive_selection::append(*primitive_selection, k3d::selection::SURFACE, 0.0);
-		k3d::geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
-		k3d::geometry::primitive_selection::append(*primitive_selection, k3d::selection::VERTEX, 0.0);
 
-    // For each primitive in the mesh ...
-    k3d::uint_t primitive = 0;
+		// For each primitive in the mesh ...
+		k3d::uint_t primitive = 0;
 		for(k3d::mesh::primitives_t::const_iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p, ++primitive)
 		{
-      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **p));
-      if(polyhedron)
-      {
-        // Convert point and edge selections to face selections ...
-        const k3d::uint_t face_begin = 0;
-        const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
-        for(k3d::uint_t face = face_begin; face != face_end; ++face)
-        {
-          const k3d::uint_t face_loop_begin = polyhedron->face_first_loops[face];
-          const k3d::uint_t face_loop_end = face_loop_begin + polyhedron->face_loop_counts[face];
-          for(k3d::uint_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
-          {
-            const k3d::uint_t first_edge = polyhedron->loop_first_edges[face_loop];
-            for(k3d::uint_t edge = first_edge; ; )
-            {
-              if(polyhedron->edge_selections[edge])
-                {
-		            k3d::geometry::primitive_selection::append(*primitive_selection, primitive, primitive+1, k3d::selection::FACE, face, face+1, 1.0);
-                }
-              else if((*Mesh.point_selection)[polyhedron->vertex_points[edge]])
-                {
-		            k3d::geometry::primitive_selection::append(*primitive_selection, primitive, primitive+1, k3d::selection::FACE, face, face+1, 1.0);
-                }
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **p));
+			if(polyhedron)
+			{
+				// Convert point and edge selections to face selections ...
+				const k3d::uint_t face_begin = 0;
+				const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
+				for(k3d::uint_t face = face_begin; face != face_end; ++face)
+				{
+					const k3d::uint_t face_loop_begin = polyhedron->face_first_loops[face];
+					const k3d::uint_t face_loop_end = face_loop_begin + polyhedron->face_loop_counts[face];
+					for(k3d::uint_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
+					{
+						const k3d::uint_t first_edge = polyhedron->loop_first_edges[face_loop];
+						for(k3d::uint_t edge = first_edge; ; )
+						{
+							if(polyhedron->edge_selections[edge])
+								{
+								k3d::geometry::primitive_selection::append(*primitive_selection, primitive, primitive+1, k3d::selection::FACE, face, face+1, 1.0);
+								}
+							else if((*Mesh.point_selection)[polyhedron->vertex_points[edge]])
+								{
+								k3d::geometry::primitive_selection::append(*primitive_selection, primitive, primitive+1, k3d::selection::FACE, face, face+1, 1.0);
+								}
 
-              edge = polyhedron->clockwise_edges[edge];
-              if(edge == first_edge)
-                break;
-            }
-          }
-        } 
+							edge = polyhedron->clockwise_edges[edge];
+							if(edge == first_edge)
+								break;
+						}
+					}
+				} 
 
-        continue;
-      }
+				continue;
+			}
 		}
 
-    return results;
+		return results;
 	}
 
 	static k3d::iplugin_factory& get_factory()

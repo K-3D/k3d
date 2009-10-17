@@ -10,12 +10,12 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 /** \file
 	\author Tim Shead (tshead@k-3d.com)
@@ -41,6 +41,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/selection_tool.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
@@ -389,7 +390,7 @@ struct select_component
 
 std::ostream& operator<<(std::ostream& Stream, const mode& RHS)
 {
-        switch(RHS)
+				switch(RHS)
 	{
 		case CURVE:
 			Stream << "curve";
@@ -414,32 +415,32 @@ std::ostream& operator<<(std::ostream& Stream, const mode& RHS)
 			break;
 	}
 
-        return Stream;
+				return Stream;
 }
 
 std::istream& operator>>(std::istream& Stream, mode& RHS)
 {
-        std::string text;
-        Stream >> text;
+				std::string text;
+				Stream >> text;
 
-        if(text == "curve")
-                RHS = CURVE;
-        else if(text == "face")
-                RHS = FACE;
-        else if(text == "node")
-                RHS = NODE;
-        else if(text == "patch")
-                RHS = PATCH;
-        else if(text == "point")
-                RHS = POINT;
-        else if(text == "edge")
-                RHS = EDGE;
-        else if(text == "surface")
-                RHS = SURFACE;
-        else
-                log() << error << "Unknown enumeration [" << text << "]"<< std::endl;
+				if(text == "curve")
+					RHS = CURVE;
+				else if(text == "face")
+					RHS = FACE;
+				else if(text == "node")
+					RHS = NODE;
+				else if(text == "patch")
+					RHS = PATCH;
+				else if(text == "point")
+					RHS = POINT;
+				else if(text == "edge")
+					RHS = EDGE;
+				else if(text == "surface")
+					RHS = SURFACE;
+				else
+					log() << error << "Unknown enumeration [" << text << "]"<< std::endl;
 
-        return Stream;
+				return Stream;
 }
 
 /// Provides human-readable labels for the selection::mode enumeration
@@ -493,12 +494,12 @@ public:
 		return m_node_selection;
 	}
 
-  const nodes_t selected_nodes()
-  {
-    return_val_if_fail(node_selection(), nodes_t());
-    const inode_selection::selected_nodes_t nodes = node_selection()->selected_nodes();
-    return nodes_t(nodes.begin(), nodes.end());
-  }
+	const nodes_t selected_nodes()
+	{
+		return_val_if_fail(node_selection(), nodes_t());
+		const inode_selection::selected_nodes_t nodes = node_selection()->selected_nodes();
+		return nodes_t(nodes.begin(), nodes.end());
+	}
 
 	idocument& document;
 
@@ -507,10 +508,18 @@ public:
 //	k3d_data(selection::mode, immutable_name, explicit_change_signal, with_undo, local_storage, no_constraint, no_property, no_serialization) current_mode;
 	k3d_data(selection::mode, immutable_name, explicit_change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) current_mode;
 
+	/// Defines storage for the document-wide keep-selection mode
+	k3d_data(bool_t, immutable_name, explicit_change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) keep_selection;
+
+	/// Defines storage for the document-wide convert-selection mode
+	k3d_data(bool_t, immutable_name, explicit_change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) convert_selection;
+
 private:
 	implementation(idocument& Document) :
 		document(Document),
 		current_mode(init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(selection::NODE) + init_values(mode_values())),
+		keep_selection(init_name("keep_selection") + init_label(_("Keep Selection")) + init_description(_("Keep the current selection when changing the selection mode.")) + init_value(false)),
+		convert_selection(init_name("convert_selection") + init_label(_("Convert Selection")) + init_description(_("Convert the current selection when changing the selection mode.")) + init_value(true)),
 		m_node_selection(0)
 	{
 		current_mode.connect_explicit_change_signal(sigc::mem_fun(*this, &implementation::on_selection_mode_changed));
@@ -519,104 +528,96 @@ private:
 	/// Called by the signal system when the selection mode changes
 	void on_selection_mode_changed(k3d::iunknown*)
 	{
-    const nodes_t nodes = selected_nodes();
-    for(nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-    {
-      if(classes::MeshInstance() != (*node)->factory().factory_id())
-        continue;
-
-      imesh_selection_sink* const mesh_selection_sink = dynamic_cast<imesh_selection_sink*>(*node);
-      if(!mesh_selection_sink)
-        continue;
-
-      imesh_source* const mesh_source = dynamic_cast<imesh_source*>(*node);
-      if(!mesh_source)
-        continue;
-
-      const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_internal_value());
-      if(!mesh)
-        continue;
-
-      const k3d::selection::set current_selection =
-        boost::any_cast<k3d::selection::set>(mesh_selection_sink->mesh_selection_sink_input().property_internal_value());
-
-      k3d::selection::set new_selection;
-      switch(current_mode.internal_value())
-      {
-        case CURVE:
-        {
-          static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakeCurveSelection");
-          return_if_fail(conversion);
-
-          new_selection = conversion->create_mesh_selection(*mesh, current_selection);
-          break;
-        }
-        case EDGE:
-        {
-          static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakeEdgeSelection");
-          return_if_fail(conversion);
-
-          new_selection = conversion->create_mesh_selection(*mesh, current_selection);
-          break;
-        }
-        case FACE:
-        {
-          static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakeFaceSelection");
-          return_if_fail(conversion);
-
-          new_selection = conversion->create_mesh_selection(*mesh, current_selection);
-          break;
-        }
-        case NODE:
-        {
-          break;
-        }
-        case PATCH:
-        {
-          break;
-        }
-        case POINT:
-        {
-          static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakePointSelection");
-          return_if_fail(conversion);
-
-          new_selection = conversion->create_mesh_selection(*mesh, current_selection);
-          break;
-        }
-        case SURFACE:
-        {
-          break;
-        }
-      }
-
-      property::set_internal_value(mesh_selection_sink->mesh_selection_sink_input(), new_selection);
-      property::set_internal_value(**node, "show_component_selection", true);
-    }
-/*
-		if (!m_selection_tool->keep_selection() && !m_selection_tool->convert_selection())
+		const nodes_t nodes = selected_nodes();
+		for(nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
-			detail::update_component_selection(selected_nodes(), detail::deselect_all(), true);
-		}
-		switch(m_selection_mode.internal_value())
-		{
-			case SELECT_NODES:
-				on_set_node_mode();
-				break;
-			case SELECT_POINTS:
-				on_set_point_mode();
-				break;
-			case SELECT_SPLIT_EDGES:
-				on_set_split_edge_mode();
-				break;
-			case SELECT_UNIFORM:
-				on_set_uniform_mode();
-				break;
-		}
+			if(classes::MeshInstance() != (*node)->factory().factory_id())
+				continue;
 
-		m_last_selection_mode = m_selection_mode.internal_value();
+			imesh_selection_sink* const mesh_selection_sink = dynamic_cast<imesh_selection_sink*>(*node);
+			if(!mesh_selection_sink)
+				continue;
 
-		selection_changed();
-*/
+			imesh_source* const mesh_source = dynamic_cast<imesh_source*>(*node);
+			if(!mesh_source)
+				continue;
+
+			const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_internal_value());
+			if(!mesh)
+				continue;
+
+			k3d::selection::set new_selection;
+
+			if(keep_selection.internal_value())
+			{
+				new_selection = boost::any_cast<k3d::selection::set>(mesh_selection_sink->mesh_selection_sink_input().property_internal_value());
+			}
+			else
+			{
+				boost::scoped_ptr<geometry::point_selection::storage> point_selection(geometry::point_selection::create(new_selection));
+				geometry::point_selection::append(*point_selection, 0.0);
+
+				boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(new_selection));
+				geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, 0.0);
+				geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, 0.0);
+				geometry::primitive_selection::append(*primitive_selection, k3d::selection::EDGE, 0.0);
+				geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE, 0.0);
+				geometry::primitive_selection::append(*primitive_selection, k3d::selection::PATCH, 0.0);
+				geometry::primitive_selection::append(*primitive_selection, k3d::selection::SURFACE, 0.0);
+				geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
+				geometry::primitive_selection::append(*primitive_selection, k3d::selection::VERTEX, 0.0);
+			}
+
+			if(convert_selection.internal_value())
+			{
+				switch(current_mode.internal_value())
+				{
+					case CURVE:
+					{
+						static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakeCurveSelection");
+						return_if_fail(conversion);
+						k3d::selection::set::append(conversion->create_mesh_selection(*mesh), new_selection);
+						break;
+					}
+					case EDGE:
+					{
+						static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakeEdgeSelection");
+						return_if_fail(conversion);
+						k3d::selection::set::append(conversion->create_mesh_selection(*mesh), new_selection);
+						break;
+					}
+					case FACE:
+					{
+						static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakeFaceSelection");
+						return_if_fail(conversion);
+						k3d::selection::set::append(conversion->create_mesh_selection(*mesh), new_selection);
+						break;
+					}
+					case NODE:
+					{
+						break;
+					}
+					case PATCH:
+					{
+						break;
+					}
+					case POINT:
+					{
+						static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakePointSelection");
+						return_if_fail(conversion);
+						k3d::selection::set::append(conversion->create_mesh_selection(*mesh), new_selection);
+						break;
+					}
+					case SURFACE:
+					{
+						break;
+					}
+				}
+			}
+
+			property::set_internal_value(mesh_selection_sink->mesh_selection_sink_input(), new_selection);
+			property::set_internal_value(**node, "show_component_selection", true);
+		}
 	}
 
 	void on_node_selection_node_changed()
@@ -655,9 +656,39 @@ sigc::connection state::connect_current_mode_changed_signal(const sigc::slot<voi
 	return internal.current_mode.changed_signal().connect(Slot);
 }
 
+bool_t state::keep_selection()
+{
+	return internal.keep_selection.internal_value();
+}
+
+void state::set_keep_selection(const bool_t Keep)
+{
+	internal.keep_selection.set_value(Keep);
+}
+
+sigc::connection state::connect_keep_selection_changed_signal(const sigc::slot<void, ihint*>& Slot)
+{
+	return internal.keep_selection.changed_signal().connect(Slot);
+}
+
+bool_t state::convert_selection()
+{
+	return internal.convert_selection.internal_value();
+}
+
+void state::set_convert_selection(const bool_t Convert)
+{
+	internal.convert_selection.set_value(Convert);
+}
+
+sigc::connection state::connect_convert_selection_changed_signal(const sigc::slot<void, ihint*>& Slot)
+{
+	return internal.convert_selection.changed_signal().connect(Slot);
+}
+
 const nodes_t state::selected_nodes()
 {
-  return internal.selected_nodes();
+	return internal.selected_nodes();
 }
 
 void state::select(inode& Node)

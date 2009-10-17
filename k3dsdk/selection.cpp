@@ -403,6 +403,11 @@ bool_t set::almost_equal(const set& Other, const uint64_t Threshold) const
 	return true;
 }
 
+void set::append(const set& Source, set& Target)
+{
+	Target.insert(Target.end(), Source.begin(), Source.end());
+}
+
 std::ostream& operator<<(std::ostream& Stream, const set& RHS)
 {
 	for(set::const_iterator storage = RHS.begin(); storage != RHS.end(); ++storage)
