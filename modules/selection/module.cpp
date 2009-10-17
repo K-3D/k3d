@@ -35,6 +35,7 @@ extern k3d::iplugin_factory& grow_selection_factory();
 extern k3d::iplugin_factory& make_curve_selection_factory();
 extern k3d::iplugin_factory& make_edge_selection_factory();
 extern k3d::iplugin_factory& make_face_selection_factory();
+extern k3d::iplugin_factory& make_patch_selection_factory();
 extern k3d::iplugin_factory& make_point_selection_factory();
 extern k3d::iplugin_factory& mesh_selection_factory();
 extern k3d::iplugin_factory& node_selection_factory();
@@ -65,6 +66,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::selection::make_curve_selection_factory());
 	Registry.register_factory(module::selection::make_edge_selection_factory());
 	Registry.register_factory(module::selection::make_face_selection_factory());
+	Registry.register_factory(module::selection::make_patch_selection_factory());
 	Registry.register_factory(module::selection::make_point_selection_factory());
 	Registry.register_factory(module::selection::mesh_selection_factory());
 	Registry.register_factory(module::selection::node_selection_factory());

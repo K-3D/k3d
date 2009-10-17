@@ -599,6 +599,10 @@ private:
 					}
 					case PATCH:
 					{
+						static imesh_selection_algorithm* conversion = plugin::create<imesh_selection_algorithm>("MakePatchSelection");
+						return_if_fail(conversion);
+						k3d::selection::set::append(conversion->create_mesh_selection(*mesh), new_selection);
+						break;
 						break;
 					}
 					case POINT:
