@@ -48,12 +48,12 @@ public:
 	{
 	}
 
-	const arguments_t parse_startup_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
+	const arguments_t parse_startup_arguments(const arguments_t& Arguments, k3d::bool_t& Quit, k3d::bool_t& Error)
 	{
 		return Arguments;
 	}
 
-	const arguments_t parse_runtime_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
+	const arguments_t parse_runtime_arguments(const arguments_t& Arguments, k3d::bool_t& Quit, k3d::bool_t& Error)
 	{
 		return Arguments;
 	}
@@ -90,22 +90,26 @@ public:
 	{
 	}
 
-	unsigned int query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
+	k3d::uint_t query_message(const k3d::string_t& Message, const k3d::uint_t DefaultOption, const std::vector<k3d::string_t>& Options)
 	{
 		return 0;
 	}
 
-	bool tutorial_message(const k3d::string_t& Message)
+	void nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
+	{
+	}
+
+	k3d::bool_t tutorial_message(const k3d::string_t& Message)
 	{
 		return false;
 	}
 
-	bool get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
+	k3d::bool_t get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
 	{
 		return false;
 	}
 
-	bool show(iunknown& Object)
+	k3d::bool_t show(iunknown& Object)
 	{
 		return false;
 	}
@@ -114,7 +118,7 @@ public:
 	{
 	}
 
-	sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot)
+	sigc::connection get_timer(const k3d::double_t FrameRate, sigc::slot<void> Slot)
 	{
 		return sigc::connection();
 	}

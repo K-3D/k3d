@@ -474,23 +474,28 @@ public:
 		k3d::ngui::error_message(Message);
 	}
 
-	unsigned int query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
+	k3d::uint_t query_message(const k3d::string_t& Message, const k3d::uint_t DefaultOption, const std::vector<k3d::string_t>& Options)
 	{
 		return k3d::ngui::query_message(Message, DefaultOption, Options);
 	}
 
-	bool tutorial_message(const k3d::string_t& Message)
+	void nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
+	{
+		k3d::ngui::nag_message(Type, Message, SecondaryMessage);
+	}
+
+	k3d::bool_t tutorial_message(const k3d::string_t& Message)
 	{
 		return false;
 	}
 
-	bool get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
+	k3d::bool_t get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
 	{
 		file_chooser_dialog dialog(Prompt, Type, Mode);
 		return dialog.get_file_path(Result);
 	}
 
-	bool show(iunknown& Object)
+	k3d::bool_t show(iunknown& Object)
 	{
 		k3d::log() << error << k3d_file_reference << ": not implemented!" << std::endl;
 		return false;
@@ -501,7 +506,7 @@ public:
 		k3d::ngui::handle_pending_events();
 	}
 
-	sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot)
+	sigc::connection get_timer(const k3d::double_t FrameRate, sigc::slot<void> Slot)
 	{
 		return_val_if_fail(FrameRate != 0.0, sigc::connection());
 
@@ -601,9 +606,9 @@ private:
 	}
 	
 	/// Set to true iff we should display the tutorial menu at startup
-	bool m_show_learning_menu;
+	k3d::bool_t m_show_learning_menu;
 	/// Set to true iff we should begin recording a tutorial immediately at startup
-	bool m_record_tutorials;
+	k3d::bool_t m_record_tutorials;
 	/// Stores the path where tutorials should be displayed
 	k3d::filesystem::path m_tutorials_path;
 	/// Stores the main loop
