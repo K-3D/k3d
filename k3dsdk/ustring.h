@@ -264,6 +264,8 @@ public:
 
 	const std::string& raw() const;
 
+	const std::string& utf8_str() const;
+
 	//! @}
 	//! @name UTF-8 utilities.
 	//! @{
@@ -398,6 +400,7 @@ inline ustring::size_type ustring::capacity() const { return storage.capacity();
 inline ustring::size_type ustring::max_size() const { return storage.max_size(); }
 inline void ustring::reserve(size_type n) { storage.reserve(n); }
 inline const std::string& ustring::raw() const { return storage.raw(); }
+inline const std::string& ustring::utf8_str() const { return storage.raw(); }
 inline bool ustring::validate() const { return storage.validate(); }
 inline bool ustring::validate(iterator& first_invalid) { return storage.validate(first_invalid); }
 inline bool ustring::validate(const_iterator& first_invalid) const { return storage.validate(first_invalid); }
