@@ -364,7 +364,21 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		return boost::any(results);
 	}
 
-	throw std::invalid_argument("can't convert python value to unrecognized type [" + demangle(TargetType) + "]");
+	throw std::invalid_argument("Can't convert Python value to unrecognized type [" + demangle(TargetType) + "]");
+}
+
+const ustring python_to_ustring(const boost::python::object& Value)
+{
+	if(PyString_Check(Value.ptr()))
+	{
+		return ustring::from_utf8(PyString_AsString(Value.ptr()));
+	}
+	else if(PyUnicode_Check(Value.ptr()))
+	{
+		return ustring::from_utf8(PyString_AsString(Value.attr("encode")("UTF-8").ptr()));
+	}
+
+	throw std::invalid_argument("Can't convert Python value to a Unicode string.");
 }
 
 } // namespace python
