@@ -56,6 +56,12 @@ void create_cap(k3d::mesh& Mesh, k3d::nurbs_patch::primitive& Patches, const k3d
 /// Traverse each selected curve in SourceCurves along each selected curve in CurvesToTraverse
 void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTraverse, k3d::mesh& OutputMesh, const k3d::bool_t CreateCaps);
 
+/// Traverse curves in the source mesh stored in the primitive given by SourcePrimIdx, storing the resulting patches in the given patch primitives
+void traverse_curve(const k3d::mesh& SourceCurves, const k3d::uint_t SourcePrimIdx, const k3d::mesh& CurvesToTraverse, k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::bool_t CreateCaps);
+
+/// Extract a curve from the given patch, appending it to the output structures.
+void extract_patch_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch, const k3d::uint_t Curve, const k3d::bool_t UDirection);
+
 /// Apply a modifier to the selected curves in OutputMesh, outputting to patches
 template <typename FunctorT>
 void selected_curves_to_patches(k3d::mesh& OutputMesh, FunctorT Modifier)

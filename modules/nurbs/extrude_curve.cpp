@@ -53,24 +53,6 @@ namespace module
 namespace nurbs
 {
 
-namespace detail
-{
-
-/// Adds a straight line to the given NURBS curve set. New points are added to the OutputMesh
-void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::uint_t Segments, k3d::nurbs_curve::primitive& NurbsCurves, k3d::mesh& OutputMesh, const k3d::uint_t Order = 2)
-{
-	k3d::vector3 delta = (End - Start) / Segments;
-
-	k3d::mesh::points_t points;
-	for (k3d::uint_t i = 0; i <= Segments; i++)
-	{
-		points.push_back(Start + delta * i);
-	}
-	k3d::nurbs_curve::add_curve(OutputMesh, NurbsCurves, Order, points);
-}
-
-} // namespace detail
-
 class extrude_curve :
 	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
@@ -130,7 +112,7 @@ public:
 		extrusion_vector_mesh.point_selection.create();
 		extrusion_vector_mesh.points.create();
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> extrusion_vector_primitive(k3d::nurbs_curve::create(extrusion_vector_mesh));
-		detail::straight_line(startpoint, endpoint, segments, *extrusion_vector_primitive, extrusion_vector_mesh);
+		straight_line(startpoint, endpoint, segments, *extrusion_vector_primitive, extrusion_vector_mesh);
 		extrusion_vector_primitive->curve_selections[0] = 1.0;
 		extrusion_vector_primitive->material.push_back(0);
 
