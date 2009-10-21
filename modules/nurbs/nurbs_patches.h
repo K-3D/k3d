@@ -21,6 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
+  \author Carsten Haubold (CarstenHaubold@web.de)
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
@@ -50,6 +51,9 @@ void add_patch(k3d::mesh& Mesh,
 		const k3d::uint_t UOrder,
 		const k3d::uint_t VOrder);
 
+/// Copies a patch from one primitive to another
+void add_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch);
+
 /// Create a cap over a curve, if it is closed
 void create_cap(k3d::mesh& Mesh, k3d::nurbs_patch::primitive& Patches, const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::point3& Centroid, const k3d::uint_t VSegments = 1);
 
@@ -62,25 +66,28 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::uint_t SourcePrimI
 /// Extract a curve from the given patch, appending it to the output structures.
 void extract_patch_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch, const k3d::uint_t Curve, const k3d::bool_t UDirection);
 
+/// Elevate patch degree by the requested number of elevations
+void elevate_patch_degree(const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_t Patch, const k3d::uint_t Elevations, const k3d::bool_t UDirection);
+
 /// Apply a modifier to the selected curves in OutputMesh, outputting to patches
-template <typename FunctorT>
-void selected_curves_to_patches(k3d::mesh& OutputMesh, FunctorT Modifier)
-{
-	const k3d::uint_t prim_count = OutputMesh.primitives.size();
-	for(k3d::uint_t prim_idx = 0; prim_idx != prim_count; ++prim_idx)
-	{
-		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves(k3d::nurbs_curve::validate(OutputMesh, *OutputMesh.primitives[prim_idx]));
-		if(curves.get())
-		{
-			boost::scoped_ptr<k3d::nurbs_patch::primitive> patches(k3d::nurbs_patch::create(OutputMesh));
-			for(k3d::uint_t curve = 0; curve != curves->curve_selections.size(); ++curve)
-			{
-				if(curves->curve_selections[curve])
-					Modifier(OutputMesh, *curves, *patches, curve);
-			}
-		}
-	}
-}
+//template <typename FunctorT>
+//void selected_curves_to_patches(k3d::mesh& OutputMesh, FunctorT Modifier)
+//{
+//	const k3d::uint_t prim_count = OutputMesh.primitives.size();
+//	for(k3d::uint_t prim_idx = 0; prim_idx != prim_count; ++prim_idx)
+//	{
+//		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves(k3d::nurbs_curve::validate(OutputMesh, *OutputMesh.primitives[prim_idx]));
+//		if(curves.get())
+//		{
+//			boost::scoped_ptr<k3d::nurbs_patch::primitive> patches(k3d::nurbs_patch::create(OutputMesh));
+//			for(k3d::uint_t curve = 0; curve != curves->curve_selections.size(); ++curve)
+//			{
+//				if(curves->curve_selections[curve])
+//					Modifier(OutputMesh, *curves, *patches, curve);
+//			}
+//		}
+//	}
+//}
 
 } //namespace nurbs
 

@@ -23,6 +23,7 @@
 
 #include "nurbs_curves.h"
 #include "nurbs_patches.h"
+#include "utility.h"
 
 #include <k3dsdk/axis.h>
 #include <k3dsdk/data.h>

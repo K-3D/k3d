@@ -22,6 +22,7 @@
 */
 
 #include "nurbs_curves.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>

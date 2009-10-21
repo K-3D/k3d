@@ -23,6 +23,7 @@
 
 #include "nurbs_curves.h"
 #include "nurbs_patches.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -84,7 +85,7 @@ public:
 			k3d::uint_t selected_count = selected_curves.size();
 			if(Output.primitives[prim_idx]->type == "nurbs_curve")
 			{
-				k3d::mesh::visit_arrays(*Output.primitives[prim_idx], selected_curves_extractor(selected_curves));
+				k3d::mesh::visit_arrays(*Output.primitives[prim_idx], selected_component_extractor(selected_curves, "curve"));
 				if(selected_count < selected_curves.size())
 					selected_prims.push_back(prim_idx);
 			}
