@@ -125,6 +125,7 @@ OPTION(K3D_BUILD_GNOME_MODULE "Build the GNOME integration plugin module" ${K3D_
 OPTION(K3D_BUILD_GRAPHVIZ_MODULE "Build the GraphViz integration plugin module" ON)
 OPTION(K3D_BUILD_GTS_IO_MODULE "Build the GNU Triangulated Surfaces file format module" ON)
 OPTION(K3D_BUILD_GTS_MODULE "Build the GNU Triangulated Surfaces plugin module" ${K3D_GTS_FOUND})
+OPTION(K3D_BUILD_HIGHLIGHTING_MODULE "Build the user interface 'highlighting' plugin module" ON)
 OPTION(K3D_BUILD_IMAGEMAGICK_IO_MODULE "Build the ImageMagick file format module" ${K3D_IMAGEMAGICK_FOUND})
 OPTION(K3D_BUILD_INDIGO_MODULE "Build the Indigo render engine integration module" ON)
 OPTION(K3D_BUILD_INOTIFY_MODULE "Build the inotify file change notification module" ${K3D_BUILD_INOTIFY_DEFAULT})
