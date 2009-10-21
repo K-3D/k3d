@@ -178,6 +178,10 @@ public:
 /// The caller is responsible for the lifetime of the returned object.
 primitive* create(mesh& Mesh);
 
+/// Creates a new nurbs_patch mesh primitive using the given primitive, returning references to its member arrays.
+/// The caller is responsible for the lifetime of the returned object.
+primitive* create(mesh::primitive& Primitive);
+
 /// Tests the given mesh primitive to see if it is a valid nurbs_patch primitive, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 const_primitive* validate(const mesh& Mesh, const mesh::primitive& GenericPrimitive);
