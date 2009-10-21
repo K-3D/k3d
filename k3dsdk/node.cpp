@@ -100,6 +100,11 @@ void node::load(xml::element& Element, const ipersistent::load_context& Context)
 	persistent_property_collection::load(Element, Context);
 }
 
+const std::vector<inode*> node::lookup(idocument& Document)
+{
+	return Document.nodes().collection();
+}
+
 const std::vector<inode*> node::lookup(idocument& Document, const uuid FactoryID)
 {
 	std::vector<inode*> result;
@@ -125,6 +130,25 @@ const std::vector<inode*> node::lookup(idocument& Document, const string_t& Node
 			result.push_back(*node);
 	}
 
+	return result;
+}
+
+const std::vector<inode*> node::lookup(idocument& Document, const string_t& MetaName, const string_t& MetaValue)
+{
+	std::vector<inode*> result;
+
+	const std::vector<inode*>::const_iterator end = Document.nodes().collection().end();
+	for(std::vector<inode*>::const_iterator node = Document.nodes().collection().begin(); node != end; ++node)
+	{
+		if(imetadata* const metadata = dynamic_cast<imetadata*>(*node))
+		{
+			imetadata::metadata_t pairs = metadata->get_metadata();
+			imetadata::metadata_t::iterator pair = pairs.find(MetaName);
+			if(pair != pairs.end() && pair->second == MetaValue)
+				result.push_back(*node);
+		}
+	}
+	
 	return result;
 }
 

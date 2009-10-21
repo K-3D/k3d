@@ -47,7 +47,7 @@ namespace k3d
 namespace python
 {
 
-static const bool save(idocument_wrapper& Self, const std::string& Path)
+static const bool save(idocument_wrapper& Self, const string_t& Path)
 {
 	boost::scoped_ptr<k3d::idocument_exporter> exporter(k3d::plugin::create<k3d::idocument_exporter>(k3d::classes::DocumentExporter()));
 	if(!exporter)
@@ -66,7 +66,7 @@ static void cancel_change_set(idocument_wrapper& Self)
 	k3d::cancel_state_change_set(Self.wrapped(), K3D_CHANGE_SET_CONTEXT);
 }
 
-static void finish_change_set(idocument_wrapper& Self, const std::string& Label)
+static void finish_change_set(idocument_wrapper& Self, const string_t& Label)
 {
 	k3d::finish_state_change_set(Self.wrapped(), Label, K3D_CHANGE_SET_CONTEXT);
 }
@@ -89,7 +89,7 @@ static const list nodes(idocument_wrapper& Self)
 
 static const object new_node(idocument_wrapper& Self, const object& Type)
 {
-	extract<std::string> plugin_name(Type);
+	extract<string_t> plugin_name(Type);
 	if(plugin_name.check())
 	{
 		k3d::iplugin_factory* const plugin_factory = k3d::plugin::factory::lookup(plugin_name());
@@ -108,12 +108,20 @@ static const object new_node(idocument_wrapper& Self, const object& Type)
 	throw std::invalid_argument("can't create new node from given argument");
 }
 
-static const object get_node(idocument_wrapper& Self, const std::string& Name)
+static const object get_node(idocument_wrapper& Self, const string_t& Name)
 {
-	return wrap_unknown(k3d::find_node(Self.wrapped().nodes(), Name));
+	const std::vector<k3d::inode*> nodes = k3d::node::lookup(Self.wrapped(), Name);
+	
+	if(nodes.size() > 1)
+		throw std::runtime_error("multiple nodes exist with the given name");
+	
+	if(nodes.empty())
+		return boost::python::object();
+	
+	return wrap_unknown(nodes.back());
 }
 
-static const object get_node_by_metadata(idocument_wrapper& Self, const std::string& MetaName, const std::string& MetaValue)
+static const object get_node_by_metadata(idocument_wrapper& Self, const string_t& MetaName, const string_t& MetaValue)
 {
 	const std::vector<k3d::inode*> nodes = k3d::node::lookup<k3d::inode>(Self.wrapped(), MetaName, MetaValue);
 	
@@ -126,9 +134,10 @@ static const object get_node_by_metadata(idocument_wrapper& Self, const std::str
 	return wrap_unknown(nodes.back());
 }
 
-static const bool has_node(idocument_wrapper& Self, const std::string& Name)
+static const bool has_node(idocument_wrapper& Self, const string_t& Name)
 {
-	return k3d::find_node(Self.wrapped().nodes(), Name) ? true : false;
+	const std::vector<k3d::inode*> nodes = k3d::node::lookup(Self.wrapped(), Name);
+	return nodes.size() == 1;
 }
 
 static void delete_node(idocument_wrapper& Self, object& Node)
