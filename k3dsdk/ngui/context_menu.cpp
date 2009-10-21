@@ -10,12 +10,12 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 /** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
@@ -60,7 +60,7 @@
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/ngui/widget_manip.h>
-#include <k3dsdk/nodes.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/plugins.h>
@@ -528,18 +528,18 @@ private:
 			if (k3d::inode* const track = k3d::plugin::create<k3d::inode>("AnimationTrackDoubleMatrix4", m_document_state.document(), (*node)->name() + " Track"))
 			{
 				// Create a default interpolator, if it didn't exist already
-				k3d::inode* interpolator;
-				const k3d::nodes_t nodes = k3d::find_nodes(m_document_state.document().nodes(), "Linear Transformation Interpolator");
-	      if (1 == nodes.size())
-	      {
-	      	interpolator = *nodes.begin();
-	      }
-	      else
-	      {
-	      	interpolator = k3d::plugin::create<k3d::inode>("InterpolatorDoubleMatrix4Linear", m_document_state.document(), "Linear Transformation Interpolator");
-	      }
-	       
-	      // Set the interpolator
+				k3d::inode* interpolator = 0;
+				const std::vector<k3d::inode*> nodes = k3d::node::lookup(m_document_state.document(), "Linear Transformation Interpolator");
+				if(1 == nodes.size())
+				{
+					interpolator = nodes[0];
+				}
+				else
+				{
+					interpolator = k3d::plugin::create<k3d::inode>("InterpolatorDoubleMatrix4Linear", m_document_state.document(), "Linear Transformation Interpolator");
+				}
+				 
+				// Set the interpolator
 				k3d::property::set_internal_value(*track, "interpolator", interpolator);
 				
 				k3d::ipipeline::dependencies_t dependencies;

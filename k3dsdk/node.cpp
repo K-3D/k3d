@@ -100,5 +100,33 @@ void node::load(xml::element& Element, const ipersistent::load_context& Context)
 	persistent_property_collection::load(Element, Context);
 }
 
+const std::vector<inode*> node::lookup(idocument& Document, const uuid FactoryID)
+{
+	std::vector<inode*> result;
+
+	const std::vector<inode*>::const_iterator end = Document.nodes().collection().end();
+	for(std::vector<inode*>::const_iterator node = Document.nodes().collection().begin(); node != end; ++node)
+	{
+		if((**node).factory().factory_id() == FactoryID)
+			result.push_back(*node);
+	}
+
+	return result;
+}
+
+const std::vector<inode*> node::lookup(idocument& Document, const string_t& NodeName)
+{
+	std::vector<inode*> result;
+
+	const std::vector<inode*>::const_iterator end = Document.nodes().collection().end();
+	for(std::vector<inode*>::const_iterator node = Document.nodes().collection().begin(); node != end; ++node)
+	{
+		if((**node).name() == NodeName)
+			result.push_back(*node);
+	}
+
+	return result;
+}
+
 } // namespace k3d
 

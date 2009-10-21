@@ -63,6 +63,12 @@ public:
 	void save(xml::element& Element, const ipersistent::save_context& Context);
 	void load(xml::element& Element, const ipersistent::load_context& Context);
 
+	/// Returns the set of nodes that match a specific uuid (could return empty set!)
+	static const std::vector<inode*> lookup(idocument& Document, const uuid ClassID);
+
+	/// Returns the set of nodes that match the given name (be prepared to handle zero, one, or many results)
+	static const std::vector<inode*> lookup(idocument& Document, const string_t& NodeName);
+
 	/// Returns the set of nodes that implement the requested interface type (could return an empty set).
 	template<typename interface_t>
 	static const std::vector<interface_t*> lookup(idocument& Document)
@@ -76,7 +82,28 @@ public:
 		}
 		return result;
 	}
-	
+
+	/// Returns the set of nodes that implement the requested interface type and match the given metadata name and value.	
+	template<typename interface_t>
+	static const std::vector<interface_t*> lookup(idocument& Document, const string_t& MetaName, const string_t& MetaValue)
+	{
+		std::vector<interface_t*> result;
+
+		const std::vector<imetadata*> meta_nodes = lookup<imetadata>(Document);
+		for(std::vector<imetadata*>::const_iterator meta_node = meta_nodes.begin(); meta_node != meta_nodes.end(); ++meta_node)
+		{
+			imetadata::metadata_t metadata = (**meta_node).get_metadata();
+			imetadata::metadata_t::iterator pair = metadata.find(MetaName);
+			if(pair != metadata.end() && pair->second == MetaValue)
+			{
+				if(interface_t* const node = dynamic_cast<interface_t*>(*meta_node))
+					result.push_back(node);
+			}
+		}
+		
+		return result;
+	}
+
 private:
 	void on_deleted();
 

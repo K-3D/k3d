@@ -63,6 +63,7 @@
 #include <k3dsdk/ngui/unsaved_document.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
@@ -281,14 +282,14 @@ assert_not_implemented();
 
 	k3d::inode* default_gl_painter()
 	{
-		const k3d::nodes_t nodes = k3d::find_nodes(m_document.nodes(), "GL Default Painter");
-	        return (1 == nodes.size()) ? *nodes.begin() : 0;
+		const std::vector<k3d::inode*> nodes = k3d::node::lookup(m_document, "GL Default Painter");
+	        return (1 == nodes.size()) ? nodes[0] : 0;
 	}
 
 	k3d::inode* default_ri_painter()
 	{
-		const k3d::nodes_t nodes = k3d::find_nodes(m_document.nodes(), "RenderMan Default Painter");
-	        return (1 == nodes.size()) ? *nodes.begin() : 0;
+		const std::vector<k3d::inode*> nodes = k3d::node::lookup(m_document, "RenderMan Default Painter");
+	        return (1 == nodes.size()) ? nodes[0] : 0;
 	}
 	
 	k3d::inode* instantiate_mesh(k3d::inode* Node)
@@ -399,7 +400,7 @@ assert_not_implemented();
 		// If the new node is a material sink, assign a default material ...
 		if(k3d::imaterial_sink* const material_sink = dynamic_cast<k3d::imaterial_sink*>(node))
 		{
-			const k3d::nodes_t materials = k3d::find_nodes<k3d::imaterial>(m_document.nodes());
+			const std::vector<k3d::imaterial*> materials = k3d::node::lookup<k3d::imaterial>(m_document);
 			if(materials.size())
 				k3d::property::set_internal_value(material_sink->material_sink_input(), dynamic_cast<k3d::inode*>(*materials.rbegin()));
 		}

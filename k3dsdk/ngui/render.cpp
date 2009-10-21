@@ -21,15 +21,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <gtkmm/cellrenderertext.h>
-#include <gtkmm/combobox.h>
-#include <gtkmm/dialog.h>
-#include <gtkmm/entry.h>
-#include <gtkmm/label.h>
-#include <gtkmm/liststore.h>
-#include <gtkmm/scrolledwindow.h>
-#include <gtkmm/stock.h>
-
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/classes.h>
@@ -49,6 +40,7 @@
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
@@ -60,6 +52,15 @@
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/time_source.h>
+
+#include <gtkmm/cellrenderertext.h>
+#include <gtkmm/combobox.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/label.h>
+#include <gtkmm/liststore.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/stock.h>
 
 #include <boost/format.hpp>
 
@@ -111,29 +112,31 @@ private:
 };
 
 /// Prompt the user to choose an existing camera from within a document, or create a new one
-k3d::icamera* pick_camera(document_state& DocumentState, const k3d::nodes_t& RenderEngines, const k3d::plugin::factory::collection_t& Factories, const k3d::icamera* CurrentCamera, const k3d::string_t& Title, const k3d::string_t& Message)
+k3d::icamera* pick_camera(document_state& DocumentState, const std::vector<k3d::icamera*>& Cameras, const k3d::plugin::factory::collection_t& Factories, const k3d::icamera* CurrentCamera, const k3d::string_t& Title, const k3d::string_t& Message)
 {
 	camera_columns columns;
 	Glib::RefPtr<Gtk::ListStore> model = Gtk::ListStore::create(columns);
 
 	int index = 0;
 	int active_row = 0;
-	for(k3d::nodes_t::const_iterator node = RenderEngines.begin(); node != RenderEngines.end(); ++node)
+	for(std::vector<k3d::icamera*>::const_iterator camera = Cameras.begin(); camera != Cameras.end(); ++camera)
 	{
+		k3d::inode* const node = dynamic_cast<k3d::inode*>(*camera);
+
 		Gtk::TreeRow row = *model->append();
-		row[columns.node] = *node;
+		row[columns.node] = node;
 		row[columns.factory] = 0;
-		row[columns.label] = (*node)->name();
-		row[columns.icon] = quiet_load_icon((*node)->factory().name(), Gtk::ICON_SIZE_MENU);
+		row[columns.label] = node->name();
+		row[columns.icon] = quiet_load_icon(node->factory().name(), Gtk::ICON_SIZE_MENU);
 		row[columns.separator] = false;
 
-		if(CurrentCamera == dynamic_cast<k3d::icamera*>(*node))
+		if(CurrentCamera == (*camera))
 			active_row = index;
 
 		++index;
 	}
 
-	if(RenderEngines.size() && Factories.size())
+	if(Cameras.size() && Factories.size())
 	{
 		Gtk::TreeRow row = *model->append();
 		row[columns.node] = 0;
@@ -242,18 +245,20 @@ private:
 
 /// Prompt the user to choose an existing render engine from within a document, or create a new one
 template<typename interface_t>
-interface_t* pick_render_engine(document_state& DocumentState, const k3d::nodes_t& RenderEngines, const k3d::plugin::factory::collection_t& Factories, const k3d::string_t& Title, const k3d::string_t& Message)
+interface_t* pick_render_engine(document_state& DocumentState, const std::vector<interface_t*>& RenderEngines, const k3d::plugin::factory::collection_t& Factories, const k3d::string_t& Title, const k3d::string_t& Message)
 {
 	render_engine_columns columns;
 	Glib::RefPtr<Gtk::ListStore> model = Gtk::ListStore::create(columns);
 
-	for(k3d::nodes_t::const_iterator object = RenderEngines.begin(); object != RenderEngines.end(); ++object)
+	for(typename std::vector<interface_t*>::const_iterator object = RenderEngines.begin(); object != RenderEngines.end(); ++object)
 	{
+		k3d::inode* const node = dynamic_cast<k3d::inode*>(*object);
+
 		Gtk::TreeRow row = *model->append();
-		row[columns.object] = *object;
+		row[columns.object] = node;
 		row[columns.factory] = 0;
-		row[columns.label] = (*object)->name();
-		row[columns.icon] = quiet_load_icon((*object)->factory().name(), Gtk::ICON_SIZE_MENU);
+		row[columns.label] = node->name();
+		row[columns.icon] = quiet_load_icon(node->factory().name(), Gtk::ICON_SIZE_MENU);
 		row[columns.separator] = false;
 	}
 
@@ -626,63 +631,63 @@ const bool assign_destinations(k3d::iunknown& Engine, k3d::frames& Frames)
 
 k3d::icamera* default_camera(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::icamera>(DocumentState.document().nodes());
-	return render_engines.size() == 1 ? dynamic_cast<k3d::icamera*>(*render_engines.begin()) : 0;
+	const std::vector<k3d::icamera*> cameras = k3d::node::lookup<k3d::icamera>(DocumentState.document());
+	return cameras.size() == 1 ? cameras[0] : 0;
 }
 
 k3d::irender_preview* default_preview_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_preview>(DocumentState.document().nodes());
-	return render_engines.size() == 1 ? dynamic_cast<k3d::irender_preview*>(*render_engines.begin()) : 0;
+	const std::vector<k3d::irender_preview*> render_engines = k3d::node::lookup<k3d::irender_preview>(DocumentState.document());
+	return render_engines.size() == 1 ? render_engines[0] : 0;
 }
 
 k3d::irender_frame* default_still_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_frame>(DocumentState.document().nodes());
-	return render_engines.size() == 1 ? dynamic_cast<k3d::irender_frame*>(*render_engines.begin()) : 0;
+	const std::vector<k3d::irender_frame*> render_engines = k3d::node::lookup<k3d::irender_frame>(DocumentState.document());
+	return render_engines.size() == 1 ? render_engines[0] : 0;
 }
 
 k3d::irender_animation* default_animation_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_animation>(DocumentState.document().nodes());
-	return render_engines.size() == 1 ? dynamic_cast<k3d::irender_animation*>(*render_engines.begin()) : 0;
+	const std::vector<k3d::irender_animation*> render_engines = k3d::node::lookup<k3d::irender_animation>(DocumentState.document());
+	return render_engines.size() == 1 ? render_engines[0] : 0;
 }
 
 k3d::irender_camera_preview* default_camera_preview_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_camera_preview>(DocumentState.document().nodes());
-	return render_engines.size() == 1 ? dynamic_cast<k3d::irender_camera_preview*>(*render_engines.begin()) : 0;
+	const std::vector<k3d::irender_camera_preview*> render_engines = k3d::node::lookup<k3d::irender_camera_preview>(DocumentState.document());
+	return render_engines.size() == 1 ? render_engines[0] : 0;
 }
 
 k3d::irender_camera_frame* default_camera_still_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_camera_frame>(DocumentState.document().nodes());
-	return render_engines.size() == 1 ? dynamic_cast<k3d::irender_camera_frame*>(*render_engines.begin()) : 0;
+	const std::vector<k3d::irender_camera_frame*> render_engines = k3d::node::lookup<k3d::irender_camera_frame>(DocumentState.document());
+	return render_engines.size() == 1 ? render_engines[0] : 0;
 }
 
 k3d::irender_camera_animation* default_camera_animation_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_camera_animation>(DocumentState.document().nodes());
-	return render_engines.size() == 1 ? dynamic_cast<k3d::irender_camera_animation*>(*render_engines.begin()) : 0;
+	const std::vector<k3d::irender_camera_animation*> render_engines = k3d::node::lookup<k3d::irender_camera_animation>(DocumentState.document());
+	return render_engines.size() == 1 ? render_engines[0] : 0;
 }
 
 k3d::gl::irender_viewport* default_gl_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::gl::irender_viewport>(DocumentState.document().nodes());
-	return render_engines.size() == 1 ? dynamic_cast<k3d::gl::irender_viewport*>(*render_engines.begin()) : 0;
+	const std::vector<k3d::gl::irender_viewport*> render_engines = k3d::node::lookup<k3d::gl::irender_viewport>(DocumentState.document());
+	return render_engines.size() == 1 ? render_engines[0] : 0;
 }
 
 k3d::icamera* pick_camera(document_state& DocumentState, const k3d::icamera* CurrentCamera)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::icamera>(DocumentState.document().nodes());
+	const std::vector<k3d::icamera*> cameras = k3d::node::lookup<k3d::icamera>(DocumentState.document());
 	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::icamera>();
 
-	return detail::pick_camera(DocumentState, render_engines, factories, CurrentCamera, _("Pick Camera:"), _("Choose a camera"));
+	return detail::pick_camera(DocumentState, cameras, factories, CurrentCamera, _("Pick Camera:"), _("Choose a camera"));
 }
 
 k3d::irender_preview* pick_preview_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_preview>(DocumentState.document().nodes());
+	const std::vector<k3d::irender_preview*> render_engines = k3d::node::lookup<k3d::irender_preview>(DocumentState.document());
 	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::irender_preview>();
 
 	return detail::pick_render_engine<k3d::irender_preview>(DocumentState, render_engines, factories, _("Pick Preview Render Engine:"), _("Choose a render engine to be used for preview image rendering"));
@@ -690,7 +695,7 @@ k3d::irender_preview* pick_preview_render_engine(document_state& DocumentState)
 
 k3d::irender_frame* pick_still_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_frame>(DocumentState.document().nodes());
+	const std::vector<k3d::irender_frame*> render_engines = k3d::node::lookup<k3d::irender_frame>(DocumentState.document());
 	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::irender_frame>();
 
 	return detail::pick_render_engine<k3d::irender_frame>(DocumentState, render_engines, factories, _("Pick Still Render Engine:"), _("Choose a render engine to be used for still image rendering"));
@@ -698,7 +703,7 @@ k3d::irender_frame* pick_still_render_engine(document_state& DocumentState)
 
 k3d::irender_animation* pick_animation_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_animation>(DocumentState.document().nodes());
+	const std::vector<k3d::irender_animation*> render_engines = k3d::node::lookup<k3d::irender_animation>(DocumentState.document());
 	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::irender_animation>();
 
 	return detail::pick_render_engine<k3d::irender_animation>(DocumentState, render_engines, factories, _("Pick Animation Render Engine:"), _("Choose a render engine to be used for animation rendering"));
@@ -706,7 +711,7 @@ k3d::irender_animation* pick_animation_render_engine(document_state& DocumentSta
 
 k3d::irender_camera_preview* pick_camera_preview_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_camera_preview>(DocumentState.document().nodes());
+	const std::vector<k3d::irender_camera_preview*> render_engines = k3d::node::lookup<k3d::irender_camera_preview>(DocumentState.document());
 	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::irender_camera_preview>();
 
 	return detail::pick_render_engine<k3d::irender_camera_preview>(DocumentState, render_engines, factories, _("Pick Preview Render Engine:"), _("Choose a render engine to be used for preview image rendering"));
@@ -714,7 +719,7 @@ k3d::irender_camera_preview* pick_camera_preview_render_engine(document_state& D
 
 k3d::irender_camera_frame* pick_camera_still_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_camera_frame>(DocumentState.document().nodes());
+	const std::vector<k3d::irender_camera_frame*> render_engines = k3d::node::lookup<k3d::irender_camera_frame>(DocumentState.document());
 	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::irender_camera_frame>();
 
 	return detail::pick_render_engine<k3d::irender_camera_frame>(DocumentState, render_engines, factories, _("Pick Still Render Engine:"), _("Choose a render engine to be used for still image rendering"));
@@ -722,7 +727,7 @@ k3d::irender_camera_frame* pick_camera_still_render_engine(document_state& Docum
 
 k3d::irender_camera_animation* pick_camera_animation_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::irender_camera_animation>(DocumentState.document().nodes());
+	const std::vector<k3d::irender_camera_animation*> render_engines = k3d::node::lookup<k3d::irender_camera_animation>(DocumentState.document());
 	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::irender_camera_animation>();
 
 	return detail::pick_render_engine<k3d::irender_camera_animation>(DocumentState, render_engines, factories, _("Pick Animation Render Engine:"), _("Choose a render engine to be used for animation rendering"));
@@ -730,7 +735,7 @@ k3d::irender_camera_animation* pick_camera_animation_render_engine(document_stat
 
 k3d::gl::irender_viewport* pick_gl_render_engine(document_state& DocumentState)
 {
-	const k3d::nodes_t render_engines = k3d::find_nodes<k3d::gl::irender_viewport>(DocumentState.document().nodes());
+	const std::vector<k3d::gl::irender_viewport*> render_engines = k3d::node::lookup<k3d::gl::irender_viewport>(DocumentState.document());
 	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup<k3d::gl::irender_viewport>();
 
 	return detail::pick_render_engine<k3d::gl::irender_viewport>(DocumentState, render_engines, factories, _("Pick OpenGL Render Engine:"), _("Choose an OpenGL render engine to be used for drawing"));

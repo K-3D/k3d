@@ -21,30 +21,29 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <gtkmm/box.h>
-#include <gtkmm/eventbox.h>
-#include <gtkmm/stock.h>
-
 #include <k3d-i18n-config.h>
-
-#include <k3dsdk/ngui/document_state.h>
-#include <k3dsdk/ngui/document_window.h>
-#include <k3dsdk/ngui/icons.h>
-#include <k3dsdk/ngui/image_toggle_button.h>
-#include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/ngui/panel_frame.h>
-#include <k3dsdk/ngui/render.h>
-#include <k3dsdk/ngui/utility.h>
-#include <k3dsdk/ngui/viewport.h>
-#include <k3dsdk/ngui/widget_manip.h>
-
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/log.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/document_window.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/image_toggle_button.h>
+#include <k3dsdk/ngui/panel_frame.h>
+#include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/render.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/nodes.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/string_cast.h>
+
+#include <gtkmm/box.h>
+#include <gtkmm/eventbox.h>
+#include <gtkmm/stock.h>
 
 #include <boost/format.hpp>
 
@@ -184,8 +183,8 @@ void control::mount_panel(const k3d::string_t& Type, bool RequestCamera)
 	get_accessible()->set_name(Type);
 	if("NGUIViewportPanel" == Type)
 	{
-		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_viewport>(m_document_state.document().nodes());
-		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_viewport*>(*(gl_engines.begin())) : 0;
+		const std::vector<k3d::gl::irender_viewport*> gl_engines = k3d::node::lookup<k3d::gl::irender_viewport>(m_document_state.document());
+		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() ? gl_engines[0] : 0;
 
 		k3d::icamera* camera = 0;
 		if (RequestCamera)
@@ -194,8 +193,8 @@ void control::mount_panel(const k3d::string_t& Type, bool RequestCamera)
 		}
 		else
 		{
-			const k3d::nodes_t cameras = k3d::find_nodes<k3d::icamera>(m_document_state.document().nodes());
-			camera = cameras.size() > 0 ? dynamic_cast<k3d::icamera*>(*(cameras.begin())) : 0;
+			const std::vector<k3d::icamera*> cameras = k3d::node::lookup<k3d::icamera>(m_document_state.document());
+			camera = cameras.size() ? cameras[0] : 0;
 		}
 
 		if(glengine1 && camera)

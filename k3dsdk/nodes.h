@@ -48,59 +48,9 @@ class inode_collection_sink;
 /// Defines a collection of nodes
 typedef inode_collection::nodes_t nodes_t;
 
-/// Returns the node that matches the given name (returns NULL if no node matches or if more-than-one node matches)
-/** \deprecated Use methods in k3d::node instead */
-inode* find_node(inode_collection& Nodes, const std::string& NodeName);
-
 /// Returns the node that owns the given property (could return NULL)
 /** \deprecated Use methods in k3d::node instead */
 inode* find_node(inode_collection& Nodes, iproperty& Property);
-
-/// Returns the set of nodes that match a specific uuid (could return empty set!)
-/** \deprecated Use methods in k3d::node instead */
-const nodes_t find_nodes(inode_collection& Nodes, const uuid ClassID);
-
-/// Returns the set of nodes that match the given name (be prepared to handle zero, one, or many results)
-/** \deprecated Use methods in k3d::node instead */
-const nodes_t find_nodes(inode_collection& Nodes, const std::string& NodeName);
-
-/// Returns the set of nodes that implement a specific interface type (could return empty set!)
-/** \deprecated Use methods in k3d::node instead */
-template<typename interface_t>
-const nodes_t find_nodes(inode_collection& Nodes)
-{
-	nodes_t nodes;
-
-	const nodes_t::const_iterator end(Nodes.collection().end());
-	for(nodes_t::const_iterator node = Nodes.collection().begin(); node != end; ++node)
-	{
-		if(dynamic_cast<interface_t*>(*node))
-			nodes.insert(nodes.end(), *node);
-	}
-
-	return nodes;
-}
-
-/** \deprecated Use methods in k3d::node instead */
-template<typename interface_t>
-const nodes_t find_nodes(inode_collection& Nodes, const string_t& MetaName, const string_t& MetaValue)
-{
-	nodes_t meta_nodes = find_nodes<imetadata>(Nodes);
-	nodes_t nodes;
-	for(nodes_t::iterator node = meta_nodes.begin(); node != meta_nodes.end(); ++node)
-	{
-		imetadata* meta_node = dynamic_cast<imetadata*>(*node);
-		imetadata::metadata_t metadata = meta_node->get_metadata();
-		imetadata::metadata_t::iterator pair = metadata.find(MetaName);
-		if(pair != metadata.end() && pair->second == MetaValue)
-		{
-			if(dynamic_cast<interface_t*>(*node))
-				nodes.push_back(*node);
-		}
-	}
-	
-	return nodes;
-}
 
 /// Returns a unique node name based on the one supplied
 const std::string unique_name(inode_collection& Nodes, const std::string& Name);

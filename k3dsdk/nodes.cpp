@@ -61,29 +61,6 @@ factory_id_filter_t<functor_t> factory_id_filter(const uuid ID, functor_t Functo
 	return factory_id_filter_t<functor_t>(ID, Functor);
 }
 
-template<typename functor_t>
-struct name_filter_t
-{
-	explicit name_filter_t(const std::string Name, functor_t Functor) : name(Name), functor(Functor) {}
-
-	void operator()(k3d::inode* Object)
-	{
-		if(Object->name() == name)
-		{
-			functor(Object);
-		}
-	}
-
-	const std::string name;
-	functor_t functor;
-};
-
-template<typename functor_t>
-name_filter_t<functor_t> name_filter(const std::string Name, functor_t Functor)
-{
-	return name_filter_t<functor_t>(Name, Functor);
-}
-
 void skip_node(inode& Node, ipipeline::dependencies_t& NewDependencies)
 {
 	idocument& document = Node.document();
@@ -123,15 +100,6 @@ void skip_nodes(nodes_t Nodes, ipipeline::dependencies_t& NewDependencies)
 
 } // namespace detail
 
-inode* find_node(inode_collection& Nodes, const std::string& ObjectName)
-{
-	nodes_t nodes = find_nodes(Nodes, ObjectName);
-	if(1 == nodes.size())
-		return *nodes.begin();
-
-	return 0;
-}
-
 inode* find_node(inode_collection& Nodes, iproperty& Property)
 {
 	const nodes_t::const_iterator end = Nodes.collection().end();
@@ -147,22 +115,6 @@ inode* find_node(inode_collection& Nodes, iproperty& Property)
 	}
 
 	return 0;
-}
-
-const nodes_t find_nodes(inode_collection& Nodes, const uuid FactoryID)
-{
-	nodes_t results;
-	std::for_each(Nodes.collection().begin(), Nodes.collection().end(), detail::factory_id_filter(FactoryID, inserter(results)));
-
-	return results;
-}
-
-const nodes_t find_nodes(inode_collection& Nodes, const std::string& ObjectName)
-{
-	nodes_t results;
-	std::for_each(Nodes.collection().begin(), Nodes.collection().end(), detail::name_filter(ObjectName, inserter(results)));
-
-	return results;
 }
 
 const std::string unique_name(inode_collection& Nodes, const std::string& Name)

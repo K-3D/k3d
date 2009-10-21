@@ -78,6 +78,7 @@
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/ngui/widget_manip.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
@@ -363,11 +364,11 @@ public:
 		// Viewport on node list's right
 		panel_frame::control* const panel_frame4 = split_panel(*panel_frame2, *Gtk::manage(new Gtk::HPaned), 200);
 
-		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_viewport>(document().nodes());
-		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_viewport*>(*(gl_engines.begin())) : 0;
+		const std::vector<k3d::gl::irender_viewport*> gl_engines = k3d::node::lookup<k3d::gl::irender_viewport>(document());
+		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() ? gl_engines[0] : 0;
 
-		const k3d::nodes_t cameras = k3d::find_nodes<k3d::icamera>(document().nodes());
-		k3d::icamera* const camera1 = cameras.size() > 0 ? dynamic_cast<k3d::icamera*>(*(cameras.begin())) : 0;
+		const std::vector<k3d::icamera*> cameras = k3d::node::lookup<k3d::icamera>(document());
+		k3d::icamera* const camera1 = cameras.size() ? cameras[0] : 0;
 
 		if(glengine1 && camera1)
 		{

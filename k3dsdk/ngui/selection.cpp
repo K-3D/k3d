@@ -42,6 +42,7 @@
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/selection_tool.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
@@ -482,14 +483,14 @@ public:
 	{
 		if(!m_node_selection)
 		{
-			inode_collection::nodes_t nodes = find_nodes<inode_selection>(document.nodes(), "ngui:unique_node", "node_selection");
+			const std::vector<inode_selection*> nodes = node::lookup<inode_selection>(document, "ngui:unique_node", "node_selection");
 			if(nodes.size() != 1)
 				return 0;
-			m_node_selection = dynamic_cast<inode_selection*>(nodes.back());
+			m_node_selection = nodes[0];
 			// Make sure the node gets updated whenever the metadata is changed or the node is deleted
-			imetadata* metadata = dynamic_cast<imetadata*>(m_node_selection);
+			imetadata* metadata = dynamic_cast<imetadata*>(nodes[0]);
 			m_node_selection_metadata_connection = metadata->connect_metadata_changed_signal(sigc::mem_fun(*this, &implementation::on_node_selection_node_changed));
-			m_node_selection_deleted_connection = nodes.back()->deleted_signal().connect(sigc::mem_fun(*this, &implementation::on_node_selection_node_changed));
+			m_node_selection_deleted_connection = dynamic_cast<inode*>(m_node_selection)->deleted_signal().connect(sigc::mem_fun(*this, &implementation::on_node_selection_node_changed));
 		}
 		return m_node_selection;
 	}

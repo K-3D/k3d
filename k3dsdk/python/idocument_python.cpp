@@ -31,6 +31,7 @@
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iplugin_factory_collection.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/utility_gl.h>
@@ -114,7 +115,7 @@ static const object get_node(idocument_wrapper& Self, const std::string& Name)
 
 static const object get_node_by_metadata(idocument_wrapper& Self, const std::string& MetaName, const std::string& MetaValue)
 {
-	const k3d::inode_collection::nodes_t nodes = k3d::find_nodes<k3d::inode>(Self.wrapped().nodes(), MetaName, MetaValue);
+	const std::vector<k3d::inode*> nodes = k3d::node::lookup<k3d::inode>(Self.wrapped(), MetaName, MetaValue);
 	
 	if(nodes.size() > 1)
 		throw std::runtime_error("multiple nodes exist with the given metadata");
