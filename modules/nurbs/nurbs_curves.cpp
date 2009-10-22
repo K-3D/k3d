@@ -28,6 +28,7 @@
 #include <k3dsdk/table_copier.h>
 
 #include "nurbs_curves.h"
+#include "utility.h" // for knot_nomalizer
 
 #include <boost/scoped_ptr.hpp>
 #include <sstream>
@@ -224,16 +225,6 @@ void delete_curve(k3d::nurbs_curve::primitive& Curves, const k3d::uint_t Curve)
 	erase(Curves.curve_point_counts, Curve);
 	erase(Curves.curve_selections, Curve);
 }
-
-struct knot_normalizer
-{
-	knot_normalizer(const k3d::double_t Min, const k3d::double_t Max) : min(Min), max(Max) {}
-	k3d::double_t min, max;
-	const k3d::double_t operator()(const k3d::double_t Knot)
-	{
-		return (Knot - min) / (max - min);
-	}
-};
 
 void normalize_knot_vector(k3d::nurbs_curve::primitive& NurbsCurve, const k3d::uint_t Curve)
 {

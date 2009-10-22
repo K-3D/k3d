@@ -299,58 +299,50 @@ void extract_patch_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Out
 	k3d::nurbs_curve::add_curve(OutputMesh, OutputCurve, order, points, weights, knots);
 }
 
-void elevate_patch_degree(const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_t Patch, const k3d::uint_t Elevations, const k3d::bool_t UDirection)
+// stores all curves of a patch in one direction in a curve primitive
+void extract_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch, const k3d::bool_t UDirection)
 {
-	// Extract the curves
-	k3d::mesh curves_mesh;
-	curves_mesh.points.create();
-	curves_mesh.point_selection.create();
-	boost::scoped_ptr<k3d::nurbs_curve::primitive> curves_prim(k3d::nurbs_curve::create(curves_mesh));
-	curves_prim->material.push_back(InputPatches.patch_materials[Patch]);
+	OutputMesh.points.create();
+	OutputMesh.point_selection.create();
 	const k3d::uint_t curve_count = UDirection ? InputPatches.patch_v_point_counts[Patch] : InputPatches.patch_u_point_counts[Patch];
 	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
 	{
-		extract_patch_curve(curves_mesh, *curves_prim, InputMesh, InputPatches, Patch, curve, UDirection);
+		extract_patch_curve(OutputMesh, OutputCurves, InputMesh, InputPatches, Patch, curve, UDirection);
 	}
+}
 
-	// Elevate them
-	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_curves_prim(k3d::nurbs_curve::validate(curves_mesh, *curves_mesh.primitives.front()));
-	boost::scoped_ptr<k3d::nurbs_curve::primitive> elevated_curves_prim(k3d::nurbs_curve::create(curves_mesh));
-	elevated_curves_prim->material.push_back(InputPatches.patch_materials[Patch]);
-	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
-	{
-		elevate_curve_degree(curves_mesh, *elevated_curves_prim, curves_mesh, *const_curves_prim, curve, Elevations);
-	}
+// Convert a series of curves back to a patch
+void curves_to_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::primitive& InputCurves, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch, const k3d::bool_t UDirection)
+{
+	const k3d::uint_t u_order = UDirection ? InputCurves.curve_orders.front() : InputPatches.patch_u_orders[Patch];
+	const k3d::uint_t v_order = UDirection ? InputPatches.patch_v_orders[Patch] : InputCurves.curve_orders.front();
+	const k3d::uint_t curve_count = InputCurves.curve_first_points.size();
 
-	const k3d::uint_t u_order = UDirection ? InputPatches.patch_u_orders[Patch] + Elevations : InputPatches.patch_u_orders[Patch];
-	const k3d::uint_t v_order = UDirection ? InputPatches.patch_v_orders[Patch] : InputPatches.patch_v_orders[Patch] + Elevations;
-
-	// Turn them into a patch
 	if(UDirection)
 	{
 		// Because of the way elevate_curve_degree (and ultimately add_curve) works, the points are already ordered correctly in the U case
-		k3d::mesh::points_t points(curves_mesh.points->begin() + elevated_curves_prim->curve_points[elevated_curves_prim->curve_first_points.front()], curves_mesh.points->end());
-		k3d::mesh::knots_t u_knots(elevated_curves_prim->curve_knots.begin(), elevated_curves_prim->curve_knots.begin() + elevated_curves_prim->curve_point_counts.front() + elevated_curves_prim->curve_orders.front());
+		k3d::mesh::points_t points(InputMesh.points->begin() + InputCurves.curve_points[InputCurves.curve_first_points.front()], InputMesh.points->end());
+		k3d::mesh::knots_t u_knots(InputCurves.curve_knots.begin(), InputCurves.curve_knots.begin() + InputCurves.curve_point_counts.front() + InputCurves.curve_orders.front());
 		const k3d::uint_t v_knots_begin = InputPatches.patch_v_first_knots[Patch];
 		const k3d::uint_t v_knots_end = v_knots_begin + curve_count + v_order;
 		k3d::mesh::knots_t v_knots(InputPatches.patch_v_knots.begin() + v_knots_begin, InputPatches.patch_v_knots.begin() + v_knots_end);
-		add_patch(OutputMesh, OutputPatches, points, elevated_curves_prim->curve_point_weights, u_knots, v_knots, u_order, v_order);
+		add_patch(OutputMesh, OutputPatches, points, InputCurves.curve_point_weights, u_knots, v_knots, u_order, v_order);
 	}
 	else
 	{
 		k3d::mesh::points_t points;
 		k3d::mesh::weights_t weights;
-		const k3d::uint_t point_count = elevated_curves_prim->curve_point_counts.front();
+		const k3d::uint_t point_count = InputCurves.curve_point_counts.front();
 		for(k3d::uint_t i = 0; i != point_count; ++i)
 		{
 			for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
 			{
-				const k3d::uint_t point_idx = elevated_curves_prim->curve_first_points[curve] + i;
-				points.push_back(curves_mesh.points->at(elevated_curves_prim->curve_points[point_idx]));
-				weights.push_back(elevated_curves_prim->curve_point_weights[point_idx]);
+				const k3d::uint_t point_idx = InputCurves.curve_first_points[curve] + i;
+				points.push_back(InputMesh.points->at(InputCurves.curve_points[point_idx]));
+				weights.push_back(InputCurves.curve_point_weights[point_idx]);
 			}
 		}
-		k3d::mesh::knots_t v_knots(elevated_curves_prim->curve_knots.begin(), elevated_curves_prim->curve_knots.begin() + elevated_curves_prim->curve_point_counts.front() + elevated_curves_prim->curve_orders.front());
+		k3d::mesh::knots_t v_knots(InputCurves.curve_knots.begin(), InputCurves.curve_knots.begin() + InputCurves.curve_point_counts.front() + InputCurves.curve_orders.front());
 		const k3d::uint_t u_knots_begin = InputPatches.patch_u_first_knots[Patch];
 		const k3d::uint_t u_knots_end = u_knots_begin + curve_count + u_order;
 		k3d::mesh::knots_t u_knots(InputPatches.patch_u_knots.begin() + u_knots_begin, InputPatches.patch_u_knots.begin() + u_knots_end);
@@ -359,6 +351,48 @@ void elevate_patch_degree(const k3d::mesh& InputMesh, const k3d::nurbs_patch::co
 
 	OutputPatches.patch_materials.push_back(InputPatches.patch_materials[Patch]);
 	OutputPatches.patch_selections.back() = InputPatches.patch_selections[Patch];
+}
+
+void elevate_patch_degree(const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_t Patch, const k3d::uint_t Elevations, const k3d::bool_t UDirection)
+{
+	// Extract the curves
+	k3d::mesh curves_mesh;
+	boost::scoped_ptr<k3d::nurbs_curve::primitive> curves_prim(k3d::nurbs_curve::create(curves_mesh));
+	curves_prim->material.push_back(InputPatches.patch_materials[Patch]);
+	extract_curves(curves_mesh, *curves_prim, InputMesh, InputPatches, Patch, UDirection);
+
+	// Elevate them
+	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_curves_prim(k3d::nurbs_curve::validate(curves_mesh, *curves_mesh.primitives.front()));
+	boost::scoped_ptr<k3d::nurbs_curve::primitive> elevated_curves_prim(k3d::nurbs_curve::create(curves_mesh));
+	elevated_curves_prim->material.push_back(InputPatches.patch_materials[Patch]);
+	const k3d::uint_t curve_count = UDirection ? InputPatches.patch_v_point_counts[Patch] : InputPatches.patch_u_point_counts[Patch];
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		elevate_curve_degree(curves_mesh, *elevated_curves_prim, curves_mesh, *const_curves_prim, curve, Elevations);
+	}
+
+	curves_to_patch(OutputMesh, OutputPatches, curves_mesh, *elevated_curves_prim, InputPatches, Patch, UDirection);
+}
+
+void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, k3d::uint_t Patch, const k3d::double_t u, const k3d::uint_t r, const k3d::bool_t UDirection)
+{
+	// Extract the curves
+	k3d::mesh curves_mesh;
+	boost::scoped_ptr<k3d::nurbs_curve::primitive> curves_prim(k3d::nurbs_curve::create(curves_mesh));
+	curves_prim->material.push_back(InputPatches.patch_materials[Patch]);
+	extract_curves(curves_mesh, *curves_prim, InputMesh, InputPatches, Patch, UDirection);
+
+	// Insert the new knot into every curve
+	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_curves_prim(k3d::nurbs_curve::validate(curves_mesh, *curves_mesh.primitives.front()));
+	boost::scoped_ptr<k3d::nurbs_curve::primitive> knot_inserted_curves_prim(k3d::nurbs_curve::create(curves_mesh));
+	knot_inserted_curves_prim->material.push_back(InputPatches.patch_materials[Patch]);
+	const k3d::uint_t curve_count = UDirection ? InputPatches.patch_v_point_counts[Patch] : InputPatches.patch_u_point_counts[Patch];
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		insert_knot(curves_mesh, *knot_inserted_curves_prim, curves_mesh, *const_curves_prim, curve, u, r);
+	}
+
+	curves_to_patch(OutputMesh, OutputPatches, curves_mesh, *knot_inserted_curves_prim, InputPatches, Patch, UDirection);
 }
 
 } //namespace nurbs

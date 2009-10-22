@@ -238,6 +238,17 @@ void modify_selected_patches(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, 
 		k3d::mesh::delete_unused_points(OutputMesh);
 }
 
+/// Use with std::transform to normalize a knot vector
+struct knot_normalizer
+{
+	knot_normalizer(const k3d::double_t Min, const k3d::double_t Max) : min(Min), max(Max) {}
+	k3d::double_t min, max;
+	const k3d::double_t operator()(const k3d::double_t Knot)
+	{
+		return (Knot - min) / (max - min);
+	}
+};
+
 } //namespace nurbs
 
 } //namespace module
