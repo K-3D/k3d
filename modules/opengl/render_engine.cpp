@@ -185,7 +185,7 @@ void gl_draw_2d_widgets(k3d::icamera& Camera, const k3d::rectangle& WindowRect, 
 	// Set ourselves up to draw 2D overlays ...
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(WindowRect.left, WindowRect.right, WindowRect.bottom, WindowRect.top, -1, 1);
+	glOrtho(WindowRect.x1, WindowRect.x2, WindowRect.y2, WindowRect.y1, -1, 1);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -196,10 +196,10 @@ void gl_draw_2d_widgets(k3d::icamera& Camera, const k3d::rectangle& WindowRect, 
 		glDisable(GL_LIGHTING);
 
 		glBegin(GL_LINE_LOOP);
-			glVertex2d(CameraRect.left, CameraRect.top);
-			glVertex2d(CameraRect.right, CameraRect.top);
-			glVertex2d(CameraRect.right, CameraRect.bottom);
-			glVertex2d(CameraRect.left, CameraRect.bottom);
+			glVertex2d(CameraRect.x1, CameraRect.y1);
+			glVertex2d(CameraRect.x2, CameraRect.y1);
+			glVertex2d(CameraRect.x2, CameraRect.y2);
+			glVertex2d(CameraRect.x1, CameraRect.y2);
 		glEnd();
 	}
 
@@ -215,10 +215,10 @@ void gl_draw_2d_widgets(k3d::icamera& Camera, const k3d::rectangle& WindowRect, 
 		glDisable(GL_LIGHTING);
 
 		glBegin(GL_LINE_LOOP);
-			glVertex2d(k3d::mix(CameraRect.left, CameraRect.right, left), k3d::mix(CameraRect.top, CameraRect.bottom, top));
-			glVertex2d(k3d::mix(CameraRect.left, CameraRect.right, right), k3d::mix(CameraRect.top, CameraRect.bottom, top));
-			glVertex2d(k3d::mix(CameraRect.left, CameraRect.right, right), k3d::mix(CameraRect.top, CameraRect.bottom, bottom));
-			glVertex2d(k3d::mix(CameraRect.left, CameraRect.right, left), k3d::mix(CameraRect.top, CameraRect.bottom, bottom));
+			glVertex2d(k3d::mix(CameraRect.x1, CameraRect.x2, left), k3d::mix(CameraRect.y1, CameraRect.y2, top));
+			glVertex2d(k3d::mix(CameraRect.x1, CameraRect.x2, right), k3d::mix(CameraRect.y1, CameraRect.y2, top));
+			glVertex2d(k3d::mix(CameraRect.x1, CameraRect.x2, right), k3d::mix(CameraRect.y1, CameraRect.y2, bottom));
+			glVertex2d(k3d::mix(CameraRect.x1, CameraRect.x2, left), k3d::mix(CameraRect.y1, CameraRect.y2, bottom));
 		glEnd();
 	}
 
@@ -229,10 +229,10 @@ void gl_draw_2d_widgets(k3d::icamera& Camera, const k3d::rectangle& WindowRect, 
 		glDisable(GL_LIGHTING);
 
 		glBegin(GL_LINE_LOOP);
-			glVertex2d(CameraRect.left * 0.9, CameraRect.top * 0.9);
-			glVertex2d(CameraRect.right * 0.9, CameraRect.top * 0.9);
-			glVertex2d(CameraRect.right * 0.9, CameraRect.bottom * 0.9);
-			glVertex2d(CameraRect.left * 0.9, CameraRect.bottom * 0.9);
+			glVertex2d(CameraRect.x1 * 0.9, CameraRect.y1 * 0.9);
+			glVertex2d(CameraRect.x2 * 0.9, CameraRect.y1 * 0.9);
+			glVertex2d(CameraRect.x2 * 0.9, CameraRect.y2 * 0.9);
+			glVertex2d(CameraRect.x1 * 0.9, CameraRect.y2 * 0.9);
 		glEnd();
 	}
 
@@ -243,10 +243,10 @@ void gl_draw_2d_widgets(k3d::icamera& Camera, const k3d::rectangle& WindowRect, 
 		glDisable(GL_LIGHTING);
 
 		glBegin(GL_LINES);
-			glVertex2d(CameraRect.left * 0.05, 0);
-			glVertex2d(CameraRect.right * 0.05, 0);
-			glVertex2d(0, CameraRect.top * 0.05);
-			glVertex2d(0, CameraRect.bottom * 0.05);
+			glVertex2d(CameraRect.x1 * 0.05, 0);
+			glVertex2d(CameraRect.x2 * 0.05, 0);
+			glVertex2d(0, CameraRect.y1 * 0.05);
+			glVertex2d(0, CameraRect.y2 * 0.05);
 		glEnd();
 	}
 }
@@ -390,41 +390,41 @@ public:
 		{
 			Orthographic = false;
 
-			CameraRect.left = k3d::property::pipeline_value<double>(perspective->left());
-			CameraRect.right = k3d::property::pipeline_value<double>(perspective->right());
-			if(CameraRect.right < CameraRect.left)
-				std::swap(CameraRect.left, CameraRect.right);
+			CameraRect.x1 = k3d::property::pipeline_value<double>(perspective->left());
+			CameraRect.x2 = k3d::property::pipeline_value<double>(perspective->right());
+			if(CameraRect.x2 < CameraRect.x1)
+				std::swap(CameraRect.x1, CameraRect.x2);
 
-			CameraRect.top = k3d::property::pipeline_value<double>(perspective->top());
-			CameraRect.bottom = k3d::property::pipeline_value<double>(perspective->bottom());
-			if(CameraRect.top < CameraRect.bottom)
-				std::swap(CameraRect.top, CameraRect.bottom);
+			CameraRect.y1 = k3d::property::pipeline_value<double>(perspective->top());
+			CameraRect.y2 = k3d::property::pipeline_value<double>(perspective->bottom());
+			if(CameraRect.y1 < CameraRect.y2)
+				std::swap(CameraRect.y1, CameraRect.y2);
 
 			Near = k3d::property::pipeline_value<double>(perspective->near());
 			Far = k3d::property::pipeline_value<double>(perspective->far());
 
-			return_if_fail(CameraRect.left != CameraRect.right && CameraRect.top != CameraRect.bottom);
+			return_if_fail(CameraRect.x1 != CameraRect.x2 && CameraRect.y1 != CameraRect.y2);
 
-			const double frustum_ratio = (CameraRect.right - CameraRect.left) / (CameraRect.top - CameraRect.bottom);
+			const double frustum_ratio = (CameraRect.x2 - CameraRect.x1) / (CameraRect.y1 - CameraRect.y2);
 			const double raster_ratio = static_cast<double>(PixelWidth) / static_cast<double>(PixelHeight);
 
 			if(raster_ratio > frustum_ratio)
 			{
 				const double width = 0.5 * raster_ratio * CameraRect.height();
 
-				WindowRect.left = ((CameraRect.left + CameraRect.right) * 0.5) - width;
-				WindowRect.right = ((CameraRect.left + CameraRect.right) * 0.5) + width;
-				WindowRect.top = CameraRect.top;
-				WindowRect.bottom = CameraRect.bottom;
+				WindowRect.x1 = ((CameraRect.x1 + CameraRect.x2) * 0.5) - width;
+				WindowRect.x2 = ((CameraRect.x1 + CameraRect.x2) * 0.5) + width;
+				WindowRect.y1 = CameraRect.y1;
+				WindowRect.y2 = CameraRect.y2;
 			}
 			else
 			{
 				const double height = 0.5 * CameraRect.width() / raster_ratio;
 
-				WindowRect.left = CameraRect.left;
-				WindowRect.right = CameraRect.right;
-				WindowRect.top = ((CameraRect.top + CameraRect.bottom) * 0.5) + height;
-				WindowRect.bottom = ((CameraRect.top + CameraRect.bottom) * 0.5) - height;
+				WindowRect.x1 = CameraRect.x1;
+				WindowRect.x2 = CameraRect.x2;
+				WindowRect.y1 = ((CameraRect.y1 + CameraRect.y2) * 0.5) + height;
+				WindowRect.y2 = ((CameraRect.y1 + CameraRect.y2) * 0.5) - height;
 			}
 
 			return;
@@ -433,41 +433,41 @@ public:
 		{
 			Orthographic = true;
 
-			CameraRect.left = k3d::property::pipeline_value<double>(orthographic->left());
-			CameraRect.right = k3d::property::pipeline_value<double>(orthographic->right());
-			if(CameraRect.right < CameraRect.left)
-				std::swap(CameraRect.left, CameraRect.right);
+			CameraRect.x1 = k3d::property::pipeline_value<double>(orthographic->left());
+			CameraRect.x2 = k3d::property::pipeline_value<double>(orthographic->right());
+			if(CameraRect.x2 < CameraRect.x1)
+				std::swap(CameraRect.x1, CameraRect.x2);
 
-			CameraRect.top = k3d::property::pipeline_value<double>(orthographic->top());
-			CameraRect.bottom = k3d::property::pipeline_value<double>(orthographic->bottom());
-			if(CameraRect.top < CameraRect.bottom)
-				std::swap(CameraRect.top, CameraRect.bottom);
+			CameraRect.y1 = k3d::property::pipeline_value<double>(orthographic->top());
+			CameraRect.y2 = k3d::property::pipeline_value<double>(orthographic->bottom());
+			if(CameraRect.y1 < CameraRect.y2)
+				std::swap(CameraRect.y1, CameraRect.y2);
 
 			Near = k3d::property::pipeline_value<double>(orthographic->near());
 			Far = k3d::property::pipeline_value<double>(orthographic->far());
 
-			return_if_fail(CameraRect.left != CameraRect.right && CameraRect.top != CameraRect.bottom);
+			return_if_fail(CameraRect.x1 != CameraRect.x2 && CameraRect.y1 != CameraRect.y2);
 
-			const double frustum_ratio = (CameraRect.right - CameraRect.left) / (CameraRect.top - CameraRect.bottom);
+			const double frustum_ratio = (CameraRect.x2 - CameraRect.x1) / (CameraRect.y1 - CameraRect.y2);
 			const double raster_ratio = static_cast<double>(PixelWidth) / static_cast<double>(PixelHeight);
 
 			if(raster_ratio > frustum_ratio)
 			{
 				const double width = 0.5 * raster_ratio * CameraRect.height();
 
-				WindowRect.left = ((CameraRect.left + CameraRect.right) * 0.5) - width;
-				WindowRect.right = ((CameraRect.left + CameraRect.right) * 0.5) + width;
-				WindowRect.top = CameraRect.top;
-				WindowRect.bottom = CameraRect.bottom;
+				WindowRect.x1 = ((CameraRect.x1 + CameraRect.x2) * 0.5) - width;
+				WindowRect.x2 = ((CameraRect.x1 + CameraRect.x2) * 0.5) + width;
+				WindowRect.y1 = CameraRect.y1;
+				WindowRect.y2 = CameraRect.y2;
 			}
 			else
 			{
 				const double height = 0.5 * CameraRect.width() / raster_ratio;
 
-				WindowRect.left = CameraRect.left;
-				WindowRect.right = CameraRect.right;
-				WindowRect.top = ((CameraRect.top + CameraRect.bottom) * 0.5) + height;
-				WindowRect.bottom = ((CameraRect.top + CameraRect.bottom) * 0.5) - height;
+				WindowRect.x1 = CameraRect.x1;
+				WindowRect.x2 = CameraRect.x2;
+				WindowRect.y1 = ((CameraRect.y1 + CameraRect.y2) * 0.5) + height;
+				WindowRect.y2 = ((CameraRect.y1 + CameraRect.y2) * 0.5) - height;
 			}
 
 			return;
@@ -627,8 +627,8 @@ private:
 			const k3d::point3 world_target = boost::any_cast<k3d::point3>(Camera.world_target().property_internal_value());
 			const double distance = k3d::distance(world_position, world_target);
 
-			const double window_aspect = (window_rect.right - window_rect.left) / (window_rect.top - window_rect.bottom);
-			const double window_tan_fov = (window_rect.top - window_rect.bottom) * 0.5 / near;
+			const double window_aspect = (window_rect.x2 - window_rect.x1) / (window_rect.y1 - window_rect.y2);
+			const double window_tan_fov = (window_rect.y1 - window_rect.y2) * 0.5 / near;
 			const double window_size = distance * window_tan_fov;
 
 			RenderState.orthographic = true;
@@ -641,7 +641,7 @@ private:
 			RenderState.gl_window_frustum_near = near;
 			RenderState.gl_window_frustum_far = far;
 			
-			const double camera_aspect = (camera_rect.right - camera_rect.left) / (camera_rect.top - camera_rect.bottom);
+			const double camera_aspect = (camera_rect.x2 - camera_rect.x1) / (camera_rect.y1 - camera_rect.y2);
 
 			if(camera_aspect > window_aspect)
 			{
@@ -671,7 +671,7 @@ private:
 
 				const double width  = SelectionRegion.width();
 				const double height = SelectionRegion.height();
-				gluPickMatrix(SelectionRegion.left + (width * 0.5), RenderState.gl_viewport[3] - (SelectionRegion.top + (height * 0.5)), width, height, static_cast<GLint*>(RenderState.gl_viewport));
+				gluPickMatrix(SelectionRegion.x1 + (width * 0.5), RenderState.gl_viewport[3] - (SelectionRegion.y1 + (height * 0.5)), width, height, static_cast<GLint*>(RenderState.gl_viewport));
 
 				glOrtho(-window_size * window_aspect, window_size * window_aspect, -window_size, window_size, near, far);
 			}
@@ -680,21 +680,21 @@ private:
 		{
 			RenderState.orthographic = false;
 			
-			RenderState.gl_window_frustum_left = window_rect.left;
-			RenderState.gl_window_frustum_right = window_rect.right;
-			RenderState.gl_window_frustum_top = window_rect.top;
-			RenderState.gl_window_frustum_bottom = window_rect.bottom;
+			RenderState.gl_window_frustum_left = window_rect.x1;
+			RenderState.gl_window_frustum_right = window_rect.x2;
+			RenderState.gl_window_frustum_top = window_rect.y1;
+			RenderState.gl_window_frustum_bottom = window_rect.y2;
 			RenderState.gl_window_frustum_near = near;
 			RenderState.gl_window_frustum_far = far;
 
-			RenderState.gl_camera_frustum_left = camera_rect.left;
-			RenderState.gl_camera_frustum_right = camera_rect.right;
-			RenderState.gl_camera_frustum_top = camera_rect.top;
-			RenderState.gl_camera_frustum_bottom = camera_rect.bottom;
+			RenderState.gl_camera_frustum_left = camera_rect.x1;
+			RenderState.gl_camera_frustum_right = camera_rect.x2;
+			RenderState.gl_camera_frustum_top = camera_rect.y1;
+			RenderState.gl_camera_frustum_bottom = camera_rect.y2;
 			RenderState.gl_camera_frustum_near = near;
 			RenderState.gl_camera_frustum_far = far;
 
-			glFrustum(window_rect.left, window_rect.right, window_rect.bottom, window_rect.top, near, far);
+			glFrustum(window_rect.x1, window_rect.x2, window_rect.y2, window_rect.y1, near, far);
 
 			if(Select)
 			{
@@ -703,9 +703,9 @@ private:
 
 				const double width  = SelectionRegion.width();
 				const double height = SelectionRegion.height();
-				gluPickMatrix(SelectionRegion.left + (width * 0.5), RenderState.gl_viewport[3] - (SelectionRegion.top + (height * 0.5)), width, height, static_cast<GLint*>(RenderState.gl_viewport));
+				gluPickMatrix(SelectionRegion.x1 + (width * 0.5), RenderState.gl_viewport[3] - (SelectionRegion.y1 + (height * 0.5)), width, height, static_cast<GLint*>(RenderState.gl_viewport));
 
-				glFrustum(window_rect.left, window_rect.right, window_rect.bottom, window_rect.top, near, far);
+				glFrustum(window_rect.x1, window_rect.x2, window_rect.y2, window_rect.y1, near, far);
 			}
 		}
 

@@ -56,17 +56,13 @@ void rubber_band::draw(Gtk::Widget& Widget)
 		gc->set_line_attributes(1, Gdk::LINE_ON_OFF_DASH, Gdk::CAP_BUTT, Gdk::JOIN_MITER);
 	}
 	
-	const k3d::rectangle b = k3d::rectangle(
-		std::min(box.left, box.right),
-		std::max(box.left, box.right),
-		std::min(box.top, box.bottom),
-		std::max(box.top, box.bottom));
+	const k3d::rectangle b = k3d::rectangle::normalize(box);
 	
 	Widget.get_window()->draw_rectangle(
 		gc,
 		false,
-		static_cast<int>(b.left),
-		static_cast<int>(b.top),
+		static_cast<int>(b.x1),
+		static_cast<int>(b.y1),
 		static_cast<int>(b.width()),
 		static_cast<int>(b.height()));
 }

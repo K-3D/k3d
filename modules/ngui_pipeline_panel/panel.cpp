@@ -468,10 +468,10 @@ public:
 
 	void draw_box(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::rectangle& Box)
 	{
-		Context->move_to(Box.left, Box.top);
-		Context->line_to(Box.right, Box.top);
-		Context->line_to(Box.right, Box.bottom);
-		Context->line_to(Box.left, Box.bottom);
+		Context->move_to(Box.x1, Box.y1);
+		Context->line_to(Box.x2, Box.y1);
+		Context->line_to(Box.x2, Box.y2);
+		Context->line_to(Box.x1, Box.y2);
 		Context->close_path();
 
 		Context->stroke();
@@ -479,10 +479,10 @@ public:
 
 	void draw_filled_box(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::rectangle& Box)
 	{
-		Context->move_to(Box.left, Box.top);
-		Context->line_to(Box.right, Box.top);
-		Context->line_to(Box.right, Box.bottom);
-		Context->line_to(Box.left, Box.bottom);
+		Context->move_to(Box.x1, Box.y1);
+		Context->line_to(Box.x2, Box.y1);
+		Context->line_to(Box.x2, Box.y2);
+		Context->line_to(Box.x1, Box.y2);
 		Context->close_path();
 
 		Context->fill();

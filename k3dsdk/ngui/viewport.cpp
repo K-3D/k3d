@@ -1456,7 +1456,7 @@ const GLint control::select(const k3d::gl::selection_state& SelectState, const k
 		glInitNames();
 
 		GLdouble projection_matrix[16];
-		m_implementation->m_gl_engine.internal_value()->render_viewport_selection(SelectState, *m_implementation->m_camera.internal_value(), width, height, k3d::normalize(SelectionRegion), m_implementation->m_gl_view_matrix, projection_matrix, m_implementation->m_gl_viewport);
+		m_implementation->m_gl_engine.internal_value()->render_viewport_selection(SelectState, *m_implementation->m_camera.internal_value(), width, height, k3d::rectangle::normalize(SelectionRegion), m_implementation->m_gl_view_matrix, projection_matrix, m_implementation->m_gl_viewport);
 		std::copy(m_implementation->m_gl_view_matrix, m_implementation->m_gl_view_matrix + 16, ViewMatrix);
 		std::copy(projection_matrix, projection_matrix + 16, ProjectionMatrix);
 		std::copy(m_implementation->m_gl_viewport, m_implementation->m_gl_viewport + 4, Viewport);
@@ -1497,11 +1497,11 @@ const k3d::point2 widget_to_ndc(viewport::control& Viewport, const k3d::point2& 
 	k3d::rectangle window_rect(0, 0, 0, 0);
 	Viewport.gl_engine()->get_ndc(*Viewport.camera(), width, height, host_rect, window_rect);
 
-	const double window_x = k3d::mix(window_rect.left, window_rect.right, WidgetCoords[0] / width);
-	const double window_y = k3d::mix(window_rect.top, window_rect.bottom, WidgetCoords[1] / height);
+	const double window_x = k3d::mix(window_rect.x1, window_rect.x2, WidgetCoords[0] / width);
+	const double window_y = k3d::mix(window_rect.y1, window_rect.y2, WidgetCoords[1] / height);
 
-	const double x = (window_x - host_rect.left) / (host_rect.right - host_rect.left);
-	const double y = (window_y - host_rect.top) / (host_rect.bottom - host_rect.top);
+	const double x = (window_x - host_rect.x1) / (host_rect.x2 - host_rect.x1);
+	const double y = (window_y - host_rect.y1) / (host_rect.y2 - host_rect.y1);
 
 	return k3d::point2(x, y);
 }
@@ -1520,11 +1520,11 @@ const k3d::point2 ndc_to_widget(viewport::control& Viewport, const k3d::point2& 
 	k3d::rectangle window_rect(0, 0, 0, 0);
 	Viewport.gl_engine()->get_ndc(*Viewport.camera(), width, height, host_rect, window_rect);
 
-	const double host_x = k3d::mix(host_rect.left, host_rect.right, NDC[0]);
-	const double host_y = k3d::mix(host_rect.top, host_rect.bottom, NDC[1]);
+	const double host_x = k3d::mix(host_rect.x1, host_rect.x2, NDC[0]);
+	const double host_y = k3d::mix(host_rect.y1, host_rect.y2, NDC[1]);
 
-	const double x = (host_x - window_rect.left) / (window_rect.right - window_rect.left);
-	const double y = (host_y - window_rect.top) / (window_rect.bottom - window_rect.top);
+	const double x = (host_x - window_rect.x1) / (window_rect.x2 - window_rect.x1);
+	const double y = (host_y - window_rect.y1) / (window_rect.y2 - window_rect.y1);
 
 	return k3d::point2(width * x, height * y);
 }

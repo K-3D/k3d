@@ -140,8 +140,8 @@ public:
 	void on_lbutton_drag(viewport::control& Viewport, const GdkEventMotion& Event)
 	{
 		m_rubber_band.draw(Viewport);
-		m_rubber_band.box.right = Event.x;
-		m_rubber_band.box.bottom = Event.y;
+		m_rubber_band.box.x2 = Event.x;
+		m_rubber_band.box.y2 = Event.y;
 		m_rubber_band.draw(Viewport);
 	}
 
@@ -152,9 +152,9 @@ public:
 		k3d::icrop_window* const crop_window = dynamic_cast<k3d::icrop_window*>(Viewport.camera());
 		return_if_fail(crop_window);
 
-		const k3d::rectangle box = k3d::normalize(m_rubber_band.box);
-		const k3d::point2 top_left = widget_to_ndc(Viewport, k3d::point2(box.left, box.top));
-		const k3d::point2 bottom_right = widget_to_ndc(Viewport, k3d::point2(box.right, box.bottom));
+		const k3d::rectangle box = k3d::rectangle::normalize(m_rubber_band.box);
+		const k3d::point2 top_left = widget_to_ndc(Viewport, k3d::point2(box.x1, box.y1));
+		const k3d::point2 bottom_right = widget_to_ndc(Viewport, k3d::point2(box.x2, box.y2));
 
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Set Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
 

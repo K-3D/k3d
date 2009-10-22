@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -31,78 +31,70 @@ namespace k3d
 /////////////////////////////////////////////////////////////////////////////
 // rectangle
 
-rectangle::rectangle(const double Left, const double Right, const double Top, const double Bottom) :
-	left(Left),
-	right(Right),
-	top(Top),
-	bottom(Bottom)
+rectangle::rectangle(const double_t X1, const double_t X2, const double_t Y1, const double_t Y2) :
+	x1(X1),
+	x2(X2),
+	y1(Y1),
+	y2(Y2)
 {
 }
 
-rectangle::rectangle(const point2& TopLeft, const point2& BottomRight) :
-	left(TopLeft[0]),
-	right(BottomRight[0]),
-	top(TopLeft[1]),
-	bottom(BottomRight[1])
+rectangle::rectangle(const point2& Center, const double_t Width, const double_t Height) :
+       x1(Center[0] - (Width / 2)),
+       x2(Center[0] + (Width / 2)),
+       y1(Center[1] - (Height / 2)),
+       y2(Center[1] + (Height / 2))
 {
 }
 
-rectangle::rectangle(const point2& Center, const double Width, const double Height) :
-	left(Center[0] - (Width / 2)),
-	right(Center[0] + (Width / 2)),
-	top(Center[1] - (Height / 2)),
-	bottom(Center[1] + (Height / 2))
+double_t rectangle::width() const
 {
+	return std::fabs(x2 - x1);
 }
 
-double rectangle::width() const
+double_t rectangle::height() const
 {
-	return std::fabs(right - left);
-}
-
-double rectangle::height() const
-{
-	return std::fabs(bottom - top);
-}
-
-const point2 rectangle::top_left() const
-{
-	return point2(left, top);
-}
-
-const point2 rectangle::bottom_right() const
-{
-	return point2(right, bottom);
+	return std::fabs(y2 - y1);
 }
 
 const point2 rectangle::center() const
 {
-	return point2(left+right, top+bottom) * 0.5;
+	return point2(x1 + x2, y1 + y2) * 0.5;
 }
 
-bool rectangle::contains(const point2& Point) const
+bool_t rectangle::contains(const point2& Point) const
 {
-	return (left <= Point[0] && Point[0] <= right && top <= Point[1] && Point[1] <= bottom) ? true : false;
+       return std::min(x1, x2) <= Point[0] && Point[0] <= std::max(x1, x2) && std::min(y1, y2) <= Point[1] && Point[1] <= std::max(y1, y2);
 }
 
-const rectangle normalize(const rectangle& Rectangle)
+bool_t rectangle::operator==(const rectangle& Other) const
+{
+	return x1 == Other.x1 && x2 == Other.x2 && y1 == Other.y1 && y2 == Other.y2;
+}
+
+bool_t rectangle::operator!=(const rectangle& Other) const
+{
+	return !(*this == Other);
+}
+
+const rectangle rectangle::normalize(const rectangle& Rectangle)
 {
 	return rectangle(
-		std::min(Rectangle.left, Rectangle.right),
-		std::max(Rectangle.left, Rectangle.right),
-		std::min(Rectangle.top, Rectangle.bottom),
-		std::max(Rectangle.top, Rectangle.bottom));
+		std::min(Rectangle.x1, Rectangle.x2),
+		std::max(Rectangle.x1, Rectangle.x2),
+		std::min(Rectangle.y1, Rectangle.y2),
+		std::max(Rectangle.y1, Rectangle.y2));
 }
 
 std::ostream& operator<<(std::ostream& Stream, const rectangle& Arg)
 {
-	Stream << Arg.left << " " << Arg.right << " " << Arg.top << " " << Arg.bottom;
+	Stream << Arg.x1 << " " << Arg.x2 << " " << Arg.y1 << " " << Arg.y2;
 	return Stream;
 }
 
 std::istream& operator>>(std::istream& Stream, rectangle& Arg)
 {
-	Stream >> Arg.left >> Arg.right >> Arg.top >> Arg.bottom;
+	Stream >> Arg.x1 >> Arg.x2 >> Arg.y1 >> Arg.y2;
 	return Stream;
 }
 

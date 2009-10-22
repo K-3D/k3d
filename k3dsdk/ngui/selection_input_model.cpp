@@ -320,8 +320,8 @@ struct selection_input_model::implementation :
 			case MOTION_RUBBER_BAND_DESELECT:
 			{
 				m_rubber_band.draw(Viewport);
-				m_rubber_band.box.right = Event.x;
-				m_rubber_band.box.bottom = Event.y;
+				m_rubber_band.box.x2 = Event.x;
+				m_rubber_band.box.y2 = Event.y;
 				m_rubber_band.draw(Viewport);
 
 				break;
