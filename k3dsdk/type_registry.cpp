@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -80,6 +80,7 @@
 #include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/rectangle.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/texture3.h>
 #include <k3dsdk/type_registry.h>
@@ -243,6 +244,7 @@ void initialize_types()
 	register_type(typeid(k3d::ri::itexture), "k3d::ri::itexture");
 	register_type(typeid(k3d::ri::itexture*), "k3d::ri::itexture*");
 	register_type(typeid(k3d::ri::ivolume_shader), "k3d::ri::ivolume_shader");
+	register_type(typeid(k3d::rectangle), "k3d::rectangle");
 	register_type(typeid(k3d::selection::set), "k3d::selection::set");
 	register_type(typeid(k3d::string_t), "k3d::string_t");
 	register_type(typeid(k3d::texture3), "k3d::texture3");
