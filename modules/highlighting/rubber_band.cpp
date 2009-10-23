@@ -29,6 +29,7 @@
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/rectangle.h>
 #include <k3dsdk/render_state_gl.h>
 #include <k3dsdk/utility_gl.h>
 
@@ -55,20 +56,14 @@ public:
 		m_opacity(init_owner(*this) + init_name("opacity") + init_label(_("Opacity")) + init_description(_("Opacity")) + init_value(0.1) + init_units(typeid(k3d::measurement::scalar)) + init_step_increment(0.1)),
 		m_border_color(init_owner(*this) + init_name("border_color") + init_label(_("Border Color")) + init_description(_("Border Color")) + init_value(k3d::color(1, 0, 0))),
 		m_border_opacity(init_owner(*this) + init_name("border_opacity") + init_label(_("Border Opacity")) + init_description(_("Border Opacity")) + init_value(0.5) + init_units(typeid(k3d::measurement::scalar)) + init_step_increment(0.1)),
-		m_left(init_owner(*this) + init_name("left") + init_label(_("Left")) + init_description(_("Left")) + init_value(0)),
-		m_right(init_owner(*this) + init_name("right") + init_label(_("Right")) + init_description(_("Right")) + init_value(0)),
-		m_bottom(init_owner(*this) + init_name("bottom") + init_label(_("Bottom")) + init_description(_("Bottom")) + init_value(0)),
-		m_top(init_owner(*this) + init_name("top") + init_label(_("Top")) + init_description(_("Top")) + init_value(0))
+		m_rectangle(init_owner(*this) + init_name("rectangle") + init_label(_("Rectangle")) + init_description(_("Rectangle")) + init_value(k3d::rectangle(0, 0, 0, 0)))
 	{
 		m_camera.changed_signal().connect(make_async_redraw_slot());
 		m_color.changed_signal().connect(make_async_redraw_slot());
 		m_opacity.changed_signal().connect(make_async_redraw_slot());
 		m_border_color.changed_signal().connect(make_async_redraw_slot());
 		m_border_opacity.changed_signal().connect(make_async_redraw_slot());
-		m_left.changed_signal().connect(make_async_redraw_slot());
-		m_right.changed_signal().connect(make_async_redraw_slot());
-		m_bottom.changed_signal().connect(make_async_redraw_slot());
-		m_top.changed_signal().connect(make_async_redraw_slot());
+		m_rectangle.changed_signal().connect(make_async_redraw_slot());
 	}
 
 	sigc::slot<void, k3d::ihint*> make_async_redraw_slot()
@@ -104,10 +99,7 @@ public:
 		const k3d::color border_color = m_border_color.pipeline_value();
 		const k3d::double_t border_opacity = m_border_opacity.pipeline_value();
 
-		const k3d::double_t left = m_left.pipeline_value();
-		const k3d::double_t right = m_right.pipeline_value();
-		const k3d::double_t bottom = m_bottom.pipeline_value();
-		const k3d::double_t top = m_top.pipeline_value();
+		const k3d::rectangle rectangle = m_rectangle.pipeline_value();
 		const k3d::double_t depth = 0;
 
 		glMatrixMode(GL_PROJECTION);
@@ -131,18 +123,18 @@ public:
 
 		glColor4d(color.red, color.green, color.blue, opacity);
 		glBegin(GL_QUADS);
-			glVertex3d(left, top, depth);
-			glVertex3d(right, top, depth);
-			glVertex3d(right, bottom, depth);
-			glVertex3d(left, bottom, depth);
+			glVertex3d(rectangle.left, rectangle.top, depth);
+			glVertex3d(rectangle.right, rectangle.top, depth);
+			glVertex3d(rectangle.right, rectangle.bottom, depth);
+			glVertex3d(rectangle.left, rectangle.bottom, depth);
 		glEnd();
 
 		glColor4d(border_color.red, border_color.green, border_color.blue, border_opacity);
 		glBegin(GL_LINE_LOOP);
-			glVertex3d(left, top, depth);
-			glVertex3d(right, top, depth);
-			glVertex3d(right, bottom, depth);
-			glVertex3d(left, bottom, depth);
+			glVertex3d(rectangle.left, rectangle.top, depth);
+			glVertex3d(rectangle.right, rectangle.top, depth);
+			glVertex3d(rectangle.right, rectangle.bottom, depth);
+			glVertex3d(rectangle.left, rectangle.bottom, depth);
 		glEnd();
 
 		glMatrixMode(GL_MODELVIEW);
@@ -170,10 +162,7 @@ private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_opacity;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_border_color;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_border_opacity;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_left;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_right;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_bottom;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_top;
+	k3d_data(k3d::rectangle, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_rectangle;
 };
 
 /////////////////////////////////////////////////////////////////////////////
