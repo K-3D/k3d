@@ -25,6 +25,7 @@
 #include "nurbs_curves.h"
 #include "nurbs_patches.h"
 
+#include <k3dsdk/axis.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/table_copier.h>
 
@@ -450,6 +451,79 @@ void split_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 		curves_to_patch(OutputMesh, OutputPatches, first_mesh, *first_prim, InputPatches, Patch, UDirection);
 		curves_to_patch(OutputMesh, OutputPatches, second_mesh, *second_prim, InputPatches, Patch, UDirection);
 	}
+}
+
+void revolve_curve(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::axis Axis, const k3d::double_t Angle, const k3d::uint_t Segments, const k3d::bool_t Caps)
+{
+	//create a circle with the given angle
+	k3d::mesh::knots_t u_knots;
+	k3d::mesh::weights_t u_weights;
+	k3d::mesh::points_t u_control_points;
+	switch (Axis)
+	{
+	case k3d::Z :
+		k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 1, 0), 0, Angle, Segments, u_knots, u_weights, u_control_points);
+		break;
+	case k3d::X :
+		k3d::nurbs_curve::circular_arc(k3d::vector3(0, 0, 1), k3d::vector3(0, 1, 0), 0, Angle, Segments, u_knots, u_weights, u_control_points);
+		break;
+	case k3d::Y :
+		k3d::nurbs_curve::circular_arc(k3d::vector3(1, 0, 0), k3d::vector3(0, 0, 1), 0, Angle, Segments, u_knots, u_weights, u_control_points);
+		break;
+	}
+
+	// New patch arrays
+	k3d::mesh::points_t points;
+	k3d::mesh::weights_t weights;
+
+	const k3d::uint_t curve_points_begin = InputCurves.curve_first_points[Curve];
+	const k3d::uint_t curve_points_end = InputCurves.curve_point_counts[Curve] + curve_points_begin;
+	for (k3d::uint_t i = curve_points_begin; i != curve_points_end; ++i)
+	{
+		k3d::point3 p = InputMesh.points->at(InputCurves.curve_points[i]);
+		double w = InputCurves.curve_point_weights[i];
+		double distance = 1.0;
+		switch (Axis)
+		{
+		case k3d::Z :
+			distance = sqrt((p[0] * p[0]) + (p[1] * p[1])); // we want the distance to the z axis
+			break;
+		case k3d::X :
+			distance = sqrt((p[2] * p[2]) + (p[1] * p[1])); // we want the distance to the x axis
+			break;
+		case k3d::Y :
+			distance = sqrt((p[0] * p[0]) + (p[2] * p[2])); // we want the distance to the y axis
+			break;
+		}
+
+		for (int j = 0; j < u_control_points.size(); j++)
+		{
+			k3d::point3 p_u;
+			switch (Axis)
+			{
+			case k3d::Z :
+				p_u = k3d::point3(u_control_points[j][0] * distance, u_control_points[j][1] * distance, p[2]);
+				break;
+			case k3d::X :
+				p_u = k3d::point3(p[0], u_control_points[j][1] * distance, u_control_points[j][2] * distance);
+				break;
+			case k3d::Y :
+				p_u = k3d::point3(u_control_points[j][0] * distance, p[1], u_control_points[j][2] * distance);
+				break;
+			}
+
+			points.push_back(p_u);
+			weights.push_back(w * u_weights[j]);
+		}
+	}
+
+	const k3d::uint_t v_order = InputCurves.curve_orders[Curve];
+	const k3d::uint_t knots_begin = InputCurves.curve_first_knots[Curve];
+	const k3d::uint_t knots_end = knots_begin + v_order + InputCurves.curve_point_counts[Curve];
+	k3d::mesh::knots_t v_knots(InputCurves.curve_knots.begin() + knots_begin, InputCurves.curve_knots.begin() + knots_end);
+
+	add_patch(OutputMesh, OutputPatches, points, weights, u_knots, v_knots, 3, v_order);
+	OutputPatches.patch_materials.push_back(InputCurves.material.front());
 }
 
 } //namespace nurbs

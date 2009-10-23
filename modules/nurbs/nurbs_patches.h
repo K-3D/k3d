@@ -25,6 +25,7 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
+#include <k3dsdk/axis.h>
 #include <k3dsdk/types.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/metadata.h>
@@ -74,6 +75,8 @@ void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 
 /// Splits the patch at the requested parameter value u
 void split_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, k3d::uint_t Patch, const k3d::double_t u, const k3d::bool_t UDirection);
+
+void revolve_curve(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::axis Axis, const k3d::double_t Angle, const k3d::uint_t Segments, const k3d::bool_t Caps);
 
 } //namespace nurbs
 

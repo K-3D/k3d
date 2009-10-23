@@ -21,7 +21,8 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_curve_modifier.h"
+#include "nurbs_curves.h"
+#include "nurbs_patches.h"
 
 #include <k3dsdk/axis.h>
 #include <k3dsdk/data.h>
@@ -73,35 +74,62 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		Output = Input;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-		
-		k3d::log() << debug << "curve count: " << nurbs->curve_first_points.size() << std::endl;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		nurbs_curve_modifier mod(Output, *nurbs);
-		int my_curve = mod.selected_curve();
-
-		if (my_curve < 0)
+		for(k3d::uint_t prim_idx = 0; prim_idx != Input.primitives.size(); ++prim_idx)
 		{
-			k3d::log() << error << nurbs_debug << "You need to select exactly one curve!" << std::endl;
-			return;
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves_prim(k3d::nurbs_curve::validate(Output, *Output.primitives[prim_idx]));
+			if(!curves_prim)
+				continue;
+			boost::scoped_ptr<k3d::nurbs_patch::primitive> patches_prim;
+			for(k3d::uint_t curve = 0; curve != curves_prim->curve_first_points.size(); ++curve)
+			{
+				if(curves_prim->curve_selections[curve])
+				{
+					if(!patches_prim)
+						patches_prim.reset(k3d::nurbs_patch::create(Output));
+					module::nurbs::revolve_curve(Output, *patches_prim, Input, *curves_prim, curve, m_around.pipeline_value(), m_angle.pipeline_value(), m_segments.pipeline_value(), m_create_caps.pipeline_value());
+				}
+			}
 		}
 
-		mod.revolve_curve(my_curve, m_around.pipeline_value(), m_angle.pipeline_value(), m_segments.pipeline_value(), m_create_caps.pipeline_value());
-
-		if (m_delete_original.pipeline_value())
+		if(m_delete_original.pipeline_value())
 		{
-			mod.delete_curve(my_curve);
+			for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end();)
+			{
+				boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(Output, *primitive));
+				if(!curves)
+				{
+					++primitive;
+					continue;
+				}
+				for(k3d::uint_t curve = 0; ;)
+				{
+					if(curves->curve_selections[curve])
+					{
+						delete_curve(*curves, curve);
+					}
+					else
+					{
+						++curve;
+					}
+					if(curve == curves->curve_first_points.size())
+						break;
+				}
+				if(!curves->curve_first_points.empty())
+				{
+					++primitive;
+				}
+				else
+				{
+					primitive = Output.primitives.erase(primitive);
+				}
+			}
 		}
 	}
 
