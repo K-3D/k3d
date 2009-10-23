@@ -830,7 +830,6 @@ void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::me
 	}
 }
 
-// Helper function to determin is a curve is closed
 k3d::bool_t is_closed(const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve)
 {
 	k3d::uint_t curve_points_begin = NurbsCurves.curve_first_points[Curve];

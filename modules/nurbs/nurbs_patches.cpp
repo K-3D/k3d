@@ -395,6 +395,63 @@ void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	curves_to_patch(OutputMesh, OutputPatches, curves_mesh, *knot_inserted_curves_prim, InputPatches, Patch, UDirection);
 }
 
+void split_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, k3d::uint_t Patch, const k3d::double_t u, const k3d::bool_t UDirection)
+{
+	// Can't split at end
+	if(u > 1 - 0.000001 || u < 0.000001)
+	{
+		add_patch(OutputMesh, OutputPatches, InputMesh, InputPatches, Patch);
+		return;
+	}
+
+	// Extract the curves
+	k3d::mesh curves_mesh;
+	boost::scoped_ptr<k3d::nurbs_curve::primitive> curves_prim(k3d::nurbs_curve::create(curves_mesh));
+	curves_prim->material.push_back(InputPatches.patch_materials[Patch]);
+	extract_curves(curves_mesh, *curves_prim, InputMesh, InputPatches, Patch, UDirection);
+
+	// Split all the curves
+	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_curves_prim(k3d::nurbs_curve::validate(curves_mesh, *curves_mesh.primitives.front()));
+	boost::scoped_ptr<k3d::nurbs_curve::primitive> split_curves_prim(k3d::nurbs_curve::create(curves_mesh));
+	split_curves_prim->material.push_back(InputPatches.patch_materials[Patch]);
+	const k3d::uint_t curve_count = UDirection ? InputPatches.patch_v_point_counts[Patch] : InputPatches.patch_u_point_counts[Patch];
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		split_curve(curves_mesh, *split_curves_prim, curves_mesh, *const_curves_prim, curve, u);
+	}
+
+	if(is_closed(*const_curves_prim, 0))
+	{
+		curves_to_patch(OutputMesh, OutputPatches, curves_mesh, *split_curves_prim, InputPatches, Patch, UDirection);
+	}
+	else
+	{
+		assert_warning(curve_count * 2 == split_curves_prim->curve_first_points.size());
+		// separate each first and second split curve into different primitives and meshes
+		k3d::mesh first_mesh, second_mesh;
+		first_mesh.points.create();
+		first_mesh.point_selection.create();
+		second_mesh.points.create();
+		second_mesh.point_selection.create();
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> first_prim(k3d::nurbs_curve::create(first_mesh));
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> second_prim(k3d::nurbs_curve::create(second_mesh));
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_split_prim(k3d::nurbs_curve::validate(curves_mesh, *curves_mesh.primitives.back()));
+		for(k3d::uint_t curve = 0; curve != split_curves_prim->curve_first_points.size(); ++curve)
+		{
+			if(curve % 2 == 0)
+			{
+				add_curve(first_mesh, *first_prim, curves_mesh, *const_split_prim, curve);
+			}
+			else
+			{
+				add_curve(second_mesh, *second_prim, curves_mesh, *const_split_prim, curve);
+			}
+		}
+		curves_to_patch(OutputMesh, OutputPatches, first_mesh, *first_prim, InputPatches, Patch, UDirection);
+		curves_to_patch(OutputMesh, OutputPatches, second_mesh, *second_prim, InputPatches, Patch, UDirection);
+	}
+}
+
 } //namespace nurbs
 
 } //namespace module

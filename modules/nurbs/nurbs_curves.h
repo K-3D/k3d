@@ -106,6 +106,9 @@ void delete_selected_curves(k3d::mesh& Mesh);
 
 void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::uint_t Segments, k3d::nurbs_curve::primitive& NurbsCurves, k3d::mesh& OutputMesh, const k3d::uint_t Order = 2);
 
+/// True if the given curve is closed
+k3d::bool_t is_closed(const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
+
 } //namespace nurbs
 
 } //namespace module

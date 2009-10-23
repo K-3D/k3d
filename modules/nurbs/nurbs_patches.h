@@ -72,6 +72,9 @@ void elevate_patch_degree(const k3d::mesh& InputMesh, const k3d::nurbs_patch::co
 /// Insert a knot in one directrion of the patch
 void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, k3d::uint_t Patch, const k3d::double_t u, const k3d::uint_t r, const k3d::bool_t UDirection);
 
+/// Splits the patch at the requested parameter value u
+void split_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, k3d::uint_t Patch, const k3d::double_t u, const k3d::bool_t UDirection);
+
 } //namespace nurbs
 
 } //namespace module
