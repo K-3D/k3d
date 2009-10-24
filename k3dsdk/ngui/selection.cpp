@@ -502,6 +502,26 @@ public:
 		return nodes_t(nodes.begin(), nodes.end());
 	}
 
+	inode* rubber_band()
+	{
+		if(!m_rubber_band)
+		{
+			std::vector<inode*> nodes = node::lookup(document, uuid(0x72d36e00, 0x0a4621f4, 0xfdc8e69d, 0x621eadc8));
+			if(nodes.empty())
+			{
+				nodes.push_back(plugin::create<inode>(uuid(0x72d36e00, 0x0a4621f4, 0xfdc8e69d, 0x621eadc8), document, "RubberBand"));
+			}
+
+			nodes.erase(std::remove(nodes.begin(), nodes.end(), static_cast<inode*>(0)), nodes.end());
+			if(nodes.empty())
+				return 0;
+
+			m_rubber_band = nodes[0];
+		}
+
+		return m_rubber_band;
+	}
+
 	idocument& document;
 
 	/// Defines storage for the current document-wide selection mode
@@ -521,7 +541,8 @@ private:
 		current_mode(init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(selection::NODE) + init_values(mode_values())),
 		keep_selection(init_name("keep_selection") + init_label(_("Keep Selection")) + init_description(_("Keep the current selection when changing the selection mode.")) + init_value(false)),
 		convert_selection(init_name("convert_selection") + init_label(_("Convert Selection")) + init_description(_("Convert the current selection when changing the selection mode.")) + init_value(true)),
-		m_node_selection(0)
+		m_node_selection(0),
+		m_rubber_band(0)
 	{
 		current_mode.connect_explicit_change_signal(sigc::mem_fun(*this, &implementation::on_selection_mode_changed));
 	}
@@ -636,6 +657,9 @@ private:
 	inode_selection* m_node_selection;
 	sigc::connection m_node_selection_metadata_connection;
 	sigc::connection m_node_selection_deleted_connection;
+
+	/// Cached pointer to the rubber band highlighting node
+	inode* m_rubber_band;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1217,6 +1241,11 @@ void state::deselect_all_nodes()
 {
 	if(internal.node_selection())
 		internal.node_selection()->deselect_all();
+}
+
+inode* state::rubber_band()
+{
+	return internal.rubber_band();
 }
 
 mesh* get_mesh(inode* Node, const k3d::selection::id& MeshID)

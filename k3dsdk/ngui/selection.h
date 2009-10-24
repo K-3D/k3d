@@ -135,6 +135,9 @@ public:
 	/// Deselects all nodes.
 	void deselect_all_nodes();
 
+	/// Returns a node suitable for interactive rubber-band operations
+	inode* rubber_band();
+
 private:
 	class implementation;
 	implementation& internal;

@@ -35,13 +35,13 @@
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/keyboard.h>
 #include <k3dsdk/ngui/panel_mediator.h>
-#include <k3dsdk/ngui/rubber_band.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/selection_input_model.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/property_collection.h>
+#include <k3dsdk/rectangle.h>
 #include <k3dsdk/system.h>
 
 namespace k3d
@@ -58,7 +58,6 @@ struct selection_input_model::implementation :
 {
 	implementation(document_state& DocumentState) :
 		m_document_state(DocumentState),
-		m_rubber_band(k3d::color(0.8, 0, 0)),
 		m_start_selection(k3d::selection::record::empty_record()),
 		m_motion_type(MOTION_NONE),
 		m_extended_mode(true),
@@ -254,36 +253,26 @@ struct selection_input_model::implementation :
 			}
 
 			case MOTION_RUBBER_BAND_REPLACE:
-			{
-				m_rubber_band.box = k3d::rectangle(Event.x, Event.x, Event.y, Event.y);
-				m_rubber_band.draw(Viewport);
-
-				break;
-			}
-
 			case MOTION_RUBBER_BAND_SELECT:
-			{
-				m_rubber_band.box = k3d::rectangle(Event.x, Event.x, Event.y, Event.y);
-				m_rubber_band.draw(Viewport);
-
-				break;
-			}
-
 			case MOTION_RUBBER_BAND_DESELECT:
 			{
-				m_rubber_band.box = k3d::rectangle(Event.x, Event.x, Event.y, Event.y);
-				m_rubber_band.draw(Viewport);
+				if(inode* const rubber_band = selection::state(m_document_state.document()).rubber_band())
+				{
+					property::set_internal_value(*rubber_band, "camera", dynamic_cast<inode*>(Viewport.camera()));
+					property::set_internal_value(*rubber_band, "color", color(1, 0, 0));
+					property::set_internal_value(*rubber_band, "opacity", 0.1);
+					property::set_internal_value(*rubber_band, "border_color", color(1, 0, 0));
+					property::set_internal_value(*rubber_band, "border_opacity", 0.5);
+					property::set_internal_value(*rubber_band, "rectangle", rectangle(Event.x, Event.x, Viewport.get_height() - Event.y, Viewport.get_height() - Event.y));
+				}
 
 				break;
 			}
-
 		}
 	}
 
 	void on_button_drag(viewport::control& Viewport, const GdkEventMotion& Event)
 	{
-		const k3d::point2 coordinates(Event.x, Event.y);
-
 		switch(m_motion_type)
 		{
 			case MOTION_NONE:
@@ -291,7 +280,7 @@ struct selection_input_model::implementation :
 
 			case MOTION_PAINT_SELECT:
 			{
-				const k3d::selection::record selection = Viewport.pick_object(coordinates, m_paint_backfacing);
+				const k3d::selection::record selection = Viewport.pick_object(k3d::point2(Event.x, Event.y), m_paint_backfacing);
 				if(!selection::state(m_document_state.document()).is_selected(selection))
 				{
 					selection::state(m_document_state.document()).select(selection);
@@ -304,7 +293,7 @@ struct selection_input_model::implementation :
 
 			case MOTION_PAINT_DESELECT:
 			{
-				const k3d::selection::record selection = Viewport.pick_object(coordinates, m_paint_backfacing);
+				const k3d::selection::record selection = Viewport.pick_object(k3d::point2(Event.x, Event.y), m_paint_backfacing);
 				if(selection::state(m_document_state.document()).is_selected(selection))
 				{
 					selection::state(m_document_state.document()).deselect(selection);
@@ -319,10 +308,13 @@ struct selection_input_model::implementation :
 			case MOTION_RUBBER_BAND_SELECT:
 			case MOTION_RUBBER_BAND_DESELECT:
 			{
-				m_rubber_band.draw(Viewport);
-				m_rubber_band.box.x2 = Event.x;
-				m_rubber_band.box.y2 = Event.y;
-				m_rubber_band.draw(Viewport);
+				if(inode* const rubber_band = selection::state(m_document_state.document()).rubber_band())
+				{
+					rectangle new_rectangle = property::pipeline_value<rectangle>(*rubber_band, "rectangle");
+					new_rectangle.x2 = Event.x;
+					new_rectangle.y2 = Viewport.get_height() - Event.y;
+					property::set_internal_value(*rubber_band, "rectangle", new_rectangle);
+				}
 
 				break;
 			}
@@ -350,9 +342,16 @@ struct selection_input_model::implementation :
 
 			case MOTION_RUBBER_BAND_REPLACE:
 			{
-				const k3d::selection::records selection = Viewport.get_object_selectables(m_rubber_band.box, m_rubber_band_backfacing);
+				rectangle selection_rectangle;
+				if(inode* const rubber_band = selection::state(m_document_state.document()).rubber_band())
+				{
+					selection_rectangle = property::pipeline_value<rectangle>(*rubber_band, "rectangle");
+					selection_rectangle.y1 = Viewport.get_height() - selection_rectangle.y1;
+					selection_rectangle.y2 = Viewport.get_height() - selection_rectangle.y2;
+					property::set_internal_value(*rubber_band, "camera", static_cast<inode*>(0));
+				}
 
-				m_rubber_band.draw(Viewport);
+				const k3d::selection::records selection = Viewport.get_object_selectables(selection_rectangle, m_rubber_band_backfacing);
 
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Replace"), K3D_CHANGE_SET_CONTEXT);
 				selection::state(m_document_state.document()).deselect_all();
@@ -362,9 +361,16 @@ struct selection_input_model::implementation :
 
 			case MOTION_RUBBER_BAND_SELECT:
 			{
-				const k3d::selection::records selection = Viewport.get_object_selectables(m_rubber_band.box, m_rubber_band_backfacing);
+				rectangle selection_rectangle;
+				if(inode* const rubber_band = selection::state(m_document_state.document()).rubber_band())
+				{
+					selection_rectangle = property::pipeline_value<rectangle>(*rubber_band, "rectangle");
+					selection_rectangle.y1 = Viewport.get_height() - selection_rectangle.y1;
+					selection_rectangle.y2 = Viewport.get_height() - selection_rectangle.y2;
+					property::set_internal_value(*rubber_band, "camera", static_cast<inode*>(0));
+				}
 
-				m_rubber_band.draw(Viewport);
+				const k3d::selection::records selection = Viewport.get_object_selectables(selection_rectangle, m_rubber_band_backfacing);
 
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Select"), K3D_CHANGE_SET_CONTEXT);
 				selection::state(m_document_state.document()).select(selection);
@@ -373,9 +379,16 @@ struct selection_input_model::implementation :
 
 			case MOTION_RUBBER_BAND_DESELECT:
 			{
-				const k3d::selection::records selection = Viewport.get_object_selectables(m_rubber_band.box, m_rubber_band_backfacing);
+				rectangle selection_rectangle;
+				if(inode* const rubber_band = selection::state(m_document_state.document()).rubber_band())
+				{
+					selection_rectangle = property::pipeline_value<rectangle>(*rubber_band, "rectangle");
+					selection_rectangle.y1 = Viewport.get_height() - selection_rectangle.y1;
+					selection_rectangle.y2 = Viewport.get_height() - selection_rectangle.y2;
+					property::set_internal_value(*rubber_band, "camera", static_cast<inode*>(0));
+				}
 
-				m_rubber_band.draw(Viewport);
+				const k3d::selection::records selection = Viewport.get_object_selectables(selection_rectangle, m_rubber_band_backfacing);
 
 				k3d::record_state_change_set change_set(m_document_state.document(), _("Rubber Band Deselect"), K3D_CHANGE_SET_CONTEXT);
 				selection::state(m_document_state.document()).deselect(selection);
@@ -387,8 +400,6 @@ struct selection_input_model::implementation :
 
 	/// Stores a reference to the owning document
 	document_state& m_document_state;
-	/// Used to draw rubber-band selections
-	rubber_band m_rubber_band;
 
 	k3d::selection::record m_start_selection;
 	enum

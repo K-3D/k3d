@@ -123,18 +123,18 @@ public:
 
 		glColor4d(color.red, color.green, color.blue, opacity);
 		glBegin(GL_QUADS);
-			glVertex3d(rectangle.left, rectangle.top, depth);
-			glVertex3d(rectangle.right, rectangle.top, depth);
-			glVertex3d(rectangle.right, rectangle.bottom, depth);
-			glVertex3d(rectangle.left, rectangle.bottom, depth);
+			glVertex3d(rectangle.x1, rectangle.y1, depth);
+			glVertex3d(rectangle.x2, rectangle.y1, depth);
+			glVertex3d(rectangle.x2, rectangle.y2, depth);
+			glVertex3d(rectangle.x1, rectangle.y2, depth);
 		glEnd();
 
 		glColor4d(border_color.red, border_color.green, border_color.blue, border_opacity);
 		glBegin(GL_LINE_LOOP);
-			glVertex3d(rectangle.left, rectangle.top, depth);
-			glVertex3d(rectangle.right, rectangle.top, depth);
-			glVertex3d(rectangle.right, rectangle.bottom, depth);
-			glVertex3d(rectangle.left, rectangle.bottom, depth);
+			glVertex3d(rectangle.x1, rectangle.y1, depth);
+			glVertex3d(rectangle.x2, rectangle.y1, depth);
+			glVertex3d(rectangle.x2, rectangle.y2, depth);
+			glVertex3d(rectangle.x1, rectangle.y2, depth);
 		glEnd();
 
 		glMatrixMode(GL_MODELVIEW);
