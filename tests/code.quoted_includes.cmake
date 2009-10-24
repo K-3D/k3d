@@ -2,12 +2,18 @@
 
 SET(ERROR_COUNT 0)
 SET(SKIP_FILES
+	"[.]hg/"
 	"[.]sl$"
-  "^application/main.cpp$"
-  "^application/winmain.cpp$"
+	"^application/main.cpp$"
+	"^application/winmain.cpp$"
+	"^k3dsdk/expression/fparser.cpp$"
+	"^k3dsdk/expression/fpoptimizer.cpp$"
 	"^k3dsdk/ftgl/src/"
 	"^k3dsdk/gil/boost/gil/"
+	"^k3dsdk/glew/glew.c$"
+	"^k3dsdk/glew/glxew.h$"
 	"^k3dsdk/sgi_tesselator/"
+	"^modules/"
 	"^share/shaders/.*[.]h$"
 	)
 

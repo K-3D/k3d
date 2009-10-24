@@ -22,9 +22,6 @@
 		\created Feb 18, 2009
 */
 
-#include "catmull_clark.h"
-
-#include <k3dsdk/table_copier.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/idocument.h>
@@ -32,6 +29,8 @@
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
+#include <k3dsdk/subdivision_surface/catmull_clark.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/utility.h>
 #include <k3dsdk/vectors.h>
 
