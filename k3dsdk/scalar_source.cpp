@@ -21,40 +21,33 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "scalar_source.h"
-
 #include <k3d-i18n-config.h>
+#include <k3dsdk/scalar_source.h>
 
-namespace module
+namespace k3d
 {
 
-namespace scalar
-{
-
-scalar_source::scalar_source(k3d::iplugin_factory& Factory, k3d::idocument& Document, const char* const OutputDescription) :
+scalar_source::scalar_source(iplugin_factory& Factory, idocument& Document, const char* const OutputDescription) :
 	base(Factory, Document),
 	m_output(init_owner(*this) + init_name("output") + init_label(_("Output")) + init_description(OutputDescription) + init_value(0.0))
 {
 	m_output.set_update_slot(sigc::mem_fun(*this, &scalar_source::execute));
 }
 
-sigc::slot<void, k3d::ihint*> scalar_source::make_update_value_slot()
+sigc::slot<void, ihint*> scalar_source::make_update_value_slot()
 {
 	return m_output.make_slot();
 }
 
-void scalar_source::execute(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Output)
+void scalar_source::execute(const std::vector<ihint*>& Hints, double_t& Output)
 {
 	on_update_value(Output);
 }
 
-void scalar_source::on_update_value(k3d::double_t& Output)
+void scalar_source::on_update_value(double_t& Output)
 {
 	Output = 0.0;
 }
 
-} // namespace scalar
-
-} // namespace module
-
+} // namespace k3d
 

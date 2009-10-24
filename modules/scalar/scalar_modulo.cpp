@@ -21,7 +21,7 @@
 	\author Anders Dahnielson (anders@dahnielson.com)
 */
 
-#include "scalar_source.h"
+#include <k3dsdk/scalar_source.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -36,9 +36,9 @@ namespace scalar
 
 /// An object that take two doubles as input and produce their remainder as output
 class scalar_modulo :
-	public scalar_source
+	public k3d::scalar_source
 {
-	typedef scalar_source base;
+	typedef k3d::scalar_source base;
 public:
 	scalar_modulo(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, _("Remainder of inputs.")),

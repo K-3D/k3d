@@ -22,7 +22,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "scalar_source.h"
+#include <k3dsdk/scalar_source.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -39,9 +39,9 @@ namespace scalar
 {
 
 class scalar_expression :
-	public scalar_source
+	public k3d::scalar_source
 {
-	typedef scalar_source base;
+	typedef k3d::scalar_source base;
 public:
 	scalar_expression(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, _("Output value.")),

@@ -1,5 +1,5 @@
-#ifndef MODULES_SCALAR_SCALAR_SOURCE_H
-#define MODULES_SCALAR_SCALAR_SOURCE_H
+#ifndef K3DSDK_SCALAR_SOURCE_H
+#define K3DSDK_SCALAR_SOURCE_H
 
 // K-3D
 // Copyright (c) 1995-2009, Timothy M. Shead
@@ -28,36 +28,31 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/value_demand_storage.h>
 
-namespace module
-{
-
-namespace scalar
+namespace k3d
 {
 
 /// Convenience base-class for sources / filters that produce a scalar output value
 class scalar_source :
-	public k3d::node
+	public node
 {
-	typedef k3d::node base;
+	typedef node base;
 public:
-	scalar_source(k3d::iplugin_factory& Factory, k3d::idocument& Document, const char* const OutputDescription);
+	scalar_source(iplugin_factory& Factory, idocument& Document, const char* const OutputDescription);
 
 	/// Returns a slot that should be connected to input properties to signal that the output value has changed.
-	sigc::slot<void, k3d::ihint*> make_update_value_slot();
+	sigc::slot<void, ihint*> make_update_value_slot();
 
 private:
 	/// Stores the output value
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_output;
+	k3d_data(double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_output;
 
 	/// Called whenever the output value has been modified and needs to be updated.
-	void execute(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Output);
+	void execute(const std::vector<ihint*>& Hints, double_t& Output);
 	/// Override this in derived classes, to return a new / modified value
-	virtual void on_update_value(k3d::double_t& Output);
+	virtual void on_update_value(double_t& Output);
 };
 
-} // namespace scalar
+} // namespace k3d
 
-} // namespace module
-
-#endif // !MODULES_SCALAR_SCALAR_SOURCE_H
+#endif // !K3DSDK_SCALAR_SOURCE_H
 
