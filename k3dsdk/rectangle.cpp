@@ -31,6 +31,14 @@ namespace k3d
 /////////////////////////////////////////////////////////////////////////////
 // rectangle
 
+rectangle::rectangle() :
+	x1(0),
+	x2(0),
+	y1(0),
+	y2(0)
+{
+}
+
 rectangle::rectangle(const double_t X1, const double_t X2, const double_t Y1, const double_t Y2) :
 	x1(X1),
 	x2(X2),
