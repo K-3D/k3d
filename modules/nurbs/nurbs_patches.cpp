@@ -524,6 +524,27 @@ void revolve_curve(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
 
 	add_patch(OutputMesh, OutputPatches, points, weights, u_knots, v_knots, 3, v_order);
 	OutputPatches.patch_materials.push_back(InputCurves.material.front());
+	if(Caps)
+	{
+		k3d::mesh::points_t first_circle_points(points.begin(), points.begin() + u_control_points.size());
+		k3d::mesh::points_t last_circle_points(points.end() - u_control_points.size(), points.end());
+		k3d::mesh curves_mesh;
+		curves_mesh.points.create();
+		curves_mesh.point_selection.create();
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> curves_prim(k3d::nurbs_curve::create(curves_mesh));
+		k3d::nurbs_curve::add_curve(curves_mesh, *curves_prim, 3, first_circle_points, u_weights, u_knots);
+		k3d::nurbs_curve::add_curve(curves_mesh, *curves_prim, 3, last_circle_points, u_weights, u_knots);
+		curves_prim->material.push_back(InputCurves.material.front());
+		k3d::point3 first_centroid(0,0,0);
+		first_centroid[Axis] = points.front()[Axis];
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_curves_prim(k3d::nurbs_curve::validate(curves_mesh, *curves_mesh.primitives.front()));
+		create_cap(OutputMesh, OutputPatches, *curves_mesh.points, *const_curves_prim, 0, first_centroid, Segments);
+		OutputPatches.patch_materials.push_back(InputCurves.material.front());
+		k3d::point3 second_centroid(0,0,0);
+		second_centroid[Axis] = points.back()[Axis];
+		create_cap(OutputMesh, OutputPatches, *curves_mesh.points, *const_curves_prim, 1, second_centroid, Segments);
+		OutputPatches.patch_materials.push_back(InputCurves.material.front());
+	}
 }
 
 } //namespace nurbs
