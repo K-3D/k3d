@@ -624,8 +624,6 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 	OutputCurves.curve_selections.back() = 1.0;
 }
 
-
-
 void flip_curve(k3d::nurbs_curve::primitive& NurbsCurves, const k3d::uint_t curve)
 {
 	const k3d::uint_t curve_point_begin = NurbsCurves.curve_first_points[curve];
@@ -1067,7 +1065,26 @@ const k3d::point3 centroid(const k3d::mesh::points_t& Points, const k3d::nurbs_c
 	return result / (points_end - points_begin);
 }
 
-/// Adds a straight line to the given NURBS curve set. New points are added to the OutputMesh
+void delete_selected_curves(k3d::mesh& Mesh)
+{
+	for(k3d::uint_t prim_idx = 0; prim_idx != Mesh.primitives.size(); ++prim_idx)
+	{
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(Mesh, Mesh.primitives[prim_idx]));
+		if(curves.get())
+		{
+			for(k3d::uint_t curve = 0; ;)
+			{
+				if(curves->curve_selections[curve])
+					delete_curve(*curves, curve);
+				else
+					++curve;
+				if(curve == curves->curve_selections.size())
+					break;
+			}
+		}
+	}
+}
+
 void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::uint_t Segments, k3d::nurbs_curve::primitive& NurbsCurves, k3d::mesh& OutputMesh, const k3d::uint_t Order)
 {
 	k3d::vector3 delta = (End - Start) / Segments;

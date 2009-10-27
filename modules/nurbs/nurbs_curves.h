@@ -71,6 +71,9 @@ void close_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 /// Elevate the degree of the curves listed in Curves, storing the resulting mesh in OutputMesh and OutputCurves
 void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::uint_t Elevations = 1);
 
+/// Flips a curve in the given mesh
+void flip_curve(k3d::nurbs_curve::primitive& NurbsCurves, const k3d::uint_t curve);
+
 /// Connect the two input curves at their selected end points, storing the result in Output
 void connect_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::uint_t Primitive1Index, const k3d::uint_t Curve1Index, const k3d::bool_t Curve1FirstPointSelection, const k3d::uint_t Primitive2Index, const k3d::uint_t Curve2Index, const k3d::bool_t Curve2FirstPointSelection);
 
@@ -104,6 +107,7 @@ const k3d::point3 centroid(const k3d::mesh::points_t& Points, const k3d::nurbs_c
 /// Deletes all selected curves from the mesh
 void delete_selected_curves(k3d::mesh& Mesh);
 
+/// Adds a straight line to the given NURBS curve set. New points are added to the OutputMesh
 void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::uint_t Segments, k3d::nurbs_curve::primitive& NurbsCurves, k3d::mesh& OutputMesh, const k3d::uint_t Order = 2);
 
 /// True if the given curve is closed

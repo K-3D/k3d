@@ -121,36 +121,8 @@ public:
 
 		if(m_delete_original.pipeline_value())
 		{
-			for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end();)
-			{
-				boost::scoped_ptr<k3d::nurbs_curve::primitive> curves(k3d::nurbs_curve::validate(Output, *primitive));
-				if(!curves)
-				{
-					++primitive;
-					continue;
-				}
-				for(k3d::uint_t curve = 0; ;)
-				{
-					if(curves->curve_selections[curve])
-					{
-						delete_curve(*curves, curve);
-					}
-					else
-					{
-						++curve;
-					}
-					if(curve == curves->curve_first_points.size())
-						break;
-				}
-				if(!curves->curve_first_points.empty())
-				{
-					++primitive;
-				}
-				else
-				{
-					primitive = Output.primitives.erase(primitive);
-				}
-			}
+			delete_selected_curves(Output);
+			delete_empty_primitives(Output);
 		}
 	}
 

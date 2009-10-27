@@ -76,7 +76,15 @@ void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 /// Splits the patch at the requested parameter value u
 void split_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, k3d::uint_t Patch, const k3d::double_t u, const k3d::bool_t UDirection);
 
+/// Revolves a curve around an axis
 void revolve_curve(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::axis Axis, const k3d::double_t Angle, const k3d::uint_t Segments, const k3d::bool_t Caps);
+
+/// Creates a ruled surface between two curves.
+/**
+ * Prerequisites: - NurbsCurves must contain exactly two curves
+ *                - The curves must be compatible, i.e. have the same knot vector and order
+ */
+void ruled_surface(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Order, const k3d::uint_t Segments);
 
 } //namespace nurbs
 

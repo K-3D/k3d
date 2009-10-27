@@ -547,6 +547,38 @@ void revolve_curve(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
 	}
 }
 
+void ruled_surface(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Order, const k3d::uint_t Segments)
+{
+	return_if_fail(InputCurves.curve_first_points.size() == 2);
+	return_if_fail(InputCurves.curve_orders.front() == InputCurves.curve_orders.back());
+	return_if_fail(InputCurves.curve_point_counts.front() == InputCurves.curve_point_counts.back());
+
+	const k3d::uint_t v_point_count = InputCurves.curve_point_counts.front();
+	k3d::mesh::points_t points;
+	k3d::mesh::weights_t weights;
+	for(k3d::uint_t i = 0; i != v_point_count; ++i)
+	{
+		const k3d::point3& p1 = InputMesh.points->at(InputCurves.curve_points[i]);
+		const k3d::double_t w1 = InputCurves.curve_point_weights[i];
+		const k3d::point3& p2 = InputMesh.points->at(InputCurves.curve_points[i + v_point_count]);
+		const k3d::double_t w2 = InputCurves.curve_point_weights[i + v_point_count];
+
+		const k3d::vector3 delta = (p2 - p1) / Segments;
+		for (k3d::uint_t segment = 0; segment <= Segments; ++segment)
+		{
+			points.push_back(p1 + delta * segment);
+			weights.push_back(k3d::mix(w1, w2, static_cast<double>(segment)/static_cast<double>(Segments)));
+		}
+	}
+
+	k3d::mesh::knots_t u_knots;
+	k3d::nurbs_curve::add_open_uniform_knots(Order, Segments + 1, u_knots);
+	const k3d::uint_t v_order = InputCurves.curve_orders.front();
+	k3d::mesh::knots_t v_knots(InputCurves.curve_knots.begin(), InputCurves.curve_knots.begin() + v_point_count + v_order);
+	add_patch(OutputMesh, OutputPatches, points, weights, u_knots, v_knots, Order, v_order);
+	OutputPatches.patch_materials.push_back(InputCurves.material.back());
+}
+
 } //namespace nurbs
 
 } //namespace module
