@@ -77,6 +77,9 @@ void flip_curve(k3d::nurbs_curve::primitive& NurbsCurves, const k3d::uint_t curv
 /// Connect the two input curves at their selected end points, storing the result in Output
 void connect_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::uint_t Primitive1Index, const k3d::uint_t Curve1Index, const k3d::bool_t Curve1FirstPointSelection, const k3d::uint_t Primitive2Index, const k3d::uint_t Curve2Index, const k3d::bool_t Curve2FirstPointSelection);
 
+/// Merge all input curves into one curve, if their endpoints are identical
+void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::uint_t InputCurvesPrimIdx);
+
 ///Insert a knot into a curve, makes use of the algorithm in "The NURBS book" by A. Piegl and W. Tiller
 /**
  * \param curve The curve

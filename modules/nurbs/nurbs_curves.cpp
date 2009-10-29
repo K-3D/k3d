@@ -704,6 +704,152 @@ void connect_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCu
 	k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, order, points, weights, knots);
 }
 
+/// Appends the given curve to the output arrays
+void append_curve(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, k3d::mesh::knots_t& Knots, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve)
+{
+	if(Points.empty())
+	{
+		extract_curve_arrays(Points, Knots, Weights, InputMesh, InputCurves, Curve, false);
+	}
+	else
+	{
+		const k3d::uint_t points_begin = InputCurves.curve_first_points[Curve] + 1;
+		const k3d::uint_t points_end = points_begin - 1 + InputCurves.curve_point_counts[Curve];
+		for(k3d::uint_t point_idx = points_begin; point_idx != points_end; ++point_idx)
+		{
+			Points.push_back(InputMesh.points->at(InputCurves.curve_points[point_idx]));
+			Weights.push_back(InputCurves.curve_point_weights[point_idx]);
+		}
+		const k3d::uint_t order = InputCurves.curve_orders[Curve];
+		const k3d::uint_t knots_begin = InputCurves.curve_first_knots[Curve];
+		const k3d::uint_t knots_end = knots_begin + order + InputCurves.curve_point_counts[Curve];
+		k3d::double_t knot_offset = Knots.back() - InputCurves.curve_knots[knots_begin];
+		const k3d::uint_t last_knot = Knots.size() - 1;
+		Knots.resize(Knots.size() + InputCurves.curve_point_counts[Curve] - 1);
+		for(k3d::uint_t knot = knots_begin + order, i = 0; knot != knots_end; ++knot, ++i)
+			Knots[last_knot + i] = InputCurves.curve_knots[knot] + knot_offset;
+	}
+}
+
+void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::uint_t InputCurvesPrimIdx)
+{
+	// make sure all curves are at the same order, and store them in a temporary mesh
+	k3d::mesh temp_mesh;
+	temp_mesh.points.create();
+	temp_mesh.point_selection.create();
+	boost::scoped_ptr<k3d::nurbs_curve::primitive> temp_curves(k3d::nurbs_curve::create(temp_mesh));
+	k3d::uint_t max_order = 0;
+	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> input_curves(k3d::nurbs_curve::validate(InputMesh, *InputMesh.primitives[InputCurvesPrimIdx]));
+	const k3d::uint_t curve_count = input_curves->curve_first_points.size();
+	temp_curves->material.push_back(input_curves->material.back());
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		const k3d::uint_t order = input_curves->curve_orders[curve];
+		max_order = order > max_order ? order : max_order;
+	}
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		const k3d::uint_t order = input_curves->curve_orders[curve];
+		elevate_curve_degree(temp_mesh, *temp_curves, InputMesh, *input_curves, curve, max_order - order);
+	}
+	temp_curves->material = input_curves->material;
+	replace_duplicate_points(temp_mesh);
+
+	// Get the first and last point of every curve
+	k3d::mesh::indices_t first_points, last_points;
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		const k3d::uint_t first_idx = temp_curves->curve_first_points[curve];
+		const k3d::uint_t last_idx = first_idx + temp_curves->curve_point_counts[curve] - 1;
+		first_points.push_back(temp_curves->curve_points[first_idx]);
+		last_points.push_back(temp_curves->curve_points[last_idx]);
+	}
+
+	// Find out how many curves share first and last points
+	const k3d::uint_t point_count = temp_mesh.points->size();
+	k3d::mesh::counts_t first_valences(point_count);
+	k3d::mesh::counts_t last_valences(point_count);
+	k3d::mesh::bools_t connection_points(point_count);
+	for(k3d::uint_t point = 0; point != point_count; ++point)
+	{
+		first_valences[point] = std::count(first_points.begin(), first_points.end(), point);
+		last_valences[point] = std::count(last_points.begin(), last_points.end(), point);
+		connection_points[point] = (first_valences[point] + last_valences[point]) == 2;
+	}
+
+	// Flip curves in case two curves start or end at the same point
+	k3d::mesh::bools_t flipped_curves(curve_count, 0);
+	k3d::mesh::indices_t first_point_curves(point_count, 0); // Maps a first point index to its curve
+	k3d::mesh::indices_t last_point_curves(point_count, 0); // Maps a last point index to its curve
+	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	{
+		const k3d::uint_t first_point = first_points[curve];
+		if(!flipped_curves[curve] && connection_points[first_point] && first_valences[first_point] == 2)
+		{
+			flip_curve(*temp_curves, curve);
+			flipped_curves[curve] = true;
+			first_points[curve] = last_points[curve];
+			last_points[curve] = first_point;
+		}
+		const k3d::uint_t last_point = last_points[curve];
+		if(!flipped_curves[curve] && connection_points[last_point] && last_valences[last_point] == 2)
+		{
+			flip_curve(*temp_curves, curve);
+			flipped_curves[curve] = true;
+			last_points[curve] = first_points[curve];
+			first_points[curve] = last_point;
+		}
+		first_point_curves[first_points[curve]] = curve;
+		last_point_curves[last_points[curve]] = curve;
+	}
+
+	k3d::log() << debug << "first_points: " << first_points << std::endl;
+	k3d::log() << debug << "last points:  " << last_points << std::endl;
+	k3d::log() << debug << "connections:  " << connection_points << std::endl;
+
+	// Follow connected curves and join them into single curves
+	k3d::mesh::bools_t added_curves(curve_count, false);
+	for(k3d::uint_t checked_curve = 0; checked_curve != curve_count; ++checked_curve)
+	{
+		if(added_curves[checked_curve])
+			continue;
+		k3d::mesh::points_t points;
+		k3d::mesh::weights_t weights;
+		k3d::mesh::knots_t knots;
+
+		// Find the first curve in this sequence
+		k3d::uint_t first_curve;
+		for(first_curve = checked_curve; ;)
+		{
+			if(!connection_points[first_points[first_curve]])
+				break;
+
+			first_curve = last_point_curves[first_points[first_curve]];
+			if(first_curve == checked_curve)
+				break;
+		}
+
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_temp_curves(k3d::nurbs_curve::validate(temp_mesh, *temp_mesh.primitives.back()));
+		// Now append all curves in the sequence to the merged curve
+		for(k3d::uint_t curve = first_curve; ;)
+		{
+			append_curve(points, weights, knots, temp_mesh, *const_temp_curves, curve);
+			added_curves[curve] = true;
+
+			if(!connection_points[last_points[curve]])
+				break;
+
+			curve = first_point_curves[last_points[curve]];
+			if(curve == first_curve)
+				break;
+		}
+		k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, max_order, points, weights, knots);
+		OutputCurves.curve_selections.back() = 1.0;
+	}
+
+
+}
+
 /// Predicate to find the first knot greater than the value given in the constructor
 struct find_first_knot_after
 {
