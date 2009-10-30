@@ -621,7 +621,6 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 	}
 	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_temp_curves(k3d::nurbs_curve::validate(temp_mesh, *temp_mesh.primitives.back()));
 	add_curve(OutputMesh, OutputCurves, temp_mesh, *const_temp_curves, Elevations);
-	OutputCurves.curve_selections.back() = 1.0;
 }
 
 void flip_curve(k3d::nurbs_curve::primitive& NurbsCurves, const k3d::uint_t curve)

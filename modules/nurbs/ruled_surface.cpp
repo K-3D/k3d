@@ -98,12 +98,13 @@ public:
 				compatible_curves->material.push_back(input_curves->material.back());
 			for(k3d::uint_t curve = 0; curve != input_curves->curve_first_points.size(); ++curve)
 			{
-				merger(compatible_mesh, *compatible_curves, elevated_mesh, *input_curves, curve);
+				if(input_curves->curve_selections[curve])
+					merger(compatible_mesh, *compatible_curves, elevated_mesh, *input_curves, curve);
 			}
 		}
 		if(compatible_curves->curve_first_points.size() != 2)
 		{
-			k3d::log() << error << "You must select exactly 2 curves" << std::endl;
+			k3d::log() << error << "You must select exactly 2 curves. Number of selected curves: " << compatible_curves->curve_first_points.size() << std::endl;
 			return;
 		}
 

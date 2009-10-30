@@ -119,7 +119,6 @@ void modify_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, F
 					try
 					{
 						Modifier(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
-						output_curves->curve_selections.back() = curve_selections[curve];
 					}
 					catch(std::runtime_error& E)
 					{
@@ -131,6 +130,7 @@ void modify_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, F
 				{
 					add_curve(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
 				}
+				output_curves->curve_selections.back() = curve_selections[curve];
 			}
 			if(output_curves->material.empty())
 				output_curves->material = input_curves->material;
