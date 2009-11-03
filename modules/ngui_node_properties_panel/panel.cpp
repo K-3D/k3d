@@ -46,6 +46,8 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/scoped_ptr.hpp>
 
+#include <iterator>
+
 using namespace k3d::ngui;
 
 namespace module
@@ -94,6 +96,7 @@ public:
 
 		// Initial update ...
 		m_nodes = selection::state(m_document_state.document()).selected_nodes();
+
 		if(m_nodes.size() > 1)
 			m_nodes.resize(1);
 		update_connections();
@@ -102,9 +105,8 @@ public:
 
 	void on_view_node_properties(k3d::inode* const Node, k3d::iunknown* const Sender)
 	{
-		m_nodes = k3d::nodes_t(1, Node);
+		m_nodes = Node ? k3d::nodes_t(1, Node) : k3d::nodes_t();
 		update_connections();
-		
 		schedule_update();
 	}
 
