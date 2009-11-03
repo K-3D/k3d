@@ -47,6 +47,8 @@ int main(int argc, char* argv[])
 {
 	try
 	{
+		const k3d::string_t type_string = k3d::string_cast(static_cast<k3d::selection::type>(-1));
+
 		k3d::selection::set a;
 		k3d::selection::storage& points = a.create("points");
 		k3d::uint_t_array& begin = points.structure.create<k3d::uint_t_array>("begin");

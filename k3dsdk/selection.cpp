@@ -85,7 +85,8 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 			Stream << "vertex";
 			break;
 		default:
-			Stream << RHS;
+			// Note: we coerce the type here to prevent an infinite loop!
+			log() << error << k3d_file_reference << ": unknown selection type: " << int(RHS) << std::endl;
 			break;
 	}
 
