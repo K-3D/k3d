@@ -497,9 +497,14 @@ public:
 
 	const nodes_t selected_nodes()
 	{
-		return_val_if_fail(node_selection(), nodes_t());
+		nodes_t result;
+		return_val_if_fail(node_selection(), result);
+		
 		const inode_selection::selected_nodes_t nodes = node_selection()->selected_nodes();
-		return nodes_t(nodes.begin(), nodes.end());
+		result.assign(nodes.begin(), nodes.end());
+		result.erase(std::remove(result.begin(), result.end(), static_cast<inode*>(0)), result.end());
+
+		return result;
 	}
 
 	inode* rubber_band()
