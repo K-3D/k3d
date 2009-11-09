@@ -249,6 +249,19 @@ struct knot_normalizer
 	}
 };
 
+// Extracts all selected curves from a mesh and stores them in the primitive supplied at construction
+struct selected_curve_extractor
+{
+	selected_curve_extractor(k3d::mesh& Mesh, k3d::nurbs_curve::primitive& Curves) : mesh(Mesh), curves(Curves) {}
+	void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
+	{
+		add_curve(mesh, curves, Mesh, Curves, Curve);
+		curves.material.back() = Curves.material.back();
+	}
+	k3d::mesh& mesh;
+	k3d::nurbs_curve::primitive& curves;
+};
+
 } //namespace nurbs
 
 } //namespace module

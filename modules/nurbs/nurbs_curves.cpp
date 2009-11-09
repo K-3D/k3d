@@ -802,10 +802,6 @@ void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& 
 		last_point_curves[last_points[curve]] = curve;
 	}
 
-	k3d::log() << debug << "first_points: " << first_points << std::endl;
-	k3d::log() << debug << "last points:  " << last_points << std::endl;
-	k3d::log() << debug << "connections:  " << connection_points << std::endl;
-
 	// Follow connected curves and join them into single curves
 	k3d::mesh::bools_t added_curves(curve_count, false);
 	for(k3d::uint_t checked_curve = 0; checked_curve != curve_count; ++checked_curve)
@@ -845,7 +841,8 @@ void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& 
 		k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, max_order, points, weights, knots);
 		OutputCurves.curve_selections.back() = 1.0;
 	}
-
+	if(OutputCurves.material.empty())
+		OutputCurves.material.push_back(input_curves->material.back());
 
 }
 
@@ -895,7 +892,7 @@ void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::me
 	//we found the first knot greater than u or we're at the end so thats our k now
 	int k = knot_u - normalized_knots.begin() - 1;
 
-	if (s + r > Order - 1)
+	if(s + r > Order - 1)
 	{
 		k3d::log() << debug << "insert_knot: No knot inserted: target multiplicity " << s + r << " for knot " << u << " exceeds curve degree " << Order-1 << std::endl;
 		return;
@@ -987,6 +984,8 @@ void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 	if(u > 1 - 0.000001 || u < 0.000001)
 	{
 		add_curve(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve);
+		if(OutputCurves.material.empty())
+			OutputCurves.material.push_back(InputCurves.material.back());
 		return;
 	}
 
@@ -1042,6 +1041,8 @@ void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 		OutputCurves.curve_selections.back() = 1.0;
 		k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, order, second_points, second_weights, second_knots);
 	}
+	if(OutputCurves.material.empty())
+		OutputCurves.material.push_back(InputCurves.material.back());
 }
 
 void extract_curve_arrays(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::bool_t NormalizeKnots)

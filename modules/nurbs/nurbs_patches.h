@@ -55,8 +55,8 @@ void add_patch(k3d::mesh& Mesh,
 /// Copies a patch from one primitive to another
 void add_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch);
 
-/// Create a cap over a curve, if it is closed
-void create_cap(k3d::mesh& Mesh, k3d::nurbs_patch::primitive& Patches, const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::point3& Centroid, const k3d::uint_t VSegments = 1);
+/// Creates a cap over all curves in the curves primitive with the given index, if they are closed
+void create_cap(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::uint_t CurvesPrimIdx);
 
 /// Traverse each selected curve in SourceCurves along each selected curve in CurvesToTraverse
 void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTraverse, k3d::mesh& OutputMesh, const k3d::bool_t CreateCaps);
@@ -85,6 +85,13 @@ void revolve_curve(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
  *                - The curves must be compatible, i.e. have the same knot vector and order
  */
 void ruled_surface(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Order, const k3d::uint_t Segments);
+
+/// Creates a Coons surface between 4 curves
+/**
+ * InputCurves must contain 4 curves, and the parameters U1, U2, V1, V2 indicate which curves
+ * span the patch in the U and V direction. Each U and V curve must have a common endpoint
+ */
+void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t U1 = 0, const k3d::uint_t V1 = 1, const k3d::uint_t U2 = 2, const k3d::uint_t V2 = 3);
 
 } //namespace nurbs
 
