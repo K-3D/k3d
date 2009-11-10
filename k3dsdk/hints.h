@@ -165,6 +165,34 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////////
+// graph_topology_changed
+
+/// Hint object that indicates that a graph's topology has changed
+class graph_topology_changed :
+	public ihint
+{
+public:
+	ihint* clone();
+	void print(std::ostream& Stream);
+
+	static graph_topology_changed* instance();
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// graph_attributes_changed
+
+/// Hint object that indicates that a graph's attributes have changed
+class graph_attributes_changed :
+	public ihint
+{
+public:
+	ihint* clone();
+	void print(std::ostream& Stream);
+
+	static graph_attributes_changed* instance();
+};
+
+//////////////////////////////////////////////////////////////////////////////
 // any
 
 /// Used when creating a hint-mapping that matches any incoming hint type.
@@ -277,6 +305,38 @@ public:
 	static ihint* convert(ihint*)
 	{
 		static mesh_geometry_changed hint;
+		return &hint;
+	}
+};
+
+template<>
+class hint_traits<graph_topology_changed>
+{
+public:
+	static bool_t match(ihint* Hint)
+	{
+		return dynamic_cast<graph_topology_changed*>(Hint);
+	}
+
+	static ihint* convert(ihint*)
+	{
+		static graph_topology_changed hint;
+		return &hint;
+	}
+};
+
+template<>
+class hint_traits<graph_attributes_changed>
+{
+public:
+	static bool_t match(ihint* Hint)
+	{
+		return dynamic_cast<graph_attributes_changed*>(Hint);
+	}
+
+	static ihint* convert(ihint*)
+	{
+		static graph_attributes_changed hint;
 		return &hint;
 	}
 };

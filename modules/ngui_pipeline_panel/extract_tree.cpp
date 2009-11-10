@@ -72,10 +72,11 @@ private:
 extract_tree::extract_tree() :
 	m_root(init_owner(*this) + init_name("root") + init_label("") + init_description("") + init_value(0))
 {
-	m_root.changed_signal().connect(make_reset_graph_slot());
+	m_root.changed_signal().connect(k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::any, k3d::hint::graph_topology_changed> >(make_update_graph_slot()));
 }
 
-void extract_tree::on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
+void extract_tree::on_update_graph_topology(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 	return_if_fail(Input.topology);
 	const k3d::graph::undirected::adjacency_list_t& input_topology = *Input.topology;
@@ -125,7 +126,7 @@ void extract_tree::on_initialize_graph(const k3d::graph::undirected& Input, k3d:
 	root.push_back(vertex_map[m_root.pipeline_value()]);
 }
 
-void extract_tree::on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
+void extract_tree::on_update_graph_attributes(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 }
 

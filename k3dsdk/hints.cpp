@@ -166,6 +166,44 @@ file_changed* file_changed::instance()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// graph_topology_changed
+
+ihint* graph_topology_changed::clone()
+{
+	return new graph_topology_changed(*this);
+}
+
+void graph_topology_changed::print(std::ostream& Stream)
+{
+	Stream << "graph_topology_changed";
+}
+
+graph_topology_changed* graph_topology_changed::instance()
+{
+	static graph_topology_changed hint;
+	return &hint;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// graph_attributes_changed
+
+ihint* graph_attributes_changed::clone()
+{
+	return new graph_attributes_changed(*this);
+}
+
+void graph_attributes_changed::print(std::ostream& Stream)
+{
+	Stream << "graph_topology_changed";
+}
+
+graph_attributes_changed* graph_attributes_changed::instance()
+{
+	static graph_attributes_changed hint;
+	return &hint;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // print
 
 print::print(ihint* Hint) :

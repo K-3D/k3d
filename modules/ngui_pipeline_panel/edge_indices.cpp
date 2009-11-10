@@ -36,7 +36,7 @@ edge_indices::edge_indices()
 {
 }
 
-void edge_indices::on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
+void edge_indices::on_update_graph_topology(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 	Output = Input;
 
@@ -47,7 +47,7 @@ void edge_indices::on_initialize_graph(const k3d::graph::undirected& Input, k3d:
 		topology[*edges.first].index = index;
 }
 
-void edge_indices::on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
+void edge_indices::on_update_graph_attributes(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 }
 

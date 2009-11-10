@@ -2,7 +2,7 @@
 #define MODULES_NGUI_PIPELINE_PANEL_GRAPH_MODIFIER_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -27,82 +27,88 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/graph.h>
+#include <k3dsdk/hints.h>
+#include <k3dsdk/pointer_demand_storage.h>
 #include <k3dsdk/property_collection.h>
 
-namespace module
-{
-
-namespace ngui
-{
-
-namespace pipeline
+namespace k3d
 {
 
 class graph_modifier :
-	public k3d::property_collection
+	public property_collection
 {
 public:
 	graph_modifier() :
-		m_input(init_owner(*this) + init_name("input_graph") + init_label(_("Input Graph")) + init_description("Input graph") + init_value<k3d::graph::undirected*>(0)),
+		m_input(init_owner(*this) + init_name("input_graph") + init_label(_("Input Graph")) + init_description("Input graph") + init_value<graph::undirected*>(0)),
 		m_output(init_owner(*this) + init_name("output_graph") + init_label(_("Output Graph")) + init_description("Output graph"))
 	{
-		m_input.changed_signal().connect(make_reset_graph_slot());
+		m_output.set_update_slot(sigc::mem_fun(*this, &graph_modifier::execute));
 
-		m_output.set_initialize_slot(sigc::mem_fun(*this, &graph_modifier::initialize_graph));
-		m_output.set_update_slot(sigc::mem_fun(*this, &graph_modifier::update_graph));
+		m_input.changed_signal().connect(hint::converter<
+			hint::convert<hint::any, hint::unchanged> >(m_output.make_slot()));
 	}
 
-	k3d::iproperty& input()
+	iproperty& input()
 	{
 		return m_input;
 	}
 
-	k3d::iproperty& output()
+	iproperty& output()
 	{
 		return m_output;
 	}
 
-	sigc::slot<void, k3d::ihint*> make_reset_graph_slot()
+	sigc::slot<void, ihint*> make_update_graph_slot()
 	{
-		return m_output.make_reset_slot();
-	}
-
-	sigc::slot<void, k3d::ihint*> make_update_graph_slot()
-	{
-		return m_output.make_update_slot();
+		return m_output.make_slot();
 	}
 
 protected:
-	k3d_data(k3d::graph::undirected*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input;
-	k3d_data(k3d::graph::undirected*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::pointer_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_output;
+	k3d_data(graph::undirected*, immutable_name, change_signal, no_undo, local_storage, no_constraint, read_only_property, no_serialization) m_input;
+	k3d_data(graph::undirected*, immutable_name, change_signal, no_undo, pointer_demand_storage, no_constraint, read_only_property, no_serialization) m_output;
 
 private:
-	void initialize_graph(k3d::graph::undirected& Output)
+	void execute(const std::vector<ihint*>& Hints, graph::undirected& Output)
 	{
-		if(const k3d::graph::undirected* const input = m_input.pipeline_value())
+		if(const graph::undirected* const input = m_input.pipeline_value())
 		{
-			on_initialize_graph(*input, Output);
-			on_update_graph(*input, Output);
+			bool_t update_topology = false;
+			bool_t update_attributes = false;
+
+			for(uint_t i = 0; i != Hints.size(); ++i)
+			{
+				// Update attributes ...
+				if(dynamic_cast<hint::bitmap_pixels_changed*>(Hints[i]))
+				{
+					update_attributes = true;
+				}
+				// In every other case (graph_topology_changed, unknown hint, or no hint),
+				// we assume the worst and recreate everything from scratch ...
+				else
+				{
+					update_topology = true;
+					update_attributes = true;
+					break;
+				}
+			}
+
+			if(update_topology)
+			{
+				on_update_graph_topology(*input, Output);
+			}
+
+			if(update_attributes)
+			{
+				on_update_graph_attributes(*input, Output);
+			}
 		}
 	}
 
-	void update_graph(k3d::graph::undirected& Output)
-	{
-		if(const k3d::graph::undirected* const input = m_input.pipeline_value())
-		{
-			on_update_graph(*input, Output);
-		}
-	}
-
-	virtual void on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output) = 0;
-	virtual void on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output) = 0;
+	virtual void on_update_graph_topology(const graph::undirected& Input, graph::undirected& Output) = 0;
+	virtual void on_update_graph_attributes(const graph::undirected& Input, graph::undirected& Output) = 0;
 };
 
-} // namespace pipeline
-
-} // namespace ngui
-
-} // namespace module
+} // namespace k3d
 
 #endif // !MODULES_NGUI_PIPELINE_PANEL_GRAPH_MODIFIER_H
 

@@ -68,11 +68,14 @@ tree_layout::tree_layout() :
 	m_column_offset(init_owner(*this) + init_name("column_offset") + init_label("") + init_description("") + init_value(1.0)),
 	m_row_offset(init_owner(*this) + init_name("row_offset") + init_label("") + init_description("") + init_value(1.0))
 {
-	m_column_offset.changed_signal().connect(make_reset_graph_slot());
-	m_row_offset.changed_signal().connect(make_reset_graph_slot());
+	m_column_offset.changed_signal().connect(k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::any, k3d::hint::graph_topology_changed> >(make_update_graph_slot()));
+
+	m_row_offset.changed_signal().connect(k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::any, k3d::hint::graph_topology_changed> >(make_update_graph_slot()));
 }
 
-void tree_layout::on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
+void tree_layout::on_update_graph_topology(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 	// The input graph must be a tree ...
 	const k3d::graph::indices_t* const root_array = Input.graph_data.lookup<k3d::graph::indices_t>("root");
@@ -108,7 +111,7 @@ void tree_layout::on_initialize_graph(const k3d::graph::undirected& Input, k3d::
 	}
 }
 
-void tree_layout::on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
+void tree_layout::on_update_graph_attributes(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 }
 

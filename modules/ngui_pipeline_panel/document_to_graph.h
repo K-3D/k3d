@@ -44,7 +44,7 @@ enum edge_type
 };	
 
 class document_to_graph :
-	public graph_source
+	public k3d::graph_source
 {
 public:
 	document_to_graph(k3d::idocument& Document);
@@ -55,8 +55,8 @@ public:
 	}
 
 private:
-	void on_initialize_graph(k3d::graph::undirected& Output);
-	void on_update_graph(k3d::graph::undirected& Output);
+	void on_update_graph_topology(k3d::graph::undirected& Output);
+	void on_update_graph_attributes(k3d::graph::undirected& Output);
 
 	k3d::idocument& m_document;
 

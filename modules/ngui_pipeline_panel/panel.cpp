@@ -385,7 +385,7 @@ public:
 
 	void reset_graph()
 	{
-		m_create_graph->make_reset_graph_slot()(0);
+		m_create_graph->make_update_graph_slot()(0);
 	}
 
 	void selected_node_changed(k3d::inode* const Node, k3d::iunknown* const Sender)
