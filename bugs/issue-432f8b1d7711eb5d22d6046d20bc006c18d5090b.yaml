@@ -1,5 +1,5 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: 5 The viewport does not display anything.
+title: Empty viewport on Windows Vista
 desc: |-
   Contact: matts-address@hotmail.com
   Summary: The viewport does not display anything.
@@ -43,4 +43,8 @@ log_events:
 - - 2009-08-02 22:53:05.446654 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 0.8.0.0 from unassigned
+  - ""
+- - 2009-11-11 05:42:44.867642 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - edited title
   - ""
