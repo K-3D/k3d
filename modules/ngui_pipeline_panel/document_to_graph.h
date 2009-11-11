@@ -43,6 +43,7 @@ enum edge_type
 	BEHAVIOR_EDGE
 };	
 
+/// Converts a K-3D document to an undirected graph.
 class document_to_graph :
 	public k3d::graph_source
 {

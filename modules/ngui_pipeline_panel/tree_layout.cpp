@@ -77,6 +77,11 @@ tree_layout::tree_layout() :
 
 void tree_layout::on_update_graph_topology(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
+	Output = Input;
+}
+
+void tree_layout::on_update_graph_attributes(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
+{
 	// The input graph must be a tree ...
 	const k3d::graph::indices_t* const root_array = Input.graph_data.lookup<k3d::graph::indices_t>("root");
 	return_if_fail(root_array);
@@ -86,9 +91,6 @@ void tree_layout::on_update_graph_topology(const k3d::graph::undirected& Input, 
 	return_if_fail(Input.topology);
 	const k3d::graph::undirected::adjacency_list_t& input_topology = *Input.topology;
 	const k3d::uint_t vertex_count = boost::num_vertices(input_topology);
-
-	// Shallow-copy our input ...
-	Output = Input;
 
 	// Use a BFS to calculate each vertex' rank and number (its position within its rank) ...
 	k3d::graph::indices_t vertex_rank(vertex_count, 0);
@@ -109,10 +111,6 @@ void tree_layout::on_update_graph_topology(const k3d::graph::undirected& Input, 
 
 		vertex_position[vertex] = k3d::point2(rank * column_offset, (item * row_offset) - (item_offset * row_offset * 0.5));
 	}
-}
-
-void tree_layout::on_update_graph_attributes(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
-{
 }
 
 } // namespace pipeline
