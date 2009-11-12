@@ -748,7 +748,7 @@ void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	OutputPatches.patch_materials.push_back(InputCurves.material.back());
 }
 
-void extract_plane(k3d::point3& Origin, k3d::normal3& Normal, k3d::vector3& U, k3d::vector3& V, k3d::mesh::points_2d_t& ParameterPoints, const k3d::mesh::points_t& Points, const k3d::double_t UStart)
+void extract_plane(k3d::point3& Origin, k3d::normal3& Normal, k3d::vector3& U, k3d::vector3& V, k3d::mesh::points_2d_t& ParameterPoints, const k3d::mesh::points_t& Points, const k3d::double_t UOffset)
 {
 	// The origin is the centroid of the point cloud
 	Origin = k3d::point3(0,0,0);
@@ -770,9 +770,9 @@ void extract_plane(k3d::point3& Origin, k3d::normal3& Normal, k3d::vector3& U, k
 	}
 	Normal = k3d::normalize(Normal);
 
-	// As U-axis, we use the first point in the cloud, rotated by an angle depending on the UStart parameter
+	// As U-axis, we use the first point in the cloud, rotated by an angle depending on the UOffset parameter
 	k3d::point4 u_point(Points.front()[0], Points.front()[1], Points.front()[2], 1);
-	k3d::point4 u_point_rotated = k3d::rotate3(k3d::pi_times_2()*UStart, k3d::to_vector(Normal)) * u_point;
+	k3d::point4 u_point_rotated = k3d::rotate3(k3d::pi_times_2()*UOffset, k3d::to_vector(Normal)) * u_point;
 	U = k3d::normalize(k3d::point3(u_point_rotated[0], u_point_rotated[1], u_point_rotated[2]) - Origin);
 
 	// The V axis is the cross product of the Normal and U

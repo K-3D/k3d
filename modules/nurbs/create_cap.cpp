@@ -59,12 +59,12 @@ public:
 	create_cap(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the curve which was used to create the cap")) + init_value(false)),
-		m_start_u(init_owner(*this) + init_name(_("start_u")) + init_label(_("Start U")) + init_description(_("U value to open the closed curves at")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.0)),
+		m_u_offset(init_owner(*this) + init_name(_("u_offset")) + init_label(_("U Offset")) + init_description(_("Shift the capped curve U range by this amount, useful to rotate the UV-system on the cap")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.0)),
 		m_coons(init_owner(*this) + init_name(_("coons")) + init_label(_("Coons")) + init_description(_("Use a Coons surface to fill the curve if true, use a trimmed bilinear patch otherwise")) + init_value(true))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_delete_original.changed_signal().connect(make_update_mesh_slot());
-		m_start_u.changed_signal().connect(make_update_mesh_slot());
+		m_u_offset.changed_signal().connect(make_update_mesh_slot());
 		m_coons.changed_signal().connect(make_update_mesh_slot());
 	}
 
@@ -115,7 +115,7 @@ public:
 				halved_mesh.point_selection.create();
 				boost::scoped_ptr<k3d::nurbs_curve::primitive> halved_curves(k3d::nurbs_curve::create(halved_mesh));
 				// This opens the curve
-				split_curve(halved_mesh, *halved_curves, merged_mesh, *const_merged_curves, curve, m_start_u.pipeline_value());
+				split_curve(halved_mesh, *halved_curves, merged_mesh, *const_merged_curves, curve, m_u_offset.pipeline_value());
 				boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_halved_curves(k3d::nurbs_curve::validate(halved_mesh, *halved_mesh.primitives.front()));
 				// Now we split it in two
 				split_curve(halved_mesh, *halved_curves, halved_mesh, *const_halved_curves, 0, 0.5);
@@ -153,7 +153,7 @@ public:
 				k3d::mesh::knots_t knots;
 				extract_curve_arrays(points, knots, weights, merged_mesh, *const_merged_curves, curve, true);
 				// Get the plane the curve lies in
-				extract_plane(origin, normal, u_axis, v_axis, parameter_points, points, m_start_u.pipeline_value());
+				extract_plane(origin, normal, u_axis, v_axis, parameter_points, points, m_u_offset.pipeline_value());
 				// Get the bounding box for the curve points in this plane
 				k3d::point2 bbmin, bbmax;
 				bbox2(bbmin, bbmax, parameter_points);
@@ -193,7 +193,7 @@ public:
 
 private:
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_start_u;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_offset;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_coons;
 };
 

@@ -108,7 +108,7 @@ void ruled_surface(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
 void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t U1 = 0, const k3d::uint_t V1 = 1, const k3d::uint_t U2 = 2, const k3d::uint_t V2 = 3);
 
 /// Extracts a coordinate system and the points parametric coordinates from a point cloud, based on the "mean" normal of the points
-void extract_plane(k3d::point3& Origin, k3d::normal3& Normal, k3d::vector3& U, k3d::vector3& V, k3d::mesh::points_2d_t& ParameterPoints, const k3d::mesh::points_t& Points, const k3d::double_t UStart = 0.0);
+void extract_plane(k3d::point3& Origin, k3d::normal3& Normal, k3d::vector3& U, k3d::vector3& V, k3d::mesh::points_2d_t& ParameterPoints, const k3d::mesh::points_t& Points, const k3d::double_t UOffset = 0.0);
 
 /// Helper function to extract a 2D bounding box
 void bbox2(k3d::point2& Min, k3d::point2& Max, const k3d::mesh::points_2d_t& Points);
