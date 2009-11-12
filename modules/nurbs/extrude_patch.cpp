@@ -61,14 +61,12 @@ public:
 		base(Factory, Document),
 		m_distance(init_owner(*this) + init_name(_("distance")) + init_label(_("Distance")) + init_description(_("How far to extrude the curve")) + init_step_increment(0.5) + init_units(typeid(k3d::measurement::scalar)) + init_value(1.0)),
 		m_segments(init_owner(*this) + init_name("segments") + init_label(_("segments")) + init_description(_("Segments")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_along(init_owner(*this) + init_name("along") + init_label(_("Extrude along")) + init_description(_("Axis along which the curve gets extruded")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
-		m_cap(init_owner(*this) + init_name(_("cap")) + init_label(_("Create Caps?")) + init_description(_("Create caps at both ends?")) + init_value(false))
+		m_along(init_owner(*this) + init_name("along") + init_label(_("Extrude along")) + init_description(_("Axis along which the curve gets extruded")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values()))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_distance.changed_signal().connect(make_update_mesh_slot());
 		m_segments.changed_signal().connect(make_update_mesh_slot());
 		m_along.changed_signal().connect(make_update_mesh_slot());
-		m_cap.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -82,7 +80,6 @@ public:
 
 		double distance = m_distance.pipeline_value();
 		k3d::axis axis = m_along.pipeline_value();
-		bool create_cap =  m_cap.pipeline_value();
 		int segments = m_segments.pipeline_value();
 
 		// Determine the start and end point of the extrusion vector
@@ -135,7 +132,7 @@ public:
 				tmp_curves->curve_selections.assign(4, 1.0);
 				tmp_curves->material.push_back(const_patches->patch_materials[patch]);
 
-				traverse_curve(tmp_mesh, 0, extrusion_vector_mesh, Output, *patches, m_cap.pipeline_value());
+				traverse_curve(tmp_mesh, 0, extrusion_vector_mesh, Output, *patches);
 			}
 		}
 		replace_duplicate_points(Output);
@@ -157,7 +154,6 @@ public:
 private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_distance;
 	k3d_data(k3d::axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_along;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_cap;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_segments;
 };
 

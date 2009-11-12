@@ -59,11 +59,9 @@ class curve_traversal :
 public:
 	curve_traversal(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false)),
 		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curves")) + init_description(_("Delete the curves used to construct the surface")) + init_value(true))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-		m_create_caps.changed_signal().connect(make_update_mesh_slot());
 		m_delete_original.changed_signal().connect(make_update_mesh_slot());
 	}
 
@@ -102,7 +100,7 @@ public:
 		curves->curve_selections[selected_curves.front()] = 0.0;
 
 		// traverse the curves
-		traverse_curve(to_traverse, traverse_along, Output, m_create_caps.pipeline_value());
+		traverse_curve(to_traverse, traverse_along, Output);
 
 		// clean up
 		if(m_delete_original.pipeline_value())
@@ -126,7 +124,6 @@ public:
 	}
 
 private:
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_create_caps;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
 };
 

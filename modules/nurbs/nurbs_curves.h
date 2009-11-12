@@ -101,9 +101,6 @@ void extract_curve_arrays(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots
 /// Appends new knots found in the given curve to the given output knot vector.
 void append_common_knot_vector(k3d::mesh::knots_t& CommonKnotVector, const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
 
-/// Creates lookup arrays to store connectivity between curves that are connected to form a loop
-void find_loops(const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::const_primitive& Curves, k3d::mesh::bools_t& IsInLoop, k3d::mesh::indices_t& LoopFirstCurves, k3d::mesh::indices_t& CurveLoops, k3d::mesh::indices_t& NextCurves, k3d::mesh::bools_t& LoopSelections, k3d::mesh::points_t& LoopCentroids);
-
 /// Find the centroid of all points in a curve
 const k3d::point3 centroid(const k3d::mesh::points_t& Points, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve);
 
