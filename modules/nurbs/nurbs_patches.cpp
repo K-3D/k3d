@@ -105,58 +105,42 @@ void add_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches
 	OutputPatches.patch_materials.push_back(InputPatches.patch_materials[Patch]);
 }
 
+void add_trim_curve(k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_t Patch, const k3d::mesh::points_2d_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t UOffset, const k3d::double_t VOffset, const k3d::double_t UScale, const k3d::double_t VScale)
+{
+	return_if_fail(Points.size() == Weights.size());
+	return_if_fail(Points.size() + Order == Knots.size());
+	const k3d::uint_t insert_idx = OutputPatches.patch_trim_loop_counts[Patch] == 0 ? OutputPatches.trim_loop_first_curves.size() : OutputPatches.patch_first_trim_loops[Patch] + OutputPatches.patch_trim_loop_counts[Patch];
+	if(OutputPatches.patch_trim_loop_counts[Patch] == 0)
+	{
+		OutputPatches.patch_first_trim_loops[Patch] = OutputPatches.trim_loop_first_curves.size();
+	}
+	OutputPatches.trim_loop_first_curves.insert(OutputPatches.trim_loop_first_curves.begin() + insert_idx, OutputPatches.curve_first_points.size());
+	OutputPatches.trim_loop_curve_counts.insert(OutputPatches.trim_loop_curve_counts.begin() + insert_idx, 1);
+	OutputPatches.trim_loop_selections.insert(OutputPatches.trim_loop_selections.begin() + insert_idx, 1.0);
+	for(k3d::uint_t patch = Patch + 1; patch != OutputPatches.patch_first_trim_loops.size(); ++patch)
+		++OutputPatches.patch_first_trim_loops[patch];
+	OutputPatches.curve_first_points.push_back(OutputPatches.curve_points.size());
+	OutputPatches.curve_first_knots.push_back(OutputPatches.curve_knots.size());
+	for(k3d::uint_t i = 0; i != Points.size(); ++i)
+	{
+		OutputPatches.curve_points.push_back(OutputPatches.points.size());
+		OutputPatches.points.push_back(k3d::point2((Points[i][0] + UOffset) * UScale, (Points[i][1] + VOffset) * VScale));
+		OutputPatches.curve_point_weights.push_back(Weights[i]);
+		OutputPatches.point_selections.push_back(1.0);
+	}
+	OutputPatches.curve_point_counts.push_back(Points.size());
+	for(k3d::uint_t i = 0; i != Knots.size(); ++i)
+	{
+		OutputPatches.curve_knots.push_back(Knots[i]);
+	}
+	OutputPatches.curve_selections.push_back(1.0);
+	OutputPatches.curve_orders.push_back(Order);
+	OutputPatches.patch_trim_loop_counts[Patch]++;
+}
+
 void create_cap(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::uint_t CurvesPrimIdx)
 {
-	// Eliminate duplicate points
-	k3d::mesh no_duplicated_points = InputMesh;
-	replace_duplicate_points(no_duplicated_points);
-	k3d::mesh::delete_unused_points(no_duplicated_points);
 
-	// Merge all curves that share endpoints into a single curve
-	k3d::mesh merged_mesh;
-	merged_mesh.points.create();
-	merged_mesh.point_selection.create();
-	boost::scoped_ptr<k3d::nurbs_curve::primitive> merged_curves(k3d::nurbs_curve::create(merged_mesh));
-	merge_connected_curves(merged_mesh, *merged_curves, no_duplicated_points, CurvesPrimIdx);
-
-	// Eliminate duplicate points again, closing any loops
-	replace_duplicate_points(merged_mesh);
-	k3d::mesh::delete_unused_points(merged_mesh);
-
-	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_merged_curves(k3d::nurbs_curve::validate(merged_mesh, *merged_mesh.primitives.front()));
-
-	// Split all loops into 4 curves, and apply the Coons patch algorithm to create the caps
-	for(k3d::uint_t curve = 0; curve != merged_curves->curve_first_points.size(); ++curve)
-	{
-		if(!is_closed(*const_merged_curves, curve))
-			continue;
-		// Split the curve in half
-		k3d::mesh halved_mesh;
-		halved_mesh.points.create();
-		halved_mesh.point_selection.create();
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> halved_curves(k3d::nurbs_curve::create(halved_mesh));
-		// This opens the curve
-		split_curve(halved_mesh, *halved_curves, merged_mesh, *const_merged_curves, curve, 0.0);
-		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_halved_curves(k3d::nurbs_curve::validate(halved_mesh, *halved_mesh.primitives.front()));
-		// Now we split it in two
-		split_curve(halved_mesh, *halved_curves, halved_mesh, *const_halved_curves, 0, 0.5);
-		return_if_fail(halved_curves->curve_first_points.size() == 3);
-		// Split both new curves
-		k3d::mesh quartered_mesh;
-		quartered_mesh.points.create();
-		quartered_mesh.point_selection.create();
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> quartered_curves(k3d::nurbs_curve::create(quartered_mesh));
-		split_curve(quartered_mesh, *quartered_curves, halved_mesh, *const_halved_curves, 1, 0.5);
-		split_curve(quartered_mesh, *quartered_curves, halved_mesh, *const_halved_curves, 2, 0.5);
-
-		// Make sure the endpoints of the split curves are shared
-		replace_duplicate_points(quartered_mesh);
-		k3d::mesh::delete_unused_points(quartered_mesh);
-
-		// Apply coons
-		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_quartered_curves(k3d::nurbs_curve::validate(quartered_mesh, *quartered_mesh.primitives.front()));
-		coons_patch(OutputMesh, OutputPatches, quartered_mesh, *const_quartered_curves);
-	}
 }
 
 void traverse_curve(const k3d::mesh& SourceCurves, const k3d::uint_t SourcePrimIdx, const k3d::mesh& CurvesToTraverse, k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::bool_t CreateCaps)
@@ -633,6 +617,35 @@ void apply_knot_vectors(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& Outp
 	curves_to_patch(OutputMesh, OutputPatches, v_mesh, *v_curves_merged, *const_u_patch_merged, 0, false);
 }
 
+void create_bilinear_patch(k3d::mesh& OutputMesh,
+		k3d::nurbs_patch::primitive& OutputPatches,
+		const k3d::point3& P1,
+		const k3d::point3& P2,
+		const k3d::point3& P3,
+		const k3d::point3& P4,
+		const k3d::double_t W1,
+		const k3d::double_t W2,
+		const k3d::double_t W3,
+		const k3d::double_t W4)
+{
+	k3d::mesh::points_t bilinear_points;
+	bilinear_points.push_back(P1);
+	bilinear_points.push_back(P2);
+	bilinear_points.push_back(P4);
+	bilinear_points.push_back(P3);
+	k3d::mesh::weights_t bilinear_weights;
+	bilinear_weights.push_back(W1);
+	bilinear_weights.push_back(W2);
+	bilinear_weights.push_back(W4);
+	bilinear_weights.push_back(W3);
+	k3d::mesh::knots_t bilinear_knots;
+	bilinear_knots.push_back(0);
+	bilinear_knots.push_back(0);
+	bilinear_knots.push_back(1);
+	bilinear_knots.push_back(1);
+	add_patch(OutputMesh, OutputPatches, bilinear_points, bilinear_weights, bilinear_knots, bilinear_knots, 2, 2);
+}
+
 void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t U1, const k3d::uint_t V1, const k3d::uint_t U2, const k3d::uint_t V2)
 {
 	const k3d::point3& P1 = InputMesh.points->at(InputCurves.curve_points[InputCurves.curve_first_points[U1]]);
@@ -650,24 +663,8 @@ void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	patch_mesh.points.create();
 	patch_mesh.point_selection.create();
 
-	// bilinear patch
-	k3d::mesh::points_t bilinear_points;
-	bilinear_points.push_back(P1);
-	bilinear_points.push_back(P2);
-	bilinear_points.push_back(P4);
-	bilinear_points.push_back(P3);
-	k3d::mesh::weights_t bilinear_weights;
-	bilinear_weights.push_back(W1);
-	bilinear_weights.push_back(W2);
-	bilinear_weights.push_back(W4);
-	bilinear_weights.push_back(W3);
-	k3d::mesh::knots_t bilinear_knots;
-	bilinear_knots.push_back(0);
-	bilinear_knots.push_back(0);
-	bilinear_knots.push_back(1);
-	bilinear_knots.push_back(1);
 	boost::scoped_ptr<k3d::nurbs_patch::primitive> bilinear_patch(k3d::nurbs_patch::create(patch_mesh));
-	add_patch(patch_mesh, *bilinear_patch, bilinear_points, bilinear_weights, bilinear_knots, bilinear_knots, 2, 2);
+	create_bilinear_patch(patch_mesh, *bilinear_patch, P1, P2, P3, P4, W1, W2, W3, W4);
 	bilinear_patch->patch_materials.push_back(InputCurves.material.back());
 
 	// Flip curve U2 and V2
@@ -749,6 +746,58 @@ void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	}
 	add_patch(OutputMesh, OutputPatches, points, weights, common_u_knots, common_v_knots, u_order, v_order);
 	OutputPatches.patch_materials.push_back(InputCurves.material.back());
+}
+
+void extract_plane(k3d::point3& Origin, k3d::normal3& Normal, k3d::vector3& U, k3d::vector3& V, k3d::mesh::points_2d_t& ParameterPoints, const k3d::mesh::points_t& Points, const k3d::double_t UStart)
+{
+	// The origin is the centroid of the point cloud
+	Origin = k3d::point3(0,0,0);
+	const k3d::uint_t points_count = Points.size();
+	for(k3d::uint_t i = 0; i != points_count; ++i)
+		Origin += k3d::to_vector(Points[i]);
+	Origin /= points_count;
+
+	// Extract the average normal (from polyhedron.cpp)
+	Normal = k3d::normal3(0,0,0);
+	for(k3d::uint_t p = 0; p != points_count; ++p)
+	{
+		const k3d::point3& i = Points[p];
+		const k3d::point3& j = Points[(p+1)%points_count];
+
+		Normal[0] += (i[1] + j[1]) * (j[2] - i[2]);
+		Normal[1] += (i[2] + j[2]) * (j[0] - i[0]);
+		Normal[2] += (i[0] + j[0]) * (j[1] - i[1]);
+	}
+	Normal = k3d::normalize(Normal);
+
+	// As U-axis, we use the first point in the cloud, rotated by an angle depending on the UStart parameter
+	k3d::point4 u_point(Points.front()[0], Points.front()[1], Points.front()[2], 1);
+	k3d::point4 u_point_rotated = k3d::rotate3(k3d::pi_times_2()*UStart, k3d::to_vector(Normal)) * u_point;
+	U = k3d::normalize(k3d::point3(u_point_rotated[0], u_point_rotated[1], u_point_rotated[2]) - Origin);
+
+	// The V axis is the cross product of the Normal and U
+	V = Normal ^ U;
+
+	// Now we can extract the parameter coords
+	for(k3d::uint_t i = 0; i != points_count; ++i)
+	{
+		const k3d::vector3 vec = Points[i] - Origin;
+		ParameterPoints.push_back(k3d::point2(U*vec, V*vec));
+	}
+}
+
+void bbox2(k3d::point2& Min, k3d::point2& Max, const k3d::mesh::points_2d_t& Points)
+{
+	Min = k3d::point2(std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
+	Max = k3d::point2(-std::numeric_limits<double>::max(), -std::numeric_limits<double>::max());
+	for(k3d::uint_t i = 0; i != Points.size(); ++i)
+	{
+		const k3d::point2& p = Points[i];
+		Min[0] = std::min(p[0], Min[0]);
+		Min[1] = std::min(p[1], Min[1]);
+		Max[0] = std::max(p[0], Max[0]);
+		Max[1] = std::max(p[1], Max[1]);
+	}
 }
 
 } //namespace nurbs

@@ -55,6 +55,20 @@ void add_patch(k3d::mesh& Mesh,
 /// Copies a patch from one primitive to another
 void add_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch);
 
+void add_trim_curve(k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_t Patch, const k3d::mesh::points_2d_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t UOffset = 0, const k3d::double_t VOffset = 0, const k3d::double_t UScale = 1, const k3d::double_t VScale = 1);
+
+/// Creates a bilinear patch between the given corner points (in counter-clockwise order)
+void create_bilinear_patch(k3d::mesh& OutputMesh,
+		k3d::nurbs_patch::primitive& OutputPatches,
+		const k3d::point3& P1,
+		const k3d::point3& P2,
+		const k3d::point3& P3,
+		const k3d::point3& P4,
+		const k3d::double_t W1 = 1.0,
+		const k3d::double_t W2 = 1.0,
+		const k3d::double_t W3 = 1.0,
+		const k3d::double_t W4 = 1.0);
+
 /// Creates a cap over all curves in the curves primitive with the given index, if they are closed
 void create_cap(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::uint_t CurvesPrimIdx);
 
@@ -92,6 +106,12 @@ void ruled_surface(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
  * span the patch in the U and V direction. Each U and V curve must have a common endpoint
  */
 void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t U1 = 0, const k3d::uint_t V1 = 1, const k3d::uint_t U2 = 2, const k3d::uint_t V2 = 3);
+
+/// Extracts a coordinate system and the points parametric coordinates from a point cloud, based on the "mean" normal of the points
+void extract_plane(k3d::point3& Origin, k3d::normal3& Normal, k3d::vector3& U, k3d::vector3& V, k3d::mesh::points_2d_t& ParameterPoints, const k3d::mesh::points_t& Points, const k3d::double_t UStart = 0.0);
+
+/// Helper function to extract a 2D bounding box
+void bbox2(k3d::point2& Min, k3d::point2& Max, const k3d::mesh::points_2d_t& Points);
 
 } //namespace nurbs
 
