@@ -67,6 +67,11 @@ public:
 			gluDeleteNurbsRenderer(m_nurbs_renderer);
 	}
 
+	uint_t gl_layer()
+	{
+		return 1024;
+	}
+
 	void gl_draw(const render_state& State)
 	{
 		if(!m_visible.pipeline_value())

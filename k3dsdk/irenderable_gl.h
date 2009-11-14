@@ -2,7 +2,7 @@
 #define K3DSDK_IRENDERABLE_GL_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -25,6 +25,7 @@
 */
 
 #include <k3dsdk/iunknown.h>
+#include <k3dsdk/types.h>
 
 namespace k3d
 {
@@ -40,6 +41,9 @@ class irenderable :
 	public virtual iunknown
 {
 public:
+	/// Returns the layer on which this renderable should be drawn.  Lower-numbered layers are rendered earlier than higher-numbered layers.
+	/// The (arbitrary) default layer for most 3D objects is 1024.  Layer zero is reserved for the viewport background.
+	virtual uint_t gl_layer() = 0;
 	virtual void gl_draw(const render_state& State) = 0;
 	virtual void gl_select(const render_state& State, const selection_state& SelectState) = 0;
 

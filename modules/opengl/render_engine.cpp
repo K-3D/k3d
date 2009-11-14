@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,8 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Tim Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -89,6 +89,16 @@ private:
 	unsigned long m_light_number;
 };
 
+/// Sorts drawables so they can be rendered.  Currently, drawables are sorted by-layer, but
+/// this could be extended to to sort based on selection-state, depth (for transparency), etc.
+struct render_order
+{
+	bool operator()(k3d::gl::irenderable* const A, k3d::gl::irenderable* const B) const
+	{
+		return A->gl_layer() < B->gl_layer();
+	}
+};
+
 /// Functor for drawing objects during OpenGL drawing
 class draw
 {
@@ -99,13 +109,13 @@ public:
 	{
 	}
 
-	void operator()(k3d::inode* const Object)
+	void operator()(k3d::gl::irenderable* const Renderable)
 	{
 		if(m_node_selection)
 		{
-			m_state.node_selection = m_node_selection->selection_weight(*Object);
+			m_state.node_selection = m_node_selection->selection_weight(*dynamic_cast<k3d::inode*>(Renderable));
 			k3d::node* parent = 0;
-			k3d::iparentable* const parentable = dynamic_cast<k3d::iparentable*>(Object);
+			k3d::iparentable* const parentable = dynamic_cast<k3d::iparentable*>(Renderable);
 			if(parentable)
 				k3d::node* parent = dynamic_cast<k3d::node*>(k3d::property::pipeline_value<k3d::inode*>(parentable->parent()));
 			m_state.parent_selection = parent ? m_node_selection->selection_weight(*parent) : 0.0;
@@ -116,9 +126,7 @@ public:
 			m_state.parent_selection = 0.0;
 		}
 		
-		k3d::gl::irenderable* const renderable = dynamic_cast<k3d::gl::irenderable*>(Object);
-		if(renderable)
-			renderable->gl_draw(m_state);
+		Renderable->gl_draw(m_state);
 	}
 
 private:
@@ -131,20 +139,20 @@ class draw_selection
 {
 public:
 	draw_selection(const k3d::gl::render_state& State, const k3d::gl::selection_state& SelectState, k3d::inode_selection* NodeSelection) :
-		m_state(State), m_selection_state(SelectState), m_node_selection(NodeSelection)
+		m_state(State),
+		m_selection_state(SelectState),
+		m_node_selection(NodeSelection)
 	{
 	}
 
-	void operator()(k3d::inode* const Object)
+	void operator()(k3d::gl::irenderable* const Renderable)
 	{
 		k3d::double_t selection_weight = 0.0;
 		if(m_node_selection)
-			selection_weight = m_node_selection->selection_weight(*Object);
+			selection_weight = m_node_selection->selection_weight(*dynamic_cast<k3d::inode*>(Renderable));
 		if(m_selection_state.exclude_unselected_nodes && !selection_weight)
 			return;
-		k3d::gl::irenderable* const renderable = dynamic_cast<k3d::gl::irenderable*>(Object);
-		if(renderable)
-			renderable->gl_select(m_state, m_selection_state);
+		Renderable->gl_select(m_state, m_selection_state);
 	}
 
 private:
@@ -279,22 +287,6 @@ void gl_setup_lights(const bool Headlight)
 		// Setup light direction ...
 		const GLfloat position[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
 		glLightfv(GL_LIGHT0, GL_POSITION, position);
-	}
-}
-
-/// Gets the deselected nodes for this document
-void get_deselected_nodes(k3d::inode_selection* NodeSelection, const k3d::inode_collection::nodes_t& DocumentNodes, k3d::inode_collection::nodes_t& DeselectedNodes)
-{
-	if(!NodeSelection)
-	{
-		DeselectedNodes.insert(DeselectedNodes.begin(), DocumentNodes.begin(), DocumentNodes.end());
-		return;
-	}
-	
-	for(k3d::inode_collection::nodes_t::const_iterator node = DocumentNodes.begin(); node != DocumentNodes.end(); ++node)
-	{
-		if(!NodeSelection->selection_weight(**node))
-			DeselectedNodes.push_back(*node);
 	}
 }
 
@@ -521,20 +513,13 @@ public:
 
 		if(m_show_lights.pipeline_value())
 			std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::light_setup());
-		
-		k3d::inode_selection* node_selection = m_node_selection.pipeline_value();
-		k3d::inode_collection::nodes_t deselected_nodes;
-		detail::get_deselected_nodes(node_selection, document().nodes().collection(), deselected_nodes);
 
-		// Draw selected nodes first, so they are "on top" when creating geometry
-		if(node_selection)
-		{
-			const k3d::inode_selection::selected_nodes_t selected_nodes = node_selection->selected_nodes();
-			std::for_each(selected_nodes.begin(), selected_nodes.end(), detail::draw(state, node_selection));
-		}
-		std::for_each(deselected_nodes.begin(), deselected_nodes.end(), detail::draw(state, node_selection));
+		k3d::inode_selection* const node_selection = m_node_selection.pipeline_value();
+		std::vector<k3d::gl::irenderable*> renderable_nodes = k3d::node::lookup<k3d::gl::irenderable>(document());
+		std::sort(renderable_nodes.begin(), renderable_nodes.end(), detail::render_order());
+		std::for_each(renderable_nodes.begin(), renderable_nodes.end(), detail::draw(state, node_selection));
 
-/* I really hate to loose this feedback, but the GLU NURBS routines generate large numbers of errors, which ruins its utility :-(
+/* I really hate to lose this feedback, but the GLU NURBS routines generate large numbers of errors, which ruins its utility :-(
 		for(GLenum gl_error = glGetError(); gl_error != GL_NO_ERROR; gl_error = glGetError())
 			k3d::log() << error << "OpenGL error: " << reinterpret_cast<const char*>(gluErrorString(gl_error)) << std::endl;
 */
@@ -546,12 +531,13 @@ public:
 		if(!draw_scene(Camera, PixelWidth, PixelHeight, ViewMatrix, ProjectionMatrix, Viewport, true, Region, state))
 			return;
 
-		// Clear background ...
 		glClear(GL_DEPTH_BUFFER_BIT);
-
 		glDisable(GL_LIGHTING);
 
-		std::for_each(document().nodes().collection().begin(), document().nodes().collection().end(), detail::draw_selection(state, SelectState, m_node_selection.pipeline_value()));
+		k3d::inode_selection* const node_selection = m_node_selection.pipeline_value();
+		std::vector<k3d::gl::irenderable*> renderable_nodes = k3d::node::lookup<k3d::gl::irenderable>(document());
+		std::sort(renderable_nodes.begin(), renderable_nodes.end(), detail::render_order());
+		std::for_each(renderable_nodes.begin(), renderable_nodes.end(), detail::draw_selection(state, SelectState, node_selection));
 	}
 
 	redraw_request_signal_t& redraw_request_signal()

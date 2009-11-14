@@ -76,6 +76,11 @@ public:
 		k3d::gl::redraw_all(document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
+	k3d::uint_t gl_layer()
+	{
+		return 4096;
+	}
+
 	void gl_draw(const k3d::gl::render_state& State)
 	{
 		if(&State.camera != m_camera.pipeline_value())
