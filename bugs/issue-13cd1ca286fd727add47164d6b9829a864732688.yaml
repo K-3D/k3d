@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Support display of non-SI units of measure.
+desc: K-3D uses SI units internally for all data storage.  The UI supports automatic conversion from other units to SI, but there is no provision currently to display alternate units.  It should be possible to set global user preferences for display units, as-well-as changing preferences on a control-by-control basis.  Similarly, it should be possible to specify the number of digits to display.
+type: :feature
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-11-14 23:18:23.284634 Z
+references: []
+
+id: 13cd1ca286fd727add47164d6b9829a864732688
+log_events: 
+- - 2009-11-14 23:18:24.252580 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
