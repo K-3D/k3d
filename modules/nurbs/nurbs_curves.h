@@ -93,6 +93,11 @@ void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::me
 void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u);
 
 /// Returns the multiplicity of the given curve
+/**
+ * \param Knots a collection of knot vectors
+ * \param Begin The first knot of the knot vector to consider
+ * \param Count The number of knots to consider
+ */
 const k3d::uint_t multiplicity(const k3d::mesh::knots_t& Knots, const k3d::double_t u, const k3d::uint_t Begin, const k3d::uint_t Count);
 
 /// Extracts the points, knots and weights arrays from the given curve in the given mesh and curve primitive

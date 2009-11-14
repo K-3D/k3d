@@ -125,10 +125,10 @@ public:
 				tmp_mesh.points.create();
 				tmp_mesh.point_selection.create();
 				boost::scoped_ptr<k3d::nurbs_curve::primitive> tmp_curves(k3d::nurbs_curve::create(tmp_mesh));
-				extract_patch_curve(tmp_mesh, *tmp_curves, Output, *const_patches, patch, 0, true);
-				extract_patch_curve(tmp_mesh, *tmp_curves, Output, *const_patches, patch, 0, false);
-				extract_patch_curve(tmp_mesh, *tmp_curves, Output, *const_patches, patch, const_patches->patch_v_point_counts[patch] - 1, true);
-				extract_patch_curve(tmp_mesh, *tmp_curves, Output, *const_patches, patch, const_patches->patch_u_point_counts[patch] - 1, false);
+				extract_patch_curve_by_number(tmp_mesh, *tmp_curves, Output, *const_patches, patch, 0, true);
+				extract_patch_curve_by_number(tmp_mesh, *tmp_curves, Output, *const_patches, patch, 0, false);
+				extract_patch_curve_by_number(tmp_mesh, *tmp_curves, Output, *const_patches, patch, const_patches->patch_v_point_counts[patch] - 1, true);
+				extract_patch_curve_by_number(tmp_mesh, *tmp_curves, Output, *const_patches, patch, const_patches->patch_u_point_counts[patch] - 1, false);
 				tmp_curves->curve_selections.assign(4, 1.0);
 				tmp_curves->material.push_back(const_patches->patch_materials[patch]);
 

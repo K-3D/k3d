@@ -51,6 +51,7 @@ namespace module
 
 namespace nurbs
 {
+
 class create_cap :
 	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {

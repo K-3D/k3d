@@ -846,17 +846,6 @@ void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& 
 
 }
 
-/// Predicate to find the first knot greater than the value given in the constructor
-struct find_first_knot_after
-{
-	find_first_knot_after(const k3d::double_t KnotValue) : knot_value(KnotValue) {}
-	k3d::bool_t operator()(const k3d::double_t TestKnot)
-	{
-		return TestKnot > knot_value;
-	}
-	const k3d::double_t knot_value;
-};
-
 /// Predicate to find knot multiplicity
 struct find_knot_multiplicity
 {

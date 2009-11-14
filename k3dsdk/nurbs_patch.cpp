@@ -103,6 +103,42 @@ const_primitive::const_primitive(
 {
 }
 
+const_primitive::const_primitive(primitive& Primitive) :
+		patch_first_points(Primitive.patch_first_points),
+		patch_u_point_counts(Primitive.patch_u_point_counts),
+		patch_v_point_counts(Primitive.patch_v_point_counts),
+		patch_u_orders(Primitive.patch_u_orders),
+		patch_v_orders(Primitive.patch_v_orders),
+		patch_u_first_knots(Primitive.patch_u_first_knots),
+		patch_v_first_knots(Primitive.patch_v_first_knots),
+		patch_selections(Primitive.patch_selections),
+		patch_materials(Primitive.patch_materials),
+		patch_points(Primitive.patch_points),
+		patch_point_weights(Primitive.patch_point_weights),
+		patch_u_knots(Primitive.patch_u_knots),
+		patch_v_knots(Primitive.patch_v_knots),
+		patch_first_trim_loops(Primitive.patch_first_trim_loops),
+		patch_trim_loop_counts(Primitive.patch_trim_loop_counts),
+		trim_loop_first_curves(Primitive.trim_loop_first_curves),
+		trim_loop_curve_counts(Primitive.trim_loop_curve_counts),
+		trim_loop_selections(Primitive.trim_loop_selections),
+		curve_first_points(Primitive.curve_first_points),
+		curve_point_counts(Primitive.curve_point_counts),
+		curve_orders(Primitive.curve_orders),
+		curve_first_knots(Primitive.curve_first_knots),
+		curve_selections(Primitive.curve_selections),
+		curve_points(Primitive.curve_points),
+		curve_point_weights(Primitive.curve_point_weights),
+		curve_knots(Primitive.curve_knots),
+		points(Primitive.points),
+		point_selections(Primitive.point_selections),
+		constant_attributes(Primitive.constant_attributes),
+		patch_attributes(Primitive.patch_attributes),
+		varying_attributes(Primitive.varying_attributes),
+		vertex_attributes(Primitive.vertex_attributes)
+{
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 // primitive
 

@@ -262,6 +262,17 @@ struct selected_curve_extractor
 	k3d::nurbs_curve::primitive& curves;
 };
 
+/// Predicate to find the first knot greater than the value given in the constructor
+struct find_first_knot_after
+{
+	find_first_knot_after(const k3d::double_t KnotValue) : knot_value(KnotValue) {}
+	k3d::bool_t operator()(const k3d::double_t TestKnot)
+	{
+		return TestKnot > knot_value;
+	}
+	const k3d::double_t knot_value;
+};
+
 } //namespace nurbs
 
 } //namespace module
