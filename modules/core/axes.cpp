@@ -128,11 +128,13 @@ public:
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
 		const long grid_count = m_grid_count.pipeline_value();
-		const double grid_size = m_grid_size.pipeline_value();
+		const k3d::double_t grid_size = m_grid_size.pipeline_value();
 		const k3d::color x_color = m_x_color.pipeline_value();
 		const k3d::color y_color = m_y_color.pipeline_value();
 		const k3d::color z_color = m_z_color.pipeline_value();
 		const k3d::color grid_color = m_grid_color.pipeline_value();
+
+		const k3d::double_t size = grid_count * grid_size;
 
 		k3d::gl::store_attributes attributes;
 
@@ -141,13 +143,8 @@ public:
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDisable(GL_CULL_FACE);
-
 		glLineWidth(1.0f);
 		glDisable(GL_LINE_STIPPLE);
-
-		const double size = grid_count * grid_size;
 
 		// Draw axes and labels
 		if(m_axes.pipeline_value())
@@ -224,7 +221,7 @@ public:
 			// Draw axis labels ...
 			k3d::gl::color3d(grid_color);
 
-			double labelposition = size * 1.1;
+			k3d::double_t labelposition = size * 1.1;
 
 			if(!m_font)
 			{
