@@ -29,8 +29,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :reorg
 creation_time: 2009-05-19 03:35:47.936321 Z
 references: []
 
@@ -48,3 +48,7 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - edited title
   - ""
+- - 2009-11-15 16:12:46.718277 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition reorg
+  - This is already fixed in 0.7, using the DisableDesktopComposition plugin.
