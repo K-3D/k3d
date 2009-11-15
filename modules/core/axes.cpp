@@ -120,6 +120,11 @@ public:
 		return k3d::bounding_box3(size, -size, size, -size, size, -size);
 	}
 
+	k3d::uint_t gl_layer()
+	{
+		return 2048;
+	}
+
 	void on_gl_draw(const k3d::gl::render_state& State)
 	{
 		const long grid_count = m_grid_count.pipeline_value();
