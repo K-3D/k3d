@@ -259,7 +259,8 @@ void extract_patch_curve_by_parameter(k3d::mesh& OutputMesh, k3d::nurbs_curve::p
 	}
 	if(U > 0.999999)
 	{
-		extract_patch_curve_by_number(OutputMesh, OutputCurve, InputMesh, InputPatches, Patch, InputPatches.patch_u_point_counts[Patch] - 1, UDirection);
+		const k3d::uint_t curve_count = UDirection ? InputPatches.patch_v_point_counts[Patch] : InputPatches.patch_u_point_counts[Patch];
+		extract_patch_curve_by_number(OutputMesh, OutputCurve, InputMesh, InputPatches, Patch, curve_count - 1, UDirection);
 		return;
 	}
 	const k3d::uint_t first_knot = !UDirection ? InputPatches.patch_u_first_knots[Patch] : InputPatches.patch_v_first_knots[Patch];

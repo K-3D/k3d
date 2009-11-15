@@ -61,11 +61,11 @@ public:
 	extract_patch_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_parameter(init_owner(*this) + init_name(_("parameter")) + init_label(_("Parameter Value")) + init_description(_("Parameter value (u or v) for which a curve will be extracted")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.0)),
-		m_insert_to_v(init_owner(*this) + init_name(_("extract_v_curve")) + init_label(_("Extract V curve")) + init_description(_("If true, a curve in the V direction is extracted (iso-U curve), otherwise it's a U-curve")) + init_value(false))
+		m_extract_v_curve(init_owner(*this) + init_name(_("extract_v_curve")) + init_label(_("Extract V curve")) + init_description(_("If true, a curve in the V direction is extracted (iso-U curve), otherwise it's a U-curve")) + init_value(false))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_parameter.changed_signal().connect(make_update_mesh_slot());
-		m_insert_to_v.changed_signal().connect(make_update_mesh_slot());
+		m_extract_v_curve.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -83,11 +83,13 @@ public:
 		for(k3d::uint_t prim_idx = 0; prim_idx != Input.primitives.size(); ++prim_idx)
 		{
 			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> input_patches(k3d::nurbs_patch::validate(Output, *Output.primitives[prim_idx]));
+			if(!input_patches.get())
+				continue;
 			for(k3d::uint_t patch = 0; patch != input_patches->patch_first_points.size(); ++patch)
 			{
 				if(input_patches->patch_selections[patch])
 				{
-					extract_patch_curve_by_parameter(Output, *output_curves, Output, *input_patches, patch, m_parameter.pipeline_value(), !m_insert_to_v.pipeline_value());
+					extract_patch_curve_by_parameter(Output, *output_curves, Output, *input_patches, patch, m_parameter.pipeline_value(), !m_extract_v_curve.pipeline_value());
 					output_curves->material[0] = input_patches->patch_materials[patch];
 				}
 			}
@@ -108,7 +110,7 @@ public:
 
 private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_parameter;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_insert_to_v;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_extract_v_curve;
 };
 
 //Create connect_curve factory

@@ -76,6 +76,8 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
+		if(!Output.points.get())
+			return;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 		boost::scoped_ptr<k3d::nurbs_patch::primitive> output_patches(k3d::nurbs_patch::create(Output));
 
