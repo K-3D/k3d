@@ -861,6 +861,10 @@ const k3d::uint_t multiplicity(const k3d::mesh::knots_t& Knots, const k3d::doubl
 {
 	k3d::mesh::knots_t::const_iterator begin = Knots.begin() + Begin;
 	k3d::mesh::knots_t::const_iterator end = begin + Count;
+	k3d::log() << "checking knots:";
+	for(k3d::mesh::knots_t::const_iterator knot = begin; knot != end; ++knot)
+		k3d::log() << debug << " " << *knot;
+	k3d::log() << debug << std::endl;
 	return std::count_if(begin, end, find_knot_multiplicity(u));
 }
 

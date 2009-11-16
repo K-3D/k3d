@@ -263,16 +263,19 @@ void extract_patch_curve_by_parameter(k3d::mesh& OutputMesh, k3d::nurbs_curve::p
 		extract_patch_curve_by_number(OutputMesh, OutputCurve, InputMesh, InputPatches, Patch, curve_count - 1, UDirection);
 		return;
 	}
-	const k3d::uint_t first_knot = !UDirection ? InputPatches.patch_u_first_knots[Patch] : InputPatches.patch_v_first_knots[Patch];
+	k3d::mesh::knots_t::const_iterator knots_begin = !UDirection ? InputPatches.patch_u_knots.begin() + InputPatches.patch_u_first_knots[Patch] : InputPatches.patch_v_knots.begin() + InputPatches.patch_v_first_knots[Patch];
 	const k3d::uint_t order = !UDirection ? InputPatches.patch_u_orders[Patch] : InputPatches.patch_v_orders[Patch];
 	const k3d::uint_t knot_count = !UDirection ? InputPatches.patch_u_point_counts[Patch] + order : InputPatches.patch_v_point_counts[Patch] + order;
-	const k3d::uint_t mul = multiplicity(!UDirection ? InputPatches.patch_u_knots : InputPatches.patch_v_knots, U, first_knot, knot_count);
+	k3d::mesh::knots_t normalized_knots(knot_count);
+	std::transform(knots_begin, knots_begin + knot_count, normalized_knots.begin(), knot_normalizer(*knots_begin, *(knots_begin + knot_count - 1)));
+	const k3d::uint_t mul = multiplicity(normalized_knots, U, 0, knot_count);
 	k3d::mesh tmp_mesh;
 	tmp_mesh.points.create();
 	tmp_mesh.point_selection.create();
 	boost::scoped_ptr<k3d::nurbs_patch::primitive> tmp_patch(k3d::nurbs_patch::create(tmp_mesh));
 	if(mul < (order-1))
 	{
+		k3d::log() << debug << "inserting knot " << U << " which had mul " << mul << std::endl;
 		insert_knot(tmp_mesh, *tmp_patch, InputMesh, InputPatches, Patch, U, order-mul-1, !UDirection);
 	}
 	else
@@ -280,8 +283,10 @@ void extract_patch_curve_by_parameter(k3d::mesh& OutputMesh, k3d::nurbs_curve::p
 		add_patch(tmp_mesh, *tmp_patch, InputMesh, InputPatches, Patch);
 	}
 	const k3d::mesh::knots_t& knots = !UDirection ? tmp_patch->patch_u_knots : tmp_patch->patch_v_knots;
-	const k3d::mesh::knots_t::const_iterator split_knot = std::find_if(knots.begin(), knots.end(), find_first_knot_after(U));
-	const k3d::uint_t curve_idx = (split_knot - knots.begin()) - order;
+	k3d::mesh::knots_t normalized_knots2(knots.size());
+	std::transform(knots.begin(), knots.end(), normalized_knots2.begin(), knot_normalizer(knots.front(), knots.back()));
+	const k3d::mesh::knots_t::const_iterator split_knot = std::find_if(normalized_knots2.begin(), normalized_knots2.end(), find_first_knot_after(U));
+	const k3d::uint_t curve_idx = (split_knot - normalized_knots2.begin()) - order;
 	extract_patch_curve_by_number(OutputMesh, OutputCurve, tmp_mesh, *tmp_patch, 0, curve_idx, UDirection);
 }
 
