@@ -1,10 +1,22 @@
-# Setup some odds-and-ends used for distribution
-SET(K3D_SVN_ROOT "https://k3d.svn.sourceforge.net:/svnroot/k3d")
-SET(K3D_SVN_TRUNK "${K3D_SVN_ROOT}/trunk")
-SET(K3D_SVN_TAGS "${K3D_SVN_ROOT}/tags")
-SET(K3D_SVN_BRANCHES "${K3D_SVN_ROOT}/branches")
-SET(K3D_BRANCH_TAG "k3d-release-${K3D_MAJOR_VERSION}.${K3D_MINOR_VERSION}")
+# Setup automatic generation of the changelog
+ADD_CUSTOM_TARGET(changelog
+	COMMAND ${HGCOMMAND} log > ${k3d_BINARY_DIR}/ChangeLog
+	WORKING_DIRECTORY ${k3d_SOURCE_DIR}
+	)
+
+# Setup convenience targets for tagging and branching
 SET(K3D_VERSION_TAG "k3d-${K3D_MAJOR_VERSION}.${K3D_MINOR_VERSION}.${K3D_RELEASE_VERSION}.${K3D_BUILD_VERSION}")
+ADD_CUSTOM_TARGET(tag-version
+	COMMAND ${HGCOMMAND} tag ${K3D_VERSION_TAG}
+	WORKING_DIRECTORY ${k3d_SOURCE_DIR}
+	)
+
+#SET(K3D_BRANCH_TAG "k3d-release-${K3D_MAJOR_VERSION}.${K3D_MINOR_VERSION}")
+#ADD_CUSTOM_TARGET(tag-branch
+#	COMMAND ${SVNCOMMAND} cp ${K3D_SVN_TRUNK}
+#	${K3D_SVN_BRANCHES}/${K3D_BRANCH_TAG} -m "COMP: Branched K-3D Version ${K3D_MAJOR_VERSION}.${K3D_MINOR_VERSION}"
+#	WORKING_DIRECTORY ${k3d_SOURCE_DIR}
+#	)
 
 # Get a SourceForge username so we can upload distributables to the FRS
 IF(WIN32)
@@ -13,23 +25,6 @@ ELSE(WIN32)
 	SET(K3D_SOURCEFORGE_USERNAME "$ENV{USER}" CACHE STRING "SourceForge user account name, for uploading distribution files.")
 ENDIF(WIN32)
 MARK_AS_ADVANCED(K3D_SOURCEFORGE_USERNAME)
-
-ADD_CUSTOM_TARGET(changelog
-	COMMAND ${SVNCOMMAND} log > ${k3d_BINARY_DIR}/ChangeLog
-	WORKING_DIRECTORY ${k3d_SOURCE_DIR}
-	)
-
-ADD_CUSTOM_TARGET(tag-trunk
-	COMMAND ${SVNCOMMAND} cp ${K3D_SVN_TRUNK}
-	${K3D_SVN_TAGS}/${K3D_VERSION_TAG} -m "COMP: Tagged K-3D Version ${K3D_VERSION}"
-	WORKING_DIRECTORY ${k3d_SOURCE_DIR}
-	)
-
-ADD_CUSTOM_TARGET(tag-branch
-	COMMAND ${SVNCOMMAND} cp ${K3D_SVN_TRUNK}
-	${K3D_SVN_BRANCHES}/${K3D_BRANCH_TAG} -m "COMP: Branched K-3D Version ${K3D_MAJOR_VERSION}.${K3D_MINOR_VERSION}"
-	WORKING_DIRECTORY ${k3d_SOURCE_DIR}
-	)
 
 # Setup default packaging parameters (deprecated) ...
 SET(CPACK_PACKAGE_DESCRIPTION "K-3D free-as-in-freedom modeling, animation and rendering system")
