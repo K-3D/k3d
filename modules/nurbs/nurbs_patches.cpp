@@ -313,13 +313,10 @@ void curves_to_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputP
 
 	if(UDirection)
 	{
-		// Because of the way elevate_curve_degree (and ultimately add_curve) works, the points are already ordered correctly in the U case
-		k3d::mesh::points_t points(InputMesh.points->begin() + InputCurves.curve_points[InputCurves.curve_first_points.front()], InputMesh.points->end());
-		k3d::mesh::knots_t u_knots(InputCurves.curve_knots.begin(), InputCurves.curve_knots.begin() + InputCurves.curve_point_counts.front() + InputCurves.curve_orders.front());
 		const k3d::uint_t v_knots_begin = InputPatches.patch_v_first_knots[Patch];
 		const k3d::uint_t v_knots_end = v_knots_begin + curve_count + v_order;
 		k3d::mesh::knots_t v_knots(InputPatches.patch_v_knots.begin() + v_knots_begin, InputPatches.patch_v_knots.begin() + v_knots_end);
-		add_patch(OutputMesh, OutputPatches, points, InputCurves.curve_point_weights, u_knots, v_knots, u_order, v_order);
+		skin_curves(OutputMesh, OutputPatches, InputMesh, InputCurves, v_knots, v_order);
 	}
 	else
 	{
@@ -340,10 +337,9 @@ void curves_to_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputP
 		const k3d::uint_t u_knots_end = u_knots_begin + curve_count + u_order;
 		k3d::mesh::knots_t u_knots(InputPatches.patch_u_knots.begin() + u_knots_begin, InputPatches.patch_u_knots.begin() + u_knots_end);
 		add_patch(OutputMesh, OutputPatches, points, weights, u_knots, v_knots, u_order, v_order);
+		OutputPatches.patch_materials.push_back(InputPatches.patch_materials[Patch]);
+		OutputPatches.patch_selections.back() = InputPatches.patch_selections[Patch];
 	}
-
-	OutputPatches.patch_materials.push_back(InputPatches.patch_materials[Patch]);
-	OutputPatches.patch_selections.back() = InputPatches.patch_selections[Patch];
 }
 
 void elevate_patch_degree(const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_t Patch, const k3d::uint_t Elevations, const k3d::bool_t UDirection)
@@ -772,6 +768,19 @@ void bbox2(k3d::point2& Min, k3d::point2& Max, const k3d::mesh::points_2d_t& Poi
 		Max[0] = std::max(p[0], Max[0]);
 		Max[1] = std::max(p[1], Max[1]);
 	}
+}
+
+void skin_curves(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::primitive& InputCurves, const k3d::mesh::knots_t VKnots, const k3d::uint_t VOrder)
+{
+	const k3d::uint_t u_order = InputCurves.curve_orders.front();
+	const k3d::uint_t curve_count = InputCurves.curve_first_points.size();
+
+	// Because of the way elevate_curve_degree (and ultimately add_curve) works, the points should be ordered correctly
+	k3d::mesh::points_t points(InputMesh.points->begin() + InputCurves.curve_points[InputCurves.curve_first_points.front()], InputMesh.points->end());
+	k3d::mesh::knots_t u_knots(InputCurves.curve_knots.begin(), InputCurves.curve_knots.begin() + InputCurves.curve_point_counts.front() + InputCurves.curve_orders.front());
+	add_patch(OutputMesh, OutputPatches, points, InputCurves.curve_point_weights, u_knots, VKnots, u_order, VOrder);
+	OutputPatches.patch_materials.push_back(InputCurves.material.back());
+	OutputPatches.patch_selections.back() = 1.0;
 }
 
 } //namespace nurbs

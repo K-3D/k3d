@@ -119,6 +119,9 @@ void extract_plane(k3d::point3& Origin, k3d::normal3& Normal, k3d::vector3& U, k
 /// Helper function to extract a 2D bounding box
 void bbox2(k3d::point2& Min, k3d::point2& Max, const k3d::mesh::points_2d_t& Points);
 
+/// Skinned surface between the curves in the given primitive
+void skin_curves(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::primitive& InputCurves, const k3d::mesh::knots_t VKnots, const k3d::uint_t VOrder);
+
 } //namespace nurbs
 
 } //namespace module
