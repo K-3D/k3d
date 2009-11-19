@@ -118,6 +118,9 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 /// True if the given curve is closed
 k3d::bool_t is_closed(const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
 
+/// Evaluate the postion using the given curve arrays
+const k3d::point3 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U);
+
 } //namespace nurbs
 
 } //namespace module

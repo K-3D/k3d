@@ -1145,6 +1145,28 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 	k3d::nurbs_curve::add_curve(OutputMesh, NurbsCurves, Order, points);
 }
 
+const k3d::point3 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U)
+{
+	if(U < 0.000001)
+		return Points.front();
+	if(U > 0.999999)
+		return Points.back();
+	k3d::mesh::points_t points = Points;
+	k3d::mesh::weights_t weights = Weights;
+	k3d::mesh::knots_t normalized_knots(Knots.size());
+	std::transform(Knots.begin(), Knots.end(), normalized_knots.begin(), knot_normalizer(Knots.front(), Knots.back()));
+	const k3d::uint_t order = Knots.size() - Points.size();
+	const k3d::uint_t mul = multiplicity(normalized_knots, U, 0, Knots.size());
+
+	// Insert a knot up to the curve degree
+	if(mul < (order - 1))
+		insert_knot(points, normalized_knots, weights, U, order - mul - 1, order);
+
+	// Find the corresponding point
+	const k3d::mesh::knots_t::iterator split_knot = std::find_if(normalized_knots.begin(), normalized_knots.end(), find_first_knot_after(U));
+	return points[(split_knot - normalized_knots.begin()) - order];
+}
+
 } //namespace nurbs
 
 } //namespace module
