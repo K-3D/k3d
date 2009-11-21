@@ -3,7 +3,7 @@ title: Support display of non-SI units of measure.
 desc: K-3D uses SI units internally for all data storage.  The UI supports automatic conversion from other units to SI, but there is no provision currently to display alternate units.  It should be possible to set global user preferences for display units, as-well-as changing preferences on a control-by-control basis.  Similarly, it should be possible to specify the number of digits to display.
 type: :feature
 component: K-3D
-release: 0.8.0.0
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,8 @@ log_events:
 - - 2009-11-14 23:18:24.252580 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2009-11-21 05:08:42.265667 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
   - ""
