@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+	<head>
+		<title>K-3D Issue Tracker</title>
+		<link rel="icon" type="image/png" href="../k3d.png" />
+		<link rel="stylesheet" type="text/css" href="../k3d.css" />
+	</head>
+
+	<body>
+		<div id="nav">
+			<a id="logo" href=".."><h1>K-3D</h1></a>
+
+			<ul>
+				<li><a href="../downloads">Downloads</a></li>
+				<li><a href="http://www.k-3d.org/blogs">Blogs</a></li>
+				<li><a href="http://www.k-3d.org/forums">Forums</a></li>
+				<li><a href="http://www.k-3d.org/wiki">Wiki</a></li>
+				<li><a href="../planet">Planet</a></li>
+				<li><a href="./index">Tracker</a></li>
+			</ul>
+		</div>
+
+		<div id="content">
+			<div id="top">
+				<div id="tracker">
+					<h2>K-3D Issue Tracker</h2>
+
+					<h3>Upcoming Releases</h3>
+					<% upcoming_releases = filter(lambda release: release["status"] == ":unreleased", project["releases"]) %>
+					% if len(upcoming_releases):
+					<ul>
+						% for release in upcoming_releases:
+						<li><a href="${release['filename']}">${release['name'] | h}</a></li>
+						% endfor
+					</ul>
+					% else:
+					<p>No upcoming releases.</p>
+					% endif
+
+					<h3>Past Releases</h3>
+					<% past_releases = filter(lambda release: release["status"] != ":unreleased", project["releases"]) %>
+					% if len(past_releases):
+					<ul>
+						% for release in past_releases:
+						<li><a href="${release['filename']}">${release['name'] | h}</a></li>
+						% endfor
+					</ul>
+					% else:
+					<p>No past releases.</p>
+					% endif
+
+					<h3>Unassigned Issues</h3>
+					<% unassigned_issues = filter(lambda issue: issue["release"] == None, issues) %>
+					% if len(unassigned_issues):
+					<table>
+						<tbody>
+						% for issue in sorted(unassigned_issues, lambda lhs, rhs: cmp(lhs["creation_time"], rhs["creation_time"]), reverse=True):
+							<tr><td>${issue['creation_time'].date() | h}</td><td><a href="${issue['filename']}">${issue['title'] | h}</a></td></tr>
+						% endfor
+						</tbody>
+					</table>
+					% else:
+					<p>No unassigned issues.</p>
+					% endif
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			try{
+			var pageTracker = _gat._getTracker("UA-3773195-1");
+			pageTracker._trackPageview();
+			} catch(err) {}
+		</script>
+	</body>
+</html>
+

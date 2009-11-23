@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+	<head>
+		<title>K-3D Issue - ${issue["title"] | h}</title>
+		<link rel="icon" type="image/png" href="../k3d.png" />
+		<link rel="stylesheet" type="text/css" href="../k3d.css" />
+	</head>
+
+	<body>
+		<div id="nav">
+			<a id="logo" href=".."><h1>K-3D</h1></a>
+
+			<ul>
+				<li><a href="../downloads">Downloads</a></li>
+				<li><a href="http://www.k-3d.org/blogs">Blogs</a></li>
+				<li><a href="http://www.k-3d.org/forums">Forums</a></li>
+				<li><a href="http://www.k-3d.org/wiki">Wiki</a></li>
+				<li><a href="../planet">Planet</a></li>
+				<li><a href="./index">Tracker</a></li>
+			</ul>
+		</div>
+
+		<div id="content">
+			<div id="top">
+				<div id="tracker">
+					<h2>K-3D Issue - ${issue["title"] | h}</h2>
+					<p>${issue["desc"] | h}</p>	
+	
+					<h3>Details</h3>
+					<dl>
+						<dt>Id:</dt>
+						<dd>${issue["id"] | h}</dd>
+
+						<dt>Type:</dt>
+						<dd>${issue["type"] | h}</dd>
+
+						<dt>Creation Time:</dt>
+						<dd>${issue["creation_time"].strftime("%Y-%m-%d %H:%M UTC") | h}</dd>
+
+						<dt>Reporter:</dt>
+						<dd>${issue["reporter"] | h}</dd>
+
+						<dt>Release:</dt>
+						% if release:
+						<dd><a href="${release['filename'] | h}">${issue["release"] | h}</a></dd>
+						% else:
+						<dd>None</dd>
+						% endif
+
+						<dt>Status:</dt>
+						<dd>${issue["status"] | h}</dd>
+					</dl>
+
+					<h3>Issue Log</h3>
+
+					<table>
+						<tbody>
+						% for event in issue["log_events"]:
+							<tr><td>${event[0].strftime("%Y-%m-%d %H:%M UTC") | h}</td><td>${event[1] | h}</td><td>${event[2] | h}</td></tr>
+						% endfor
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			try{
+			var pageTracker = _gat._getTracker("UA-3773195-1");
+			pageTracker._trackPageview();
+			} catch(err) {}
+		</script>
+	</body>
+</html>
+

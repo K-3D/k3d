@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+	<head>
+		<title>K-3D Release ${release["name"] | h}</title>
+		<link rel="icon" type="image/png" href="../k3d.png" />
+		<link rel="stylesheet" type="text/css" href="../k3d.css" />
+	</head>
+
+	<body>
+		<div id="nav">
+			<a id="logo" href=".."><h1>K-3D</h1></a>
+
+			<ul>
+				<li><a href="../downloads">Downloads</a></li>
+				<li><a href="http://www.k-3d.org/blogs">Blogs</a></li>
+				<li><a href="http://www.k-3d.org/forums">Forums</a></li>
+				<li><a href="http://www.k-3d.org/wiki">Wiki</a></li>
+				<li><a href="../planet">Planet</a></li>
+				<li><a href="./index">Tracker</a></li>
+			</ul>
+		</div>
+
+		<div id="content">
+			<div id="top">
+				<div id="tracker">
+					<h2>K-3D Release ${release["name"] | h}</h2>
+
+					<h3>Open Issues</h3>
+					<% open_issues = filter(lambda issue: issue["status"] != ":closed", issues) %>
+					% if len(open_issues):
+					<table>
+						<tbody>
+						% for issue in sorted(open_issues, lambda lhs, rhs: cmp(lhs["creation_time"], rhs["creation_time"]), reverse=True):
+							<tr><td>${issue['creation_time'].date() | h}</td><td><a href="${issue['filename']}">${issue['title'] | h}</a></td></tr>
+						% endfor
+						</tbody>
+					</table>
+					% else:
+				  	<p>No open issues.</p>
+					% endif	
+					
+					<h3>Closed Issues</h3>
+					<% closed_issues = filter(lambda issue: issue["status"] == ":closed", issues) %>
+					% if len(closed_issues):
+					<table>
+						<tbody>
+						% for issue in sorted(closed_issues, lambda lhs, rhs: cmp(lhs["creation_time"], rhs["creation_time"]), reverse=True):
+							<tr><td>${issue['creation_time'].date() | h}</td><td><a href="${issue['filename']}">${issue['title'] | h}</a></td></tr>
+						% endfor
+						</tbody>
+					</table>
+					% else:
+					<p>No closed issues.</p>
+					% endif
+
+					<h3>Release Log</h3>
+					<table>
+						<tbody>
+						% for event in release["log_events"]:
+							<tr><td>${event[0].strftime("%Y-%m-%d %H:%M UTC") | h}</td><td>${event[1] | h}</td><td>${event[2] | h}</td></tr>
+						% endfor
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			try{
+			var pageTracker = _gat._getTracker("UA-3773195-1");
+			pageTracker._trackPageview();
+			} catch(err) {}
+		</script>
+	</body>
+</html>
+
