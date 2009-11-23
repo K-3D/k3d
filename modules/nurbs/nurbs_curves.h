@@ -121,6 +121,9 @@ k3d::bool_t is_closed(const k3d::nurbs_curve::const_primitive& NurbsCurves, cons
 /// Evaluate the postion using the given curve arrays
 const k3d::point3 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U);
 
+/// Get the normalized tangent vector at the given location on the curve
+const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU = 0.00001);
+
 } //namespace nurbs
 
 } //namespace module

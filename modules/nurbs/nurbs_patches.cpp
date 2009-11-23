@@ -27,8 +27,11 @@
 #include "utility.h"
 
 #include <k3dsdk/axis.h>
+#include <k3dsdk/algebra.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/table_copier.h>
+
+#include <cmath>
 
 namespace module
 {
@@ -781,6 +784,57 @@ void skin_curves(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	add_patch(OutputMesh, OutputPatches, points, InputCurves.curve_point_weights, u_knots, VKnots, u_order, VOrder);
 	OutputPatches.patch_materials.push_back(InputCurves.material.back());
 	OutputPatches.patch_selections.back() = 1.0;
+}
+
+void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& SweptCurves, const k3d::nurbs_curve::const_primitive& Paths, const k3d::uint_t Segments)
+{
+	const k3d::uint_t paths_count = Paths.curve_first_points.size();
+	const k3d::uint_t swept_curves_count = SweptCurves.curve_first_points.size();
+	for(k3d::uint_t path = 0; path != paths_count; ++path)
+	{
+		k3d::mesh::points_t path_points;
+		k3d::mesh::weights_t path_weights;
+		k3d::mesh::knots_t path_knots;
+		extract_curve_arrays(path_points, path_knots, path_weights, OutputMesh, Paths, path, true);
+		const k3d::uint_t path_point_count = path_points.size();
+		const k3d::vector3 start_tangent = tangent(path_points, path_weights, path_knots, 0);
+		for(k3d::uint_t swept_curve = 0; swept_curve != swept_curves_count; ++swept_curve)
+		{
+			k3d::mesh skeleton_mesh;
+			skeleton_mesh.points.create();
+			skeleton_mesh.point_selection.create();
+			boost::scoped_ptr<k3d::nurbs_curve::primitive> skeleton_curves(k3d::nurbs_curve::create(skeleton_mesh));
+			skeleton_curves->material = SweptCurves.material;
+			const k3d::point3 cen = centroid(*InputMesh.points, SweptCurves, swept_curve);
+			// arrays for the curve to sweep
+			k3d::mesh::points_t swept_points;
+			k3d::mesh::weights_t swept_weigts;
+			k3d::mesh::knots_t swept_knots;
+			extract_curve_arrays(swept_points, swept_knots, swept_weigts, InputMesh, SweptCurves, swept_curve, true);
+			for(k3d::uint_t segment = 0; segment <= Segments; ++segment)
+			{
+				const k3d::double_t u = static_cast<k3d::double_t>(segment) / static_cast<k3d::double_t>(Segments);
+				const k3d::point3 path_point = evaluate_position(path_points, path_weights, path_knots, u);
+				const k3d::vector3 offset = path_point - path_points.front();
+				const k3d::vector3 tangent_i = tangent(path_points, path_weights, path_knots, u);
+				const k3d::vector3 normal = start_tangent ^ tangent_i;
+				const k3d::vector3 axis = normal.length2() ? k3d::normalize(start_tangent ^ tangent_i) : k3d::vector3(0,0,1);
+				const k3d::double_t angle = start_tangent * tangent_i > 0.99999999 ? 0 : std::acos(start_tangent * tangent_i);
+				k3d::log() << debug << "sweep angle: " << angle << ", axis: " << axis << std::endl;
+				k3d::matrix4 rot = k3d::rotate3(angle, axis);
+				k3d::mesh::points_t transformed_points;
+				for(k3d::uint_t i = 0; i != swept_points.size(); ++i)
+				{
+					transformed_points.push_back(rot*(swept_points[i]-k3d::to_vector(cen)) + k3d::to_vector(cen) + offset);
+				}
+				k3d::nurbs_curve::add_curve(skeleton_mesh, *skeleton_curves, SweptCurves.curve_orders[swept_curve], transformed_points, swept_weigts, swept_knots);
+				skeleton_curves->curve_selections.back() = 1.0;
+			}
+			k3d::mesh::knots_t v_knots;
+			k3d::nurbs_curve::add_open_uniform_knots(3, Segments + 1, v_knots);
+			skin_curves(OutputMesh, OutputPatches, skeleton_mesh, *skeleton_curves, v_knots, 3);
+		}
+	}
 }
 
 } //namespace nurbs

@@ -21,7 +21,9 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_patch_modifier.h"
+#include "nurbs_curves.h"
+#include "nurbs_patches.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -70,47 +72,34 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		Output = Input;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
+		if(!Output.points.get())
 			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> output_patches(k3d::nurbs_patch::create(Output));
 
-		std::vector<k3d::uint_t> curves;
+		k3d::mesh selected_curves_mesh;
+		selected_curves_mesh.points.create();
+		selected_curves_mesh.point_selection.create();
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> paths(k3d::nurbs_curve::create(selected_curves_mesh));
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> sweep_curves(k3d::nurbs_curve::create(selected_curves_mesh));
+		visit_selected_curves(Output, curve_extractor(selected_curves_mesh, *paths, *sweep_curves));
 
-		const k3d::uint_t curve_begin = 0;
-		const k3d::uint_t curve_end = nurbs->curve_first_knots.size();
-		for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_paths(k3d::nurbs_curve::validate(selected_curves_mesh, *selected_curves_mesh.primitives.front()));
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_sweep_curves(k3d::nurbs_curve::validate(selected_curves_mesh, *selected_curves_mesh.primitives.back()));
+
+		sweep(Output, *output_patches, selected_curves_mesh, *const_sweep_curves, *const_paths, m_segments.pipeline_value());
+
+		if(m_delete_original.pipeline_value())
 		{
-			if (nurbs->curve_selections[curve] > 0.0)
-				curves.push_back(curve);
+			delete_selected_curves(Output);
 		}
-
-		if (curves.size() != 2)
-		{
-			k3d::log() << error << nurbs_debug << "You need to select 2 curves!\n" << std::endl;
-		}
-		else
-		{
-			nurbs_curve_modifier mod(Output, *nurbs);
-			if (m_swap.pipeline_value())
-				mod.sweep_surface(curves[0], curves[1], m_segments.pipeline_value(), m_create_caps.pipeline_value());
-			else
-				mod.sweep_surface(curves[1], curves[0], m_segments.pipeline_value(), m_create_caps.pipeline_value());
-
-			if (m_delete_original.pipeline_value())
-			{
-				mod.delete_curve(curves[0]);
-				mod.delete_curve(curves[1]);
-			}
-		}
+		delete_empty_primitives(Output);
+		k3d::mesh::delete_unused_points(Output);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -126,6 +115,27 @@ public:
 	}
 
 private:
+	/// Extracts the first curve as a path, and the rest as curves that sweep it
+	struct curve_extractor
+	{
+		k3d::mesh& mesh;
+		k3d::nurbs_curve::primitive& paths;
+		k3d::nurbs_curve::primitive& sweep_curves;
+		curve_extractor(k3d::mesh& Mesh, k3d::nurbs_curve::primitive& Paths, k3d::nurbs_curve::primitive& SweepCurves) : mesh(Mesh), paths(Paths), sweep_curves(SweepCurves) {}
+		void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
+		{
+			if(paths.curve_first_points.empty())
+			{
+				add_curve(mesh, paths, Mesh, Curves, Curve);
+				paths.material = Curves.material;
+			}
+			else
+			{
+				add_curve(mesh, sweep_curves, Mesh, Curves, Curve);
+				sweep_curves.material = Curves.material;
+			}
+		}
+	};
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_create_caps;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_segments;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_swap;

@@ -1167,6 +1167,14 @@ const k3d::point3 evaluate_position(const k3d::mesh::points_t& Points, const k3d
 	return points[(split_knot - normalized_knots.begin()) - order];
 }
 
+const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU)
+{
+	const k3d::double_t u = U > (1.0 - DeltaU) ? U - DeltaU : U;
+	const k3d::point3 u_point = evaluate_position(Points, Weights, Knots, u);
+	const k3d::point3 du_point = evaluate_position(Points, Weights, Knots, u + DeltaU);
+	return k3d::normalize(du_point - u_point);
+}
+
 } //namespace nurbs
 
 } //namespace module
