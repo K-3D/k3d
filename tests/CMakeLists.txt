@@ -96,6 +96,7 @@ K3D_ADD_CMAKE_TEST(code.exit ${CMAKE_CURRENT_SOURCE_DIR}/code.exit.cmake ${CMAKE
 K3D_ADD_CMAKE_TEST(code.filename.case ${CMAKE_CURRENT_SOURCE_DIR}/code.filename.case.cmake ${CMAKE_SOURCE_DIR})
 K3D_ADD_CMAKE_TEST(code.filename.length ${CMAKE_CURRENT_SOURCE_DIR}/code.filename.length.cmake ${CMAKE_SOURCE_DIR})
 K3D_ADD_CMAKE_TEST(code.header_guard ${CMAKE_CURRENT_SOURCE_DIR}/code.header_guard.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.legacy ${CMAKE_CURRENT_SOURCE_DIR}/code.legacy.cmake ${CMAKE_SOURCE_DIR})
 K3D_ADD_CMAKE_TEST(code.line_endings ${CMAKE_CURRENT_SOURCE_DIR}/code.line_endings.cmake ${CMAKE_SOURCE_DIR})
 K3D_ADD_CMAKE_TEST(code.pretty_function ${CMAKE_CURRENT_SOURCE_DIR}/code.pretty_function.cmake ${CMAKE_SOURCE_DIR})
 K3D_ADD_CMAKE_TEST(code.printf ${CMAKE_CURRENT_SOURCE_DIR}/code.printf.cmake ${CMAKE_SOURCE_DIR})
