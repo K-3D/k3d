@@ -34,10 +34,11 @@
 
 						<%
 
-						closed_issues = filter(lambda issue: issue["status"] == ":closed", issues)
-						open_issues = filter(lambda issue: issue["status"] != ":closed", issues)
+						release_issues = filter(lambda issue: issue["release"] == release["name"], issues)
+						closed_issues = filter(lambda issue: issue["status"] == ":closed", release_issues)
+						open_issues = filter(lambda issue: issue["status"] != ":closed", release_issues)
 
-						issue_count = len(issues)
+						issue_count = len(release_issues)
 						closed_count = len(closed_issues)
 						open_count = len(open_issues)
 
