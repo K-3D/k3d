@@ -24,14 +24,29 @@
 		<div id="content">
 			<div id="top">
 				<div id="tracker">
-					<h2>K-3D Issue Tracker</h2>
+					<h2>Issue Tracker</h2>
 
 					<h3>Upcoming Releases</h3>
 					<% upcoming_releases = filter(lambda release: release["status"] == ":unreleased", project["releases"]) %>
 					% if len(upcoming_releases):
 					<ul>
 						% for release in upcoming_releases:
-						<li><a href="${release['filename']}">${release['name'] | h}</a></li>
+
+						<%
+
+						closed_issues = filter(lambda issue: issue["status"] == ":closed", issues)
+						open_issues = filter(lambda issue: issue["status"] != ":closed", issues)
+
+						issue_count = len(issues)
+						closed_count = len(closed_issues)
+						open_count = len(open_issues)
+
+						closed_percent = closed_count * 100 / issue_count
+						open_percent = open_count * 100 / issue_count
+
+						%>
+
+						<li><dl><dt><a href="${release['filename']}">${release['name'] | h}</a></dt><dd><span class="progress-closed-issues">${"&nbsp;" * closed_percent}</span><span class="progress-open-issues">${"&nbsp;" * open_percent}</span>${closed_count} / ${issue_count | h} (${closed_percent | h}%)</dd></dl></li>
 						% endfor
 					</ul>
 					% else:

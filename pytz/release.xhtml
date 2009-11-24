@@ -24,10 +24,32 @@
 		<div id="content">
 			<div id="top">
 				<div id="tracker">
-					<h2>K-3D Release ${release["name"] | h}</h2>
+					<h2>Release ${release["name"] | h}</h2>
+
+<%
+
+closed_issues = filter(lambda issue: issue["status"] == ":closed", issues)
+open_issues = filter(lambda issue: issue["status"] != ":closed", issues)
+
+issue_count = len(issues)
+closed_count = len(closed_issues)
+open_count = len(open_issues)
+
+closed_percent = closed_count * 100 / issue_count
+open_percent = open_count * 100 / issue_count
+
+%>
+
+					<h3>Details</h3>
+					<dl>
+						<dt>Status:</dt>
+						<dd>${release["status"] | h}</dd>
+
+						<dt>Progress:</dt>
+						<dd><span class="progress-closed-issues">${"&nbsp;" * closed_percent}</span><span class="progress-open-issues">${"&nbsp;" * open_percent}</span>${closed_count} / ${issue_count | h} (${closed_percent | h}%)</dd>
+					</dl>
 
 					<h3>Open Issues</h3>
-					<% open_issues = filter(lambda issue: issue["status"] != ":closed", issues) %>
 					% if len(open_issues):
 					<table>
 						<tbody>
@@ -41,7 +63,6 @@
 					% endif	
 					
 					<h3>Closed Issues</h3>
-					<% closed_issues = filter(lambda issue: issue["status"] == ":closed", issues) %>
 					% if len(closed_issues):
 					<table>
 						<tbody>
