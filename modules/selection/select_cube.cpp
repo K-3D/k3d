@@ -24,8 +24,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/renderable_gl.h>
@@ -41,11 +40,11 @@ namespace selection
 // select_cube
 
 class select_cube :
-	public k3d::gl::renderable<k3d::transformable<k3d::legacy::mesh_modifier<k3d::node > > >
+	public k3d::gl::renderable<k3d::transformable<k3d::mesh_selection_modifier<k3d::node > > >
 {
-	typedef k3d::gl::renderable<k3d::transformable<k3d::legacy::mesh_modifier<k3d::node > > > base;
+	typedef k3d::gl::renderable<k3d::transformable<k3d::mesh_selection_modifier<k3d::node > > > base;
 
-	public:
+public:
 	select_cube(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_x1(init_owner(*this) + init_name("x1") + init_label(_("X1")) + init_description(_("X coordinate of cube's min corner")) + init_value(-10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
@@ -55,20 +54,21 @@ class select_cube :
 		m_y2(init_owner(*this) + init_name("y2") + init_label(_("Y2")) + init_description(_("Y coordinate of cube's max corner")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_z2(init_owner(*this) + init_name("z2") + init_label(_("Z2")) + init_description(_("Z coordinate of cube's max corner")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
-		m_x1.changed_signal().connect(make_update_mesh_slot());
-		m_y1.changed_signal().connect(make_update_mesh_slot());
-		m_z1.changed_signal().connect(make_update_mesh_slot());
-		m_x2.changed_signal().connect(make_update_mesh_slot());
-		m_y2.changed_signal().connect(make_update_mesh_slot());
-		m_z2.changed_signal().connect(make_update_mesh_slot());
+		m_x1.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
+		m_y1.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
+		m_z1.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
+		m_x2.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
+		m_y2.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
+		m_z2.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
 	}
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-	}
-
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		const k3d::bounding_box3 cube(
 				m_x1.pipeline_value(),
@@ -78,7 +78,18 @@ class select_cube :
 				m_z1.pipeline_value(),
 				m_z2.pipeline_value());
 
-		k3d::legacy::for_each_component(Mesh, select_volume(cube));
+		if(!Input.points)
+			return;
+		if(!Input.point_selection)
+			return;
+
+		const k3d::mesh::points_t& points = *Output.points;
+		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
+
+		const k3d::uint_t point_begin = 0;
+		const k3d::uint_t point_end = point_begin + points.size();
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
+			point_selection[point] = cube.contains(points[point]);
 	}
 
 	void on_gl_draw(const k3d::gl::render_state& State)
@@ -97,28 +108,6 @@ class select_cube :
 	{
 	}
 
-	struct select_volume
-	{
-		select_volume(const k3d::bounding_box3& Cube) :
-			cube(Cube)
-		{
-		}
-
-		template<typename T>
-		void operator()(T& Component)
-		{
-			Component.selection_weight = 0;
-		}
-
-		void operator()(k3d::legacy::point& Component)
-		{
-			const bool contained = cube.contains(Component.position);
-			Component.selection_weight = contained;
-		}
-
-		const k3d::bounding_box3 cube;
-	};
-
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<select_cube,
@@ -133,13 +122,13 @@ class select_cube :
 		return factory;
 	}
 
-	private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x1;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y1;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z1;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x2;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y2;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z2;
+private:
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x1;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y1;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z1;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x2;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y2;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z2;
 };
 
 /////////////////////////////////////////////////////////////////////////////

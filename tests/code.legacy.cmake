@@ -49,7 +49,6 @@ SET(SKIP_FILES
 	"^modules/polyhedron_sources/poly_sphere.cpp$"
 	"^modules/polyhedron_sources/poly_torus.cpp$"
 	"^modules/qslim/quadric_decimation.cpp$"
-	"^modules/selection/select_cube.cpp$"
 	"^modules/selection/select_n_sided.cpp$"
 	"^modules/test/legacy_mesh_conversion.cpp$"
 	"^modules/test/memory_pools.cpp$"
