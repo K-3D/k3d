@@ -845,11 +845,11 @@ public:
 		{
 		}
 	
-	void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
+	void operator()(const k3d::parallel::blocked_range<uint_t>& range) const
 	{
-		const k3d::uint_t edge_begin = range.begin();
-		const k3d::uint_t edge_end = range.end();
-		for(size_t edge = edge_begin; edge != edge_end; ++edge)
+		const uint_t edge_begin = range.begin();
+		const uint_t edge_end = range.end();
+		for(uint_t edge = edge_begin; edge != edge_end; ++edge)
 		{
 			const uint_t vertex1 = m_edge_points[edge];
 			const uint_t vertex2 = m_edge_points[m_clockwise_edges[edge]];
@@ -1091,7 +1091,7 @@ void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh:
 	
 	// Making this parallel decreases running time by 20 % on a Pentium D. 
 	k3d::parallel::parallel_for(
-				k3d::parallel::blocked_range<k3d::uint_t>(edge_begin, edge_end, k3d::parallel::grain_size()),
+				k3d::parallel::blocked_range<uint_t>(edge_begin, edge_end, k3d::parallel::grain_size()),
 				detail::find_companion_worker(EdgePoints, ClockwiseEdges, valences, first_edges, point_edges, BoundaryEdges, AdjacentEdges));
 }
 
@@ -1102,16 +1102,16 @@ void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::
 {
 	EdgeFaces.assign(ClockwiseEdges.size(), 0);
 
-	const size_t face_begin = 0;
-	const size_t face_end = face_begin + FaceFirstLoops.size();
-	for(size_t face = face_begin; face != face_end; ++face)
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + FaceFirstLoops.size();
+	for(uint_t face = face_begin; face != face_end; ++face)
 	{
-		const size_t loop_begin = FaceFirstLoops[face];
-		const size_t loop_end = loop_begin + FaceLoopCounts[face];
-		for(size_t loop = loop_begin; loop != loop_end; ++loop)
+		const uint_t loop_begin = FaceFirstLoops[face];
+		const uint_t loop_end = loop_begin + FaceLoopCounts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 		{
-			const size_t first_edge = LoopFirstEdges[loop];
-			for(size_t edge = first_edge; ;)
+			const uint_t first_edge = LoopFirstEdges[loop];
+			for(uint_t edge = first_edge; ;)
 			{
 				EdgeFaces[edge] = face;
 
@@ -1123,23 +1123,43 @@ void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::
 	}
 }
 
+void create_edge_count_lookup(const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::counts_t& Counts)
+{
+	Counts.assign(LoopFirstEdges.size(), 0);
+
+	const uint_t loop_begin = 0;
+	const uint_t loop_end = loop_begin + LoopFirstEdges.size();
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+	{
+		const uint_t first_edge = LoopFirstEdges[loop];
+		for(uint_t edge = first_edge; ;)
+		{
+			++Counts[loop];
+
+			edge = ClockwiseEdges[edge];
+			if(edge == first_edge)
+				break;
+		}
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create_vertex_face_lookup
 
 void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces)
 {
-	std::vector<std::vector<size_t> > adjacency_list(Points.size());
+	std::vector<std::vector<uint_t> > adjacency_list(Points.size());
 
-	const size_t face_begin = 0;
-	const size_t face_end = face_begin + FaceFirstLoops.size();
-	for(size_t face = face_begin; face != face_end; ++face)
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + FaceFirstLoops.size();
+	for(uint_t face = face_begin; face != face_end; ++face)
 	{
-		const size_t loop_begin = FaceFirstLoops[face];
-		const size_t loop_end = loop_begin + FaceLoopCounts[face];
-		for(size_t loop = loop_begin; loop != loop_end; ++loop)
+		const uint_t loop_begin = FaceFirstLoops[face];
+		const uint_t loop_end = loop_begin + FaceLoopCounts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 		{
-			const size_t first_edge = LoopFirstEdges[loop];
-			for(size_t edge = first_edge; ;)
+			const uint_t first_edge = LoopFirstEdges[loop];
+			for(uint_t edge = first_edge; ;)
 			{
 				adjacency_list[EdgePoints[edge]].push_back(face);
 
@@ -1154,9 +1174,9 @@ void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh
 	PointFaceCounts.assign(Points.size(), 0);
 	PointFaces.clear();
 
-	const size_t point_begin = 0;
-	const size_t point_end = point_begin + Points.size();
-	for(size_t point = point_begin; point != point_end; ++point)
+	const uint_t point_begin = 0;
+	const uint_t point_end = point_begin + Points.size();
+	for(uint_t point = point_begin; point != point_end; ++point)
 	{
 		PointFirstFaces[point] = PointFaces.size();
 		PointFaceCounts[point] = adjacency_list[point].size();
@@ -1171,7 +1191,7 @@ void create_vertex_edge_lookup(const mesh::indices_t& EdgePoints, mesh::indices_
 {
 	if(PointEdgeCounts.empty())
 		create_vertex_valence_lookup(0, EdgePoints, PointEdgeCounts);
-	const k3d::uint_t point_count = PointEdgeCounts.size();
+	const uint_t point_count = PointEdgeCounts.size();
 	mesh::counts_t found_edges(point_count, 0);
 	PointFirstEdges.assign(point_count, 0); // first edge in point_edges for each point
 	PointEdges.assign(EdgePoints.size(), 0);
@@ -1218,16 +1238,16 @@ void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const me
 	BoundaryFaces.clear();
 	BoundaryFaces.resize(FaceFirstLoops.size());
 	
-	const size_t face_begin = 0;
-	const size_t face_end = face_begin + FaceFirstLoops.size();
-	for(size_t face = face_begin; face != face_end; ++face)
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + FaceFirstLoops.size();
+	for(uint_t face = face_begin; face != face_end; ++face)
 	{
-		const size_t loop_begin = FaceFirstLoops[face];
-		const size_t loop_end = loop_begin + FaceLoopCounts[face];
-		for(size_t loop = loop_begin; loop != loop_end; ++loop)
+		const uint_t loop_begin = FaceFirstLoops[face];
+		const uint_t loop_end = loop_begin + FaceLoopCounts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 		{
-			const size_t first_edge = LoopFirstEdges[loop];
-			for(size_t edge = first_edge; ;)
+			const uint_t first_edge = LoopFirstEdges[loop];
+			for(uint_t edge = first_edge; ;)
 			{
 				if (BoundaryEdges[edge])
 				{
