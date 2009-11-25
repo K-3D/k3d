@@ -18,21 +18,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
-#include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh_selection_modifier.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 
-#include <map>
-#include <set>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -40,121 +40,75 @@ namespace module
 namespace selection
 {
 
-namespace detail
-{
-
-/// Count face's edge number
-const unsigned long edge_number(const k3d::legacy::face& Face)
-{
-	unsigned long edges = 0;
-
-	k3d::legacy::split_edge* current_edge = Face.first_edge;
-	do
-	{
-		++edges;
-		current_edge = current_edge->face_clockwise;
-	}
-	while(current_edge != Face.first_edge);
-
-	return edges;
-}
-
-} // namespace detail
-
 /////////////////////////////////////////////////////////////////////////////
 // select_n_sided
 
 class select_n_sided :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_modifier<k3d::mesh_selection_sink<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_modifier<k3d::mesh_selection_sink<k3d::node > > base;
 
 public:
 	select_n_sided(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_sides(init_owner(*this) + init_name("sides") + init_label(_("Side number")) + init_description(_("Gives chosen side number")) + init_value(5L) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
-		m_operator(init_owner(*this) + init_name("operator") + init_label(_("Operator")) + init_description(_("Selection operator comparing with side number")) + init_value(EQUAL) + init_enumeration(operator_values())),
-		m_component(init_owner(*this) + init_name("component") + init_label(_("Component type")) + init_description(_("Components to be selected (faces or edges)")) + init_value(FACES) + init_enumeration(component_values()))
+		m_operation(init_owner(*this) + init_name("operator") + init_label(_("Operator")) + init_description(_("Selection operator comparing with side number")) + init_value(EQUAL) + init_enumeration(operator_values()))
 	{
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
-
-		m_sides.changed_signal().connect(make_update_mesh_slot());
-		m_operator.changed_signal().connect(make_update_mesh_slot());
-		m_component.changed_signal().connect(make_update_mesh_slot());
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
+		m_sides.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
+		m_operation.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::selection_changed> >(make_update_mesh_slot()));
 	}
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Mesh);
-	}
+		const k3d::int32_t sides = m_sides.pipeline_value();
+		const operation_t operation = m_operation.pipeline_value();
 
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		const unsigned long sides = m_sides.pipeline_value();
-		const operator_t op = m_operator.pipeline_value();
-		const component_t component = m_component.pipeline_value();
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		k3d::legacy::for_each_component(Mesh, k3d::selection::set_weight(0.0));
-
-		if(component == FACES)
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			for(k3d::legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
+			if(polyhedron)
 			{
-				for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
+				k3d::mesh::counts_t counts;
+				k3d::polyhedron::create_edge_count_lookup(polyhedron->loop_first_edges, polyhedron->clockwise_edges, counts);
+
+				const k3d::uint_t face_begin = 0;
+				const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
+
+				switch(operation)
 				{
-					const unsigned long edge_number = detail::edge_number(**face);
-					if(op == LESS_OR_EQUAL && edge_number <= sides
-						|| op == EQUAL && edge_number == sides
-						|| op == GREATER_OR_EQUAL && edge_number >= sides)
+					case LESS_OR_EQUAL:
 					{
-						(*face)->selection_weight = 1.0;
+						for(k3d::uint_t face = face_begin; face != face_end; ++face)
+						{
+							if(counts[polyhedron->face_first_loops[face]] <= sides)
+								polyhedron->face_selections[face] = 1;
+						}
+						break;
 					}
-				}
-			}
-		}
-		else if(component == POINTS)
-		{
-			// Create a mapping of points to their array index
-			typedef std::map<k3d::legacy::point*, unsigned long> point_map_t;
-			point_map_t point_map;
-			unsigned long index = 0;
-			for(k3d::legacy::mesh::points_t::const_iterator point = Mesh.points.begin(); point != Mesh.points.end(); ++point)
-				point_map[*point] = index++;
-
-			// Build vertex valency array
-			typedef std::vector<unsigned long> valencies_t;
-			valencies_t valencies(point_map.size(), 0);
-
-			for(k3d::legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
-			{
-				for(k3d::legacy::polyhedron::faces_t::const_iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
-				{
-					k3d::legacy::split_edge* current_edge = (*face)->first_edge;
-					do
+					case EQUAL:
 					{
-						k3d::legacy::point* vertex = current_edge->vertex;
-						const unsigned long vertex_index = point_map[vertex];
-						++valencies[vertex_index];
-						// Edge without companion means two single edges that make one more
-						if(!current_edge->companion)
-							++valencies[vertex_index];
-
-						current_edge = current_edge->face_clockwise;
+						for(k3d::uint_t face = face_begin; face != face_end; ++face)
+						{
+							if(counts[polyhedron->face_first_loops[face]] == sides)
+								polyhedron->face_selections[face] = 1;
+						}
+						break;
 					}
-					while(current_edge != (*face)->first_edge);
-				}
-			}
-
-			// Select points
-			for(unsigned long n = 0; n < valencies.size(); ++ n)
-			{
-				const unsigned long edge_number = valencies[n];
-				if(op == LESS_OR_EQUAL && edge_number <= sides
-					|| op == EQUAL && edge_number == sides
-					|| op == GREATER_OR_EQUAL && edge_number >= sides)
-				{
-					Mesh.points[n]->selection_weight = 1.0;
+					case GREATER_OR_EQUAL:
+					{
+						for(k3d::uint_t face = face_begin; face != face_end; ++face)
+						{
+							if(counts[polyhedron->face_first_loops[face]] >= sides)
+								polyhedron->face_selections[face] = 1;
+						}
+						break;
+					}
 				}
 			}
 		}
@@ -180,9 +134,9 @@ private:
 		LESS_OR_EQUAL,
 		EQUAL,
 		GREATER_OR_EQUAL
-	} operator_t;
+	} operation_t;
 
-	friend std::ostream& operator << (std::ostream& Stream, const operator_t& Value)
+	friend std::ostream& operator<<(std::ostream& Stream, const operation_t& Value)
 	{
 		switch(Value)
 		{
@@ -199,7 +153,7 @@ private:
 		return Stream;
 	}
 
-	friend std::istream& operator >> (std::istream& Stream, operator_t& Value)
+	friend std::istream& operator>>(std::istream& Stream, operation_t& Value)
 	{
 		std::string text;
 		Stream >> text;
@@ -221,47 +175,12 @@ private:
 		static k3d::ienumeration_property::enumeration_values_t values;
 		if(values.empty())
 		{
-			values.push_back(k3d::ienumeration_property::enumeration_value_t("Less_or_equal", "less_or_equal", "Selects components with N or less than N sides"));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t("Equal", "equal", "Selects components with N sides "));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t("Greater_or_equal", "greater_or_equal", "Selects components with N or greater than N sides "));
+			values.push_back(k3d::ienumeration_property::enumeration_value_t("<= Less-than-or-equal", "less_or_equal", "Selects components with N or less than N sides"));
+			values.push_back(k3d::ienumeration_property::enumeration_value_t("= Equal", "equal", "Selects components with N sides "));
+			values.push_back(k3d::ienumeration_property::enumeration_value_t(">= Greater-than-or-equal", "greater_or_equal", "Selects components with N or greater than N sides "));
 		}
 
 		return values;
-	}
-
-	typedef enum
-	{
-		FACES,
-		POINTS
-	} component_t;
-
-	friend std::ostream& operator << (std::ostream& Stream, const component_t& Value)
-	{
-		switch(Value)
-		{
-			case FACES:
-				Stream << "faces";
-				break;
-			case POINTS:
-				Stream << "points";
-				break;
-		}
-		return Stream;
-	}
-
-	friend std::istream& operator >> (std::istream& Stream, component_t& Value)
-	{
-		std::string text;
-		Stream >> text;
-
-		if(text == "faces")
-			Value = FACES;
-		else if(text == "points")
-			Value = POINTS;
-		else
-			k3d::log() << error << k3d_file_reference << ": unknown enumeration [" << text << "]" << std::endl;
-
-		return Stream;
 	}
 
 	const k3d::ienumeration_property::enumeration_values_t& component_values()
@@ -277,8 +196,7 @@ private:
 	}
 
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_sides;
-	k3d_data(operator_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_operator;
-	k3d_data(component_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_component;
+	k3d_data(operation_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_operation;
 };
 
 /////////////////////////////////////////////////////////////////////////////
