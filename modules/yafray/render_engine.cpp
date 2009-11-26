@@ -47,7 +47,6 @@
 #include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/network_render_farm.h>
@@ -503,25 +502,6 @@ private:
 
 		return true;
 	}
-
-/*
-	/// Apply SDS if needed
-	void sds_filter(const k3d::legacy::mesh& Input, const std::string& RenderType, k3d::legacy::mesh& Output, int Levels)
-	{
-		if (!m_preview_sds.pipeline_value() || !(Input.polyhedra.size() > 0 && (RenderType == "catmull-clark")))
-		{
-			k3d::legacy::deep_copy(Input, Output);
-			return;
-		}
-		k3d::sds::k3d_mesh_sds_cache sds_cache;
-
-		// Set levels -before- input
-		sds_cache.set_levels(Levels);
-		sds_cache.set_input(&Input);
-		sds_cache.update();
-		sds_cache.output(&Output);
-	}
-*/
 
 	/// Helper class that limits the list of visible nodes to those that we can render
 	template<typename value_t, class name_policy_t>
