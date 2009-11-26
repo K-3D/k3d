@@ -47,9 +47,6 @@ extern k3d::iplugin_factory& join_points_factory();
 extern k3d::iplugin_factory& make_creases_factory();
 extern k3d::iplugin_factory& merge_mesh_factory();
 extern k3d::iplugin_factory& mesh_instance_factory();
-extern k3d::iplugin_factory& sds_corner_factory();
-extern k3d::iplugin_factory& sds_crease_factory();
-extern k3d::iplugin_factory& sds_hole_factory();
 extern k3d::iplugin_factory& show_component_numbering_factory();
 extern k3d::iplugin_factory& show_face_orientations_factory();
 extern k3d::iplugin_factory& weld_factory();
@@ -76,9 +73,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh::join_points_factory());
 	Registry.register_factory(module::mesh::make_creases_factory());
 	Registry.register_factory(module::mesh::merge_mesh_factory());
-	Registry.register_factory(module::mesh::sds_corner_factory());
-	Registry.register_factory(module::mesh::sds_crease_factory());
-	Registry.register_factory(module::mesh::sds_hole_factory());
 	Registry.register_factory(module::mesh::weld_factory());
 K3D_MODULE_END
 
