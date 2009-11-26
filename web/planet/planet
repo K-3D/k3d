@@ -27,6 +27,7 @@ sources.append(define_feed("http://www.k-3d.org/forums/rss/topics", "forum", "K-
 sources.append(define_feed("http://www.k-3d.org/k3d_wiki/index.php?title=News&feed=atom", "wiki", "K-3D Wiki"))
 sources.append(define_feed("http://k3d.hg.sf.net/hgweb/k3d/k3d/rss-log", "commit", "K-3D Repository"))
 sources.append(define_feed("http://code.google.com/feeds/p/k3d-bart/hgchanges/basic", "commit", "Bart Janssens' Repository"))
+sources.append(define_feed("http://bitbucket.org/tshead/k3d-sandbox/rss/", "commit", "Tim Shead's Sandbox Repository"))
 
 entries = []
 for source in sources:

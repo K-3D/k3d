@@ -14,12 +14,63 @@
 import datetime
 import time
 
-left_entries = filter(lambda entry: entry["source"]["feed_type"] != "commit", entries)
-right_entries = filter(lambda entry: entry["source"]["feed_type"] == "commit", entries)
-
 def entry_date(entry):
 	return datetime.date(entry.updated_parsed.tm_year, entry.updated_parsed.tm_mon, entry.updated_parsed.tm_mday)
 %>
+
+<%def name="generate_feeds(entries)">
+	<%
+	last_date = None
+	last_source = None
+	%>
+	% for i in range(len(entries)):
+	<%
+	entry = entries[i]
+	date = entry_date(entry)
+	source = entry.source
+	%>
+
+	% if date != last_date:
+	<div class="date">
+		<h2>${date.strftime("%B %d, %Y") | h}</h2>
+	% endif
+
+	% if source != last_source or date != last_date:
+		<div class="channel ${source["feed_type"]}_channel">
+			<h3>
+				<a class="feed_link" href="${source.href | h}"><span>Feed:</span></a>
+				<a class="feed_title" href="${source.feed.link | h}"><span>${source["custom_title"]}</span></a>
+			</h3>
+	% endif
+
+			<div class="entry">
+				<h4><a href="${entry.link | h}">${entry.title | h}</a></h4>
+				% if source["feed_type"] not in ["wiki", "commit"]:
+				<div class="content">
+					<p>${entry.content[0].value if entry.has_key("content") else entry.summary}</p>
+				</div>
+				% endif
+			</div> <!-- entry -->
+
+	<%
+	last_source = source
+	last_date = date
+
+	next_entry = entries[i+1] if i+1 < len(entries) else None
+	next_date = entry_date(next_entry) if next_entry else None
+	next_source = next_entry.source if next_entry else None
+	%>
+
+	% if source != next_source or date != next_date:
+		</div> <!-- channel -->
+	% endif
+
+	% if date != next_date:
+	</div> <!-- date -->
+	% endif
+
+	% endfor
+</%def>
 
 	<body>
 		<div id="nav">
@@ -38,111 +89,10 @@ def entry_date(entry):
 
 		<div id="content">
 			<div id="left" class="feeds">
-					<%
-					last_date = None
-					last_source = None
-					%>
-					% for i in range(len(left_entries)):
-					<%
-					entry = left_entries[i]
-					date = entry_date(entry)
-					source = entry.source
-					%>
-
-					% if date != last_date:
-					<div class="date">
-						<h2>${date.strftime("%B %d, %Y") | h}</h2>
-					% endif
-
-					% if source != last_source or date != last_date:
-						<div class="channel ${source["feed_type"] | h}_channel">
-							<h3><a href="${source.feed.link | h}">${source["custom_title"]}</a></h3>
-					% endif
-
-							<div class="entry">
-								<h4><a href="${entry.link | h}">${entry.title | h}</a></h4>
-								<div class="content">
-									% if source["feed_type"] != "wiki":
-									<p>${entry.content[0].value if entry.has_key("content") else entry.summary}</p>
-									% endif
-								</div>
-							</div> <!-- entry -->
-
-					<%
-					last_source = source
-					last_date = date
-
-					next_entry = left_entries[i+1] if i+1 < len(left_entries) else None
-					next_date = entry_date(next_entry) if next_entry else None
-					next_source = next_entry.source if next_entry else None
-					%>
-
-					% if source != next_source or date != next_date:
-						</div> <!-- channel -->
-					% endif
-
-					% if date != next_date:
-					</div> <!-- date -->
-					% endif
-
-					% endfor
+				${generate_feeds(filter(lambda entry: entry["source"]["feed_type"] != "commit", entries))}
 			</div>
 			<div id="right" class="feeds">
-					<%
-					last_date = None
-					last_source = None
-					%>
-					% for i in range(len(right_entries)):
-					<%
-					entry = right_entries[i]
-					date = datetime.date(entry.updated_parsed.tm_year, entry.updated_parsed.tm_mon, entry.updated_parsed.tm_mday)
-					source = entry.source
-					%>
-
-					% if date != last_date:
-					<div class="date">
-						<h2>${date.strftime("%B %d, %Y") | h}</h2>
-					% endif
-
-					% if source != last_source or date != last_date:
-						<div class="channel ${source["feed_type"] | h}_channel">
-							<h3><a href="${source.feed.link | h}">${source["custom_title"] | h}</a></h3>
-					% endif
-
-							<div class="entry">
-								<h4><a href="${entry.link | h}">${entry.title | h}</a></h4>
-							</div> <!-- entry -->
-
-					<%
-					last_source = source
-					last_date = date
-
-					next_entry = right_entries[i+1] if i+1 < len(right_entries) else None
-					next_date = entry_date(next_entry) if next_entry else None
-					next_source = next_entry.source if next_entry else None
-					%>
-
-					% if source != next_source or date != next_date:
-						</div> <!-- channel -->
-					% endif
-
-					% if date != next_date:
-					</div> <!-- date -->
-					% endif
-
-					% endfor
-			</div>
-
-			<div id="footer">
-				<h2>Feed Details</h2>
-				<table>
-					% for source in sorted(sources, lambda lhs, rhs: cmp(lhs["custom_title"], rhs["custom_title"])):
-					<tr>
-						<td><a href="${source.href | h}">Feed</a></td>
-						<td><a href="${source.feed.link | h}">${source["custom_title"]}</a></td>
-					</tr>
-					% endfor
-				</table>
+				${generate_feeds(filter(lambda entry: entry["source"]["feed_type"] == "commit", entries))}
 			</div>
 		</div>
 

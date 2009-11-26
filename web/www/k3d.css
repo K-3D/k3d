@@ -214,6 +214,22 @@ h2.highlighted
   padding-left: 10px;
 }
 
+.feeds a.feed_link
+{
+  float: left;
+  background: transparent url("http://www.k-3d.org/feed-icon-10x10.png") no-repeat;
+  width: 10px;
+  height: 10px;
+  color: blue;
+  margin-top: 6px;
+  margin-right: 8px;
+}
+
+.feeds a.feed_link span
+{
+  display: none;
+}
+
 .feeds div.blog_channel
 {
   border-left: 10px solid #ff8888;
