@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+	<head>
+		<title>Planet K-3D</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="icon" type="image/png" href="http://www.k-3d.org/k3d.png" />
+		<link rel="stylesheet" type="text/css" href="http://www.k-3d.org/k3d.css" />
+<!--
+<link rel="alternate" href="<TMPL_VAR feed ESCAPE="HTML">" title="<TMPL_VAR channel_title_plain ESCAPE="HTML">" type="application/<TMPL_VAR feedtype>+xml">
+-->
+	</head>
+
+<%
+import datetime
+import time
+
+left_entries = filter(lambda entry: entry["source"]["feed_type"] != "commit", entries)
+right_entries = filter(lambda entry: entry["source"]["feed_type"] == "commit", entries)
+
+def entry_date(entry):
+	return datetime.date(entry.updated_parsed.tm_year, entry.updated_parsed.tm_mon, entry.updated_parsed.tm_mday)
+%>
+
+	<body>
+		<div id="nav">
+			<a id="logo" href="http://www.k-3d.org"><h1>K-3D</h1></a>
+
+			<ul>
+				<li><a href="http://www.k-3d.org/downloads">Downloads</a></li>
+				<li><a href="http://www.k-3d.org/donations">Donations</a></li>
+				<li><a href="http://www.k-3d.org/blogs">Blogs</a></li>
+				<li><a href="http://www.k-3d.org/forums">Forums</a></li>
+				<li><a href="http://www.k-3d.org/wiki">Wiki</a></li>
+				<li><a href=".">Planet</a></li>
+				<li><a href="http://www.k-3d.org/tracker">Tracker</a></li>
+			</ul>
+		</div>
+
+		<div id="content">
+			<div id="left" class="feeds">
+					<%
+					last_date = None
+					last_source = None
+					%>
+					% for i in range(len(left_entries)):
+					<%
+					entry = left_entries[i]
+					date = entry_date(entry)
+					source = entry.source
+					%>
+
+					% if date != last_date:
+					<div class="date">
+						<h2>${date.strftime("%B %d, %Y") | h}</h2>
+					% endif
+
+					% if source != last_source or date != last_date:
+						<div class="channel ${source["feed_type"] | h}_channel">
+							<h3><a href="${source.feed.link | h}">${source["custom_title"]}</a></h3>
+					% endif
+
+							<div class="entry">
+								<h4><a href="${entry.link | h}">${entry.title | h}</a></h4>
+								<div class="content">
+									% if source["feed_type"] != "wiki":
+									<p>${entry.content[0].value if entry.has_key("content") else entry.summary}</p>
+									% endif
+								</div>
+							</div> <!-- entry -->
+
+					<%
+					last_source = source
+					last_date = date
+
+					next_entry = left_entries[i+1] if i+1 < len(left_entries) else None
+					next_date = entry_date(next_entry) if next_entry else None
+					next_source = next_entry.source if next_entry else None
+					%>
+
+					% if source != next_source or date != next_date:
+						</div> <!-- channel -->
+					% endif
+
+					% if date != next_date:
+					</div> <!-- date -->
+					% endif
+
+					% endfor
+			</div>
+			<div id="right" class="feeds">
+					<%
+					last_date = None
+					last_source = None
+					%>
+					% for i in range(len(right_entries)):
+					<%
+					entry = right_entries[i]
+					date = datetime.date(entry.updated_parsed.tm_year, entry.updated_parsed.tm_mon, entry.updated_parsed.tm_mday)
+					source = entry.source
+					%>
+
+					% if date != last_date:
+					<div class="date">
+						<h2>${date.strftime("%B %d, %Y") | h}</h2>
+					% endif
+
+					% if source != last_source or date != last_date:
+						<div class="channel ${source["feed_type"] | h}_channel">
+							<h3><a href="${source.feed.link | h}">${source["custom_title"] | h}</a></h3>
+					% endif
+
+							<div class="entry">
+								<h4><a href="${entry.link | h}">${entry.title | h}</a></h4>
+							</div> <!-- entry -->
+
+					<%
+					last_source = source
+					last_date = date
+
+					next_entry = right_entries[i+1] if i+1 < len(right_entries) else None
+					next_date = entry_date(next_entry) if next_entry else None
+					next_source = next_entry.source if next_entry else None
+					%>
+
+					% if source != next_source or date != next_date:
+						</div> <!-- channel -->
+					% endif
+
+					% if date != next_date:
+					</div> <!-- date -->
+					% endif
+
+					% endfor
+			</div>
+
+			<div id="footer">
+				<h2>Feed Details</h2>
+				<table>
+					% for source in sorted(sources, lambda lhs, rhs: cmp(lhs["custom_title"], rhs["custom_title"])):
+					<tr>
+						<td><a href="${source.href | h}">Feed</a></td>
+						<td><a href="${source.feed.link | h}">${source["custom_title"]}</a></td>
+					</tr>
+					% endfor
+				</table>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+		try {
+		var pageTracker = _gat._getTracker("UA-3773195-1");
+		pageTracker._trackPageview();
+		} catch(err) {}</script>
+
+	</body>
+</html>
+

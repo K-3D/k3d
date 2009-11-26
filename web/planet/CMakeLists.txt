@@ -1,0 +1,6 @@
+PROJECT(planet)
+
+ADD_CUSTOM_TARGET(planet-html
+	COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/html"
+	COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/planet" --templates "${CMAKE_CURRENT_SOURCE_DIR}" --output "${CMAKE_CURRENT_BINARY_DIR}/html"
+	)
