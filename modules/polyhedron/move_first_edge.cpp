@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,32 +18,32 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
 
-namespace mesh
-{
-
-namespace detail
+namespace polyhedron
 {
 
 /// Handles negative numbers the way I'd expect it to
-long mymod(const long a, const long b)
+static k3d::int32_t mymod(const k3d::int32_t a, const k3d::int32_t b)
 {
-	long result = a;
+	k3d::int32_t result = a;
 
 	while(result < 0)
 		result += b;
@@ -53,60 +53,59 @@ long mymod(const long a, const long b)
 	return result;
 }
 
-} // namespace detail
-
 /////////////////////////////////////////////////////////////////////////////
 // move_first_edge_implementation
 
 class move_first_edge_implementation :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
 	move_first_edge_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_distance(init_owner(*this) + init_name("distance") + init_label(_("distance")) + init_description(_("Face distance")) + init_value(0UL) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
-		m_distance.changed_signal().connect(make_reset_mesh_slot());
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
+		m_distance.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
-	}
+		Output = Input;
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Mesh);
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		const long distance = m_distance.pipeline_value();
+		const k3d::int32_t distance = m_distance.pipeline_value();
 
-		for(k3d::legacy::mesh::polyhedra_t::const_iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
-			for(k3d::legacy::polyhedron::faces_t::iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
+			if(!polyhedron)
+				continue;
+
+			k3d::mesh::counts_t counts;
+			k3d::polyhedron::create_edge_count_lookup(polyhedron->loop_first_edges, polyhedron->clockwise_edges, counts);
+
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				if(!(*face)->selection_weight)
+				if(!polyhedron->face_selections[face])
 					continue;
 
-				std::vector<k3d::legacy::split_edge*> edges;
-				for(k3d::legacy::split_edge* edge = (*face)->first_edge; edge; edge = edge->face_clockwise)
-				{
-					edges.push_back(edge);
-					if(edge->face_clockwise == (*face)->first_edge)
-						break;
-				}
+				const k3d::uint_t loop = polyhedron->face_first_loops[face];
+				const k3d::uint_t loop_distance = mymod(distance, counts[loop]);
 
-				(*face)->first_edge = edges[detail::mymod(distance, edges.size())];
+				for(k3d::uint_t i = 0; i != loop_distance; ++i)
+					polyhedron->loop_first_edges[loop] = polyhedron->clockwise_edges[polyhedron->loop_first_edges[loop]];
 			}
 		}
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 
@@ -136,7 +135,7 @@ k3d::iplugin_factory& move_first_edge_factory()
 	return move_first_edge_implementation::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 
