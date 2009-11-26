@@ -72,43 +72,43 @@ public:
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
-			if(polyhedron)
+			if(!polyhedron)
+				continue;
+
+			k3d::mesh::counts_t counts;
+			k3d::polyhedron::create_edge_count_lookup(polyhedron->loop_first_edges, polyhedron->clockwise_edges, counts);
+
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
+
+			switch(operation)
 			{
-				k3d::mesh::counts_t counts;
-				k3d::polyhedron::create_edge_count_lookup(polyhedron->loop_first_edges, polyhedron->clockwise_edges, counts);
-
-				const k3d::uint_t face_begin = 0;
-				const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
-
-				switch(operation)
+				case LESS_OR_EQUAL:
 				{
-					case LESS_OR_EQUAL:
+					for(k3d::uint_t face = face_begin; face != face_end; ++face)
 					{
-						for(k3d::uint_t face = face_begin; face != face_end; ++face)
-						{
-							if(counts[polyhedron->face_first_loops[face]] <= sides)
-								polyhedron->face_selections[face] = 1;
-						}
-						break;
+						if(counts[polyhedron->face_first_loops[face]] <= sides)
+							polyhedron->face_selections[face] = 1;
 					}
-					case EQUAL:
+					break;
+				}
+				case EQUAL:
+				{
+					for(k3d::uint_t face = face_begin; face != face_end; ++face)
 					{
-						for(k3d::uint_t face = face_begin; face != face_end; ++face)
-						{
-							if(counts[polyhedron->face_first_loops[face]] == sides)
-								polyhedron->face_selections[face] = 1;
-						}
-						break;
+						if(counts[polyhedron->face_first_loops[face]] == sides)
+							polyhedron->face_selections[face] = 1;
 					}
-					case GREATER_OR_EQUAL:
+					break;
+				}
+				case GREATER_OR_EQUAL:
+				{
+					for(k3d::uint_t face = face_begin; face != face_end; ++face)
 					{
-						for(k3d::uint_t face = face_begin; face != face_end; ++face)
-						{
-							if(counts[polyhedron->face_first_loops[face]] >= sides)
-								polyhedron->face_selections[face] = 1;
-						}
-						break;
+						if(counts[polyhedron->face_first_loops[face]] >= sides)
+							polyhedron->face_selections[face] = 1;
 					}
+					break;
 				}
 			}
 		}
