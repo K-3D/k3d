@@ -37,7 +37,6 @@ SET(SKIP_FILES
 	"^modules/mesh/sds_crease.cpp$"
 	"^modules/mesh/sds_hole.cpp$"
 	"^modules/mesh/weld.cpp$"
-	"^modules/ngui_knife_tool/tool.cpp$"
 	"^modules/polyhedron/bevel_points.cpp$"
 	"^modules/polyhedron/extrude_faces.cpp$"
 	"^modules/polyhedron/helpers.cpp$"

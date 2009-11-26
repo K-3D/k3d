@@ -541,14 +541,6 @@ private:
 				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIRenderRegionTool", get_accel_group())));
 		}
 
-		if(k3d::plugin::factory::lookup("NGUIKnifeTool"))
-		{
-			menu->items().push_back(*Gtk::manage(
-				new Gtk::MenuItem(_("_Knife Tool"), true)
-				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_knife_tool))
-				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIKnifeTool", get_accel_group())));
-		}
-
 		if(k3d::plugin::factory::lookup("NGUISnapTool"))
 		{
 			menu->items().push_back(*Gtk::manage(
@@ -1589,14 +1581,6 @@ private:
 		return_if_fail(parent_tool);
 
 		m_document_state.set_active_tool(*parent_tool);
-	}
-
-	void on_knife_tool()
-	{
-		tool* const knife_tool = m_document_state.get_tool("NGUIKnifeTool");
-		return_if_fail(knife_tool);
-
-		m_document_state.set_active_tool(*knife_tool);
 	}
 
 	void on_snap_tool()
