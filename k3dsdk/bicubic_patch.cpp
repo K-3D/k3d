@@ -10,12 +10,12 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 #include <k3dsdk/bicubic_patch.h>
 #include <k3dsdk/metadata_keys.h>
@@ -177,13 +177,13 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& Primitive)
 {
-  if(!Primitive.get())
-    return 0;
+	if(!Primitive.get())
+		return 0;
 
 	if(Primitive->type != "bicubic_patch")
 		return 0;
 
-  return validate(Mesh, Primitive.writable());
+	return validate(Mesh, Primitive.writable());
 }
 
 } // namespace bicubic_patch
