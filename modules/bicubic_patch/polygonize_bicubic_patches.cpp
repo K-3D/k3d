@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,16 +18,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/imaterial.h>
+#include <k3dsdk/bicubic_patch.h>
+#include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -39,98 +44,123 @@ namespace bicubic_patch
 // polygonize_bicubic_patches
 
 class polygonize_bicubic_patches :
-	public k3d::legacy::mesh_modifier<k3d::node >
+	public k3d::mesh_modifier<k3d::node >
 {
-	typedef k3d::legacy::mesh_modifier<k3d::node > base;
+	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
 	polygonize_bicubic_patches(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_subdivisions(init_owner(*this) + init_name("subdivisions") + init_label(_("Subdivisions")) + init_description(_("Patch subdivision number")) + init_value(3) + init_step_increment(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_units(typeid(k3d::measurement::scalar)))
 	{
-		m_subdivisions.changed_signal().connect(make_reset_mesh_slot());
+		m_subdivisions.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reset_mesh_slot()));
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
-	}
+		Output = k3d::mesh();
+		Output.points = Input.points;
+		Output.point_selection = Input.point_selection;
+		Output.point_attributes = Input.point_attributes;
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		const unsigned long subdivisions = m_subdivisions.pipeline_value();
+		const k3d::int32_t subdivisions = m_subdivisions.pipeline_value();
 
-		// Polygonize each bicubic patch ...
-		for(k3d::legacy::mesh::bicubic_patches_t::const_iterator patch = InputMesh.bicubic_patches.begin(); patch != InputMesh.bicubic_patches.end(); patch++)
+		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
-			Mesh.polyhedra.push_back(new k3d::legacy::polyhedron());
-			k3d::legacy::polyhedron& polyhedron = *Mesh.polyhedra.back();
-
-			// Polygonize patch
-			std::vector<k3d::legacy::point*> points;
-			for(unsigned long j = 0; j <= subdivisions; j++)
+			boost::scoped_ptr<k3d::bicubic_patch::const_primitive> bicubic_patch(k3d::bicubic_patch::validate(Output, **primitive));
+			if(!bicubic_patch)
 			{
-				const double u = static_cast<double>(j) / static_cast<double>(subdivisions);
-				for(unsigned long k = 0; k <= subdivisions; k++)
-				{
-					const double v = static_cast<double>(k) / static_cast<double>(subdivisions);
-					double U[4], V[4];
-					U[0] = (1-u)*(1-u)*(1-u);
-					U[1] = 3*u*(1-u)*(1-u);
-					U[2] = 3*u*u*(1-u);
-					U[3] = u*u*u;
-					V[0] = (1-v)*(1-v)*(1-v);
-					V[1] = 3*v*(1-v)*(1-v);
-					V[2] = 3*v*v*(1-v);
-					V[3] = v*v*v;
+				Output.primitives.push_back(*primitive);
+				continue;
+			}
 
-					k3d::point3 p(0, 0, 0);
-					for(unsigned long l = 0; l < 4; l++)
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+
+			k3d::mesh::points_t& points = Output.points.writable();
+			k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
+
+			const k3d::uint_t patch_begin = 0;
+			const k3d::uint_t patch_end = patch_begin + bicubic_patch->patch_selections.size();
+			for(k3d::uint_t patch = patch_begin; patch != patch_end; ++patch)
+			{
+				const k3d::uint_t point_offset = points.size();
+
+				for(k3d::int32_t j = 0; j <= subdivisions; ++j)
+				{
+					const k3d::double_t u = static_cast<k3d::double_t>(j) / static_cast<k3d::double_t>(subdivisions);
+					for(k3d::int32_t k = 0; k <= subdivisions; ++k)
 					{
-						for(unsigned long m = 0; m < 4; m++)
+						const k3d::double_t v = static_cast<k3d::double_t>(k) / static_cast<k3d::double_t>(subdivisions);
+
+						k3d::double_t U[4], V[4];
+						U[0] = (1-u)*(1-u)*(1-u);
+						U[1] = 3*u*(1-u)*(1-u);
+						U[2] = 3*u*u*(1-u);
+						U[3] = u*u*u;
+						V[0] = (1-v)*(1-v)*(1-v);
+						V[1] = 3*v*(1-v)*(1-v);
+						V[2] = 3*v*v*(1-v);
+						V[3] = v*v*v;
+
+						k3d::point3 new_point(0, 0, 0);
+						for(unsigned long l = 0; l < 4; ++l)
 						{
-							const k3d::point3 position = (*patch)->control_points[l*4+m]->position;
-							p += k3d::to_vector(position * U[l] * V[m]);
+							for(unsigned long m = 0; m < 4; ++m)
+							{
+								const k3d::point3 position = points[bicubic_patch->patch_points[(patch * 16) + (l * 4) + m]];
+								new_point += k3d::to_vector(position * U[l] * V[m]);
+							}
 						}
+
+						points.push_back(new_point);
+						point_selection.push_back(1);
 					}
-
-					k3d::legacy::point* const newpoint = new k3d::legacy::point(p);
-					return_if_fail(newpoint);
-
-					points.push_back(newpoint);
-					Mesh.points.push_back(newpoint);
 				}
-			}
 
-			// Save quads
-			for(unsigned long j = 0; j < subdivisions; j++)
-			{
-				for(unsigned long k = 0; k < subdivisions; k++)
+				for(k3d::int32_t j = 0; j != subdivisions; ++j)
 				{
-					std::vector<k3d::legacy::split_edge*> edges;
-					edges.push_back(new k3d::legacy::split_edge(points[j*(subdivisions+1)+k]));
-					edges.push_back(new k3d::legacy::split_edge(points[j*(subdivisions+1)+k+1]));
-					edges.push_back(new k3d::legacy::split_edge(points[(j+1)*(subdivisions+1)+k+1]));
-					edges.push_back(new k3d::legacy::split_edge(points[(j+1)*(subdivisions+1)+k]));
+					for(k3d::int32_t k = 0; k != subdivisions; ++k)
+					{
+						polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+						polyhedron->face_loop_counts.push_back(1);
+						polyhedron->face_selections.push_back(1);
+						polyhedron->face_materials.push_back(bicubic_patch->patch_materials[patch]);
+						
+						polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
-					k3d::legacy::loop_edges(edges.begin(), edges.end());
-					//for(unsigned long j = 0; j < 4; ++j)
-					//	edges[j]->face_clockwise = edges[(j+1) % blobby_polygons[i].size()];
+						polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+						polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+						polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+						polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() - 3);
 
-					polyhedron.faces.push_back(new k3d::legacy::face(edges.front(), (*patch)->material));
+						polyhedron->edge_selections.push_back(1);
+						polyhedron->edge_selections.push_back(1);
+						polyhedron->edge_selections.push_back(1);
+						polyhedron->edge_selections.push_back(1);
+
+						polyhedron->vertex_points.push_back(point_offset + (j+0) * (subdivisions+1) + (k+0));
+						polyhedron->vertex_points.push_back(point_offset + (j+0) * (subdivisions+1) + (k+1));
+						polyhedron->vertex_points.push_back(point_offset + (j+1) * (subdivisions+1) + (k+1));
+						polyhedron->vertex_points.push_back(point_offset + (j+1) * (subdivisions+1) + (k+0));
+
+						polyhedron->vertex_selections.push_back(1);
+						polyhedron->vertex_selections.push_back(1);
+						polyhedron->vertex_selections.push_back(1);
+						polyhedron->vertex_selections.push_back(1);
+					}
 				}
 			}
 
-			assert_warning(is_valid(polyhedron));
-
-			// Set companions
-			k3d::legacy::set_companions(polyhedron);
+			polyhedron->shell_first_faces.push_back(0);
+			polyhedron->shell_face_counts.push_back(polyhedron->face_first_loops.size());
+			polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 		}
+
+		k3d::mesh::delete_unused_points(Output);
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 
