@@ -466,7 +466,7 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 
 		const k3d::mesh::points_t& input_points = *temp_mesh.points;
 
-		new_points.at(0) = homogeneous(input_points[temp_curves->curve_points[curve_points_begin]], temp_curves->curve_point_weights[curve_points_begin]);
+		new_points[0] = homogeneous(input_points[temp_curves->curve_points[curve_points_begin]], temp_curves->curve_point_weights[curve_points_begin]);
 
 		for (int i = 0; i <= power + t; i++)
 			new_knots.push_back(ua);
@@ -474,7 +474,7 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 		//initialize first bezier segment
 		for (int i = 0; i <= power; i++)
 		{
-			bpts.at(i) = homogeneous(input_points[temp_curves->curve_points[curve_points_begin + i]], temp_curves->curve_point_weights[curve_points_begin + i]);
+			bpts[i] = homogeneous(input_points[temp_curves->curve_points[curve_points_begin + i]], temp_curves->curve_point_weights[curve_points_begin + i]);
 		}
 
 		while (b < m)//big loop through knot vector
@@ -505,7 +505,7 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 				double numer = ub - ua;
 				for (int k = power; k > mul; k--)
 				{
-					alphas.at(k - mul - 1) = numer / (temp_curves->curve_knots[curve_knots_begin + a + k] - ua);
+					alphas[k - mul - 1] = numer / (temp_curves->curve_knots[curve_knots_begin + a + k] - ua);
 				}
 				for (int j = 1; j <= r; j++)
 				{
@@ -513,20 +513,20 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 					int s = mul + j;
 					for (int k = power; k >= s; k--)
 					{
-						bpts.at(k) = alphas.at(k - s) * bpts.at(k) + (1.0 - alphas.at(k - s)) * bpts.at(k - 1);
+						bpts[k] = alphas[k - s] * bpts[k] + (1.0 - alphas[k - s]) * bpts[k - 1];
 					}
-					next_bpts.at(save) = bpts.at(power);
+					next_bpts[save] = bpts[power];
 				}
 			}//end of "insert knot"
 			//degree elevate bezier
 			for (int i = lbz; i <= power + t; i++)
 			{
 				//only points lbz, ... , power+t are used here
-				ebpts.at(i) = k3d::point4(0.0, 0.0, 0.0, 0.0);
+				ebpts[i] = k3d::point4(0.0, 0.0, 0.0, 0.0);
 				int mpi = std::min(power, i);
 				for (int j = std::max(0, i - t); j <= mpi; j++)
 				{
-					ebpts.at(i) += k3d::to_vector(bezalfs.at(i).at(j) * bpts.at(j));
+					ebpts[i] += k3d::to_vector(bezalfs[i][j] * bpts[j]);
 				}
 			}
 
@@ -536,7 +536,7 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 				int first = kind - 2;
 				int last = kind;
 				double den = ub - ua;
-				double bet = (ub - new_knots.at(kind - 1)) / den;
+				double bet = (ub - new_knots[kind - 1]) / den;
 				//knot removal loop
 				for (int tr = 1; tr < oldr; tr++)
 				{
@@ -547,18 +547,18 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 					{
 						if (i < cind)
 						{
-							double alf = (ub - new_knots.at(i)) / (ua - new_knots.at(i));
-							new_points.at(i) = alf * new_points.at(i) + (1.0 - alf) * new_points.at(i - 1);
+							double alf = (ub - new_knots[i]) / (ua - new_knots[i]);
+							new_points[i] = alf * new_points[i] + (1.0 - alf) * new_points[i - 1];
 						}
 						if (j >= lbz)
 						{
 							if (j - tr <= kind - power - t + oldr)
 							{
-								double gam = (ub - new_knots.at(j - tr)) / den;
-								ebpts.at(kj) = gam * ebpts.at(kj) + (1.0 - gam) * ebpts.at(kj + 1);
+								double gam = (ub - new_knots[j - tr]) / den;
+								ebpts[kj] = gam * ebpts[kj] + (1.0 - gam) * ebpts[kj + 1];
 							}
 							else
-								ebpts.at(kj) = bet * ebpts.at(kj) + (1.0 - bet) * ebpts.at(kj + 1);
+								ebpts[kj] = bet * ebpts[kj] + (1.0 - bet) * ebpts[kj + 1];
 						}
 						i++;
 						j--;
@@ -572,13 +572,13 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 			{
 				for (int i = 0; i < power + t - oldr; i++)
 				{
-					new_knots.at(kind) = ua;
+					new_knots[kind] = ua;
 					kind++;
 				}
 			}
 			for (int j = lbz; j <= rbz; j++)
 			{
-				new_points.at(cind) = ebpts.at(j);
+				new_points[cind] = ebpts[j];
 				cind++;
 
 			}
@@ -586,7 +586,7 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 			if (b < m)
 			{
 				for (int j = 0; j < r; j++)
-					bpts.at(j) = next_bpts.at(j);
+					bpts[j] = next_bpts[j];
 				for (int j = r; j <= power; j++)
 				{
 
@@ -600,7 +600,7 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 			{
 				for (int i = 0; i <= power + t; i++)
 				{
-					new_knots.at(kind + i) = ub;
+					new_knots[kind + i] = ub;
 				}
 			}
 		}//end while loop (b < m)
@@ -931,7 +931,7 @@ void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::me
 		for (k3d::uint_t i = 0; i <= Order - 1 - j - s; i++)
 		{
 			alpha = (u - normalized_knots[L + i]) / (normalized_knots[i + k + 1] - normalized_knots[L + i]);
-			tmp[i] = alpha * tmp.at(i + 1) + (1.0 - alpha) * tmp.at(i);
+			tmp[i] = alpha * tmp[i + 1] + (1.0 - alpha) * tmp[i];
 		}
 		const k3d::point4& t1 = tmp[0];
 		double w = t1[3];
@@ -1147,24 +1147,19 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 
 const k3d::point3 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U)
 {
-	if(U < 0.000001)
-		return Points.front();
-	if(U > 0.999999)
-		return Points.back();
-	k3d::mesh::points_t points = Points;
-	k3d::mesh::weights_t weights = Weights;
-	k3d::mesh::knots_t normalized_knots(Knots.size());
-	std::transform(Knots.begin(), Knots.end(), normalized_knots.begin(), knot_normalizer(Knots.front(), Knots.back()));
+	k3d::mesh::knots_t bases;
 	const k3d::uint_t order = Knots.size() - Points.size();
-	const k3d::uint_t mul = multiplicity(normalized_knots, U, 0, Knots.size());
-
-	// Insert a knot up to the curve degree
-	if(mul < (order - 1))
-		insert_knot(points, normalized_knots, weights, U, order - mul - 1, order);
-
-	// Find the corresponding point
-	const k3d::mesh::knots_t::iterator split_knot = std::find_if(normalized_knots.begin(), normalized_knots.end(), find_first_knot_after(U));
-	return points[(split_knot - normalized_knots.begin()) - order];
+	basis_functions(bases, Knots, order, U);
+	const k3d::uint_t knot_idx = std::find_if(Knots.begin(), Knots.end(), find_first_knot_after(U)) - Knots.begin();
+	const k3d::uint_t first_point = knot_idx - order;
+	k3d::point4 result(0,0,0,0);
+	for(k3d::uint_t i = 0; i != order; ++i)
+	{
+		const k3d::double_t w = Weights[first_point+i];
+		const k3d::point3& pt = Points[first_point+i];
+		result += k3d::to_vector(bases[i]*k3d::point4(pt[0]*w, pt[1]*w, pt[2]*w, w));
+	}
+	return k3d::point3(result[0]/result[3], result[1]/result[3], result[2]/result[3]);
 }
 
 const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU)
@@ -1173,6 +1168,32 @@ const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::w
 	const k3d::point3 u_point = evaluate_position(Points, Weights, Knots, u);
 	const k3d::point3 du_point = evaluate_position(Points, Weights, Knots, u + DeltaU);
 	return k3d::normalize(du_point - u_point);
+}
+
+void basis_functions(k3d::mesh::weights_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U)
+{
+	BasisFunctions.resize(Order, 0.0);
+	BasisFunctions[0] = 1;
+	k3d::mesh::weights_t left(Order, 0.0);
+	k3d::mesh::weights_t right(Order, 0.0);
+
+	const k3d::uint_t span = std::find_if(Knots.begin(), Knots.end(), find_first_knot_after(U)) - Knots.begin() - 1;
+
+	for (k3d::uint_t j = 1; j != Order; j++)
+	{
+		left[j] = U - Knots[span + 1 - j];
+		right[j] = Knots[span + j] - U;
+
+		k3d::double_t saved = 0.0;
+
+		for (k3d::uint_t r = 0; r != j; r++)
+		{
+			k3d::double_t temp = BasisFunctions[r] / (right[r + 1] + left[j - r]);
+			BasisFunctions[r] = saved + right[r + 1] * temp;
+			saved = left[j - r] * temp;
+		}
+		BasisFunctions[j] = saved;
+	}
 }
 
 } //namespace nurbs

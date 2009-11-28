@@ -124,6 +124,9 @@ const k3d::point3 evaluate_position(const k3d::mesh::points_t& Points, const k3d
 /// Get the normalized tangent vector at the given location on the curve
 const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU = 0.00001);
 
+/// Calculate the non-zero values of the B-spline basis functions at the given parameter value
+void basis_functions(k3d::mesh::weights_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U);
+
 } //namespace nurbs
 
 } //namespace module

@@ -122,8 +122,13 @@ void bbox2(k3d::point2& Min, k3d::point2& Max, const k3d::mesh::points_2d_t& Poi
 /// Skinned surface between the curves in the given primitive
 void skin_curves(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::primitive& InputCurves, const k3d::mesh::knots_t VKnots, const k3d::uint_t VOrder);
 
-/// Sweeps the curves in SweepedCurves along the Paths
-void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& SweptCurves, const k3d::nurbs_curve::const_primitive& Paths, const k3d::uint_t Segments);
+/// Sweeps the curves in SweepedCurves along the curves in Paths
+/**
+ * Algorithm: Each control point on the curve to sweep is traced along the convex hull of the path.
+ * This is done by projecting the control points on planes that bisect the convex hull of the path,
+ * or planes normal to the path in the case of the start and end points.
+ */
+void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& SweptCurves, const k3d::nurbs_curve::const_primitive& Paths);
 
 } //namespace nurbs
 

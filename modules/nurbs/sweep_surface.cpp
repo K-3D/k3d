@@ -58,15 +58,9 @@ class sweep_surface :
 public:
 	sweep_surface(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_swap(init_owner(*this) + init_name(_("swap")) + init_label(_("Swap the curves?")) + init_description(_("Exchanges the profile curve and the traverse curve")) + init_value(false)),
-		m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false)),
-		m_segments(init_owner(*this) + init_name(_("segments")) + init_label(_("Segments")) + init_description(_("The more segments the better the result")) + init_value(10) + init_constraint(constraint::minimum(3))),
 		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the original curves")) + init_value(true))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-		m_create_caps.changed_signal().connect(make_update_mesh_slot());
-		m_swap.changed_signal().connect(make_update_mesh_slot());
-		m_segments.changed_signal().connect(make_update_mesh_slot());
 		m_delete_original.changed_signal().connect(make_update_mesh_slot());
 	}
 
@@ -92,7 +86,7 @@ public:
 		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_paths(k3d::nurbs_curve::validate(selected_curves_mesh, *selected_curves_mesh.primitives.front()));
 		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_sweep_curves(k3d::nurbs_curve::validate(selected_curves_mesh, *selected_curves_mesh.primitives.back()));
 
-		sweep(Output, *output_patches, selected_curves_mesh, *const_sweep_curves, *const_paths, m_segments.pipeline_value());
+		sweep(Output, *output_patches, selected_curves_mesh, *const_sweep_curves, *const_paths);
 
 		if(m_delete_original.pipeline_value())
 		{
@@ -136,9 +130,6 @@ private:
 			}
 		}
 	};
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_create_caps;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_segments;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_swap;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
 };
 
