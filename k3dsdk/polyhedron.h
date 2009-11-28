@@ -173,6 +173,11 @@ void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices,
 /// Adds a face with holes to an existing primitive.
 void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material);
 
+/// Adds a triangle to an existing primitive.
+void add_triangle(mesh& Mesh, primitive& Polyhedron, uint_t V1, uint_t V2, uint_t V3, imaterial* const Material);
+/// Adds a quadrilateral to an existing primitive.
+void add_quadrilateral(mesh& Mesh, primitive& Polyhedron, uint_t V1, uint_t V2, uint_t V3, uint_t V4, imaterial* const Material);
+
 /// Returns true iff every face in the given polyhedron is a triangle.
 bool_t is_triangles(const const_primitive& Polyhedron);
 /// Returns true iff the given polyhedron is a solid (i.e. it has no topological holes).

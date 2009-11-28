@@ -779,6 +779,80 @@ void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices,
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
+// add_triangle
+
+void add_triangle(mesh& Mesh, primitive& Polyhedron, uint_t V1, uint_t V2, uint_t V3, imaterial* const Material)
+{
+	return_if_fail(Polyhedron.shell_first_faces.size() == 1);
+	return_if_fail(Polyhedron.shell_face_counts.size() == 1);
+	return_if_fail(Polyhedron.shell_types.size() == 1);
+
+	Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
+	Polyhedron.face_loop_counts.push_back(1);
+	Polyhedron.face_selections.push_back(0);
+	Polyhedron.face_materials.push_back(Material);
+
+	Polyhedron.loop_first_edges.push_back(Polyhedron.clockwise_edges.size());
+
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() - 2);
+
+	Polyhedron.edge_selections.push_back(0);
+	Polyhedron.edge_selections.push_back(0);
+	Polyhedron.edge_selections.push_back(0);
+
+	Polyhedron.vertex_points.push_back(V1);
+	Polyhedron.vertex_points.push_back(V2);
+	Polyhedron.vertex_points.push_back(V3);
+
+	Polyhedron.vertex_selections.push_back(0);
+	Polyhedron.vertex_selections.push_back(0);
+	Polyhedron.vertex_selections.push_back(0);
+
+	Polyhedron.shell_face_counts.back() = Polyhedron.face_first_loops.size();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// add_quadrilateral
+
+void add_quadrilateral(mesh& Mesh, primitive& Polyhedron, uint_t V1, uint_t V2, uint_t V3, uint_t V4, imaterial* const Material)
+{
+	return_if_fail(Polyhedron.shell_first_faces.size() == 1);
+	return_if_fail(Polyhedron.shell_face_counts.size() == 1);
+	return_if_fail(Polyhedron.shell_types.size() == 1);
+
+	Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
+	Polyhedron.face_loop_counts.push_back(1);
+	Polyhedron.face_selections.push_back(0);
+	Polyhedron.face_materials.push_back(Material);
+
+	Polyhedron.loop_first_edges.push_back(Polyhedron.clockwise_edges.size());
+
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() - 3);
+
+	Polyhedron.edge_selections.push_back(0);
+	Polyhedron.edge_selections.push_back(0);
+	Polyhedron.edge_selections.push_back(0);
+	Polyhedron.edge_selections.push_back(0);
+
+	Polyhedron.vertex_points.push_back(V1);
+	Polyhedron.vertex_points.push_back(V2);
+	Polyhedron.vertex_points.push_back(V3);
+	Polyhedron.vertex_points.push_back(V4);
+
+	Polyhedron.vertex_selections.push_back(0);
+	Polyhedron.vertex_selections.push_back(0);
+	Polyhedron.vertex_selections.push_back(0);
+	Polyhedron.vertex_selections.push_back(0);
+
+	Polyhedron.shell_face_counts.back() = Polyhedron.face_first_loops.size();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 // is_triangles
 
 bool_t is_triangles(const const_primitive& Polyhedron)
