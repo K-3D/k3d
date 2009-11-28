@@ -18,7 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
@@ -28,11 +29,12 @@
 #include <k3dsdk/file_helpers.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/legacy_mesh_source.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh_source.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/string_modifiers.h>
@@ -77,11 +79,11 @@ typedef struct s_rec
 	k3d::vector3	upp;	// up direction
 	k3d::point3	last;	// last position used for connecting cylinders
 	k3d::point3	last_v[8];	// last vertices of object used for connecting cylinders
-	double		dis;	// value of F distance
-	double		ang;	// value of basic angle
-	double		thick;	// value of thickness
-	double		dis2;	// value of Z distance
-	double		tr;	// trope value
+	k3d::double_t		dis;	// value of F distance
+	k3d::double_t		ang;	// value of basic angle
+	k3d::double_t		thick;	// value of thickness
+	k3d::double_t		dis2;	// value of Z distance
+	k3d::double_t		tr;	// trope value
 	unsigned long	col;	// current color
 	unsigned long	last_col;	// color of last object
 } s_rec;
@@ -93,19 +95,19 @@ bool closed_form = false;
 bool last_recur = false; // processing the last recursion step
 
 // Init vars
-double		thick, min_thick = 0.0, rand_amount = 0.0;
-double		trope_amount = 0.0;
+k3d::double_t		thick, min_thick = 0.0, rand_amount = 0.0;
+k3d::double_t		trope_amount = 0.0;
 unsigned long	polcount = 0;
 // Limit total generated polygons
 unsigned long	poly_limit = 500000L;
 // Set maximum production string size in kbytes
 unsigned long	max_string = 2L * 1024L * 1024L;
 unsigned long	col = 2, lev, last_col = 0;
-double		dis, ang, dis2, tr = 0.2;
+k3d::double_t		dis, ang, dis2, tr = 0.2;
 k3d::vector3	sky(0.0, 0.0, 1.0);
 k3d::vector3	trope;
 k3d::point3	last(1.0, 1.0, 1.0), last_v[8];
-double		fraction;
+k3d::double_t		fraction;
 k3d::point3	axis_x, axis_y, axis_z;
 
 // Stacks []
@@ -150,9 +152,9 @@ bool flip_normals;
 
 // Bounding-box
 k3d::bounding_box3 bounding_box;
-double bbox_x = 0;
-double bbox_y = 0;
-double bbox_z = 0;
+k3d::double_t bbox_x = 0;
+k3d::double_t bbox_y = 0;
+k3d::double_t bbox_z = 0;
 
 // LViewer colors
 const unsigned long color_number = 15;
@@ -174,17 +176,31 @@ k3d::color colors[color_number] = {
 	k3d::color(0.9, 0.9, 0.9)
 };
 
-// Convert an object to a k3d::legacy::mesh
-bool add_geometry(unsigned long Color, k3d::legacy::mesh* mesh, k3d::imaterial* const Material)
+struct context
 {
-	std::vector<k3d::legacy::point*> points;
+	context(k3d::mesh::points_t& Points, k3d::mesh::selection_t& PointSelection, k3d::polyhedron::primitive& Polyhedron, k3d::imaterial* const Material) :
+		points(Points),
+		point_selection(PointSelection),
+		polyhedron(Polyhedron),
+		material(Material)
+	{
+	}
 
+	k3d::mesh::points_t& points;
+	k3d::mesh::selection_t& point_selection;
+	k3d::polyhedron::primitive& polyhedron;
+	k3d::imaterial* const material;
+};
+
+bool add_geometry(unsigned long Color, const context& Context)
+{
+	k3d::mesh::indices_t new_points;
 	for(unsigned long t = 0; t < vertices.size(); t++)
 	{
 		// Update orientation and change handedness
-		double x = 0;
-		double y = 0;
-		double z = 0;
+		k3d::double_t x = 0;
+		k3d::double_t y = 0;
+		k3d::double_t z = 0;
 		switch(orientation)
 		{
 			case k3d::PX:
@@ -219,38 +235,119 @@ bool add_geometry(unsigned long Color, k3d::legacy::mesh* mesh, k3d::imaterial* 
 				break;
 		}
 
-		k3d::legacy::point* point = new k3d::legacy::point(x, y, z);
-		points.push_back(point);
-		mesh->points.push_back(point);
+		const k3d::point3 point(x, y, z);
 
-		bounding_box.insert(point->position);
+		new_points.push_back(Context.points.size());
+
+		Context.points.push_back(point);
+		Context.point_selection.push_back(0);
+		bounding_box.insert(point);
 	}
 
 	for(unsigned long t = 0; t < polygons.size(); t++)
 	{
-		std::vector<k3d::legacy::split_edge*> edges;
-		edges.push_back(new k3d::legacy::split_edge(points[polygons[t].a]));
-		edges.push_back(new k3d::legacy::split_edge(points[polygons[t].b]));
-		edges.push_back(new k3d::legacy::split_edge(points[polygons[t].c]));
+		Context.polyhedron.face_first_loops.push_back(Context.polyhedron.loop_first_edges.size());
+		Context.polyhedron.face_loop_counts.push_back(1);
+		Context.polyhedron.face_selections.push_back(0);
+		Context.polyhedron.face_materials.push_back(Context.material);
 
-		if(polygons[t].c != polygons[t].d)
-			edges.push_back(new k3d::legacy::split_edge(points[polygons[t].d]));
+		Context.polyhedron.loop_first_edges.push_back(Context.polyhedron.clockwise_edges.size());
 
 		if(flip_normals)
-			std::reverse(edges.begin(), edges.end());
-		k3d::legacy::loop_edges(edges.begin(), edges.end());
-		k3d::legacy::polyhedron& polyhedron = *mesh->polyhedra.back();
+		{
+			if(polygons[t].c != polygons[t].d)
+			{
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() + 1);
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() + 1);
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() + 1);
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() - 3);
 
-		k3d::legacy::face* new_face = new k3d::legacy::face(edges.front(), Material);
-		return_val_if_fail(new_face, false);
-		polyhedron.faces.push_back(new_face);
+				Context.polyhedron.edge_selections.push_back(0);
+				Context.polyhedron.edge_selections.push_back(0);
+				Context.polyhedron.edge_selections.push_back(0);
+				Context.polyhedron.edge_selections.push_back(0);
 
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].a]);
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].d]);
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].c]);
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].b]);
+
+				Context.polyhedron.vertex_selections.push_back(0);
+				Context.polyhedron.vertex_selections.push_back(0);
+				Context.polyhedron.vertex_selections.push_back(0);
+				Context.polyhedron.vertex_selections.push_back(0);
+			}
+			else
+			{
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() + 1);
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() + 1);
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() - 2);
+
+				Context.polyhedron.edge_selections.push_back(0);
+				Context.polyhedron.edge_selections.push_back(0);
+				Context.polyhedron.edge_selections.push_back(0);
+
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].a]);
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].c]);
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].b]);
+
+				Context.polyhedron.vertex_selections.push_back(0);
+				Context.polyhedron.vertex_selections.push_back(0);
+				Context.polyhedron.vertex_selections.push_back(0);
+			}
+		}
+		else
+		{
+			if(polygons[t].c != polygons[t].d)
+			{
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() + 1);
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() + 1);
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() + 1);
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() - 3);
+
+				Context.polyhedron.edge_selections.push_back(0);
+				Context.polyhedron.edge_selections.push_back(0);
+				Context.polyhedron.edge_selections.push_back(0);
+				Context.polyhedron.edge_selections.push_back(0);
+
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].a]);
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].b]);
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].c]);
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].d]);
+
+				Context.polyhedron.vertex_selections.push_back(0);
+				Context.polyhedron.vertex_selections.push_back(0);
+				Context.polyhedron.vertex_selections.push_back(0);
+				Context.polyhedron.vertex_selections.push_back(0);
+			}
+			else
+			{
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() + 1);
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() + 1);
+				Context.polyhedron.clockwise_edges.push_back(Context.polyhedron.clockwise_edges.size() - 2);
+
+				Context.polyhedron.edge_selections.push_back(0);
+				Context.polyhedron.edge_selections.push_back(0);
+				Context.polyhedron.edge_selections.push_back(0);
+
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].a]);
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].b]);
+				Context.polyhedron.vertex_points.push_back(new_points[polygons[t].c]);
+
+				Context.polyhedron.vertex_selections.push_back(0);
+				Context.polyhedron.vertex_selections.push_back(0);
+				Context.polyhedron.vertex_selections.push_back(0);
+			}
+		}
+
+/*
 		// Set color ...
 		unsigned long color_index = Color;
 		if(color_index > color_number - 1)
 			color_index = 0;
 
 		new_face->uniform_data["Cs"] = colors[color_index];
+*/
 	}
 
 	return true;
@@ -258,15 +355,15 @@ bool add_geometry(unsigned long Color, k3d::legacy::mesh* mesh, k3d::imaterial* 
 
 
 // Here we build a cube shape directly on the input vectors
-void add_cube(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned long color, k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::signed_axis Orientation)
+void add_cube(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned long color, const context& Context, const k3d::signed_axis Orientation)
 {
 	// Check size
 	k3d::vector3 direction = end - start;
-	double length = direction.length();
+	k3d::double_t length = direction.length();
 	if(length == 0)
 		return;
 
-	double s = length * thick;
+	k3d::double_t s = length * thick;
 	s = std::max(s, min_thick);
 	s *= 0.5;
 
@@ -301,21 +398,21 @@ void add_cube(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned long
 	polygons.push_back(polygon(0, 1, 2, 3));
 	polygons.push_back(polygon(7, 6, 5, 4));
 
-	add_geometry(color, mesh, Material);
+	add_geometry(color, Context);
 }
 
 // The lastxxx vars are used to store the previous top of the cylinder
 // for connecting a next one; since the vars are stacked for [] we can
 // connect correctly according to current nesting level
-void add_cylinder(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned long color, k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::signed_axis Orientation)
+void add_cylinder(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned long color, const context& Context, const k3d::signed_axis Orientation)
 {
 	// Check size
 	k3d::vector3 direction = end - start;
-	double length = direction.length();
+	k3d::double_t length = direction.length();
 	if(length == 0.0)
 		return;
 
-	double s = length * thick;
+	k3d::double_t s = length * thick;
 	s = std::max(s, min_thick);
 	s *= 0.5;
 
@@ -349,7 +446,7 @@ void add_cylinder(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned 
 	{
 		direction = start - last;
 		length = direction.length();
-		double dd = std::numeric_limits<double>::max();
+		k3d::double_t dd = std::numeric_limits<k3d::double_t>::max();
 
 		// Connect cylinders if near enough
 		if(length < 1.0)
@@ -386,7 +483,7 @@ void add_cylinder(k3d::point3 start, k3d::point3 end, k3d::vector3 up, unsigned 
 	polygons.push_back(polygon(6, 14, 15, 7));
 	polygons.push_back(polygon(7, 15, 8, 0));
 
-	add_geometry(color, mesh, Material);
+	add_geometry(color, Context);
 
 	// Save cylinder's parameters and top vertices
 	last_col = color;
@@ -421,7 +518,7 @@ bool ls_line(std::istream& file, std::string& linebuffer)
 	return false;
 }
 
-bool load_configuration_values(const k3d::filesystem::path& file_path, double& recursion, double& basic_angle, double& thickness)
+bool load_configuration_values(const k3d::filesystem::path& file_path, k3d::double_t& recursion, k3d::double_t& basic_angle, k3d::double_t& thickness)
 {
 	// Open configuration file
 	k3d::filesystem::ifstream file(file_path);
@@ -451,7 +548,7 @@ bool load_configuration_values(const k3d::filesystem::path& file_path, double& r
 }
 
 // Process a ls file and setup rules
-bool load_configuration_rules(const double recursion, const double basic_angle, const double thickness, const k3d::filesystem::path& file_path)
+bool load_configuration_rules(const k3d::double_t recursion, const k3d::double_t basic_angle, const k3d::double_t thickness, const k3d::filesystem::path& file_path)
 {
 	// Open grammar file
 	k3d::filesystem::ifstream file(file_path);
@@ -485,7 +582,7 @@ bool load_configuration_rules(const double recursion, const double basic_angle, 
 	return_val_if_fail(ls_line(file, temp), false);
 
 	lev = (unsigned long)std::floor(recursion);
-	fraction = recursion - (double)lev;
+	fraction = recursion - (k3d::double_t)lev;
 	if(fraction > 0)
 		lev++;
 
@@ -599,8 +696,8 @@ bool load_configuration_rules(const double recursion, const double basic_angle, 
 }
 
 // Apply mutations to the rules
-const double inv_max = 1.0 / RAND_MAX;
-double Rnd()
+const k3d::double_t inv_max = 1.0 / RAND_MAX;
+k3d::double_t Rnd()
 {
 	return rand() * inv_max;
 }
@@ -612,7 +709,7 @@ void L_mutate()
 		if(rules[n][0] == '+')
 			break;
 
-	double rules_n = static_cast<double>(n);
+	k3d::double_t rules_n = static_cast<k3d::double_t>(n);
 	const unsigned long max = 1000;
 
 	unsigned long i = static_cast<unsigned long>(Rnd() * 6.0);
@@ -630,7 +727,7 @@ void L_mutate()
 
 			unsigned long j = static_cast<unsigned long>(Rnd() * rules_n);
 
-			unsigned long k = (unsigned long)(Rnd() * (double)rules[j].length());
+			unsigned long k = (unsigned long)(Rnd() * (k3d::double_t)rules[j].length());
 			k = (k < 2) ? 2 : k;
 			std::string rulet = std::string(rules[j], k);
 			rules[j].replace(k, rulet.length(), '[' + T + ']');
@@ -845,8 +942,8 @@ void L_save()
 }
 
 // Read a (xx) value from a production string
-// at location j and return it as double
-double parse_value(unsigned long& j)
+// at location j and return it as k3d::double_t
+k3d::double_t parse_value(unsigned long& j)
 {
 	// Skip current character and '('
 	j += 2;
@@ -856,7 +953,7 @@ double parse_value(unsigned long& j)
 		val += object_string[j++];
 
 	std::stringstream scan(val);
-	double r = 0.0;
+	k3d::double_t r = 0.0;
 	scan >> r;
 
 	if(last_recur)
@@ -868,18 +965,18 @@ double parse_value(unsigned long& j)
 // Set up a rotation matrix
 k3d::vector3 C1, C2, C3;
 
-void set_rotation_matrix(double a, k3d::vector3 n)
+void set_rotation_matrix(k3d::double_t a, k3d::vector3 n)
 {
-	double cosa = cos(a);
-	double sina = sin(a);
+	k3d::double_t cosa = cos(a);
+	k3d::double_t sina = sin(a);
 
-	double n11 = n[0] * n[0];
-	double n22 = n[1] * n[1];
-	double n33 = n[2] * n[2];
+	k3d::double_t n11 = n[0] * n[0];
+	k3d::double_t n22 = n[1] * n[1];
+	k3d::double_t n33 = n[2] * n[2];
 
-	double nxy = n[0] * n[1];
-	double nxz = n[0] * n[2];
-	double nyz = n[1] * n[2];
+	k3d::double_t nxy = n[0] * n[1];
+	k3d::double_t nxz = n[0] * n[2];
+	k3d::double_t nyz = n[1] * n[2];
 
 	C1[0] = n11 + (1.0 - n11) * cosa;
 	C1[1] = nxy * (1.0 - cosa) - n[2] * sina;
@@ -900,14 +997,14 @@ k3d::vector3 rotate(const k3d::vector3& In)
 }
 
 // Process a production string and generate form
-void L_draw(k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::signed_axis Orientation)
+void L_draw(const context& Context, const k3d::signed_axis Orientation)
 {
 	// Save values
-	double thick_l = 0;
-	double ang_l = 0;
-	double dis_l = 0;
-	double dis2_l = 0;
-	double trope_l = 0;
+	k3d::double_t thick_l = 0;
+	k3d::double_t ang_l = 0;
+	k3d::double_t dis_l = 0;
+	k3d::double_t dis2_l = 0;
+	k3d::double_t trope_l = 0;
 
 	bool poly_on = false;
 
@@ -995,13 +1092,13 @@ void L_draw(k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::
 
 			case '~':
 			{
-				double r = 6.0;
+				k3d::double_t r = 6.0;
 				if(next == '(')
 					r = 0.017453 * parse_value(i);
 				else if(rand_set)
 					r = 0.017453 * rand_amount;
 
-				double a = Rnd() * r * 2.0 - r;
+				k3d::double_t a = Rnd() * r * 2.0 - r;
 				set_rotation_matrix(a, upp);
 				fow = rotate(fow);
 				lef = rotate(lef);
@@ -1037,7 +1134,7 @@ void L_draw(k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::
 				trope[1] = -trope[1];
 				trope[2] = 0.0;
 				trope = k3d::normalize(trope);
-				double r = tr * (fow * trope);
+				k3d::double_t r = tr * (fow * trope);
 				set_rotation_matrix(-r, lef);
 				fow = rotate(fow);
 				upp = rotate(upp);
@@ -1204,7 +1301,7 @@ void L_draw(k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::
 			case '\'':
 				if(next == '(')
 				{
-					double r = parse_value(i);
+					k3d::double_t r = parse_value(i);
 					if(last_recur)
 					{
 						dis *= 1.0 + fraction * (r - 1.0);
@@ -1234,7 +1331,7 @@ void L_draw(k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::
 			case '"':
 				if(next == '(')
 				{
-					double r = parse_value(i);
+					k3d::double_t r = parse_value(i);
 					if(last_recur)
 					{
 						dis *= 1.0 + fraction * (r - 1.0);
@@ -1273,9 +1370,9 @@ void L_draw(k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::
 
 				k3d::point3 end = pos + dis2 * fow;
 				if(closed_form)
-					add_cylinder(pos, end, upp, col, mesh, Material, Orientation);
+					add_cylinder(pos, end, upp, col, Context, Orientation);
 				else
-					add_cube(pos, end, upp, col, mesh, Material, Orientation);
+					add_cube(pos, end, upp, col, Context, Orientation);
 
 				pos = end;
 				dis2 = save.dis2;
@@ -1294,9 +1391,9 @@ void L_draw(k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::
 
 				k3d::point3 end = pos + dis * fow;
 				if(closed_form)
-					add_cylinder(pos, end, upp, col, mesh, Material, Orientation);
+					add_cylinder(pos, end, upp, col, Context, Orientation);
 				else
-					add_cube(pos, end, upp, col, mesh, Material, Orientation);
+					add_cube(pos, end, upp, col, Context, Orientation);
 
 				pos = end;
 				dis = save.dis;
@@ -1429,7 +1526,7 @@ void L_draw(k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::
 					for(unsigned long j = 1; j < vertices.size() - 1; j++)
 						polygons.push_back(polygon(0, j, j + 1, j + 1));
 
-					add_geometry(col, mesh, Material);
+					add_geometry(col, Context);
 				}
 
 				poly_on = false;
@@ -1457,11 +1554,8 @@ void L_draw(k3d::legacy::mesh* mesh, k3d::imaterial* const Material, const k3d::
 	}
 }
 
-bool l_parser(const unsigned long RandomSeed, const bool ClosedForm, const double Trope, const unsigned long Mutations, const unsigned long MutationSeed, const unsigned long MaximalStackSize, k3d::legacy::mesh* Mesh, k3d::imaterial* const Material, const k3d::signed_axis Orientation, const bool FlipNormals)
+bool l_parser(const unsigned long RandomSeed, const bool ClosedForm, const k3d::double_t Trope, const unsigned long Mutations, const unsigned long MutationSeed, const unsigned long MaximalStackSize, const context& Context, const k3d::signed_axis Orientation, const bool FlipNormals)
 {
-	// Make sure we have a polyhedron to fill
-	return_val_if_fail(Mesh->polyhedra.size(), false);
-
 	// set minimum thickness
 	//min_thick = ;
 
@@ -1487,7 +1581,7 @@ bool l_parser(const unsigned long RandomSeed, const bool ClosedForm, const doubl
 	// Parse production string and create geometry
 	srand(RandomSeed);
 	max_stack_size = MaximalStackSize;
-	L_draw(Mesh, Material, Orientation);
+	L_draw(Context, Orientation);
 
 	return true;
 }
@@ -1498,15 +1592,15 @@ bool l_parser(const unsigned long RandomSeed, const bool ClosedForm, const doubl
 // l_parser
 
 class l_parser :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	l_parser(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_file_path(init_owner(*this) + init_name("file") + init_label(_("File")) + init_description(_("File path for lsystem description")) + init_value(k3d::filesystem::path(k3d::share_path() / k3d::filesystem::generic_path("lsystem/abop-nested-polygon-leaves.ls"))) + init_path_mode(k3d::ipath_property::READ) + init_path_type("lsystems")),
-		m_recursion(init_owner(*this) + init_name("growth") + init_label(_("Growth")) + init_description(_("Growth value")) + init_value(5.0) + init_step_increment(0.1) + init_constraint(constraint::minimum<double>(1.0)) + init_units(typeid(k3d::measurement::scalar))),
+		m_recursion(init_owner(*this) + init_name("growth") + init_label(_("Growth")) + init_description(_("Growth value")) + init_value(5.0) + init_step_increment(0.1) + init_constraint(constraint::minimum<k3d::double_t>(1.0)) + init_units(typeid(k3d::measurement::scalar))),
 		m_basic_angle(init_owner(*this) + init_name("basic_angle") + init_label(_("Basic angle")) + init_description(_("Basic angle")) + init_value(10.0) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
 		m_thickness(init_owner(*this) + init_name("thickness") + init_label(_("Thickness")) + init_description(_("Thickness")) + init_value(50.0) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
 		m_random_seed(init_owner(*this) + init_name("random_seed") + init_label(_("Random seed")) + init_description(_("Random seed")) + init_value(0) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -1520,18 +1614,30 @@ public:
 	{
 		m_file_path.changed_signal().connect(sigc::mem_fun(*this, &l_parser::on_new_file));
 
-		m_material.changed_signal().connect(make_reset_mesh_slot());
-		m_recursion.changed_signal().connect(make_reset_mesh_slot());
-		m_basic_angle.changed_signal().connect(make_reset_mesh_slot());
-		m_thickness.changed_signal().connect(make_reset_mesh_slot());
-		m_random_seed.changed_signal().connect(make_reset_mesh_slot());
-		m_size.changed_signal().connect(make_reset_mesh_slot());
-		m_closed_form.changed_signal().connect(make_reset_mesh_slot());
-		m_mutations.changed_signal().connect(make_reset_mesh_slot());
-		m_mutation_seed.changed_signal().connect(make_reset_mesh_slot());
-		m_max_stack_size.changed_signal().connect(make_reset_mesh_slot());
-		m_orientation.changed_signal().connect(make_reset_mesh_slot());
-		m_flip_normals.changed_signal().connect(make_reset_mesh_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_recursion.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_basic_angle.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_thickness.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_random_seed.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_size.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_closed_form.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_mutations.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_mutation_seed.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_max_stack_size.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_orientation.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_flip_normals.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 
 		// Init with default example
 		init_lsystem();
@@ -1541,7 +1647,7 @@ public:
 	{
 		// Load configuration file
 		const k3d::filesystem::path file_path = m_file_path.pipeline_value();
-		double recursion, basic_angle, thickness;
+		k3d::double_t recursion, basic_angle, thickness;
 		if(!lparser::load_configuration_values(file_path, recursion, basic_angle, thickness))
 			return;
 
@@ -1558,16 +1664,18 @@ public:
 	void on_new_file(k3d::iunknown*)
 	{
 		init_lsystem();
-		make_reset_mesh_slot()(0);
+		make_update_mesh_slot()(0);
 	}
 
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		const double recursion = m_recursion.pipeline_value();
-		const double basic_angle = m_basic_angle.pipeline_value();
-		const double thickness = m_thickness.pipeline_value();
+		Output = k3d::mesh();
+
+		const k3d::double_t recursion = m_recursion.pipeline_value();
+		const k3d::double_t basic_angle = m_basic_angle.pipeline_value();
+		const k3d::double_t thickness = m_thickness.pipeline_value();
 		const unsigned long random_seed = m_random_seed.pipeline_value();
-		const double size = m_size.pipeline_value();
+		const k3d::double_t size = m_size.pipeline_value();
 		const bool closed_form = m_closed_form.pipeline_value();
 		const unsigned long mutations = m_mutations.pipeline_value();
 		const unsigned long mutation_seed = m_mutation_seed.pipeline_value();
@@ -1580,9 +1688,15 @@ public:
 			return;
 
 		// Create geometry ...
-		k3d::legacy::polyhedron* polyhedron = new k3d::legacy::polyhedron();
-		Mesh.polyhedra.push_back(polyhedron);
-		lparser::l_parser(random_seed, closed_form, 0, mutations, mutation_seed, max_stack_size, &Mesh, material, m_orientation.pipeline_value(), m_flip_normals.pipeline_value());
+		k3d::mesh::points_t& points = Output.points.create();
+		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+
+		lparser::l_parser(random_seed, closed_form, 0, mutations, mutation_seed, max_stack_size, lparser::context(points, point_selection, *polyhedron, material), m_orientation.pipeline_value(), m_flip_normals.pipeline_value());
+
+		polyhedron->shell_first_faces.push_back(0);
+		polyhedron->shell_face_counts.push_back(polyhedron->face_first_loops.size());
+		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
 		// Cache first bounding box to allow growth
 		if(lparser::bbox_x == 0 && lparser::bbox_y == 0 && lparser::bbox_z == 0)
@@ -1593,18 +1707,19 @@ public:
 		}
 
 		// Resize ...
-		double bbox_size = std::max(std::max(lparser::bbox_x, lparser::bbox_y), lparser::bbox_z);
+		k3d::double_t bbox_size = std::max(std::max(lparser::bbox_x, lparser::bbox_y), lparser::bbox_z);
 		if(bbox_size > 0)
 		{
-			double new_size = 1 / bbox_size * size;
-			for(k3d::legacy::mesh::points_t::const_iterator point = Mesh.points.begin(); point != Mesh.points.end(); point++)
-				(*point)->position *= new_size;
-		}
+			k3d::double_t new_size = 1 / bbox_size * size;
 
-		assert_warning(is_valid(*polyhedron));
+			const k3d::uint_t point_begin = 0;
+			const k3d::uint_t point_end = point_begin + points.size();
+			for(k3d::uint_t point = point_begin; point != point_end; ++point)
+				points[point] *= new_size;
+		}
 	}
 
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
@@ -1622,11 +1737,11 @@ public:
 
 private:
 	k3d_data(k3d::filesystem::path, immutable_name, change_signal, with_undo, local_storage, no_constraint, path_property, path_serialization) m_file_path;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_recursion;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_basic_angle;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_thickness;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_recursion;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_basic_angle;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_thickness;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_random_seed;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_size;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_size;
 	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_closed_form;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_mutations;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_mutation_seed;

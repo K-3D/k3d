@@ -18,7 +18,6 @@ SET(SKIP_FILES
 	"^k3dsdk/selectable.h$"
 	"^k3dsdk/serialization_xml.cpp$"
 	"^k3dsdk/type_registry.cpp$"
-	"^modules/lsystem/l_parser.cpp$"
 	"^modules/mesh/bevel_faces.cpp$"
 	"^modules/mesh/bridge_edges.cpp$"
 	"^modules/mesh/bridge_faces.cpp$"
