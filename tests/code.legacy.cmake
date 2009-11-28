@@ -40,7 +40,6 @@ SET(SKIP_FILES
 	"^modules/polyhedron_sources/poly_cushion.cpp$"
 	"^modules/polyhedron_sources/poly_cylinder.cpp$"
 	"^modules/polyhedron_sources/poly_sphere.cpp$"
-	"^modules/polyhedron_sources/poly_torus.cpp$"
 	"^modules/qslim/quadric_decimation.cpp$"
 	"^modules/test/legacy_mesh_conversion.cpp$"
 	"^modules/test/memory_pools.cpp$"
