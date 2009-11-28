@@ -422,6 +422,85 @@ primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, 
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
+// create_torus
+
+primitive* create_torus(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material)
+{
+	try
+	{
+		if(Rows < 2)
+			throw std::runtime_error("Cannot create torus with <2 rows.");
+
+		if(Columns < 2)
+			throw std::runtime_error("Cannot create torus with <2 columns.");
+
+		const uint_t rows = Rows;
+		const uint_t columns = Columns;
+		const uint_t point_rows = rows;
+		const uint_t point_columns = columns;
+
+		// Append points to the mesh (create the arrays if they don't already exist) ...
+		mesh::points_t& points = Mesh.points ? Mesh.points.writable() : Mesh.points.create();
+		mesh::selection_t& point_selection = Mesh.point_selection ? Mesh.point_selection.writable() : Mesh.point_selection.create();
+
+		const uint_t point_offset = points.size();
+		points.insert(points.end(), point_rows * point_columns, point3());
+		point_selection.insert(point_selection.end(), point_rows * point_columns, 0);
+		Mesh.point_attributes.set_row_count(point_offset + (point_rows * point_columns));
+
+		// Append a new polyhedron to the mesh ...
+		primitive* const polyhedron = create(Mesh);
+
+		polyhedron->shell_first_faces.assign(1, 0);
+		polyhedron->shell_face_counts.assign(1, rows * columns);
+		polyhedron->shell_types.assign(1, POLYGONS);
+		polyhedron->face_first_loops.resize(rows * columns);
+		polyhedron->face_loop_counts.assign(rows * columns, 1);
+		polyhedron->face_selections.assign(rows * columns, 0);
+		polyhedron->face_materials.assign(rows * columns, Material);
+		polyhedron->loop_first_edges.resize(rows * columns);
+		polyhedron->vertex_points.resize(4 * rows * columns);
+		polyhedron->vertex_selections.resize(4 * rows * columns, 0);
+		polyhedron->clockwise_edges.resize(4 * rows * columns);
+		polyhedron->edge_selections.assign(4 * rows * columns, 0);
+		
+		mesh::indices_t::iterator face_first_loop = polyhedron->face_first_loops.begin();
+		mesh::indices_t::iterator loop_first_edge = polyhedron->loop_first_edges.begin();
+		mesh::indices_t::iterator vertex_point = polyhedron->vertex_points.begin();
+		mesh::indices_t::iterator clockwise_edge = polyhedron->clockwise_edges.begin();
+
+		uint_t face_number = 0;
+		for(uint_t row = 0; row != rows; ++row)
+		{
+			for(uint_t column = 0; column != columns; ++column, ++face_number)
+			{
+				*face_first_loop++ = face_number;
+
+				*loop_first_edge++ = 4 * face_number;
+
+				*vertex_point++ = point_offset + (((row + 0) % point_rows) * point_columns) + ((column + 0) % point_columns);
+				*vertex_point++ = point_offset + (((row + 0) % point_rows) * point_columns) + ((column + 1) % point_columns);
+				*vertex_point++ = point_offset + (((row + 1) % point_rows) * point_columns) + ((column + 1) % point_columns);
+				*vertex_point++ = point_offset + (((row + 1) % point_rows) * point_columns) + ((column + 0) % point_columns);
+
+				*clockwise_edge++ = (4 * face_number) + 1;
+				*clockwise_edge++ = (4 * face_number) + 2;
+				*clockwise_edge++ = (4 * face_number) + 3;
+				*clockwise_edge++ = (4 * face_number);
+			}
+		}
+
+		return polyhedron;
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
+	}
+
+	return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 // validate
 
 const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)

@@ -149,10 +149,14 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
 /// Creates a new polyhedron mesh primitive whose faces form a topological "cylinder" with the given number of rows and columns,
 /// and the first and last columns stitched-together.  The geometry (vertex coordinates) of the cylinder is undefined, and must
-/// be set by the caller after create_grid() returns.  Note that many surfaces-of-revolution can be represented as topological
+/// be set by the caller after create_cylinder() returns.  Note that many surfaces-of-revolution can be represented as topological
 /// cylinders, including disks, cones, cylinders, hyperboloids, paraboloids, and spheres.  The caller is responsible for the
 /// lifetime of the returned object.
 primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
+/// Creates a new polyhedron mesh primitive whose faces form a topological "torus" with the given number of rows and columns,
+/// and the first and last rows and columns stitched-together.  The geometry (vertex coordinates) of the torus is undefined, and must
+/// be set by the caller after create_torus() returns.  The caller is responsible for the lifetime of the returned object.
+primitive* create_torus(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
 
 /// Tests the given mesh primitive to see if it is a valid polyhedron, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
