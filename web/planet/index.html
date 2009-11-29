@@ -3,8 +3,9 @@
 	<head>
 		<title>Planet K-3D</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel="icon" type="image/png" href="http://www.k-3d.org/k3d.png" />
-		<link rel="stylesheet" type="text/css" href="http://www.k-3d.org/k3d.css" />
+		<link rel="icon" type="image/png" href="k3d.png" />
+		<link rel="stylesheet" type="text/css" href="k3d.css" />
+		<link rel="stylesheet" type="text/css" href="planet.css" />
 <!--
 <link rel="alternate" href="<TMPL_VAR feed ESCAPE="HTML">" title="<TMPL_VAR channel_title_plain ESCAPE="HTML">" type="application/<TMPL_VAR feedtype>+xml">
 -->
@@ -87,16 +88,16 @@ def entry_date(entry):
 			</ul>
 		</div>
 
-		<div id="content">
+		<div id="main">
 			<div id="left" class="feeds">
 				${generate_feeds(filter(lambda entry: entry["source"]["feed_type"] != "commit", entries))}
 			</div>
 			<div id="right" class="feeds">
 				${generate_feeds(filter(lambda entry: entry["source"]["feed_type"] == "commit", entries))}
 			</div>
-			<div id="footer">
-				<p class="generated">${datetime.datetime.utcnow().strftime("Generated %B %d, %Y %H:%M UTC") | h}</p>
-			</div>
+		</div>
+		<div id="footer">
+			<p class="generated">${datetime.datetime.utcnow().strftime("Updated %B %d, %Y %H:%M UTC") | h}</p>
 		</div>
 
 		<script type="text/javascript" src="http://www.google-analytics.com/ga.js"/>

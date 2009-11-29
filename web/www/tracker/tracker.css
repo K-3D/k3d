@@ -1,0 +1,18 @@
+
+.tracker ul
+{
+  list-style: none;
+  margin-left: 12px;
+}
+
+.progress-closed-issues
+{
+  background-color: #0c0;
+}
+
+.progress-open-issues
+{
+  background-color: #ddd;
+  margin-right: 12px;
+}
+

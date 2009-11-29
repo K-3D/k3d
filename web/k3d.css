@@ -24,12 +24,12 @@ h1, h2, h3, h4, h5, h6
 
 h1
 {
-  font-size: 160%;
+  font-size: 170%;
 }
 
 h2
 {
-  font-size: 130%;
+  font-size: 150%;
   padding: 8px 0 8px 0;
 }
 
@@ -98,7 +98,13 @@ a:hover
   text-decoration: underline;
 }
 
-h2.highlighted
+.generated
+{
+  font-size: 90%;
+  color: #aaaaaa;
+}
+
+.highlighted
 {
   background-color: DarkRed;
   color: White;
@@ -157,7 +163,7 @@ h2.highlighted
   font-weight: bold;
 }
 
-#content
+#main
 {
   clear: both;
 }
@@ -195,84 +201,6 @@ h2.highlighted
 #footer
 {
   clear: both;
+  margin-top: 24px;
 }
 
-.feeds div.date
-{
-  padding-bottom: 0.8em;
-  border-bottom: 1px solid #cccccc;
-  margin-bottom: 0.4em;
-}
-
-.feeds div.date h2
-{
-  margin-bottom: 0.5em;
-}
-
-.feeds div.channel
-{
-  padding-left: 10px;
-}
-
-.feeds a.feed_link
-{
-  float: left;
-  background: transparent url("http://www.k-3d.org/feed-icon-10x10.png") no-repeat;
-  width: 10px;
-  height: 10px;
-  color: blue;
-  margin-top: 6px;
-  margin-right: 8px;
-}
-
-.feeds a.feed_link span
-{
-  display: none;
-}
-
-.feeds div.blog_channel
-{
-  border-left: 10px solid #ff8888;
-}
-
-.feeds div.forum_channel
-{
-  border-left: 10px solid #88ff88;
-}
-
-.feeds div.wiki_channel
-{
-  border-left: 10px solid #8888ff;
-}
-
-.feeds div.commit_channel
-{
-  border-left: 10px solid #ffff88;
-}
-
-.feeds div.entry
-{
-  margin-top: 2em;
-}
-
-#tracker h2
-{
-  font-size: 150%;
-}
-
-#tracker ul
-{
-  list-style: none;
-  margin-left: 12px;
-}
-
-.progress-closed-issues
-{
-  background-color: #0c0;
-}
-
-.progress-open-issues
-{
-  background-color: #ddd;
-  margin-right: 12px;
-}
