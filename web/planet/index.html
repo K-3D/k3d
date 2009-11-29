@@ -94,6 +94,9 @@ def entry_date(entry):
 			<div id="right" class="feeds">
 				${generate_feeds(filter(lambda entry: entry["source"]["feed_type"] == "commit", entries))}
 			</div>
+			<div id="footer">
+				<p class="generated">${datetime.datetime.utcnow().strftime("Generated %B %d, %Y %H:%M UTC") | h}</p>
+			</div>
 		</div>
 
 		<script type="text/javascript" src="http://www.google-analytics.com/ga.js"/>

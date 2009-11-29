@@ -7,6 +7,10 @@
 		<link rel="stylesheet" type="text/css" href="../k3d.css" />
 	</head>
 
+<%
+import datetime
+%>
+
 	<body>
 		<div id="nav">
 			<a id="logo" href=".."><h1>K-3D</h1></a>
@@ -81,6 +85,9 @@
 					<p>No unassigned issues.</p>
 					% endif
 				</div>
+			</div>
+			<div id="footer">
+				<p class="generated">${datetime.datetime.utcnow().strftime("Generated %B %d, %Y %H:%M UTC") | h}</p>
 			</div>
 		</div>
 
