@@ -83,7 +83,13 @@ public:
 		const k3d::int32_t v_segments = m_v_segments.pipeline_value();
 		k3d::imaterial* const material = m_material.pipeline_value();
 
-		k3d::polyhedron::create_torus(Output, v_segments, u_segments, material);;
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+
+		polyhedron->shell_first_faces.push_back(0);
+		polyhedron->shell_face_counts.push_back(0);
+		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
+
+		k3d::polyhedron::add_torus(Output, *polyhedron, v_segments, u_segments, material);;
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

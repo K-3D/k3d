@@ -103,7 +103,14 @@ public:
 		const k3d::int32_t top_segments = m_top_segments.pipeline_value();
 		const k3d::int32_t bottom_segments = m_bottom_segments.pipeline_value();
 
-		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create_cylinder(Output, v_segments, u_segments, material));
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+
+		polyhedron->shell_first_faces.push_back(0);
+		polyhedron->shell_face_counts.push_back(0);
+		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
+
+		k3d::polyhedron::add_cylinder(Output, *polyhedron, v_segments, u_segments, material);
+
 		k3d::mesh::points_t& points = Output.points.writable();
 		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
 

@@ -143,21 +143,6 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 /// The caller is responsible for the lifetime of the returned object.
 primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts_t& VertexCounts, const mesh::indices_t& VertexIndices, const mesh::texture_coordinates_t& TextureCoordinates, imaterial* const Material);
 
-/// Creates a new polyhedron mesh primitive whose faces form a topological "grid" with the given number of rows and columns.
-/// The geometry (vertex coordinates) of the grid is undefined, and must be set by the caller after create_grid() returns.
-/// The caller is responsible for the lifetime of the returned object.
-primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
-/// Creates a new polyhedron mesh primitive whose faces form a topological "cylinder" with the given number of rows and columns,
-/// and the first and last columns stitched-together.  The geometry (vertex coordinates) of the cylinder is undefined, and must
-/// be set by the caller after create_cylinder() returns.  Note that many surfaces-of-revolution can be represented as topological
-/// cylinders, including disks, cones, cylinders, hyperboloids, paraboloids, and spheres.  The caller is responsible for the
-/// lifetime of the returned object.
-primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
-/// Creates a new polyhedron mesh primitive whose faces form a topological "torus" with the given number of rows and columns,
-/// and the first and last rows and columns stitched-together.  The geometry (vertex coordinates) of the torus is undefined, and must
-/// be set by the caller after create_torus() returns.  The caller is responsible for the lifetime of the returned object.
-primitive* create_torus(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
-
 /// Tests the given mesh primitive to see if it is a valid polyhedron, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 const_primitive* validate(const mesh& Mesh, const mesh::primitive& GenericPrimitive);
@@ -168,15 +153,31 @@ primitive* validate(const mesh& Mesh, mesh::primitive& GenericPrimitive);
 /// The caller is responsible for the lifetime of the returned object.
 primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& GenericPrimitive);
 
-/// Adds a face to an existing primitive.
-void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, imaterial* const Material);
-/// Adds a face with holes to an existing primitive.
-void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material);
-
-/// Adds a triangle to an existing primitive.
+/// Adds a triangle to an existing polyhedron.  Preconditions: the polyhedron must contain exactly one shell.
 void add_triangle(mesh& Mesh, primitive& Polyhedron, uint_t V1, uint_t V2, uint_t V3, imaterial* const Material);
-/// Adds a quadrilateral to an existing primitive.
+/// Adds a quadrilateral to an existing polyhedron.  Preconditions: the polyhedron must contain exactly one shell.
 void add_quadrilateral(mesh& Mesh, primitive& Polyhedron, uint_t V1, uint_t V2, uint_t V3, uint_t V4, imaterial* const Material);
+/// Adds a face to an existing polyhedron.  Preconditions: the polyhedron must contain exactly one shell.
+void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, imaterial* const Material);
+/// Adds a face with holes to an existing polyhedron.  Preconditions: the polyhedron must contain exactly one shell.
+void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material);
+/// Adds a set of points and faces that form a topological "grid" with the given number of rows and columns to an existing polyhedron.
+/// The geometry (vertex coordinates) of the grid is undefined, and must be set by the caller after add_grid() returns.
+/// Preconditions: the polyhedron must contain exactly one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
+/// Rows x Columns x 4 new half edges, and the mesh contains (Rows + 1) x (Columns + 1) new points.
+void add_grid(mesh& Mesh, primitive& Polyhedron, const uint_t Rows, const uint_t Columns, imaterial* const Material);
+/// Adds a set of points and faces that form a topological "cylinder" with the given number of rows and columns to an existing polyhedron.
+/// The geometry (vertex coordinates) of the cylinder is undefined, and must be set by the caller after add_cylinder() returns.
+/// Note that many surfaces-of-revolution can be represented as topological cylinders, including disks, cones, cylinders,
+/// hyperboloids, paraboloids, and spheres.
+/// Preconditions: the polyhedron must contain exactly one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
+/// Rows x Columns x 4 new half edges, and the mesh contains (Rows + 1) x Columns new points.
+void add_cylinder(mesh& Mesh, primitive& Polyhedron, const uint_t Rows, const uint_t Columns, imaterial* const Material);
+/// Adds a set of points and faces that form a topological "torus" with the given number of rows and columns to an existing polyhedron.
+/// The geometry (vertex coordinates) of the torus is undefined, and must be set by the caller after add_torus() returns.
+/// Preconditions: the polyhedron must contain exactly one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
+/// Rows x Columns x 4 new half edges, and the mesh contains Rows x Columns new points.
+void add_torus(mesh& Mesh, primitive& Polyhedron, const uint_t Rows, const uint_t Columns, imaterial* const Material);
 
 /// Returns true iff every face in the given polyhedron is a triangle.
 bool_t is_triangles(const const_primitive& Polyhedron);

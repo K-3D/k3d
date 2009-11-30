@@ -55,145 +55,145 @@ namespace plot
 namespace detail
 {
 
-	class least_squares_solver_plotter
+class least_squares_solver_plotter
+{
+private:
+	std::vector<k3d::expression::parser*> function_parsers;
+	std::vector<k3d::double_t> coefficients;
+public:
+	least_squares_solver_plotter()
 	{
-		private:
-			std::vector<k3d::expression::parser*> function_parsers;
-			std::vector<k3d::double_t> coefficients;
-		public:
-			least_squares_solver_plotter()
+		
+	}
+
+	~least_squares_solver_plotter()
+	{
+		// Free parsers' memory
+		for(k3d::uint32_t func_index=0; func_index< function_parsers.size(); ++func_index)
+		{
+			delete function_parsers[func_index];
+		}
+	}
+
+	//solve the linear system for the Least Square Approximation and return the coefficients
+	std::vector<k3d::double_t> solve(const k3d::mesh::points_t& input_points, std::vector<k3d::double_t> values)
+	{
+		// Evaluate each function on every point and create a new array for accesing the z values of input_points
+		k3d::uint64_t points_size = input_points.size();
+
+		boost::multi_array<k3d::double_t,1> points_z_value(boost::extents[points_size]);
+		boost::multi_array<k3d::double_t, 2> function_eval_on_points(boost::extents[function_parsers.size()][points_size]);
+		for(k3d::uint64_t point_index=0; point_index< points_size; ++point_index)
+		{
+			values[0] = input_points[point_index][0];
+			values[1] = input_points[point_index][1];
+			for(k3d::uint32_t func_index=0; func_index < function_parsers.size(); ++func_index)
 			{
-				
+				function_eval_on_points[func_index][point_index] = function_parsers[func_index]->evaluate(&values[0]);
 			}
-
-			~least_squares_solver_plotter()
+			points_z_value[point_index] = input_points[point_index][2];
+		}
+		
+		//Create the linear system for least squares
+			//Create the matrix A
+			boost::numeric::ublas::matrix<k3d::double_t> matrix_A(function_parsers.size(),function_parsers.size());
+			for(k3d::uint32_t j_index = 0; j_index < function_parsers.size(); ++j_index)
 			{
-				// Free parsers' memory
-				for(k3d::uint32_t func_index=0; func_index< function_parsers.size(); ++func_index)
+				for(k3d::uint32_t i_index = 0; i_index < function_parsers.size(); ++i_index)
 				{
-					delete function_parsers[func_index];
+					k3d::double_t scalar_product = 0;
+					for(k3d::uint64_t point_index=0; point_index < points_size; ++point_index)
+					{
+						scalar_product += function_eval_on_points[i_index][point_index]*
+															function_eval_on_points[j_index][point_index];
+					}
+					matrix_A(j_index,i_index) = scalar_product;
 				}
-			}
-
-			//solve the linear system for the Least Square Approximation and return the coefficients
-			std::vector<k3d::double_t> solve(const k3d::mesh::points_t& input_points, std::vector<k3d::double_t> values)
-			{
-				// Evaluate each function on every point and create a new array for accesing the z values of input_points
-				k3d::uint64_t points_size = input_points.size();
-
-				boost::multi_array<k3d::double_t,1> points_z_value(boost::extents[points_size]);
-				boost::multi_array<k3d::double_t, 2> function_eval_on_points(boost::extents[function_parsers.size()][points_size]);
-				for(k3d::uint64_t point_index=0; point_index< points_size; ++point_index)
-				{
-					values[0] = input_points[point_index][0];
-					values[1] = input_points[point_index][1];
-					for(k3d::uint32_t func_index=0; func_index < function_parsers.size(); ++func_index)
-					{
-						function_eval_on_points[func_index][point_index] = function_parsers[func_index]->evaluate(&values[0]);
-					}
-					points_z_value[point_index] = input_points[point_index][2];
-				}
-				
-				//Create the linear system for least squares
-					//Create the matrix A
-					boost::numeric::ublas::matrix<k3d::double_t> matrix_A(function_parsers.size(),function_parsers.size());
-					for(k3d::uint32_t j_index = 0; j_index < function_parsers.size(); ++j_index)
-					{
-						for(k3d::uint32_t i_index = 0; i_index < function_parsers.size(); ++i_index)
-						{
-							k3d::double_t scalar_product = 0;
-							for(k3d::uint64_t point_index=0; point_index < points_size; ++point_index)
-							{
-								scalar_product += function_eval_on_points[i_index][point_index]*
-																	function_eval_on_points[j_index][point_index];
-							}
-							matrix_A(j_index,i_index) = scalar_product;
-						}
-					}
-					
-					//Create the vector b
-					boost::numeric::ublas::vector<k3d::double_t> vector_b(function_parsers.size());
-					for(k3d::uint32_t j_index=0; j_index < function_parsers.size(); ++j_index)
-					{
-						k3d::double_t scalar_product = 0;
-						for(k3d::uint64_t point_index=0; point_index < points_size; ++point_index)
-						{
-							scalar_product +=                   points_z_value[point_index]*
-																function_eval_on_points[j_index][point_index];
-						}
-						vector_b(j_index) = scalar_product;
-					}
-				// Solve the linear system
-					boost::numeric::ublas::permutation_matrix<> piv(function_parsers.size());
-					boost::numeric::ublas::lu_factorize(matrix_A, piv);
-					boost::numeric::ublas::lu_substitute(matrix_A, piv, vector_b);
-					boost::numeric::ublas::vector<k3d::double_t> & vector_x = vector_b;
-				
-				//Save the result
-				for(k3d::uint32_t func_index=0; func_index < function_parsers.size() ; ++func_index)
-				{
-					coefficients.push_back(vector_x(func_index));
-				}
-				//return it
-				return coefficients;
-			}
-
-			//Plot the function given a grid.
-			void plot(
-				k3d::mesh::points_t::iterator point,
-				k3d::int32_t point_rows,
-				k3d::int32_t point_columns,
-				k3d::double_t width,
-				k3d::double_t height,
-				std::vector<k3d::double_t> values
-				)
-			{
-				k3d::vector3 i, j, k;
-				// Orientation k3d::PZ:
-				i = k3d::vector3(1, 0, 0);
-				j = k3d::vector3(0, 1, 0);
-				k = k3d::vector3(0, 0, 1);
-				
-// 				k3d::mesh::points_t::iterator point = output_points.begin();
-				for(k3d::uint64_t row = 0; row != point_rows; ++row)
-				{
-					const k3d::double_t row_percent = static_cast<k3d::double_t>(row) / static_cast<k3d::double_t>(point_rows - 1);
-
-					for(k3d::uint64_t column = 0; column != point_columns; ++column)
-					{
-						const k3d::double_t column_percent = static_cast<k3d::double_t>(column) / static_cast<k3d::double_t>(point_columns - 1);
-
-						const k3d::double_t u = k3d::mix(-0.5 * width, 0.5 * width, column_percent);
-						const k3d::double_t v = k3d::mix(-0.5 * height, 0.5 * height, row_percent);
-
-						values[0] = u;
-						values[1] = v;
-						k3d::double_t w = 0;
-						for(k3d::uint32_t func_index=0; func_index < function_parsers.size(); ++func_index)
-						{
-							w += coefficients[func_index] *
-												 function_parsers[func_index]->evaluate(&values[0]);
-						}
-						*point++ = k3d::to_point((u * i) + (v * j) + (w * k));
-					}
-				}				
 			}
 			
-			// Function Parsers for the Leat Square Approximation
-			void create_function_parsers(std::vector<k3d::string_t> functions, k3d::string_t variables, k3d::string_t factory)
+			//Create the vector b
+			boost::numeric::ublas::vector<k3d::double_t> vector_b(function_parsers.size());
+			for(k3d::uint32_t j_index=0; j_index < function_parsers.size(); ++j_index)
 			{
-				for(k3d::uint32_t func_index=0; func_index< functions.size(); ++func_index)
+				k3d::double_t scalar_product = 0;
+				for(k3d::uint64_t point_index=0; point_index < points_size; ++point_index)
 				{
-					k3d::expression::parser * temp_parser =  new k3d::expression::parser();
-					function_parsers.push_back(temp_parser);
-					if( !function_parsers[func_index]->parse(functions[func_index],variables) )
-					{
-						k3d::log() << error << factory << ": function [" << functions[func_index] << " ] parsing failed: " << function_parsers[func_index]->last_parse_error() << std::endl;
-						throw std::exception();
-					}
+					scalar_product +=                   points_z_value[point_index]*
+														function_eval_on_points[j_index][point_index];
 				}
+				vector_b(j_index) = scalar_product;
 			}
-	};
+		// Solve the linear system
+			boost::numeric::ublas::permutation_matrix<> piv(function_parsers.size());
+			boost::numeric::ublas::lu_factorize(matrix_A, piv);
+			boost::numeric::ublas::lu_substitute(matrix_A, piv, vector_b);
+			boost::numeric::ublas::vector<k3d::double_t> & vector_x = vector_b;
+		
+		//Save the result
+		for(k3d::uint32_t func_index=0; func_index < function_parsers.size() ; ++func_index)
+		{
+			coefficients.push_back(vector_x(func_index));
+		}
+		//return it
+		return coefficients;
+	}
+
+	//Plot the function given a grid.
+	void plot(
+		k3d::mesh::points_t::iterator point,
+		k3d::int32_t point_rows,
+		k3d::int32_t point_columns,
+		k3d::double_t width,
+		k3d::double_t height,
+		std::vector<k3d::double_t> values
+		)
+	{
+		k3d::vector3 i, j, k;
+		// Orientation k3d::PZ:
+		i = k3d::vector3(1, 0, 0);
+		j = k3d::vector3(0, 1, 0);
+		k = k3d::vector3(0, 0, 1);
+		
+// 				k3d::mesh::points_t::iterator point = output_points.begin();
+		for(k3d::uint64_t row = 0; row != point_rows; ++row)
+		{
+			const k3d::double_t row_percent = static_cast<k3d::double_t>(row) / static_cast<k3d::double_t>(point_rows - 1);
+
+			for(k3d::uint64_t column = 0; column != point_columns; ++column)
+			{
+				const k3d::double_t column_percent = static_cast<k3d::double_t>(column) / static_cast<k3d::double_t>(point_columns - 1);
+
+				const k3d::double_t u = k3d::mix(-0.5 * width, 0.5 * width, column_percent);
+				const k3d::double_t v = k3d::mix(-0.5 * height, 0.5 * height, row_percent);
+
+				values[0] = u;
+				values[1] = v;
+				k3d::double_t w = 0;
+				for(k3d::uint32_t func_index=0; func_index < function_parsers.size(); ++func_index)
+				{
+					w += coefficients[func_index] *
+										 function_parsers[func_index]->evaluate(&values[0]);
+				}
+				*point++ = k3d::to_point((u * i) + (v * j) + (w * k));
+			}
+		}				
+	}
+	
+	// Function Parsers for the Leat Square Approximation
+	void create_function_parsers(std::vector<k3d::string_t> functions, k3d::string_t variables, k3d::string_t factory)
+	{
+		for(k3d::uint32_t func_index=0; func_index< functions.size(); ++func_index)
+		{
+			k3d::expression::parser * temp_parser =  new k3d::expression::parser();
+			function_parsers.push_back(temp_parser);
+			if( !function_parsers[func_index]->parse(functions[func_index],variables) )
+			{
+				k3d::log() << error << factory << ": function [" << functions[func_index] << " ] parsing failed: " << function_parsers[func_index]->last_parse_error() << std::endl;
+				throw std::exception();
+			}
+		}
+	}
+};
 
 }
 
@@ -236,7 +236,13 @@ public:
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
   		Output = k3d::mesh();
-		k3d::polyhedron::create_grid(Output, m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
+
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+		polyhedron->shell_first_faces.push_back(0);
+		polyhedron->shell_face_counts.push_back(0);
+		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
+
+		k3d::polyhedron::add_grid(Output, *polyhedron, m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

@@ -89,44 +89,50 @@ public:
 		const k3d::bool_t bottom = m_bottom.pipeline_value();
 
 		// Create the cone topology ...
-		boost::scoped_ptr<k3d::polyhedron::primitive> primitive(k3d::polyhedron::create_cylinder(Output, v_segments, u_segments, material));
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+
+		polyhedron->shell_first_faces.push_back(0);
+		polyhedron->shell_face_counts.push_back(0);
+		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
+
+		k3d::polyhedron::add_cylinder(Output, *polyhedron, v_segments, u_segments, material);
 
 		// Ensure that the top of the cone is "closed" topologically ...
-		primitive->shell_face_counts[0] += 1;
-		primitive->face_first_loops.push_back(primitive->loop_first_edges.size());
-		primitive->face_loop_counts.push_back(1);
-		primitive->face_selections.push_back(0);
-		primitive->face_materials.push_back(material);
-		primitive->loop_first_edges.push_back(primitive->clockwise_edges.size());
+		polyhedron->shell_face_counts[0] += 1;
+		polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+		polyhedron->face_loop_counts.push_back(1);
+		polyhedron->face_selections.push_back(0);
+		polyhedron->face_materials.push_back(material);
+		polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
 		for(k3d::int32_t u = u_segments; u != 0; --u)
 		{
-			primitive->clockwise_edges.push_back(primitive->clockwise_edges.size() + 1);
-			primitive->edge_selections.push_back(0);
-			primitive->vertex_points.push_back(u % u_segments);
-			primitive->vertex_selections.push_back(0);
+			polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+			polyhedron->edge_selections.push_back(0);
+			polyhedron->vertex_points.push_back(u % u_segments);
+			polyhedron->vertex_selections.push_back(0);
 		}
-		primitive->clockwise_edges.back() = primitive->loop_first_edges.back();
+		polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
 
 		// Optionally close the bottom of the cone ...
 		if(bottom)
 		{
-			primitive->shell_face_counts[0] += 1;
-			primitive->face_first_loops.push_back(primitive->loop_first_edges.size());
-			primitive->face_loop_counts.push_back(1);
-			primitive->face_selections.push_back(0);
-			primitive->face_materials.push_back(material);
-			primitive->loop_first_edges.push_back(primitive->clockwise_edges.size());
+			polyhedron->shell_face_counts[0] += 1;
+			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+			polyhedron->face_loop_counts.push_back(1);
+			polyhedron->face_selections.push_back(0);
+			polyhedron->face_materials.push_back(material);
+			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
 			const k3d::uint_t offset = v_segments * u_segments;
 			for(k3d::int32_t u = 0; u != u_segments; ++u)
 			{
-				primitive->clockwise_edges.push_back(primitive->clockwise_edges.size() + 1);
-				primitive->edge_selections.push_back(0);
-				primitive->vertex_points.push_back(offset + u);
-				primitive->vertex_selections.push_back(0);
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+				polyhedron->edge_selections.push_back(0);
+				polyhedron->vertex_points.push_back(offset + u);
+				polyhedron->vertex_selections.push_back(0);
 			}
-			primitive->clockwise_edges.back() = primitive->loop_first_edges.back();
+			polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
 		}
 	}
 
