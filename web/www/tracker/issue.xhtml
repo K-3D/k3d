@@ -10,6 +10,9 @@
 
 <%
 import datetime
+
+keywords = { ":unstarted":"Unstarted", ":closed":"Closed", ":bugfix":"Bugfix", ":task":"Task", ":feature":"Feature" }
+
 %>
 
 	<body>
@@ -37,7 +40,7 @@ import datetime
 				<dd>${issue["id"] | h}</dd>
 
 				<dt>Type:</dt>
-				<dd>${issue["type"] | h}</dd>
+				<dd>${keywords[issue["type"]] | h}</dd>
 
 				<dt>Creation Time:</dt>
 				<dd>${issue["creation_time"].strftime("%Y-%m-%d %H:%M UTC") | h}</dd>
@@ -53,7 +56,7 @@ import datetime
 				% endif
 
 				<dt>Status:</dt>
-				<dd>${issue["status"] | h}</dd>
+				<dd>${keywords[issue["status"]] | h}</dd>
 			</dl>
 
 			<h3>Issue Log</h3>

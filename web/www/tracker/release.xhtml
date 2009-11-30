@@ -39,18 +39,24 @@ issue_count = len(issues)
 closed_count = len(closed_issues)
 open_count = len(open_issues)
 
-closed_percent = closed_count * 100 / issue_count
-open_percent = open_count * 100 / issue_count
+closed_percent = closed_count * 100 / issue_count if issue_count else 100
+open_percent = open_count * 100 / issue_count if issue_count else 100
+
+keywords = { ":released":"Released", ":unreleased":"Unreleased" }
 
 %>
 
 			<h3>Details</h3>
 			<dl>
 				<dt>Status:</dt>
-				<dd>${release["status"] | h}</dd>
+				<dd>${keywords[release["status"]] | h}</dd>
 
 				<dt>Progress:</dt>
+				% if release["status"] != ":released":
 				<dd><span class="progress-closed-issues">${"&nbsp;" * closed_percent}</span><span class="progress-open-issues">${"&nbsp;" * open_percent}</span>${closed_count} / ${issue_count | h} (${closed_percent | h}%)</dd>
+				% else:
+				<dd>${release["release_time"].strftime("Released %B %d, %Y") | h}</dd>
+				% endif
 			</dl>
 
 			<h3>Open Issues</h3>

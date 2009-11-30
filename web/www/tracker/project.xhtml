@@ -63,7 +63,8 @@ import datetime
 			% if len(past_releases):
 			<ul>
 				% for release in past_releases:
-				<li><a href="${release['filename']}">${release['name'] | h}</a></li>
+
+				<li><dl><dt><a href="${release['filename']}">${release['name'] | h}</a></dt><dd>${release["release_time"].strftime("Released %B %d, %Y") | h}</dd></dl></li>
 				% endfor
 			</ul>
 			% else:
