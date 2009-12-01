@@ -36,7 +36,6 @@ SET(SKIP_FILES
 	"^modules/polyhedron/extrude_faces.cpp$"
 	"^modules/polyhedron/helpers.cpp$"
 	"^modules/polyhedron/helpers.h$"
-	"^modules/polyhedron_sources/poly_cube.cpp$"
 	"^modules/polyhedron_sources/poly_cushion.cpp$"
 	"^modules/qslim/quadric_decimation.cpp$"
 	"^modules/test/legacy_mesh_conversion.cpp$"

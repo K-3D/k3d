@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <k3dml>
 	<mesh_arrays>
-		<points>-2.5 -2.5 2.5 -2.5 2.5 2.5 2.5 -2.5 2.5 2.5 2.5 2.5 -2.5 -2.5 -2.5 2.5 -2.5 -2.5 2.5 2.5 -2.5 -2.5 2.5 -2.5</points>
+		<points>-2.5 2.5 2.5 2.5 2.5 2.5 2.5 -2.5 2.5 -2.5 -2.5 2.5 -2.5 2.5 -2.5 2.5 2.5 -2.5 2.5 -2.5 -2.5 -2.5 -2.5 -2.5</points>
 		<point_selection>0 0 0 0 0 0 0 0</point_selection>
 		<point_attributes/>
 		<primitives>
