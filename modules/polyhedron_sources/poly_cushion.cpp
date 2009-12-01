@@ -18,19 +18,20 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
 #include <k3d-i18n-config.h>
+#include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/node.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_source.h>
+#include <k3dsdk/mesh_source.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
 
-#include <iterator>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -45,9 +46,9 @@ namespace sources
 // poly_cushion_implementation
 
 class poly_cushion_implementation :
-	public k3d::material_sink<k3d::legacy::mesh_source<k3d::node > >
+	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
-	typedef k3d::material_sink<k3d::legacy::mesh_source<k3d::node > > base;
+	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
 	poly_cushion_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -59,62 +60,57 @@ public:
 		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Original cube height")) + init_value(8.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_depth(init_owner(*this) + init_name("depth") + init_label(_("Depth")) + init_description(_("Original cube depth")) + init_value(8.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
-		m_material.changed_signal().connect(make_reset_mesh_slot());
-		m_length_segments.changed_signal().connect(make_reset_mesh_slot());
-		m_radial_segments.changed_signal().connect(make_reset_mesh_slot());
-		m_diameter.changed_signal().connect(make_reset_mesh_slot());
-		m_width.changed_signal().connect(make_reset_mesh_slot());
-		m_height.changed_signal().connect(make_reset_mesh_slot());
-		m_depth.changed_signal().connect(make_reset_mesh_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_length_segments.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_radial_segments.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_diameter.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_width.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_height.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_depth.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
 	}
 
-	void add_point(k3d::point3 Position)
+	void add_point(k3d::mesh::points_t& Points, k3d::mesh::selection_t& PointSelection, const k3d::point3& Position)
 	{
-		m_mesh->points.push_back(new k3d::legacy::point(Position));
+		Points.push_back(Position);
+		PointSelection.push_back(0);
 	}
 
-	void add_face(const unsigned long v1, const unsigned long v2, const unsigned long v3)
+	void add_face(k3d::mesh& Mesh, k3d::polyhedron::primitive& Polyhedron, const unsigned long v1, const unsigned long v2, const unsigned long v3, k3d::imaterial* const Material)
 	{
-		k3d::legacy::split_edge* edge1 = new k3d::legacy::split_edge(m_mesh->points[v1]);
-		k3d::legacy::split_edge* edge2 = new k3d::legacy::split_edge(m_mesh->points[v2]);
-		k3d::legacy::split_edge* edge3 = new k3d::legacy::split_edge(m_mesh->points[v3]);
-
-		edge1->face_clockwise = edge2;
-		edge2->face_clockwise = edge3;
-		edge3->face_clockwise = edge1;
-
-		m_polyhedron->faces.push_back(new k3d::legacy::face(edge1, m_material.pipeline_value()));
+		k3d::polyhedron::add_triangle(Mesh, Polyhedron, v1, v2, v3, Material);
 	}
 
-	void add_face(const unsigned long v1, const unsigned long v2, const unsigned long v3, const unsigned long v4)
+	void add_face(k3d::mesh& Mesh, k3d::polyhedron::primitive& Polyhedron, const unsigned long v1, const unsigned long v2, const unsigned long v3, const unsigned long v4, k3d::imaterial* const Material)
 	{
-		k3d::legacy::split_edge* edge1 = new k3d::legacy::split_edge(m_mesh->points[v1]);
-		k3d::legacy::split_edge* edge2 = new k3d::legacy::split_edge(m_mesh->points[v2]);
-		k3d::legacy::split_edge* edge3 = new k3d::legacy::split_edge(m_mesh->points[v3]);
-		k3d::legacy::split_edge* edge4 = new k3d::legacy::split_edge(m_mesh->points[v4]);
-
-		edge1->face_clockwise = edge2;
-		edge2->face_clockwise = edge3;
-		edge3->face_clockwise = edge4;
-		edge4->face_clockwise = edge1;
-
-		m_polyhedron->faces.push_back(new k3d::legacy::face(edge1, m_material.pipeline_value()));
+		k3d::polyhedron::add_quadrilateral(Mesh, Polyhedron, v1, v2, v3, v4, Material);
 	}
 
-	void on_initialize_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_topology(k3d::mesh& Output)
 	{
-		/** \todo Get rid of this - pass the mesh as a method argument instead */
-		m_mesh = &Mesh;
+		Output = k3d::mesh();
 
-		Mesh.polyhedra.push_back(new k3d::legacy::polyhedron());
-		m_polyhedron = Mesh.polyhedra.back();
+		k3d::mesh::points_t& points = Output.points.create();
+		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
 
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+		polyhedron->shell_first_faces.push_back(0);
+		polyhedron->shell_face_counts.push_back(0);
+		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
+
+		k3d::imaterial* const material = m_material.pipeline_value();
 		const unsigned long length_segments = m_length_segments.pipeline_value();
 		const unsigned long radial_segments = m_radial_segments.pipeline_value();
-		const double diameter = m_diameter.pipeline_value();
-		const double width = m_width.pipeline_value();
-		const double height = m_height.pipeline_value();
-		const double depth = m_depth.pipeline_value();
+		const k3d::double_t diameter = m_diameter.pipeline_value();
+		const k3d::double_t width = m_width.pipeline_value();
+		const k3d::double_t height = m_height.pipeline_value();
+		const k3d::double_t depth = m_depth.pipeline_value();
 
 		// Build a sphere
 		typedef std::vector<k3d::point3> points_t;
@@ -127,12 +123,12 @@ public:
 
 		for(j = 0; j < N; j++)
 			for(i = 0; i < R; i++)
-				{
-					double l = sin(k3d::pi()/2 -(double)(i+1)*k3d::pi() / (double)(R+1))*diameter/2;
-					double r = sqrt(diameter*diameter/4 - l*l);
+			{
+				k3d::double_t l = sin(k3d::pi()/2 -(k3d::double_t)(i+1)*k3d::pi() / (k3d::double_t)(R+1))*diameter/2;
+				k3d::double_t r = sqrt(diameter*diameter/4 - l*l);
 
-					sphere_points.push_back(k3d::point3( r*sin((double)j*2*k3d::pi() / (double)N), l, r*cos((double)j*2*k3d::pi() / (double)N)));
-				}
+				sphere_points.push_back(k3d::point3( r*sin((k3d::double_t)j*2*k3d::pi() / (k3d::double_t)N), l, r*cos((k3d::double_t)j*2*k3d::pi() / (k3d::double_t)N)));
+			}
 		sphere_points.push_back(k3d::point3(0, diameter/2, 0));
 		sphere_points.push_back(k3d::point3(0, -diameter/2, 0));
 
@@ -142,118 +138,115 @@ public:
 		k3d::point3 tP = k3d::point3(width / 2.0, height / 2.0, depth / 2.0);
 		for(j = 0; j < N / 4+1; j++)
 			for(i = 0; i < c; i++)
-				add_point(sphere_points[R == 1 ? j : j*R+i] + tP);
+				add_point(points, point_selection, sphere_points[R == 1 ? j : j*R+i] + tP);
 
-		add_point(sphere_points[N*R] + tP);
+		add_point(points, point_selection, sphere_points[N*R] + tP);
 
 		tP = k3d::point3(width / 2.0, -height / 2.0, depth / 2.0);
 		for(j = 0; j < N / 4+1; j++)
 			for(i = 0; i < c; i++)
-				add_point(sphere_points[R / 2 +(R == 1 ? j : j*R+i)] + tP);
+				add_point(points, point_selection, sphere_points[R / 2 +(R == 1 ? j : j*R+i)] + tP);
 
-		add_point(sphere_points[N*R+1] + tP);
+		add_point(points, point_selection, sphere_points[N*R+1] + tP);
 
 		tP = k3d::point3(width / 2.0, height / 2.0, -depth / 2.0);
 		for(j = N / 4; j < N / 2+1; j++)
 			for(i = 0; i < c; i++)
-				add_point(sphere_points[R == 1 ? j : j*R+i] + tP);
+				add_point(points, point_selection, sphere_points[R == 1 ? j : j*R+i] + tP);
 
-		add_point(sphere_points[N*R] + tP);
+		add_point(points, point_selection, sphere_points[N*R] + tP);
 
 		tP = k3d::point3(width / 2.0, -height / 2.0, -depth / 2.0);
 		for(j = N / 4; j < N / 2+1; j++)
 			for(i = 0; i < c; i++)
-				add_point(sphere_points[R / 2 +(R == 1 ? j : j*R+i)] + tP);
+				add_point(points, point_selection, sphere_points[R / 2 +(R == 1 ? j : j*R+i)] + tP);
 
-		add_point(sphere_points[N*R+1] + tP);
+		add_point(points, point_selection, sphere_points[N*R+1] + tP);
 
 		tP = k3d::point3(-width / 2.0, height / 2.0, -depth / 2.0);
 		for(j = N / 2; j < 3*N / 4+1; j++)
 			for(i = 0; i < c; i++)
-				add_point(sphere_points[R == 1 ? j : j*R+i] + tP);
+				add_point(points, point_selection, sphere_points[R == 1 ? j : j*R+i] + tP);
 
-		add_point(sphere_points[N*R] + tP);
+		add_point(points, point_selection, sphere_points[N*R] + tP);
 
 		tP = k3d::point3(-width / 2.0, -height / 2.0, -depth / 2.0);
 		for(j = N / 2; j < 3*N / 4+1; j++)
 			for(i = 0; i < c; i++)
-				add_point(sphere_points[R / 2 +(R == 1 ? j : j*R+i)] + tP);
+				add_point(points, point_selection, sphere_points[R / 2 +(R == 1 ? j : j*R+i)] + tP);
 
-		add_point(sphere_points[N*R+1] + tP);
+		add_point(points, point_selection, sphere_points[N*R+1] + tP);
 
 		tP = k3d::point3(-width / 2.0, height / 2.0, depth / 2.0);
 		for(j = 3*N / 4; j <= N; j++)
 			for(i = 0; i < c; i++)
-				add_point(sphere_points[R == 1 ? j % N :(j % N)*R+i] + tP);
+				add_point(points, point_selection, sphere_points[R == 1 ? j % N :(j % N)*R+i] + tP);
 
-		add_point(sphere_points[N*R] + tP);
+		add_point(points, point_selection, sphere_points[N*R] + tP);
 
 		tP = k3d::point3(-width / 2.0, -height / 2.0, depth / 2.0);
 		for(j = 3*N / 4; j <= N; j++)
 			for(i = 0; i < c; i++)
-				add_point(sphere_points[R / 2 +(R == 1 ? j % N :(j % N)*R+i)] + tP);
+				add_point(points, point_selection, sphere_points[R / 2 +(R == 1 ? j % N :(j % N)*R+i)] + tP);
 
-		add_point(sphere_points[N*R+1] + tP);
+		add_point(points, point_selection, sphere_points[N*R+1] + tP);
 
 		// Make faces for sphere parts
 		const unsigned long d = c*(N/4+1)+1;
 
 		for(unsigned long n = 0; n < 8; n++)
-			{
-				for(j = 0; j < N / 4; j++)
-					for(i = 0; i < c-1; i++)
-						add_face(n*d + c*j + i, n*d + c*j + i+1, n*d + c*(j+1) + i+1, n*d + c*(j+1) + i);
+		{
+			for(j = 0; j < N / 4; j++)
+				for(i = 0; i < c-1; i++)
+					add_face(Output, *polyhedron, n*d + c*j + i, n*d + c*j + i+1, n*d + c*(j+1) + i+1, n*d + c*(j+1) + i, material);
 
-				for(j = 0; j < N / 4; j ++)
-					if(n % 2 == 0)
-						add_face(n*d + c*j, n*d + c*(j+1), (n+1) * d - 1);
-					else
-						add_face(n*d + c*(j+1) - 1, (n+1) * d - 1, n*d + c*(j+2) - 1);
-			}
+			for(j = 0; j < N / 4; j ++)
+				if(n % 2 == 0)
+					add_face(Output, *polyhedron, n*d + c*j, n*d + c*(j+1), (n+1) * d - 1, material);
+				else
+					add_face(Output, *polyhedron, n*d + c*(j+1) - 1, (n+1) * d - 1, n*d + c*(j+2) - 1, material);
+		}
 
 		// Link parts
 		for(unsigned long n = 0; n < 8; n++)
-			{
-				const unsigned long e = (n+1)*d - c-1;
-				const unsigned long f = ((n+2) % 8)*d;
+		{
+			const unsigned long e = (n+1)*d - c-1;
+			const unsigned long f = ((n+2) % 8)*d;
 
-				for(j = 0; j < c-1; j++)
-					add_face(e+j, e+j+1, f+j+1, f+j);
-			}
+			for(j = 0; j < c-1; j++)
+				add_face(Output, *polyhedron, e+j, e+j+1, f+j+1, f+j, material);
+		}
 
-		add_face(0, d - 1, 7*d - 1, 7*d - c-1);
-		add_face(d - c-1, 2*d, 3*d - 1, d - 1);
-		add_face(3*d - c-1, 4*d, 5*d - 1, 3*d - 1);
-		add_face(5*d - c-1, 6*d, 7*d - 1, 5*d - 1);
+		add_face(Output, *polyhedron, 0, d - 1, 7*d - 1, 7*d - c-1, material);
+		add_face(Output, *polyhedron, d - c-1, 2*d, 3*d - 1, d - 1, material);
+		add_face(Output, *polyhedron, 3*d - c-1, 4*d, 5*d - 1, 3*d - 1, material);
+		add_face(Output, *polyhedron, 5*d - c-1, 6*d, 7*d - 1, 5*d - 1, material);
 
-		add_face(d + c-1, 8*d - 2, 8*d - 1, 2*d - 1);
-		add_face(2*d - 2, 2*d - 1, 4*d - 1, 3*d + c-1);
-		add_face(4*d - 2, 4*d - 1, 6*d - 1, 5*d + c-1);
-		add_face(6*d - 2, 6*d - 1, 8*d - 1, 7*d + c-1);
+		add_face(Output, *polyhedron, d + c-1, 8*d - 2, 8*d - 1, 2*d - 1, material);
+		add_face(Output, *polyhedron, 2*d - 2, 2*d - 1, 4*d - 1, 3*d + c-1, material);
+		add_face(Output, *polyhedron, 4*d - 2, 4*d - 1, 6*d - 1, 5*d + c-1, material);
+		add_face(Output, *polyhedron, 6*d - 2, 6*d - 1, 8*d - 1, 7*d + c-1, material);
 
 
 		for(unsigned long n = 0; n < 4; n++)
-			{
-				const unsigned long e = d*(n*2) + c-1;
-				const unsigned long f = d*(n*2+1);
+		{
+			const unsigned long e = d*(n*2) + c-1;
+			const unsigned long f = d*(n*2+1);
 
-				for(j = 0; j < N / 4; j++)
-					add_face(e+j*c, f+j*c, f+(j+1)*c, e+(j+1)*c);
-			}
+			for(j = 0; j < N / 4; j++)
+				add_face(Output, *polyhedron, e+j*c, f+j*c, f+(j+1)*c, e+(j+1)*c, material);
+		}
 
-		add_face(c-1, d*7 - 2, d*8 - c-1, d);
-		add_face(d-2, d*2 - c-1, d*3, d*2 + c-1);
-		add_face(d*3 - 2, d*4 - c-1, d*5, d*4 + c-1);
-		add_face(d*5 - 2, d*6 - c-1, d*7, d*6 + c-1);
+		add_face(Output, *polyhedron, c-1, d*7 - 2, d*8 - c-1, d, material);
+		add_face(Output, *polyhedron, d-2, d*2 - c-1, d*3, d*2 + c-1, material);
+		add_face(Output, *polyhedron, d*3 - 2, d*4 - c-1, d*5, d*4 + c-1, material);
+		add_face(Output, *polyhedron, d*5 - 2, d*6 - c-1, d*7, d*6 + c-1, material);
 
-		add_face(d-1, d*3 - 1, d*5 - 1, d*7 - 1);
-		add_face(d*2 - 1, d*8 - 1, d*6 - 1, d*4 - 1);
-
-		// Make it a solid
-		k3d::legacy::set_companions(*m_polyhedron);
+		add_face(Output, *polyhedron, d-1, d*3 - 1, d*5 - 1, d*7 - 1, material);
+		add_face(Output, *polyhedron, d*2 - 1, d*8 - 1, d*6 - 1, d*4 - 1, material);
 	}
 
-	void on_update_mesh(k3d::legacy::mesh& Mesh)
+	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
 	}
 
@@ -272,15 +265,10 @@ public:
 private:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_length_segments;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_radial_segments;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_diameter;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_depth;
-
-	/** \todo Get rid of this and pass the mesh in method arguments */
-	k3d::legacy::mesh* m_mesh;
-	/** \todo Get rid of this and pass the polyhedron in method arguments */
-	k3d::legacy::polyhedron* m_polyhedron;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_diameter;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_depth;
 };
 
 /////////////////////////////////////////////////////////////////////////////
