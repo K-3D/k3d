@@ -36,7 +36,7 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 namespace detail
@@ -1472,7 +1472,7 @@ k3d::iplugin_factory& fillet_edges_factory()
 	return fillet_edges_implementation::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 

@@ -36,7 +36,7 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -230,7 +230,7 @@ k3d::iplugin_factory& cap_hole_factory()
 	return cap_hole_implementation::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 

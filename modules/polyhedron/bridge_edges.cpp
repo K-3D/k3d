@@ -34,7 +34,7 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 namespace detail
@@ -246,7 +246,7 @@ k3d::iplugin_factory& bridge_edges_factory()
 	return bridge_edges_implementation::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 

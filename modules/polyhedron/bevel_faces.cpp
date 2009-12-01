@@ -38,7 +38,7 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 namespace detail
@@ -434,7 +434,7 @@ k3d::iplugin_factory& bevel_faces_factory()
 	return bevel_faces_implementation::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 

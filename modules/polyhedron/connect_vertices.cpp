@@ -33,7 +33,7 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -208,7 +208,7 @@ k3d::iplugin_factory& connect_vertices_factory()
 	return connect_vertices_implementation::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 

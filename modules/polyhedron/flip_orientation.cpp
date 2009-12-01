@@ -42,7 +42,7 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 namespace detail
@@ -182,7 +182,7 @@ k3d::iplugin_factory& flip_orientation_factory()
 	return flip_orientation_implementation::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 

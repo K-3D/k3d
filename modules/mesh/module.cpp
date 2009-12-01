@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/module.h>
@@ -32,21 +32,8 @@ namespace mesh
 extern k3d::iplugin_factory& array_1d_factory();
 extern k3d::iplugin_factory& array_2d_factory();
 extern k3d::iplugin_factory& array_3d_factory();
-extern k3d::iplugin_factory& bevel_faces_factory();
-extern k3d::iplugin_factory& bridge_edges_factory();
-extern k3d::iplugin_factory& bridge_faces_factory();
-extern k3d::iplugin_factory& cap_hole_factory();
-extern k3d::iplugin_factory& collapse_edges_factory();
-extern k3d::iplugin_factory& collapse_faces_factory();
-extern k3d::iplugin_factory& connect_vertices_factory();
-extern k3d::iplugin_factory& dissolve_components_factory();
-extern k3d::iplugin_factory& fillet_edges_factory();
-extern k3d::iplugin_factory& flip_orientation_factory();
 extern k3d::iplugin_factory& join_points_factory();
 extern k3d::iplugin_factory& merge_mesh_factory();
-extern k3d::iplugin_factory& mesh_instance_factory();
-extern k3d::iplugin_factory& show_component_numbering_factory();
-extern k3d::iplugin_factory& show_face_orientations_factory();
 extern k3d::iplugin_factory& weld_factory();
 
 } // namespace mesh
@@ -57,16 +44,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh::array_1d_factory());
 	Registry.register_factory(module::mesh::array_2d_factory());
 	Registry.register_factory(module::mesh::array_3d_factory());
-	Registry.register_factory(module::mesh::bevel_faces_factory());
-	Registry.register_factory(module::mesh::bridge_edges_factory());
-	Registry.register_factory(module::mesh::bridge_faces_factory());
-	Registry.register_factory(module::mesh::cap_hole_factory());
-	Registry.register_factory(module::mesh::collapse_edges_factory());
-	Registry.register_factory(module::mesh::collapse_faces_factory());
-	Registry.register_factory(module::mesh::connect_vertices_factory());
-	Registry.register_factory(module::mesh::dissolve_components_factory());
-	Registry.register_factory(module::mesh::fillet_edges_factory());
-	Registry.register_factory(module::mesh::flip_orientation_factory());
 	Registry.register_factory(module::mesh::join_points_factory());
 	Registry.register_factory(module::mesh::merge_mesh_factory());
 	Registry.register_factory(module::mesh::weld_factory());
