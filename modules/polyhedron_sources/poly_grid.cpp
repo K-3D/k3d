@@ -125,11 +125,11 @@ public:
 		k3d::mesh::points_t::iterator point = const_cast<k3d::mesh::points_t&>(*Output.points).begin();
 		for(k3d::int32_t row = 0; row != point_rows; ++row)
 		{
-			const k3d::double_t row_percent = 0.5 - (static_cast<k3d::double_t>(row) / static_cast<k3d::double_t>(point_rows-1));
+			const k3d::double_t row_percent = 0.5 - k3d::ratio(row, point_rows-1);
 
 			for(k3d::int32_t column = 0; column != point_columns; ++column)
 			{
-				const k3d::double_t column_percent = (static_cast<k3d::double_t>(column) / static_cast<k3d::double_t>(point_columns-1)) - 0.5;
+				const k3d::double_t column_percent = k3d::ratio(column, point_columns-1) - 0.5;
 
 				*point++ = k3d::to_point((column_percent * x) + (row_percent * y));
 			}

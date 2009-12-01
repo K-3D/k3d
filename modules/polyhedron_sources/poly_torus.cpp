@@ -108,7 +108,7 @@ public:
 		// Shape the torus points
 		for(k3d::int32_t v = 0; v != v_segments; ++v)
 		{
-			const k3d::double_t phi = k3d::pi_times_2() * static_cast<k3d::double_t>(v) / static_cast<k3d::double_t>(v_segments);
+			const k3d::double_t phi = k3d::pi_times_2() * k3d::ratio(v, v_segments);
 			k3d::double_t minor_x = cos(phi);
 			k3d::double_t minor_y = sin(phi);
 			minor_x = k3d::sign(minor_x) * std::pow(std::abs(minor_x), inv_v_power);
@@ -118,7 +118,7 @@ public:
 
 			for(k3d::int32_t u = 0; u != u_segments; ++u)
 			{
-				const k3d::double_t theta = k3d::pi_times_2() * static_cast<k3d::double_t>(u) / static_cast<k3d::double_t>(u_segments);
+				const k3d::double_t theta = k3d::pi_times_2() * k3d::ratio(u, u_segments);
 
 				k3d::double_t x = -sin(theta);
 				k3d::double_t y = -cos(theta);

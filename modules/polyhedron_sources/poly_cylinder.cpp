@@ -117,11 +117,11 @@ public:
 		// Shape the cylinder points
 		for(k3d::int32_t v = 0; v <= v_segments; ++v)
 		{
-			const k3d::double_t height = static_cast<k3d::double_t>(v) / static_cast<k3d::double_t>(v_segments);
+			const k3d::double_t height = k3d::ratio(v, v_segments);
 
 			for(k3d::int32_t u = 0; u != u_segments; ++u)
 			{
-				const k3d::double_t theta = k3d::pi_times_2() * static_cast<k3d::double_t>(u) / static_cast<k3d::double_t>(u_segments);
+				const k3d::double_t theta = k3d::pi_times_2() * k3d::ratio(u, u_segments);
 
 				k3d::double_t x = cos(theta);
 				k3d::double_t y = -sin(theta);
@@ -172,7 +172,7 @@ public:
 				for(k3d::int32_t n = top_segments; n > 1; --n)
 				{
 					current_ring_point_offset = points.size();
-					const k3d::double_t factor = static_cast<k3d::double_t>(n - 1) / static_cast<k3d::double_t>(top_segments);
+					const k3d::double_t factor = k3d::ratio(n - 1, top_segments);
 					for(k3d::int32_t u = 0; u < u_segments; ++u)
 					{
 						points.push_back(middle_point + factor * (points[u] - middle_point));
@@ -243,7 +243,7 @@ public:
 				for(k3d::int32_t n = bottom_segments; n > 1; --n)
 				{
 					current_ring_point_offset = points.size();
-					const k3d::double_t factor = static_cast<k3d::double_t>(n - 1) / static_cast<k3d::double_t>(bottom_segments);
+					const k3d::double_t factor = k3d::ratio(n - 1, bottom_segments);
 					for(k3d::int32_t u = 0; u < u_segments; ++u)
 					{
 						points.push_back(middle_point + factor * (points[(v_segments * u_segments) + u] - middle_point));

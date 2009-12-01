@@ -100,11 +100,11 @@ public:
 		k3d::uint_t point = 0;
 		for(k3d::int32_t v = 0; v <= v_segments; ++v)
 		{
-			const k3d::double_t ring = static_cast<k3d::double_t>(v) / static_cast<k3d::double_t>(v_segments);
+			const k3d::double_t ring = k3d::ratio(v, v_segments);
 
 			for(k3d::int32_t u = 0; u != u_segments; ++u, ++point)
 			{
-				const k3d::double_t theta = k3d::pi_times_2() * static_cast<k3d::double_t>(u) / static_cast<k3d::double_t>(u_segments);
+				const k3d::double_t theta = k3d::pi_times_2() * k3d::ratio(u, u_segments);
 
 				k3d::double_t x = cos(theta);
 				k3d::double_t y = -sin(theta);

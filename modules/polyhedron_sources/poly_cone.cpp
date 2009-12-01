@@ -154,12 +154,12 @@ public:
 		k3d::uint_t point = 0;
 		for(k3d::int32_t v = 0; v != point_v_segments; ++v)
 		{
-			const k3d::double_t percent = static_cast<k3d::double_t>(v) / static_cast<k3d::double_t>(point_v_segments - 1);
+			const k3d::double_t percent = k3d::ratio(v, point_v_segments - 1);
 			const k3d::double_t varying_radius = k3d::mix(0.001 * radius, radius, percent);
 
 			for(k3d::int32_t u = 0; u != point_u_segments; ++u, ++point)
 			{
-				const k3d::double_t theta = k3d::pi_times_2() * static_cast<k3d::double_t>(u) / static_cast<k3d::double_t>(point_u_segments);
+				const k3d::double_t theta = k3d::pi_times_2() * k3d::ratio(u, point_u_segments);
 
 				k3d::double_t x = cos(theta);
 				k3d::double_t y = -sin(theta);
