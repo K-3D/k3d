@@ -1,5 +1,5 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: ExtrudeFaces broken.
+title: Eliminate legacy mesh code.
 desc: ExtrudeFaces (and all other legacy plugins) are broken, since conversion between legacy meshes and generic primitives isn't implemented.  Either do the conversion, or refactor the legacy plugins.
 type: :bugfix
 component: K-3D
@@ -15,4 +15,8 @@ log_events:
 - - 2009-11-21 23:58:00.769253 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2009-12-01 06:35:52.416307 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - edited title
   - ""
