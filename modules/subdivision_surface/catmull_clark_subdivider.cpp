@@ -39,7 +39,7 @@
 namespace module
 {
 
-namespace mesh
+namespace subdivision_surface
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -126,10 +126,10 @@ private:
 
 k3d::iplugin_factory& catmull_clark_subdivision_factory()
 {
-	return module::mesh::catmull_clark_subdivider::get_factory();
+	return catmull_clark_subdivider::get_factory();
 }
 
-} // namespace mesh
+} // namespace subdivision_surface
 
 } // namespace module
 

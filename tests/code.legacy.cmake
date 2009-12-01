@@ -29,7 +29,6 @@ SET(SKIP_FILES
 	"^modules/mesh/helpers.cpp$"
 	"^modules/mesh/helpers.h$"
 	"^modules/mesh/join_points.cpp$"
-	"^modules/mesh/make_creases.cpp$"
 	"^modules/mesh/weld.cpp$"
 	"^modules/polyhedron/bevel_points.cpp$"
 	"^modules/polyhedron/extrude_faces.cpp$"

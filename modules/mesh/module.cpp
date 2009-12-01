@@ -43,7 +43,6 @@ extern k3d::iplugin_factory& dissolve_components_factory();
 extern k3d::iplugin_factory& fillet_edges_factory();
 extern k3d::iplugin_factory& flip_orientation_factory();
 extern k3d::iplugin_factory& join_points_factory();
-extern k3d::iplugin_factory& make_creases_factory();
 extern k3d::iplugin_factory& merge_mesh_factory();
 extern k3d::iplugin_factory& mesh_instance_factory();
 extern k3d::iplugin_factory& show_component_numbering_factory();
@@ -69,7 +68,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh::fillet_edges_factory());
 	Registry.register_factory(module::mesh::flip_orientation_factory());
 	Registry.register_factory(module::mesh::join_points_factory());
-	Registry.register_factory(module::mesh::make_creases_factory());
 	Registry.register_factory(module::mesh::merge_mesh_factory());
 	Registry.register_factory(module::mesh::weld_factory());
 K3D_MODULE_END

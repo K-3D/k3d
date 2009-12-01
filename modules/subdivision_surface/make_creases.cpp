@@ -24,7 +24,7 @@
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 
@@ -33,43 +33,36 @@
 namespace module
 {
 
-namespace mesh
+namespace subdivision_surface
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// make_creases_implementation
+// make_creases
 
-class make_creases_implementation :
-	public k3d::legacy::mesh_modifier<k3d::node >
+class make_creases :
+	public k3d::mesh_modifier<k3d::node >
 {
-	typedef k3d::legacy::mesh_modifier<k3d::node > base;
+	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
-	make_creases_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	make_creases(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
-	}
-
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-//TODO: reimplement this
 		assert_not_implemented();
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		assert_not_implemented();
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<make_creases_implementation,
+		static k3d::document_plugin_factory<make_creases,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0xf50fe5b6, 0xecfa4df3, 0x8474a557, 0xbee303ba),
@@ -87,10 +80,10 @@ public:
 
 k3d::iplugin_factory& make_creases_factory()
 {
-	return make_creases_implementation::get_factory();
+	return make_creases::get_factory();
 }
 
-} // namespace mesh
+} // namespace subdivision_surface
 
 } // namespace module
 
