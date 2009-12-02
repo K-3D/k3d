@@ -17,7 +17,6 @@ SET(SKIP_FILES
 	"^k3dsdk/selectable.h$"
 	"^k3dsdk/serialization_xml.cpp$"
 	"^k3dsdk/type_registry.cpp$"
-	"^modules/mesh/weld.cpp$"
 	"^modules/polyhedron/bevel_faces.cpp$"
 	"^modules/polyhedron/bevel_points.cpp$"
 	"^modules/polyhedron/bridge_edges.cpp$"

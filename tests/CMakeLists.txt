@@ -355,6 +355,7 @@ K3D_ADD_TEST(mesh.modifier.TriangulateFaces.PolyGrid.selection.py PYTHON REQUIRE
 K3D_ADD_TEST(mesh.modifier.TriangulateFaces.face_varying.py PYTHON REQUIRES K3D_BUILD_POLYHEDRON_MODULE)
 K3D_ADD_TEST(mesh.modifier.TriangulateFaces.self_intersection.py PYTHON REQUIRES K3D_BUILD_POLYHEDRON_MODULE)
 K3D_ADD_TEST(mesh.modifier.TwistPoints.py PYTHON REQUIRES K3D_BUILD_DEFORMATION_MODULE)
+K3D_ADD_TEST(mesh.modifier.Weld.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE)
 
 K3D_ADD_TEST(notifier.InotifyFileChangeNotifier.py PYTHON REQUIRES K3D_BUILD_INOTIFY_MODULE)
 

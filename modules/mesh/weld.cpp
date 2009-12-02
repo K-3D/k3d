@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,17 +18,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/basic_math.h>
 #include <k3d-i18n-config.h>
-#include <k3dsdk/node.h>
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/utility.h>
 
 namespace module
@@ -41,186 +43,99 @@ namespace mesh
 // weld
 
 class weld :
-	public k3d::legacy::mesh_modifier<k3d::node >
+	public k3d::mesh_modifier<k3d::node >
 {
-	typedef k3d::legacy::mesh_modifier<k3d::node > base;
+	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
 	weld(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_distance(init_owner(*this) + init_name("distance") + init_label(_("Distance")) + init_description(_("Maximum distance between points")) + init_value(0.001) + init_step_increment(0.0001) + init_units(typeid(k3d::measurement::distance)) + init_constraint(constraint::minimum<double>(0.0)))
+		m_distance(init_owner(*this) + init_name("distance") + init_label(_("Distance")) + init_description(_("Maximum distance between points")) + init_value(0.001) + init_step_increment(0.0001) + init_units(typeid(k3d::measurement::distance)) + init_constraint(constraint::minimum<k3d::double_t>(0.0)))
 	{
-		m_distance.changed_signal().connect(make_reset_mesh_slot());
+		m_distance.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	struct map_point_indices
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
-	}
-
-	typedef std::map<k3d::legacy::point*, k3d::legacy::point*> point_map_t;
-	typedef std::vector<k3d::legacy::split_edge*> boundary_edges_t;
-
-	class get_boundary_edges_t
-	{
-	public:
-		get_boundary_edges_t(boundary_edges_t& BoundaryEdges) :
-			boundary_edges(BoundaryEdges)
-		{
-		}
-
-		void operator()(k3d::legacy::split_edge& edge)
-		{
-			if(edge.vertex && edge.face_clockwise && !edge.companion)
-				boundary_edges.push_back(&edge);
-		}
-
-	private:
-		boundary_edges_t& boundary_edges;
-	};
-	
-	class remap_points_t
-	{
-	public:
-		remap_points_t(point_map_t& PointMap) :
+		map_point_indices(const k3d::mesh::indices_t PointMap) :
 			point_map(PointMap)
 		{
 		}
 
-		void operator()(k3d::legacy::mesh&) {}
-		void operator()(k3d::legacy::point&) {}
-		void operator()(k3d::legacy::polyhedron&) {}
-		void operator()(k3d::legacy::linear_curve_group&) {}
-		void operator()(k3d::legacy::cubic_curve_group&) {}
-		void operator()(k3d::legacy::nucurve_group&) {}
-		void operator()(k3d::legacy::face& face) {}
+		void operator()(const k3d::string_t&, const k3d::table&, const k3d::string_t& ArrayName, k3d::pipeline_data<k3d::array>& Array)
+		{
+			if(Array->get_metadata_value(k3d::metadata::key::domain()) != k3d::metadata::value::point_indices_domain())
+				return;
 
-		void operator()(k3d::legacy::split_edge& edge)
-		{
-			edge.vertex = point_map[edge.vertex];
-		}
-		
-		void operator()(k3d::legacy::linear_curve& curve)
-		{
-			for(size_t i = 0; i != curve.control_points.size(); ++i)
-				curve.control_points[i] = point_map[curve.control_points[i]];
-		}
+			k3d::uint_t_array* const array = dynamic_cast<k3d::uint_t_array*>(&Array.writable());
+			if(!array)
+			{
+				k3d::log() << error << "array [" << ArrayName << "] must be a k3d::uint_t_array." << std::endl;
+				return;
+			}
 
-		void operator()(k3d::legacy::cubic_curve& curve)
-		{
-			for(size_t i = 0; i != curve.control_points.size(); ++i)
-				curve.control_points[i] = point_map[curve.control_points[i]];
+			const k3d::uint_t begin = 0;
+			const k3d::uint_t end = begin + array->size();
+			for(k3d::uint_t i = begin; i != end; ++i)
+				(*array)[i] = point_map[(*array)[i]];
 		}
 
-		void operator()(k3d::legacy::nucurve& curve)
-		{
-			for(size_t i = 0; i != curve.control_points.size(); ++i)
-				curve.control_points[i].position = point_map[curve.control_points[i].position];
-		}
-		
-		void operator()(k3d::legacy::bilinear_patch& patch)
-		{
-			for(size_t i = 0; i != 4; ++i)
-				patch.control_points[i] = point_map[patch.control_points[i]];
-		}
-
-		void operator()(k3d::legacy::bicubic_patch& patch)
-		{
-			for(size_t i = 0; i != 16; ++i)
-				patch.control_points[i] = point_map[patch.control_points[i]];
-		}
-
-		void operator()(k3d::legacy::nupatch& patch)
-		{
-			for(size_t i = 0; i != patch.control_points.size(); ++i)
-				patch.control_points[i].position = point_map[patch.control_points[i].position];
-		}
-
-	private:
-		point_map_t& point_map;
+		const k3d::mesh::indices_t& point_map;	
 	};
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		const double distance = m_distance.pipeline_value();
+		Output = Input;
 
-		// Begin with a copy of the original mesh ...
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-//k3d::log() << debug << "original point count: " << Mesh.points.size() << std::endl;
-		
-		// Get a list of "boundary" edges (edges without a neighbor) ...
-		boundary_edges_t boundary_edges;
-		get_boundary_edges_t get_boundary_edges(boundary_edges);
-		k3d::legacy::for_each_edge(Mesh, get_boundary_edges);
-//k3d::log() << debug << "original boundary edges: " << boundary_edges.size() << std::endl;
+		if(!Output.points)
+			return;
+		k3d::mesh::points_t& points = Output.points.writable();
 
-		// Create an identity mapping from each point to itself ...
-		point_map_t point_map;
-		point_map.insert(std::make_pair(static_cast<k3d::legacy::point*>(0), static_cast<k3d::legacy::point*>(0)));
-		for(k3d::legacy::mesh::points_t::iterator point = Mesh.points.begin(); point != Mesh.points.end(); ++point)
-			point_map.insert(std::make_pair(*point, *point));
+		// Begin by creating an identity map from each mesh point to itself ...
+		const k3d::uint_t point_begin = 0;
+		const k3d::uint_t point_end = point_begin + points.size();
+		k3d::mesh::indices_t point_map(points.size());
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
+			point_map[point] = point;
 
-		// Create a list of points to be eliminated ...
-		for(boundary_edges_t::iterator edge1 = boundary_edges.begin(); edge1 != boundary_edges.end(); ++edge1)
+		// Update the point map to eliminate "duplicate" points ... warning: this is O(N^2)!!!
+		k3d::uint_t weld_count = 0;
+		const k3d::double_t distance = m_distance.pipeline_value();
+		for(k3d::uint_t point1 = point_begin; point1 != point_end; ++point1)
 		{
-			if(point_map[(*edge1)->vertex] != (*edge1)->vertex)
+			// Skip points that have already been welded ...
+			if(point_map[point1] != point1)
 				continue;
 
-			for(boundary_edges_t::iterator edge2 = edge1 + 1; edge2 != boundary_edges.end(); ++edge2)
+			for(k3d::uint_t point2 = point1 + 1; point2 != point_end; ++point2)
 			{
-				if(point_map[(*edge2)->vertex] != (*edge2)->vertex)
+				// Skip points that have already been welded ...
+				if(point_map[point2] != point2)
 					continue;
 
-				const k3d::vector3 delta = (*edge2)->vertex->position - (*edge1)->vertex->position;
+				const k3d::vector3 delta = points[point2] - points[point1];
 				if(std::fabs(delta[0]) < distance && std::fabs(delta[1]) < distance && std::fabs(delta[2]) < distance)
 				{
-					point_map[(*edge2)->vertex] = (*edge1)->vertex;
+					++weld_count;
+					point_map[point2] = point1;
 				}
 			}
 		}
 
-		// Get rid of dangling references to the points that will be erased ...
-		remap_points_t remap_points(point_map);
-		k3d::legacy::for_each_component(Mesh, remap_points);
+		// If we didn't find any points to weld, we're done ...
+		if(!weld_count)
+			return;
 
-		// Stitch-together boundary edges that have been eliminated ...
-//size_t stitched_edge_count = 0;
-		for(boundary_edges_t::iterator edge1 = boundary_edges.begin(); edge1 != boundary_edges.end(); ++edge1)
-		{
-			k3d::legacy::split_edge& e1 = **edge1;
-			for(boundary_edges_t::iterator edge2 = edge1 + 1; edge2 != boundary_edges.end(); ++edge2)
-			{
-				k3d::legacy::split_edge& e2 = **edge2;
-				if(
-					e1.vertex == e2.face_clockwise->vertex &&
-					e2.vertex == e1.face_clockwise->vertex &&
-					e1.companion == 0 &&
-					e2.companion == 0)
-				{
-					k3d::legacy::join_edges(e1, e2);
-//++stitched_edge_count;
-				}
-			}
-		}
-//k3d::log() << debug << "stitched edges: " << stitched_edge_count << std::endl;
+		// Remap primitive points so that they no longer reference "duplicate" points ... 
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+			k3d::mesh::visit_arrays(primitive->writable(), map_point_indices(point_map));
 
-		
-		// Delete leftover unused points ...
-		for(k3d::legacy::mesh::points_t::iterator point = Mesh.points.begin(); point != Mesh.points.end(); ++point)
-		{
-			if(point_map[*point] != (*point))
-			{
-				delete *point;
-				*point = 0;
-			}
-		}
-		Mesh.points.erase(std::remove(Mesh.points.begin(), Mesh.points.end(), static_cast<k3d::legacy::point*>(0)), Mesh.points.end());
-//k3d::log() << debug << "new point count: " << Mesh.points.size() << std::endl;
+		// Delete lefover unused points ...
+		k3d::mesh::delete_unused_points(Output);
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 
@@ -239,7 +154,7 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_distance;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_distance;
 };
 
 /////////////////////////////////////////////////////////////////////////////
