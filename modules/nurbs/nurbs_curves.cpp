@@ -33,6 +33,14 @@
 #include <boost/scoped_ptr.hpp>
 #include <sstream>
 
+// For linear system solve in the approximate function
+#include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/io.hpp>
+
+namespace ublas = boost::numeric::ublas;
+
 namespace k3d { namespace nurbs_curve { class primitive; } }
 
 namespace module
@@ -1250,8 +1258,11 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 	span_sample_counts.push_back(sample_count - span_first_samples.back());
 	base_span_ends.resize(dim, span_sample_counts.size());
 	cumulative_sum(offsets);
-	k3d::point4 rhs_x, rhs_y, rhs_z, rhs_w;
-	k3d::matrix4 mat;
+	ublas::vector<k3d::double_t> rhs_x(dim);
+	ublas::vector<k3d::double_t> rhs_y(dim);
+	ublas::vector<k3d::double_t> rhs_z(dim);
+	ublas::vector<k3d::double_t> rhs_w(dim);
+	ublas::compressed_matrix<k3d::double_t> A(dim, dim, ((Order - 1)*2+1)*dim); // system matrix
 	for(k3d::uint_t i = 0; i != dim; ++i)
 	{
 		const k3d::uint_t spans_begin_i = base_span_starts[i];
@@ -1270,8 +1281,11 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 				for(k3d::uint_t sample = samples_begin; sample != samples_end; ++sample)
 					result += sample_bases[sample][idx_i] * sample_bases[sample][idx_j];
 			}
-			mat[i][j] = result;
+			A(i,j) = result;
 		}
+
+		k3d::log() << debug << A << std::endl;
+
 		k3d::double_t result_x = 0.0;
 		k3d::double_t result_y = 0.0;
 		k3d::double_t result_z = 0.0;
@@ -1289,23 +1303,27 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 				result_w += sample_bases[sample][idx] * SamplePoints[sample][3];
 			}
 		}
-		rhs_x[i] = result_x;
-		rhs_y[i] = result_y;
-		rhs_z[i] = result_z;
-		rhs_w[i] = result_w;
+		rhs_x(i) = result_x;
+		rhs_y(i) = result_y;
+		rhs_z(i) = result_z;
+		rhs_w(i) = result_w;
 	}
 
-	k3d::matrix4 inv = k3d::inverse(mat);
-	k3d::point4 result_x = inv * rhs_x;
-	k3d::point4 result_y = inv * rhs_y;
-	k3d::point4 result_z = inv * rhs_z;
-	k3d::point4 result_w = inv * rhs_w;
+	// This solves the system, overwriting the RHS with the solution
+	ublas::permutation_matrix<k3d::double_t> PM(dim);
+	ublas::lu_factorize(A, PM);
+	ublas::lu_substitute(A, PM, rhs_x);
+	ublas::lu_substitute(A, PM, rhs_y);
+	ublas::lu_substitute(A, PM, rhs_z);
+	ublas::lu_substitute(A, PM, rhs_w);
+
+	// Store the solution in the output arrays
 	Points.clear();
 	Weights.clear();
-	for(k3d::uint_t i = 0; i != 4; ++i)
+	for(k3d::uint_t i = 0; i != dim; ++i)
 	{
-		const k3d::double_t w = result_w[i];
-		Points.push_back(k3d::point3(result_x[i]/w, result_y[i]/w, result_z[i]/w));
+		const k3d::double_t w = rhs_w(i);
+		Points.push_back(k3d::point3(rhs_x(i)/w, rhs_y(i)/w, rhs_z(i)/w));
 		Weights.push_back(w);
 	}
 }
