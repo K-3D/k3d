@@ -105,7 +105,9 @@ private:
 			k3d::mesh::weights_t curve_weights;
 			k3d::mesh::knots_t curve_knots;
 			extract_curve_arrays(curve_points, curve_knots, curve_weights, Mesh, Curves, Curve, true);
-			points.push_back(evaluate_position(curve_points, curve_weights, curve_knots, u));
+			const k3d::point4 p = evaluate_position(curve_points, curve_weights, curve_knots, u);
+			const k3d::double_t w = p[3];
+			points.push_back(k3d::point3(p[0]/w,p[1]/w,p[2]/w));
 		}
 		k3d::mesh::points_t& points;
 		const k3d::double_t u;

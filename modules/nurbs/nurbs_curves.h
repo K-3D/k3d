@@ -39,6 +39,9 @@ namespace module
 namespace nurbs
 {
 
+/// Storage for an array of 4D points
+typedef k3d::typed_array<k3d::point4> points4_t;
+
 /// Adds the given curve to the other primitive and mesh
 void add_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve);
 
@@ -118,14 +121,17 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 /// True if the given curve is closed
 k3d::bool_t is_closed(const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
 
-/// Evaluate the postion using the given curve arrays
-const k3d::point3 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U);
+/// Evaluate the postion (x*weight, y*weight, z*weight, weight) using the given curve arrays
+const k3d::point4 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U);
 
 /// Get the normalized tangent vector at the given location on the curve
 const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU = 0.00001);
 
 /// Calculate the non-zero values of the B-spline basis functions at the given parameter value
-void basis_functions(k3d::mesh::weights_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U);
+void basis_functions(k3d::mesh::knots_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U);
+
+/// Lesat squares approximation of the given sample points.
+void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& SampleParameters, const points4_t& SamplePoints, const k3d::uint_t Order, const k3d::mesh::knots_t& Knots);
 
 } //namespace nurbs
 

@@ -30,6 +30,7 @@ namespace nurbs
 {
 
 extern k3d::iplugin_factory& add_trim_curve_factory();
+extern k3d::iplugin_factory& approximate_test_factory();
 extern k3d::iplugin_factory& close_curve_factory();
 extern k3d::iplugin_factory& connect_curves_factory();
 extern k3d::iplugin_factory& create_cap_factory();
@@ -61,6 +62,7 @@ extern k3d::iplugin_factory& sweep_surface_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::nurbs::add_trim_curve_factory());
+	Registry.register_factory(module::nurbs::approximate_test_factory());
 	Registry.register_factory(module::nurbs::close_curve_factory());
 	Registry.register_factory(module::nurbs::connect_curves_factory());
 	Registry.register_factory(module::nurbs::create_cap_factory());

@@ -1145,13 +1145,13 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 	k3d::nurbs_curve::add_curve(OutputMesh, NurbsCurves, Order, points);
 }
 
-const k3d::point3 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U)
+const k3d::point4 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U)
 {
 	k3d::mesh::knots_t bases;
 	const k3d::uint_t order = Knots.size() - Points.size();
 	basis_functions(bases, Knots, order, U);
 	const k3d::uint_t knot_idx = std::find_if(Knots.begin(), Knots.end(), find_first_knot_after(U)) - Knots.begin();
-	const k3d::uint_t first_point = knot_idx - order;
+	const k3d::uint_t first_point = knot_idx != Knots.size() ? knot_idx - order : knot_idx - (2*order);
 	k3d::point4 result(0,0,0,0);
 	for(k3d::uint_t i = 0; i != order; ++i)
 	{
@@ -1159,25 +1159,31 @@ const k3d::point3 evaluate_position(const k3d::mesh::points_t& Points, const k3d
 		const k3d::point3& pt = Points[first_point+i];
 		result += k3d::to_vector(bases[i]*k3d::point4(pt[0]*w, pt[1]*w, pt[2]*w, w));
 	}
-	return k3d::point3(result[0]/result[3], result[1]/result[3], result[2]/result[3]);
+	return result;
 }
 
 const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU)
 {
 	const k3d::double_t u = U > (1.0 - DeltaU) ? U - DeltaU : U;
-	const k3d::point3 u_point = evaluate_position(Points, Weights, Knots, u);
-	const k3d::point3 du_point = evaluate_position(Points, Weights, Knots, u + DeltaU);
+	k3d::point4 p = evaluate_position(Points, Weights, Knots, u);
+	k3d::double_t w = p[3];
+	const k3d::point3 u_point(p[0]/w,p[1]/w,p[2]/w);
+	p = evaluate_position(Points, Weights, Knots, u + DeltaU);;
+	w = p[3];
+	const k3d::point3 du_point(p[0]/w,p[1]/w,p[2]/w);
 	return k3d::normalize(du_point - u_point);
 }
 
-void basis_functions(k3d::mesh::weights_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U)
+void basis_functions(k3d::mesh::knots_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U)
 {
-	BasisFunctions.resize(Order, 0.0);
+	BasisFunctions.assign(Order, 0.0);
 	BasisFunctions[0] = 1;
 	k3d::mesh::weights_t left(Order, 0.0);
 	k3d::mesh::weights_t right(Order, 0.0);
 
-	const k3d::uint_t span = std::find_if(Knots.begin(), Knots.end(), find_first_knot_after(U)) - Knots.begin() - 1;
+	k3d::uint_t span = std::find_if(Knots.begin(), Knots.end(), find_first_knot_after(U)) - Knots.begin() - 1;
+	if(span == (Knots.size() - 1))
+		span -= Order;
 
 	for (k3d::uint_t j = 1; j != Order; j++)
 	{
@@ -1193,6 +1199,114 @@ void basis_functions(k3d::mesh::weights_t& BasisFunctions, const k3d::mesh::knot
 			saved = left[j - r] * temp;
 		}
 		BasisFunctions[j] = saved;
+	}
+}
+
+/// Replace the elements of Array with their cumulative sum
+template<class ArrayT> void cumulative_sum(ArrayT& Array)
+{
+	const k3d::uint_t array_begin = 0;
+	const k3d::uint_t array_end = Array.size();
+	for(k3d::uint_t i = array_begin + 1; i != array_end; ++i)
+		Array[i] += Array[i-1];
+}
+
+void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& SampleParameters, const points4_t& SamplePoints, const k3d::uint_t Order, const k3d::mesh::knots_t& Knots)
+{
+	//Aij = \sum_r N_i(x_r)N_j(x_r), b_i = sum N_i(x_r)*f_r
+	const k3d::uint_t knot_count = Knots.size();
+	const k3d::uint_t dim = knot_count - Order; // The dimension of the problem to solve
+	const k3d::uint_t sample_count = SampleParameters.size();
+
+	std::vector<k3d::mesh::knots_t> sample_bases(sample_count); // Non-zero basis function values for each sample
+	k3d::mesh::counts_t offsets; // Multiplicity of knots separating spans
+	k3d::mesh::indices_t span_first_samples; // First sample point in a span between different knot values.
+	k3d::mesh::counts_t span_sample_counts; // Number of samples in the given span.
+	k3d::mesh::indices_t base_span_starts(Order, 0); // First span for each base
+	k3d::mesh::indices_t base_span_ends; // Last span + 1 for each base
+
+	offsets.push_back(0); // The multiplicity of the first knot is not counted
+	span_first_samples.push_back(0);
+	k3d::uint_t next_knot_idx = Order;
+	k3d::double_t next_knot_val = Knots[next_knot_idx];
+	for(k3d::uint_t i = 0; i != sample_count; ++i)
+	{
+		if(SampleParameters[i] > next_knot_val)
+		{
+			const k3d::uint_t mul = multiplicity(Knots, next_knot_val, 0, knot_count);
+			offsets.push_back(mul);
+			for(k3d::uint_t base = 0; base != mul; ++base)
+			{
+				base_span_starts.push_back(span_first_samples.size());
+				base_span_ends.push_back(span_first_samples.size());
+			}
+			span_sample_counts.push_back(i - span_first_samples.back());
+			span_first_samples.push_back(i);
+			next_knot_idx += mul;
+			next_knot_val = Knots[next_knot_idx];
+		}
+		basis_functions(sample_bases[i], Knots, Order, SampleParameters[i]);
+	}
+	span_sample_counts.push_back(sample_count - span_first_samples.back());
+	base_span_ends.resize(dim, span_sample_counts.size());
+	cumulative_sum(offsets);
+	k3d::point4 rhs_x, rhs_y, rhs_z, rhs_w;
+	k3d::matrix4 mat;
+	for(k3d::uint_t i = 0; i != dim; ++i)
+	{
+		const k3d::uint_t spans_begin_i = base_span_starts[i];
+		const k3d::uint_t spans_end_i = base_span_ends[i];
+		for(k3d::uint_t j = 0; j != dim; ++j)
+		{
+			k3d::double_t result = 0.0;
+			const k3d::uint_t spans_begin = std::max(base_span_starts[j], spans_begin_i);
+			const k3d::uint_t spans_end = std::min(base_span_ends[j], spans_end_i);
+			for(k3d::uint_t span = spans_begin; span < spans_end; ++span)
+			{
+				const k3d::uint_t idx_i = i - offsets[span];
+				const k3d::uint_t idx_j = j - offsets[span];
+				const k3d::uint_t samples_begin = span_first_samples[span];
+				const k3d::uint_t samples_end = samples_begin + span_sample_counts[span];
+				for(k3d::uint_t sample = samples_begin; sample != samples_end; ++sample)
+					result += sample_bases[sample][idx_i] * sample_bases[sample][idx_j];
+			}
+			mat[i][j] = result;
+		}
+		k3d::double_t result_x = 0.0;
+		k3d::double_t result_y = 0.0;
+		k3d::double_t result_z = 0.0;
+		k3d::double_t result_w = 0.0;
+		for(k3d::uint_t span = spans_begin_i; span < spans_end_i; ++span)
+		{
+			const k3d::uint_t idx = i - offsets[span];
+			const k3d::uint_t samples_begin = span_first_samples[span];
+			const k3d::uint_t samples_end = samples_begin + span_sample_counts[span];
+			for(k3d::uint_t sample = samples_begin; sample != samples_end; ++sample)
+			{
+				result_x += sample_bases[sample][idx] * SamplePoints[sample][0];
+				result_y += sample_bases[sample][idx] * SamplePoints[sample][1];
+				result_z += sample_bases[sample][idx] * SamplePoints[sample][2];
+				result_w += sample_bases[sample][idx] * SamplePoints[sample][3];
+			}
+		}
+		rhs_x[i] = result_x;
+		rhs_y[i] = result_y;
+		rhs_z[i] = result_z;
+		rhs_w[i] = result_w;
+	}
+
+	k3d::matrix4 inv = k3d::inverse(mat);
+	k3d::point4 result_x = inv * rhs_x;
+	k3d::point4 result_y = inv * rhs_y;
+	k3d::point4 result_z = inv * rhs_z;
+	k3d::point4 result_w = inv * rhs_w;
+	Points.clear();
+	Weights.clear();
+	for(k3d::uint_t i = 0; i != 4; ++i)
+	{
+		const k3d::double_t w = result_w[i];
+		Points.push_back(k3d::point3(result_x[i]/w, result_y[i]/w, result_z[i]/w));
+		Weights.push_back(w);
 	}
 }
 

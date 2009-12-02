@@ -17,9 +17,8 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file
-		\author Carsten Haubold (CarstenHaubold@web.de)
-*/
+#include "nurbs_curves.h"
+#include "utility.h"
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/log.h>
@@ -39,16 +38,13 @@ namespace module
 namespace nurbs
 {
 
-namespace source
-{
-
-class curve :
+class approximate_test :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	approximate_test(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_order(init_owner(*this) + init_name("order") + init_label(_("Order")) + init_description(_("Order of the curve (2-linear - 4-cubic)")) + init_value(3) + init_constraint(constraint::minimum(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_point_count(init_owner(*this) + init_name("point_count") + init_label(_("Point Count")) + init_description(_("Number of control points")) + init_value(4) + init_constraint(constraint::minimum(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -67,26 +63,38 @@ public:
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
-
-		k3d::imaterial* const material = m_material.pipeline_value();
-		const k3d::int32_t order = m_order.pipeline_value();
-		const k3d::int32_t point_count = m_point_count.pipeline_value();
-		const k3d::double_t point_spacing = m_point_spacing.pipeline_value();
-
-		return_if_fail(point_count >= order);
-
-		// Create a NURBS curve primitive, and add a single curve ...
 		Output.points.create();
 		Output.point_selection.create();
 
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> primitive(k3d::nurbs_curve::create(Output));
-		primitive->material.push_back(material);
+		const k3d::uint_t order = 3;
+
+		k3d::mesh::knots_t knots;
+		k3d::nurbs_curve::add_open_uniform_knots(order, order+1, knots);
+
+		k3d::mesh::points_t orig_points;
+		orig_points.push_back(k3d::point3(0,0,0));
+		orig_points.push_back(k3d::point3(2.0/3.0,0,-1.0));
+		orig_points.push_back(k3d::point3(4.0/3.0,0,1.0));
+		orig_points.push_back(k3d::point3(2,0,0));
+		k3d::mesh::weights_t orig_weights(orig_points.size(), 1);
+		orig_weights[2] = 5.0;
+
+		k3d::mesh::knots_t sample_params;
+		points4_t samples;
+		for(k3d::double_t u = 0; u < knots.back(); u += 0.1)
+		{
+			sample_params.push_back(u);
+			samples.push_back(evaluate_position(orig_points, orig_weights, knots, u));
+		}
+		sample_params.push_back(knots.back());
+		samples.push_back(evaluate_position(orig_points, orig_weights, knots, knots.back()));
 
 		k3d::mesh::points_t points;
-		for(k3d::uint_t i = 0; i != point_count; ++i)
-			points.push_back(k3d::point3(i * point_spacing, 0.0, 0.0)); //store the point (a straight line along x-axis)
-
-		k3d::nurbs_curve::add_curve(Output, *primitive, order, points);
+		k3d::mesh::weights_t weights;
+		approximate(points, weights, sample_params, samples, order, knots);
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> output_curves(k3d::nurbs_curve::create(Output));
+		k3d::nurbs_curve::add_curve(Output, *output_curves, order, points, weights, knots);
+		output_curves->material.push_back(0);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -95,12 +103,12 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<curve, k3d::interface_list<k3d::imesh_source > > factory(
-		  k3d::uuid(0x13c474c8, 0x5c4e278f, 0x70eb8c8c, 0xabe8bd2a),
-		  "NurbsCurve",
-		  _("Generates a NURBS curve"),
+		static k3d::document_plugin_factory<approximate_test, k3d::interface_list<k3d::imesh_source > > factory(
+		  k3d::uuid(0x1959c1d8, 0x444f7fdc, 0xc242cba2, 0x277b1ee7),
+		  "NurbsApproximateTest",
+		  _("Temporary test plugin for the NURBS curve approximation algorithm"),
 		  "NURBS",
-		  k3d::iplugin_factory::EXPERIMENTAL);
+		  k3d::iplugin_factory::DEPRECATED);
 
 		return factory;
 	}
@@ -112,14 +120,12 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// curve_factory
+// approximate_test_factory
 
-k3d::iplugin_factory& curve_factory()
+k3d::iplugin_factory& approximate_test_factory()
 {
-	return curve::get_factory();
+	return approximate_test::get_factory();
 }
-
-} // namespace source
 
 } // namespace nurbs
 
