@@ -33,19 +33,19 @@
 namespace module
 {
 
-namespace mesh
+namespace polyhedron
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// join_points_implementation
+// join_points
 
-class join_points_implementation :
+class join_points :
 	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
 
 public:
-	join_points_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	join_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
@@ -246,7 +246,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<join_points_implementation,
+		static k3d::document_plugin_factory<join_points,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x915ba4d4, 0xd4154a12, 0x938bec97, 0x60f819f3),
@@ -264,10 +264,10 @@ public:
 
 k3d::iplugin_factory& join_points_factory()
 {
-	return join_points_implementation::get_factory();
+	return join_points::get_factory();
 }
 
-} // namespace mesh
+} // namespace polyhedron
 
 } // namespace module
 
