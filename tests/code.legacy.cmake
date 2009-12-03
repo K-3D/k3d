@@ -21,7 +21,6 @@ SET(SKIP_FILES
 	"^modules/polyhedron/bevel_points.cpp$"
 	"^modules/polyhedron/bridge_edges.cpp$"
 	"^modules/polyhedron/bridge_faces.cpp$"
-	"^modules/polyhedron/cap_hole.cpp$"
 	"^modules/polyhedron/collapse_edges.cpp$"
 	"^modules/polyhedron/connect_vertices.cpp$"
 	"^modules/polyhedron/dissolve_components.cpp$"
