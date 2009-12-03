@@ -1263,51 +1263,93 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 	ublas::vector<k3d::double_t> rhs_z(dim);
 	ublas::vector<k3d::double_t> rhs_w(dim);
 	ublas::compressed_matrix<k3d::double_t> A(dim, dim, ((Order - 1)*2+1)*dim); // system matrix
+
+	// Find out what control points would interpolate the curve
+	k3d::mesh::bools_t interpolating_points(dim, false);
+	points4_t interpolation_points(dim, k3d::point4(0,0,0,1)); // store the samples to interpolate through
+	for(k3d::uint_t knot_idx = 0; knot_idx != knot_count;)
+	{
+		return_if_fail(knot_idx < knot_count);
+		const k3d::uint_t mul = multiplicity(Knots, Knots[knot_idx], 0, knot_count);
+		if(mul >= (Order - 1))
+		{
+			const k3d::double_t u = Knots[knot_idx];
+			const k3d::uint_t sample_idx = (std::find_if(SampleParameters.begin(), SampleParameters.end(), find_first_knot_after(u)) - SampleParameters.begin()) - 1;
+			return_if_fail(sample_idx < sample_count);
+			knot_idx += mul;
+			if(std::abs(SampleParameters[sample_idx] - u) < 0.00000001)
+			{
+				interpolating_points[knot_idx - Order - (knot_idx - Order == dim)] = true;
+				interpolation_points[knot_idx - Order - (knot_idx - Order == dim)] = SamplePoints[sample_idx];
+			}
+		}
+		else
+		{
+			++knot_idx;
+		}
+	}
+
+	k3d::log() << debug << "interpolation_points:" << std::endl;
+	for(k3d::uint_t i = 0; i != dim; ++i) k3d::log() << "  " << interpolation_points[i] << std::endl;
+
 	for(k3d::uint_t i = 0; i != dim; ++i)
 	{
-		const k3d::uint_t spans_begin_i = base_span_starts[i];
-		const k3d::uint_t spans_end_i = base_span_ends[i];
-		for(k3d::uint_t j = 0; j != dim; ++j)
+		if(interpolating_points[i])
 		{
-			k3d::double_t result = 0.0;
-			const k3d::uint_t spans_begin = std::max(base_span_starts[j], spans_begin_i);
-			const k3d::uint_t spans_end = std::min(base_span_ends[j], spans_end_i);
-			for(k3d::uint_t span = spans_begin; span < spans_end; ++span)
+			A(i,i) = 1.0;
+			const k3d::point4& p = interpolation_points[i];
+			rhs_x(i) = p[0];
+			rhs_y(i) = p[1];
+			rhs_z(i) = p[2];
+			rhs_w(i) = p[3];
+		}
+		else
+		{
+			const k3d::uint_t spans_begin_i = base_span_starts[i];
+			const k3d::uint_t spans_end_i = base_span_ends[i];
+			for(k3d::uint_t j = 0; j != dim; ++j)
 			{
-				const k3d::uint_t idx_i = i - offsets[span];
-				const k3d::uint_t idx_j = j - offsets[span];
+				k3d::double_t result = 0.0;
+				const k3d::uint_t spans_begin = std::max(base_span_starts[j], spans_begin_i);
+				const k3d::uint_t spans_end = std::min(base_span_ends[j], spans_end_i);
+				for(k3d::uint_t span = spans_begin; span < spans_end; ++span)
+				{
+					const k3d::uint_t idx_i = i - offsets[span];
+					const k3d::uint_t idx_j = j - offsets[span];
+					const k3d::uint_t samples_begin = span_first_samples[span];
+					const k3d::uint_t samples_end = samples_begin + span_sample_counts[span];
+					for(k3d::uint_t sample = samples_begin; sample != samples_end; ++sample)
+						result += sample_bases[sample][idx_i] * sample_bases[sample][idx_j];
+				}
+				A(i,j) = result;
+			}
+
+			k3d::double_t result_x = 0.0;
+			k3d::double_t result_y = 0.0;
+			k3d::double_t result_z = 0.0;
+			k3d::double_t result_w = 0.0;
+			for(k3d::uint_t span = spans_begin_i; span < spans_end_i; ++span)
+			{
+				const k3d::uint_t idx = i - offsets[span];
 				const k3d::uint_t samples_begin = span_first_samples[span];
 				const k3d::uint_t samples_end = samples_begin + span_sample_counts[span];
 				for(k3d::uint_t sample = samples_begin; sample != samples_end; ++sample)
-					result += sample_bases[sample][idx_i] * sample_bases[sample][idx_j];
+				{
+					result_x += sample_bases[sample][idx] * SamplePoints[sample][0];
+					result_y += sample_bases[sample][idx] * SamplePoints[sample][1];
+					result_z += sample_bases[sample][idx] * SamplePoints[sample][2];
+					result_w += sample_bases[sample][idx] * SamplePoints[sample][3];
+				}
 			}
-			A(i,j) = result;
+			rhs_x(i) = result_x;
+			rhs_y(i) = result_y;
+			rhs_z(i) = result_z;
+			rhs_w(i) = result_w;
 		}
-
-		k3d::log() << debug << A << std::endl;
-
-		k3d::double_t result_x = 0.0;
-		k3d::double_t result_y = 0.0;
-		k3d::double_t result_z = 0.0;
-		k3d::double_t result_w = 0.0;
-		for(k3d::uint_t span = spans_begin_i; span < spans_end_i; ++span)
-		{
-			const k3d::uint_t idx = i - offsets[span];
-			const k3d::uint_t samples_begin = span_first_samples[span];
-			const k3d::uint_t samples_end = samples_begin + span_sample_counts[span];
-			for(k3d::uint_t sample = samples_begin; sample != samples_end; ++sample)
-			{
-				result_x += sample_bases[sample][idx] * SamplePoints[sample][0];
-				result_y += sample_bases[sample][idx] * SamplePoints[sample][1];
-				result_z += sample_bases[sample][idx] * SamplePoints[sample][2];
-				result_w += sample_bases[sample][idx] * SamplePoints[sample][3];
-			}
-		}
-		rhs_x(i) = result_x;
-		rhs_y(i) = result_y;
-		rhs_z(i) = result_z;
-		rhs_w(i) = result_w;
 	}
+
+	k3d::log() << debug << A << std::endl;
+	k3d::log() << debug << rhs_w << std::endl;
 
 	// This solves the system, overwriting the RHS with the solution
 	ublas::permutation_matrix<k3d::double_t> PM(dim);

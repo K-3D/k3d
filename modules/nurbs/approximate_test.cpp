@@ -55,7 +55,7 @@ class approximate_test :
 public:
 	approximate_test(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-				m_samples_per_span(init_owner(*this) + init_name("samples") + init_label(_("Samples")) + init_description(_("The number of samples per span")) + init_value(20) + init_constraint(constraint::minimum(5)) + init_step_increment(10) + init_units(typeid(k3d::measurement::scalar)))
+				m_samples_per_span(init_owner(*this) + init_name("samples") + init_label(_("Samples")) + init_description(_("The number of samples per span")) + init_value(20) + init_constraint(constraint::minimum(1)) + init_step_increment(10) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_samples_per_span.changed_signal().connect(make_update_mesh_slot());
@@ -68,7 +68,7 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+		k3d::geometry::selection::merge(k3d::geometry::selection::create(1), Output);
 		if(!Output.points)
 			return;
 		k3d::mesh mesh;
@@ -121,6 +121,9 @@ private:
 					samples.push_back(evaluate_position(orig_points, orig_weights, orig_knots, u));
 				}
 			}
+			sample_params.push_back(orig_knots.back());
+			samples.push_back(evaluate_position(orig_points, orig_weights, orig_knots, orig_knots.back()));
+			return_if_fail(sample_params.size() == samples.size());
 			k3d::mesh::points_t points;
 			k3d::mesh::weights_t weights;
 			approximate(points, weights, sample_params, samples, order, orig_knots);
