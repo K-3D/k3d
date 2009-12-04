@@ -22,7 +22,6 @@ SET(SKIP_FILES
 	"^modules/polyhedron/bridge_edges.cpp$"
 	"^modules/polyhedron/bridge_faces.cpp$"
 	"^modules/polyhedron/collapse_edges.cpp$"
-	"^modules/polyhedron/connect_vertices.cpp$"
 	"^modules/polyhedron/dissolve_components.cpp$"
 	"^modules/polyhedron/extrude_faces.cpp$"
 	"^modules/polyhedron/fillet_edges.cpp$"

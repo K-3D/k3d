@@ -877,6 +877,35 @@ bool_t is_sds(const const_primitive& Polyhedron)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// same_loop
+
+bool_t same_loop(const mesh::indices_t& ClockwiseEdges, const uint_t EdgeA, const uint_t EdgeB)
+{
+	for(uint_t edge = EdgeA; ;)
+	{
+		if(edge == EdgeB)
+			return true;
+
+		edge = ClockwiseEdges[edge];
+		if(edge == EdgeA)
+			return false;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// counterclockwise_edge
+
+uint_t counterclockwise_edge(const mesh::indices_t& ClockwiseEdges, const uint_t Edge)
+{
+	uint_t edge = Edge;
+	for(; ClockwiseEdges[edge] != Edge; edge = ClockwiseEdges[edge])
+	{
+	}
+
+	return edge;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // center
 
 const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)

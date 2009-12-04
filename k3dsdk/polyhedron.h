@@ -188,6 +188,11 @@ bool_t is_solid(const const_primitive& Polyhedron);
 should consider whether SDS should be set on a per-shell basis? */
 bool_t is_sds(const const_primitive& Polyhedron);
 
+/// Returns true iff the given edges are on the same loop.
+bool_t same_loop(const mesh::indices_t& ClockwiseEdges, const uint_t EdgeA, const uint_t EdgeB);
+/// Returns the previous (counterclockwise) edge on the same loop.
+uint_t counterclockwise_edge(const mesh::indices_t& ClockwiseEdges, const uint_t Edge);
+
 /// Calculates the center (average) for an edge loop (returns the origin for degenerate cases).
 const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
 /// Calculates the normal for an edge loop (returns a zero-length normal for degenerate cases).
