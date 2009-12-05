@@ -14,6 +14,8 @@ ADD_CUSTOM_TARGET(developer-html
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/k3d.png" "${developer_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/developer/developer.css" "${developer_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/developer/logo.png" "${developer_OUTPUT_DIR}"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "dashboard.xhtml" > "${developer_OUTPUT_DIR}/dashboard.xhtml"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "dashboard-index.xhtml" > "${developer_OUTPUT_DIR}/dashboard-index.xhtml"
 	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "index.xhtml" > "${developer_OUTPUT_DIR}/index.xhtml"
 	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "source.xhtml" > "${developer_OUTPUT_DIR}/source.xhtml"
 	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "documentation.xhtml" > "${developer_OUTPUT_DIR}/documentation.xhtml"

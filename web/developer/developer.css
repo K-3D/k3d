@@ -2,3 +2,21 @@
 {
   padding: 0 10px 0 0;
 }
+
+dt
+{
+  position: relative;
+  width: 15em;
+  height: 1em;
+  padding: 0.25em 0 0 0;
+}
+
+dd
+{
+  margin: 0 0 0 16em;
+  margin-left: 16em;
+  border-left: 1px solid #cccccc;
+  padding-left: 1em;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+};
