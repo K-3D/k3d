@@ -29,8 +29,6 @@ namespace module
 namespace test
 {
 
-extern k3d::iplugin_factory& legacy_mesh_conversion_factory();
-extern k3d::iplugin_factory& memory_pools_factory();
 extern k3d::iplugin_factory& mesh_diff_factory();
 extern k3d::iplugin_factory& mesh_to_stdout_factory();
 extern k3d::iplugin_factory& pipeline_profiler_factory();
@@ -41,13 +39,9 @@ extern k3d::iplugin_factory& selection_to_stdout_factory();
 } // namespace module
 
 K3D_MODULE_START(Registry)
-
-	Registry.register_factory(module::test::legacy_mesh_conversion_factory());
-	Registry.register_factory(module::test::memory_pools_factory());
 	Registry.register_factory(module::test::mesh_diff_factory());
 	Registry.register_factory(module::test::mesh_to_stdout_factory());
 	Registry.register_factory(module::test::pipeline_profiler_factory());
 	Registry.register_factory(module::test::selection_to_stdout_factory());
-
 K3D_MODULE_END
 
