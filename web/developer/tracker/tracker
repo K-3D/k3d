@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 import glob
-import mako.template
+from mako.template import Template
+from mako.lookup import TemplateLookup
 import optparse
 import sys
 import yaml
@@ -34,10 +35,11 @@ for issue in glob.glob(options.project_directory + "/issue-*.yaml"):
 	issues.append(issue)
 	
 
-project_template = mako.template.Template(filename=options.template_directory + "/project.xhtml", output_encoding='utf-8')
+lookup = TemplateLookup(directories=[options.template_directory])
+project_template = Template(filename="project.xhtml", output_encoding='utf-8', lookup=lookup)
 file(options.output_directory + "/" + options.html_index, "w").write(project_template.render(project=project, issues=issues))
 
-release_template = mako.template.Template(filename=options.template_directory + "/release.xhtml", output_encoding='utf-8')
+release_template = Template(filename="release.xhtml", output_encoding='utf-8', lookup=lookup)
 for release in project["releases"]:
 	release_issues = []
 	for issue in issues:
@@ -46,7 +48,7 @@ for release in project["releases"]:
 
 	file(options.output_directory + "/" + release["filename"], "w").write(release_template.render(project=project, release=release, issues=release_issues))
 
-issue_template = mako.template.Template(filename=options.template_directory + "/issue.xhtml", output_encoding='utf-8')
+issue_template = Template(filename="issue.xhtml", output_encoding='utf-8', lookup=lookup)
 for issue in issues:
 	issue_release = None 
 	for release in project["releases"]:

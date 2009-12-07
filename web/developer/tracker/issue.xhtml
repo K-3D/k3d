@@ -5,6 +5,7 @@
 		<title>K-3D Issue - ${issue["title"] | h}</title>
 		<link rel="icon" type="image/png" href="../k3d.png" />
 		<link rel="stylesheet" type="text/css" href="../k3d.css" />
+		<link rel="stylesheet" type="text/css" href="../developer.css" />
 		<link rel="stylesheet" type="text/css" href="tracker.css" />
 	</head>
 
@@ -16,19 +17,7 @@ keywords = { ":unstarted":"Unstarted", ":closed":"Closed", ":bugfix":"Bugfix", "
 %>
 
 	<body>
-		<div id="nav">
-			<a id="logo" href=".."><h1>K-3D</h1></a>
-
-			<ul>
-				<li><a href="../downloads">Downloads</a></li>
-				<li><a href="../donations">Donations</a></li>
-				<li><a href="../blogs">Blogs</a></li>
-				<li><a href="../forums">Forums</a></li>
-				<li><a href="../wiki">Wiki</a></li>
-				<li><a href="http://planet.k-3d.org">Planet</a></li>
-				<li><a href="./index">Tracker</a></li>
-			</ul>
-		</div>
+<%include file="navigation.xhtml"/>
 
 		<div id="main" class="tracker">
 			<h2>Issue - ${issue["title"] | h}</h2>
