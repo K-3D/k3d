@@ -25,6 +25,7 @@
 */
 
 #include <k3dsdk/types.h>
+#include <k3dsdk/linear_curve.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/metadata.h>
 #include <k3dsdk/metadata_keys.h>
@@ -130,8 +131,11 @@ const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::w
 /// Calculate the non-zero values of the B-spline basis functions at the given parameter value
 void basis_functions(k3d::mesh::knots_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U);
 
-/// Lesat squares approximation of the given sample points.
+/// Least squares approximation of the given sample points.
 void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& SampleParameters, const points4_t& SamplePoints, const k3d::uint_t Order, const k3d::mesh::knots_t& Knots);
+
+/// Polygonize a curve
+void polygonize(k3d::mesh& OutputMesh, k3d::linear_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::uint_t Samples);
 
 } //namespace nurbs
 

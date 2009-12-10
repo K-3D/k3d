@@ -74,13 +74,16 @@ struct selected_component_extractor
 template <typename FunctorT>
 void visit_selected_curves(const k3d::mesh& Mesh, FunctorT Modifier)
 {
-	for(k3d::uint_t prim_idx = 0; prim_idx != Mesh.primitives.size(); ++prim_idx)
+	const k3d::uint_t prims_end = Mesh.primitives.size();
+	for(k3d::uint_t prim_idx = 0; prim_idx != prims_end; ++prim_idx)
 	{
 		k3d::mesh::indices_t selected_curves;
 		k3d::mesh::visit_arrays(*Mesh.primitives[prim_idx], selected_component_extractor(selected_curves, "curve"));
 		if(selected_curves.size())
 		{
 			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves(k3d::nurbs_curve::validate(Mesh, *Mesh.primitives[prim_idx]));
+			if(!curves)
+				continue;
 			for(k3d::uint_t i = 0; i != selected_curves.size(); ++i)
 			{
 				const k3d::uint_t curve = selected_curves[i];
@@ -272,6 +275,12 @@ struct find_first_knot_after
 	}
 	const k3d::double_t knot_value;
 };
+
+inline const k3d::point3 dehomogenize(const k3d::point4 P)
+{
+	const k3d::double_t w = P[3];
+	return k3d::point3(P[0]/w, P[1]/w, P[2]/w);
+}
 
 } //namespace nurbs
 

@@ -1362,6 +1362,46 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 	}
 }
 
+void polygonize(k3d::mesh& OutputMesh, k3d::linear_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::uint_t Samples)
+{
+	k3d::mesh::points_t nurbs_points;
+	k3d::mesh::weights_t weights;
+	k3d::mesh::knots_t knots;
+	extract_curve_arrays(nurbs_points, knots, weights, InputMesh, InputCurves, Curve, true);
+	k3d::mesh::knots_t unique_knots;
+	for(k3d::uint_t i = 0; i < knots.size();)
+	{
+		const k3d::double_t u = knots[i];
+		unique_knots.push_back(u);
+		i += multiplicity(knots, u, i, knots.size());
+	}
+
+	OutputCurve.periodic.push_back(false);
+	OutputCurve.material = InputCurves.material;
+	OutputCurve.curve_first_points.push_back(OutputCurve.curve_points.size());
+	OutputCurve.curve_point_counts.push_back(0);
+	OutputCurve.curve_selections.push_back(InputCurves.curve_selections[Curve]);
+
+	k3d::mesh::points_t& points = OutputMesh.points.writable();
+	OutputCurve.curve_points.push_back(points.size());
+	OutputCurve.curve_point_counts.back()++;
+	points.push_back(nurbs_points.front());
+	const k3d::uint_t unique_knots_end = unique_knots.size() - 1;
+	for(k3d::uint_t i = 0; i != unique_knots_end; ++i)
+	{
+		const k3d::double_t start_u = unique_knots[i];
+		const k3d::double_t step = (unique_knots[i+1] - start_u) / static_cast<k3d::double_t>(Samples + 1);
+		for(k3d::uint_t sample = 1; sample <= (Samples+1); ++sample)
+		{
+			const k3d::double_t u = start_u + static_cast<k3d::double_t>(sample) * step;
+			OutputCurve.curve_points.push_back(points.size());
+			OutputCurve.curve_point_counts.back()++;
+			points.push_back(dehomogenize(evaluate_position(nurbs_points, weights, knots, u)));
+		}
+	}
+	OutputMesh.point_selection.writable().resize(points.size(), 1.0);
+}
+
 } //namespace nurbs
 
 } //namespace module

@@ -787,12 +787,6 @@ void skin_curves(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	OutputPatches.patch_selections.back() = 1.0;
 }
 
-const k3d::point3 dehomogenize(const k3d::point4 P)
-{
-	const k3d::double_t w = P[3];
-	return k3d::point3(P[0]/w, P[1]/w, P[2]/w);
-}
-
 void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& SweptCurves, const k3d::nurbs_curve::const_primitive& Paths, const k3d::uint_t Samples)
 {
 	const k3d::uint_t paths_count = Paths.curve_first_points.size();
