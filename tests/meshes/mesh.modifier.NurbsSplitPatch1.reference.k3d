@@ -11,7 +11,7 @@
 						<array name="patch_first_points" type="k3d::uint_t">0 16</array>
 						<array name="patch_first_trim_loops" type="k3d::uint_t">0 0</array>
 						<array name="patch_materials" type="k3d::imaterial*">0 0</array>
-						<array name="patch_selections" type="k3d::double_t">0 1
+						<array name="patch_selections" type="k3d::double_t">1 1
 							<metadata>
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>

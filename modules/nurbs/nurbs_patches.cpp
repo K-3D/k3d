@@ -571,6 +571,7 @@ void apply_knot_vectors(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& Outp
 	knot_vector_merger u_merger(UKnots, UOrder);
 	for(k3d::uint_t curve = 0; curve != u_curves->curve_first_points.size(); ++curve)
 		u_merger(u_mesh, *u_curves_merged, u_mesh, *const_u_curves, curve);
+	u_curves_merged->material = const_u_curves->material;
 	boost::scoped_ptr<k3d::nurbs_patch::primitive> u_patch_merged(k3d::nurbs_patch::create(u_mesh));
 	curves_to_patch(u_mesh, *u_patch_merged, u_mesh, *u_curves_merged, *const_v_elevated, 0, true);
 
@@ -586,6 +587,7 @@ void apply_knot_vectors(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& Outp
 	knot_vector_merger v_merger(VKnots, VOrder);
 	for(k3d::uint_t curve = 0; curve != v_curves->curve_first_points.size(); ++curve)
 		v_merger(v_mesh, *v_curves_merged, v_mesh, *const_v_curves, curve);
+	v_curves_merged->material = const_v_curves->material;
 	curves_to_patch(OutputMesh, OutputPatches, v_mesh, *v_curves_merged, *const_u_patch_merged, 0, false);
 }
 
