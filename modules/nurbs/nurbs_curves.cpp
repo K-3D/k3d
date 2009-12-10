@@ -1223,7 +1223,7 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 {
 	//Aij = \sum_r N_i(x_r)N_j(x_r), b_i = sum N_i(x_r)*f_r
 	const k3d::uint_t knot_count = Knots.size();
-	const k3d::uint_t dim = knot_count - Order; // The dimension of the problem to solve
+	const k3d::uint_t dim = knot_count - Order; // The dimension of the problem to solve is equal to the number of control points of the final curve
 	const k3d::uint_t sample_count = SampleParameters.size();
 
 	std::vector<k3d::mesh::knots_t> sample_bases(sample_count); // Non-zero basis function values for each sample

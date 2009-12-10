@@ -786,7 +786,7 @@ void skin_curves(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	OutputPatches.patch_selections.back() = 1.0;
 }
 
-void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& SweptCurves, const k3d::nurbs_curve::const_primitive& Paths)
+void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& SweptCurves, const k3d::nurbs_curve::const_primitive& Paths, const k3d::uint_t Samples)
 {
 	const k3d::uint_t paths_count = Paths.curve_first_points.size();
 	const k3d::uint_t swept_curves_count = SweptCurves.curve_first_points.size();
@@ -797,42 +797,129 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 		k3d::mesh::knots_t path_knots;
 		extract_curve_arrays(path_points, path_knots, path_weights, OutputMesh, Paths, path, true);
 		const k3d::uint_t path_point_count = path_points.size();
+		const k3d::uint_t order = Paths.curve_orders[path];
+
+		// Unique knot values
+		k3d::mesh::knots_t unique_knots;
+		for(k3d::uint_t i = 0; i < path_knots.size();)
+		{
+			const k3d::double_t u = path_knots[i];
+			unique_knots.push_back(u);
+			i += multiplicity(path_knots, u, i, path_knots.size());
+		}
+		k3d::log() << debug << "unique knots: " << unique_knots << std::endl;
+
+		// Construct a local coordinate system around each sample point
+		points4_t origins;
+		k3d::mesh::vectors_t x_vecs, y_vecs, z_vecs;
+		k3d::mesh::knots_t samples_u;
+		{
+			const k3d::point3 o = path_points.front();
+			const k3d::double_t w = path_weights.front();
+			origins.push_back(k3d::point4(o[0]*w, o[1]*w, o[2]*w, w));
+			const k3d::vector3 z = k3d::normalize(path_points[1] - path_points[0]);
+			const k3d::double_t step = (path_knots[order] - path_knots[0]) / static_cast<k3d::double_t>(Samples+1);
+			k3d::vector3 next_tangent = tangent(path_points, path_weights, path_knots, 0.5*step);
+			if(std::abs(z*next_tangent) > 0.999999)
+			{
+				next_tangent = path_point_count > 2 ? k3d::normalize(path_points[2] - path_points[1]) : z;
+				if(std::abs(z*next_tangent) > 0.999999) // Choose a random vector that is not parallel to z to make a cross product with
+				{
+					if(z[0] != 0)
+						next_tangent[1] += 1;
+					else
+						next_tangent[0] += 1;
+					next_tangent  = k3d::normalize(next_tangent);
+					k3d::log() << debug << "random tangent: " << next_tangent << std::endl;
+				}
+			}
+			const k3d::vector3 y = k3d::normalize(z ^ next_tangent);
+			x_vecs.push_back(k3d::normalize(y ^ z));
+			y_vecs.push_back(y);
+			z_vecs.push_back(z);
+			samples_u.push_back(0);
+		}
+		const k3d::uint_t unique_knots_end = unique_knots.size() - 1;
+		k3d::log() << debug << "local system:" << std::endl;
+		for(k3d::uint_t i = 0; i != unique_knots_end; ++i)
+		{
+			const k3d::double_t start_u = unique_knots[i];
+			const k3d::double_t step = (unique_knots[i+1] - start_u) / static_cast<k3d::double_t>(Samples + 1);
+			for(k3d::uint_t sample = 1; sample <= (Samples+1); ++sample)
+			{
+				const k3d::double_t u = start_u + static_cast<k3d::double_t>(sample) * step;
+				samples_u.push_back(u);
+				origins.push_back(evaluate_position(path_points, path_weights, path_knots, u));
+				const k3d::vector3 z = tangent(path_points, path_weights, path_knots, u, 0.5*step);
+				//k3d::vector3 y = std::abs(z*z_vecs.back()) > 0.999999 ? y_vecs.back() : k3d::normalize(z_vecs.back() ^ z);
+				k3d::vector3 y = k3d::normalize(z_vecs.back() ^ z);
+				k3d::vector3 x = k3d::normalize(y ^ z);
+				if(y*y_vecs.back() < 0 || x*x_vecs.back() < 0)
+				{
+					k3d::log() << debug << "reversing y vector" << std::endl;
+					y = k3d::normalize(z ^ z_vecs.back());
+					x = k3d::normalize(y ^ z);
+				}
+				x_vecs.push_back(x);
+				y_vecs.push_back(y);
+				z_vecs.push_back(z);
+				k3d::log() << debug << "knot " << start_u << ": [" << x_vecs.back() << "] [" << y_vecs.back() << "] [" << z_vecs.back() << "]" << std::endl;
+			}
+		}
+
+		k3d::mesh::points_t& output_points = OutputMesh.points.writable();
+
 		for(k3d::uint_t swept_curve = 0; swept_curve != swept_curves_count; ++swept_curve)
 		{
-			k3d::mesh skeleton_mesh;
-			skeleton_mesh.points.create();
-			skeleton_mesh.point_selection.create();
-			boost::scoped_ptr<k3d::nurbs_curve::primitive> skeleton_curves(k3d::nurbs_curve::create(skeleton_mesh));
-			skeleton_curves->material = SweptCurves.material;
-			// arrays for the curve to sweep
+			// Store the control points of the curve to sweep in a format relative to the coordinat system around the path's first point
+			k3d::mesh::points_t relative_points;
+			k3d::vector3 x,y,z;
+			k3d::point4 p = origins.front();
+			k3d::double_t w = p[3];
+			k3d::point3 origin(p[0]/w, p[1]/w, p[2]/w);
+			x = x_vecs.front();
+			y = y_vecs.front();
+			z = z_vecs.front();
 			k3d::mesh::points_t swept_points;
 			k3d::mesh::weights_t swept_weights;
 			k3d::mesh::knots_t swept_knots;
 			extract_curve_arrays(swept_points, swept_knots, swept_weights, InputMesh, SweptCurves, swept_curve, true);
-			for(k3d::uint_t i = 0; i != path_point_count; ++i)
+			for(k3d::uint_t i = 0; i != swept_points.size(); ++i)
 			{
-				const k3d::point3& path_point = path_points[i];
-				// Determine normal vector for a plane that bisects the angle in the convex hull at this point
-				const k3d::vector3 incoming = i != 0 ? k3d::normalize(path_points[i] - path_points[i-1]) : k3d::normalize(path_points[i+1] - path_points[i]);
-				const k3d::vector3 outgoing = i != (path_point_count - 1) ? k3d::normalize(path_points[i+1] - path_points[i]) : incoming;
-				const k3d::vector3 n = outgoing + incoming;
-				const k3d::vector3 bisect_z = n.length2() ? k3d::normalize(n) : outgoing; // The normal to the plane
-				const k3d::vector3 u_proj = k3d::normalize(incoming); // unit vector to project along
-				k3d::mesh::points_t transformed_points;
-				k3d::mesh::weights_t transformed_weights;
-				for(k3d::uint_t j = 0; j != swept_points.size(); ++j)
-				{
-					// curve_point is the point in the curve that was last added, or the original curve point if we're at the beginning
-					const k3d::point3& curve_point = i != 0 ? skeleton_mesh.points->at(skeleton_curves->curve_points[skeleton_curves->curve_first_points.back() + j]) : swept_points[j];
-					const k3d::double_t d = -((curve_point - path_point)*bisect_z) / (u_proj * bisect_z); // Projection distance
-					transformed_points.push_back(curve_point + d*u_proj);
-					transformed_weights.push_back(path_weights[i] * swept_weights[j]);
-				}
-				k3d::nurbs_curve::add_curve(skeleton_mesh, *skeleton_curves, SweptCurves.curve_orders[swept_curve], transformed_points, transformed_weights, swept_knots);
-				skeleton_curves->curve_selections.back() = 1.0;
+				const k3d::vector3 vec = swept_points[i] - origin;
+				relative_points.push_back(k3d::point3(vec*x, vec*y, vec*z));
 			}
-			skin_curves(OutputMesh, OutputPatches, skeleton_mesh, *skeleton_curves, path_knots, Paths.curve_orders[path]);
+			k3d::mesh curves_mesh;
+			curves_mesh.points.create();
+			curves_mesh.point_selection.create();
+			boost::scoped_ptr<k3d::nurbs_curve::primitive> curves_prim(k3d::nurbs_curve::create(curves_mesh));
+			curves_prim->material = SweptCurves.material;
+			for(k3d::uint_t j = 0; j != relative_points.size(); ++j)
+			{
+				const k3d::point3& rel_point = relative_points[j];
+				points4_t samples;
+				for(k3d::uint_t i = 0; i != origins.size(); ++i)
+				{
+					p = origins[i];
+					w = p[3];
+					origin = k3d::point3(p[0]/w, p[1]/w, p[2]/w);
+					x = x_vecs[i];
+					y = y_vecs[i];
+					z = z_vecs[i];
+					const k3d::vector3 vec = x*rel_point[0] + y*rel_point[1] + z*rel_point[2];
+					const k3d::point3 out = origin + vec;
+					if(j == 0) output_points.push_back(out);
+					samples.push_back(k3d::point4(out[0]*w, out[1]*w, out[2]*w, w));
+				}
+				k3d::mesh::points_t points_out;
+				k3d::mesh::weights_t weights_out;
+				approximate(points_out, weights_out, samples_u, samples, order, path_knots);
+				k3d::nurbs_curve::add_curve(curves_mesh, *curves_prim, order, points_out, weights_out, path_knots);
+				k3d::log() << debug << "added curve with knots " << path_knots << std::endl;
+			}
+			skin_curves(OutputMesh, OutputPatches, curves_mesh, *curves_prim, swept_knots, SweptCurves.curve_orders[swept_curve]);
 		}
+		OutputMesh.point_selection.writable().resize(output_points.size(), 0.0);
 	}
 }
 
