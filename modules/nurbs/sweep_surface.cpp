@@ -59,7 +59,7 @@ public:
 	sweep_surface(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the original curves")) + init_value(true)),
-		m_samples(init_owner(*this) + init_name("samples") + init_label(_("Samples")) + init_description(_("The number of samples per span")) + init_value(20) + init_constraint(constraint::minimum(1)) + init_step_increment(5) + init_units(typeid(k3d::measurement::scalar)))
+		m_samples(init_owner(*this) + init_name("samples") + init_label(_("Samples")) + init_description(_("The number of samples per span")) + init_value(200) + init_constraint(constraint::minimum(10)) + init_step_increment(50) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_delete_original.changed_signal().connect(make_update_mesh_slot());

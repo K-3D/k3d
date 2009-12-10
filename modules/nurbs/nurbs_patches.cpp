@@ -278,7 +278,6 @@ void extract_patch_curve_by_parameter(k3d::mesh& OutputMesh, k3d::nurbs_curve::p
 	boost::scoped_ptr<k3d::nurbs_patch::primitive> tmp_patch(k3d::nurbs_patch::create(tmp_mesh));
 	if(mul < (order-1))
 	{
-		k3d::log() << debug << "inserting knot " << U << " which had mul " << mul << std::endl;
 		insert_knot(tmp_mesh, *tmp_patch, InputMesh, InputPatches, Patch, U, order-mul-1, !UDirection);
 	}
 	else
@@ -786,6 +785,12 @@ void skin_curves(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	OutputPatches.patch_selections.back() = 1.0;
 }
 
+const k3d::point3 dehomogenize(const k3d::point4 P)
+{
+	const k3d::double_t w = P[3];
+	return k3d::point3(P[0]/w, P[1]/w, P[2]/w);
+}
+
 void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& SweptCurves, const k3d::nurbs_curve::const_primitive& Paths, const k3d::uint_t Samples)
 {
 	const k3d::uint_t paths_count = Paths.curve_first_points.size();
@@ -807,7 +812,6 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 			unique_knots.push_back(u);
 			i += multiplicity(path_knots, u, i, path_knots.size());
 		}
-		k3d::log() << debug << "unique knots: " << unique_knots << std::endl;
 
 		// Construct a local coordinate system around each sample point
 		points4_t origins;
@@ -830,7 +834,6 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 					else
 						next_tangent[0] += 1;
 					next_tangent  = k3d::normalize(next_tangent);
-					k3d::log() << debug << "random tangent: " << next_tangent << std::endl;
 				}
 			}
 			const k3d::vector3 y = k3d::normalize(z ^ next_tangent);
@@ -840,7 +843,6 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 			samples_u.push_back(0);
 		}
 		const k3d::uint_t unique_knots_end = unique_knots.size() - 1;
-		k3d::log() << debug << "local system:" << std::endl;
 		for(k3d::uint_t i = 0; i != unique_knots_end; ++i)
 		{
 			const k3d::double_t start_u = unique_knots[i];
@@ -849,25 +851,19 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 			{
 				const k3d::double_t u = start_u + static_cast<k3d::double_t>(sample) * step;
 				samples_u.push_back(u);
-				origins.push_back(evaluate_position(path_points, path_weights, path_knots, u));
+				const k3d::point4 origin = evaluate_position(path_points, path_weights, path_knots, u);
 				const k3d::vector3 z = tangent(path_points, path_weights, path_knots, u, 0.5*step);
-				//k3d::vector3 y = std::abs(z*z_vecs.back()) > 0.999999 ? y_vecs.back() : k3d::normalize(z_vecs.back() ^ z);
-				k3d::vector3 y = k3d::normalize(z_vecs.back() ^ z);
-				k3d::vector3 x = k3d::normalize(y ^ z);
-				if(y*y_vecs.back() < 0 || x*x_vecs.back() < 0)
-				{
-					k3d::log() << debug << "reversing y vector" << std::endl;
-					y = k3d::normalize(z ^ z_vecs.back());
-					x = k3d::normalize(y ^ z);
-				}
+				const k3d::vector3& last_z = z_vecs.back(); // We project the coordinate system along the last z axis
+				const k3d::point3 last_y_point = dehomogenize(origins.back()) + y_vecs.back();
+				const k3d::double_t d = -((last_y_point - dehomogenize(origin))*z) / (last_z * z); // Projection distance
+				const k3d::vector3 y = (last_y_point + d*last_z) - dehomogenize(origin);
+				const k3d::vector3 x = k3d::normalize(y ^ z);
+				origins.push_back(origin);
 				x_vecs.push_back(x);
 				y_vecs.push_back(y);
 				z_vecs.push_back(z);
-				k3d::log() << debug << "knot " << start_u << ": [" << x_vecs.back() << "] [" << y_vecs.back() << "] [" << z_vecs.back() << "]" << std::endl;
 			}
 		}
-
-		k3d::mesh::points_t& output_points = OutputMesh.points.writable();
 
 		for(k3d::uint_t swept_curve = 0; swept_curve != swept_curves_count; ++swept_curve)
 		{
@@ -908,18 +904,15 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 					z = z_vecs[i];
 					const k3d::vector3 vec = x*rel_point[0] + y*rel_point[1] + z*rel_point[2];
 					const k3d::point3 out = origin + vec;
-					if(j == 0) output_points.push_back(out);
 					samples.push_back(k3d::point4(out[0]*w, out[1]*w, out[2]*w, w));
 				}
 				k3d::mesh::points_t points_out;
 				k3d::mesh::weights_t weights_out;
 				approximate(points_out, weights_out, samples_u, samples, order, path_knots);
 				k3d::nurbs_curve::add_curve(curves_mesh, *curves_prim, order, points_out, weights_out, path_knots);
-				k3d::log() << debug << "added curve with knots " << path_knots << std::endl;
 			}
 			skin_curves(OutputMesh, OutputPatches, curves_mesh, *curves_prim, swept_knots, SweptCurves.curve_orders[swept_curve]);
 		}
-		OutputMesh.point_selection.writable().resize(output_points.size(), 0.0);
 	}
 }
 

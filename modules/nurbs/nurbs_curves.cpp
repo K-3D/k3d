@@ -37,7 +37,6 @@
 #include <boost/numeric/ublas/lu.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/io.hpp>
 
 namespace ublas = boost::numeric::ublas;
 
@@ -1221,7 +1220,6 @@ template<class ArrayT> void cumulative_sum(ArrayT& Array)
 
 void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& SampleParameters, const points4_t& SamplePoints, const k3d::uint_t Order, const k3d::mesh::knots_t& Knots)
 {
-	//Aij = \sum_r N_i(x_r)N_j(x_r), b_i = sum N_i(x_r)*f_r
 	const k3d::uint_t knot_count = Knots.size();
 	const k3d::uint_t dim = knot_count - Order; // The dimension of the problem to solve is equal to the number of control points of the final curve
 	const k3d::uint_t sample_count = SampleParameters.size();
@@ -1289,9 +1287,6 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 		}
 	}
 
-	k3d::log() << debug << "interpolation_points:" << std::endl;
-	for(k3d::uint_t i = 0; i != dim; ++i) k3d::log() << "  " << interpolation_points[i] << std::endl;
-
 	for(k3d::uint_t i = 0; i != dim; ++i)
 	{
 		if(interpolating_points[i])
@@ -1347,9 +1342,6 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 			rhs_w(i) = result_w;
 		}
 	}
-
-	k3d::log() << debug << A << std::endl;
-	k3d::log() << debug << rhs_w << std::endl;
 
 	// This solves the system, overwriting the RHS with the solution
 	ublas::permutation_matrix<k3d::double_t> PM(dim);
