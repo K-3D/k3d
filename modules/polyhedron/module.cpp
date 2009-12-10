@@ -32,7 +32,6 @@ namespace polyhedron
 extern k3d::iplugin_factory& bevel_faces_factory();
 extern k3d::iplugin_factory& bevel_points_factory();
 extern k3d::iplugin_factory& bridge_edges_factory();
-extern k3d::iplugin_factory& bridge_faces_factory();
 extern k3d::iplugin_factory& cap_hole_factory();
 extern k3d::iplugin_factory& collapse_edges_factory();
 extern k3d::iplugin_factory& collapse_faces_factory();
@@ -61,7 +60,6 @@ extern k3d::iplugin_factory& triangulate_faces_factory();
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::polyhedron::bevel_faces_factory());
 	Registry.register_factory(module::polyhedron::bridge_edges_factory());
-	Registry.register_factory(module::polyhedron::bridge_faces_factory());
 	Registry.register_factory(module::polyhedron::cap_hole_factory());
 	Registry.register_factory(module::polyhedron::collapse_edges_factory());
 	Registry.register_factory(module::polyhedron::collapse_faces_factory());

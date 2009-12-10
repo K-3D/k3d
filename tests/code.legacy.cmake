@@ -19,7 +19,6 @@ SET(SKIP_FILES
 	"^k3dsdk/type_registry.cpp$"
 	"^modules/polyhedron/bevel_faces.cpp$"
 	"^modules/polyhedron/bevel_points.cpp$"
-	"^modules/polyhedron/bridge_faces.cpp$"
 	"^modules/polyhedron/collapse_edges.cpp$"
 	"^modules/polyhedron/dissolve_components.cpp$"
 	"^modules/polyhedron/extrude_faces.cpp$"
