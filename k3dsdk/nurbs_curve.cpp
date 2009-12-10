@@ -67,6 +67,23 @@ const_primitive::const_primitive(
 {
 }
 
+const_primitive::const_primitive(const primitive& Primitive) :
+	material(Primitive.material),
+	curve_first_points(Primitive.curve_first_points),
+	curve_point_counts(Primitive.curve_point_counts),
+	curve_orders(Primitive.curve_orders),
+	curve_first_knots(Primitive.curve_first_knots),
+	curve_selections(Primitive.curve_selections),
+	curve_points(Primitive.curve_points),
+	curve_point_weights(Primitive.curve_point_weights),
+	curve_knots(Primitive.curve_knots),
+	constant_attributes(Primitive.constant_attributes),
+	curve_attributes(Primitive.curve_attributes),
+	varying_attributes(Primitive.varying_attributes),
+	vertex_attributes(Primitive.vertex_attributes)
+{
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 // primitive
 
