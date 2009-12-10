@@ -26,7 +26,6 @@ SET(SKIP_FILES
 	"^modules/polyhedron/helpers.cpp$"
 	"^modules/polyhedron/helpers.h$"
 	"^modules/polyhedron/join_points.cpp$"
-	"^modules/qslim/quadric_decimation.cpp$"
 	"^modules/test/legacy_mesh_conversion.cpp$"
 	"^modules/test/memory_pools.cpp$"
 	"^tests/code.legacy.cmake$"
