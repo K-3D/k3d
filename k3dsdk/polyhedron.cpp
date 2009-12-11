@@ -908,14 +908,14 @@ uint_t counterclockwise_edge(const mesh::indices_t& ClockwiseEdges, const uint_t
 //////////////////////////////////////////////////////////////////////////////
 // center
 
-const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
+const point3 center(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
 {
 	point3 result(0, 0, 0);
 
 	uint_t count = 0;
 	for(uint_t edge = EdgeIndex; ; )
 	{
-		result += to_vector(Points[EdgePoints[edge]]);
+		result += to_vector(Points[VertexPoints[edge]]);
 		++count;
 
 		edge = ClockwiseEdges[edge];
@@ -932,15 +932,15 @@ const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& Cl
 //////////////////////////////////////////////////////////////////////////////
 // normal
 
-const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
+const normal3 normal(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
 {
 	// Calculates the normal for an edge loop using the summation method, which is more robust than the three-point methods (handles zero-length edges)
 	normal3 result(0, 0, 0);
 
 	for(uint_t edge = EdgeIndex; ; )
 	{
-		const point3& i = Points[EdgePoints[edge]];
-		const point3& j = Points[EdgePoints[ClockwiseEdges[edge]]];
+		const point3& i = Points[VertexPoints[edge]];
+		const point3& j = Points[VertexPoints[ClockwiseEdges[edge]]];
 
 		result[0] += (i[1] + j[1]) * (j[2] - i[2]);
 		result[1] += (i[2] + j[2]) * (j[0] - i[0]);
@@ -983,14 +983,14 @@ class find_companion_worker
 {
 public:
 	find_companion_worker(
-		const mesh::indices_t& EdgePoints,
+		const mesh::indices_t& VertexPoints,
 		const mesh::indices_t& ClockwiseEdges,
 		const mesh::counts_t& Valences,
 		const mesh::indices_t& FirstEdges,
 		const mesh::indices_t& PointEdges,
 		mesh::bools_t& BoundaryEdges,
 		mesh::indices_t& AdjacentEdges) :
-			m_edge_points(EdgePoints),
+			m_edge_points(VertexPoints),
 			m_clockwise_edges(ClockwiseEdges),
 			m_valences(Valences),
 			m_first_edges(FirstEdges),
@@ -1230,24 +1230,24 @@ private:
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create_edge_adjacency_lookup
 
-void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges)
+void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges)
 {
 	mesh::counts_t valences;
-	create_vertex_valence_lookup(0, EdgePoints, valences);
+	create_vertex_valence_lookup(0, VertexPoints, valences);
 	mesh::indices_t first_edges; // first edge in point_edges for each point
 	mesh::indices_t point_edges;
-	create_vertex_edge_lookup(EdgePoints, point_edges, first_edges, valences);
+	create_vertex_edge_lookup(VertexPoints, point_edges, first_edges, valences);
 
-	BoundaryEdges.assign(EdgePoints.size(), true);
-	AdjacentEdges.assign(EdgePoints.size(), 0);
+	BoundaryEdges.assign(VertexPoints.size(), true);
+	AdjacentEdges.assign(VertexPoints.size(), 0);
 
 	const uint_t edge_begin = 0;
-	const uint_t edge_end = edge_begin + EdgePoints.size();
+	const uint_t edge_end = edge_begin + VertexPoints.size();
 	
 	// Making this parallel decreases running time by 20 % on a Pentium D. 
 	k3d::parallel::parallel_for(
 				k3d::parallel::blocked_range<uint_t>(edge_begin, edge_end, k3d::parallel::grain_size()),
-				detail::find_companion_worker(EdgePoints, ClockwiseEdges, valences, first_edges, point_edges, BoundaryEdges, AdjacentEdges));
+				detail::find_companion_worker(VertexPoints, ClockwiseEdges, valences, first_edges, point_edges, BoundaryEdges, AdjacentEdges));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -1301,7 +1301,7 @@ void create_edge_count_lookup(const mesh::indices_t& LoopFirstEdges, const mesh:
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create_vertex_face_lookup
 
-void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces)
+void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces)
 {
 	std::vector<std::vector<uint_t> > adjacency_list(Points.size());
 
@@ -1316,7 +1316,7 @@ void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh
 			const uint_t first_edge = LoopFirstEdges[loop];
 			for(uint_t edge = first_edge; ;)
 			{
-				adjacency_list[EdgePoints[edge]].push_back(face);
+				adjacency_list[VertexPoints[edge]].push_back(face);
 
 				edge = ClockwiseEdges[edge];
 				if(edge == first_edge)
@@ -1342,14 +1342,14 @@ void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create_vertex_edge_lookup
 
-void create_vertex_edge_lookup(const mesh::indices_t& EdgePoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts)
+void create_vertex_edge_lookup(const mesh::indices_t& VertexPoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts)
 {
 	if(PointEdgeCounts.empty())
-		create_vertex_valence_lookup(0, EdgePoints, PointEdgeCounts);
+		create_vertex_valence_lookup(0, VertexPoints, PointEdgeCounts);
 	const uint_t point_count = PointEdgeCounts.size();
 	mesh::counts_t found_edges(point_count, 0);
 	PointFirstEdges.assign(point_count, 0); // first edge in point_edges for each point
-	PointEdges.assign(EdgePoints.size(), 0);
+	PointEdges.assign(VertexPoints.size(), 0);
 	uint_t count = 0;
 	for(uint_t point = 0; point != point_count; ++point)
 	{
@@ -1358,10 +1358,10 @@ void create_vertex_edge_lookup(const mesh::indices_t& EdgePoints, mesh::indices_
 	}
 
 	const uint_t edge_begin = 0;
-	const uint_t edge_end = edge_begin + EdgePoints.size();
+	const uint_t edge_end = edge_begin + VertexPoints.size();
 	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
 	{
-		const uint_t point = EdgePoints[edge];
+		const uint_t point = VertexPoints[edge];
 		PointEdges[PointFirstEdges[point] + found_edges[point]] = edge;
 		++found_edges[point];
 	}
@@ -1370,15 +1370,15 @@ void create_vertex_edge_lookup(const mesh::indices_t& EdgePoints, mesh::indices_
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create_vertex_valence_lookup
 
-void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& EdgePoints, mesh::counts_t& Valences)
+void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& VertexPoints, mesh::counts_t& Valences)
 {
 	Valences.assign(PointCount, 0);
 	
 	// Add 1 for each edge that starts at a point
-	uint_t edge_count = EdgePoints.size();
+	uint_t edge_count = VertexPoints.size();
 	for (uint_t edge = 0; edge != edge_count; ++edge)
 	{
-		const uint_t edge_point = EdgePoints[edge];
+		const uint_t edge_point = VertexPoints[edge];
 		if(edge_point >= Valences.size()) // In case PointCount was not known to the caller
 			Valences.resize(edge_point + 1, 0);
 		++Valences[edge_point];
@@ -1421,16 +1421,16 @@ void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const me
 /////////////////////////////////////////////////////////////////////////////////////////////
 // mark_collinear_edges
 
-void mark_collinear_edges(mesh::indices_t& RedundantEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold)
+void mark_collinear_edges(mesh::indices_t& RedundantEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold)
 {
-	for(uint_t edge = 0; edge != EdgePoints.size(); ++edge)
+	for(uint_t edge = 0; edge != VertexPoints.size(); ++edge)
 	{
 		if(!EdgeSelection[edge])
 			continue;
 		const uint_t clockwise = ClockwiseEdges[edge];
-		const uint_t p1_index = EdgePoints[edge];
-		const uint_t p2_index = EdgePoints[clockwise];
-		const uint_t p3_index = EdgePoints[ClockwiseEdges[clockwise]];
+		const uint_t p1_index = VertexPoints[edge];
+		const uint_t p2_index = VertexPoints[clockwise];
+		const uint_t p3_index = VertexPoints[ClockwiseEdges[clockwise]];
 		// valence must be 2 for internal edges or 1 for boundary edges
 		if(!((!BoundaryEdges[clockwise] && VertexValences[p2_index] == 2) || (BoundaryEdges[clockwise] && VertexValences[p2_index] == 1)))
 			continue;

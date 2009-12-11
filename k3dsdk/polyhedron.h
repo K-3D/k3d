@@ -194,14 +194,14 @@ bool_t same_loop(const mesh::indices_t& ClockwiseEdges, const uint_t EdgeA, cons
 uint_t counterclockwise_edge(const mesh::indices_t& ClockwiseEdges, const uint_t Edge);
 
 /// Calculates the center (average) for an edge loop (returns the origin for degenerate cases).
-const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
+const point3 center(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
 /// Calculates the normal for an edge loop (returns a zero-length normal for degenerate cases).
-const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
+const normal3 normal(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
 /// Calculates the normal for a triangle (returns a zero-length normal for degenerate cases).
 const normal3 normal(const point3& A, const point3& B, const point3& C);
 
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
-void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
+void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
 
 /// Initializes an array for constant-time lookup from an edge to the face that owns it
 void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::indices_t& EdgeFaces);
@@ -210,23 +210,23 @@ void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::
 void create_edge_count_lookup(const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::counts_t& Counts);
 
 /// Initialize arrays for fast lookup from a vertex to its adjacent faces
-void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces);
+void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces);
 /// Initialize arrays for fast lookup from a point index to all edges that start from it. If PointEdgeCounts is filled (by create_vertex_valence_lookup) it is used, otherwise it is created
-void create_vertex_edge_lookup(const mesh::indices_t& EdgePoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts);
+void create_vertex_edge_lookup(const mesh::indices_t& VertexPoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts);
 
 /// Initialize Valences array for constant time lookup of vertex valence (number of incoming edges)
 /**
  * \param PointCount Initial guess for the number of points. Valences will be expanded to the correct size if this is too small
- * \param EdgePoints The indices of the edge points
+ * \param VertexPoints The indices of the edge points
  * \param Valences will store the number of edges for each point
  */
-void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& EdgePoints, mesh::counts_t& Valences);
+void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& VertexPoints, mesh::counts_t& Valences);
 
 /// Initialise boundary_faces array for constant time lookup of faces that are on the mesh boundary. BoundaryEdges and AdjacentEdges can be created using create_edge_adjacency_lookup
 void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, mesh::bools_t& BoundaryFaces);
 
 /// Adds edges that are collinear and with points of valence 1 for boundary edges or valence 2 otherwise to EdgeList
-void mark_collinear_edges(mesh::indices_t& RedundantEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold = 1e-8);
+void mark_collinear_edges(mesh::indices_t& RedundantEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold = 1e-8);
 
 /// Marks edges that are shared by coplanar faces among the selected faces
 void mark_coplanar_edges(const mesh::indices_t& Companions,
