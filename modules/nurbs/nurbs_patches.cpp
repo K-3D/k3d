@@ -905,9 +905,92 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 				k3d::mesh::points_t points_out;
 				k3d::mesh::weights_t weights_out;
 				approximate(points_out, weights_out, samples_u, samples, order, path_knots);
+				const k3d::double_t swept_w = swept_weights[j];
+				for(k3d::uint_t i = 0; i != weights_out.size(); ++i)
+					weights_out[i] *= swept_w;
 				k3d::nurbs_curve::add_curve(curves_mesh, *curves_prim, order, points_out, weights_out, path_knots);
 			}
 			skin_curves(OutputMesh, OutputPatches, curves_mesh, *curves_prim, swept_knots, SweptCurves.curve_orders[swept_curve]);
+		}
+	}
+}
+
+void polygonize(k3d::mesh::points_t& Vertices, k3d::mesh::counts_t& VertexCounts, k3d::mesh::indices_t& VertexIndices, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch, const k3d::uint_t USamples, const k3d::uint_t VSamples)
+{
+	const k3d::uint_t u_order = InputPatches.patch_u_orders[Patch];
+	const k3d::uint_t u_knots_begin = InputPatches.patch_u_first_knots[Patch];
+	const k3d::uint_t u_knots_end = u_knots_begin + InputPatches.patch_u_point_counts[Patch] + u_order;
+	k3d::mesh::knots_t unique_u_knots;
+	for(k3d::uint_t i = u_knots_begin; i < u_knots_end; ++i)
+	{
+		const k3d::double_t u = InputPatches.patch_u_knots[i];
+		unique_u_knots.push_back(u);
+		i += multiplicity(InputPatches.patch_u_knots, u, i, u_knots_end);
+	}
+
+	k3d::mesh::knots_t u_samples;
+	const k3d::uint_t unique_u_knots_end = unique_u_knots.size() - 1;
+	for(k3d::uint_t i = 0; i != unique_u_knots_end; ++i)
+	{
+		const k3d::double_t start_u = unique_u_knots[i];
+		const k3d::double_t u_step = (unique_u_knots[i+1] - start_u) / static_cast<k3d::double_t>(USamples + 1);
+		const k3d::uint_t u_sample_start = i == 0 ? 0 : 1;
+		for(k3d::uint_t u_sample = u_sample_start; u_sample <= (USamples+1); ++u_sample)
+		{
+			u_samples.push_back(start_u + static_cast<k3d::double_t>(u_sample) * u_step);
+		}
+	}
+
+	const k3d::uint_t v_order = InputPatches.patch_v_orders[Patch];
+	const k3d::uint_t v_knots_begin = InputPatches.patch_v_first_knots[Patch];
+	const k3d::uint_t v_knots_end = v_knots_begin + InputPatches.patch_v_point_counts[Patch] + v_order;
+	k3d::mesh::knots_t unique_v_knots;
+	for(k3d::uint_t i = v_knots_begin; i < v_knots_end; ++i)
+	{
+		const k3d::double_t v = InputPatches.patch_v_knots[i];
+		unique_v_knots.push_back(v);
+		i += multiplicity(InputPatches.patch_v_knots, v, i, v_knots_end);
+	}
+
+	k3d::mesh::knots_t v_samples;
+	const k3d::uint_t unique_v_knots_end = unique_v_knots.size() - 1;
+	for(k3d::uint_t i = 0; i != unique_v_knots_end; ++i)
+	{
+		const k3d::double_t start_v = unique_v_knots[i];
+		const k3d::double_t v_step = (unique_v_knots[i+1] - start_v) / static_cast<k3d::double_t>(VSamples + 1);
+		const k3d::uint_t v_sample_start = i == 0 ? 0 : 1;
+		for(k3d::uint_t v_sample = v_sample_start; v_sample <= (VSamples+1); ++v_sample)
+		{
+			v_samples.push_back(start_v + static_cast<k3d::double_t>(v_sample) * v_step);
+		}
+	}
+
+	const k3d::uint_t u_sample_count = u_samples.size();
+	const k3d::uint_t v_sample_count = v_samples.size();
+
+	for(k3d::uint_t j = 0; j != v_sample_count; ++j)
+	{
+		const k3d::double_t v = v_samples[j];
+		k3d::mesh curve_mesh;
+		curve_mesh.points.create();
+		curve_mesh.point_selection.create();
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> curve(k3d::nurbs_curve::create(curve_mesh));
+		extract_patch_curve_by_parameter(curve_mesh, *curve, InputMesh, InputPatches, Patch, v, true);
+		for(k3d::uint_t i = 0; i != u_sample_count; ++i)
+		{
+			const k3d::double_t u = u_samples[i];
+			Vertices.push_back(dehomogenize(evaluate_position(*curve_mesh.points, curve->curve_point_weights, curve->curve_knots, u)));
+		}
+	}
+	for(k3d::uint_t j = 0; j != v_sample_count-1; ++j)
+	{
+		for(k3d::uint_t i = 0; i != u_sample_count-1; ++i)
+		{
+			VertexIndices.push_back(j*u_sample_count+i);
+			VertexIndices.push_back(j*u_sample_count+i+1);
+			VertexIndices.push_back((j+1)*u_sample_count+i+1);
+			VertexIndices.push_back((j+1)*u_sample_count+i);
+			VertexCounts.push_back(4);
 		}
 	}
 }
