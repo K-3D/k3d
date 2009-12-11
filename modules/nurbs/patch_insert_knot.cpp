@@ -21,7 +21,8 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_patch_modifier.h"
+#include "nurbs_patches.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -69,41 +70,13 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		Output = Input;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(get_first_nurbs_patch(Output));
-		if(!nurbs)
-			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
-
-		nurbs_patch_modifier mod(Output, *nurbs);
-
-		std::vector<k3d::uint_t> my_patches = mod.get_selected_patches();
-
-		if (my_patches.size() == 0)
-		{
-			k3d::log() << error << "You need to select at least one patch!" << std::endl;
-			return;
-		}
-
-		double u = m_u_value.pipeline_value();
-		int multiplicity = m_multiplicity.pipeline_value();
-
-		for (int i = 0; i < my_patches.size(); i++)
-		{
-			if (!m_insert_to_v.pipeline_value())
-				mod.patch_u_knot_insertion(my_patches.at(i), u, multiplicity);
-			else
-				mod.patch_v_knot_insertion(my_patches.at(i), u, multiplicity);
-		}
-
-		k3d::mesh::delete_unused_points(Output);
+		modify_selected_patches(Input, Output, knot_inserter(m_u_value.pipeline_value(), m_multiplicity.pipeline_value(), !m_insert_to_v.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -118,6 +91,18 @@ public:
 		return factory;
 	}
 private:
+	struct knot_inserter
+	{
+		knot_inserter(const k3d::double_t Parameter, const k3d::uint_t Multiplicity, const k3d::bool_t UDirection) : parameter(Parameter), multiplicity(Multiplicity), u_direction(UDirection) {}
+		void operator()(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t& Patch)
+		{
+			insert_knot(OutputMesh, OutputPatches, InputMesh, InputPatches, Patch, parameter, multiplicity, u_direction);
+		}
+		const k3d::double_t parameter;
+		const k3d::uint_t multiplicity;
+		const k3d::bool_t u_direction;
+	};
+
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_value;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_multiplicity;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_insert_to_v;

@@ -25,6 +25,7 @@
 */
 
 #include <k3dsdk/types.h>
+#include <k3dsdk/linear_curve.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/metadata.h>
 #include <k3dsdk/metadata_keys.h>
@@ -38,6 +39,9 @@ namespace module
 
 namespace nurbs
 {
+
+/// Storage for an array of 4D points
+typedef k3d::typed_array<k3d::point4> points4_t;
 
 /// Adds the given curve to the other primitive and mesh
 void add_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve);
@@ -71,8 +75,14 @@ void close_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 /// Elevate the degree of the curves listed in Curves, storing the resulting mesh in OutputMesh and OutputCurves
 void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::uint_t Elevations = 1);
 
+/// Flips a curve in the given mesh
+void flip_curve(k3d::nurbs_curve::primitive& NurbsCurves, const k3d::uint_t curve);
+
 /// Connect the two input curves at their selected end points, storing the result in Output
 void connect_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::uint_t Primitive1Index, const k3d::uint_t Curve1Index, const k3d::bool_t Curve1FirstPointSelection, const k3d::uint_t Primitive2Index, const k3d::uint_t Curve2Index, const k3d::bool_t Curve2FirstPointSelection);
+
+/// Merge all input curves into one curve, if their endpoints are identical
+void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::uint_t InputCurvesPrimIdx);
 
 ///Insert a knot into a curve, makes use of the algorithm in "The NURBS book" by A. Piegl and W. Tiller
 /**
@@ -87,166 +97,45 @@ void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::me
 void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u);
 
 /// Returns the multiplicity of the given curve
+/**
+ * \param Knots a collection of knot vectors
+ * \param Begin The first knot of the knot vector to consider
+ * \param Count The number of knots to consider
+ */
 const k3d::uint_t multiplicity(const k3d::mesh::knots_t& Knots, const k3d::double_t u, const k3d::uint_t Begin, const k3d::uint_t Count);
 
 /// Extracts the points, knots and weights arrays from the given curve in the given mesh and curve primitive
 void extract_curve_arrays(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::bool_t NormalizeKnots = false);
 
-/// Visitor to get the selected curves
-struct selected_curves_extractor
-{
-	selected_curves_extractor(k3d::mesh::indices_t& SelectedCurves) : selected_curves(SelectedCurves) {}
-	void operator()(const k3d::string_t& StructureName, const k3d::table& Structure, const k3d::string_t& ArrayName, const k3d::pipeline_data<k3d::array>& Array)
-	{
-		if(StructureName == "curve" && Array->get_metadata_value(k3d::metadata::key::role()) == k3d::metadata::value::selection_role())
-		{
-			const k3d::mesh::selection_t* curve_selections = dynamic_cast<const k3d::mesh::selection_t*>(Array.get());
-			for(k3d::uint_t curve = 0; curve != curve_selections->size(); ++curve)
-			{
-				if(curve_selections->at(curve))
-					selected_curves.push_back(curve);
-			}
-		}
-	}
-	k3d::mesh::indices_t& selected_curves;
-};
-
 /// Appends new knots found in the given curve to the given output knot vector.
 void append_common_knot_vector(k3d::mesh::knots_t& CommonKnotVector, const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
-
-/// Creates lookup arrays to store connectivity between curves that are connected to form a loop
-void find_loops(const k3d::mesh::points_t& CurvePoints, const k3d::nurbs_curve::const_primitive& Curves, k3d::mesh::bools_t& IsInLoop, k3d::mesh::indices_t& LoopFirstCurves, k3d::mesh::indices_t& CurveLoops, k3d::mesh::indices_t& NextCurves, k3d::mesh::bools_t& LoopSelections, k3d::mesh::points_t& LoopCentroids);
 
 /// Find the centroid of all points in a curve
 const k3d::point3 centroid(const k3d::mesh::points_t& Points, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve);
 
-//////////////////////////////////////////////////////////////////
-// Curve visiting functions
-//////////////////////////////////////////////////////////////////
+/// Deletes all selected curves from the mesh
+void delete_selected_curves(k3d::mesh& Mesh);
 
-/// Visit all selected curves
-template <typename FunctorT>
-void visit_selected_curves(const k3d::mesh& Mesh, FunctorT Modifier)
-{
-	for(k3d::uint_t prim_idx = 0; prim_idx != Mesh.primitives.size(); ++prim_idx)
-	{
-		k3d::mesh::indices_t selected_curves;
-		k3d::mesh::visit_arrays(*Mesh.primitives[prim_idx], selected_curves_extractor(selected_curves));
-		if(selected_curves.size())
-		{
-			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves(k3d::nurbs_curve::validate(Mesh, *Mesh.primitives[prim_idx]));
-			for(k3d::uint_t i = 0; i != selected_curves.size(); ++i)
-			{
-				const k3d::uint_t curve = selected_curves[i];
-				try
-				{
-					Modifier(Mesh, *curves, curve);
-				}
-				catch(std::runtime_error& E)
-				{
-					k3d::log() << error << "Error visiting curve " << curve << " of primitive " << prim_idx << ": " << E.what() << std::endl;
-				}
-			}
-		}
-	}
-}
+/// Adds a straight line to the given NURBS curve set. New points are added to the OutputMesh
+void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::uint_t Segments, k3d::nurbs_curve::primitive& NurbsCurves, k3d::mesh& OutputMesh, const k3d::uint_t Order = 2);
 
-/// Apply a modifier to the selected curves in OutputMesh
-template <typename FunctorT>
-void modify_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, FunctorT Modifier)
-{
-	for(k3d::uint_t prim_idx = 0; prim_idx != InputMesh.primitives.size(); ++prim_idx)
-	{
-		k3d::mesh::indices_t selected_curves;
-		k3d::mesh::visit_arrays(*OutputMesh.primitives[prim_idx], selected_curves_extractor(selected_curves));
-		if(selected_curves.size())
-		{
-			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> input_curves(k3d::nurbs_curve::validate(InputMesh, *InputMesh.primitives[prim_idx]));
-			const k3d::uint_t curve_count = input_curves->curve_first_points.size();
-			k3d::mesh::bools_t curve_selections(curve_count, false);
-			for(k3d::uint_t i = 0; i != selected_curves.size(); ++i) curve_selections[selected_curves[i]] = true;
-			boost::scoped_ptr<k3d::nurbs_curve::primitive> output_curves(k3d::nurbs_curve::create(OutputMesh.primitives[prim_idx].create(new k3d::mesh::primitive("nurbs_curve"))));
-			for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
-			{
-				if(curve_selections[curve])
-				{
-					try
-					{
-						Modifier(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
-						output_curves->curve_selections.back() = curve_selections[curve];
-					}
-					catch(std::runtime_error& E)
-					{
-						k3d::log() << error << "Error modifiying curve " << curve << " of primitive " << prim_idx << ": " << E.what() << std::endl;
-						add_curve(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
-					}
-				}
-				else
-				{
-					add_curve(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
-				}
-			}
-			if(output_curves->material.empty())
-				output_curves->material = input_curves->material;
-		}
-	}
-	if(OutputMesh.points)
-		k3d::mesh::delete_unused_points(OutputMesh);
-}
+/// True if the given curve is closed
+k3d::bool_t is_closed(const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-// shared functors
-//////////////////////////////////////////////////////////////////////////////////////////////
+/// Evaluate the postion (x*weight, y*weight, z*weight, weight) using the given curve arrays
+const k3d::point4 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U);
 
-/// Calculates the maximum order of all visited curves
-struct max_order_calculator
-{
-	max_order_calculator(k3d::double_t& Order) : order(Order)
-	{
-		order = 0;
-	}
-	void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
-	{
-		order = Curves.curve_orders[Curve] > order ? Curves.curve_orders[Curve] : order;
-	}
-	/// The maximum order of all curves visited
-	k3d::double_t& order;
-};
+/// Get the normalized tangent vector at the given location on the curve
+const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU = 0.00001);
 
-/// Calculates a common knot vector among the visited curves
-struct knot_vector_calculator
-{
-	knot_vector_calculator(k3d::mesh::knots_t& Knots) : knots(Knots) {}
-	void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
-	{
-		append_common_knot_vector(knots, Curves, Curve);
-	}
-	/// The common knot vector for the visited curves
-	k3d::mesh::knots_t& knots;
-};
+/// Calculate the non-zero values of the B-spline basis functions at the given parameter value
+void basis_functions(k3d::mesh::knots_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U);
 
-/// Applies NURBS curve degree elevation to reach the given order
-struct degree_elevator
-{
-	degree_elevator(const k3d::uint_t Order) : order(Order) {}
-	const k3d::double_t order;
-	void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
-	{
-		elevate_curve_degree(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve, order - InputCurves.curve_orders[Curve]);
-	}
-};
+/// Least squares approximation of the given sample points.
+void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& SampleParameters, const points4_t& SamplePoints, const k3d::uint_t Order, const k3d::mesh::knots_t& Knots);
 
-/// Makes UnifiedKnots the knot vector of all given curves
-struct knot_vector_merger
-{
-	knot_vector_merger(const k3d::mesh::knots_t& UnifiedKnots, const k3d::uint_t Order);
-	void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve);
-	k3d::mesh::knots_t unified_knots;
-	const k3d::uint_t order;
-};
-
-/// TODO: Move to SDK
-void delete_empty_primitives(k3d::mesh& Mesh);
+/// Polygonize a curve
+void polygonize(k3d::mesh& OutputMesh, k3d::linear_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::uint_t Samples);
 
 } //namespace nurbs
 

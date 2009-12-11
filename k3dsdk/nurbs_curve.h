@@ -28,6 +28,8 @@ namespace k3d
 namespace nurbs_curve
 {
 
+class primitive;
+
 /// Gathers the member arrays of a nurbs_curve primitive into a convenient package
 class const_primitive
 {
@@ -47,6 +49,8 @@ public:
 		const mesh::table_t& VaryingAttributes,
 		const mesh::table_t& VertexAttributes
 		);
+
+	const_primitive(const primitive& Primitive);
 
 	const mesh::materials_t& material;
 	const mesh::indices_t& curve_first_points;

@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <k3dml>
 	<mesh_arrays>
-		<points>5 0 0 5 5.0000000000255174 0 -2.5517059846396142e-11 5 0 -5.0000000000510338 4.9999999999744826 -0 -5 -5.1034119692792285e-11 -0 -4.9999999999489662 -5.0000000000765512 0 7.6551179539188427e-11 -5 0 5.0000000001020686 -4.9999999999234488 0 5 1.0206823938558457e-10 0 0.55555555557256686 5.6704883964483408e-12 0</points>
-		<point_selection>1 1 1 1 1 1 1 1 1 0</point_selection>
+		<points>5 0 0 5 5.0000000000255174 0 -2.5517059846396142e-11 5 0 -5.0000000000510338 4.9999999999744826 -0 -5 -5.1034119692792285e-11 -0 -4.9999999999489662 -5.0000000000765512 0 7.6551179539188427e-11 -5 0 5.0000000001020686 -4.9999999999234488 0 5 1.0206823938558457e-10 0 5 0 0 5 5.0000000000255174 0 -2.5517365997984598e-11 5 0 5.0000000001020686 -4.9999999999234488 0 3.827582432280027e-11 1.2757518898912163e-11 0 -5.0000000000510338 4.9999999999744817 0 7.6551209815534094e-11 -5 0 -4.9999999999489653 -5.0000000000765521 0 -5 -5.1033567942306707e-11 0</points>
+		<point_selection>1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0</point_selection>
 		<point_attributes/>
 		<primitives>
 			<primitive type="nurbs_curve">
@@ -54,10 +54,10 @@
 						<array name="patch_trim_loop_counts" type="k3d::uint_t">0</array>
 						<array name="patch_u_first_knots" type="k3d::uint_t">0</array>
 						<array name="patch_u_orders" type="k3d::uint_t">3</array>
-						<array name="patch_u_point_counts" type="k3d::uint_t">9</array>
+						<array name="patch_u_point_counts" type="k3d::uint_t">3</array>
 						<array name="patch_v_first_knots" type="k3d::uint_t">0</array>
-						<array name="patch_v_orders" type="k3d::uint_t">2</array>
-						<array name="patch_v_point_counts" type="k3d::uint_t">2</array>
+						<array name="patch_v_orders" type="k3d::uint_t">3</array>
+						<array name="patch_v_point_counts" type="k3d::uint_t">3</array>
 					</table>
 					<table type="trim_knot">
 						<array name="curve_knots" type="k3d::double_t"/>
@@ -83,14 +83,14 @@
 						<array name="curve_points" type="k3d::uint_t"/>
 					</table>
 					<table type="u_knot">
-						<array name="patch_u_knots" type="k3d::double_t">0 0 0 1 1 2 2 3 3 4 4 4</array>
+						<array name="patch_u_knots" type="k3d::double_t">0 0 0 1 1 1</array>
 					</table>
 					<table type="v_knot">
-						<array name="patch_v_knots" type="k3d::double_t">0 0 1 1</array>
+						<array name="patch_v_knots" type="k3d::double_t">0 0 0 1 1 1</array>
 					</table>
 					<table type="vertex">
-						<array name="patch_point_weights" type="k3d::double_t">1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1</array>
-						<array name="patch_points" type="k3d::uint_t">9 9 9 9 9 9 9 9 9 0 1 2 3 4 5 6 7 0
+						<array name="patch_point_weights" type="k3d::double_t">1 0.70710678118474313 1 0.70710678118474313 0.41421356236948648 0.70710678118474313 1 0.70710678118474313 1</array>
+						<array name="patch_points" type="k3d::uint_t">9 10 11 12 13 14 15 16 17
 							<metadata>
 								<pair name="k3d:domain">k3d:point-indices</pair>
 							</metadata>
