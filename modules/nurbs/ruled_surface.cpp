@@ -79,6 +79,8 @@ public:
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
+		return_if_fail(m_order.pipeline_value() <= (m_segments.pipeline_value() + 1));
+
 		// Make sure the curves are compatible first
 		k3d::double_t order;
 		visit_selected_curves(Output, max_order_calculator(order));
@@ -94,6 +96,8 @@ public:
 		for(k3d::uint_t prim_idx = 0; prim_idx != elevated_mesh.primitives.size(); ++prim_idx)
 		{
 			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> input_curves(k3d::nurbs_curve::validate(elevated_mesh, *elevated_mesh.primitives[prim_idx]));
+			if(!input_curves)
+				continue;
 			if(compatible_curves->material.empty())
 				compatible_curves->material.push_back(input_curves->material.back());
 			for(k3d::uint_t curve = 0; curve != input_curves->curve_first_points.size(); ++curve)
