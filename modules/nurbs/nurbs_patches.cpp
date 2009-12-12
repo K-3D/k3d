@@ -93,7 +93,7 @@ void add_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches
 	const k3d::uint_t u_point_count = InputPatches.patch_u_point_counts[Patch];
 	const k3d::uint_t v_point_count = InputPatches.patch_v_point_counts[Patch];
 	const k3d::uint_t points_end = points_begin + u_point_count*v_point_count;
-	for(k3d::uint_t i = 0; i != points_end; ++i)
+	for(k3d::uint_t i = points_begin; i != points_end; ++i)
 	{
 		points.push_back(InputMesh.points->at(InputPatches.patch_points[i]));
 		weights.push_back(InputPatches.patch_point_weights[i]);

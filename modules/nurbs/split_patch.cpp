@@ -75,6 +75,8 @@ public:
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 		modify_selected_patches(Input, Output, patch_splitter(m_u_value.pipeline_value(), !m_insert_to_v.pipeline_value()));
+
+		k3d::mesh::delete_unused_points(Output);
 	}
 
 	static k3d::iplugin_factory& get_factory()
