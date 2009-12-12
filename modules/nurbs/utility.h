@@ -286,4 +286,4 @@ inline const k3d::point3 dehomogenize(const k3d::point4 P)
 
 } //namespace module
 
-#endif // !MODULES_NURBS_NURBS_CURVES_H
+#endif // !MODULES_NURBS_UTILITY_H
