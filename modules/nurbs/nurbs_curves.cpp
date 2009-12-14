@@ -787,26 +787,33 @@ void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& 
 	k3d::mesh::bools_t flipped_curves(curve_count, 0);
 	k3d::mesh::indices_t first_point_curves(point_count, 0); // Maps a first point index to its curve
 	k3d::mesh::indices_t last_point_curves(point_count, 0); // Maps a last point index to its curve
-	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
+	k3d::bool_t need_fix = true;
+	while(need_fix)
 	{
-		const k3d::uint_t first_point = first_points[curve];
-		if(!flipped_curves[curve] && connection_points[first_point] && first_valences[first_point] == 2)
+		for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
 		{
-			flip_curve(*temp_curves, curve);
-			flipped_curves[curve] = true;
-			first_points[curve] = last_points[curve];
-			last_points[curve] = first_point;
+			const k3d::uint_t first_point = first_points[curve];
+			const k3d::uint_t last_point = last_points[curve];
+			if(!flipped_curves[curve] && connection_points[first_point] && first_valences[first_point] == 2)
+			{
+				flip_curve(*temp_curves, curve);
+				flipped_curves[curve] = true;
+				first_points[curve] = last_points[curve];
+				last_points[curve] = first_point;
+				first_valences[first_point]--;
+				first_valences[last_point]++;
+				last_valences[last_point]--;
+				last_valences[first_point]++;
+			}
+			first_point_curves[first_points[curve]] = curve;
+			last_point_curves[last_points[curve]] = curve;
 		}
-		const k3d::uint_t last_point = last_points[curve];
-		if(!flipped_curves[curve] && connection_points[last_point] && last_valences[last_point] == 2)
+		need_fix = false;
+		for(k3d::uint_t i = 0; i != first_valences.size(); ++i)
 		{
-			flip_curve(*temp_curves, curve);
-			flipped_curves[curve] = true;
-			last_points[curve] = first_points[curve];
-			first_points[curve] = last_point;
+			if(first_valences[i] == 2 && connection_points[i])
+				need_fix = true;
 		}
-		first_point_curves[first_points[curve]] = curve;
-		last_point_curves[last_points[curve]] = curve;
 	}
 
 	// Follow connected curves and join them into single curves
