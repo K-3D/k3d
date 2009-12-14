@@ -40,6 +40,7 @@ extern k3d::iplugin_factory& extract_curve_point_factory();
 extern k3d::iplugin_factory& extract_patch_curve_factory();
 extern k3d::iplugin_factory& extrude_curve_factory();
 extern k3d::iplugin_factory& extrude_patch_factory();
+extern k3d::iplugin_factory& flip_curve_factory();
 extern k3d::iplugin_factory& insert_knot_factory();
 extern k3d::iplugin_factory& merge_connected_curves_factory();
 extern k3d::iplugin_factory& merge_curve_knot_vectors_factory();
@@ -71,6 +72,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::nurbs::extract_patch_curve_factory());
 	Registry.register_factory(module::nurbs::extrude_curve_factory());
 	Registry.register_factory(module::nurbs::extrude_patch_factory());
+	Registry.register_factory(module::nurbs::flip_curve_factory());
 	Registry.register_factory(module::nurbs::insert_knot_factory());
 	Registry.register_factory(module::nurbs::merge_connected_curves_factory());
 	Registry.register_factory(module::nurbs::merge_curve_knot_vectors_factory());

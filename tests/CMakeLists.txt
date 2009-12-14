@@ -302,6 +302,7 @@ K3D_ADD_TEST(mesh.modifier.NurbsExtractCurvePoint.py PYTHON REQUIRES K3D_BUILD_N
 K3D_ADD_TEST(mesh.modifier.NurbsExtractPatchCurve.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
 K3D_ADD_TEST(mesh.modifier.NurbsExtrudeCurve.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
 K3D_ADD_TEST(mesh.modifier.NurbsExtrudePatch.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
+K3D_ADD_TEST(mesh.modifier.NurbsFlipCurve.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
 K3D_ADD_TEST(mesh.modifier.NurbsMergeConnectedCurves.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
 K3D_ADD_TEST(mesh.modifier.NurbsMergeCurveKnotVectors.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
 K3D_ADD_TEST(mesh.modifier.NurbsPatchDegreeElevation.py PYTHON REQUIRES K3D_BUILD_NURBS_MODULE)
