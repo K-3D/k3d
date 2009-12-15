@@ -22,6 +22,7 @@ rotate.x = 0.5*pi
 translate.x = 5
 
 modifier.mesh_selection = k3d.geometry.selection.create(1)
+modifier.align_normal = False
 
 path.thetamax = 0.6*pi
 to_sweep.radius = 1.

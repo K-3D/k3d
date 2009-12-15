@@ -903,7 +903,8 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 				k3d::log() << debug << "angle: " << k3d::degrees(angle) << ", axis: " << axis << ", rotation: " << rotation << std::endl;
 				for(k3d::uint_t i = 0; i != swept_point_count; ++i)
 				{
-					relative_points.push_back(k3d::to_point(rotation * (swept_points[i] - center)));
+					const k3d::vector3 vec = rotation * (swept_points[i] - center);
+					relative_points.push_back(k3d::point3(vec*x, vec*y, vec*z));
 				}
 			}
 			else
@@ -921,37 +922,19 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 			curves_prim->material = SweptCurves.material;
 			for(k3d::uint_t j = 0; j != relative_points.size(); ++j)
 			{
-				k3d::point3 rel_point = relative_points[j];
+				const k3d::point3& rel_point = relative_points[j];
 				points4_t samples;
-				if(AlignNormal)
+				for(k3d::uint_t i = 0; i != origins.size(); ++i)
 				{
-					const k3d::vector3 n = z_vecs.front();
-					for(k3d::uint_t i = 0; i != origins.size(); ++i)
-					{
-						p = origins[i];
-						w = p[3];
-						z = z_vecs[i];
-						const k3d::vector3 axis = n ^ z;
-						const k3d::double_t angle = acos(n*z);
-						k3d::matrix4 rotation = isnan(angle) ? k3d::identity3() : k3d::rotate3(angle, axis);
-						k3d::point3 out = dehomogenize(p) + rotation * k3d::to_vector(rel_point);
-						samples.push_back(k3d::point4(out[0]*w, out[1]*w, out[2]*w, w));
-					}
-				}
-				else
-				{
-					for(k3d::uint_t i = 0; i != origins.size(); ++i)
-					{
-						p = origins[i];
-						w = p[3];
-						origin = k3d::point3(p[0]/w, p[1]/w, p[2]/w);
-						x = x_vecs[i];
-						y = y_vecs[i];
-						z = z_vecs[i];
-						const k3d::vector3 vec = x*rel_point[0] + y*rel_point[1] + z*rel_point[2];
-						const k3d::point3 out = origin + vec;
-						samples.push_back(k3d::point4(out[0]*w, out[1]*w, out[2]*w, w));
-					}
+					p = origins[i];
+					w = p[3];
+					origin = k3d::point3(p[0]/w, p[1]/w, p[2]/w);
+					x = x_vecs[i];
+					y = y_vecs[i];
+					z = z_vecs[i];
+					const k3d::vector3 vec = x*rel_point[0] + y*rel_point[1] + z*rel_point[2];
+					const k3d::point3 out = origin + vec;
+					samples.push_back(k3d::point4(out[0]*w, out[1]*w, out[2]*w, w));
 				}
 				k3d::mesh::points_t points_out;
 				k3d::mesh::weights_t weights_out;
