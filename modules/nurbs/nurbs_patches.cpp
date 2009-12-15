@@ -787,7 +787,7 @@ void skin_curves(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	OutputPatches.patch_selections.back() = 1.0;
 }
 
-void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& SweptCurves, const k3d::nurbs_curve::const_primitive& Paths, const k3d::uint_t Samples)
+void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& SweptCurves, const k3d::nurbs_curve::const_primitive& Paths, const k3d::uint_t Samples, const k3d::bool_t AlignNormal)
 {
 	const k3d::uint_t paths_count = Paths.curve_first_points.size();
 	const k3d::uint_t swept_curves_count = SweptCurves.curve_first_points.size();
@@ -876,10 +876,43 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 			k3d::mesh::weights_t swept_weights;
 			k3d::mesh::knots_t swept_knots;
 			extract_curve_arrays(swept_points, swept_knots, swept_weights, InputMesh, SweptCurves, swept_curve, true);
-			for(k3d::uint_t i = 0; i != swept_points.size(); ++i)
+			const k3d::uint_t swept_point_count = swept_points.size();
+			if(AlignNormal)
 			{
-				const k3d::vector3 vec = swept_points[i] - origin;
-				relative_points.push_back(k3d::point3(vec*x, vec*y, vec*z));
+				k3d::point3 center(0,0,0);
+				for(k3d::uint_t i = 0; i != (swept_point_count-1); ++i)
+				{
+					center += k3d::to_vector(swept_points[i]);
+				}
+				center /= (swept_point_count-1);
+				k3d::normal3 normal(0,0,0); // Normal calculation from polyhedron.cpp
+				for(k3d::uint_t point = 0; point != swept_point_count; ++point)
+				{
+					const k3d::point3& i = swept_points[point];
+					const k3d::point3& j = swept_points[point == (swept_point_count-1) ? 0 : point + 1];
+
+					normal[0] += (i[1] + j[1]) * (j[2] - i[2]);
+					normal[1] += (i[2] + j[2]) * (j[0] - i[0]);
+					normal[2] += (i[0] + j[0]) * (j[1] - i[1]);
+				}
+				normal = normal.length2() ? k3d::normalize(normal) : k3d::normal3(0,0,1);
+				const k3d::vector3& path_tangent = z_vecs.front();
+				const k3d::vector3& axis = normal ^ path_tangent;
+				const k3d::double_t angle = acos(path_tangent*normal);
+				k3d::matrix4 rotation = isnan(angle) ? k3d::identity3() : k3d::rotate3(angle, axis);
+				k3d::log() << debug << "angle: " << k3d::degrees(angle) << ", axis: " << axis << ", rotation: " << rotation << std::endl;
+				for(k3d::uint_t i = 0; i != swept_point_count; ++i)
+				{
+					relative_points.push_back(k3d::to_point(rotation * (swept_points[i] - center)));
+				}
+			}
+			else
+			{
+				for(k3d::uint_t i = 0; i != swept_point_count; ++i)
+				{
+					const k3d::vector3 vec = swept_points[i] - origin;
+					relative_points.push_back(k3d::point3(vec*x, vec*y, vec*z));
+				}
 			}
 			k3d::mesh curves_mesh;
 			curves_mesh.points.create();
@@ -888,19 +921,37 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 			curves_prim->material = SweptCurves.material;
 			for(k3d::uint_t j = 0; j != relative_points.size(); ++j)
 			{
-				const k3d::point3& rel_point = relative_points[j];
+				k3d::point3 rel_point = relative_points[j];
 				points4_t samples;
-				for(k3d::uint_t i = 0; i != origins.size(); ++i)
+				if(AlignNormal)
 				{
-					p = origins[i];
-					w = p[3];
-					origin = k3d::point3(p[0]/w, p[1]/w, p[2]/w);
-					x = x_vecs[i];
-					y = y_vecs[i];
-					z = z_vecs[i];
-					const k3d::vector3 vec = x*rel_point[0] + y*rel_point[1] + z*rel_point[2];
-					const k3d::point3 out = origin + vec;
-					samples.push_back(k3d::point4(out[0]*w, out[1]*w, out[2]*w, w));
+					const k3d::vector3 n = z_vecs.front();
+					for(k3d::uint_t i = 0; i != origins.size(); ++i)
+					{
+						p = origins[i];
+						w = p[3];
+						z = z_vecs[i];
+						const k3d::vector3 axis = n ^ z;
+						const k3d::double_t angle = acos(n*z);
+						k3d::matrix4 rotation = isnan(angle) ? k3d::identity3() : k3d::rotate3(angle, axis);
+						k3d::point3 out = dehomogenize(p) + rotation * k3d::to_vector(rel_point);
+						samples.push_back(k3d::point4(out[0]*w, out[1]*w, out[2]*w, w));
+					}
+				}
+				else
+				{
+					for(k3d::uint_t i = 0; i != origins.size(); ++i)
+					{
+						p = origins[i];
+						w = p[3];
+						origin = k3d::point3(p[0]/w, p[1]/w, p[2]/w);
+						x = x_vecs[i];
+						y = y_vecs[i];
+						z = z_vecs[i];
+						const k3d::vector3 vec = x*rel_point[0] + y*rel_point[1] + z*rel_point[2];
+						const k3d::point3 out = origin + vec;
+						samples.push_back(k3d::point4(out[0]*w, out[1]*w, out[2]*w, w));
+					}
 				}
 				k3d::mesh::points_t points_out;
 				k3d::mesh::weights_t weights_out;
