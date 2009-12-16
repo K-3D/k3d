@@ -796,7 +796,7 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 		k3d::mesh::points_t path_points;
 		k3d::mesh::weights_t path_weights;
 		k3d::mesh::knots_t path_knots;
-		extract_curve_arrays(path_points, path_knots, path_weights, OutputMesh, Paths, path, true);
+		extract_curve_arrays(path_points, path_knots, path_weights, InputMesh, Paths, path, true);
 		const k3d::uint_t path_point_count = path_points.size();
 		const k3d::uint_t order = Paths.curve_orders[path];
 
@@ -848,17 +848,38 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 				const k3d::double_t u = start_u + static_cast<k3d::double_t>(sample) * step;
 				samples_u.push_back(u);
 				const k3d::point4 origin = evaluate_position(path_points, path_weights, path_knots, u);
-				const k3d::vector3 z = tangent(path_points, path_weights, path_knots, u, 0.5*step);
+				k3d::vector3 z = tangent(path_points, path_weights, path_knots, u, 0.5*step);
+				const k3d::uint_t mul = multiplicity(path_knots, u, 0, path_knots.size());
+				k3d::double_t scaling = 1.0;
+				if(mul == order-1)
+				{
+					z = k3d::normalize(0.5*(z + z_vecs.back()));
+					scaling = std::abs(z_vecs.back() * z);
+				}
 				const k3d::vector3& last_z = z_vecs.back(); // We project the coordinate system along the last z axis
 				const k3d::point3 last_y_point = dehomogenize(origins.back()) + y_vecs.back();
 				const k3d::double_t d = -((last_y_point - dehomogenize(origin))*z) / (last_z * z); // Projection distance
-				const k3d::vector3 y = (last_y_point + d*last_z) - dehomogenize(origin);
-				const k3d::vector3 x = k3d::normalize(y ^ z);
+				const k3d::vector3 y = k3d::normalize((last_y_point + d*last_z) - dehomogenize(origin));
+				const k3d::vector3 x = k3d::normalize(y ^ z) / scaling;
 				origins.push_back(origin);
 				x_vecs.push_back(x);
 				y_vecs.push_back(y);
 				z_vecs.push_back(z);
 			}
+		}
+		// Closed curve, make sure the vectors are the same
+		if(origins.front() == origins.back())
+		{
+			const k3d::vector3 y = k3d::normalize(y_vecs.front() + y_vecs.back());
+			const k3d::vector3 z = k3d::normalize(z_vecs.front() + z_vecs.back());
+			const k3d::double_t scaling = std::abs(z * z_vecs.front());
+			const k3d::vector3 x = k3d::normalize(x_vecs.front() + x_vecs.back()) / scaling;
+			x_vecs.front() = x;
+			x_vecs.back() = x;
+			y_vecs.front() = y;
+			y_vecs.back() = y;
+			z_vecs.front() = z;
+			z_vecs.back() = z;
 		}
 
 		for(k3d::uint_t swept_curve = 0; swept_curve != swept_curves_count; ++swept_curve)
@@ -869,7 +890,7 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 			k3d::point4 p = origins.front();
 			k3d::double_t w = p[3];
 			k3d::point3 origin(p[0]/w, p[1]/w, p[2]/w);
-			x = x_vecs.front();
+			x = k3d::normalize(x_vecs.front());
 			y = y_vecs.front();
 			z = z_vecs.front();
 			k3d::mesh::points_t swept_points;
@@ -900,7 +921,6 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 				const k3d::vector3& axis = normal ^ path_tangent;
 				const k3d::double_t angle = acos(path_tangent*normal);
 				k3d::matrix4 rotation = isnan(angle) ? k3d::identity3() : k3d::rotate3(angle, axis);
-				k3d::log() << debug << "angle: " << k3d::degrees(angle) << ", axis: " << axis << ", rotation: " << rotation << std::endl;
 				for(k3d::uint_t i = 0; i != swept_point_count; ++i)
 				{
 					const k3d::vector3 vec = rotation * (swept_points[i] - center);
@@ -1028,6 +1048,17 @@ void polygonize(k3d::mesh::points_t& Vertices, k3d::mesh::counts_t& VertexCounts
 		}
 	}
 }
+
+//void extract_trim_curve(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, k3d::mesh::knots_t& Knots, const k3d::nurbs_patch::const_primitive& NurbsPatches, const k3d::uint_t Patch, const k3d::uint_t Curve)
+//{
+//	const k3d::uint_t points_begin = NurbsPatches.curve_first_points[Curve];
+//	const k3d::uint_t points_count = NurbsPatches.curve_point_counts[Curve];
+//	const k3d::uint_t points_end = points_begin + points_count;
+//	for(k3d::uint_t point = points_begin; point != points_end; ++point)
+//	{
+//		const k3d::point2& p =
+//	}
+//}
 
 } //namespace nurbs
 
