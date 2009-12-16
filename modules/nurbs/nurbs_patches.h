@@ -133,6 +133,12 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 /// Store a polygon apprimation of a NURBS patch
 void polygonize(k3d::mesh::points_t& Vertices, k3d::mesh::counts_t& VertexCounts, k3d::mesh::indices_t& VertexIndices, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch, const k3d::uint_t USamples, const k3d::uint_t VSamples);
 
+/// Extract the trim curve with the given number into the supplied arrays, where the 2D UV points are stored in the X and Y coordinates of the output point array
+void extract_trim_curve(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, k3d::mesh::knots_t& Knots, const k3d::nurbs_patch::const_primitive& NurbsPatches, const k3d::uint_t Patch, const k3d::uint_t Curve);
+
+/// Converts the trim curves in a patch to 3D NURBS curves
+void trim_to_nurbs(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch, const k3d::uint_t Samples);
+
 } //namespace nurbs
 
 } //namespace module

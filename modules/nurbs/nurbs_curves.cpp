@@ -1409,6 +1409,30 @@ void polygonize(k3d::mesh& OutputMesh, k3d::linear_curve::primitive& OutputCurve
 	OutputMesh.point_selection.writable().resize(points.size(), 1.0);
 }
 
+void sample(k3d::mesh::knots_t& Samples, const k3d::mesh::knots_t& Knots, const k3d::uint_t SampleCount)
+{
+	k3d::mesh::knots_t unique_knots;
+	const k3d::uint_t knots_end = Knots.size();
+	for(k3d::uint_t i = 0; i < knots_end; ++i)
+	{
+		const k3d::double_t u = Knots[i];
+		unique_knots.push_back(u);
+		i += multiplicity(Knots, u, i, knots_end);
+	}
+
+	const k3d::uint_t unique_knots_end = unique_knots.size() - 1;
+	for(k3d::uint_t i = 0; i != unique_knots_end; ++i)
+	{
+		const k3d::double_t start_u = unique_knots[i];
+		const k3d::double_t step = (unique_knots[i+1] - start_u) / static_cast<k3d::double_t>(SampleCount + 1);
+		const k3d::uint_t sample_start = i == 0 ? 0 : 1;
+		for(k3d::uint_t sample = sample_start; sample <= (SampleCount+1); ++sample)
+		{
+			Samples.push_back(start_u + static_cast<k3d::double_t>(sample) * step);
+		}
+	}
+}
+
 } //namespace nurbs
 
 } //namespace module

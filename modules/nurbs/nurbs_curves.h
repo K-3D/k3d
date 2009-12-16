@@ -137,6 +137,9 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 /// Polygonize a curve
 void polygonize(k3d::mesh& OutputMesh, k3d::linear_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::uint_t Samples);
 
+/// Samples the supplied knot value SampleCount + 1 times on each interval between unique knots
+void sample(k3d::mesh::knots_t& Samples, const k3d::mesh::knots_t& Knots, const k3d::uint_t SampleCount);
+
 } //namespace nurbs
 
 } //namespace module

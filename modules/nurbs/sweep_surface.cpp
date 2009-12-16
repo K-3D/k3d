@@ -100,7 +100,7 @@ public:
 			delete_selected_curves(Output);
 		}
 		delete_empty_primitives(Output);
-		//k3d::mesh::delete_unused_points(Output);
+		k3d::mesh::delete_unused_points(Output);
 	}
 
 	static k3d::iplugin_factory& get_factory()
