@@ -117,6 +117,10 @@ void add_trim_curve(k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_
 	{
 		OutputPatches.patch_first_trim_loops[Patch] = OutputPatches.trim_loop_first_curves.size();
 	}
+	const k3d::double_t umin = OutputPatches.patch_u_knots[OutputPatches.patch_u_first_knots[Patch]];
+	const k3d::double_t urange = OutputPatches.patch_u_knots[OutputPatches.patch_u_first_knots[Patch] + OutputPatches.patch_u_point_counts[Patch] + OutputPatches.patch_u_orders[Patch] - 1] - umin;
+	const k3d::double_t vmin = OutputPatches.patch_v_knots[OutputPatches.patch_v_first_knots[Patch]];
+	const k3d::double_t vrange = OutputPatches.patch_v_knots[OutputPatches.patch_v_first_knots[Patch] + OutputPatches.patch_v_point_counts[Patch] + OutputPatches.patch_v_orders[Patch] - 1] - vmin;
 	OutputPatches.trim_loop_first_curves.insert(OutputPatches.trim_loop_first_curves.begin() + insert_idx, OutputPatches.curve_first_points.size());
 	OutputPatches.trim_loop_curve_counts.insert(OutputPatches.trim_loop_curve_counts.begin() + insert_idx, 1);
 	OutputPatches.trim_loop_selections.insert(OutputPatches.trim_loop_selections.begin() + insert_idx, 1.0);
@@ -127,7 +131,9 @@ void add_trim_curve(k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_
 	for(k3d::uint_t i = 0; i != Points.size(); ++i)
 	{
 		OutputPatches.curve_points.push_back(OutputPatches.points.size());
-		OutputPatches.points.push_back(k3d::point2((Points[i][0] + UOffset) * UScale, (Points[i][1] + VOffset) * VScale));
+		const k3d::double_t u = (Points[i][0] * UScale) + UOffset;
+		const k3d::double_t v = (Points[i][1] * VScale) + VOffset;
+		OutputPatches.points.push_back(k3d::point2(u * urange + umin, v * vrange + vmin));
 		OutputPatches.curve_point_weights.push_back(Weights[i]);
 		OutputPatches.point_selections.push_back(1.0);
 	}
@@ -289,6 +295,13 @@ void extract_patch_curve_by_parameter(k3d::mesh& OutputMesh, k3d::nurbs_curve::p
 	std::transform(knots.begin(), knots.end(), normalized_knots2.begin(), knot_normalizer(knots.front(), knots.back()));
 	const k3d::mesh::knots_t::const_iterator split_knot = std::find_if(normalized_knots2.begin(), normalized_knots2.end(), find_first_knot_after(U));
 	const k3d::uint_t curve_idx = (split_knot - normalized_knots2.begin()) - order;
+	if(mul > 1)
+		{
+			k3d::log() << debug << "  extracting curve at U=" << U << std::endl;
+			k3d::log() << debug << "  mul: " << mul << std::endl;
+			k3d::log() << debug << "  curve_idx: " << curve_idx << std::endl;
+			k3d::log() << debug << "  knot after: " << *split_knot << std::endl;
+		}
 	extract_patch_curve_by_number(OutputMesh, OutputCurve, tmp_mesh, *tmp_patch, 0, curve_idx, UDirection);
 }
 
@@ -1127,6 +1140,8 @@ void trim_to_nurbs(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCur
 			{
 				const k3d::point3 p = dehomogenize(evaluate_position(el_trim_points, el_trim_weights, el_trim_knots, u_samples[sample]));
 				sample_points.push_back(evaluate_position(InputMesh, InputPatches, Patch, (p[0]-umin)/urange, (p[1]-vmin)/vrange));
+				const k3d::point3 tmp = dehomogenize(sample_points.back());
+				k3d::log() << debug << "(u, v): (" << (p[0]-umin)/urange << ", " << (p[1]-vmin)/vrange << "), (x, y): (" << tmp[0] << ", " << tmp[1] << ")" << std::endl;
 			}
 			k3d::mesh::points_t curve_points;
 			k3d::mesh::weights_t curve_weights;

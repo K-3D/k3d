@@ -61,8 +61,8 @@ public:
 		m_delete_curve(init_owner(*this) + init_name(_("delete_curve")) + init_label(_("Delete the Curve")) + init_description(_("Delete the curve which was used to create the trimming curve")) + init_value(false)),
 		m_scale_u(init_owner(*this) + init_name(_("scale_u")) + init_label(_("U Scale")) + init_description(_("Scale factor in the U direction")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0)) + init_value(1.0)),
 		m_scale_v(init_owner(*this) + init_name(_("scale-V")) + init_label(_("V Scale")) + init_description(_("Scale factor in the V direction")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0)) + init_value(1.0)),
-		m_offset_u(init_owner(*this) + init_name(_("offset_u")) + init_label(_("U Offset")) + init_description(_("U position offset on the surface")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(-1.0 , constraint::maximum(1.0))) + init_value(0.0)),
-		m_offset_v(init_owner(*this) + init_name(_("offset_v")) + init_label(_("V Offset")) + init_description(_("V position offset on the surface")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(-1.0 , constraint::maximum(1.0))) + init_value(0.0))
+		m_offset_u(init_owner(*this) + init_name(_("offset_u")) + init_label(_("U Offset")) + init_description(_("U position offset on the surface")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.0)),
+		m_offset_v(init_owner(*this) + init_name(_("offset_v")) + init_label(_("V Offset")) + init_description(_("V position offset on the surface")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.0))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_delete_curve.changed_signal().connect(make_update_mesh_slot());
@@ -103,8 +103,8 @@ public:
 			{
 				bbox.insert(curves_mesh.points->at(curves_prim->curve_points[i]));
 			}
-			const k3d::double_t x_offset = bbox.nx;
-			const k3d::double_t y_offset = bbox.ny;
+			const k3d::double_t x_offset = (bbox.nx + bbox.px)*0.5;
+			const k3d::double_t y_offset = (bbox.ny + bbox.py)*0.5;
 			const k3d::double_t x_scale = 1.0 / (bbox.px - bbox.nx);
 			const k3d::double_t y_scale = 1.0 / (bbox.py - bbox.ny);
 			k3d::mesh::points_2d_t trim_points;

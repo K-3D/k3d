@@ -1161,6 +1161,18 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 
 const k3d::point4 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U)
 {
+	if(U <= Knots.front())
+	{
+		const k3d::point3& p = Points.front();
+		const k3d::double_t w = Weights.front();
+		return k3d::point4(p[0]*w, p[1]*w, p[2]*w, w);
+	}
+	if(U >= Knots.back())
+	{
+		const k3d::point3& p = Points.back();
+		const k3d::double_t w = Weights.back();
+		return k3d::point4(p[0]*w, p[1]*w, p[2]*w, w);
+	}
 	k3d::mesh::knots_t bases;
 	const k3d::uint_t order = Knots.size() - Points.size();
 	basis_functions(bases, Knots, order, U);
