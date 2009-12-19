@@ -2215,19 +2215,7 @@ private:
 
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)
 	{
-		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
-
-		k3d::inode* new_modifier;
-		for(k3d::nodes_t::iterator selected_node = selected_nodes.begin(); selected_node != selected_nodes.end(); ++selected_node)
-		{
-			new_modifier = modify_mesh(m_document_state, **selected_node, Modifier);
-			assert_warning(new_modifier);
-		}
-
-		// Show the new modifier properties if only one was processed
-		if(selected_nodes.size() == 1)
-			panel::mediator(m_document_state.document()).set_focus(*new_modifier);
-
+		modify_selected_meshes(m_document_state, Modifier);
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
