@@ -137,6 +137,8 @@ public:
 	static void lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints);
 	/// Remove unused points from a mesh, adjusting point indices in all remaining primitives.
 	static void delete_unused_points(mesh& Mesh);
+	/// Remove unused points from a mesh, adjusting point indices in all remaining primitives, returning an array that maps original point indices to new point indices.
+	static void delete_unused_points(mesh& Mesh, mesh::indices_t& PointMap);
 	/// Performs a deep-copy from one mesh to another (the new mesh doesn't share any memory with the old).
 	static void deep_copy(const mesh& From, mesh& To);
 

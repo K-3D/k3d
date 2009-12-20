@@ -465,6 +465,12 @@ struct remap_primitive_points
 
 void mesh::delete_unused_points(mesh& Mesh)
 {
+	mesh::indices_t point_map;
+	delete_unused_points(Mesh, point_map);
+}
+
+void mesh::delete_unused_points(mesh& Mesh, mesh::indices_t& PointMap)
+{
 	// Create a bitmap marking which points are unused ...
 	mesh::bools_t unused_points;
 	lookup_unused_points(Mesh, unused_points);
@@ -474,13 +480,13 @@ void mesh::delete_unused_points(mesh& Mesh)
 
 	// Create an array that will map from current-point-indices to new-point-indices,
 	// taking into account the points that will be removed.
-	mesh::indices_t point_map(unused_points.size());
+	PointMap.resize(unused_points.size());
 
 	const uint_t begin = 0;
 	const uint_t end = unused_points.size();
 	for(uint_t current_index = begin, new_index = begin; current_index != end; ++current_index)
 	{
-		point_map[current_index] = new_index;
+		PointMap[current_index] = new_index;
 		if(!unused_points[current_index])
 			++new_index;
 	}
@@ -492,13 +498,13 @@ void mesh::delete_unused_points(mesh& Mesh)
 	{
 		if(!unused_points[i])
 		{
-			points[point_map[i]] = points[i];
-			point_selection[point_map[i]] = point_selection[i];
+			points[PointMap[i]] = points[i];
+			point_selection[PointMap[i]] = point_selection[i];
 		}
 	}
 
 	// Update generic mesh primitives so they use the correct indices ...
-	visit_arrays(Mesh, detail::remap_primitive_points(point_map));
+	visit_arrays(Mesh, detail::remap_primitive_points(PointMap));
 
 	// Free leftover memory ...
 	points.resize(points_remaining);
