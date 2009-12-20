@@ -37,6 +37,7 @@
 #include <boost/numeric/ublas/lu.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 namespace ublas = boost::numeric::ublas;
 
@@ -1363,21 +1364,29 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 	}
 
 	// This solves the system, overwriting the RHS with the solution
-	ublas::permutation_matrix<k3d::double_t> PM(dim);
-	ublas::lu_factorize(A, PM);
-	ublas::lu_substitute(A, PM, rhs_x);
-	ublas::lu_substitute(A, PM, rhs_y);
-	ublas::lu_substitute(A, PM, rhs_z);
-	ublas::lu_substitute(A, PM, rhs_w);
-
-	// Store the solution in the output arrays
-	Points.clear();
-	Weights.clear();
-	for(k3d::uint_t i = 0; i != dim; ++i)
+	try
 	{
-		const k3d::double_t w = rhs_w(i);
-		Points.push_back(k3d::point3(rhs_x(i)/w, rhs_y(i)/w, rhs_z(i)/w));
-		Weights.push_back(w);
+		ublas::permutation_matrix<k3d::double_t> PM(dim);
+		ublas::lu_factorize(A, PM);
+		ublas::lu_substitute(A, PM, rhs_x);
+		ublas::lu_substitute(A, PM, rhs_y);
+		ublas::lu_substitute(A, PM, rhs_z);
+		ublas::lu_substitute(A, PM, rhs_w);
+
+		// Store the solution in the output arrays
+		Points.clear();
+		Weights.clear();
+		for(k3d::uint_t i = 0; i != dim; ++i)
+		{
+			const k3d::double_t w = rhs_w(i);
+			Points.push_back(k3d::point3(rhs_x(i)/w, rhs_y(i)/w, rhs_z(i)/w));
+			Weights.push_back(w);
+		}
+	}
+	catch(std::exception& E)
+	{
+		k3d::log() << debug << "error solving system: " << E.what() << std::endl;
+		k3d::log() << debug << "matrix: " << A << std::endl;
 	}
 }
 
@@ -1437,12 +1446,13 @@ void sample(k3d::mesh::knots_t& Samples, const k3d::mesh::knots_t& Knots, const 
 	{
 		const k3d::double_t start_u = unique_knots[i];
 		const k3d::double_t step = (unique_knots[i+1] - start_u) / static_cast<k3d::double_t>(SampleCount + 1);
-		const k3d::uint_t sample_start = i == 0 ? 0 : 1;
-		for(k3d::uint_t sample = sample_start; sample <= (SampleCount+1); ++sample)
+		Samples.push_back(start_u);
+		for(k3d::uint_t sample = 1; sample < (SampleCount+1); ++sample)
 		{
 			Samples.push_back(start_u + static_cast<k3d::double_t>(sample) * step);
 		}
 	}
+	Samples.push_back(unique_knots.back());
 }
 
 } //namespace nurbs

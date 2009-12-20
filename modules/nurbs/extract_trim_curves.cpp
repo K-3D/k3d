@@ -94,6 +94,7 @@ public:
 			}
 		}
 
+		delete_empty_primitives(Output);
 		k3d::mesh::delete_unused_points(Output);
 	}
 
