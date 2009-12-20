@@ -1131,8 +1131,9 @@ void trim_to_nurbs(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCur
 			points4_t sample_points;
 			for(k3d::uint_t sample = 0; sample != samples_end; ++sample)
 			{
-				const k3d::point3 p = dehomogenize(evaluate_position(el_trim_points, el_trim_weights, el_trim_knots, u_samples[sample]));
-				sample_points.push_back(evaluate_position(InputMesh, InputPatches, Patch, (p[0]-umin)/urange, (p[1]-vmin)/vrange));
+				const k3d::point4 p_trim = evaluate_position(el_trim_points, el_trim_weights, el_trim_knots, u_samples[sample]);
+				const k3d::point3 p = dehomogenize(p_trim);
+				sample_points.push_back(p_trim[3] * evaluate_position(InputMesh, InputPatches, Patch, (p[0]-umin)/urange, (p[1]-vmin)/vrange));
 			}
 			k3d::mesh::points_t curve_points;
 			k3d::mesh::weights_t curve_weights;
