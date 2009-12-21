@@ -3,12 +3,9 @@
 import k3d
 import testing
 
-setup = testing.setup_mesh_modifier_test("K3DMeshReader", "MergeCoplanarFaces")
-setup.source.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/mesh.modifier.MergeCoplanarFaces.input.k3d")
+setup = testing.setup_mesh_modifier_test("PolyGrid", "MergeCoplanarFaces")
 
-selection = k3d.geometry.selection.create(0)
-selection.faces = k3d.geometry.point_selection.uniform(selection, 1)
-setup.modifier.mesh_selection = selection 
+setup.modifier.mesh_selection = k3d.geometry.selection.create(1) 
 
 testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.MergeCoplanarFaces", 1)
 

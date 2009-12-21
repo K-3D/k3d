@@ -85,6 +85,7 @@ public:
 			m_polyhedron.vertex_points.push_back(m_vertex_indices[hc_start->source()->center_vertex()]);
 			m_polyhedron.clockwise_edges.push_back(m_polyhedron.vertex_points.size());
 			m_polyhedron.edge_selections.push_back(0.0);
+			m_polyhedron.vertex_selections.push_back(0.0);
 		}
 		m_polyhedron.clockwise_edges.back() = face_first_edge;
 		m_polyhedron.face_first_loops.push_back(m_polyhedron.loop_first_edges.size());
@@ -106,6 +107,7 @@ public:
 				m_polyhedron.vertex_points.push_back(m_vertex_indices[hole_start->source()->center_vertex()]);
 				m_polyhedron.clockwise_edges.push_back(m_polyhedron.vertex_points.size());
 				m_polyhedron.edge_selections.push_back(0.0);
+				m_polyhedron.vertex_selections.push_back(0.0);
 			}
 			m_polyhedron.clockwise_edges.back() = hole_first_edge;
 			m_polyhedron.loop_first_edges.push_back(hole_first_edge);

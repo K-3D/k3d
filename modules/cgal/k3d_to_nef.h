@@ -79,7 +79,7 @@ public:
 	
 	const Point_3 operator()(const k3d::point3& Point)
 	{
-		return Point_3(RT(k3d::round(Point[0]*m_factor)), RT(k3d::round(Point[1]*m_factor)), RT(k3d::round(Point[2]*m_factor)), RT(m_factor));
+		return Point_3(RT(static_cast<double>(k3d::round(Point[0]*m_factor))), RT(static_cast<double>(k3d::round(Point[1]*m_factor))), RT(static_cast<double>(k3d::round(Point[2]*m_factor))), RT(static_cast<double>(m_factor)));
 	}
 
 private:

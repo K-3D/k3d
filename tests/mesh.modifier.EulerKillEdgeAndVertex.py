@@ -5,9 +5,11 @@ import testing
 
 setup = testing.setup_mesh_modifier_test("PolyGrid", "EulerKillEdgeAndVertex")
 
-selection = k3d.geometry.selection.create(0)
-selection.edges = [(0, 4294967295, 0), (49, 50, 1), (55, 56, 1)]
-
+selection = k3d.geometry.selection.create(1)
+edge_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.EDGE)
+k3d.geometry.primitive_selection.append(edge_selection, 0, 4294967295, 0)
+k3d.geometry.primitive_selection.append(edge_selection, 49, 50, 1)
+k3d.geometry.primitive_selection.append(edge_selection, 55, 56, 1)
 setup.modifier.mesh_selection = selection
 
 testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.EulerKillEdgeAndVertex", 1)
