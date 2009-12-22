@@ -18,22 +18,18 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/utility.h>
-
-#include "helpers.h"
-
-#include <set>
 
 namespace module
 {
@@ -41,6 +37,7 @@ namespace module
 namespace polyhedron
 {
 
+/*
 namespace detail
 {
 
@@ -212,30 +209,47 @@ bool collapse_selected_edge(k3d::legacy::polyhedron& Polyhedron, point_map_t& Po
 }
 
 } // namespace detail
+*/
 
 /////////////////////////////////////////////////////////////////////////////
-// collapse_edges
+// collapse_faces
 
-class collapse_edges :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
+class collapse_faces :
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
-	collapse_edges(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_vertex(init_owner(*this) + init_name("vertex") + init_label(_("Vertex")) + init_description(_("Collapse destination : first or second vertex, or middle")) + init_value(CENTER) + init_enumeration(operator_values()))
+	collapse_faces(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+		base(Factory, Document)
 	{
-		m_vertex.changed_signal().connect(make_reset_mesh_slot());
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 	}
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Mesh);
+		Output = Input;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		const vertex_t destination_vertex = m_vertex.pipeline_value();
+/*
+		// Change face selection to an edge selection, then apply CollapseEdges
+		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
+		{
+			for(k3d::legacy::polyhedron::faces_t::iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
+			{
+				const double weight = (*face)->selection_weight ? 1.0 : 0.0;
+
+				k3d::legacy::split_edge* edge = (*face)->first_edge;
+				do
+				{
+					edge->selection_weight = weight;
+
+					edge = edge->face_clockwise;
+				}
+				while(edge != (*face)->first_edge);
+			}
+		}
 
 		// Keep track of replaced points
 		detail::point_map_t point_map;
@@ -277,38 +291,12 @@ public:
 			point_list_t& list = pair->second;
 			k3d::legacy::point* end = pair->first;
 
-			if(list.size() == 1)
-			{
-				k3d::legacy::point* start = list.front();
+			// More than one point were collapsed to the destination, set centroid
+			k3d::point3 sum = end->position;
+			for(point_list_t::const_iterator vertex = list.begin(); vertex != list.end(); ++vertex)
+				sum += k3d::to_vector((*vertex)->position);
 
-				switch(destination_vertex)
-				{
-					case FIRST_VERTEX:
-						end->position = start->position;
-						break;
-
-					case LAST_VERTEX:
-						// End point position is already in end point
-						break;
-
-					case CENTER:
-						end->position += k3d::to_vector(start->position);
-						end->position /= 2;
-						break;
-
-					default:
-						assert_not_reached();
-				}
-			}
-			else
-			{
-				// More than one point were collapsed to the destination, set centroid
-				k3d::point3 sum = end->position;
-				for(point_list_t::const_iterator vertex = list.begin(); vertex != list.end(); ++vertex)
-					sum += k3d::to_vector((*vertex)->position);
-
-				end->position = sum / static_cast<double>((list.size() + 1));
-			}
+			end->position = sum / static_cast<double>((list.size() + 1));
 		}
 
 		// Replace removed points in geometric primitives
@@ -324,12 +312,14 @@ public:
 
 		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 			assert_warning(k3d::legacy::is_valid(**polyhedron));
+*/
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 
+/*
 	class replace_removed_points
 	{
 	public:
@@ -424,85 +414,34 @@ public:
 		detail::point_map_t& point_map;
 		detail::point_map_t::iterator point;
 	};
+*/
+
+	k3d::iplugin_factory& factory()
+	{
+		return get_factory();
+	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<collapse_edges,
-				k3d::interface_list<k3d::imesh_source,
-				k3d::interface_list<k3d::imesh_sink > > > factory(
-					k3d::uuid(0xa5252071, 0xa3484315, 0x9c9daf1c, 0x786042a3),
-					"CollapseEdges",
-					"For each selected edge, collapses its two vertices into one",
-					"Mesh",
-					k3d::iplugin_factory::STABLE);
+		static k3d::document_plugin_factory<collapse_faces,
+			k3d::interface_list<k3d::imesh_source,
+			k3d::interface_list<k3d::imesh_sink > > > factory(
+				k3d::uuid(0x13f8a224, 0x5e284ac4, 0xb5b58ebd, 0x10f65bb6),
+				"CollapseFaces",
+				"For each selected face, collapses its vertices to the centroid",
+				"Mesh",
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
-
-private:
-	typedef enum
-	{
-		FIRST_VERTEX,
-		CENTER,
-		LAST_VERTEX
-	} vertex_t;
-
-	friend std::ostream& operator << (std::ostream& Stream, const vertex_t& Value)
-	{
-		switch(Value)
-		{
-			case FIRST_VERTEX:
-				Stream << "first_vertex";
-				break;
-			case CENTER:
-				Stream << "center";
-				break;
-			case LAST_VERTEX:
-				Stream << "last_vertex";
-				break;
-		}
-		return Stream;
-	}
-
-	friend std::istream& operator >> (std::istream& Stream, vertex_t& Value)
-	{
-		std::string text;
-		Stream >> text;
-
-		if(text == "first_vertex")
-			Value = FIRST_VERTEX;
-		else if(text == "center")
-			Value = CENTER;
-		else if(text == "last_vertex")
-			Value = LAST_VERTEX;
-		else
-			k3d::log() << error << k3d_file_reference << ": unknown enumeration [" << text << "]" << std::endl;
-
-		return Stream;
-	}
-
-	static const k3d::ienumeration_property::enumeration_values_t& operator_values()
-	{
-		static k3d::ienumeration_property::enumeration_values_t values;
-		if(values.empty())
-		{
-			values.push_back(k3d::ienumeration_property::enumeration_value_t("First_vertex", "first_vertex", "Collapses edge to first vertex"));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t("Center", "center", "Collapses edge to edge center"));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t("Last_vertex", "last_vertex", "Collapses edge to last vertex"));
-		}
-
-		return values;
-	}
-
-	k3d_data(vertex_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_vertex;
 };
 
 /////////////////////////////////////////////////////////////////////////////
 // factories
 
-k3d::iplugin_factory& collapse_edges_factory()
+k3d::iplugin_factory& collapse_faces_factory()
 {
-	return collapse_edges::get_factory();
+	return collapse_faces::get_factory();
 }
 
 } // namespace polyhedron
