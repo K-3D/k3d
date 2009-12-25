@@ -981,50 +981,19 @@ void polygonize(k3d::mesh::points_t& Vertices, k3d::mesh::counts_t& VertexCounts
 	const k3d::uint_t u_order = InputPatches.patch_u_orders[Patch];
 	const k3d::uint_t u_knots_begin = InputPatches.patch_u_first_knots[Patch];
 	const k3d::uint_t u_knots_end = u_knots_begin + InputPatches.patch_u_point_counts[Patch] + u_order;
-	k3d::mesh::knots_t unique_u_knots;
-	for(k3d::uint_t i = u_knots_begin; i < u_knots_end; ++i)
-	{
-		const k3d::double_t u = InputPatches.patch_u_knots[i];
-		unique_u_knots.push_back(u);
-		i += multiplicity(InputPatches.patch_u_knots, u, i, u_knots_end);
-	}
-
+	const k3d::mesh::knots_t::const_iterator u_it = InputPatches.patch_u_knots.begin();
+	k3d::mesh::knots_t u_knots(u_it + u_knots_begin, u_it + u_knots_end);
 	k3d::mesh::knots_t u_samples;
-	const k3d::uint_t unique_u_knots_end = unique_u_knots.size() - 1;
-	for(k3d::uint_t i = 0; i != unique_u_knots_end; ++i)
-	{
-		const k3d::double_t start_u = unique_u_knots[i];
-		const k3d::double_t u_step = (unique_u_knots[i+1] - start_u) / static_cast<k3d::double_t>(USamples + 1);
-		const k3d::uint_t u_sample_start = i == 0 ? 0 : 1;
-		for(k3d::uint_t u_sample = u_sample_start; u_sample <= (USamples+1); ++u_sample)
-		{
-			u_samples.push_back(start_u + static_cast<k3d::double_t>(u_sample) * u_step);
-		}
-	}
+	sample(u_samples, u_knots, USamples);
 
 	const k3d::uint_t v_order = InputPatches.patch_v_orders[Patch];
 	const k3d::uint_t v_knots_begin = InputPatches.patch_v_first_knots[Patch];
 	const k3d::uint_t v_knots_end = v_knots_begin + InputPatches.patch_v_point_counts[Patch] + v_order;
-	k3d::mesh::knots_t unique_v_knots;
-	for(k3d::uint_t i = v_knots_begin; i < v_knots_end; ++i)
-	{
-		const k3d::double_t v = InputPatches.patch_v_knots[i];
-		unique_v_knots.push_back(v);
-		i += multiplicity(InputPatches.patch_v_knots, v, i, v_knots_end);
-	}
-
+	const k3d::mesh::knots_t::const_iterator v_it = InputPatches.patch_v_knots.begin();
+	k3d::mesh::knots_t v_knots(v_it + v_knots_begin, v_it + v_knots_end);
+	std::transform(v_knots.begin(), v_knots.end(), v_knots.begin(), knot_normalizer(v_knots.front(), v_knots.back()));
 	k3d::mesh::knots_t v_samples;
-	const k3d::uint_t unique_v_knots_end = unique_v_knots.size() - 1;
-	for(k3d::uint_t i = 0; i != unique_v_knots_end; ++i)
-	{
-		const k3d::double_t start_v = unique_v_knots[i];
-		const k3d::double_t v_step = (unique_v_knots[i+1] - start_v) / static_cast<k3d::double_t>(VSamples + 1);
-		const k3d::uint_t v_sample_start = i == 0 ? 0 : 1;
-		for(k3d::uint_t v_sample = v_sample_start; v_sample <= (VSamples+1); ++v_sample)
-		{
-			v_samples.push_back(start_v + static_cast<k3d::double_t>(v_sample) * v_step);
-		}
-	}
+	sample(v_samples, v_knots, VSamples);
 
 	const k3d::uint_t u_sample_count = u_samples.size();
 	const k3d::uint_t v_sample_count = v_samples.size();

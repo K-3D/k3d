@@ -1434,7 +1434,7 @@ void sample(k3d::mesh::knots_t& Samples, const k3d::mesh::knots_t& Knots, const 
 {
 	k3d::mesh::knots_t unique_knots;
 	const k3d::uint_t knots_end = Knots.size();
-	for(k3d::uint_t i = 0; i < knots_end; ++i)
+	for(k3d::uint_t i = 0; i < knots_end;)
 	{
 		const k3d::double_t u = Knots[i];
 		unique_knots.push_back(u);
