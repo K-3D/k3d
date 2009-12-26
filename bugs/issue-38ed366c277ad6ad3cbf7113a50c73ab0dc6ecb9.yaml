@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Ensure primitive attributes are updated correctly.
+desc: Many (probably most) current modifiers that create new geometry fail to update primitive attributes, meaning that those modifiers will fail when applied to primitives with attributes.  Since it's really easy to write code that doesn't take attributes into account, we need a way to consistently catch such errors.  One heavy-handed way to do it would be to simply update every mesh source to generate output with attributes - then, current tests would automatically start failing in an obvious way.  On the down-side, this means increasing memory usage for everyone for what is basically a test case.  Second alternative would be to do something in the test layer that automatically adds attributes to sources.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-12-26 17:27:03.044526 Z
+references: []
+
+id: 38ed366c277ad6ad3cbf7113a50c73ab0dc6ecb9
+log_events: 
+- - 2009-12-26 17:27:03.964468 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""

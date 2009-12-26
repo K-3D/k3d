@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Ensure polyhedron shells are updated correctly.
+desc: There is probably a lot of code that doesn't update polyhedron shells correctly.  In particular, when appending faces to a polyhedron we usually just increment the shell face count, but this isn't correct, since the current schema assumes that all faces for a given shell are adjacent within the face table.  That means that filters that create new faces need to do inserts instead of appends, or we need to rethink how we handle shells.  One option would be to add a "shell number" array to the face table, so that it wouldn't matter whether the faces in a given shell are scattered throughout the face table.  This would have the additional benefit of simplifying lots of code that otherwise has to update the face count for a shell.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-12-26 17:22:42.581537 Z
+references: []
+
+id: c5bb24ef560d028232ce7243e179caf89232424a
+log_events: 
+- - 2009-12-26 17:22:43.365497 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
