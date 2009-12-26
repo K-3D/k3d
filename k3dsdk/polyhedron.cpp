@@ -906,6 +906,19 @@ uint_t counterclockwise_edge(const mesh::indices_t& ClockwiseEdges, const uint_t
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// create_counterclockwise_edge_lookup
+
+void create_counterclockwise_edge_lookup(const mesh::indices_t& clockwise_edges, mesh::indices_t& counterclockwise_edges)
+{
+	counterclockwise_edges.resize(clockwise_edges.size());
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + clockwise_edges.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+		counterclockwise_edges[clockwise_edges[edge]] = edge;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // center
 
 const point3 center(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
@@ -971,6 +984,33 @@ const normal3 normal(const point3& i, const point3& j, const point3& k)
 	result[2] += (k[0] + i[0]) * (i[1] - k[1]);
 
 	return 0.5 * result;
+}
+
+void create_face_normal_lookup(const mesh& Mesh, const const_primitive& Polyhedron, mesh::normals_t& Normals)
+{
+	Normals.resize(Polyhedron.face_first_loops.size(), normal3(0, 0, 0));
+
+	return_if_fail(Mesh.points);
+	const mesh::points_t& points = *Mesh.points;
+
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
+        for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		for(uint_t edge = Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]; ; )
+		{
+			const point3& i = points[Polyhedron.vertex_points[edge]];
+			const point3& j = points[Polyhedron.vertex_points[Polyhedron.clockwise_edges[edge]]];
+
+			Normals[face][0] += 0.5 * (i[1] + j[1]) * (j[2] - i[2]);
+			Normals[face][1] += 0.5 * (i[2] + j[2]) * (j[0] - i[0]);
+			Normals[face][2] += 0.5 * (i[0] + j[0]) * (j[1] - i[1]);
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]])
+				break;
+		}
+	}
 }
 
 namespace detail
