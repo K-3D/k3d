@@ -18,23 +18,24 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Romain Behar (romainbehar@yahoo.com)
-	\author Timothy M. Shead (tshead@k-3d.com)
+		\author Romain Behar (romainbehar@yahoo.com)
+		\author Timothy M. Shead (tshead@k-3d.com)
 */
+
+#include "helpers.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
-#include <k3dsdk/hints.h>
-#include <k3dsdk/mesh_modifier.h>
+#include <k3dsdk/legacy_mesh_modifier.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
+#include <k3dsdk/utility.h>
 
-#include <boost/scoped_ptr.hpp>
+#include <set>
 
 namespace module
 {
@@ -42,9 +43,37 @@ namespace module
 namespace polyhedron
 {
 
-/*
 namespace detail
 {
+
+/// Caches new geometry for better interactive performance
+class new_point
+{
+public:
+	new_point(const k3d::point3& OldPosition, const k3d::normal3& Direction, const k3d::vector3& InsetDirection, const double Ratio, k3d::legacy::point& Point) :
+		old_position(OldPosition),
+		direction(k3d::to_vector(Direction)),
+		inset_direction(InsetDirection),
+		ratio(Ratio),
+		point(&Point)
+	{
+	}
+
+	void update(const double Distance, const double Inset)
+	{
+		point->position = old_position + ratio * (Distance * direction + Inset * inset_direction);
+	}
+
+private:
+	k3d::point3 old_position;
+	k3d::vector3 direction;
+	k3d::vector3 inset_direction;
+	double ratio;
+	k3d::legacy::point* point;
+};
+
+/// Caches new geometry for better interactive performance
+typedef std::vector<new_point> new_points_t;
 
 /// Connects two vertices belonging to the same face
 k3d::legacy::face* segment_connect_vertices(k3d::imaterial* Material, k3d::legacy::split_edge* Edge1, k3d::legacy::split_edge* Edge2)
@@ -82,7 +111,7 @@ struct indexed_face_t
 typedef std::map<k3d::legacy::split_edge*, indexed_face_t> edge_face_map_t;
 typedef std::vector<k3d::legacy::split_edge*> face_t;
 typedef std::map<k3d::legacy::point*, k3d::normal3> vertex_normals_t;
-void extrude_face(face_t& Face, k3d::legacy::face::holes_t& FaceHoles, k3d::imaterial* Material, const unsigned long Segments, k3d::normal3& Direction, vertex_normals_t& VertexNormals, const k3d::bool_t Inside, const k3d::bool_t BackFace, edge_face_map_t& InteriorEdges, k3d::legacy::mesh& Mesh, k3d::legacy::polyhedron& Polyhedron, new_points_t& NewPoints, k3d::legacy::polyhedron::faces_t& BackFaces, k3d::legacy::polyhedron::faces_t& SideFaces)
+void extrude_face(face_t& Face, k3d::legacy::face::holes_t& FaceHoles, k3d::imaterial* Material, const unsigned long Segments, k3d::normal3& Direction, vertex_normals_t& VertexNormals, const bool Inside, const bool BackFace, edge_face_map_t& InteriorEdges, k3d::legacy::mesh& Mesh, k3d::legacy::polyhedron& Polyhedron, new_points_t& NewPoints, k3d::legacy::polyhedron::faces_t& BackFaces, k3d::legacy::polyhedron::faces_t& SideFaces)
 {
 	// Do nothing on zero-length direction
 	if(!Direction.length2())
@@ -237,7 +266,7 @@ void extrude_face(face_t& Face, k3d::legacy::face::holes_t& FaceHoles, k3d::imat
 	// Create back face (only if every bottom edge has no companion)
 	if(BackFace)
 	{
-		k3d::bool_t free = true;
+		bool free = true;
 		for(edges_t::iterator edge = bottom_edges.begin(); edge != bottom_edges.end(); ++edge)
 		{
 			if((*edge)->companion)
@@ -364,7 +393,7 @@ void extrude_face(face_t& Face, k3d::legacy::face::holes_t& FaceHoles, k3d::imat
 	// Create segments
 	if(Segments > 1)
 		{
-			const k3d::double_t segment_number = static_cast<k3d::double_t>(Segments);
+			const double segment_number = static_cast<double>(Segments);
 			k3d::point3 null_direction(0, 0, 0);
 
 			// Save all side1 edges from extrusion faces
@@ -376,9 +405,9 @@ void extrude_face(face_t& Face, k3d::legacy::face::holes_t& FaceHoles, k3d::imat
 			}
 
 			const unsigned long size = side1_edges.size();
-			for(k3d::double_t segment = segment_number - 1; segment >= 1; --segment)
+			for(double segment = segment_number - 1; segment >= 1; --segment)
 			{
-				const k3d::double_t ratio = segment / segment_number;
+				const double ratio = segment / segment_number;
 
 				// Split all side edges
 				unsigned long n = 1;
@@ -506,12 +535,12 @@ struct indexed_point_t
 	}
 };
 
-k3d::bool_t operator < (const indexed_point_t& Left, const indexed_point_t& Right)
+bool operator < (const indexed_point_t& Left, const indexed_point_t& Right)
 {
 	return Left.index < Right.index;
 }
 
-void extrude_regions(k3d::legacy::polyhedron::faces_t& Faces, const unsigned long Segments, const k3d::bool_t Inside, const k3d::bool_t GroupNormals, const k3d::bool_t BackFace, k3d::legacy::mesh& Mesh, k3d::legacy::polyhedron& Polyhedron, new_points_t& NewPoints, k3d::legacy::polyhedron::faces_t& BackFaces, k3d::legacy::polyhedron::faces_t& SideFaces)
+void extrude_regions(k3d::legacy::polyhedron::faces_t& Faces, const unsigned long Segments, const bool Inside, const bool GroupNormals, const bool BackFace, k3d::legacy::mesh& Mesh, k3d::legacy::polyhedron& Polyhedron, new_points_t& NewPoints, k3d::legacy::polyhedron::faces_t& BackFaces, k3d::legacy::polyhedron::faces_t& SideFaces)
 {
 	// Build an edge to face map for selected faces
 	edge_face_map_t edge_face_map;
@@ -589,7 +618,7 @@ void extrude_regions(k3d::legacy::polyhedron::faces_t& Faces, const unsigned lon
 		}
 
 		// Average region normal and normalize vertex normals
-		region_normal /= static_cast<k3d::double_t>(region_faces.size());
+		region_normal /= static_cast<double>(region_faces.size());
 		for(vertex_normals_t::iterator normal = vertex_normals.begin(); normal != vertex_normals.end(); ++normal)
 			normal->second = k3d::normalize(normal->second);
 
@@ -698,7 +727,7 @@ void extrude_regions(k3d::legacy::polyhedron::faces_t& Faces, const unsigned lon
 
 struct extrude_faces
 {
-	extrude_faces(const unsigned long Segments, const k3d::bool_t Inside, const k3d::bool_t BackFace, k3d::legacy::mesh& Mesh, k3d::legacy::polyhedron& Polyhedron, new_points_t& NewPoints, k3d::legacy::polyhedron::faces_t& BackFaces, k3d::legacy::polyhedron::faces_t& SideFaces) :
+	extrude_faces(const unsigned long Segments, const bool Inside, const bool BackFace, k3d::legacy::mesh& Mesh, k3d::legacy::polyhedron& Polyhedron, new_points_t& NewPoints, k3d::legacy::polyhedron::faces_t& BackFaces, k3d::legacy::polyhedron::faces_t& SideFaces) :
 		segments(Segments), inside(Inside), back_face(BackFace), mesh(Mesh), polyhedron(Polyhedron), new_points(NewPoints), back_faces(BackFaces), side_faces(SideFaces)
 	{
 	}
@@ -743,8 +772,8 @@ struct extrude_faces
 	}
 
 	const unsigned long segments;
-	const k3d::bool_t inside;
-	const k3d::bool_t back_face;
+	const bool inside;
+	const bool back_face;
 	k3d::legacy::mesh& mesh;
 	k3d::legacy::polyhedron& polyhedron;
 	new_points_t& new_points;
@@ -753,15 +782,14 @@ struct extrude_faces
 };
 
 } // namespace detail
-*/
 
 /////////////////////////////////////////////////////////////////////////////
 // extrude_faces
 
 class extrude_faces :
-	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
 
 public:
 	extrude_faces(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
@@ -775,260 +803,84 @@ public:
 		m_back_face(init_owner(*this) + init_name("back_face") + init_label(_("Back face")) + init_description(_("Add back face when possible")) + init_value(true)),
 		m_select_side_faces(init_owner(*this) + init_name("select_side_faces") + init_label(_("Select side faces")) + init_description(_("Select side faces on output")) + init_value(false))
 	{
-		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
-		m_segments.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
-		m_region.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
-		m_direction.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
-		m_group_normals.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
-		m_back_face.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
+		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 		
-		m_distance.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
-		m_inset.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
-		m_select_side_faces.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
+		m_distance.changed_signal().connect(make_update_mesh_slot());
+		m_segments.changed_signal().connect(make_reset_mesh_slot());
+		m_inset.changed_signal().connect(make_update_mesh_slot());
+		m_direction.changed_signal().connect(make_reset_mesh_slot());
+		m_region.changed_signal().connect(make_reset_mesh_slot());
+		m_group_normals.changed_signal().connect(make_reset_mesh_slot());
+		m_back_face.changed_signal().connect(make_reset_mesh_slot());
+		m_select_side_faces.changed_signal().connect(make_update_mesh_slot());
 	}
 
-	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	/** \todo Improve the implementation so we don't have to do this */
+	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
 	{
-		// Create output geometry ...
-		Output = Input;
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+		// Force updates to re-allocate our mesh, for simplicity
+		return 0;
+	}
+	
+	
 
-		if(!Output.points)
-			return;
-		if(!Output.point_selection)
-			return;
+	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	{
+		k3d::legacy::deep_copy(InputMesh, Mesh);
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Mesh);
 
-		const k3d::int32_t segments = m_segments.pipeline_value();
-		const k3d::bool_t region = m_region.pipeline_value();
-/*
-		const direction_t direction = m_direction.pipeline_value();
-		const k3d::bool_t group_normals = m_group_normals.pipeline_value();
-		const k3d::bool_t back_face = m_back_face.pipeline_value();
-*/
-
-
-		// Clear previously cached data ...
-		extrude_vertices.clear();
-/*
+		// Clear data caches
+		m_new_points.clear();
 		m_selected_faces.clear();
 		m_side_faces.clear();
-*/
 
-		k3d::mesh::points_t& points = Output.points.writable();
-		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
+		const unsigned long segments = m_segments.pipeline_value();
+		const direction_t direction = m_direction.pipeline_value();
+		const bool region = m_region.pipeline_value();
+		const bool group_normals = m_group_normals.pipeline_value();
+		const bool back_face = m_back_face.pipeline_value();
 
 		// For each polyhedron ...
-		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		k3d::legacy::polyhedron::faces_t back_faces;
+		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
 		{
-			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
-			if(!polyhedron)
-				continue;
+			// Get the set of all selected faces ...
+			k3d::copy_if((*polyhedron)->faces.begin(), (*polyhedron)->faces.end(), std::inserter(m_selected_faces, m_selected_faces.end()), k3d::is_selected());
 
-			// Compute face normal vectors ...
-			k3d::mesh::normals_t face_normals;
-			k3d::polyhedron::create_face_normal_lookup(Output, *polyhedron, face_normals);
+			if(m_selected_faces.empty())
+				m_selected_faces = (*polyhedron)->faces;
 
-			// Normalize them ...
-			std::transform(face_normals.begin(), face_normals.end(), face_normals.begin(), (const k3d::normal3(*)(const k3d::normal3&))k3d::normalize);
-
-			// Compute a mapping from edges to faces ...
-			k3d::mesh::indices_t edge_faces;
-			k3d::polyhedron::create_edge_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, edge_faces);
-
-			// Compute links to adjacent edges ...
-			k3d::mesh::bools_t boundary_edges;
-			k3d::mesh::indices_t adjacent_edges;
-			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
-
-			// Compute a mapping from edges to counterclockwise edges ...
-			k3d::mesh::indices_t counterclockwise_edges;
-			k3d::polyhedron::create_counterclockwise_edge_lookup(polyhedron->clockwise_edges, counterclockwise_edges);
-
-			// Compute the inset direction for each edge ...
-			const k3d::uint_t edge_begin = 0;
-			const k3d::uint_t edge_end = edge_begin + polyhedron->clockwise_edges.size();
-			k3d::mesh::vectors_t edge_insets(polyhedron->clockwise_edges.size());
-			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+			if(region)
 			{
-				const k3d::vector3 e1 = points[polyhedron->vertex_points[edge]] - points[polyhedron->vertex_points[counterclockwise_edges[edge]]];
-				const k3d::vector3 e2 = points[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]] - points[polyhedron->vertex_points[edge]];
-				const k3d::vector3 e3 = k3d::normalize(e1 ^ face_normals[edge_faces[edge]]);
-				const k3d::vector3 e4 = k3d::normalize(e2 ^ face_normals[edge_faces[edge]]);
-				edge_insets[edge] = (-1 / std::cos(std::acos(e3 * e4) / 2)) * k3d::normalize(e3 + e4);
+				// Extrude neighbouring faces as a single one
+				detail::extrude_regions(m_selected_faces, segments, (direction == INSIDE), group_normals, back_face, Mesh, **polyhedron, m_new_points, back_faces, m_side_faces);
+			}
+			else
+			{
+				// Extrude each face
+				std::for_each(m_selected_faces.begin(), m_selected_faces.end(), detail::extrude_faces(segments, (direction == INSIDE), back_face, Mesh, **polyhedron, m_new_points, back_faces, m_side_faces));
 			}
 
-			const k3d::uint_t face_begin = 0;
-			const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
-
-			// Keep track of newly-created vertices ...
-			k3d::mesh::indices_t previous_layer_vertex_points(polyhedron->vertex_points);
-			k3d::mesh::indices_t current_layer_vertex_points(polyhedron->vertex_points);
-
-			// For each segment ...
-			for(k3d::int32_t i = 0; i != segments; ++i)
-			{
-				// For each edge adjacent to a selected face ...
-				for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
-				{
-					if(!polyhedron->face_selections[edge_faces[edge]])
-						continue;
-
-/*
-					// Optionally skip region edges ...
-					if(region && !boundary_edges[edge] && polyhedron->face_selections[edge_faces[adjacent_edges[edge]]])
-						continue;
-*/
-
-					current_layer_vertex_points[edge] = points.size();
-
-					extrude_vertices.push_back(
-						extrude_vertex(
-							points.size(),
-							points[polyhedron->vertex_points[edge]],
-							k3d::to_vector(face_normals[edge_faces[edge]]),
-							edge_insets[edge],
-							k3d::ratio(i+1, segments)));
-					points.push_back(k3d::point3());
-					point_selection.push_back(1);
-				}
-
-k3d::log() << debug;
-std::copy(previous_layer_vertex_points.begin(), previous_layer_vertex_points.end(), std::ostream_iterator<k3d::uint_t>(k3d::log(), " "));
-k3d::log() << std::endl;
-
-k3d::log() << debug;
-std::copy(current_layer_vertex_points.begin(), current_layer_vertex_points.end(), std::ostream_iterator<k3d::uint_t>(k3d::log(), " "));
-k3d::log() << std::endl;
-
-
-				// For each selected face ...
-				const k3d::uint_t shell_begin = 0;
-				const k3d::uint_t shell_end = shell_begin + polyhedron->shell_first_faces.size();
-				for(k3d::uint_t shell = shell_begin; shell != shell_end; ++shell)
-				{
-					const k3d::uint_t face_begin = polyhedron->shell_first_faces[shell];
-					const k3d::uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
-					for(k3d::uint_t face = face_begin; face != face_end; ++face)
-					{
-						if(!polyhedron->face_selections[face])
-							continue;
-
-						const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-						const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-						for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-						{
-							const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-							const k3d::uint_t new_first_edge = polyhedron->clockwise_edges.size();
-							for(k3d::uint_t edge = first_edge; ;)
-							{
-								polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
-								polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
-								polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
-								polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() - 3);
-
-								polyhedron->edge_selections.push_back(1);
-								polyhedron->edge_selections.push_back(1);
-								polyhedron->edge_selections.push_back(1);
-								polyhedron->edge_selections.push_back(1);
-
-k3d::log() << debug << polyhedron->clockwise_edges[edge] << std::endl;
-k3d::log() << debug << edge << std::endl;
-
-								polyhedron->vertex_points.push_back(current_layer_vertex_points[polyhedron->clockwise_edges[edge]]);
-								polyhedron->vertex_points.push_back(current_layer_vertex_points[edge]);
-								polyhedron->vertex_points.push_back(previous_layer_vertex_points[edge]);
-								polyhedron->vertex_points.push_back(previous_layer_vertex_points[polyhedron->clockwise_edges[edge]]);
-
-k3d::log() << debug;
-std::copy(polyhedron->vertex_points.begin(), polyhedron->vertex_points.end(), std::ostream_iterator<k3d::uint_t>(k3d::log(), " "));
-k3d::log() << std::endl;
-
-								polyhedron->vertex_selections.push_back(1);
-								polyhedron->vertex_selections.push_back(1);
-								polyhedron->vertex_selections.push_back(1);
-								polyhedron->vertex_selections.push_back(1);
-
-								edge = polyhedron->clockwise_edges[edge];
-								if(edge == first_edge)
-									break;
-							}
-
-							polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
-							polyhedron->face_loop_counts.push_back(1);
-							polyhedron->face_selections.push_back(1);
-							polyhedron->face_materials.push_back(polyhedron->face_materials[face]);
-
-							polyhedron->loop_first_edges.push_back(new_first_edge);
-
-							++polyhedron->shell_face_counts[shell];
-						}
-					}
-				}
-
-				previous_layer_vertex_points = current_layer_vertex_points;
-			}
-
-			// For each (original) selected face, map the face vertices to its new points ...
-			for(k3d::uint_t face = face_begin; face != face_end; ++face)
-			{
-				if(!polyhedron->face_selections[face])
-					continue;
-
-				const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-				const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-				{
-					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-					for(k3d::uint_t edge = first_edge; ;)
-					{
-						polyhedron->vertex_points[edge] = current_layer_vertex_points[edge];
-
-						edge = polyhedron->clockwise_edges[edge];
-						if(edge == first_edge)
-							break;
-					}
-				}
-			}
+			assert_warning(is_valid(**polyhedron));
 		}
 
-/*
 		m_selected_faces.insert(m_selected_faces.end(), back_faces.begin(), back_faces.end());
 		std::for_each(m_selected_faces.begin(), m_selected_faces.end(), k3d::selection::set_weight(1.0));
-*/
 	}
 
-	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
+	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
 	{
-		const k3d::double_t distance = m_distance.pipeline_value();
-		const k3d::double_t inset = m_inset.pipeline_value();
+		const double distance = m_distance.pipeline_value();
+		const double inset = m_inset.pipeline_value();
 
-		k3d::mesh::points_t& points = Output.points.writable();
+		for(detail::new_points_t::iterator new_point = m_new_points.begin(); new_point != m_new_points.end(); ++new_point)
+			new_point->update(distance, inset);
 
-		const k3d::uint_t vertex_begin = 0;
-		const k3d::uint_t vertex_end = vertex_begin + extrude_vertices.size();
-		for(k3d::uint_t vertex_index = vertex_begin; vertex_index != vertex_end; ++vertex_index)
-		{
-			const extrude_vertex& vertex = extrude_vertices[vertex_index];
-
-			points[vertex.point] =
-				k3d::mix(vertex.start, vertex.start + (distance * vertex.extrude_direction) + (inset * vertex.inset_direction), vertex.ratio);
-		}
-/*
 		// Update new items selection
-		const k3d::bool_t select_side_faces = m_select_side_faces.pipeline_value();
-		const k3d::double_t side_weight = select_side_faces ? 1.0 : 0.0;
+		const bool select_side_faces = m_select_side_faces.pipeline_value();
+		const double side_weight = select_side_faces ? 1.0 : 0.0;
 		for(k3d::legacy::polyhedron::faces_t::iterator face = m_side_faces.begin(); face != m_side_faces.end(); ++face)
 			(*face)->selection_weight = side_weight;
-*/
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -1095,42 +947,19 @@ private:
 		return values;
 	}
 
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_distance;
+	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_distance;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_segments;
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_inset;
+	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_inset;
 	k3d_data(direction_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_direction;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_region;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_group_normals;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_back_face;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_select_side_faces;
+	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_region;
+	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_group_normals;
+	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_back_face;
+	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_select_side_faces;
 
-	/// Caches new points for better interactive performance
-	class extrude_vertex
-	{
-	public:
-		extrude_vertex(const k3d::uint_t Point, const k3d::point3& Start, const k3d::vector3& ExtrudeDirection, const k3d::vector3& InsetDirection, const k3d::double_t Ratio) :
-			point(Point),
-			start(Start),
-			extrude_direction(ExtrudeDirection),
-			inset_direction(InsetDirection),
-			ratio(Ratio)
-		{
-		}
-
-		k3d::uint_t point;
-		k3d::point3 start;
-		k3d::vector3 extrude_direction;
-		k3d::vector3 inset_direction;
-		k3d::double_t ratio;
-	};
-
-	/// Caches new points for better interactive performance
-	std::vector<extrude_vertex> extrude_vertices;
-
-/*
+	/// Caches new geometry for better interactive performance
+	detail::new_points_t m_new_points;
 	k3d::legacy::polyhedron::faces_t m_selected_faces;
 	k3d::legacy::polyhedron::faces_t m_side_faces;
-*/
 };
 
 /////////////////////////////////////////////////////////////////////////////

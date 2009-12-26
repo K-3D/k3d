@@ -3,7 +3,7 @@ title: NURBS OpenGL rendering weird on OSX
 desc: On OSX, NURBS patches have strange render artifacts, as if normals are flipped or something.
 type: :bugfix
 component: K-3D
-release: 1.0.0.0
+release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -15,8 +15,4 @@ log_events:
 - - 2009-08-03 14:54:19.159406 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
-  - ""
-- - 2009-12-26 17:18:11.644487 Z
-  - Timothy M. Shead <tshead@k-3d.com>
-  - assigned to release 1.0.0.0 from 0.8.0.0
   - ""

@@ -192,8 +192,6 @@ bool_t is_sds(const const_primitive& Polyhedron);
 bool_t same_loop(const mesh::indices_t& ClockwiseEdges, const uint_t EdgeA, const uint_t EdgeB);
 /// Returns the previous (counterclockwise) edge on the same loop.
 uint_t counterclockwise_edge(const mesh::indices_t& ClockwiseEdges, const uint_t Edge);
-/// Initializes arrays for constant-time lookup of counterclockwise edges.
-void create_counterclockwise_edge_lookup(const mesh::indices_t& ClockwiseEdges, mesh::indices_t& counterclockwise_edges);
 
 /// Calculates the center (average) for an edge loop (returns the origin for degenerate cases).
 const point3 center(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
@@ -201,8 +199,6 @@ const point3 center(const mesh::indices_t& VertexPoints, const mesh::indices_t& 
 const normal3 normal(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
 /// Calculates the normal for a triangle (returns a zero-length normal for degenerate cases).
 const normal3 normal(const point3& A, const point3& B, const point3& C);
-/// Initializes arrays for constant-time lookup from faces to normal vectors.
-void create_face_normal_lookup(const mesh& Mesh, const const_primitive& Polyhedron, mesh::normals_t& Normals);
 
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
 void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
