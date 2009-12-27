@@ -192,7 +192,8 @@ private:
 			if(Property->property_type() == typeid(k3d::mesh*))
 			{
 				const k3d::mesh* const input_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(*Property));
-				return_if_fail(input_mesh);
+				if(!input_mesh)
+					throw std::runtime_error("No mesh found in property " + Property->property_name());
 				// make a copy of the mesh, where we can alter the face selection so everything is selected
 				k3d::mesh mesh_all_faces_selected(*input_mesh);
 				boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron;
