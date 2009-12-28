@@ -331,14 +331,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
 
-		k3d::uint_t segments = 0;
-		for(k3d::uint_t patch = 0; patch != patch_u_point_counts.size(); ++patch)
-		{
-			segments += (1 + patch_u_point_counts[patch] - patch_u_orders[patch]) * (1 + patch_v_point_counts[patch] - patch_v_orders[patch]);
-		}
-
-		require_table_row_count(Primitive, patch_attributes, "patch", segments);
-		require_table_row_count(Primitive, varying_attributes, "varying", 4 * segments);
+		require_table_row_count(Primitive, varying_attributes, "varying", 4 * patch_u_point_counts.size());
 
 	return new const_primitive(
 		patch_first_points,
@@ -445,14 +438,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
 
-		k3d::uint_t segments = 0;
-		for(k3d::uint_t patch = 0; patch != patch_u_point_counts.size(); ++patch)
-		{
-			segments += (1 + patch_u_point_counts[patch] - patch_u_orders[patch]) * (1 + patch_v_point_counts[patch] - patch_v_orders[patch]);
-		}
-
-		require_table_row_count(Primitive, patch_attributes, "patch", segments);
-		require_table_row_count(Primitive, varying_attributes, "varying", 4 * segments);
+		require_table_row_count(Primitive, varying_attributes, "varying", 4 * patch_u_point_counts.size());
 
 	return new primitive(
 		patch_first_points,

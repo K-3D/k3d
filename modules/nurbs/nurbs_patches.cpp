@@ -211,12 +211,7 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::uint_t SourcePrimI
 					}
 				}
 				add_patch(OutputMesh, OutputPatches, new_points, new_weights, u_knots, v_knots, source_curves->curve_orders[source_curve], curves_to_traverse->curve_orders[curve_to_traverse]);
-				const k3d::uint_t u_segments = 1 + u_knots.size() - 2*source_curves->curve_orders[source_curve];
-				const k3d::uint_t v_segments = 1 + v_knots.size() - 2*curves_to_traverse->curve_orders[curve_to_traverse];
-				const k3d::uint_t patch_count = u_segments*v_segments;
-				k3d::log() << debug << "patch count: " << patch_count << std::endl;
-				for(k3d::uint_t i = 0; i != patch_count; ++i)
-					uniform_copier.push_back(source_curve);
+				uniform_copier.push_back(source_curve);
 				OutputPatches.patch_materials.push_back(source_curves->material[0]);
 			}
 		}
