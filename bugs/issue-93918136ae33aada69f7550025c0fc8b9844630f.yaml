@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Pick a better component name for "varying" components.
+desc: Choose something other than "varying" for K-3D components to avoid confusion with RenderMan "varying".
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-12-29 02:44:08.925548 Z
+references: []
+
+id: 93918136ae33aada69f7550025c0fc8b9844630f
+log_events: 
+- - 2009-12-29 02:44:10.013477 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
