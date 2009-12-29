@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Remove legacy code from FilletEdges
+desc: Like it says.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-12-29 03:13:14.813546 Z
+references: []
+
+id: 44735744038c3434abe3f3a7e13f881e2e2cc48e
+log_events: 
+- - 2009-12-29 03:13:15.781482 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
