@@ -8,9 +8,10 @@ setup = testing.setup_mesh_modifier_test("PolyGrid", "ExtrudeFaces")
 setup.source.rows = 3
 setup.source.columns = 3
 
-mesh_selection = k3d.geometry.selection.create(0)
-mesh_selection.faces = [(4, 5, 1)]
-setup.modifier.mesh_selection = mesh_selection
+selection = k3d.geometry.selection.create(0)
+face_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.FACE)
+k3d.geometry.primitive_selection.append(face_selection, 4, 5, 1)
+setup.modifier.mesh_selection = selection
 setup.modifier.distance = 5
 
 testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.ExtrudeFaces", 2)
