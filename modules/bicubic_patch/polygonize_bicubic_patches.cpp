@@ -122,6 +122,7 @@ public:
 				{
 					for(k3d::int32_t k = 0; k != subdivisions; ++k)
 					{
+						polyhedron->face_shells.push_back(0);
 						polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 						polyhedron->face_loop_counts.push_back(1);
 						polyhedron->face_selections.push_back(1);
@@ -152,8 +153,6 @@ public:
 				}
 			}
 
-			polyhedron->shell_first_faces.push_back(0);
-			polyhedron->shell_face_counts.push_back(polyhedron->face_first_loops.size());
 			polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 		}
 

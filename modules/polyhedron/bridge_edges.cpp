@@ -26,6 +26,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
 #include <k3dsdk/hints.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
@@ -45,14 +46,16 @@ namespace polyhedron
 // bridge_edges
 
 class bridge_edges :
-	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::material_sink<k3d::mesh_modifier<k3d::node > > >
 {
-	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::material_sink<k3d::mesh_modifier<k3d::node > > > base;
 
 public:
 	bridge_edges(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 	}
@@ -78,6 +81,8 @@ public:
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
+		k3d::imaterial* const material = m_material.pipeline_value();
+
 		// For each polyhedron ...
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
@@ -89,6 +94,10 @@ public:
 			k3d::mesh::bools_t boundary_edges;
 			k3d::mesh::indices_t adjacent_edges;
 			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
+
+			// Create a mapping from edges to their adjacent faces ...
+			k3d::mesh::indices_t edge_faces;
+			k3d::polyhedron::create_edge_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, edge_faces);
 
 			// Get the set of selected boundary edges (excluding polygon holes) ...
 			k3d::mesh::indices_t edges;
@@ -165,11 +174,19 @@ public:
 				continue;
 			}
 
+			// Both groups of edges must be members of the same shell ...
+			if(polyhedron->face_shells[edge_faces[grouped_edges.front().front().edge]] != polyhedron->face_shells[edge_faces[grouped_edges.back().front().edge]])
+			{
+				k3d::log() << warning << "Cannot bridge across polyhedron shells." << std::endl;
+				continue;
+			}
+
 			// Create a new polygon bridge ...
+			polyhedron->face_shells.push_back(polyhedron->face_shells[edge_faces[grouped_edges.front().front().edge]]);
 			polyhedron->face_first_loops.push_back(polyhedron->face_loop_counts.size());
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(1);
-			polyhedron->face_materials.push_back(0);
+			polyhedron->face_materials.push_back(material);
 			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
 			// Create the first cross edge ...
@@ -204,9 +221,6 @@ public:
 
 			// Close the edge loop ...
 			polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
-
-			// Finalize the shell ...
-			polyhedron->shell_face_counts.back() += 1;
 		}
 	}
 

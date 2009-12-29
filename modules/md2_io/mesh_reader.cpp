@@ -81,10 +81,9 @@ public:
 
 			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 
-			polyhedron->shell_first_faces.push_back(polyhedron->face_first_loops.size());
-			polyhedron->shell_face_counts.push_back(triangle_count);
 			polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
+			polyhedron->face_shells.reserve(triangle_count);
 			polyhedron->face_first_loops.reserve(triangle_count);
 			polyhedron->face_loop_counts.reserve(triangle_count);
 			polyhedron->face_selections.reserve(triangle_count);
@@ -97,6 +96,7 @@ public:
 
 			for(k3d::int32_t i = 0; i != triangle_count; ++i)
 			{
+				polyhedron->face_shells.push_back(0);
 				polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 				polyhedron->face_loop_counts.push_back(1);
 				polyhedron->face_selections.push_back(0);

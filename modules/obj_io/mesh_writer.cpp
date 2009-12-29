@@ -91,36 +91,31 @@ private:
 			if(!polyhedron)
 				continue;
 
-			const k3d::uint_t shell_begin = 0;
-			const k3d::uint_t shell_end = shell_begin + polyhedron->shell_first_faces.size();
-			for(k3d::uint_t shell = shell_begin; shell != shell_end; ++shell)
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				const k3d::uint_t face_begin = polyhedron->shell_first_faces[shell];
-				const k3d::uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
-				for(k3d::uint_t face = face_begin; face != face_end; ++face)
+				Output << "f";
+
+				const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+				const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
 				{
-					Output << "f";
-
-					const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-					const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-					for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+					for(k3d::uint_t edge = first_edge; ; )
 					{
-						const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-						for(k3d::uint_t edge = first_edge; ; )
-						{
-							Output << " " << polyhedron->vertex_points[edge] + 1; //specs want indices starting with 1
+						Output << " " << polyhedron->vertex_points[edge] + 1; //specs want indices starting with 1
 
-							edge = polyhedron->clockwise_edges[edge];
-							if(edge == first_edge)
-								break;
-						}
-
-						/** \todo Support faces with holes */
-						break;
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
 					}
 
-					Output << "\n";
+					/** \todo Support faces with holes */
+					break;
 				}
+
+				Output << "\n";
 			}
 		}
 	}

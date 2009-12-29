@@ -84,12 +84,12 @@ public:
 
 	void add_face(k3d::mesh& Mesh, k3d::polyhedron::primitive& Polyhedron, const unsigned long v1, const unsigned long v2, const unsigned long v3, k3d::imaterial* const Material)
 	{
-		k3d::polyhedron::add_triangle(Mesh, Polyhedron, v1, v2, v3, Material);
+		k3d::polyhedron::add_triangle(Mesh, Polyhedron, 0, v1, v2, v3, Material);
 	}
 
 	void add_face(k3d::mesh& Mesh, k3d::polyhedron::primitive& Polyhedron, const unsigned long v1, const unsigned long v2, const unsigned long v3, const unsigned long v4, k3d::imaterial* const Material)
 	{
-		k3d::polyhedron::add_quadrilateral(Mesh, Polyhedron, v1, v2, v3, v4, Material);
+		k3d::polyhedron::add_quadrilateral(Mesh, Polyhedron, 0, v1, v2, v3, v4, Material);
 	}
 
 	void on_update_mesh_topology(k3d::mesh& Output)
@@ -100,8 +100,6 @@ public:
 		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
 		k3d::imaterial* const material = m_material.pipeline_value();

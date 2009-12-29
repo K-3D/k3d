@@ -43,6 +43,8 @@ namespace module
 namespace polyhedron
 {
 
+#if 0
+
 namespace detail
 {
 
@@ -343,6 +345,7 @@ void delete_elements(const k3d::mesh::counts_t& ToRemoveIndicesSum,
 }
 
 } // namespace detail
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // delete_components
@@ -364,6 +367,7 @@ public:
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
+/*
 		k3d::mesh::primitives_t::iterator output_primitive = Output.primitives.begin();
 		for(k3d::mesh::primitives_t::const_iterator input_primitive = Input.primitives.begin(); input_primitive != Input.primitives.end(); ++input_primitive)
 		{
@@ -437,13 +441,7 @@ public:
 			detail::delete_elements(faces_to_remove, input_polyhedron->face_attributes, output_polyhedron->face_attributes);
 			
 			// Update the per-polyhedra arrays
-			output_polyhedron->shell_face_counts.clear();
-			output_polyhedron->shell_first_faces.clear();
 			output_polyhedron->shell_types.clear();
-			const k3d::mesh::indices_t& input_first_faces = input_polyhedron->shell_first_faces;
-			const k3d::mesh::counts_t& input_face_counts = input_polyhedron->shell_face_counts;
-			k3d::mesh::indices_t& output_first_faces = output_polyhedron->shell_first_faces;
-			k3d::mesh::counts_t& output_face_counts = output_polyhedron->shell_face_counts;
 			const k3d::uint_t polyhedra_count = input_first_faces.size();
 			k3d::uint_t new_first_face = 0;
 			k3d::uint_t total_removed_faces = 0;
@@ -465,6 +463,7 @@ public:
 			}
 		}
 		k3d::mesh::delete_unused_points(Output);
+*/
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

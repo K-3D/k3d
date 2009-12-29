@@ -85,11 +85,8 @@ public:
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-
-		k3d::polyhedron::add_torus(Output, *polyhedron, v_segments, u_segments, material);;
+		k3d::polyhedron::add_torus(Output, *polyhedron, 0, v_segments, u_segments, material);;
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

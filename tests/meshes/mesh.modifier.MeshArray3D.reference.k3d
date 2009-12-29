@@ -24,13 +24,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -72,13 +71,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -120,13 +118,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -168,13 +165,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -216,13 +212,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -264,13 +259,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -312,13 +306,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -360,13 +353,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -408,13 +400,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -456,13 +447,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -504,13 +494,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -552,13 +541,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -600,13 +588,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -648,13 +635,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -696,13 +682,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -744,13 +729,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -792,13 +776,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -840,13 +823,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -888,13 +870,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -936,13 +917,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -984,13 +964,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1032,13 +1011,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1080,13 +1058,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1128,13 +1105,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1176,13 +1152,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1224,13 +1199,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1272,13 +1246,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1320,13 +1293,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1368,13 +1340,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1416,13 +1387,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1464,13 +1434,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1512,13 +1481,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1560,13 +1528,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1608,13 +1575,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1656,13 +1622,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1704,13 +1669,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1752,13 +1716,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1800,13 +1763,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1848,13 +1810,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1896,13 +1857,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1944,13 +1904,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -1992,13 +1951,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2040,13 +1998,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2088,13 +2045,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2136,13 +2092,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2184,13 +2139,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2232,13 +2186,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2280,13 +2233,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2328,13 +2280,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2376,13 +2327,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2424,13 +2374,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2472,13 +2421,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2520,13 +2468,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2568,13 +2515,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2616,13 +2562,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2664,13 +2609,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2712,13 +2656,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2760,13 +2703,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2808,13 +2750,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2856,13 +2797,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2904,13 +2844,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -2952,13 +2891,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3000,13 +2938,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3048,13 +2985,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3096,13 +3032,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3144,13 +3079,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3192,13 +3126,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3240,13 +3173,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3288,13 +3220,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3336,13 +3267,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3384,13 +3314,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3432,13 +3361,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3480,13 +3408,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3528,13 +3455,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3576,13 +3502,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3624,13 +3549,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3672,13 +3596,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3720,13 +3643,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3768,13 +3690,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3816,13 +3737,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3864,13 +3784,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3912,13 +3831,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -3960,13 +3878,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4008,13 +3925,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4056,13 +3972,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4104,13 +4019,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4152,13 +4066,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4200,13 +4113,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4248,13 +4160,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4296,13 +4207,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4344,13 +4254,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4392,13 +4301,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4440,13 +4348,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4488,13 +4395,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4536,13 +4442,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4584,13 +4489,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4632,13 +4536,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4680,13 +4583,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4728,13 +4630,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4776,13 +4677,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4824,13 +4724,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4872,13 +4771,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4920,13 +4818,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -4968,13 +4865,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5016,13 +4912,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5064,13 +4959,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5112,13 +5006,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5160,13 +5053,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5208,13 +5100,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5256,13 +5147,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5304,13 +5194,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5352,13 +5241,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5400,13 +5288,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5448,13 +5335,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5496,13 +5382,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5544,13 +5429,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5592,13 +5476,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5640,13 +5523,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5688,13 +5570,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5736,13 +5617,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5784,13 +5664,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5832,13 +5711,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5880,13 +5758,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5928,13 +5805,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -5976,13 +5852,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 4 8 12 16 20</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">6</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">

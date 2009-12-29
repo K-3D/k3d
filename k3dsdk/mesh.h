@@ -35,8 +35,6 @@ namespace k3d
 class imaterial;
 class mesh_selection;
 
-namespace legacy { class mesh; }
-
 ////////////////////////////////////////////////////////////////////////////////
 // mesh
 
@@ -125,9 +123,6 @@ public:
 
 	/// Compares two meshes for equality using the fuzzy semantics of almost_equal.
 	bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;
-
-	/// Conversion from a legacy mesh to a new mesh.
-	mesh& operator=(const k3d::legacy::mesh& RHS);
 
 	/// Returns a bounding-box containing every point in the given mesh.
 	static const bounding_box3 bounds(const mesh& Mesh);

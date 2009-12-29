@@ -105,11 +105,8 @@ public:
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-
-		k3d::polyhedron::add_cylinder(Output, *polyhedron, v_segments, u_segments, material);
+		k3d::polyhedron::add_cylinder(Output, *polyhedron, 0, v_segments, u_segments, material);
 
 		k3d::mesh::points_t& points = Output.points.writable();
 		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
@@ -142,6 +139,7 @@ public:
 		{
 			if(!top_segments)
 			{
+				polyhedron->face_shells.push_back(0);
 				polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 				polyhedron->face_loop_counts.push_back(1);
 				polyhedron->face_selections.push_back(0);
@@ -184,6 +182,7 @@ public:
 						k3d::polyhedron::add_quadrilateral(
 							Output,
 							*polyhedron,
+							0,
 							last_ring_point_offset + (u + 1) % u_segments,
 							last_ring_point_offset + (u + 0) % u_segments,
 							current_ring_point_offset + (u + 0) % u_segments,
@@ -200,6 +199,7 @@ public:
 					k3d::polyhedron::add_triangle(
 						Output,
 						*polyhedron,
+						0, 
 						current_ring_point_offset + (u + 1) % u_segments,
 						current_ring_point_offset + (u + 0) % u_segments,
 						middle_point_index,
@@ -213,6 +213,7 @@ public:
 		{
 			if(!bottom_segments)
 			{
+				polyhedron->face_shells.push_back(0);
 				polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 				polyhedron->face_loop_counts.push_back(1);
 				polyhedron->face_selections.push_back(0);
@@ -255,6 +256,7 @@ public:
 						k3d::polyhedron::add_quadrilateral(
 							Output,
 							*polyhedron,
+							0,
 							last_ring_point_offset + (u + 0) % u_segments,
 							last_ring_point_offset + (u + 1) % u_segments,
 							current_ring_point_offset + (u + 1) % u_segments,
@@ -271,6 +273,7 @@ public:
 					k3d::polyhedron::add_triangle(
 						Output,
 						*polyhedron,
+						0,
 						current_ring_point_offset + (u + 0) % u_segments,
 						current_ring_point_offset + (u + 1) % u_segments,
 						middle_point_index,
@@ -278,8 +281,6 @@ public:
 				}
 			}
 		}
-
-		polyhedron->shell_face_counts.back() = polyhedron->face_first_loops.size();
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

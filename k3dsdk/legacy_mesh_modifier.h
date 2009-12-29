@@ -86,6 +86,8 @@ private:
 
 	void initialize_mesh(k3d::mesh& Output)
 	{
+		assert_not_implemented();
+/*
 		if(const k3d::mesh* const input = m_input_mesh.pipeline_value())
 		{
 			m_legacy_output.reset(new legacy::mesh());
@@ -107,10 +109,13 @@ private:
 			Output = *m_legacy_output;
 			base_t::document().pipeline_profiler().finish_execution(*this, "Convert Output");
 		}
+*/
 	}
 
 	void update_mesh(k3d::mesh& Output)
 	{
+		assert_not_implemented();
+/*
 		if(const k3d::mesh* const input = m_input_mesh.pipeline_value())
 		{
 			return_if_fail(m_legacy_output.get());
@@ -128,6 +133,7 @@ private:
 			Output = *m_legacy_output;
 			base_t::document().pipeline_profiler().finish_execution(*this, "Convert Output");
 		}
+*/
 	}
 
 	virtual void on_initialize_mesh(const legacy::mesh& Input, legacy::mesh& Output) = 0;

@@ -115,6 +115,10 @@ public:
 			k3d::mesh::indices_t adjacent_edges;
 			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
 
+			// Create a mapping from edges to faces ...
+			k3d::mesh::indices_t edge_faces;
+			k3d::polyhedron::create_edge_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, edge_faces);
+
 			// Create mappings from edges to corners ...
 			k3d::mesh::indices_t edge1_corners(polyhedron->clockwise_edges.size(), corners.size());
 			k3d::mesh::indices_t edge2_corners(polyhedron->clockwise_edges.size(), corners.size());
@@ -224,6 +228,7 @@ public:
 						}
 					}
 
+					polyhedron->face_shells.push_back(polyhedron->face_shells[edge_faces[corners[clockwise_corners[0]].edge1]]);
 					polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 					polyhedron->face_loop_counts.push_back(1);
 					polyhedron->face_selections.push_back(1);
@@ -250,8 +255,6 @@ public:
 						polyhedron->vertex_points.push_back(*corners[clockwise_corners.back()].point1);
 						polyhedron->vertex_selections.push_back(0);
 					}
-
-					++polyhedron->shell_face_counts.back();
 				}
 			}
 		}

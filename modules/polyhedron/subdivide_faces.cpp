@@ -46,6 +46,7 @@ namespace module
 namespace polyhedron
 {
 
+#if 0
 namespace detail
 {
 
@@ -215,8 +216,6 @@ public:
 		}
 		m_last_polyhedron = Polyhedron;
 
-		const k3d::mesh::counts_t& face_counts = m_polyhedron.shell_face_counts;
-		const k3d::mesh::indices_t& first_faces = m_polyhedron.shell_first_faces;
 		const k3d::mesh::indices_t& face_first_loops = m_polyhedron.face_first_loops;
 		const k3d::mesh::counts_t& face_loop_counts = m_polyhedron.face_loop_counts;
 		const k3d::mesh::selection_t& face_selection = m_input_face_selection;
@@ -832,6 +831,7 @@ private:
 };
 
 } // namespace detail
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // subdivide_faces
@@ -855,6 +855,7 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+/*
 		subdivision_t subdivision_type = m_subdivision_type.pipeline_value();
 		// Shallow copy of the input (no data is copied, only shared pointers are)
 		document().pipeline_profiler().start_execution(*this, "Merge selection");
@@ -1116,10 +1117,12 @@ public:
 			output_polyhedron->vertex_selections.assign(output_vertex_points.size(), 0.0);
 		}
 		output_point_selection.resize(output_points.size(), 0.0);
+*/
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+/*
 		subdivision_t subdivision_type = m_subdivision_type.pipeline_value();
 		for(k3d::uint_t i = 0; i != Input.primitives.size(); ++i)
 		{
@@ -1165,6 +1168,7 @@ public:
 				document().pipeline_profiler().finish_execution(*this, "Edge midpoints");
 			}
 		}
+*/
 	}
 
 	static k3d::iplugin_factory& get_factory()

@@ -20,7 +20,6 @@
 #include <k3dsdk/color.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/iomanip.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/polyhedron.h>
@@ -269,101 +268,6 @@ bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) const
 		detail::almost_equal(point_attributes, Other.point_attributes, Threshold) &&
 		detail::almost_equal(primitives, Other.primitives, Threshold)
 		;
-}
-
-mesh& mesh::operator=(const legacy::mesh& RHS)
-{
-	// Convert points ...
-	std::map<legacy::point*, uint_t> point_map;
-
-	const uint_t point_size = RHS.points.size();
-	points_t& points = this->points.create(new points_t(point_size));
-	selection_t& point_selection = this->point_selection.create(new selection_t(point_size));
-
-	for(uint_t i = 0; i != point_size; ++i)
-	{
-		points[i] = RHS.points[i]->position;
-		point_selection[i] = RHS.points[i]->selection_weight;
-		point_map[RHS.points[i]] = i;
-	}
-
-	// Convert primitives ...
-	primitives = RHS.primitives;
-
-	// Convert polyhedra ...
-	if(RHS.polyhedra.size())
-	{
-		boost::scoped_ptr<polyhedron::primitive> polyhedron(k3d::polyhedron::create(*this));
-
-		for(legacy::mesh::polyhedra_t::const_iterator legacy_polyhedron = RHS.polyhedra.begin(); legacy_polyhedron != RHS.polyhedra.end(); ++legacy_polyhedron)
-		{
-			uint_t first_face = polyhedron->face_first_loops.size();
-			uint_t face_count = 0;
-			int32_t type = (*legacy_polyhedron)->type == legacy::polyhedron::POLYGONS ? polyhedron::POLYGONS : polyhedron::CATMULL_CLARK;
-
-			for(legacy::polyhedron::faces_t::const_iterator legacy_face = (*legacy_polyhedron)->faces.begin(); legacy_face != (*legacy_polyhedron)->faces.end(); ++legacy_face)
-			{
-				++face_count;
-
-				uint_t face_first_loop = polyhedron->loop_first_edges.size();
-				uint_t face_loop_count = 1 + (*legacy_face)->holes.size();
-
-				const uint_t first_edge = polyhedron->vertex_points.size();
-
-				polyhedron->loop_first_edges.push_back(first_edge);
-				for(legacy::split_edge* edge = (*legacy_face)->first_edge; edge; edge = edge->face_clockwise)
-				{
-					if(edge->vertex && edge->face_clockwise)
-					{
-						polyhedron->vertex_points.push_back(point_map[edge->vertex]);
-						polyhedron->vertex_selections.push_back(edge->selection_weight);
-						polyhedron->clockwise_edges.push_back(polyhedron->vertex_points.size());
-						polyhedron->edge_selections.push_back(edge->selection_weight);
-					}
-
-					if(edge->face_clockwise == (*legacy_face)->first_edge)
-					{
-						polyhedron->clockwise_edges.back() = first_edge;
-						break;
-					}
-				}
-
-				for(legacy::face::holes_t::iterator hole = (*legacy_face)->holes.begin(); hole != (*legacy_face)->holes.end(); ++hole)
-				{
-					const uint_t first_edge = polyhedron->vertex_points.size();
-
-					polyhedron->loop_first_edges.push_back(first_edge);
-					for(legacy::split_edge* edge = *hole; edge; edge = edge->face_clockwise)
-					{
-						if(edge->vertex && edge->face_clockwise && edge->face_clockwise->vertex)
-						{
-							polyhedron->vertex_points.push_back(point_map[edge->vertex]);
-							polyhedron->vertex_selections.push_back(edge->selection_weight);
-							polyhedron->clockwise_edges.push_back(polyhedron->vertex_points.size());
-							polyhedron->edge_selections.push_back(edge->selection_weight);
-						}
-
-						if(edge->face_clockwise == (*hole))
-						{
-							polyhedron->clockwise_edges.back() = first_edge;
-							break;
-						}
-					}
-				}
-
-				polyhedron->face_first_loops.push_back(face_first_loop);
-				polyhedron->face_loop_counts.push_back(face_loop_count);
-				polyhedron->face_selections.push_back((*legacy_face)->selection_weight);
-				polyhedron->face_materials.push_back((*legacy_face)->material);
-			}
-
-			polyhedron->shell_first_faces.push_back(first_face);
-			polyhedron->shell_face_counts.push_back(face_count);
-			polyhedron->shell_types.push_back(type);
-		}
-	}
-
-	return *this;
 }
 
 namespace detail

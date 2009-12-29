@@ -19,10 +19,9 @@ for position in positions:
 	points.append(k3d.point3(position[0], position[1], position[2]))
 	point_selection.append(0)
 
-polyhedron.shell_first_faces().append(len(polyhedron.face_first_loops()))
-polyhedron.shell_face_counts().append(2)
 polyhedron.shell_types().append(k3d.polyhedron.shell_type.POLYGONS)
 
+polyhedron.face_shells().append(0)
 polyhedron.face_first_loops().append(len(polyhedron.loop_first_edges()))
 polyhedron.face_loop_counts().append(1)
 polyhedron.face_materials().append(None)
@@ -54,6 +53,7 @@ polyhedron.vertex_points().append(5)
 polyhedron.vertex_selections().append(0)
 Cs.append(k3d.color(1, 1, 1))
 
+polyhedron.face_shells().append(0)
 polyhedron.face_first_loops().append(len(polyhedron.loop_first_edges()))
 polyhedron.face_loop_counts().append(1)
 polyhedron.face_materials().append(None)

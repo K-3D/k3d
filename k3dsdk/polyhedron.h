@@ -47,9 +47,8 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const mesh::indices_t& ShellFirstFaces,
-		const mesh::counts_t& ShellFaceCounts,
 		const typed_array<int32_t>& ShellTypes,
+		const mesh::indices_t& FaceShells,
 		const mesh::indices_t& FaceFirstLoops,
 		const mesh::counts_t& FaceLoopCounts,
 		const mesh::selection_t& FaceSelections,
@@ -68,9 +67,8 @@ public:
 	/// Implicit conversion
 	const_primitive(const primitive& Primitive);
 
-	const mesh::indices_t& shell_first_faces;
-	const mesh::counts_t& shell_face_counts;
 	const typed_array<int32_t>& shell_types;
+	const mesh::indices_t& face_shells;
 	const mesh::indices_t& face_first_loops;
 	const mesh::counts_t& face_loop_counts;
 	const mesh::selection_t& face_selections;
@@ -91,9 +89,8 @@ class primitive
 {
 public:
 	primitive(
-		mesh::indices_t& ShellFirstFaces,
-		mesh::counts_t& ShellFaceCounts,
 		typed_array<int32_t>& ShellTypes,
+		mesh::indices_t& FaceShells,
 		mesh::indices_t& FaceFirstLoops,
 		mesh::counts_t& FaceLoopCounts,
 		mesh::selection_t& FaceSelections,
@@ -109,9 +106,8 @@ public:
 		mesh::table_t& VertexAttributes
 		);
 
-	mesh::indices_t& shell_first_faces;
-	mesh::counts_t& shell_face_counts;
 	typed_array<int32_t>& shell_types;
+	mesh::indices_t& face_shells;
 	mesh::indices_t& face_first_loops;
 	mesh::counts_t& face_loop_counts;
 	mesh::selection_t& face_selections;
@@ -153,31 +149,31 @@ primitive* validate(const mesh& Mesh, mesh::primitive& GenericPrimitive);
 /// The caller is responsible for the lifetime of the returned object.
 primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& GenericPrimitive);
 
-/// Adds a triangle to an existing polyhedron.  Preconditions: the polyhedron must contain exactly one shell.
-void add_triangle(mesh& Mesh, primitive& Polyhedron, uint_t V1, uint_t V2, uint_t V3, imaterial* const Material);
-/// Adds a quadrilateral to an existing polyhedron.  Preconditions: the polyhedron must contain exactly one shell.
-void add_quadrilateral(mesh& Mesh, primitive& Polyhedron, uint_t V1, uint_t V2, uint_t V3, uint_t V4, imaterial* const Material);
-/// Adds a face to an existing polyhedron.  Preconditions: the polyhedron must contain exactly one shell.
-void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, imaterial* const Material);
-/// Adds a face with holes to an existing polyhedron.  Preconditions: the polyhedron must contain exactly one shell.
-void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material);
+/// Adds a triangle to an existing polyhedron shell.  Preconditions: the polyhedron must already contain at least one shell.
+void add_triangle(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t V1, const uint_t V2, const uint_t V3, imaterial* const Material);
+/// Adds a quadrilateral to an existing polyhedron shell.  Preconditions: the polyhedron must already contain at least one shell.
+void add_quadrilateral(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t V1, const uint_t V2, const uint_t V3, const uint_t V4, imaterial* const Material);
+/// Adds a face to an existing polyhedron shell.  Preconditions: the polyhedron must already contain at least one shell.
+void add_face(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const mesh::points_t& Vertices, imaterial* const Material);
+/// Adds a face with holes to an existing polyhedron shell.  Preconditions: the polyhedron must already contain at least one shell.
+void add_face(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material);
 /// Adds a set of points and faces that form a topological "grid" with the given number of rows and columns to an existing polyhedron.
 /// The geometry (vertex coordinates) of the grid is undefined, and must be set by the caller after add_grid() returns.
-/// Preconditions: the polyhedron must contain exactly one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
+/// Preconditions: the polyhedron must contain at last one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
 /// Rows x Columns x 4 new half edges, and the mesh contains (Rows + 1) x (Columns + 1) new points.
-void add_grid(mesh& Mesh, primitive& Polyhedron, const uint_t Rows, const uint_t Columns, imaterial* const Material);
+void add_grid(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t Rows, const uint_t Columns, imaterial* const Material);
 /// Adds a set of points and faces that form a topological "cylinder" with the given number of rows and columns to an existing polyhedron.
 /// The geometry (vertex coordinates) of the cylinder is undefined, and must be set by the caller after add_cylinder() returns.
 /// Note that many surfaces-of-revolution can be represented as topological cylinders, including disks, cones, cylinders,
 /// hyperboloids, paraboloids, and spheres.
-/// Preconditions: the polyhedron must contain exactly one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
+/// Preconditions: the polyhedron must contain at least one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
 /// Rows x Columns x 4 new half edges, and the mesh contains (Rows + 1) x Columns new points.
-void add_cylinder(mesh& Mesh, primitive& Polyhedron, const uint_t Rows, const uint_t Columns, imaterial* const Material);
+void add_cylinder(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t Rows, const uint_t Columns, imaterial* const Material);
 /// Adds a set of points and faces that form a topological "torus" with the given number of rows and columns to an existing polyhedron.
 /// The geometry (vertex coordinates) of the torus is undefined, and must be set by the caller after add_torus() returns.
-/// Preconditions: the polyhedron must contain exactly one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
+/// Preconditions: the polyhedron must contain at least one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
 /// Rows x Columns x 4 new half edges, and the mesh contains Rows x Columns new points.
-void add_torus(mesh& Mesh, primitive& Polyhedron, const uint_t Rows, const uint_t Columns, imaterial* const Material);
+void add_torus(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t Rows, const uint_t Columns, imaterial* const Material);
 
 /// Returns true iff every face in the given polyhedron is a triangle.
 bool_t is_triangles(const const_primitive& Polyhedron);
