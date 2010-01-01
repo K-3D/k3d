@@ -333,6 +333,20 @@ void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 	visit_arrays(Mesh, detail::mark_used_primitive_points(UnusedPoints));
 }
 
+void mesh::create_index_removal_map(const mesh::bools_t& KeepIndices, mesh::indices_t& IndexMap)
+{
+	IndexMap.resize(KeepIndices.size());
+
+	const uint_t begin = 0;
+	const uint_t end = KeepIndices.size();
+	for(uint_t current_index = begin, new_index = begin; current_index != end; ++current_index)
+	{
+		IndexMap[current_index] = new_index;
+		if(!KeepIndices[current_index])
+			++new_index;
+	}
+}
+
 namespace detail
 {
 
@@ -378,22 +392,14 @@ void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_
 	// Count how many points will be left when we're done ...
 	const uint_t points_remaining = std::count(Points.begin(), Points.end(), false);
 
-	// Create an array that will map from current-point-indices to new-point-indices,
-	// taking into account the points that will be removed.
-	PointMap.resize(Points.size());
-
-	const uint_t begin = 0;
-	const uint_t end = Points.size();
-	for(uint_t current_index = begin, new_index = begin; current_index != end; ++current_index)
-	{
-		PointMap[current_index] = new_index;
-		if(!Points[current_index])
-			++new_index;
-	}
+	// Create a mapping from current point indices to indices after we've removed points ...
+	create_index_removal_map(Points, PointMap);
 
 	// Move leftover points (and point selections) into their final positions ...
 	mesh::points_t& points = Mesh.points.writable();
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
+	const uint_t begin = 0;
+	const uint_t end = begin + Points.size();
 	for(uint_t i = begin; i != end; ++i)
 	{
 		if(!Points[i])

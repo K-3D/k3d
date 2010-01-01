@@ -128,6 +128,9 @@ public:
 	static const bounding_box3 bounds(const mesh& Mesh);
 	/// Returns a bounding-box containing every point in the given array.
 	static const bounding_box3 bounds(const points_t& Points);
+
+	/// Converts a bitmap marking indices to be removed from a contiguous set into a map.
+	static void create_index_removal_map(const mesh::bools_t& KeepIndices, mesh::indices_t& IndexMap);
 	/// Initialize an array to mark unused mesh points (points not used by any primitive).
 	static void lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints);
 	/// Remove points from a mesh, adjusting point indices in all remaining primitives.
