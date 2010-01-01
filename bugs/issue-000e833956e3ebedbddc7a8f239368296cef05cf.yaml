@@ -1,5 +1,5 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: REmove legacy code from CollapseEdges.
+title: Remove legacy code from CollapseEdges.
 desc: Like it says.
 type: :bugfix
 component: K-3D
@@ -15,4 +15,8 @@ log_events:
 - - 2009-12-29 03:13:39.029483 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2010-01-01 02:50:23.773581 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - edited title
   - ""
