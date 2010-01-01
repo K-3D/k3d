@@ -24,13 +24,13 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
-						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 2 2 2 2 2</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 12 18 24 30 36 40 46 52 56 60 64 68 74 86 98 110 120 133 146 158 164 170 175</array>
 					</table>
 					<table type="shell">
-						<array name="shell_types" type="k3d::int32_t">0 0 0</array>
+						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
 						<array name="vertex_points" type="k3d::uint_t">5 32 33 4 34 35 7 36 37 6 38 39 7 35 34 4 0 1 0 4 33 32 5 2 2 5 39 38 6 3 6 37 36 7 1 3 1 0 2 3 12 13 15 14 40 41 12 41 40 14 9 8 11 13 12 8 14 15 10 9 10 15 13 11 9 10 11 8 16 17 49 48 22 21 17 42 43 18 44 45 23 46 47 22 48 49 18 50 51 19 52 53 24 54 55 23 45 44 19 56 57 20 58 59 25 60 61 24 53 52 20 62 63 16 21 65 64 25 59 58 16 63 62 20 57 56 19 51 50 18 43 42 17 21 22 47 46 23 55 54 24 61 60 25 64 65 26 66 67 27 68 69 30 70 71 29 72 73 27 28 31 30 69 68 28 26 73 72 29 31 26 28 27 67 66 29 71 70 30 31
