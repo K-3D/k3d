@@ -3,7 +3,7 @@ title: Create image-based regression tests for reference painters.
 desc: ""
 type: :task
 component: K-3D
-release: 0.8.0.0
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -15,4 +15,8 @@ log_events:
 - - 2009-08-23 23:55:01.367688 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2010-01-01 03:21:32.180481 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
   - ""
