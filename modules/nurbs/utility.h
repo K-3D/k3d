@@ -140,7 +140,11 @@ void modify_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, F
 		}
 	}
 	if(OutputMesh.points)
-		k3d::mesh::delete_unused_points(OutputMesh);
+	{
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(OutputMesh, unused_points);
+		k3d::mesh::delete_points(OutputMesh, unused_points);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -238,7 +242,11 @@ void modify_selected_patches(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, 
 		}
 	}
 	if(OutputMesh.points)
-		k3d::mesh::delete_unused_points(OutputMesh);
+	{
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(OutputMesh, unused_points);
+		k3d::mesh::delete_points(OutputMesh, unused_points);
+	}
 }
 
 /// Use with std::transform to normalize a knot vector

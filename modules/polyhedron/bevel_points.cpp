@@ -259,7 +259,9 @@ public:
 			}
 		}
 
-		k3d::mesh::delete_unused_points(Output, point_map);
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points, point_map);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

@@ -90,7 +90,10 @@ public:
 
 		// Eliminate duplicate points
 		replace_duplicate_points(selected_curves_mesh);
-		k3d::mesh::delete_unused_points(selected_curves_mesh);
+
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(selected_curves_mesh, unused_points);
+		k3d::mesh::delete_points(selected_curves_mesh, unused_points);
 
 		// Merge all curves that share endpoints into a single curve
 		k3d::mesh merged_mesh;
@@ -101,7 +104,8 @@ public:
 
 		// Eliminate duplicate points again, closing any loops
 		replace_duplicate_points(merged_mesh);
-		k3d::mesh::delete_unused_points(merged_mesh);
+		k3d::mesh::lookup_unused_points(merged_mesh, unused_points);
+		k3d::mesh::delete_points(merged_mesh, unused_points);
 
 		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_merged_curves(k3d::nurbs_curve::validate(merged_mesh, *merged_mesh.primitives.front()));
 
@@ -133,7 +137,9 @@ public:
 
 				// Make sure the endpoints of the split curves are shared
 				replace_duplicate_points(quartered_mesh);
-				k3d::mesh::delete_unused_points(quartered_mesh);
+				k3d::mesh::bools_t unused_points;
+				k3d::mesh::lookup_unused_points(quartered_mesh, unused_points);
+				k3d::mesh::delete_points(quartered_mesh, unused_points);
 
 				// Apply coons
 				boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_quartered_curves(k3d::nurbs_curve::validate(quartered_mesh, *quartered_mesh.primitives.front()));
@@ -179,7 +185,8 @@ public:
 			delete_selected_curves(Output);
 		}
 		delete_empty_primitives(Output);
-		k3d::mesh::delete_unused_points(Output);
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	static k3d::iplugin_factory& get_factory()

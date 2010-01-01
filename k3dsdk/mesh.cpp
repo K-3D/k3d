@@ -336,7 +336,7 @@ void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 namespace detail
 {
 
-/// Helper function used by delete_unused_points()
+/// Helper function used by delete_points()
 void remap_points(mesh::indices_t& PrimitivePoints, const mesh::indices_t& PointMap)
 {
 	const uint_t begin = 0;
@@ -345,7 +345,7 @@ void remap_points(mesh::indices_t& PrimitivePoints, const mesh::indices_t& Point
 		PrimitivePoints[i] = PointMap[PrimitivePoints[i]];
 }
 
-/// Helper object used by delete_unused_points()
+/// Helper object used by delete_points()
 struct remap_primitive_points
 {
 	remap_primitive_points(mesh::indices_t& PointMap) :
@@ -367,31 +367,27 @@ struct remap_primitive_points
 
 } // namespace detail
 
-void mesh::delete_unused_points(mesh& Mesh)
+void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points)
 {
 	mesh::indices_t point_map;
-	delete_unused_points(Mesh, point_map);
+	delete_points(Mesh, Points, point_map);
 }
 
-void mesh::delete_unused_points(mesh& Mesh, mesh::indices_t& PointMap)
+void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_t& PointMap)
 {
-	// Create a bitmap marking which points are unused ...
-	mesh::bools_t unused_points;
-	lookup_unused_points(Mesh, unused_points);
-
 	// Count how many points will be left when we're done ...
-	const uint_t points_remaining = std::count(unused_points.begin(), unused_points.end(), false);
+	const uint_t points_remaining = std::count(Points.begin(), Points.end(), false);
 
 	// Create an array that will map from current-point-indices to new-point-indices,
 	// taking into account the points that will be removed.
-	PointMap.resize(unused_points.size());
+	PointMap.resize(Points.size());
 
 	const uint_t begin = 0;
-	const uint_t end = unused_points.size();
+	const uint_t end = Points.size();
 	for(uint_t current_index = begin, new_index = begin; current_index != end; ++current_index)
 	{
 		PointMap[current_index] = new_index;
-		if(!unused_points[current_index])
+		if(!Points[current_index])
 			++new_index;
 	}
 
@@ -400,7 +396,7 @@ void mesh::delete_unused_points(mesh& Mesh, mesh::indices_t& PointMap)
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
 	for(uint_t i = begin; i != end; ++i)
 	{
-		if(!unused_points[i])
+		if(!Points[i])
 		{
 			points[PointMap[i]] = points[i];
 			point_selection[PointMap[i]] = point_selection[i];
