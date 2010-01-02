@@ -12,7 +12,7 @@ patches = k3d.bilinear_patch.create(Output)
 
 # Create an (optional) array to hold color values at the parametric
 # corners of each patch ...
-Cs = patches.varying_attributes().create("Cs", "k3d::color")
+Cs = patches.parameter_attributes().create("Cs", "k3d::color")
 
 # We will create two identical bilinear patches
 for i in range(2):

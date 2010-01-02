@@ -31,8 +31,8 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
+					<table type="parameter"/>
 					<table type="surface"/>
-					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>

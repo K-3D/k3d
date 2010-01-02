@@ -86,7 +86,7 @@ public:
 				ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
 
 				array_copier ri_varying_attributes;
-				ri_varying_attributes.add_arrays(paraboloid->varying_attributes);
+				ri_varying_attributes.add_arrays(paraboloid->parameter_attributes);
 				for(k3d::uint_t j = 0; j != 4; ++j)
 					ri_varying_attributes.push_back((i * 4) + j);
 				ri_varying_attributes.copy_to(k3d::ri::VARYING, ri_parameters);

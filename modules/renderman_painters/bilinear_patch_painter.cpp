@@ -71,7 +71,7 @@ public:
 			const k3d::mesh::indices_t& patch_points = bilinear_patch->patch_points;
 			const k3d::mesh::table_t& constant_attributes = bilinear_patch->constant_attributes;
 			const k3d::mesh::table_t& patch_attributes = bilinear_patch->patch_attributes;
-			const k3d::mesh::table_t& varying_attributes = bilinear_patch->varying_attributes;
+			const k3d::mesh::table_t& parameter_attributes = bilinear_patch->parameter_attributes;
 
 			const k3d::mesh::points_t& points = *Mesh.points;
 			const k3d::mesh::table_t& vertex_attributes = Mesh.point_attributes;
@@ -87,7 +87,7 @@ public:
 				ri_uniform_attributes.add_arrays(patch_attributes);
 
 				array_copier ri_varying_attributes;
-				ri_varying_attributes.add_arrays(varying_attributes);
+				ri_varying_attributes.add_arrays(parameter_attributes);
 
 				array_copier ri_vertex_attributes;
 				ri_vertex_attributes.add_arrays(vertex_attributes);

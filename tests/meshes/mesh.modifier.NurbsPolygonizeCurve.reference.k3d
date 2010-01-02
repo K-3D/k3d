@@ -31,7 +31,7 @@
 				<attributes>
 					<table type="constant"/>
 					<table type="curve"/>
-					<table type="varying"/>
+					<table type="parameter"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>

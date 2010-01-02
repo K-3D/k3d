@@ -63,8 +63,8 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case SURFACE:
 			Stream << "surface";
 			break;
-		case VARYING:
-			Stream << "varying";
+		case PARAMETER:
+			Stream << "parameter";
 			break;
 		case EDGE:
 			Stream << "edge";
@@ -112,8 +112,8 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = CONSTANT;
 	else if(buffer == "surface")
 		RHS = SURFACE;
-	else if(buffer == "varying")
-		RHS = VARYING;
+	else if(buffer == "parameter")
+		RHS = PARAMETER;
 	else if(buffer == "edge")
 		RHS = EDGE;
 	else if(buffer == "point")

@@ -64,8 +64,8 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
+					<table type="parameter"/>
 					<table type="patch"/>
-					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>
@@ -128,8 +128,8 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
+					<table type="parameter"/>
 					<table type="patch"/>
-					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>
@@ -164,7 +164,7 @@
 				<attributes>
 					<table type="constant"/>
 					<table type="curve"/>
-					<table type="varying"/>
+					<table type="parameter"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>

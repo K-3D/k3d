@@ -79,7 +79,7 @@ public:
 			ri_uniform_attributes.add_arrays(linear_curve->curve_attributes);
 			
 			array_copier ri_varying_attributes;
-			ri_varying_attributes.add_arrays(linear_curve->varying_attributes);
+			ri_varying_attributes.add_arrays(linear_curve->parameter_attributes);
 
 			array_copier ri_vertex_attributes;
 			ri_vertex_attributes.add_arrays(vertex_attributes);

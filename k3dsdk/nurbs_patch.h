@@ -63,7 +63,7 @@ public:
 		mesh::selection_t& PointSelections,
 		mesh::table_t& ConstantAttributes,
 		mesh::table_t& PatchAttributes,
-		mesh::table_t& VaryingAttributes,
+		mesh::table_t& ParameterAttributes,
 		mesh::table_t& VertexAttributes
 		);
 
@@ -97,7 +97,7 @@ public:
 	mesh::selection_t& point_selections;
 	mesh::table_t& constant_attributes;
 	mesh::table_t& patch_attributes;
-	mesh::table_t& varying_attributes;
+	mesh::table_t& parameter_attributes;
 	mesh::table_t& vertex_attributes;
 };
 
@@ -136,7 +136,7 @@ public:
 		const mesh::selection_t& PointSelections,
 		const mesh::table_t& ConstantAttributes,
 		const mesh::table_t& PatchAttributes,
-		const mesh::table_t& VaryingAttributes,
+		const mesh::table_t& ParameterAttributes,
 		const mesh::table_t& VertexAttributes
 		);
 
@@ -172,7 +172,7 @@ public:
 	const mesh::selection_t& point_selections;
 	const mesh::table_t& constant_attributes;
 	const mesh::table_t& patch_attributes;
-	const mesh::table_t& varying_attributes;
+	const mesh::table_t& parameter_attributes;
 	const mesh::table_t& vertex_attributes;
 };
 

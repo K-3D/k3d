@@ -143,7 +143,7 @@ void add_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves,
 {
 	k3d::table_copier point_attribute_copier(InputMesh.point_attributes, OutputMesh.point_attributes);
 	k3d::table_copier curve_attribute_copier(InputCurves.curve_attributes, OutputCurves.curve_attributes);
-	k3d::table_copier varying_attribute_copier(InputCurves.varying_attributes, OutputCurves.varying_attributes);
+	k3d::table_copier parameter_attribute_copier(InputCurves.parameter_attributes, OutputCurves.parameter_attributes);
 	k3d::table_copier vertex_attribute_copier(InputCurves.vertex_attributes, OutputCurves.vertex_attributes);
 	const k3d::uint_t curve_point_start = InputCurves.curve_first_points[Curve];
 	const k3d::uint_t curve_point_end = curve_point_start + InputCurves.curve_point_counts[Curve];
@@ -155,7 +155,7 @@ void add_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves,
 	k3d::mesh::selection_t& output_point_selection = OutputMesh.point_selection.writable();
 	for(k3d::uint_t curve_point = curve_point_start; curve_point != curve_point_end; ++curve_point)
 	{
-		varying_attribute_copier.push_back(OutputCurves.curve_points.size());
+		parameter_attribute_copier.push_back(OutputCurves.curve_points.size());
 		vertex_attribute_copier.push_back(OutputCurves.curve_points.size());
 		OutputCurves.curve_points.push_back(output_points.size());
 		OutputCurves.curve_point_weights.push_back(InputCurves.curve_point_weights[curve_point]);
@@ -203,14 +203,14 @@ void delete_curve(k3d::nurbs_curve::primitive& Curves, const k3d::uint_t Curve)
 		uniform_copier.push_back(i);
 	for(k3d::uint_t i = Curve + 1; i != curve_count; ++i)
 		uniform_copier.push_back(i);
-	k3d::table varying_attributes = Curves.varying_attributes.clone_types();
-	k3d::table_copier varying_copier(Curves.varying_attributes, varying_attributes);
+	k3d::table parameter_attributes = Curves.parameter_attributes.clone_types();
+	k3d::table_copier parameter_copier(Curves.parameter_attributes, parameter_attributes);
 	k3d::uint_t curve_start_index = Curves.curve_first_points[Curve];
 	k3d::uint_t curve_end_index = curve_start_index + Curves.curve_point_counts[Curve];
 	for(k3d::uint_t i = 0; i != curve_start_index; ++i)
-		varying_copier.push_back(i);
+		parameter_copier.push_back(i);
 	for(k3d::uint_t i = curve_end_index; i != Curves.curve_points.size(); ++i)
-		varying_copier.push_back(i);
+		parameter_copier.push_back(i);
 
 	return_if_fail(Curve < curve_count);
 	// Erase point indices and weights

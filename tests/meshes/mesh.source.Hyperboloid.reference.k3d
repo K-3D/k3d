@@ -20,8 +20,8 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
+					<table type="parameter"/>
 					<table type="surface"/>
-					<table type="varying"/>
 				</attributes>
 			</primitive>
 		</primitives>

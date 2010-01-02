@@ -43,7 +43,7 @@ const_primitive::const_primitive(
 	const mesh::indices_t& CurvePoints,
 	const mesh::table_t& ConstantAttributes,
 	const mesh::table_t& CurveAttributes,
-	const mesh::table_t& VaryingAttributes,
+	const mesh::table_t& ParameterAttributes,
 	const mesh::table_t& VertexAttributes
 		) :
 	periodic(Periodic),
@@ -54,7 +54,7 @@ const_primitive::const_primitive(
 	curve_points(CurvePoints),
 	constant_attributes(ConstantAttributes),
 	curve_attributes(CurveAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -71,7 +71,7 @@ primitive::primitive(
 	mesh::indices_t& CurvePoints,
 	mesh::table_t& ConstantAttributes,
 	mesh::table_t& CurveAttributes,
-	mesh::table_t& VaryingAttributes,
+	mesh::table_t& ParameterAttributes,
 	mesh::table_t& VertexAttributes
 		) :
 	periodic(Periodic),
@@ -82,7 +82,7 @@ primitive::primitive(
 	curve_points(CurvePoints),
 	constant_attributes(ConstantAttributes),
 	curve_attributes(CurveAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -103,7 +103,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.structure["vertex"].create<mesh::indices_t >("curve_points"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["curve"],
-		generic_primitive.attributes["varying"],
+		generic_primitive.attributes["parameter"],
 		generic_primitive.attributes["vertex"]
 		);
 
@@ -131,7 +131,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		const mesh::table_t& curve_attributes = require_attributes(Primitive, "curve");
-		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		const mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		const mesh::bools_t& periodic = require_array<mesh::bools_t>(Primitive, constant_structure, "periodic");
@@ -147,9 +147,9 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		require_table_row_count(Primitive, vertex_structure, "vertex", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
 		/** \todo Compute varying attributes size here */
-		//require_table_row_count(Primitive, varying_attributes, "varying", );
+		//require_table_row_count(Primitive, parameter_attributes, "parameter", );
 
-		return new const_primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_attributes, curve_attributes, varying_attributes, vertex_attributes);
+		return new const_primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_attributes, curve_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -174,7 +174,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		mesh::table_t& curve_attributes = require_attributes(Primitive, "curve");
-		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		mesh::bools_t& periodic = require_array<mesh::bools_t>(Primitive, constant_structure, "periodic");
@@ -190,9 +190,9 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		require_table_row_count(Primitive, vertex_structure, "vertex", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 
 		/** \todo Compute varying attributes size here */
-		//require_table_row_count(Primitive, varying_attributes, "varying", );
+		//require_table_row_count(Primitive, parameter_attributes, "parameter", );
 
-		return new primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_attributes, curve_attributes, varying_attributes, vertex_attributes);
+		return new primitive(periodic, material, curve_first_points, curve_point_counts, curve_selections, curve_points, constant_attributes, curve_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
