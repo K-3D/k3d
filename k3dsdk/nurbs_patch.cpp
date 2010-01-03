@@ -330,8 +330,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		require_table_row_count(Primitive, v_knot_structure, "v_knot",
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
-
-		require_table_row_count(Primitive, parameter_attributes, "parameter", 4 * patch_u_point_counts.size());
+		require_table_row_count(Primitive, parameter_attributes, "parameter", patch_structure.row_count() * 4);
 
 	return new const_primitive(
 		patch_first_points,
@@ -437,8 +436,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		require_table_row_count(Primitive, v_knot_structure, "v_knot",
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
-
-		require_table_row_count(Primitive, parameter_attributes, "parameter", 4 * patch_u_point_counts.size());
+		require_table_row_count(Primitive, parameter_attributes, "parameter", patch_structure.row_count() * 4);
 
 	return new primitive(
 		patch_first_points,
