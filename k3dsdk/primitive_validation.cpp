@@ -37,7 +37,7 @@ static void require_valid_table(const mesh& Mesh, const string_t& Name, const ta
 
 		const array* const first_array = Table.begin()->second.get();
 		if(current_array->size() != first_array->size())
-			throw std::runtime_error("Table array length mismatch for table " + Name);
+			throw std::runtime_error("Array length mismatch for table [" + Name + "]");
 
 		if(current_array->get_metadata_value(metadata::key::domain()) == metadata::value::point_indices_domain())
 		{
@@ -75,7 +75,7 @@ void require_valid_primitive(const mesh& Mesh, const mesh::primitive& Primitive)
 		if(structure != Primitive.structure.end())
 		{
 			if(structure->second.row_count() != attributes->second.row_count())
-				throw std::runtime_error("Attribute / structure table length mismatch.");
+				throw std::runtime_error("[" + Primitive.type + "] attribute / structure table [" + structure->first + "] length mismatch.");
 		}
 	}
 }
