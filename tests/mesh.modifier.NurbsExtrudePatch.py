@@ -7,5 +7,5 @@ document = k3d.new_document()
 setup = testing.setup_mesh_modifier_test("NurbsDisk", "NurbsExtrudePatch")
 setup.modifier.mesh_selection = k3d.geometry.selection.create(1)
 
-testing.mesh_comparison_to_reference(document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsExtrudePatch", 1)
+testing.mesh_reference_comparison(document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsExtrudePatch", 1)
 

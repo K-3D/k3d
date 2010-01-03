@@ -16,5 +16,5 @@ modifier = document.new_node("BlobbySubtract")
 document.set_dependency(modifier.get_property("input_a"), source1.get_property("output_mesh"))
 document.set_dependency(modifier.get_property("input_b"), source2.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.BlobbySubtract", 5)
+testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.BlobbySubtract", 5)
 

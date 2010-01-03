@@ -33,4 +33,4 @@ document.set_dependency(merge_mesh.get_property("input_mesh1"), path.get_propert
 document.set_dependency(merge_mesh.get_property("input_mesh2"), translate.get_property("output_mesh"))
 document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsSweepSurface", 1)
+testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsSweepSurface", 1)

@@ -7,5 +7,5 @@ setup = testing.setup_mesh_modifier_test("PolyGrid", "MergeCoplanarFaces")
 
 setup.modifier.mesh_selection = k3d.geometry.selection.create(1) 
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.MergeCoplanarFaces", 1)
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.MergeCoplanarFaces", 1)
 

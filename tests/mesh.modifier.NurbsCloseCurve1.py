@@ -12,4 +12,4 @@ curve_selection = k3d.geometry.primitive_selection.create(selection, k3d.selecti
 k3d.geometry.primitive_selection.append(curve_selection, 0, 10000, 1)
 setup.modifier.mesh_selection = selection
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsCloseCurve1", 1)
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsCloseCurve1", 1)

@@ -13,5 +13,5 @@ k3d.geometry.primitive_selection.append(edge_selection, 7, 8, 1)
 
 setup.modifier.mesh_selection = selection
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.BridgeEdges", 1)
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.BridgeEdges", 1)
 

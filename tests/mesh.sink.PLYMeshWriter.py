@@ -24,5 +24,5 @@ reader.scale_to_size = False
 
 # Compare the newly-loaded geometry to a reference (we don't use the original PolyCube mesh source
 # because PLYMeshWriter triangulates its input).
-testing.mesh_comparison_to_reference(doc, reader.get_property("output_mesh"), "mesh.sink.PLYMeshWriter", 1)
+testing.mesh_reference_comparison(doc, reader.get_property("output_mesh"), "mesh.sink.PLYMeshWriter", 1)
 

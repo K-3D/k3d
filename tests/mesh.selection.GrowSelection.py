@@ -20,5 +20,5 @@ k3d.geometry.primitive_selection.append(face_selection, 12, 13, 1)
 
 setup.modifier.mesh_selection = selection
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.selection.GrowSelection", 1)
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.selection.GrowSelection", 1)
 

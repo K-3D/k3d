@@ -12,5 +12,5 @@ setup.modifier.mesh_selection = selection
 
 setup.modifier.knot_vector = [0, 0, 0, 0.1, 0.2, 0.25, 0.3, 0.3, 0.8, 0.8, 1, 1, 1]
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsEditKnotVector", 1)
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsEditKnotVector", 1)
 

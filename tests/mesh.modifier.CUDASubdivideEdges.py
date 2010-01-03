@@ -19,7 +19,7 @@ modifier.vertices = 2
 
 document.set_dependency(modifier.get_property("input_mesh"), reader.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.SubdivideEdges", 1)
+testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.SubdivideEdges", 1)
 
 writer = document.new_node("K3DMeshWriter")
 

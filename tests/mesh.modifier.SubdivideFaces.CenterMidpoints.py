@@ -37,5 +37,5 @@ modifier.mesh_selection = selection
 document.set_dependency(modifier.get_property("input_mesh"), reader.get_property("output_mesh"))
 
 modifier.subdivision_type = "centermidpoints"
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.SubdivideFaces.CenterMidpoints", 1)
+testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.SubdivideFaces.CenterMidpoints", 1)
 
