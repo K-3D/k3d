@@ -3,19 +3,11 @@
 import k3d
 import testing
 
-document = k3d.new_document()
-
-reader = document.new_node("K3DMeshReader")
+setup = testing.setup_mesh_modifier_test("K3DMeshReader", "SubdivideFaces")
 # load a mesh that has multiple polyhedra, triangles, quads, n-sided polygons and holes. (i.e. a mesh from hell)
-reader.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/polyhedron.hole.k3d")
-reader.center = False
-reader.scale_to_size = False
-
-#varying_colors = document.new_node("RandomColors")
-
-#document.set_dependency(varying_colors.get_property("input_mesh"), reader.get_property("output_mesh"))
-
-modifier = document.new_node("SubdivideFaces")
+setup.source.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/polyhedron.hole.k3d")
+setup.source.center = False
+setup.source.scale_to_size = False
 
 # select some faces, distributed along polyhedra
 selection = k3d.geometry.selection.create(0)
@@ -32,10 +24,9 @@ k3d.geometry.primitive_selection.append(face_selection, 17, 19, 0)
 k3d.geometry.primitive_selection.append(face_selection, 19, 20, 1)
 k3d.geometry.primitive_selection.append(face_selection, 20, 23, 0)
 
-modifier.mesh_selection = selection
+setup.modifier.mesh_selection = selection
+setup.modifier.subdivision_type = "centermidpoints"
 
-document.set_dependency(modifier.get_property("input_mesh"), reader.get_property("output_mesh"))
-
-modifier.subdivision_type = "centermidpoints"
-testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.SubdivideFaces.CenterMidpoints", 1)
+testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SubdivideFaces.CenterMidpoints", 1)
 

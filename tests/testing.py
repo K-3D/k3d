@@ -68,8 +68,8 @@ def setup_bitmap_reader_test(reader_name, source_file):
 
 	result = result_object
 	result.document = k3d.new_document()
-	result.reader = result.document.new_node(reader_name)
-	result.reader.file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + source_file)
+	result.source = result.document.new_node(reader_name)
+	result.source.file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + source_file)
 
 	return result
 
@@ -79,10 +79,10 @@ def setup_mesh_reader_test(reader_name, source_file):
 
 	result = result_object
 	result.document = k3d.new_document()
-	result.reader = result.document.new_node(reader_name)
-	result.reader.file = k3d.filesystem.generic_path(source_path() + "/meshes/" + source_file)
-	result.reader.center = False
-	result.reader.scale_to_size = False
+	result.source = result.document.new_node(reader_name)
+	result.source.file = k3d.filesystem.generic_path(source_path() + "/meshes/" + source_file)
+	result.source.center = False
+	result.source.scale_to_size = False
 
 	return result
 
@@ -114,8 +114,10 @@ def setup_mesh_modifier_test(source_name, modifier_name):
 	result = result_object
 	result.document = k3d.new_document()
 	result.source = result.document.new_node(source_name)
+	result.add_index_attributes = result.document.new_node("AddIndexAttributes")
 	result.modifier = result.document.new_node(modifier_name)
-	result.document.set_dependency(result.modifier.get_property("input_mesh"), result.source.get_property("output_mesh"))
+	result.document.set_dependency(result.modifier.get_property("input_mesh"), result.add_index_attributes.get_property("output_mesh"))
+	result.document.set_dependency(result.add_index_attributes.get_property("input_mesh"), result.source.get_property("output_mesh"))
 
 	return result
 
@@ -126,10 +128,12 @@ def setup_mesh_modifier_test2(source_name, modifier1_name, modifier2_name):
 	result = result_object
 	result.document = k3d.new_document()
 	result.source = result.document.new_node(source_name)
+	result.add_index_attributes = result.document.new_node("AddIndexAttributes")
 	result.modifier1 = result.document.new_node(modifier1_name)
 	result.modifier2 = result.document.new_node(modifier2_name)
-	result.document.set_dependency(result.modifier1.get_property("input_mesh"), result.source.get_property("output_mesh"))
 	result.document.set_dependency(result.modifier2.get_property("input_mesh"), result.modifier1.get_property("output_mesh"))
+	result.document.set_dependency(result.modifier1.get_property("input_mesh"), result.add_index_attributes.get_property("output_mesh"))
+	result.document.set_dependency(result.add_index_attributes.get_property("input_mesh"), result.source.get_property("output_mesh"))
 
 	return result
 
@@ -150,6 +154,13 @@ def mesh_area_comparison(calculated_area, expected_area):
 
 	if calculated_area != expected_area:
 		raise Exception("incorrect mesh area")
+
+def require_valid_primitives(document, input_mesh):
+	primitives = document.new_node("ValidPrimitives")
+	primitives.create_property("k3d::mesh*", "input_mesh", "Input Mesh", "First input mesh")
+	document.set_dependency(primitives.get_property("input_mesh"), input_mesh)
+	if not primitives.valid:
+		raise Exception("invalid or unknown primitive type in mesh")
 
 def mesh_reference_comparison(document, input_mesh, base_mesh_name, threshold, platform = platform_agnostic):
 	mesh_name = base_mesh_name + ".reference" + platform()

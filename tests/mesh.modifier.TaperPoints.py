@@ -11,5 +11,7 @@ selection.points = k3d.geometry.point_selection.create(selection, 1)
 setup.modifier.mesh_selection = selection
 setup.modifier.taper_factor = 1
 
+
+testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TaperPoints", 1, testing.platform_specific)
 

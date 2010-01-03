@@ -18,5 +18,7 @@ modifier.create_property("k3d::mesh*", "input_mesh2", "Input Mesh 2", "")
 document.set_dependency(modifier.get_property("input_mesh1"), source1.get_property("output_mesh"))
 document.set_dependency(modifier.get_property("input_mesh2"), source2.get_property("output_mesh"))
 
+
+testing.require_valid_primitives(document, modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.BlobbyMultiply", 5)
 

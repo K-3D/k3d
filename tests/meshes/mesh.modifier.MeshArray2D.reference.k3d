@@ -46,10 +46,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -93,10 +101,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -140,10 +156,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -187,10 +211,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -234,10 +266,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -281,10 +321,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -328,10 +376,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -375,10 +431,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -422,10 +486,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -469,10 +541,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -516,10 +596,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -563,10 +651,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -610,10 +706,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -657,10 +761,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -704,10 +816,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -751,10 +871,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -798,10 +926,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -845,10 +981,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -892,10 +1036,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -939,10 +1091,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -986,10 +1146,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -1033,10 +1201,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -1080,10 +1256,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -1127,10 +1311,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 			<primitive type="polyhedron">
@@ -1174,10 +1366,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23</array>
+					</table>
 				</attributes>
 			</primitive>
 		</primitives>

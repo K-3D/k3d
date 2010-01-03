@@ -14,5 +14,7 @@ selection.points = k3d.geometry.point_selection.create(selection, 1)
 
 setup.modifier.mesh_selection = selection
 
+
+testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SphereizePoints", 1)
 

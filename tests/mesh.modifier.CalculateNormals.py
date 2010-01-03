@@ -12,5 +12,7 @@ setup.modifier.face_array = "Nu"
 setup.modifier.varying_array = "Nf"
 setup.modifier.vertex_array = "Nv"
 
+
+testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.CalculateNormals", 1)
 

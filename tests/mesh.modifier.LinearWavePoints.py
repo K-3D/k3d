@@ -15,5 +15,7 @@ setup.modifier.mesh_selection = selection
 setup.modifier.axis = "x"
 setup.modifier.along = "z"
 
+
+testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.LinearWavePoints", 1, testing.platform_specific)
 

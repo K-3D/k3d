@@ -3,25 +3,14 @@
 import k3d
 import testing
 
-document = k3d.new_document()
+setup = testing.setup_mesh_modifier_test2("PolyTorus", "TriangulateFaces", "PGPRemesh")
+setup.modifier1.mesh_selection = k3d.select_all()
+setup.modifier2.use_smooth = False
+setup.modifier2.steps = 0
+setup.modifier2.omega = 5
+setup.modifier2.div = 17
+setup.modifier2.triangulate = True
 
-source = document.new_node("PolyTorus")
-
-triangles = document.new_node("TriangulateFaces")
-triangles.mesh_selection = k3d.select_all()
-document.set_dependency(triangles.get_property("input_mesh"), source.get_property("output_mesh"))
-
-modifier = document.new_node("PGPRemesh")
-modifier.use_smooth = False
-modifier.steps = 0
-modifier.omega = 5
-modifier.div = 17
-modifier.triangulate = True
-document.set_dependency(modifier.get_property("input_mesh"), triangles.get_property("output_mesh"))
-
-#print "source output: " + repr(source.output_mesh)
-#print "triangles output: " + repr(triangles.output_mesh)
-#print "modifier output: " + repr(modifier.output_mesh)
-
-testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.PGPRemesh.high", 1)
+testing.require_valid_primitives(setup.document, setup.modifier2.get_property("output_mesh"))
+testing.mesh_reference_comparison(setup.document, setup.modifier2.get_property("output_mesh"), "mesh.modifier.PGPRemesh.high", 1)
 

@@ -17,5 +17,6 @@ point_selection.weight().append(1)
 setup.modifier.mesh_selection = mesh_selection
 setup.modifier.x = 2
 
+testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.selection.points", 1)
 

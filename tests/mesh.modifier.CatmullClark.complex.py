@@ -36,4 +36,6 @@ modifier.level = 2
 
 document.set_dependency(modifier.get_property("input_mesh"), varying_colors.get_property("output_mesh"))
 
+
+testing.require_valid_primitives(setup.document, modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.CatmullClark.complex", 2)

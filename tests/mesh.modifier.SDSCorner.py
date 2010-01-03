@@ -14,5 +14,7 @@ point_selection.weight().append(1)
 setup.modifier.mesh_selection = selection
 setup.modifier.sharpness = 3.5
 
+
+testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SDSCorner", 1)
 

@@ -36,5 +36,7 @@ document.set_dependency(modifier.get_property("input_mesh7"), source7.get_proper
 document.set_dependency(modifier.get_property("input_mesh8"), source8.get_property("output_mesh"))
 document.set_dependency(modifier.get_property("input_mesh9"), source9.get_property("output_mesh"))
 
+
+testing.require_valid_primitives(document, modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.MergeMesh", 1, testing.platform_specific)
 

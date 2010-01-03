@@ -3,10 +3,9 @@
 import k3d
 import testing
 
-document = k3d.new_document()
+setup = testing.setup_mesh_modifier_test("FrozenMesh", "TriangulateFaces")
 
-source = document.new_node("FrozenMesh")
-mesh = source.create_mesh()
+mesh = setup.source.create_mesh()
 
 positions = [(-5, 5, 0), (5, 5, 0), (-5, -5, 0), (5, -5, 0)]
 
@@ -33,10 +32,9 @@ polyhedron.vertex_selections().assign([0, 0, 0, 0])
 Cs = polyhedron.edge_attributes().create("Cs", "k3d::color")
 Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color(1, 1, 1)])
 
-modifier = document.new_node("TriangulateFaces")
 mesh_selection = k3d.geometry.selection.create(1)
-modifier.mesh_selection = mesh_selection
-document.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
+setup.modifier.mesh_selection = mesh_selection
 
-testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.self_intersection", 0)
+testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.self_intersection", 0)
 

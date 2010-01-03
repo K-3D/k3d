@@ -10,9 +10,9 @@ for factory in factories:
 
 		print "\n\nTesting " + factory.name() + " with a file containing all zeroes ..."
 		setup = testing.setup_mesh_reader_test(factory.name(), "zero_bytes")
-		mesh = setup.reader.output_mesh
+		mesh = setup.source.output_mesh
 
 		print "\n\nTesting " + factory.name() + " with a file containing random data ..."
 		setup = testing.setup_mesh_reader_test(factory.name(), "random_bytes")
-		mesh = setup.reader.output_mesh
+		mesh = setup.source.output_mesh
 

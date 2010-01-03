@@ -18,5 +18,7 @@ face_selection.weight().append(1)
 
 setup.modifier.mesh_selection = selection
 
+
+testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SDSHole", 1)
 

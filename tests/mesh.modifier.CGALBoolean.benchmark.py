@@ -17,6 +17,8 @@ document.set_dependency(cgal_boolean.get_property("input_1"), sphere.get_propert
 document.set_dependency(cgal_boolean.get_property("input_2"), torus.get_property("output_mesh"))
 
 profiler = document.new_node("PipelineProfiler")
+
+testing.require_valid_primitives(setup.document, cgal_boolean.get_property("output_mesh"))
 testing.mesh_reference_comparison(document, cgal_boolean.get_property("output_mesh"), "mesh.modifier.CGALBoolean.benchmark", 1)
 benchmarking.print_profiler_records(profiler.records)
 print """<DartMeasurement name="Total Boolean Time" type="numeric/float">""" + str(benchmarking.total_profiler_time(profiler.records)) + """</DartMeasurement>"""
