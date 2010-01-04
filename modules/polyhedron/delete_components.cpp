@@ -238,7 +238,7 @@ public:
 			polyhedron->face_materials.resize(remaining_faces);
 
 			// Delete face attributes ...
-			k3d::table_copier face_attribute_copier(polyhedron->face_attributes, polyhedron->face_attributes);
+			k3d::table_copier face_attribute_copier(polyhedron->face_attributes);
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
 				if(remove_face[face])
@@ -275,7 +275,7 @@ public:
 			polyhedron->vertex_selections.resize(remaining_edges);
 
 			// Delete edge attributes ...
-			k3d::table_copier edge_attribute_copier(polyhedron->edge_attributes, polyhedron->edge_attributes);
+			k3d::table_copier edge_attribute_copier(polyhedron->edge_attributes);
 			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 			{
 				if(remove_edge[edge])
@@ -286,7 +286,7 @@ public:
 			polyhedron->edge_attributes.set_row_count(remaining_edges);
 
 			// Delete vertex attributes ...
-			k3d::table_copier vertex_attribute_copier(polyhedron->vertex_attributes, polyhedron->vertex_attributes);
+			k3d::table_copier vertex_attribute_copier(polyhedron->vertex_attributes);
 			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 			{
 				if(remove_edge[edge])
@@ -312,17 +312,6 @@ public:
 		k3d::mesh::indices_t point_map;
 		k3d::mesh::delete_points(Output, remove_point, point_map);
 		const k3d::uint_t remaining_points = std::count(remove_point.begin(), remove_point.end(), false);
-
-		// Delete point attributes ...
-		k3d::table_copier point_attribute_copier(Output.point_attributes, Output.point_attributes);
-		for(k3d::uint_t point = point_begin; point != point_end; ++point)
-		{
-			if(remove_point[point])
-				continue;
-
-			point_attribute_copier.copy(point, point_map[point]);
-		}
-		Output.point_attributes.set_row_count(remaining_points);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

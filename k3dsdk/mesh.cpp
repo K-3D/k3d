@@ -23,6 +23,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/type_registry.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -398,15 +399,25 @@ void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_
 	// Move leftover points (and point selections) into their final positions ...
 	mesh::points_t& points = Mesh.points.writable();
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
-	const uint_t begin = 0;
-	const uint_t end = begin + Points.size();
-	for(uint_t i = begin; i != end; ++i)
+	const uint_t point_begin = 0;
+	const uint_t point_end = point_begin + Points.size();
+	for(uint_t point = point_begin; point != point_end; ++point)
 	{
-		if(!Points[i])
+		if(!Points[point])
 		{
-			points[PointMap[i]] = points[i];
-			point_selection[PointMap[i]] = point_selection[i];
+			points[PointMap[point]] = points[point];
+			point_selection[PointMap[point]] = point_selection[point];
 		}
+	}
+
+	// Move leftover attributes into their final positions ...
+	table_copier point_attributes(Mesh.point_attributes);
+	for(uint_t point = point_begin; point != point_end; ++point)
+	{
+		if(Points[point])
+			continue;
+
+		point_attributes.copy(point, PointMap[point]);
 	}
 
 	// Update generic mesh primitives so they use the correct indices ...
@@ -415,6 +426,7 @@ void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_
 	// Free leftover memory ...
 	points.resize(points_remaining);
 	point_selection.resize(points_remaining);
+	Mesh.point_attributes.set_row_count(points_remaining);
 }
 
 namespace detail
