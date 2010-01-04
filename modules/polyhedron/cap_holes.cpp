@@ -146,9 +146,9 @@ public:
 			}
 
 			// Get ready to copy attributes ...
-			k3d::table_copier face_copier(polyhedron->face_attributes, polyhedron->face_attributes);
-			k3d::table_copier edge_copier(polyhedron->edge_attributes, polyhedron->edge_attributes);
-			k3d::table_copier vertex_copier(polyhedron->vertex_attributes, polyhedron->vertex_attributes);
+			k3d::table_copier face_copier(polyhedron->face_attributes);
+			k3d::table_copier edge_copier(polyhedron->edge_attributes);
+			k3d::table_copier vertex_copier(polyhedron->vertex_attributes);
 
 			// For each remaining cap edge ...
 			for(k3d::uint_t loop_first_edge = edge_begin; loop_first_edge != edge_end; ++loop_first_edge)
