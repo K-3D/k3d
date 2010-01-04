@@ -40,6 +40,7 @@
 #include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/paraboloid.h>
 #include <k3dsdk/particle.h>
+#include <k3dsdk/primitive_validation.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/sphere.h>
@@ -57,23 +58,23 @@ namespace test
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// valid_primitives
+// valid_meshes
 
-class valid_primitives :
+class valid_meshes :
 	public k3d::node
 {
 	typedef k3d::node base;
 
 public:
-	valid_primitives(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	valid_meshes(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_valid(init_owner(*this) + init_name("valid") + init_label(_("Valid")) + init_description(_("True iff every primitive in every input mesh can be validated.")) + init_value(true)),
+		m_valid(init_owner(*this) + init_name("valid") + init_label(_("Valid")) + init_description(_("True iff every every input mesh can be validated.")) + init_value(true)),
 		m_user_property_changed_signal(*this)
 	{
 		m_user_property_changed_signal.connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_valid.make_slot()));
 
-		m_valid.set_update_slot(sigc::mem_fun(*this, &valid_primitives::execute));
+		m_valid.set_update_slot(sigc::mem_fun(*this, &valid_meshes::execute));
 	}
 
 	void execute(const std::vector<k3d::ihint*>& Hints, k3d::bool_t& Output)
@@ -88,6 +89,17 @@ public:
 			{
 				if(const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property)))
 				{
+					try
+					{
+						k3d::require_valid_points(*mesh);
+					}
+					catch(std::exception& e)
+					{
+						k3d::log() << error << e.what() << std::endl;
+						Output = false;
+						return;
+					}
+
 					for(k3d::mesh::primitives_t::const_iterator primitive = mesh->primitives.begin(); primitive != mesh->primitives.end(); ++primitive)
 					{
 						boost::scoped_ptr<k3d::bezier_triangle_patch::const_primitive> bezier_triangle_patch(k3d::bezier_triangle_patch::validate(*mesh, **primitive));
@@ -172,11 +184,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<valid_primitives >
+		static k3d::document_plugin_factory<valid_meshes >
 			factory(
 				k3d::uuid(0x55617239, 0x914e0fcf, 0x0d0f9784, 0x899546a4),
-				"ValidPrimitives",
-				_("Tests to see that every primitive in a collection of meshes can be validated."),
+				"ValidMeshes",
+				_("Tests to see that every every primitive and mesh in a collection of meshes can be validated."),
 				"Test",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
@@ -189,11 +201,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// valid_primitives_factory
+// valid_meshes_factory
 
-k3d::iplugin_factory& valid_primitives_factory()
+k3d::iplugin_factory& valid_meshes_factory()
 {
-	return valid_primitives::get_factory();
+	return valid_meshes::get_factory();
 }
 
 } // namespace test

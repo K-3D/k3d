@@ -11,6 +11,6 @@ setup.modifier2.omega = 5
 setup.modifier2.div = 17
 setup.modifier2.triangulate = True
 
-testing.require_valid_primitives(setup.document, setup.modifier2.get_property("output_mesh"))
+testing.require_valid_mesh(setup.document, setup.modifier2.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier2.get_property("output_mesh"), "mesh.modifier.PGPRemesh.high", 1)
 

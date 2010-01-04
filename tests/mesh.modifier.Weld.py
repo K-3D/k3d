@@ -18,6 +18,6 @@ weld = document.new_node("Weld")
 weld.distance = 0.5
 document.set_dependency(weld.get_property("input_mesh"), merge.get_property("output_mesh"))
 
-testing.require_valid_primitives(document, weld.get_property("output_mesh"))
+testing.require_valid_mesh(document, weld.get_property("output_mesh"))
 testing.mesh_reference_comparison(document, weld.get_property("output_mesh"), "mesh.modifier.Weld", 1)
 

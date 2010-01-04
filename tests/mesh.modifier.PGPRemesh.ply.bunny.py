@@ -18,6 +18,6 @@ document.set_dependency(modifier.get_property("input_mesh"), setup.source.get_pr
 #print "triangles output: " + repr(triangles.output_mesh)
 #print "modifier output: " + repr(modifier.output_mesh)
 
-testing.require_valid_primitives(document, modifier.get_property("output_mesh"))
+testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.PGPRemesh.bunny", 1)
 

@@ -21,5 +21,5 @@ document.set_dependency(merge_mesh.get_property("input_mesh1"), patch.get_proper
 document.set_dependency(merge_mesh.get_property("input_mesh2"), curve.get_property("output_mesh"))
 document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
 
-testing.require_valid_primitives(document, modifier.get_property("output_mesh"))
+testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsAddTrimCurve", 1)

@@ -155,8 +155,8 @@ def mesh_area_comparison(calculated_area, expected_area):
 	if calculated_area != expected_area:
 		raise Exception("incorrect mesh area")
 
-def require_valid_primitives(document, input_mesh):
-	primitives = document.new_node("ValidPrimitives")
+def require_valid_mesh(document, input_mesh):
+	primitives = document.new_node("ValidMeshes")
 	primitives.create_property("k3d::mesh*", "input_mesh", "Input Mesh", "First input mesh")
 	document.set_dependency(primitives.get_property("input_mesh"), input_mesh)
 	if not primitives.valid:

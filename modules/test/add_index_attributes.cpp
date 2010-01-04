@@ -58,6 +58,11 @@ public:
 	{
 		Output = Input;
 
+		const k3d::uint_t attribute_count = Output.points ? Output.points->size() : 0;
+		k3d::mesh::indices_t& array = Output.point_attributes.create("index", new k3d::mesh::indices_t(attribute_count));
+		for(k3d::uint_t i = 0; i != attribute_count; ++i)
+			array[i] = i;
+
 		for(k3d::mesh::primitives_t::iterator p = Output.primitives.begin(); p != Output.primitives.end(); ++p)
 		{
 			k3d::mesh::primitive& primitive = p->writable();

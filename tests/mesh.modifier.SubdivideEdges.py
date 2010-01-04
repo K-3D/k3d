@@ -18,5 +18,5 @@ k3d.geometry.primitive_selection.append(edge_selection, 74, 82, 1)
 setup.modifier.mesh_selection = selection
 setup.modifier.vertices = 2
 
-testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SubdivideEdges", 1)

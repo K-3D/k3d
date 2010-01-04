@@ -28,6 +28,6 @@ k3d.geometry.primitive_selection.append(face_selection, 20, 23, 0)
 setup.modifier.mesh_selection = selection
 setup.modifier.subdivision_type = "midpoints"
 
-testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SubdivideFaces.Midpoints", 1)
 

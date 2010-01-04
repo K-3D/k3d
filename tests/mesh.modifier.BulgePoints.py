@@ -16,6 +16,6 @@ setup.modifier.displace_y = False
 setup.modifier.displace_z = False
 
 
-testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.BulgePoints", 1, testing.platform_specific)
 

@@ -17,6 +17,6 @@ document.set_dependency(modifier.get_property("input_a"), source1.get_property("
 document.set_dependency(modifier.get_property("input_b"), source2.get_property("output_mesh"))
 
 
-testing.require_valid_primitives(document, modifier.get_property("output_mesh"))
+testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.BlobbySubtract", 5)
 

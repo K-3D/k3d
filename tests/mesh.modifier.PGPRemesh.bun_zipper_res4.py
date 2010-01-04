@@ -12,6 +12,6 @@ setup.source.file = testing.source_path() + "/meshes/bun_zipper_res4.ply"
 #setup.modifier.omega = 10
 #setup.modifier.div = 2
 
-testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.PGPRemesh.bun_zipper_res4", 1)
 

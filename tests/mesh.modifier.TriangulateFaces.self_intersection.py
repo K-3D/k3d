@@ -35,6 +35,6 @@ Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color
 mesh_selection = k3d.geometry.selection.create(1)
 setup.modifier.mesh_selection = mesh_selection
 
-testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.self_intersection", 0)
 

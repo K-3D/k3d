@@ -24,6 +24,6 @@ setup.modifier.function_1 = "u^2"
 setup.modifier.function_2 = "sin(v)"
 setup.modifier.function_3 = "u*v"
 
-testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.source.LeastSquaresPlot", 1, testing.platform_specific)
 

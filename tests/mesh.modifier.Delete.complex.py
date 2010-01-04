@@ -29,6 +29,6 @@ k3d.geometry.primitive_selection.append(edge_selection, 25, 26, 1)
 setup.modifier.mesh_selection = selection
 
 
-testing.require_valid_primitives(setup.document, setup.modifier.get_property("output_mesh"))
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
 testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.Delete.complex", 1)
 

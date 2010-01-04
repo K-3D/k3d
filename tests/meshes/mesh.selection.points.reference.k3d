@@ -3,7 +3,9 @@
 	<mesh_arrays>
 		<points>10 5 0 -10 5 0 5 -5 0 -5 -5 0</points>
 		<point_selection>1 1 0 0</point_selection>
-		<point_attributes/>
+		<point_attributes>
+			<array name="index" type="k3d::uint_t">0 1 2 3</array>
+		</point_attributes>
 		<primitives>
 			<primitive type="polyhedron">
 				<structure>
