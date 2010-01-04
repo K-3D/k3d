@@ -25,13 +25,17 @@
 */
 
 #include <k3dsdk/ilist_property.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/types.h>
 
 namespace k3d
 {
 
-/// Returns a list of common component names, for use with list properties
+/// Returns a list of common component names, for use with list properties.
 const ilist_property<string_t>::values_t& component_values();
+
+/// Returns the correct size for the given component, or zero if no size can be determined.
+const uint_t component_size(const mesh::primitive& Primitive, const string_t Component);
 
 } // namespace k3d
 

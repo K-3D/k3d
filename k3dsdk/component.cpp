@@ -25,7 +25,8 @@
 #include <k3dsdk/log.h>
 #include <k3dsdk/result.h>
 
-#include <iostream>
+#include <boost/assign/list_of.hpp>
+#include <set>
 
 namespace k3d
 {
@@ -46,6 +47,42 @@ const ilist_property<string_t>::values_t& component_values()
 	}
 	
 	return values;
+}
+
+const uint_t component_size(const mesh::primitive& Primitive, const string_t Component)
+{
+	static const std::set<string_t> two_sided_curves = boost::assign::list_of("linear_curve")("cubic_curve")("nurbs_curve");
+	static const std::set<string_t> three_sided_patches = boost::assign::list_of("bezier_triangle_patch");
+	static const std::set<string_t> four_sided_patches = boost::assign::list_of("bilinear_patch")("bicubic_patch")("nurbs_patch");
+	static const std::set<string_t> four_sided_surfaces = boost::assign::list_of("cone")("cylinder")("disk")("hyperboloid")("paraboloid")("sphere")("torus");
+
+	if(Primitive.structure.count(Component))
+	{
+		return Primitive.structure.find(Component)->second.row_count();
+	}
+	else if(Component == "constant")
+	{
+		return 1;
+	}
+	else if(Component == "parameter" && two_sided_curves.count(Primitive.type))
+	{
+		return Primitive.structure.find("curve")->second.row_count() * 2;
+	}
+	else if(Component == "parameter" && three_sided_patches.count(Primitive.type))
+	{
+		return Primitive.structure.find("patch")->second.row_count() * 3;
+	}
+	else if(Component == "parameter" && four_sided_patches.count(Primitive.type))
+	{
+		return Primitive.structure.find("patch")->second.row_count() * 4;
+	}
+	else if(Component == "parameter" && four_sided_surfaces.count(Primitive.type))
+	{
+		return Primitive.structure.find("surface")->second.row_count() * 4;
+	}
+
+	k3d::log() << error << "Cannot determine count for unknown attribute [" << Component << "] in [" << Primitive.type << "] primitive" << std::endl;
+	return 0;
 }
 
 } // namespace k3d

@@ -22,6 +22,7 @@
 */
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/component.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
 #include <k3dsdk/mesh_modifier.h>
@@ -69,52 +70,12 @@ public:
 			for(k3d::mesh::named_tables_t::iterator attribute = primitive.attributes.begin(); attribute != primitive.attributes.end(); ++attribute)
 			{
 				const k3d::string_t& attribute_name = attribute->first;
-				k3d::table& attribute_table = attribute->second;
 
-				k3d::uint_t attribute_count = 0;
-
-				k3d::table* const structure_table = primitive.structure.count(attribute_name) ? &primitive.structure[attribute_name] : static_cast<k3d::table*>(0);
-				if(structure_table)
-				{
-					attribute_count = structure_table->row_count();
-				}
-				else if(attribute_name == "constant")
-				{
-					attribute_count = 1;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "linear_curve")
-				{
-					attribute_count = primitive.structure["curve"].row_count() * 2;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "cubic_curve")
-				{
-					attribute_count = primitive.structure["curve"].row_count() * 2;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "nurbs_curve")
-				{
-					attribute_count = primitive.structure["curve"].row_count() * 2;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "bezier_triangle_patch")
-				{
-					attribute_count = primitive.structure["patch"].row_count() * 3;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "bilinear_patch")
-				{
-					attribute_count = primitive.structure["patch"].row_count() * 4;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "bicubic_patch")
-				{
-					attribute_count = primitive.structure["patch"].row_count() * 4;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "nurbs_patch")
-				{
-					attribute_count = primitive.structure["patch"].row_count() * 4;
-				}
-				else
-				{
-					k3d::log() << error << "Cannot determine count for unknown attribute [" << attribute_name << "] in [" << primitive.type << "] primitive" << std::endl;
+				const k3d::uint_t attribute_count = k3d::component_size(primitive, attribute_name);
+				if(0 == attribute_count)
 					continue;
-				}
+
+				k3d::table& attribute_table = attribute->second;
 
 				k3d::mesh::indices_t& array = attribute_table.create("index", new k3d::mesh::indices_t(attribute_count));
 				for(k3d::uint_t i = 0; i != attribute_count; ++i)

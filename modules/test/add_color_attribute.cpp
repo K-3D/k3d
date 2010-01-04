@@ -63,7 +63,7 @@ public:
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		const std::vector<k3d::color> colors = boost::assign::list_of(k3d::color(1, 1, 1))(k3d::color(1, 0, 0))(k3d::color(1, 1, 0))(k3d::color(0, 1, 0))(k3d::color(0, 1, 1))(k3d::color(0, 0, 1))(k3d::color(1, 0, 1)); 
+		const std::vector<k3d::color> colors = boost::assign::list_of(k3d::color(1, 0, 0))(k3d::color(0, 1, 0))(k3d::color(0, 0, 1))(k3d::color(1, 1, 1))(k3d::color(1, 1, 0))(k3d::color(0, 1, 1))(k3d::color(1, 0, 1)); 
 
 		const k3d::string_t component = m_component.pipeline_value();
 		const k3d::string_t name = m_name.pipeline_value();
@@ -79,49 +79,9 @@ public:
 				if(attribute_name != component)
 					continue;
 
-				k3d::uint_t attribute_count = 0;
-				k3d::table* const structure_table = primitive.structure.count(attribute_name) ? &primitive.structure[attribute_name] : static_cast<k3d::table*>(0);
-				if(structure_table)
-				{
-					attribute_count = structure_table->row_count();
-				}
-				else if(attribute_name == "constant")
-				{
-					attribute_count = 1;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "linear_curve")
-				{
-					attribute_count = primitive.structure["curve"].row_count() * 2;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "cubic_curve")
-				{
-					attribute_count = primitive.structure["curve"].row_count() * 2;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "nurbs_curve")
-				{
-					attribute_count = primitive.structure["curve"].row_count() * 2;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "bezier_triangle_patch")
-				{
-					attribute_count = primitive.structure["patch"].row_count() * 3;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "bilinear_patch")
-				{
-					attribute_count = primitive.structure["patch"].row_count() * 4;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "bicubic_patch")
-				{
-					attribute_count = primitive.structure["patch"].row_count() * 4;
-				}
-				else if(attribute_name == "parameter" && primitive.type == "nurbs_patch")
-				{
-					attribute_count = primitive.structure["patch"].row_count() * 4;
-				}
-				else
-				{
-					k3d::log() << error << "Cannot determine count for unknown attribute [" << attribute_name << "] in [" << primitive.type << "] primitive" << std::endl;
+				const k3d::uint_t attribute_count = k3d::component_size(primitive, attribute_name);
+				if(0 == attribute_count)
 					continue;
-				}
 
 				k3d::table& attribute_table = attribute->second;
 
