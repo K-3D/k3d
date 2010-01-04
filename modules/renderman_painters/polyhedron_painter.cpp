@@ -70,7 +70,7 @@ public:
 				continue;
 
 			const k3d::mesh::points_t& points = *Mesh.points;
-			const k3d::mesh::table_t& vertex_attributes = Mesh.point_attributes;
+			const k3d::mesh::table_t& point_attributes = Mesh.point_attributes;
 
 			const k3d::uint_t shell_begin = 0;
 			const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();
@@ -109,11 +109,13 @@ public:
 					ri_uniform_attributes.add_arrays(polyhedron->face_attributes);
 
 					array_copier ri_facevarying_attributes;
-					ri_facevarying_attributes.add_arrays(polyhedron->edge_attributes);
+					ri_facevarying_attributes.add_arrays(polyhedron->vertex_attributes);
 
 					array_copier ri_vertex_attributes;
-					ri_vertex_attributes.add_arrays(vertex_attributes);
 					ri_vertex_attributes.add_array(k3d::ri::RI_P(), points);
+					ri_vertex_attributes.add_arrays(point_attributes);
+
+					ri_constant_attributes.push_back(0);
 
 					for(k3d::uint_t face = faces_begin; face != faces_end; ++face)
 					{
@@ -149,8 +151,6 @@ public:
 							vertex_counts.push_back(vertex_count);
 						}
 					}
-
-					ri_constant_attributes.push_back(shell);
 
 					ri_vertex_attributes.insert(0, points.size());
 
