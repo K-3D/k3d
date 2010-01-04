@@ -108,7 +108,11 @@ void require_valid_primitive(const mesh& Mesh, const mesh::primitive& Primitive)
 		if(structure != Primitive.structure.end())
 		{
 			if(structure->second.row_count() != attributes->second.row_count())
-				throw std::runtime_error("[" + Primitive.type + "] attribute / structure table [" + structure->first + "] length mismatch.");
+			{
+				std::ostringstream buffer;
+				buffer << "[" << Primitive.type << "] attribute table [" << structure->first << "] incorrect length [" << attributes->second.row_count() << "], expected [" << structure->second.row_count() << "]";
+				throw std::runtime_error(buffer.str());
+			}
 		}
 	}
 }
