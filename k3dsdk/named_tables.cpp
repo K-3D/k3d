@@ -70,7 +70,7 @@ bool_t named_tables::almost_equal(const named_tables& Other, const uint64_t Thre
 std::ostream& operator<<(std::ostream& Stream, const named_tables& RHS)
 {
 	for(named_tables::const_iterator attributes = RHS.begin(); attributes != RHS.end(); ++attributes)
-		Stream << standard_indent << "attributes \"" << attributes->first << "\"" << attributes->second << "\n";
+		Stream << standard_indent << "table \"" << attributes->first << "\"\n" << push_indent << attributes->second << pop_indent << "\n";
 
 	return Stream;
 }
