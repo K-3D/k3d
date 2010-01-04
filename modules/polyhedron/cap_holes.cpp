@@ -31,6 +31,7 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -144,6 +145,11 @@ public:
 				}
 			}
 
+			// Get ready to copy attributes ...
+			k3d::table_copier face_copier(polyhedron->face_attributes, polyhedron->face_attributes);
+			k3d::table_copier edge_copier(polyhedron->edge_attributes, polyhedron->edge_attributes);
+			k3d::table_copier vertex_copier(polyhedron->vertex_attributes, polyhedron->vertex_attributes);
+
 			// For each remaining cap edge ...
 			for(k3d::uint_t loop_first_edge = edge_begin; loop_first_edge != edge_end; ++loop_first_edge)
 			{
@@ -176,13 +182,18 @@ public:
 				polyhedron->face_selections.push_back(1);
 				polyhedron->face_materials.push_back(material);
 				polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
-			
+
+				face_copier.push_back(edge_faces[loop_first_edge]);
+
 				for(k3d::uint_t edge = 0; edge != loop.size(); ++edge)
 				{
 					polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 					polyhedron->edge_selections.push_back(1);
 					polyhedron->vertex_points.push_back(polyhedron->vertex_points[loop[edge]]);
 					polyhedron->vertex_selections.push_back(0);
+
+					edge_copier.push_back(loop[edge]);
+					vertex_copier.push_back(loop[edge]);
 				}
 				polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
 			}
