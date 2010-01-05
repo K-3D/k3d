@@ -31,10 +31,9 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/scoped_ptr.hpp>
-
-#include <vector>
 
 namespace module
 {
@@ -95,7 +94,7 @@ public:
 			k3d::mesh::indices_t adjacent_edges;
 			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
 
-			// Create a mapping from edges to their adjacent faces ...
+			// Create a lookup from edges to their adjacent faces ...
 			k3d::mesh::indices_t edge_faces;
 			k3d::polyhedron::create_edge_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, edge_faces);
 
@@ -181,6 +180,14 @@ public:
 				continue;
 			}
 
+			// Get ready to copy attributes ...
+			k3d::table_copier face_attributes(polyhedron->face_attributes);
+			k3d::table_copier edge_attributes(polyhedron->edge_attributes);
+			k3d::table_copier vertex_attributes(polyhedron->vertex_attributes);
+
+			k3d::mesh::indices_t cross_edges(2);
+			k3d::mesh::weights_t cross_edge_weights(2, 0.5);
+
 			// Create a new polygon bridge ...
 			polyhedron->face_shells.push_back(polyhedron->face_shells[edge_faces[grouped_edges.front().front().edge]]);
 			polyhedron->face_first_loops.push_back(polyhedron->face_loop_counts.size());
@@ -189,11 +196,24 @@ public:
 			polyhedron->face_materials.push_back(material);
 			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
+			k3d::mesh::indices_t face_indices;
+			for(adjacency_list::iterator edge = grouped_edges.front().begin(); edge != grouped_edges.front().end(); ++edge)
+				face_indices.push_back(edge_faces[edge->edge]);
+			for(adjacency_list::iterator edge = grouped_edges.back().begin(); edge != grouped_edges.back().end(); ++edge)
+				face_indices.push_back(edge_faces[edge->edge]);
+			k3d::mesh::weights_t face_weights(face_indices.size(), 1.0 / face_indices.size());
+			face_attributes.push_back(face_indices.size(), &face_indices[0], &face_weights[0]);
+
 			// Create the first cross edge ...
 			polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 			polyhedron->edge_selections.push_back(0);
 			polyhedron->vertex_points.push_back(grouped_edges.front().front().start_point);
 			polyhedron->vertex_selections.push_back(0);
+
+			cross_edges[0] = grouped_edges.front().front().edge;
+			cross_edges[1] = grouped_edges.back().back().edge;
+			edge_attributes.push_back(2, &cross_edges[0], &cross_edge_weights[0]);
+			vertex_attributes.push_back(grouped_edges.front().front().edge);
 
 			// Create the first set of parallel edges ...
 			for(adjacency_list::reverse_iterator edge = grouped_edges.back().rbegin(); edge != grouped_edges.back().rend(); ++edge)
@@ -202,6 +222,9 @@ public:
 				polyhedron->edge_selections.push_back(0);
 				polyhedron->vertex_points.push_back(edge->end_point);
 				polyhedron->vertex_selections.push_back(0);
+
+				edge_attributes.push_back(edge->edge);
+				vertex_attributes.push_back(polyhedron->clockwise_edges[edge->edge]);
 			}
 
 			// Create the second cross edge ...
@@ -210,6 +233,11 @@ public:
 			polyhedron->vertex_points.push_back(grouped_edges.back().front().start_point);
 			polyhedron->vertex_selections.push_back(0);
 
+			cross_edges[0] = grouped_edges.back().front().edge;
+			cross_edges[1] = grouped_edges.front().back().edge;
+			edge_attributes.push_back(2, &cross_edges[0], &cross_edge_weights[0]);
+			vertex_attributes.push_back(grouped_edges.back().front().edge);
+
 			// Create the second set of parallel edges ...
 			for(adjacency_list::reverse_iterator edge = grouped_edges.front().rbegin(); edge != grouped_edges.front().rend(); ++edge)
 			{
@@ -217,6 +245,9 @@ public:
 				polyhedron->edge_selections.push_back(0);
 				polyhedron->vertex_points.push_back(edge->end_point);
 				polyhedron->vertex_selections.push_back(0);
+
+				edge_attributes.push_back(edge->edge);
+				vertex_attributes.push_back(polyhedron->clockwise_edges[edge->edge]);
 			}
 
 			// Close the edge loop ...
