@@ -46,7 +46,9 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
 					<table type="edge"/>
 					<table type="face"/>
 					<table type="vertex"/>
