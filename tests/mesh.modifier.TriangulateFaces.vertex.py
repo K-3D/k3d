@@ -11,7 +11,7 @@ points = mesh.create_points()
 point_selection = mesh.create_point_selection()
 
 polyhedron = k3d.polyhedron.create(mesh)
-Cs = polyhedron.edge_attributes().create("Cs", "k3d::color")
+Cs = polyhedron.vertex_attributes().create("Cs", "k3d::color")
 
 positions = [(0, 0, 1), (1, 0, 1), (2, 0, 0), (2, 0, 1), (1, 0, 0), (0, 0, 0)]
 for position in positions:
@@ -88,5 +88,5 @@ mesh_selection = k3d.geometry.selection.create(1)
 setup.modifier.mesh_selection = mesh_selection
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.face_varying", 0)
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.vertex", 0)
 

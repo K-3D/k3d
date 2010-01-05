@@ -1108,6 +1108,9 @@ public:
 		output_polyhedron->edge_attributes = input_polyhedron->edge_attributes.clone_types();
 		edge_attributes_copier.reset(new table_copier(input_polyhedron->edge_attributes, output_polyhedron->edge_attributes));
 
+		output_polyhedron->vertex_attributes = input_polyhedron->vertex_attributes.clone_types();
+		vertex_attributes_copier.reset(new table_copier(input_polyhedron->vertex_attributes, output_polyhedron->vertex_attributes));
+
 		Output.point_attributes = Input.point_attributes.clone();
 		point_attributes_copier.reset(new table_copier(Input.point_attributes, Output.point_attributes));
 
@@ -1183,9 +1186,15 @@ private:
 		for(uint_t i = 0; i != 3; ++i)
 		{
 			if(new_edge_attributes.count(Vertices[i]))
+			{
 				edge_attributes_copier->push_back(4, new_edge_attributes[Vertices[i]].edges, new_edge_attributes[Vertices[i]].weights);
+				vertex_attributes_copier->push_back(4, new_edge_attributes[Vertices[i]].edges, new_edge_attributes[Vertices[i]].weights);
+			}
 			else
+			{
 				edge_attributes_copier->push_back(Edges[i]);
+				vertex_attributes_copier->push_back(Edges[i]);
+			}
 		}
 	}
 
@@ -1214,6 +1223,7 @@ private:
 				output_polyhedron->clockwise_edges.push_back(input_polyhedron->clockwise_edges[edge] + edge_offset);
 				output_polyhedron->edge_selections.push_back(0.0);
 				edge_attributes_copier->push_back(edge);
+				vertex_attributes_copier->push_back(edge);
 
 				edge = input_polyhedron->clockwise_edges[edge];
 				if(edge == first_edge)
@@ -1230,6 +1240,7 @@ private:
 
 	boost::shared_ptr<table_copier> face_attributes_copier;
 	boost::shared_ptr<table_copier> edge_attributes_copier;
+	boost::shared_ptr<table_copier> vertex_attributes_copier;
 	boost::shared_ptr<table_copier> point_attributes_copier;
 
 	uint_t current_face;

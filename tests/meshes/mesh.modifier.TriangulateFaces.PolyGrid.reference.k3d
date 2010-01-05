@@ -57,7 +57,9 @@
 					<table type="face">
 						<array name="index" type="k3d::uint_t">0 0</array>
 					</table>
-					<table type="vertex"/>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 0 2 3</array>
+					</table>
 				</attributes>
 			</primitive>
 		</primitives>

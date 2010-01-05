@@ -29,7 +29,7 @@ polyhedron.edge_selections().assign([0, 0, 0, 0])
 polyhedron.vertex_points().assign([0, 1, 2, 3])
 polyhedron.vertex_selections().assign([0, 0, 0, 0])
 
-Cs = polyhedron.edge_attributes().create("Cs", "k3d::color")
+Cs = polyhedron.vertex_attributes().create("Cs", "k3d::color")
 Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color(1, 1, 1)])
 
 mesh_selection = k3d.geometry.selection.create(1)

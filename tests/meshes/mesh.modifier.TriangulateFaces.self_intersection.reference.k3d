@@ -3,7 +3,9 @@
 	<mesh_arrays>
 		<points>-5 5 0 5 5 0 -5 -5 0 5 -5 0 0 0 0</points>
 		<point_selection>0 0 0 0 0</point_selection>
-		<point_attributes/>
+		<point_attributes>
+			<array name="index" type="k3d::uint_t">0 1 2 3 0</array>
+		</point_attributes>
 		<primitives>
 			<primitive type="polyhedron">
 				<structure>
@@ -46,12 +48,19 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge">
-						<array name="Cs" type="k3d::color">1 1 1 0.5 0.5 0.5 0 0 1 0 1 0 1 0 0 0.5 0.5 0.5</array>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
 					</table>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">3 0 2 1 0 0</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 0</array>
+					</table>
+					<table type="vertex">
+						<array name="Cs" type="k3d::color">1 1 1 0.5 0.5 0.5 0 0 1 0 1 0 1 0 0 0.5 0.5 0.5</array>
+						<array name="index" type="k3d::uint_t">3 0 2 1 0 0</array>
+					</table>
 				</attributes>
 			</primitive>
 		</primitives>
