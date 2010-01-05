@@ -25,6 +25,7 @@
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
+#include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
@@ -61,6 +62,7 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		k3d::timer timer;
 		m_subdividers.clear();
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
@@ -74,10 +76,12 @@ public:
 			m_subdividers[primitive->get()].create_mesh(*Output.points, *polyhedron, polyhedron->face_selections, this);
 		}
 		k3d::mesh::selection_t& output_point_selection = Output.point_selection.create();
+		k3d::log() << debug << "SDS create time: " << timer.elapsed() << std::endl;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		k3d::timer timer;
 		k3d::mesh::primitives_t::const_iterator input_primitive = Input.primitives.begin();
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
@@ -99,6 +103,7 @@ public:
 			m_subdividers[primitive->get()].copy_output(Output.points.create(), *polyhedron, Output.point_attributes);
 			Output.point_selection.writable().resize(Output.points->size());
 		}
+		k3d::log() << debug << "SDS Update time: " << timer.elapsed() << std::endl;
 	}
 
 
