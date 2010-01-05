@@ -29,6 +29,7 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -54,18 +55,29 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		Output.points = Input.points;
+		Output.point_selection = Input.point_selection;
+		Output.point_attributes = Input.point_attributes;
+
+		// For each polyhedron ...
 		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input, **primitive));
 			if(!polyhedron)
 				continue;
 
-			Output.points = Input.points;
-			Output.point_selection = Input.point_selection;
-			Output.point_attributes = Input.point_attributes;
+			// Create bilinear patches ...
+			boost::scoped_ptr<k3d::bilinear_patch::primitive> bilinear_patches(k3d::bilinear_patch::create(Output));
 
-			boost::scoped_ptr<k3d::bilinear_patch::primitive> primitive(k3d::bilinear_patch::create(Output));
+			// Get ready to copy attributes ...
+			bilinear_patches->constant_attributes = polyhedron->constant_attributes;
+			bilinear_patches->patch_attributes = polyhedron->face_attributes.clone_types();
+			bilinear_patches->vertex_attributes = polyhedron->vertex_attributes.clone_types();
 
+			k3d::table_copier patch_attributes(polyhedron->face_attributes, bilinear_patches->patch_attributes);
+			k3d::table_copier vertex_attributes(polyhedron->vertex_attributes, bilinear_patches->vertex_attributes);
+
+			// Create a patch for each quadrilateral face in the polyhedron ...
 			const k3d::uint_t face_begin = 0;
 			const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
@@ -85,14 +97,20 @@ public:
 				if(edges.size() != 4)
 					continue;
 
-				primitive->patch_selections.push_back(polyhedron->face_selections[face]);
-				primitive->patch_materials.push_back(polyhedron->face_materials[face]);
+				bilinear_patches->patch_selections.push_back(polyhedron->face_selections[face]);
+				bilinear_patches->patch_materials.push_back(polyhedron->face_materials[face]);
+				patch_attributes.push_back(face);
 
 				// Note: Bilinear patch control points *aren't* in clockwise order!
-				primitive->patch_points.push_back(polyhedron->vertex_points[edges[0]]);
-				primitive->patch_points.push_back(polyhedron->vertex_points[edges[1]]);
-				primitive->patch_points.push_back(polyhedron->vertex_points[edges[3]]); 
-				primitive->patch_points.push_back(polyhedron->vertex_points[edges[2]]);
+				bilinear_patches->patch_points.push_back(polyhedron->vertex_points[edges[0]]);
+				bilinear_patches->patch_points.push_back(polyhedron->vertex_points[edges[1]]);
+				bilinear_patches->patch_points.push_back(polyhedron->vertex_points[edges[3]]); 
+				bilinear_patches->patch_points.push_back(polyhedron->vertex_points[edges[2]]);
+
+				vertex_attributes.push_back(edges[0]);
+				vertex_attributes.push_back(edges[1]);
+				vertex_attributes.push_back(edges[3]);
+				vertex_attributes.push_back(edges[2]);
 			}
 		}
 	}
