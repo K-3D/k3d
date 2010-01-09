@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Duplicated / instantiated objects aren't visible when rendered.
+desc: This is an error-of-omission, the duplicate / instantiate UI code needs to make the new objects visible to render engines.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-01-09 17:21:52.037546 Z
+references: []
+
+id: 250f99eac16ec2eda3d6b7e324592efc46a1e250
+log_events: 
+- - 2010-01-09 17:21:52.725491 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
