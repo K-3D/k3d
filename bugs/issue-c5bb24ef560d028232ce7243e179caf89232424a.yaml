@@ -5,8 +5,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-12-26 17:22:42.581537 Z
 references: []
 
@@ -16,3 +16,7 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - created
   - ""
+- - 2010-01-09 17:47:32.420464 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - After changing the way the polyhedron schema stores shells, it should be much more difficult to get them wrong.
