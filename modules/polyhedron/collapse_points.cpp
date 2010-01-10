@@ -41,15 +41,15 @@ namespace polyhedron
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// join_points
+// collapse_points
 
-class join_points :
+class collapse_points :
 	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
 	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
-	join_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	collapse_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
@@ -157,11 +157,11 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<join_points,
+		static k3d::document_plugin_factory<collapse_points,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x915ba4d4, 0xd4154a12, 0x938bec97, 0x60f819f3),
-				"JoinPoints",
+				"CollapsePoints",
 				"Merge selected points into one point, positioned at the average position of the selected points.",
 				"Mesh",
 				k3d::iplugin_factory::STABLE);
@@ -171,11 +171,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// join_points_factory
+// collapse_points_factory
 
-k3d::iplugin_factory& join_points_factory()
+k3d::iplugin_factory& collapse_points_factory()
 {
-	return join_points::get_factory();
+	return collapse_points::get_factory();
 }
 
 } // namespace polyhedron
