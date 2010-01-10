@@ -18,7 +18,6 @@ SET(SKIP_FILES
 	"^k3dsdk/serialization_xml.cpp$"
 	"^k3dsdk/type_registry.cpp$"
 	"^modules/polyhedron/bevel_faces.cpp$"
-	"^modules/polyhedron/collapse_edges.cpp$"
 	"^modules/polyhedron/collapse_faces.cpp$"
 	"^modules/polyhedron/dissolve_components.cpp$"
 	"^modules/polyhedron/fillet_edges.cpp$"
