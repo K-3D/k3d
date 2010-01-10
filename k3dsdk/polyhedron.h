@@ -240,6 +240,9 @@ void mark_coplanar_edges(const mesh::indices_t& Companions,
 /// Triangulates the input polyhedron, storing the resulting primitive and storing point data in Output
 mesh::primitive* triangulate(const mesh& Input, const const_primitive& Polyhedron, mesh& Output);
 
+/// Removes edges, loops, and faces from a polyhedron, cleaning-up references and attributes.
+void delete_components(const mesh& Mesh, primitive& Polyhedron, const mesh::bools_t& RemovePoints, mesh::bools_t& RemoveEdges, mesh::bools_t& RemoveLoops, mesh::bools_t& RemoveFaces);
+
 } // namespace polyhedron
 
 } // namespace k3d

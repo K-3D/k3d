@@ -131,8 +131,12 @@ public:
 
 	/// Converts a bitmap marking indices to be removed from a contiguous set into a map.
 	static void create_index_removal_map(const mesh::bools_t& KeepIndices, mesh::indices_t& IndexMap);
+	/// Converts a bitmap marking indices in a range to a set of selected indices.
+	static void create_index_list(const mesh::bools_t& SelectedIndices, mesh::indices_t& IndexSet);
 	/// Initialize an array to mark unused mesh points (points not used by any primitive).
 	static void lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints);
+	/// Remaps point indices in every primitive in a mesh.
+	static void remap_points(mesh& Mesh, const mesh::indices_t& PointMap);
 	/// Remove points from a mesh, adjusting point indices in all remaining primitives.
 	static void delete_points(mesh& Mesh, const mesh::bools_t& Points);
 	/// Remove points from a mesh, adjusting point indices in all remaining primitives, returning an array that maps original point indices to new point indices.

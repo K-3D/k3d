@@ -348,6 +348,19 @@ void mesh::create_index_removal_map(const mesh::bools_t& KeepIndices, mesh::indi
 	}
 }
 
+void mesh::create_index_list(const mesh::bools_t& SelectedIndices, mesh::indices_t& IndexSet)
+{
+	IndexSet.resize(0);
+
+	const uint_t begin = 0;
+	const uint_t end = SelectedIndices.size();
+	for(uint_t index = begin; index != end; ++index)
+	{
+		if(SelectedIndices[index])
+			IndexSet.push_back(index);
+	}
+}
+
 namespace detail
 {
 
@@ -363,7 +376,7 @@ void remap_points(mesh::indices_t& PrimitivePoints, const mesh::indices_t& Point
 /// Helper object used by delete_points()
 struct remap_primitive_points
 {
-	remap_primitive_points(mesh::indices_t& PointMap) :
+	remap_primitive_points(const mesh::indices_t& PointMap) :
 		point_map(PointMap)
 	{
 	}
@@ -377,10 +390,15 @@ struct remap_primitive_points
 			remap_points(*array, point_map);
 	}
 
-	mesh::indices_t& point_map;
+	const mesh::indices_t& point_map;
 };
 
 } // namespace detail
+
+void mesh::remap_points(mesh& Mesh, const mesh::indices_t& PointMap)
+{
+	visit_arrays(Mesh, detail::remap_primitive_points(PointMap));
+}
 
 void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points)
 {

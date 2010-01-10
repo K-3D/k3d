@@ -1513,11 +1513,234 @@ void mark_coplanar_edges(const mesh::indices_t& Companions,
 }
 
 ////////////////////////////////////////////
-// Triangulate
+// triangulate
 
 mesh::primitive* triangulate(const mesh& Input, const const_primitive& Polyhedron, mesh& Output)
 {
 	return detail::create_triangles().process(Input, Polyhedron, Output);
+}
+
+////////////////////////////////////////////
+// delete_components
+
+void delete_components(const mesh& Mesh, primitive& Polyhedron, const mesh::bools_t& RemovePoints, mesh::bools_t& RemoveEdges, mesh::bools_t& RemoveLoops, mesh::bools_t& RemoveFaces)
+{
+	// Sanity checks ...
+	return_if_fail(RemovePoints.size() == Mesh.points->size());
+	return_if_fail(RemoveEdges.size() == Polyhedron.clockwise_edges.size());
+	return_if_fail(RemoveLoops.size() == Polyhedron.loop_first_edges.size());
+	return_if_fail(RemoveFaces.size() == Polyhedron.face_shells.size());
+
+	// Cache some useful stuff up-front ...
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + Polyhedron.face_shells.size();
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + Polyhedron.clockwise_edges.size();
+
+	const uint_t loop_begin = 0;
+	const uint_t loop_end = loop_begin + Polyhedron.loop_first_edges.size();
+
+	// Mark edges to be implicitly removed because their points are going away ...
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		if(!RemovePoints[Polyhedron.vertex_points[edge]])
+			continue;
+
+		RemoveEdges[edge] = true;
+	}
+
+	// Mark loops to be implicitly removed because they have fewer than three edges remaining ...
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+	{
+		const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+
+		uint_t remaining_edge_count = 0;
+		for(uint_t edge = first_edge; ;)
+		{
+			if(!RemoveEdges[edge])
+				++remaining_edge_count;
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
+		}
+
+		if(remaining_edge_count < 3)
+			RemoveLoops[loop] = true;
+	}
+
+	// Mark faces to be implicitly removed because their first loop is going away ...
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		if(RemoveFaces[face])
+			continue;
+
+		if(RemoveLoops[Polyhedron.face_first_loops[face]])
+			RemoveFaces[face] = true;
+	}
+
+	// Mark loops and edges to be implicitly removed because their face is going away ...
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		if(!RemoveFaces[face])
+			continue;
+
+		const uint_t loop_begin = Polyhedron.face_first_loops[face];
+		const uint_t loop_end = loop_begin + Polyhedron.face_loop_counts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			RemoveLoops[loop] = true;
+
+			const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+			for(uint_t edge = first_edge; ;)
+			{
+				RemoveEdges[edge] = true;
+
+				edge = Polyhedron.clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+		}
+	}
+
+	// Compute new first edges for loops ...
+	mesh::indices_t new_first_edge(Polyhedron.loop_first_edges.size());
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+	{
+		if(RemoveLoops[loop])
+			continue;
+
+		const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+		for(uint_t edge = first_edge; ;)
+		{
+			if(!RemoveEdges[edge])
+			{
+				new_first_edge[loop] = edge;
+				break;
+			}
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
+		}
+	}
+
+	// Compute new clockwise_edges ...
+	mesh::indices_t new_clockwise_edge(Polyhedron.clockwise_edges.size());
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+	{
+		if(RemoveLoops[loop])
+			continue;
+
+		const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+
+		mesh::indices_t remaining_edges;
+		for(uint_t edge = first_edge; ;)
+		{
+			if(!RemoveEdges[edge])
+				remaining_edges.push_back(edge);
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
+		}
+
+		for(uint_t e = 0; e != remaining_edges.size(); ++e)
+		{
+			new_clockwise_edge[remaining_edges[e]] = remaining_edges[(e+1)%remaining_edges.size()];
+		}
+	}
+
+	// Compute maps and remaining component counts ...
+	mesh::indices_t face_map;
+	mesh::create_index_removal_map(RemoveFaces, face_map);
+	const uint_t remaining_faces = std::count(RemoveFaces.begin(), RemoveFaces.end(), false);
+
+	mesh::indices_t loop_map;
+	mesh::create_index_removal_map(RemoveLoops, loop_map);
+	const uint_t remaining_loops = std::count(RemoveLoops.begin(), RemoveLoops.end(), false);
+
+	mesh::indices_t edge_map;
+	mesh::create_index_removal_map(RemoveEdges, edge_map);
+	const uint_t remaining_edges = std::count(RemoveEdges.begin(), RemoveEdges.end(), false);
+
+	// Delete faces, updating loop indices as we go ...
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		if(RemoveFaces[face])
+			continue;
+
+		Polyhedron.face_shells[face_map[face]] = Polyhedron.face_shells[face];
+		Polyhedron.face_first_loops[face_map[face]] = loop_map[Polyhedron.face_first_loops[face]];
+		Polyhedron.face_loop_counts[face_map[face]] = Polyhedron.face_loop_counts[face];
+		Polyhedron.face_selections[face_map[face]] = Polyhedron.face_selections[face];
+		Polyhedron.face_materials[face_map[face]] = Polyhedron.face_materials[face];
+	}
+	Polyhedron.face_shells.resize(remaining_faces);
+	Polyhedron.face_first_loops.resize(remaining_faces);
+	Polyhedron.face_loop_counts.resize(remaining_faces);
+	Polyhedron.face_selections.resize(remaining_faces);
+	Polyhedron.face_materials.resize(remaining_faces);
+
+	// Delete face attributes ...
+	table_copier face_attribute_copier(Polyhedron.face_attributes);
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		if(RemoveFaces[face])
+			continue;
+
+		face_attribute_copier.copy(face, face_map[face]);
+	}
+	Polyhedron.face_attributes.set_row_count(remaining_faces);
+
+	// Delete loops, updating edge indices as we go ...
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+	{
+		if(RemoveLoops[loop])
+			continue;
+
+		Polyhedron.loop_first_edges[loop_map[loop]] = edge_map[new_first_edge[loop]];
+	}
+	Polyhedron.loop_first_edges.resize(remaining_loops);
+
+	// Delete edges, updating edge indices as we go ...
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		if(RemoveEdges[edge])
+			continue;
+
+		Polyhedron.clockwise_edges[edge_map[edge]] = edge_map[new_clockwise_edge[edge]];
+		Polyhedron.edge_selections[edge_map[edge]] = Polyhedron.edge_selections[edge];
+		Polyhedron.vertex_points[edge_map[edge]] = Polyhedron.vertex_points[edge];
+		Polyhedron.vertex_selections[edge_map[edge]] = Polyhedron.vertex_selections[edge];
+	}
+	Polyhedron.clockwise_edges.resize(remaining_edges);
+	Polyhedron.edge_selections.resize(remaining_edges);
+	Polyhedron.vertex_points.resize(remaining_edges);
+	Polyhedron.vertex_selections.resize(remaining_edges);
+
+	// Delete edge attributes ...
+	table_copier edge_attribute_copier(Polyhedron.edge_attributes);
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		if(RemoveEdges[edge])
+			continue;
+
+		edge_attribute_copier.copy(edge, edge_map[edge]);
+	}
+	Polyhedron.edge_attributes.set_row_count(remaining_edges);
+
+	// Delete vertex attributes ...
+	table_copier vertex_attribute_copier(Polyhedron.vertex_attributes);
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		if(RemoveEdges[edge])
+			continue;
+
+		vertex_attribute_copier.copy(edge, edge_map[edge]);
+	}
+	Polyhedron.vertex_attributes.set_row_count(remaining_edges);
 }
 
 } // namespace polyhedron

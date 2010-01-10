@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,17 +18,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Bart Janssens <bart.janssens@lid.kviv.be>
+	\author Bart Janssens <bart.janssens@lid.kviv.be>
+	\author Timothy M. Shead <tshead@k-3d.com>
 */
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/utility.h>
 
-#include <set>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -40,210 +44,117 @@ namespace polyhedron
 // join_points
 
 class join_points :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
 	join_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
-	}
+		Output = Input;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Mesh);
-
-		// We keep track of the geometry we're going to delete ...
-		std::set<k3d::legacy::point*> points;
-		std::set<k3d::legacy::face*> faces;
-		std::set<k3d::legacy::split_edge*> edges;
-
-		// Get selected points
-		k3d::legacy::point* point = 0;
-		// sum of opsitions
-		k3d::point3 total_position(0.0,0.0,0.0);
-		for(k3d::legacy::mesh::points_t::iterator p = Mesh.points.begin(); p != Mesh.points.end(); ++p)
-		{
-			if((*p)->selection_weight)
-			{
-				total_position += k3d::to_vector((*p)->position);
-				if(!point)
-					point = *p;
-				else
-					points.insert(*p);
-			}
-		}
-
-		// abort if nothing was selected
-		if (points.empty())
+		if(!Output.points)
+			return;
+		if(!Output.point_selection)
 			return;
 
-		point->position = total_position / points.size();
+		k3d::mesh::points_t& points = Output.points.writable();
+		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
 
-		// Delete selected faces, taking their edges along with them ...
-		for(k3d::legacy::mesh::polyhedra_t::iterator p = Mesh.polyhedra.begin(); p != Mesh.polyhedra.end(); ++p)
+		// Mark points explicitly chosen by the user ...
+		k3d::mesh::bools_t remove_points(Output.point_selection->begin(), Output.point_selection->end());
+		const k3d::uint_t selected_point_count = std::count(remove_points.begin(), remove_points.end(), true);
+		if(selected_point_count < 2)
+			return;
+
+		// Compute the average position of the selected points ...
+		k3d::point3 average(0, 0, 0);
+		const k3d::uint_t point_begin = 0;
+		const k3d::uint_t point_end = point_begin + points.size();
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			k3d::legacy::polyhedron& polyhedron = **p;
+			if(!remove_points[point])
+				continue;
+			average += k3d::to_vector(points[point]);
+		}
+		average /= selected_point_count;
 
-			for(k3d::legacy::polyhedron::faces_t::iterator f = polyhedron.faces.begin(); f != polyhedron.faces.end(); ++f)
+		// Create a new point based on the average position ...
+		const k3d::uint_t new_point = points.size();
+		points.push_back(average);
+		point_selection.push_back(1);
+		remove_points.push_back(false);
+
+		k3d::mesh::indices_t point_indices;
+		k3d::mesh::create_index_list(remove_points, point_indices);
+		const k3d::mesh::weights_t point_weights(selected_point_count, 1.0 / selected_point_count);
+		k3d::table_copier point_copier(Output.point_attributes);
+		point_copier.push_back(selected_point_count, &point_indices[0], &point_weights[0]);
+
+		// Map old point references to the new point ...
+		k3d::mesh::indices_t point_map(points.size());
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
+			point_map[point] = remove_points[point] ? new_point : point;
+		point_map[new_point] = new_point;
+		k3d::mesh::remap_points(Output, point_map);
+
+		// For each polyhedron ...
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
+			if(!polyhedron)
+				continue;
+
+			// Delete any edges that have been "collapsed" onto the new point ...
+			k3d::mesh::bools_t remove_edges(polyhedron->clockwise_edges.size(), false);
+			const k3d::uint_t edge_begin = 0;
+			const k3d::uint_t edge_end = edge_begin + polyhedron->clockwise_edges.size();
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 			{
-				k3d::legacy::face* face = *f;
-				face->selection_weight = 0.0;
-				for(k3d::legacy::split_edge* edge = face->first_edge; edge; edge = edge->face_clockwise)
-				{
-					edge->selection_weight = 0.0;
-					if(edge->vertex->selection_weight)
-						edges.insert(edge);
-					if(edge->face_clockwise == face->first_edge)
-						break;
-				}
+				if(polyhedron->vertex_points[edge] != new_point)
+					continue;
+				if(polyhedron->vertex_points[polyhedron->clockwise_edges[edge]] != new_point)
+					continue;
+				remove_edges[edge] = true;
 			}
+	
+			// Don't explicitly delete any loops ...
+			k3d::mesh::bools_t remove_loops(polyhedron->loop_first_edges.size(), false);
+
+			// Don't explicitly delete any faces ...
+			k3d::mesh::bools_t remove_faces(polyhedron->face_shells.size(), false);
+			
+			// Make it happen ...
+			k3d::polyhedron::delete_components(Output, *polyhedron, remove_points, remove_edges, remove_loops, remove_faces);
 		}
 
-		point->selection_weight = 0.0;
-
-		for(std::set<k3d::legacy::split_edge*>::iterator edge = edges.begin(); edge != edges.end(); ++edge)
-			(*edge)->vertex = point;
-
-		for(std::set<k3d::legacy::split_edge*>::iterator e = edges.begin(); e != edges.end(); ++e)
+		// Mark points to be implicitly removed because they're no-longer used ...
+		k3d::mesh::bools_t unused_point;
+		k3d::mesh::lookup_unused_points(Output, unused_point);
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			k3d::legacy::split_edge* edge = *e;
-			if(edge->vertex == edge->face_clockwise->vertex)
-			{
-				edge->selection_weight = 1.0;
-			}
-		}
+			if(!unused_point[point])
+				continue;
 
-		edges.clear();
-
-		// Delete selected edges, updating their owning faces and adjacent edges as needed.
-		for(k3d::legacy::mesh::polyhedra_t::iterator p = Mesh.polyhedra.begin(); p != Mesh.polyhedra.end(); ++p)
-		{
-			k3d::legacy::polyhedron& polyhedron = **p;
-
-			for(k3d::legacy::polyhedron::faces_t::iterator f = polyhedron.faces.begin(); f != polyhedron.faces.end(); )
-			{
-				k3d::legacy::face* face = *f;
-
-				std::vector<k3d::legacy::split_edge*> remaining_edges;
-				for(k3d::legacy::split_edge* edge = face->first_edge; edge; edge = edge->face_clockwise)
-				{
-					if(edge->selection_weight)
-					{
-						edges.insert(edge);
-					}
-					else
-					{
-						remaining_edges.push_back(edge);
-					}
-
-					if(edge->face_clockwise == face->first_edge)
-						break;
-				}
-
-				// If there aren't any edges left over for this face zap it, and its little holes too ...
-				if(remaining_edges.empty())
-				{
-					f = polyhedron.faces.erase(f);
-					faces.insert(face);
-					edges.clear();
-				}
-				else
-				{
-					// handle holes...
-					for(k3d::legacy::face::holes_t::iterator hole = face->holes.begin(); hole != face->holes.end(); )
-					{
-						std::vector<k3d::legacy::split_edge*> remaining_hole_edges;
-						for(k3d::legacy::split_edge* edge = *hole; edge; edge = edge->face_clockwise)
-						{
-							if(edge->selection_weight)
-							{
-								edges.insert(edge);
-							}
-							else
-							{
-								remaining_hole_edges.push_back(edge);
-							}
-
-							if(edge->face_clockwise == *hole)
-								break;
-						}
-
-					// Fix hole with left-out edges
-						if(!remaining_hole_edges.empty())
-						{
-							*hole = remaining_hole_edges.front();
-							k3d::legacy::loop_edges(remaining_hole_edges.begin(), remaining_hole_edges.end());
-							++hole;
-						}
-						else
-						{
-							hole = face->holes.erase(hole);
-						}
-					}
-
-					face->first_edge = remaining_edges.front();
-					k3d::legacy::loop_edges(remaining_edges.begin(), remaining_edges.end());
-					std::for_each(edges.begin(), edges.end(), k3d::delete_object());
-					edges.clear();
-
-					++f;
-				}
-			}
-		}
+			remove_points[point] = true;
+		}	
 
 		// Delete points ...
-		delete_geometry(Mesh.points, points, is_selected());
-
-		// Delete faces ...
-		std::for_each(faces.begin(), faces.end(), k3d::delete_object());
-
-		// Leave the only remaining point selected
-		point->selection_weight = 1.0;
+		k3d::mesh::delete_points(Output, remove_points);
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
-
-	/// Functor object that returns true iff the given geometry is selected
-	struct is_selected
-	{
-		template<typename T>
-		bool operator()(const T* const Geometry)
-		{
-			return Geometry->selection_weight;
-		}
-
-		bool operator()(const k3d::legacy::nucurve::control_point& ControlPoint)
-		{
-			return ControlPoint.position->selection_weight;
-		}
-
-		bool operator()(const k3d::legacy::nupatch::control_point& ControlPoint)
-		{
-			return ControlPoint.position->selection_weight;
-		}
-	};
-
-	/// "Deletes" geometry by moving it from the Source container to the Disposal container, if the Functor tests true
-	template<typename S, typename D, typename F>
-	void delete_geometry(S& Source, D& Disposal, F Functor)
-	{
-		k3d::copy_if(Source.begin(), Source.end(), std::inserter(Disposal, Disposal.end()), Functor);
-		Source.erase(std::remove_if(Source.begin(), Source.end(), Functor), Source.end());
-	}
-
+	
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<join_points,
