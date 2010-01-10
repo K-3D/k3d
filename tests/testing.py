@@ -73,28 +73,42 @@ def setup_bitmap_reader_test(reader_name, source_file):
 
 	return result
 
-def setup_mesh_reader_test(reader_name, source_file):
+def setup_mesh_test(nodes):
+	if len(nodes) < 1:
+		raise Exception("Mesh test requires at least one node.")
+
 	class result_object:
 		pass
 
 	result = result_object
 	result.document = k3d.new_document()
-	result.source = result.document.new_node(reader_name)
-	result.source.file = k3d.filesystem.generic_path(source_path() + "/meshes/" + source_file)
-	result.source.center = False
-	result.source.scale_to_size = False
+	result.nodes = [] 
 
+	for node in nodes:
+		result.nodes.append(result.document.new_node(node))
+		if len(result.nodes) > 1:
+			result.document.set_dependency(result.nodes[-1].get_property("input_mesh"), result.nodes[-2].get_property("output_mesh"))
+
+	result.source = result.nodes[0]
+
+	if len(nodes) == 3:
+		result.modifier = result.nodes[1]
+
+	if len(nodes) > 1:
+		result.sink = result.nodes[-1]
+	
+	return result
+
+def setup_mesh_reader_test(reader_name, source_file):
+	result = setup_mesh_test([reader_name])
+	result.reader = result.source
+	result.reader.file = k3d.filesystem.generic_path(source_path() + "/meshes/" + source_file)
+	result.reader.center = False
+	result.reader.scale_to_size = False
 	return result
 
 def setup_mesh_source_test(source_name):
-	class result_object:
-		pass
-
-	result = result_object
-	result.document = k3d.new_document()
-	result.source = result.document.new_node(source_name)
-	result.output_mesh = result.source.get_property("output_mesh").pipeline_value()
-
+	result = setup_mesh_test([source_name])
 	return result
 
 def setup_scalar_source_test(source_name):
@@ -134,6 +148,20 @@ def setup_mesh_modifier_test2(source_name, modifier1_name, modifier2_name):
 	result.document.set_dependency(result.modifier2.get_property("input_mesh"), result.modifier1.get_property("output_mesh"))
 	result.document.set_dependency(result.modifier1.get_property("input_mesh"), result.add_index_attributes.get_property("output_mesh"))
 	result.document.set_dependency(result.add_index_attributes.get_property("input_mesh"), result.source.get_property("output_mesh"))
+
+	return result
+
+def setup_mesh_writer_test(nodes, reader, target_file):
+	if len(nodes) < 2:
+		raise Exception("Mesh writer test requires at least two nodes.")
+
+	result = setup_mesh_test(nodes)
+	result.writer = result.sink
+	result.writer.file = k3d.filesystem.generic_path(binary_path() + "/meshes/" + target_file)
+	result.reader = result.document.new_node(reader)
+	result.reader.file = k3d.filesystem.generic_path(binary_path() + "/meshes/" + target_file)
+	result.reader.center = False
+	result.reader.scale_to_size = False
 
 	return result
 
