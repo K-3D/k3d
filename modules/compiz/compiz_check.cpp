@@ -45,6 +45,8 @@ class compiz_check :
 public:
 	compiz_check()
 	{
+		g_type_init();
+
 		GError* error = 0;
 		DBusGConnection* const connection = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
 		if(connection)

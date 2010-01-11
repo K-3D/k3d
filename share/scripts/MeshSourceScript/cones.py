@@ -7,7 +7,7 @@ k3d.check_node_environment(locals(), "MeshSourceScript")
 
 # Construct a cone mesh primitive ...
 cone = k3d.cone.create(Output)
-color = cone.varying_attributes().create("Cs", "k3d::color")
+color = cone.parameter_attributes().create("Cs", "k3d::color")
 
 # Add two cones ...
 cone.matrices().append(k3d.translate3(k3d.vector3(-5, 0, 0)))

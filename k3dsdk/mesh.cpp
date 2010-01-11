@@ -20,10 +20,10 @@
 #include <k3dsdk/color.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/iomanip.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
 #include <k3dsdk/type_registry.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -271,101 +271,6 @@ bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) const
 		;
 }
 
-mesh& mesh::operator=(const legacy::mesh& RHS)
-{
-	// Convert points ...
-	std::map<legacy::point*, uint_t> point_map;
-
-	const uint_t point_size = RHS.points.size();
-	points_t& points = this->points.create(new points_t(point_size));
-	selection_t& point_selection = this->point_selection.create(new selection_t(point_size));
-
-	for(uint_t i = 0; i != point_size; ++i)
-	{
-		points[i] = RHS.points[i]->position;
-		point_selection[i] = RHS.points[i]->selection_weight;
-		point_map[RHS.points[i]] = i;
-	}
-
-	// Convert primitives ...
-	primitives = RHS.primitives;
-
-	// Convert polyhedra ...
-	if(RHS.polyhedra.size())
-	{
-		boost::scoped_ptr<polyhedron::primitive> polyhedron(k3d::polyhedron::create(*this));
-
-		for(legacy::mesh::polyhedra_t::const_iterator legacy_polyhedron = RHS.polyhedra.begin(); legacy_polyhedron != RHS.polyhedra.end(); ++legacy_polyhedron)
-		{
-			uint_t first_face = polyhedron->face_first_loops.size();
-			uint_t face_count = 0;
-			int32_t type = (*legacy_polyhedron)->type == legacy::polyhedron::POLYGONS ? polyhedron::POLYGONS : polyhedron::CATMULL_CLARK;
-
-			for(legacy::polyhedron::faces_t::const_iterator legacy_face = (*legacy_polyhedron)->faces.begin(); legacy_face != (*legacy_polyhedron)->faces.end(); ++legacy_face)
-			{
-				++face_count;
-
-				uint_t face_first_loop = polyhedron->loop_first_edges.size();
-				uint_t face_loop_count = 1 + (*legacy_face)->holes.size();
-
-				const uint_t first_edge = polyhedron->vertex_points.size();
-
-				polyhedron->loop_first_edges.push_back(first_edge);
-				for(legacy::split_edge* edge = (*legacy_face)->first_edge; edge; edge = edge->face_clockwise)
-				{
-					if(edge->vertex && edge->face_clockwise)
-					{
-						polyhedron->vertex_points.push_back(point_map[edge->vertex]);
-						polyhedron->vertex_selections.push_back(edge->selection_weight);
-						polyhedron->clockwise_edges.push_back(polyhedron->vertex_points.size());
-						polyhedron->edge_selections.push_back(edge->selection_weight);
-					}
-
-					if(edge->face_clockwise == (*legacy_face)->first_edge)
-					{
-						polyhedron->clockwise_edges.back() = first_edge;
-						break;
-					}
-				}
-
-				for(legacy::face::holes_t::iterator hole = (*legacy_face)->holes.begin(); hole != (*legacy_face)->holes.end(); ++hole)
-				{
-					const uint_t first_edge = polyhedron->vertex_points.size();
-
-					polyhedron->loop_first_edges.push_back(first_edge);
-					for(legacy::split_edge* edge = *hole; edge; edge = edge->face_clockwise)
-					{
-						if(edge->vertex && edge->face_clockwise && edge->face_clockwise->vertex)
-						{
-							polyhedron->vertex_points.push_back(point_map[edge->vertex]);
-							polyhedron->vertex_selections.push_back(edge->selection_weight);
-							polyhedron->clockwise_edges.push_back(polyhedron->vertex_points.size());
-							polyhedron->edge_selections.push_back(edge->selection_weight);
-						}
-
-						if(edge->face_clockwise == (*hole))
-						{
-							polyhedron->clockwise_edges.back() = first_edge;
-							break;
-						}
-					}
-				}
-
-				polyhedron->face_first_loops.push_back(face_first_loop);
-				polyhedron->face_loop_counts.push_back(face_loop_count);
-				polyhedron->face_selections.push_back((*legacy_face)->selection_weight);
-				polyhedron->face_materials.push_back((*legacy_face)->material);
-			}
-
-			polyhedron->shell_first_faces.push_back(first_face);
-			polyhedron->shell_face_counts.push_back(face_count);
-			polyhedron->shell_types.push_back(type);
-		}
-	}
-
-	return *this;
-}
-
 namespace detail
 {
 
@@ -429,10 +334,37 @@ void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 	visit_arrays(Mesh, detail::mark_used_primitive_points(UnusedPoints));
 }
 
+void mesh::create_index_removal_map(const mesh::bools_t& KeepIndices, mesh::indices_t& IndexMap)
+{
+	IndexMap.resize(KeepIndices.size());
+
+	const uint_t begin = 0;
+	const uint_t end = KeepIndices.size();
+	for(uint_t current_index = begin, new_index = begin; current_index != end; ++current_index)
+	{
+		IndexMap[current_index] = new_index;
+		if(!KeepIndices[current_index])
+			++new_index;
+	}
+}
+
+void mesh::create_index_list(const mesh::bools_t& SelectedIndices, mesh::indices_t& IndexSet)
+{
+	IndexSet.resize(0);
+
+	const uint_t begin = 0;
+	const uint_t end = SelectedIndices.size();
+	for(uint_t index = begin; index != end; ++index)
+	{
+		if(SelectedIndices[index])
+			IndexSet.push_back(index);
+	}
+}
+
 namespace detail
 {
 
-/// Helper function used by delete_unused_points()
+/// Helper function used by delete_points()
 void remap_points(mesh::indices_t& PrimitivePoints, const mesh::indices_t& PointMap)
 {
 	const uint_t begin = 0;
@@ -441,10 +373,10 @@ void remap_points(mesh::indices_t& PrimitivePoints, const mesh::indices_t& Point
 		PrimitivePoints[i] = PointMap[PrimitivePoints[i]];
 }
 
-/// Helper object used by delete_unused_points()
+/// Helper object used by delete_points()
 struct remap_primitive_points
 {
-	remap_primitive_points(mesh::indices_t& PointMap) :
+	remap_primitive_points(const mesh::indices_t& PointMap) :
 		point_map(PointMap)
 	{
 	}
@@ -458,49 +390,52 @@ struct remap_primitive_points
 			remap_points(*array, point_map);
 	}
 
-	mesh::indices_t& point_map;
+	const mesh::indices_t& point_map;
 };
 
 } // namespace detail
 
-void mesh::delete_unused_points(mesh& Mesh)
+void mesh::remap_points(mesh& Mesh, const mesh::indices_t& PointMap)
 {
-	mesh::indices_t point_map;
-	delete_unused_points(Mesh, point_map);
+	visit_arrays(Mesh, detail::remap_primitive_points(PointMap));
 }
 
-void mesh::delete_unused_points(mesh& Mesh, mesh::indices_t& PointMap)
+void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points)
 {
-	// Create a bitmap marking which points are unused ...
-	mesh::bools_t unused_points;
-	lookup_unused_points(Mesh, unused_points);
+	mesh::indices_t point_map;
+	delete_points(Mesh, Points, point_map);
+}
 
+void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_t& PointMap)
+{
 	// Count how many points will be left when we're done ...
-	const uint_t points_remaining = std::count(unused_points.begin(), unused_points.end(), false);
+	const uint_t points_remaining = std::count(Points.begin(), Points.end(), false);
 
-	// Create an array that will map from current-point-indices to new-point-indices,
-	// taking into account the points that will be removed.
-	PointMap.resize(unused_points.size());
-
-	const uint_t begin = 0;
-	const uint_t end = unused_points.size();
-	for(uint_t current_index = begin, new_index = begin; current_index != end; ++current_index)
-	{
-		PointMap[current_index] = new_index;
-		if(!unused_points[current_index])
-			++new_index;
-	}
+	// Create a mapping from current point indices to indices after we've removed points ...
+	create_index_removal_map(Points, PointMap);
 
 	// Move leftover points (and point selections) into their final positions ...
 	mesh::points_t& points = Mesh.points.writable();
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
-	for(uint_t i = begin; i != end; ++i)
+	const uint_t point_begin = 0;
+	const uint_t point_end = point_begin + Points.size();
+	for(uint_t point = point_begin; point != point_end; ++point)
 	{
-		if(!unused_points[i])
+		if(!Points[point])
 		{
-			points[PointMap[i]] = points[i];
-			point_selection[PointMap[i]] = point_selection[i];
+			points[PointMap[point]] = points[point];
+			point_selection[PointMap[point]] = point_selection[point];
 		}
+	}
+
+	// Move leftover attributes into their final positions ...
+	table_copier point_attributes(Mesh.point_attributes);
+	for(uint_t point = point_begin; point != point_end; ++point)
+	{
+		if(Points[point])
+			continue;
+
+		point_attributes.copy(point, PointMap[point]);
 	}
 
 	// Update generic mesh primitives so they use the correct indices ...
@@ -509,6 +444,7 @@ void mesh::delete_unused_points(mesh& Mesh, mesh::indices_t& PointMap)
 	// Free leftover memory ...
 	points.resize(points_remaining);
 	point_selection.resize(points_remaining);
+	Mesh.point_attributes.set_row_count(points_remaining);
 }
 
 namespace detail

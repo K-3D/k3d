@@ -31,9 +31,11 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
+					<table type="parameter"/>
 					<table type="surface"/>
-					<table type="varying"/>
-					<table type="vertex"/>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7</array>
+					</table>
 				</attributes>
 			</primitive>
 		</primitives>

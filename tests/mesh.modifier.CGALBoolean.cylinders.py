@@ -30,4 +30,6 @@ document.set_dependency(first_boolean.get_property("input_2"), small_cylinder.ge
 document.set_dependency(second_boolean.get_property("input_1"), torus.get_property("output_mesh"))
 document.set_dependency(second_boolean.get_property("input_2"), first_boolean.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, second_boolean.get_property("output_mesh"), "mesh.modifier.CGALBoolean.cylinders", 1)
+
+testing.require_valid_mesh(setup.document, second_boolean.get_property("output_mesh"))
+testing.mesh_reference_comparison(document, second_boolean.get_property("output_mesh"), "mesh.modifier.CGALBoolean.cylinders", 1)

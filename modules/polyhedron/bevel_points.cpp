@@ -33,6 +33,7 @@
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/optional.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -115,6 +116,10 @@ public:
 			k3d::mesh::indices_t adjacent_edges;
 			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
 
+			// Create a mapping from edges to faces ...
+			k3d::mesh::indices_t edge_faces;
+			k3d::polyhedron::create_edge_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, edge_faces);
+
 			// Create mappings from edges to corners ...
 			k3d::mesh::indices_t edge1_corners(polyhedron->clockwise_edges.size(), corners.size());
 			k3d::mesh::indices_t edge2_corners(polyhedron->clockwise_edges.size(), corners.size());
@@ -123,6 +128,12 @@ public:
 				edge1_corners[corners[corner].edge1] = corner;
 				edge2_corners[corners[corner].edge2] = corner;
 			}
+
+			// Get ready to copy attributes ...
+			k3d::table_copier point_attributes(Output.point_attributes);
+			k3d::table_copier edge_attributes(polyhedron->edge_attributes);
+			k3d::table_copier vertex_attributes(polyhedron->vertex_attributes);
+			k3d::table_copier face_attributes(polyhedron->face_attributes);
 
 			// Create new bevel points, being careful to avoid duplicating adjacent points ...
 			for(bevel_corners::iterator corner = corners.begin(); corner != corners.end(); ++corner)
@@ -143,6 +154,8 @@ public:
 							points[polyhedron->vertex_points[corner->edge1]]));
 					points.push_back(k3d::point3());
 					point_selection.push_back(1);
+
+					point_attributes.push_back(polyhedron->vertex_points[corner->edge2]);
 				}
 
 				if(!corner->point2)
@@ -161,18 +174,28 @@ public:
 							points[polyhedron->vertex_points[polyhedron->clockwise_edges[corner->edge2]]]));
 					points.push_back(k3d::point3());
 					point_selection.push_back(1);
+
+					point_attributes.push_back(polyhedron->vertex_points[corner->edge2]);
 				}
 			}
 
 			// Create a bevel edge for each face corner ...
 			for(bevel_corners::iterator corner = corners.begin(); corner != corners.end(); ++corner)
 			{
-				polyhedron->clockwise_edges[corner->edge1] = polyhedron->clockwise_edges.size();
+				corner->new_edge = polyhedron->clockwise_edges.size();
+
+				polyhedron->clockwise_edges[corner->edge1] = *corner->new_edge;
 
 				polyhedron->clockwise_edges.push_back(corner->edge2);
 				polyhedron->edge_selections.push_back(1);
 				polyhedron->vertex_points.push_back(*corner->point1);
 				polyhedron->vertex_selections.push_back(0);
+
+				k3d::uint_t edge_indices[2] = { corner->edge1, corner->edge2 };
+				k3d::double_t edge_weights[2] = { 0.5, 0.5 };
+				edge_attributes.push_back(2, edge_indices, edge_weights);
+
+				vertex_attributes.push_back(corner->edge2);
 
 				polyhedron->vertex_points[corner->edge2] = *corner->point2;
 			}
@@ -224,10 +247,19 @@ public:
 						}
 					}
 
+					// Create a new face ...
+					polyhedron->face_shells.push_back(polyhedron->face_shells[edge_faces[corners[clockwise_corners[0]].edge1]]);
 					polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 					polyhedron->face_loop_counts.push_back(1);
 					polyhedron->face_selections.push_back(1);
 					polyhedron->face_materials.push_back(material);
+
+					// Create new face attributes ...
+					k3d::mesh::indices_t face_indices(clockwise_corners.size());
+					for(k3d::uint_t corner = 0; corner != clockwise_corners.size(); ++corner)
+						face_indices[corner] = edge_faces[corners[clockwise_corners[corner]].edge1];
+					k3d::mesh::weights_t face_weights(clockwise_corners.size(), 1.0 / clockwise_corners.size());
+					face_attributes.push_back(clockwise_corners.size(), &face_indices[0], &face_weights[0]);
 
 					polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
@@ -238,6 +270,12 @@ public:
 						polyhedron->edge_selections.push_back(1);
 						polyhedron->vertex_points.push_back(*corners[clockwise_corners[corner]].point2);
 						polyhedron->vertex_selections.push_back(0);
+
+						k3d::uint_t edge_indices[2] = { corners[clockwise_corners[corner]].edge1, corners[clockwise_corners[corner]].edge2 };
+						k3d::double_t edge_weights[2] = { 0.5, 0.5 };
+						edge_attributes.push_back(2, edge_indices, edge_weights);
+
+						vertex_attributes.push_back(corners[clockwise_corners[corner]].edge2);
 					}
 					if(loop)
 					{
@@ -249,14 +287,20 @@ public:
 						polyhedron->edge_selections.push_back(1);
 						polyhedron->vertex_points.push_back(*corners[clockwise_corners.back()].point1);
 						polyhedron->vertex_selections.push_back(0);
-					}
 
-					++polyhedron->shell_face_counts.back();
+						k3d::uint_t edge_indices[2] = { corners[clockwise_corners.front()].edge2, corners[clockwise_corners.back()].edge1 };
+						k3d::double_t edge_weights[2] = { 0.5, 0.5 };
+						edge_attributes.push_back(2, edge_indices, edge_weights);
+
+						vertex_attributes.push_back(corners[clockwise_corners.back()].edge2);
+					}
 				}
 			}
 		}
 
-		k3d::mesh::delete_unused_points(Output, point_map);
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points, point_map);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -304,6 +348,7 @@ private:
 
 		k3d::uint_t edge1;
 		boost::optional<k3d::uint_t> point1;
+		boost::optional<k3d::uint_t> new_edge;
 		boost::optional<k3d::uint_t> point2;
 		k3d::uint_t edge2;
 	};

@@ -7,7 +7,7 @@ document = k3d.new_document()
 
 reader = document.new_node("K3DMeshReader")
 # load a mesh that has multiple polyhedra, triangles, quads, n-sided polygons and holes. (i.e. a mesh from hell)
-reader.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/testmesh.polyhedra.hole.k3d")
+reader.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/polyhedron.hole.k3d")
 reader.center = False
 reader.scale_to_size = False
 
@@ -36,4 +36,6 @@ modifier.level = 2
 
 document.set_dependency(modifier.get_property("input_mesh"), varying_colors.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.CatmullClark.complex", 2)
+
+testing.require_valid_mesh(setup.document, modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.CatmullClark.complex", 2)

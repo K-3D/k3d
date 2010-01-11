@@ -93,11 +93,8 @@ public:
 		// We model a cube as a cylinder ...
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-
-		k3d::polyhedron::add_cylinder(Output, *polyhedron, slices, circumference, material);
+		k3d::polyhedron::add_cylinder(Output, *polyhedron, 0, slices, circumference, material);
 
 		k3d::mesh::points_t& points = Output.points.writable();
 		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
@@ -132,6 +129,7 @@ public:
 				k3d::polyhedron::add_quadrilateral(
 					Output,
 					*polyhedron,
+					0,
 					top_map[(row + 0) * point_columns + (column + 0)],
 					top_map[(row + 0) * point_columns + (column + 1)],
 					top_map[(row + 1) * point_columns + (column + 1)],
@@ -170,6 +168,7 @@ public:
 				k3d::polyhedron::add_quadrilateral(
 					Output,
 					*polyhedron,
+					0,
 					bottom_map[(row + 0) * point_columns + (column + 0)],
 					bottom_map[(row + 0) * point_columns + (column + 1)],
 					bottom_map[(row + 1) * point_columns + (column + 1)],

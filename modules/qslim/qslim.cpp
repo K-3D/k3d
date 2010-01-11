@@ -129,24 +129,27 @@ public:
 	}
 
 	/// Appends a QSlim model to a K-3D mesh as a polyhedron primitive.
-	static void append(MxStdModel& model, k3d::mesh& Mesh, k3d::imaterial* const Material)
+	static void append(const k3d::polyhedron::const_primitive& InputPolyhedron, MxStdModel& Model, k3d::mesh& Mesh, k3d::imaterial* const Material)
 	{
 		k3d::mesh::points_t& points = Mesh.points.writable();
 		k3d::mesh::selection_t& point_selection = Mesh.point_selection.writable();
 		const k3d::uint_t point_offset = points.size();
-		for(unsigned int v = 0; v < model.vert_count(); ++v)
+		for(unsigned int v = 0; v < Model.vert_count(); ++v)
 		{
-		       k3d::point3 position(model.vertex(v));
+		       k3d::point3 position(Model.vertex(v));
 		       position[0] = -position[0];
 		       points.push_back(position);
 		}
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Mesh));
-		for(unsigned int f = 0; f != model.face_count(); ++f)
+		polyhedron->constant_attributes = InputPolyhedron.constant_attributes;
+
+		for(unsigned int f = 0; f != Model.face_count(); ++f)
 		{
-			if(!model.face_is_valid(f))
+			if(!Model.face_is_valid(f))
 				continue;
 
+			polyhedron->face_shells.push_back(0);
 			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(0);
@@ -156,22 +159,20 @@ public:
 
 			polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 			polyhedron->edge_selections.push_back(0);
-			polyhedron->vertex_points.push_back(point_offset + model.face(f).v[0]);
+			polyhedron->vertex_points.push_back(point_offset + Model.face(f).v[0]);
 			polyhedron->vertex_selections.push_back(0);
 
 			polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 			polyhedron->edge_selections.push_back(0);
-			polyhedron->vertex_points.push_back(point_offset + model.face(f).v[1]);
+			polyhedron->vertex_points.push_back(point_offset + Model.face(f).v[1]);
 			polyhedron->vertex_selections.push_back(0);
 
 			polyhedron->clockwise_edges.push_back(polyhedron->loop_first_edges.back());
 			polyhedron->edge_selections.push_back(0);
-			polyhedron->vertex_points.push_back(point_offset + model.face(f).v[2]);
+			polyhedron->vertex_points.push_back(point_offset + Model.face(f).v[2]);
 			polyhedron->vertex_selections.push_back(0);
 		}
 
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(polyhedron->face_first_loops.size());
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 	}
 
@@ -179,7 +180,6 @@ public:
 	{
 		Output.points = Input.points;
 		Output.point_selection = Input.point_selection;
-		Output.point_attributes = Input.point_attributes;
 
 		k3d::imaterial* const material = m_material.pipeline_value();
 
@@ -248,10 +248,12 @@ public:
 			slim->initialize();
 			slim->decimate(m_face_count.pipeline_value());
 
-			append(*model, Output, material);
+			append(*polyhedron, *model, Output, material);
 		}
 
-		k3d::mesh::delete_unused_points(Output);
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

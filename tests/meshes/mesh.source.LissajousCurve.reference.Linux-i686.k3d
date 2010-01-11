@@ -33,7 +33,7 @@
 						<array name="width" type="k3d::double_t">0.10000000000000001</array>
 					</table>
 					<table type="curve"/>
-					<table type="varying"/>
+					<table type="parameter"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>

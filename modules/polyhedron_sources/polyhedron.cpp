@@ -1491,6 +1491,7 @@ public:
 			if(!m_PolyhedronPaths[i].size())
 				continue;
 
+			primitive->face_shells.push_back(0);
 			primitive->face_first_loops.push_back(primitive->loop_first_edges.size());
 			primitive->face_loop_counts.push_back(1);
 			primitive->face_selections.push_back(0);
@@ -1514,8 +1515,6 @@ public:
 			colors.push_back(detail::colors[color_index]);
 		}
 
-		primitive->shell_first_faces.push_back(0);
-		primitive->shell_face_counts.push_back(primitive->face_first_loops.size());
 		primitive->shell_types.push_back(k3d::polyhedron::POLYGONS);
 	}
 

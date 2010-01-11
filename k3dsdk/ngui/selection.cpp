@@ -113,11 +113,11 @@ struct select_all_points
 		boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::PATCH, 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::EDGE, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::PARAMETER, 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::PATCH, 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SURFACE, 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
 
 		return results;
 	}
@@ -142,10 +142,10 @@ struct select_all_components
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CONSTANT, component == k3d::selection::CONSTANT ? 1.0 : 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, component == k3d::selection::CURVE ? 1.0 : 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE, component == k3d::selection::FACE ? 1.0 : 0.0);
+		geometry::primitive_selection::append(*primitive_selection, k3d::selection::PARAMETER, component == k3d::selection::PARAMETER ? 1.0 : 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::PATCH, component == k3d::selection::PATCH ? 1.0 : 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::EDGE, component == k3d::selection::EDGE ? 1.0 : 0.0);
 		geometry::primitive_selection::append(*primitive_selection, k3d::selection::SURFACE, component == k3d::selection::SURFACE ? 1.0 : 0.0);
-		geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, component == k3d::selection::VARYING ? 1.0 : 0.0);
 
 		return results;
 	}
@@ -589,9 +589,9 @@ private:
 				geometry::primitive_selection::append(*primitive_selection, k3d::selection::CURVE, 0.0);
 				geometry::primitive_selection::append(*primitive_selection, k3d::selection::EDGE, 0.0);
 				geometry::primitive_selection::append(*primitive_selection, k3d::selection::FACE, 0.0);
+				geometry::primitive_selection::append(*primitive_selection, k3d::selection::PARAMETER, 0.0);
 				geometry::primitive_selection::append(*primitive_selection, k3d::selection::PATCH, 0.0);
 				geometry::primitive_selection::append(*primitive_selection, k3d::selection::SURFACE, 0.0);
-				geometry::primitive_selection::append(*primitive_selection, k3d::selection::VARYING, 0.0);
 				geometry::primitive_selection::append(*primitive_selection, k3d::selection::VERTEX, 0.0);
 			}
 

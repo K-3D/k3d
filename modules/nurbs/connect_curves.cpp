@@ -126,7 +126,10 @@ public:
 			delete_curve(*prim2, selected_curves[1]);
 		}
 		delete_empty_primitives(Output);
-		k3d::mesh::delete_unused_points(Output);
+
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	static k3d::iplugin_factory& get_factory()

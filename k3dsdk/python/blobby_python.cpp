@@ -57,7 +57,7 @@ public:
 		static object operands(wrapper& Self) { return wrap(Self.wrapped().operands); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
@@ -81,7 +81,7 @@ public:
 		static object operands(wrapper& Self) { return wrap(Self.wrapped().operands); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
@@ -145,7 +145,7 @@ void define_namespace_blobby()
 		.def("operands", &blobby::const_primitive::operands)
 		.def("constant_attributes", &blobby::const_primitive::constant_attributes)
 		.def("surface_attributes", &blobby::const_primitive::surface_attributes)
-		.def("varying_attributes", &blobby::const_primitive::varying_attributes)
+		.def("parameter_attributes", &blobby::const_primitive::parameter_attributes)
 		.def("vertex_attributes", &blobby::const_primitive::vertex_attributes)
 		;
 
@@ -165,7 +165,7 @@ void define_namespace_blobby()
 		.def("operands", &blobby::primitive::operands)
 		.def("constant_attributes", &blobby::primitive::constant_attributes)
 		.def("surface_attributes", &blobby::primitive::surface_attributes)
-		.def("varying_attributes", &blobby::primitive::varying_attributes)
+		.def("parameter_attributes", &blobby::primitive::parameter_attributes)
 		.def("vertex_attributes", &blobby::primitive::vertex_attributes)
 		;
 }

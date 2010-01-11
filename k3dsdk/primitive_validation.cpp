@@ -24,6 +24,37 @@
 namespace k3d
 {
 
+void require_valid_points(const mesh& Mesh)
+{
+	const uint_t point_count = Mesh.points ? Mesh.points->size() : 0;
+	const uint_t point_selection_count = Mesh.point_selection ? Mesh.point_selection->size() : 0;
+
+	if(point_count != point_selection_count)
+		throw std::runtime_error("Mismatched point and point_selection array lengths.");
+
+	if(0 == Mesh.point_attributes.column_count())
+		return;
+
+	const uint_t point_attribute_count = Mesh.point_attributes.row_count();
+
+	if(point_count != point_attribute_count)
+	{
+		std::ostringstream buffer;
+		buffer << "Point attribute table incorrect length [" << point_attribute_count << "], expected [" << point_count << "]";
+		throw std::runtime_error(buffer.str());
+	}
+
+	for(mesh::table_t::const_iterator array_iterator = Mesh.point_attributes.begin(); array_iterator != Mesh.point_attributes.end(); ++array_iterator)
+	{
+		const array* const current_array = array_iterator->second.get();
+		if(!current_array)
+			throw std::runtime_error("NULL mesh point attributes array.");
+
+		if(current_array->size() != point_count)
+			throw std::runtime_error("Array length mismatch for mesh point attributes");
+	}
+}
+
 static void require_valid_table(const mesh& Mesh, const string_t& Name, const table& Table)
 {
 	if(Name == "constant" && Table.column_count() && Table.row_count() != 1)
@@ -37,15 +68,17 @@ static void require_valid_table(const mesh& Mesh, const string_t& Name, const ta
 
 		const array* const first_array = Table.begin()->second.get();
 		if(current_array->size() != first_array->size())
-			throw std::runtime_error("Table array length mismatch for table " + Name);
+			throw std::runtime_error("Array length mismatch for table [" + Name + "]");
 
 		if(current_array->get_metadata_value(metadata::key::domain()) == metadata::value::point_indices_domain())
 		{
 			if(!Mesh.points)
 				throw std::runtime_error("Mesh missing points array.");
-
+			
 			if(!Mesh.point_selection)
 				throw std::runtime_error("Mesh missing point selections array.");
+
+			require_valid_points(Mesh);
 
 			const mesh::indices_t* const indices = dynamic_cast<const mesh::indices_t*>(current_array);
 			if(!indices)
@@ -75,7 +108,11 @@ void require_valid_primitive(const mesh& Mesh, const mesh::primitive& Primitive)
 		if(structure != Primitive.structure.end())
 		{
 			if(structure->second.row_count() != attributes->second.row_count())
-				throw std::runtime_error("Attribute / structure table length mismatch.");
+			{
+				std::ostringstream buffer;
+				buffer << "[" << Primitive.type << "] attribute table [" << structure->first << "] incorrect length [" << attributes->second.row_count() << "], expected [" << structure->second.row_count() << "]";
+				throw std::runtime_error(buffer.str());
+			}
 		}
 	}
 }

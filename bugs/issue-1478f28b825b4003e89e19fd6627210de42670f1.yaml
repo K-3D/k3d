@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Fix MergeCoplanarFaces.
+desc: Need to update MergeCoplanarFaces to match changes to the polyhedron schema for shells.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-01-01 03:16:51.261549 Z
+references: []
+
+id: 1478f28b825b4003e89e19fd6627210de42670f1
+log_events: 
+- - 2010-01-01 03:16:51.966218 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""

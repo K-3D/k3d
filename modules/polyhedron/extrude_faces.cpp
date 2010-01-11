@@ -223,7 +223,7 @@ public:
 				}
 			}
 
-			// For each (original) selected face, map the face vertices to its new points ...
+			// For each (original) selected face, map the face vertices to their new locations ...
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
 				if(!polyhedron->face_selections[face])
@@ -288,14 +288,13 @@ public:
 								polyhedron->vertex_selections.push_back(0);
 								polyhedron->vertex_selections.push_back(0);
 
+								polyhedron->face_shells.push_back(polyhedron->face_shells[face]);
 								polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 								polyhedron->face_loop_counts.push_back(1);
 								polyhedron->face_selections.push_back(select_new_faces ? 1 : 0);
 								polyhedron->face_materials.push_back(polyhedron->face_materials[face]);
 
 								polyhedron->loop_first_edges.push_back(new_first_edge);
-
-								++polyhedron->shell_face_counts.back();
 							}
 
 							edge = polyhedron->clockwise_edges[edge];
@@ -307,7 +306,9 @@ public:
 			}
 		}
 
-		k3d::mesh::delete_unused_points(Output, point_map);
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points, point_map);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

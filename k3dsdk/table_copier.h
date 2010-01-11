@@ -75,9 +75,11 @@ public:
 		void unused_target(const string_t& TargetName, const array& Target) const; 
 	};
 
-	/// Initializes table_copier to copy data from a collection of source arrays to a collection of target arrays, using a copy_policy
+	/// Initializes table_copier to copy data from a source table to a target table, using a copy_policy
 	/// object to determine how each source array maps to each target array.
 	table_copier(const table& Source, table& Target, const copy_policy& CopyPolicy = strict_copy());
+	/// Special-case initialization of table_copier to copy data within a single table, using an identity-map copy policy.
+	table_copier(table& Table);
 	~table_copier();
 
 	/// Appends the given index value from each source array to each corresponding target array.

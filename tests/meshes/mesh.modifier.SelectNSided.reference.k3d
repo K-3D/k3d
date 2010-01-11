@@ -3,7 +3,9 @@
 	<mesh_arrays>
 		<points>0 0 2.5 2.2360679774997894 0 1.1180339887498953 0.69098300562505166 2.1266270208800995 1.1180339887498953 -1.8090169943749479 1.3143277802978324 1.1180339887498953 -1.8090169943749455 -1.3143277802978357 1.1180339887498953 1.8090169943749479 -1.3143277802978348 -1.1180339887498936 1.8090169943749479 1.3143277802978337 -1.118033988749894 -2.2360679774997889 -5.5511151231257827e-16 -1.1180339887498956 -0.69098300562504855 -2.1266270208800995 -1.1180339887498958 5.4817261840867104e-15 -1.9428902930940239e-15 -2.4999999999999991</points>
 		<point_selection>0 0 0 0 0 0 0 0 0 0</point_selection>
-		<point_attributes/>
+		<point_attributes>
+			<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9</array>
+		</point_attributes>
 		<primitives>
 			<primitive type="polyhedron">
 				<structure>
@@ -24,13 +26,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0 0 0 0 0 0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">0 3 6 9 14 17 20 25 28 31 34 37</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">12</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -47,12 +48,19 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39</array>
+					</table>
 					<table type="face">
 						<array name="Cs" type="k3d::color">1 0 0 1 0 0 1 0 0 0 0 1 1 0 0 1 0 0 0 0 1 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0</array>
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11</array>
 					</table>
-					<table type="vertex"/>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39</array>
+					</table>
 				</attributes>
 			</primitive>
 		</primitives>

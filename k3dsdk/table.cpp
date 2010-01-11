@@ -154,7 +154,7 @@ std::ostream& operator<<(std::ostream& Stream, const table& RHS)
 {
 	for(table::const_iterator array_iterator = RHS.begin(); array_iterator != RHS.end(); ++array_iterator)
 	{
-		Stream << standard_indent << "\"" << array_iterator->first << "\" [" << array_iterator->second->type_string() << "] (" << array_iterator->second->size() << "):\n";
+		Stream << standard_indent << "array \"" << array_iterator->first << "\" [" << array_iterator->second->type_string() << "] (" << array_iterator->second->size() << "):\n";
 		if(array_iterator->second->size())
 			Stream << push_indent << start_block() << *array_iterator->second << finish_block << pop_indent << "\n";
 	}

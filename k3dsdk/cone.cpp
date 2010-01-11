@@ -41,7 +41,7 @@ const_primitive::const_primitive(
 	const mesh::selection_t& Selections,
 	const mesh::table_t& ConstantAttributes,
 	const mesh::table_t& SurfaceAttributes,
-	const mesh::table_t& VaryingAttributes
+	const mesh::table_t& ParameterAttributes
 		) :
 	matrices(Matrices),
 	materials(Materials),
@@ -51,7 +51,7 @@ const_primitive::const_primitive(
 	selections(Selections),
 	constant_attributes(ConstantAttributes),
 	surface_attributes(SurfaceAttributes),
-	varying_attributes(VaryingAttributes)
+	parameter_attributes(ParameterAttributes)
 {
 }
 
@@ -67,7 +67,7 @@ primitive::primitive(
 	mesh::selection_t& Selections,
 	mesh::table_t& ConstantAttributes,
 	mesh::table_t& SurfaceAttributes,
-	mesh::table_t& VaryingAttributes
+	mesh::table_t& ParameterAttributes
 		) :
 	matrices(Matrices),
 	materials(Materials),
@@ -77,7 +77,7 @@ primitive::primitive(
 	selections(Selections),
 	constant_attributes(ConstantAttributes),
 	surface_attributes(SurfaceAttributes),
-	varying_attributes(VaryingAttributes)
+	parameter_attributes(ParameterAttributes)
 {
 }
 
@@ -97,7 +97,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.structure["surface"].create<mesh::selection_t>("selections"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["surface"],
-		generic_primitive.attributes["varying"]
+		generic_primitive.attributes["parameter"]
 		);
 
 	result->selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
@@ -121,7 +121,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		const mesh::table_t& surface_attributes = require_attributes(Primitive, "surface");
-		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		const mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 
 		const mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, surface_structure, "matrices");
 		const mesh::materials_t& materials = require_array<mesh::materials_t>(Primitive, surface_structure, "materials");
@@ -132,9 +132,9 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
-		require_table_row_count(Primitive, varying_attributes, "varying", surface_structure.row_count() * 4);
+		require_table_row_count(Primitive, parameter_attributes, "parameter", surface_structure.row_count() * 4);
 
-		return new const_primitive(matrices, materials, heights, radii, sweep_angles, selections, constant_attributes, surface_attributes, varying_attributes);
+		return new const_primitive(matrices, materials, heights, radii, sweep_angles, selections, constant_attributes, surface_attributes, parameter_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -157,7 +157,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		mesh::table_t& surface_attributes = require_attributes(Primitive, "surface");
-		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 
 		mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, surface_structure, "matrices");
 		mesh::materials_t& materials = require_array<mesh::materials_t>(Primitive, surface_structure, "materials");
@@ -168,9 +168,9 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
-		require_table_row_count(Primitive, varying_attributes, "varying", surface_structure.row_count() * 4);
+		require_table_row_count(Primitive, parameter_attributes, "parameter", surface_structure.row_count() * 4);
 
-		return new primitive(matrices, materials, heights, radii, sweep_angles, selections, constant_attributes, surface_attributes, varying_attributes);
+		return new primitive(matrices, materials, heights, radii, sweep_angles, selections, constant_attributes, surface_attributes, parameter_attributes);
 	}
 	catch(std::exception& e)
 	{

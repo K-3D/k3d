@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2009, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -10,12 +10,12 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 /** \file
 	\author Tim Shead (tshead@k-3d.com)
@@ -33,7 +33,7 @@
 
 #include <boost/scoped_ptr.hpp>
 
-#include <map>
+#include <set>
 
 namespace module
 {
@@ -43,33 +43,6 @@ namespace stl
 
 namespace io
 {
-
-namespace detail
-{
-
-typedef k3d::typed_array<k3d::string_t> strings_t;
-typedef std::map<k3d::string_t, k3d::mesh::indices_t> solids_t;
-
-/// Groups triangles into named solids, based on the given face array name 
-void extract_solids(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::string_t& ArrayName, solids_t& Solids)
-{
-	const strings_t* solid_names = Polyhedron.face_attributes.lookup<strings_t>(ArrayName); 
-	for(k3d::uint_t face = 0; face != Polyhedron.face_first_loops.size(); ++face)
-	{
-		k3d::mesh::indices_t& indices = solid_names ? Solids[solid_names->at(face)] : Solids["default"];
-		const k3d::uint_t first_edge = Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]; 
-		for(k3d::uint_t edge = first_edge; ; )
-		{
-			indices.push_back(Polyhedron.vertex_points[edge]);
-
-			edge = Polyhedron.clockwise_edges[edge];
-			if(edge == first_edge)
-				break;
-		}
-	}
-}
-
-} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // mesh_writerio
@@ -82,10 +55,13 @@ class mesh_writer :
 public:
 	mesh_writer(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_solid_labels(init_owner(*this) + init_name("solid_labels") + init_label(_("Solid Labels")) + init_description(_("Name of a per-face array containing solid labels (as used in OpenFOAM)")) + init_value(std::string("solids")))
+		m_group_solids(init_owner(*this) + init_name("group_solids") + init_label(_("Group Solids")) + init_description(_("Group solids using a per-face array.")) + init_value(false)),
+		m_group_array(init_owner(*this) + init_name("group_array") + init_label(_("Group Array")) + init_description(_("Name of a per-face array containing solid labels (as used in OpenFOAM).")) + init_value(std::string("solids")))
 	{
-		m_solid_labels.changed_signal().connect(k3d::hint::converter<
-				k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_write_file_slot()));
+		m_group_solids.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_write_file_slot()));
+		m_group_array.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_write_file_slot()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -105,44 +81,70 @@ private:
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
-      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input, **primitive));
-      if(!polyhedron)
-        continue;
-      
-      if(!k3d::polyhedron::is_triangles(*polyhedron))
-        continue;
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input, **primitive));
+			if(!polyhedron)
+				continue;
+			
+			if(!k3d::polyhedron::is_triangles(*polyhedron))
+				continue;
 
-      detail::solids_t solids;
-      detail::extract_solids(*polyhedron, m_solid_labels.pipeline_value(), solids);
-      const k3d::mesh::points_t& points = *Input.points;
-      
-      for(detail::solids_t::const_iterator solid = solids.begin(); solid != solids.end(); ++solid)
-      {
-        Output << "solid " << solid->first << "\n";
-        const k3d::mesh::indices_t corner_indices = solid->second;
-        for(k3d::uint_t corner = 0; corner != corner_indices.size(); ++corner)
-        {
-          if(corner % 3 == 0)
-          {
-            Output << "facet normal 0.0 0.0 0.0\n";
-            Output << "  outer loop\n";
-          }
+			// Group faces together by default, allowing for optional user-specified groups ...
+			k3d::mesh::strings_t face_groups(polyhedron->face_shells.size(), "default");
+			if(m_group_solids.pipeline_value())
+			{
+				const k3d::mesh::strings_t* const group_array = polyhedron->face_attributes.lookup<k3d::mesh::strings_t>(m_group_array.pipeline_value());
+				return_if_fail(group_array);
 
-          Output << "    vertex " << points[corner_indices[corner]] << "\n";
+				face_groups.assign(group_array->begin(), group_array->end());
+			}
 
-          if((corner+1) % 3 == 0)
-          {
-            Output << "  endloop\n";
-            Output << "endfacet\n";
-          }
-        }
-        Output << "endsolid\n";
-      }
-    }
+			std::set<k3d::string_t> face_group_names(face_groups.begin(), face_groups.end());
+
+			// Compute face normals, so we can write an STL file for maximum portability ...
+			k3d::mesh::normals_t face_normals;
+			k3d::polyhedron::create_face_normal_lookup(Input, *polyhedron, face_normals);
+
+			// Compute counterclockwise edges, since STL faces use right-hand (counterclockwise) winding ...
+			k3d::mesh::indices_t counterclockwise_edges;
+			k3d::polyhedron::create_counterclockwise_edge_lookup(polyhedron->clockwise_edges, counterclockwise_edges);
+
+			// For each group of faces, write-out an STL solid ...
+			const k3d::mesh::points_t& points = *Input.points;
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
+			for(std::set<k3d::string_t>::const_iterator face_group_name = face_group_names.begin(); face_group_name != face_group_names.end(); ++face_group_name)
+			{
+				Output << "solid " << *face_group_name << "\n";
+
+				for(k3d::uint_t face = face_begin; face != face_end; ++face)
+				{
+					if(face_groups[face] != *face_group_name)
+						continue;
+
+					Output << "facet normal " << face_normals[face] << "\n";
+					Output << "  outer loop\n";
+
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
+					for(k3d::uint_t edge = first_edge; ;)
+					{
+						Output << "    vertex " << points[polyhedron->vertex_points[edge]] << "\n";
+
+						edge = counterclockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
+
+					Output << "  endloop\n";
+					Output << "endfacet\n";
+				}
+				Output << "endsolid\n";
+			}
+		}
 	}
 
 private:
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_solid_labels;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_group_solids;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_group_array;
 };
 
 k3d::iplugin_factory& mesh_writer_factory()

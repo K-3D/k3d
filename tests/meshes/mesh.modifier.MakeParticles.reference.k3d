@@ -3,7 +3,9 @@
 	<mesh_arrays>
 		<points>-2.5 2.5 2.5 2.5 2.5 2.5 2.5 -2.5 2.5 -2.5 -2.5 2.5 -2.5 2.5 -2.5 2.5 2.5 -2.5 2.5 -2.5 -2.5 -2.5 -2.5 -2.5</points>
 		<point_selection>0 0 0 0 0 0 0 0</point_selection>
-		<point_attributes/>
+		<point_attributes>
+			<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7</array>
+		</point_attributes>
 		<primitives>
 			<primitive type="particle">
 				<structure>

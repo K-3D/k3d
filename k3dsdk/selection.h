@@ -75,8 +75,8 @@ PRIMITIVE = 25,
 CONSTANT = 26,
 /// Storage for a zero-based surface index (relative to a primitive)
 SURFACE = 27,
-/// Storage for a zero-based varying index (relative to a primitive)
-VARYING = 28,
+/// Storage for a zero-based parameter corner index (relative to a primitive)
+PARAMETER = 28,
 /// Storage for a zero-based split-edge index (relative to a primitive)
 EDGE = 30,
 /// Storage for a zero-based point index (relative to a mesh)

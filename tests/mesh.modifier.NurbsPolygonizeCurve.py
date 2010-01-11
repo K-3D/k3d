@@ -9,5 +9,7 @@ setup.modifier.mesh_selection = k3d.geometry.selection.create(1)
 setup.modifier.segments = 10
 setup.modifier.delete_original = True
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsPolygonizeCurve", 2)
+
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsPolygonizeCurve", 2)
 

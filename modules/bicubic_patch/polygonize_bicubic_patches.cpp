@@ -122,6 +122,7 @@ public:
 				{
 					for(k3d::int32_t k = 0; k != subdivisions; ++k)
 					{
+						polyhedron->face_shells.push_back(0);
 						polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 						polyhedron->face_loop_counts.push_back(1);
 						polyhedron->face_selections.push_back(1);
@@ -152,12 +153,12 @@ public:
 				}
 			}
 
-			polyhedron->shell_first_faces.push_back(0);
-			polyhedron->shell_face_counts.push_back(polyhedron->face_first_loops.size());
 			polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 		}
 
-		k3d::mesh::delete_unused_points(Output);
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

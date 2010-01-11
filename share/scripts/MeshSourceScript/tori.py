@@ -7,7 +7,7 @@ k3d.check_node_environment(locals(), "MeshSourceScript")
 
 # Construct a sphere mesh primitive ...
 torus = k3d.torus.create(Output)
-color = torus.varying_attributes().create("Cs", "k3d::color")
+color = torus.parameter_attributes().create("Cs", "k3d::color")
 
 # Add two tori ...
 torus.matrices().append(k3d.translate3(k3d.vector3(-5, 0, 0)))

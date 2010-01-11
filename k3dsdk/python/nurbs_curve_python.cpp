@@ -54,7 +54,7 @@ public:
 		static object curve_knots(wrapper& Self) { return wrap(Self.wrapped().curve_knots); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object curve_attributes(wrapper& Self) { return wrap(Self.wrapped().curve_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 	class primitive
@@ -73,7 +73,7 @@ public:
 		static object curve_knots(wrapper& Self) { return wrap(Self.wrapped().curve_knots); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object curve_attributes(wrapper& Self) { return wrap(Self.wrapped().curve_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 
@@ -115,7 +115,7 @@ void define_namespace_nurbs_curve()
 		.def("curve_knots", &nurbs_curve::const_primitive::curve_knots)
 		.def("constant_attributes", &nurbs_curve::const_primitive::constant_attributes)
 		.def("curve_attributes", &nurbs_curve::const_primitive::curve_attributes)
-		.def("varying_attributes", &nurbs_curve::const_primitive::varying_attributes)
+		.def("parameter_attributes", &nurbs_curve::const_primitive::parameter_attributes)
 		;
 
 	class_<nurbs_curve::primitive::wrapper>("primitive", no_init)
@@ -130,7 +130,7 @@ void define_namespace_nurbs_curve()
 		.def("curve_knots", &nurbs_curve::primitive::curve_knots)
 		.def("constant_attributes", &nurbs_curve::primitive::constant_attributes)
 		.def("curve_attributes", &nurbs_curve::primitive::curve_attributes)
-		.def("varying_attributes", &nurbs_curve::primitive::varying_attributes)
+		.def("parameter_attributes", &nurbs_curve::primitive::parameter_attributes)
 		;
 }
 

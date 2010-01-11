@@ -40,7 +40,7 @@ const_primitive::const_primitive(
 	const mesh::indices_t& PatchPoints,
 	const mesh::table_t& ConstantAttributes,
 	const mesh::table_t& PatchAttributes,
-	const mesh::table_t& VaryingAttributes,
+	const mesh::table_t& ParameterAttributes,
 	const mesh::table_t& VertexAttributes
 		) :
 	patch_selections(PatchSelections),
@@ -48,7 +48,7 @@ const_primitive::const_primitive(
 	patch_points(PatchPoints),
 	constant_attributes(ConstantAttributes),
 	patch_attributes(PatchAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -62,7 +62,7 @@ primitive::primitive(
 	mesh::indices_t& PatchPoints,
 	mesh::table_t& ConstantAttributes,
 	mesh::table_t& PatchAttributes,
-	mesh::table_t& VaryingAttributes,
+	mesh::table_t& ParameterAttributes,
 	mesh::table_t& VertexAttributes
 		) :
 	patch_selections(PatchSelections),
@@ -70,7 +70,7 @@ primitive::primitive(
 	patch_points(PatchPoints),
 	constant_attributes(ConstantAttributes),
 	patch_attributes(PatchAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -88,7 +88,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.structure["vertex"].create<mesh::indices_t >("patch_points"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["patch"],
-		generic_primitive.attributes["varying"],
+		generic_primitive.attributes["parameter"],
 		generic_primitive.attributes["vertex"]
 		);
 
@@ -115,7 +115,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		const table& constant_attributes = require_attributes(Primitive, "constant");
 		const table& patch_attributes = require_attributes(Primitive, "patch");
-		const table& varying_attributes = require_attributes(Primitive, "varying");
+		const table& parameter_attributes = require_attributes(Primitive, "parameter");
 		const table& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		const mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, patch_structure, "patch_selections");
@@ -126,9 +126,9 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_structure, "vertex", patch_structure.row_count() * 16);
-		require_table_row_count(Primitive, varying_attributes, "varying", patch_structure.row_count() * 4);
+		require_table_row_count(Primitive, parameter_attributes, "parameter", patch_structure.row_count() * 4);
 
-		return new const_primitive(patch_selections, patch_materials, patch_points, constant_attributes, patch_attributes, varying_attributes, vertex_attributes);
+		return new const_primitive(patch_selections, patch_materials, patch_points, constant_attributes, patch_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -152,7 +152,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		table& constant_attributes = require_attributes(Primitive, "constant");
 		table& patch_attributes = require_attributes(Primitive, "patch");
-		table& varying_attributes = require_attributes(Primitive, "varying");
+		table& parameter_attributes = require_attributes(Primitive, "parameter");
 		table& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, patch_structure, "patch_selections");
@@ -163,9 +163,9 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_structure, "vertex", patch_structure.row_count() * 16);
-		require_table_row_count(Primitive, varying_attributes, "varying", patch_structure.row_count() * 4);
+		require_table_row_count(Primitive, parameter_attributes, "parameter", patch_structure.row_count() * 4);
 
-		return new primitive(patch_selections, patch_materials, patch_points, constant_attributes, patch_attributes, varying_attributes, vertex_attributes);
+		return new primitive(patch_selections, patch_materials, patch_points, constant_attributes, patch_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{

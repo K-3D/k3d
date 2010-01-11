@@ -45,9 +45,8 @@ public:
 	public:
 		typedef owned_instance_wrapper<k3d::polyhedron::const_primitive> wrapper;
 
-		static object shell_first_faces(wrapper& Self) { return wrap(Self.wrapped().shell_first_faces); }
-		static object shell_face_counts(wrapper& Self) { return wrap(Self.wrapped().shell_face_counts); }
 		static object shell_types(wrapper& Self) { return wrap(Self.wrapped().shell_types); }
+		static object face_shells(wrapper& Self) { return wrap(Self.wrapped().face_shells); }
 		static object face_first_loops(wrapper& Self) { return wrap(Self.wrapped().face_first_loops); }
 		static object face_loop_counts(wrapper& Self) { return wrap(Self.wrapped().face_loop_counts); }
 		static object face_selections(wrapper& Self) { return wrap(Self.wrapped().face_selections); }
@@ -68,9 +67,8 @@ public:
 	public:
 		typedef owned_instance_wrapper<k3d::polyhedron::primitive> wrapper;
 
-		static object shell_first_faces(wrapper& Self) { return wrap(Self.wrapped().shell_first_faces); }
-		static object shell_face_counts(wrapper& Self) { return wrap(Self.wrapped().shell_face_counts); }
 		static object shell_types(wrapper& Self) { return wrap(Self.wrapped().shell_types); }
+		static object face_shells(wrapper& Self) { return wrap(Self.wrapped().face_shells); }
 		static object face_first_loops(wrapper& Self) { return wrap(Self.wrapped().face_first_loops); }
 		static object face_loop_counts(wrapper& Self) { return wrap(Self.wrapped().face_loop_counts); }
 		static object face_selections(wrapper& Self) { return wrap(Self.wrapped().face_selections); }
@@ -163,9 +161,8 @@ void define_namespace_polyhedron()
 		.attr("__module__") = "k3d";
 
 	class_<polyhedron::const_primitive::wrapper>("const_primitive", no_init)
-		.def("shell_first_faces", &polyhedron::const_primitive::shell_first_faces)
-		.def("shell_face_counts", &polyhedron::const_primitive::shell_face_counts)
 		.def("shell_types", &polyhedron::const_primitive::shell_types)
+		.def("face_shells", &polyhedron::const_primitive::face_shells)
 		.def("face_first_loops", &polyhedron::const_primitive::face_first_loops)
 		.def("face_loop_counts", &polyhedron::const_primitive::face_loop_counts)
 		.def("face_selections", &polyhedron::const_primitive::face_selections)
@@ -182,9 +179,8 @@ void define_namespace_polyhedron()
 		;
 
 	class_<polyhedron::primitive::wrapper>("primitive", no_init)
-		.def("shell_first_faces", &polyhedron::primitive::shell_first_faces)
-		.def("shell_face_counts", &polyhedron::primitive::shell_face_counts)
 		.def("shell_types", &polyhedron::primitive::shell_types)
+		.def("face_shells", &polyhedron::primitive::face_shells)
 		.def("face_first_loops", &polyhedron::primitive::face_first_loops)
 		.def("face_loop_counts", &polyhedron::primitive::face_loop_counts)
 		.def("face_selections", &polyhedron::primitive::face_selections)

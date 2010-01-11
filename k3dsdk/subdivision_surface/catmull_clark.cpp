@@ -1030,14 +1030,11 @@ public:
 					output_polyhedron.face_selections);
 			
 			// Connect face centers to edge midpoints
-			for(k3d::uint_t polyhedron = 0; polyhedron != input_polyhedron.shell_first_faces.size(); ++polyhedron)
+			const k3d::uint_t face_start = 0;
+			const k3d::uint_t face_end = face_start + input_polyhedron.face_shells.size();
+			for(k3d::uint_t face = face_start; face != face_end; ++face)
 			{
-				const k3d::uint_t face_start = input_polyhedron.shell_first_faces[polyhedron];
-				const k3d::uint_t face_end = face_start + input_polyhedron.shell_face_counts[polyhedron];
-				for(k3d::uint_t face = face_start; face != face_end; ++face)
-				{
-					topology_subdivider(polyhedron, face);
-				}
+				topology_subdivider(0, face);
 			}
 			// Set the per-polyhedron arrays
 			output_polyhedron.shell_first_faces.push_back(0);
@@ -1317,9 +1314,8 @@ private:
 	
 	struct polyhedron
 	{
-		k3d::mesh::indices_t shell_first_faces;
-		k3d::mesh::counts_t shell_face_counts;
 		k3d::typed_array<int32_t> shell_types;
+		k3d::mesh::indices_t face_shells;
 		k3d::mesh::indices_t face_first_loops;
 		k3d::mesh::counts_t face_loop_counts;
 		k3d::mesh::selection_t face_selections;
@@ -1337,9 +1333,9 @@ private:
 	
 	k3d::polyhedron::const_primitive* create_polyhedron_const_primitive(const polyhedron& Polyhedron)
 	{
-		return new k3d::polyhedron::const_primitive(Polyhedron.shell_first_faces,
-				Polyhedron.shell_face_counts,
+		return new k3d::polyhedron::const_primitive(
 				Polyhedron.shell_types,
+				Polyhedron.face_shells,
 				Polyhedron.face_first_loops,
 				Polyhedron.face_loop_counts,
 				Polyhedron.face_selections,
@@ -1365,9 +1361,8 @@ private:
 	
 	void copy_output_polyhedron(const polyhedron& Input, k3d::polyhedron::primitive& Output, const k3d::uint_t PointOffset)
 	{
-		copy_array(Input.shell_first_faces, Output.shell_first_faces);
-		copy_array(Input.shell_face_counts, Output.shell_face_counts);
 		copy_array(Input.shell_types, Output.shell_types);
+		copy_array(Input.face_shells, Output.face_shells);
 		copy_array(Input.face_first_loops, Output.face_first_loops);
 		copy_array(Input.face_loop_counts, Output.face_loop_counts);
 		copy_array(Input.face_selections, Output.face_selections);

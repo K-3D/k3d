@@ -91,14 +91,11 @@ public:
 		// Create the cone topology ...
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-
-		k3d::polyhedron::add_cylinder(Output, *polyhedron, v_segments, u_segments, material);
+		k3d::polyhedron::add_cylinder(Output, *polyhedron, 0, v_segments, u_segments, material);
 
 		// Ensure that the top of the cone is "closed" topologically ...
-		polyhedron->shell_face_counts[0] += 1;
+		polyhedron->face_shells.push_back(0);
 		polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 		polyhedron->face_loop_counts.push_back(1);
 		polyhedron->face_selections.push_back(0);
@@ -117,7 +114,7 @@ public:
 		// Optionally close the bottom of the cone ...
 		if(bottom)
 		{
-			polyhedron->shell_face_counts[0] += 1;
+			polyhedron->face_shells.push_back(0);
 			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(0);

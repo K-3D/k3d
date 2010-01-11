@@ -10,5 +10,7 @@ setup.source.columns = 1
 mesh_selection = k3d.geometry.selection.create(1)
 setup.modifier.mesh_selection = mesh_selection
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.PolyGrid", 0)
+
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TriangulateFaces.PolyGrid", 0)
 

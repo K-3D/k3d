@@ -12,5 +12,7 @@ modifier = document.new_node("BlobbyNegate")
 
 document.set_dependency(modifier.get_property("input_mesh"), source1.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.BlobbyNegate", 5)
+
+testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.BlobbyNegate", 5)
 

@@ -20,10 +20,10 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="surface"/>
-					<table type="varying">
+					<table type="parameter">
 						<array name="Cs" type="k3d::color">1 0 0 1 0 0 1 1 0 1 1 0 1 0 0 1 0 0 0 0 1 0 0 1</array>
 					</table>
+					<table type="surface"/>
 				</attributes>
 			</primitive>
 		</primitives>

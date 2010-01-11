@@ -65,7 +65,7 @@ const_primitive::const_primitive(
 	const mesh::selection_t& PointSelections,
 	const mesh::table_t& ConstantAttributes,
 	const mesh::table_t& PatchAttributes,
-	const mesh::table_t& VaryingAttributes,
+	const mesh::table_t& ParameterAttributes,
 	const mesh::table_t& VertexAttributes
 		) :
 	patch_first_points(PatchFirstPoints),
@@ -98,7 +98,7 @@ const_primitive::const_primitive(
 	point_selections(PointSelections),
 	constant_attributes(ConstantAttributes),
 	patch_attributes(PatchAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -134,7 +134,7 @@ const_primitive::const_primitive(primitive& Primitive) :
 		point_selections(Primitive.point_selections),
 		constant_attributes(Primitive.constant_attributes),
 		patch_attributes(Primitive.patch_attributes),
-		varying_attributes(Primitive.varying_attributes),
+		parameter_attributes(Primitive.parameter_attributes),
 		vertex_attributes(Primitive.vertex_attributes)
 {
 }
@@ -173,7 +173,7 @@ primitive::primitive(
 	mesh::selection_t& PointSelections,
 	mesh::table_t& ConstantAttributes,
 	mesh::table_t& PatchAttributes,
-	mesh::table_t& VaryingAttributes,
+	mesh::table_t& ParameterAttributes,
 	mesh::table_t& VertexAttributes
 		) :
 	patch_first_points(PatchFirstPoints),
@@ -206,7 +206,7 @@ primitive::primitive(
 	point_selections(PointSelections),
 	constant_attributes(ConstantAttributes),
 	patch_attributes(PatchAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -255,7 +255,7 @@ primitive* create(mesh::primitive& Primitive)
 		Primitive.structure["trim_point"].create<mesh::selection_t>("point_selections"),
 		Primitive.attributes["constant"],
 		Primitive.attributes["patch"],
-		Primitive.attributes["varying"],
+		Primitive.attributes["parameter"],
 		Primitive.attributes["vertex"]
 		);
 
@@ -289,7 +289,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		const mesh::table_t& patch_attributes = require_attributes(Primitive, "patch");
-		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		const mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		const mesh::indices_t& patch_first_points = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_first_points");
@@ -330,8 +330,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		require_table_row_count(Primitive, v_knot_structure, "v_knot",
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
-
-		require_table_row_count(Primitive, varying_attributes, "varying", 4 * patch_u_point_counts.size());
+		require_table_row_count(Primitive, parameter_attributes, "parameter", patch_structure.row_count() * 4);
 
 	return new const_primitive(
 		patch_first_points,
@@ -364,7 +363,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		point_selections,
 		constant_attributes,
 		patch_attributes,
-		varying_attributes,
+		parameter_attributes,
 		vertex_attributes);
 	}
 	catch(std::exception& e)
@@ -396,7 +395,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		mesh::table_t& patch_attributes = require_attributes(Primitive, "patch");
-		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		mesh::indices_t& patch_first_points = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_first_points");
@@ -437,8 +436,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		require_table_row_count(Primitive, v_knot_structure, "v_knot",
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
-
-		require_table_row_count(Primitive, varying_attributes, "varying", 4 * patch_u_point_counts.size());
+		require_table_row_count(Primitive, parameter_attributes, "parameter", patch_structure.row_count() * 4);
 
 	return new primitive(
 		patch_first_points,
@@ -471,7 +469,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		point_selections,
 		constant_attributes,
 		patch_attributes,
-		varying_attributes,
+		parameter_attributes,
 		vertex_attributes);
 	}
 	catch(std::exception& e)

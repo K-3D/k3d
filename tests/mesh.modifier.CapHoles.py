@@ -12,5 +12,6 @@ k3d.geometry.primitive_selection.append(edge_selection, 48, 49, 1)
 setup.source.text = "8"
 setup.modifier.mesh_selection = selection
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.CapHoles", 1)
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.CapHoles", 1)
 

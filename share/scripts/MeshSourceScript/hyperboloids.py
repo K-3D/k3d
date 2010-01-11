@@ -7,7 +7,7 @@ k3d.check_node_environment(locals(), "MeshSourceScript")
 
 # Construct a sphere mesh primitive ...
 hyperboloid = k3d.hyperboloid.create(Output)
-color = hyperboloid.varying_attributes().create("Cs", "k3d::color")
+color = hyperboloid.parameter_attributes().create("Cs", "k3d::color")
 
 # Add two hyperboloids ...
 hyperboloid.matrices().append(k3d.translate3(k3d.vector3(-5, 0, 0)))

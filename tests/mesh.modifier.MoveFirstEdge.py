@@ -19,5 +19,7 @@ face_selection.weight().append(1)
 setup.modifier.mesh_selection = selection
 setup.modifier.distance = 1
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.MoveFirstEdge", 1)
+
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.MoveFirstEdge", 1)
 

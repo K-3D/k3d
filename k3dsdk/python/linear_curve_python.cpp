@@ -50,7 +50,7 @@ public:
 		static object curve_points(wrapper& Self) { return wrap(Self.wrapped().curve_points); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object curve_attributes(wrapper& Self) { return wrap(Self.wrapped().curve_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 	class primitive
@@ -66,7 +66,7 @@ public:
 		static object curve_points(wrapper& Self) { return wrap(Self.wrapped().curve_points); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object curve_attributes(wrapper& Self) { return wrap(Self.wrapped().curve_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 
@@ -105,7 +105,7 @@ void define_namespace_linear_curve()
 		.def("curve_points", &linear_curve::const_primitive::curve_points)
 		.def("constant_attributes", &linear_curve::const_primitive::constant_attributes)
 		.def("curve_attributes", &linear_curve::const_primitive::curve_attributes)
-		.def("varying_attributes", &linear_curve::const_primitive::varying_attributes)
+		.def("parameter_attributes", &linear_curve::const_primitive::parameter_attributes)
 		;
 
 	class_<linear_curve::primitive::wrapper>("primitive", no_init)
@@ -117,7 +117,7 @@ void define_namespace_linear_curve()
 		.def("curve_points", &linear_curve::primitive::curve_points)
 		.def("constant_attributes", &linear_curve::primitive::constant_attributes)
 		.def("curve_attributes", &linear_curve::primitive::curve_attributes)
-		.def("varying_attributes", &linear_curve::primitive::varying_attributes)
+		.def("parameter_attributes", &linear_curve::primitive::parameter_attributes)
 		;
 }
 

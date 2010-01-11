@@ -128,7 +128,8 @@ void remove_deleted_geometry(polyhedron::primitive& Output,
 		const mesh::indices_t& LoopFaces,
 		const mesh::selection_t& FaceSelection)
 {
-
+assert_not_implemented();
+/*
 	const uint_t edge_count = EdgePoints.size();
 	const uint_t face_count = FaceFirstLoops.size();
 	mesh::counts_t edges_to_delete_sum(edge_count);
@@ -215,6 +216,7 @@ void remove_deleted_geometry(polyhedron::primitive& Output,
 			new_first_face += new_face_count; 
 		}
 	}
+*/
 }
 
 /// Creates lookup arrays linking edges to their loops, and loops to their faces

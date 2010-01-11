@@ -121,10 +121,10 @@ public:
 		// Create faces.  This is a bit of hack, because we assume that all hole contours belong to the first
 		// face contour ...
 		if(face_contours.size())
-			k3d::polyhedron::add_face(Mesh, Polyhedron, face_contours[0], hole_contours, Material);
+			k3d::polyhedron::add_face(Mesh, Polyhedron, 0, face_contours[0], hole_contours, Material);
 
 		for(k3d::uint_t i = 1; i < face_contours.size(); ++i)
-			k3d::polyhedron::add_face(Mesh, Polyhedron, face_contours[i], Material);
+			k3d::polyhedron::add_face(Mesh, Polyhedron, 0, face_contours[i], Material);
 	}
 
 private:
@@ -359,8 +359,6 @@ public:
 		Output.point_selection.create();
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
 		k3d::double_t offset = 0;

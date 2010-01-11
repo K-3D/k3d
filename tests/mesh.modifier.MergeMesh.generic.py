@@ -31,5 +31,6 @@ merge_mesh.create_property("k3d::mesh*", "input_mesh2", "Input Mesh 2", "")
 document.set_dependency(merge_mesh.get_property("input_mesh1"), modifier1.get_property("output_mesh"))
 document.set_dependency(merge_mesh.get_property("input_mesh2"), modifier2.get_property("output_mesh"))
 
-testing.mesh_comparison_to_reference(document, merge_mesh.get_property("output_mesh"), "mesh.modifier.MergeMesh.generic", 2)
+testing.require_valid_mesh(document, merge_mesh.get_property("output_mesh"))
+testing.mesh_reference_comparison(document, merge_mesh.get_property("output_mesh"), "mesh.modifier.MergeMesh.generic", 2)
 

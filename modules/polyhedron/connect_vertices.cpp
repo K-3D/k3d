@@ -78,14 +78,17 @@ public:
 
 			// For each shell ...
 			const k3d::uint_t shell_begin = 0;
-			const k3d::uint_t shell_end = shell_begin + polyhedron->shell_first_faces.size();
+			const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();
 			for(k3d::uint_t shell = shell_begin; shell != shell_end; ++shell)
 			{
 				// For each face ...
-				const k3d::uint_t face_begin = polyhedron->shell_first_faces[shell];
-				const k3d::uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
+				const k3d::uint_t face_begin = 0;
+				const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
 				for(k3d::uint_t face = face_begin; face != face_end; ++face)
 				{
+					if(polyhedron->face_shells[face] != shell)
+						continue;
+
 					const edge_groups_t edge_groups = get_edge_groups(point_selection, *polyhedron, face);
 					if(4 == edge_groups.size() && edge_groups[0].size() == edge_groups[2].size())
 					{
@@ -217,6 +220,8 @@ private:
 		Polyhedron.clockwise_edges[ccw_edge2] = new_edge2;
 
 		const k3d::uint_t new_face = Polyhedron.face_first_loops.size();
+
+		Polyhedron.face_shells.push_back(Shell);
 		Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
 		Polyhedron.face_loop_counts.push_back(1);
 		Polyhedron.face_selections.push_back(0);
@@ -224,8 +229,6 @@ private:
 		Polyhedron.loop_first_edges.push_back(Edge1);
 		if(Polyhedron.loop_first_edges[Polyhedron.face_first_loops[Face]] == Edge1)
 			Polyhedron.loop_first_edges[Polyhedron.face_first_loops[Face]] = new_edge1;
-
-		Polyhedron.shell_face_counts[Shell] += 1;
 
 		NewFaces.push_back(new_face);
 		NewEdges.push_back(new_edge1);

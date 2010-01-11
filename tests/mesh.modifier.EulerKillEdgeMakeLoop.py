@@ -29,5 +29,7 @@ k3d.geometry.primitive_selection.append(edge_selection, 5, 6, 1)
 k3d.geometry.primitive_selection.append(edge_selection, 11, 12, 1)
 setup.modifier.mesh_selection = selection
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.EulerKillEdgeMakeLoop", 1)
+
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.EulerKillEdgeMakeLoop", 1)
 

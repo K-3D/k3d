@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -29,19 +29,25 @@ namespace module
 namespace test
 {
 
+extern k3d::iplugin_factory& add_color_attribute_factory();
+extern k3d::iplugin_factory& add_index_attributes_factory();
 extern k3d::iplugin_factory& mesh_diff_factory();
 extern k3d::iplugin_factory& mesh_to_stdout_factory();
 extern k3d::iplugin_factory& pipeline_profiler_factory();
 extern k3d::iplugin_factory& selection_to_stdout_factory();
+extern k3d::iplugin_factory& valid_meshes_factory();
 
 } // namespace test
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
+	Registry.register_factory(module::test::add_color_attribute_factory());
+	Registry.register_factory(module::test::add_index_attributes_factory());
 	Registry.register_factory(module::test::mesh_diff_factory());
 	Registry.register_factory(module::test::mesh_to_stdout_factory());
 	Registry.register_factory(module::test::pipeline_profiler_factory());
 	Registry.register_factory(module::test::selection_to_stdout_factory());
+	Registry.register_factory(module::test::valid_meshes_factory());
 K3D_MODULE_END
 

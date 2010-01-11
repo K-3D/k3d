@@ -27,5 +27,6 @@ modifier.mesh_selection = selection
 modifier.amount1 = 0.1
 modifier.amount2 = 0.1 
 
-testing.mesh_comparison_to_reference(document, modifier.get_property("output_mesh"), "mesh.modifier.MorphPoints", 4)
+testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.MorphPoints", 4)
 

@@ -7,5 +7,7 @@ setup = testing.setup_mesh_modifier_test("PolyCube", "MeshArray3D")
 
 setup.modifier.layout = setup.document.new_node("TranslateArray3D")
 
-testing.mesh_comparison_to_reference(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.MeshArray3D", 1)
+
+testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
+testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.MeshArray3D", 1)
 
