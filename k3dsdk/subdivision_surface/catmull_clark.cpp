@@ -1037,13 +1037,6 @@ public:
 				topology_subdivider(0, face);
 			}
 			// Set the per-polyhedron arrays
-			output_polyhedron.shell_first_faces.push_back(0);
-			for(k3d::uint_t polyhedron = 1; polyhedron != input_polyhedron.shell_first_faces.size(); ++polyhedron)
-			{
-				output_polyhedron.shell_face_counts.push_back(topology_data.face_subface_counts[input_polyhedron.shell_first_faces[polyhedron] - 1] - output_polyhedron.shell_first_faces.back());
-				output_polyhedron.shell_first_faces.push_back(topology_data.face_subface_counts[input_polyhedron.shell_first_faces[polyhedron] - 1]);
-			}
-			output_polyhedron.shell_face_counts.push_back(topology_data.face_subface_counts.back() - output_polyhedron.shell_first_faces.back());
 			output_polyhedron.shell_types = input_polyhedron.shell_types;
 			
 			// Update selection arrays
