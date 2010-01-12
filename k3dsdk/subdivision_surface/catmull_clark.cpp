@@ -364,13 +364,15 @@ public:
 			const k3d::mesh::indices_t& CornerPoints,
 			const k3d::mesh::indices_t& EdgeMidpoints,
 			const k3d::mesh::indices_t& FaceCenters,
+			const k3d::mesh::indices_t& InputFaceShells,
 			k3d::mesh::indices_t& OutputEdgePoints,
 			k3d::mesh::indices_t& OutputClockwiseEdges,
 			k3d::mesh::indices_t& OutputLoopFirstEdges,
 			k3d::mesh::indices_t& OutputFaceFirstLoops,
 			k3d::mesh::counts_t& OutputFaceLoopCounts,
 			k3d::mesh::materials_t& OutputFaceMaterials,
-			k3d::mesh::selection_t& OutputFaceSelection
+			k3d::mesh::selection_t& OutputFaceSelection,
+			k3d::mesh::indices_t& OutputFaceShells
 			) :
 				m_mesh_arrays(MeshArrays),
 				m_input_edge_points(InputEdgePoints),
@@ -381,13 +383,15 @@ public:
 				m_corner_points(CornerPoints),
 				m_edge_midpoints(EdgeMidpoints),
 				m_face_centers(FaceCenters),
+				m_input_face_shells(InputFaceShells),
 				m_output_edge_points(OutputEdgePoints),
 				m_output_clockwise_edges(OutputClockwiseEdges),
 				m_output_loop_first_edges(OutputLoopFirstEdges),
 				m_output_face_first_loops(OutputFaceFirstLoops),
 				m_output_face_loop_counts(OutputFaceLoopCounts),
 				m_output_face_materials(OutputFaceMaterials),
-				m_output_face_selection(OutputFaceSelection)
+				m_output_face_selection(OutputFaceSelection),
+				m_output_face_shells(OutputFaceShells)
 				{}
 	
 	void operator()(const k3d::uint_t Polyhedron, const k3d::uint_t Face)
@@ -409,6 +413,7 @@ public:
 			m_output_face_first_loops[first_new_face] = first_new_loop;
 			m_output_face_materials[first_new_face] = m_input_face_materials[Face];
 			m_output_face_selection[first_new_face] = m_mesh_arrays.face_selection[Face];
+			m_output_face_shells[first_new_face] = m_input_face_shells[Face];
 
 			for(k3d::uint_t edge = first_edge; ; )
 			{
@@ -434,6 +439,7 @@ public:
 				m_output_face_first_loops[first_new_face + edgenumber] = newloop;
 				m_output_face_materials[first_new_face + edgenumber] = m_input_face_materials[Face];
 				m_output_face_selection[first_new_face + edgenumber] = m_mesh_arrays.face_selection[Face];
+				m_output_face_shells[first_new_face] = m_input_face_shells[Face];
 
 				first_new_edge += 4;
 
@@ -487,6 +493,7 @@ private:
 		m_output_face_first_loops[first_new_face] = first_new_loop;
 		m_output_face_materials[first_new_face] = m_input_face_materials[Face];
 		m_output_face_selection[first_new_face] = m_mesh_arrays.face_selection[Face];
+		m_output_face_shells[first_new_face] = m_input_face_shells[Face];
 	}
 
 	const mesh_arrays& m_mesh_arrays;
@@ -498,6 +505,7 @@ private:
 	const k3d::mesh::indices_t& m_corner_points;
 	const k3d::mesh::indices_t& m_edge_midpoints;
 	const k3d::mesh::indices_t& m_face_centers;
+	const k3d::mesh::indices_t& m_input_face_shells;
 	k3d::mesh::indices_t& m_output_edge_points;
 	k3d::mesh::indices_t& m_output_clockwise_edges;
 	k3d::mesh::indices_t& m_output_loop_first_edges;
@@ -505,6 +513,7 @@ private:
 	k3d::mesh::counts_t& m_output_face_loop_counts;
 	k3d::mesh::materials_t& m_output_face_materials;
 	k3d::mesh::selection_t& m_output_face_selection;
+	k3d::mesh::indices_t& m_output_face_shells;
 };
 
 /// Calculates face centers
@@ -1011,6 +1020,7 @@ public:
 			output_polyhedron.face_materials.resize(topology_data.face_subface_counts.back());
 			output_polyhedron.edge_attributes.set_row_count(face_edge_counts.back());
 			output_polyhedron.face_attributes.set_row_count(topology_data.face_subface_counts.back());
+			output_polyhedron.face_shells.resize(topology_data.face_subface_counts.back());
 			
 			detail::topology_subdivider topology_subdivider(mesh_arrays,
 					input_polyhedron.vertex_points,
@@ -1021,13 +1031,15 @@ public:
 					topology_data.corner_points,
 					topology_data.edge_midpoints,
 					topology_data.face_centers,
+					input_polyhedron.face_shells,
 					output_polyhedron.vertex_points,
 					output_polyhedron.clockwise_edges,
 					output_polyhedron.loop_first_edges,
 					output_polyhedron.face_first_loops,
 					output_polyhedron.face_loop_counts,
 					output_polyhedron.face_materials,
-					output_polyhedron.face_selections);
+					output_polyhedron.face_selections,
+					output_polyhedron.face_shells);
 			
 			// Connect face centers to edge midpoints
 			const k3d::uint_t face_start = 0;
