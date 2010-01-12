@@ -30,7 +30,6 @@ namespace subdivision_surface
 {
 
 extern k3d::iplugin_factory& catmull_clark_subdivision_factory();
-//extern k3d::iplugin_factory& make_creases_factory();
 
 } // namespace subdivision_surface
 
@@ -38,6 +37,5 @@ extern k3d::iplugin_factory& catmull_clark_subdivision_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::subdivision_surface::catmull_clark_subdivision_factory());
-//	Registry.register_factory(module::subdivision_surface::make_creases_factory());
 K3D_MODULE_END
 
