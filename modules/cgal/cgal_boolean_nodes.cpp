@@ -143,7 +143,9 @@ public:
 				document().pipeline_profiler().start_execution(*this, "Simplify output");
 				detail::merge_coplanar_faces(*Output.points, *output_polyhedron, m_threshold.pipeline_value());
 				detail::merge_collinear_edges(*Output.points, *output_polyhedron, m_threshold.pipeline_value());
-				k3d::mesh::delete_unused_points(Output);
+				k3d::mesh::bools_t unused_points;
+				k3d::mesh::lookup_unused_points(Output, unused_points);
+				k3d::mesh::delete_points(Output, unused_points);
 				document().pipeline_profiler().finish_execution(*this, "Simplify output");
 			}
 		}
