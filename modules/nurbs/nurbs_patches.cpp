@@ -926,7 +926,7 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 				const k3d::vector3& path_tangent = z_vecs.front();
 				const k3d::vector3& axis = normal ^ path_tangent;
 				const k3d::double_t angle = acos(path_tangent*normal);
-				k3d::matrix4 rotation = isnan(angle) ? k3d::identity3() : k3d::rotate3(angle, axis);
+				k3d::matrix4 rotation = std::isnan(angle) ? k3d::identity3() : k3d::rotate3(angle, axis);
 				for(k3d::uint_t i = 0; i != swept_point_count; ++i)
 				{
 					const k3d::vector3 vec = rotation * (swept_points[i] - center);
