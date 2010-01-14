@@ -210,7 +210,10 @@ void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::
 void create_edge_count_lookup(const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::counts_t& Counts);
 
 /// Initialize arrays for fast lookup from a vertex to its adjacent faces
+/** \deprecated Use the adjacency-list version of create_point_face_lookup() instead */
 void create_point_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces);
+/// Creates an adjacency list for fast lookup from a vertex to its adjacent faces.
+void create_point_face_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList);
 
 /// Creates an adjacency list for fast lookup from a vertex to its out-edges.
 void create_point_out_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList);

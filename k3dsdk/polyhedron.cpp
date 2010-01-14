@@ -1342,6 +1342,8 @@ void create_edge_count_lookup(const mesh::indices_t& LoopFirstEdges, const mesh:
 
 void create_point_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces)
 {
+	log() << warning << k3d_file_reference << " is deprecated" << std::endl;
+
 	std::vector<std::vector<uint_t> > adjacency_list(Points.size());
 
 	const uint_t face_begin = 0;
@@ -1375,6 +1377,31 @@ void create_point_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh:
 		PointFirstFaces[point] = PointFaces.size();
 		PointFaceCounts[point] = adjacency_list[point].size();
 		PointFaces.insert(PointFaces.end(), adjacency_list[point].begin(), adjacency_list[point].end());
+	}
+}
+
+void create_point_face_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList)
+{
+	AdjacencyList.resize(Mesh.points->size());
+
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + Polyhedron.face_shells.size();
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		const uint_t loop_begin = Polyhedron.face_first_loops[face];
+		const uint_t loop_end = loop_begin + Polyhedron.face_loop_counts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+			for(uint_t edge = first_edge; ;)
+			{
+				AdjacencyList[Polyhedron.vertex_points[edge]].push_back(face);
+
+				edge = Polyhedron.clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+		}
 	}
 }
 
