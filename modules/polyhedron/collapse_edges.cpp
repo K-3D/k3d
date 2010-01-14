@@ -51,13 +51,47 @@ class collapse_edges :
 
 public:
 	collapse_edges(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document),
-		m_position(init_owner(*this) + init_name("position") + init_label(_("Position")) + init_description(_("Location of the collapsed point")) + init_value(0.5) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)))
+		base(Factory, Document)
 	{
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
-		m_position.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
+	}
+
+	static void expand_edge_group(
+		const std::vector<k3d::mesh::indices_t>& AdjacencyList,
+		const k3d::mesh::indices_t& ClockwiseEdges,
+		const k3d::mesh::selection_t& EdgeSelections,
+		const k3d::mesh::indices_t& VertexPoints,
+		const k3d::uint_t Edge,
+		const k3d::uint_t EdgeGroup,
+		std::vector<boost::optional<k3d::uint_t> >& EdgeGroups
+		)
+	{
+		{
+			const k3d::mesh::indices_t& neighbors = AdjacencyList[VertexPoints[Edge]];
+			for(k3d::uint_t i = 0; i != neighbors.size(); ++i)
+			{
+				const k3d::uint_t neighbor = neighbors[i];
+				if(!EdgeGroups[neighbor] && EdgeSelections[neighbor])
+				{
+					EdgeGroups[neighbor] = EdgeGroup;
+					expand_edge_group(AdjacencyList, ClockwiseEdges, EdgeSelections, VertexPoints, neighbor, EdgeGroup, EdgeGroups);
+				}
+			}
+		}
+
+		{
+			const k3d::mesh::indices_t& neighbors = AdjacencyList[VertexPoints[ClockwiseEdges[Edge]]];
+			for(k3d::uint_t i = 0; i != neighbors.size(); ++i)
+			{
+				const k3d::uint_t neighbor = neighbors[i];
+				if(!EdgeGroups[neighbor] && EdgeSelections[neighbor])
+				{
+					EdgeGroups[neighbor] = EdgeGroup;
+					expand_edge_group(AdjacencyList, ClockwiseEdges, EdgeSelections, VertexPoints, neighbor, EdgeGroup, EdgeGroups);
+				}
+			}
+		}
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -74,12 +108,10 @@ public:
 		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
 		k3d::table_copier point_attributes(Output.point_attributes);
 
-		const k3d::double_t position = m_position.pipeline_value();
-
 		// Don't explicitly remove any points ...
 		k3d::mesh::bools_t remove_points(points.size(), false);
 
-		// Keep track of a mapping from old points to new points ...
+		// Create a mapping from old points to new points ...
 		const k3d::uint_t point_begin = 0;
 		const k3d::uint_t point_end = point_begin + points.size();
 		k3d::mesh::indices_t point_map(points.size());
@@ -93,52 +125,74 @@ public:
 			if(!polyhedron)
 				continue;
 
-			// Compute adjacent edges ...
-			k3d::mesh::bools_t boundary_edges;
-			k3d::mesh::indices_t adjacent_edges;
-			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
+			// Compute a vertex-edge adjacency list ...
+			std::vector<k3d::mesh::indices_t> adjacency_list;
+			k3d::polyhedron::create_point_edge_lookup(Output, *polyhedron, adjacency_list);
 
-			// Map from selected edges to newly-created points ...
-			k3d::mesh::indices_t new_edge_points(polyhedron->clockwise_edges.size());
-
-			// Keep track of edges to be deleted ...
-			k3d::mesh::bools_t remove_edges(polyhedron->clockwise_edges.size(), false);
-
-			// For each selected edge ...
+			// Label groups of selected, adjacent edges ...
+			std::vector<boost::optional<k3d::uint_t> > edge_groups(polyhedron->clockwise_edges.size());
+			k3d::uint_t edge_group_count = 0;
 			const k3d::uint_t edge_begin = 0;
 			const k3d::uint_t edge_end = edge_begin + polyhedron->clockwise_edges.size();
 			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 			{
-				if(!polyhedron->edge_selections[edge])
+				if(edge_groups[edge])
 					continue;
 
-				const k3d::uint_t start_point_index = polyhedron->vertex_points[edge];
-				const k3d::uint_t end_point_index = polyhedron->vertex_points[polyhedron->clockwise_edges[edge]];
-
-				// If this edge has a companion, and the companion has already created its point, use it ...
-				if(!boundary_edges[edge] && polyhedron->edge_selections[adjacent_edges[edge]] && adjacent_edges[edge] < edge)
+				if(polyhedron->edge_selections[edge])
 				{
-					new_edge_points[edge] = new_edge_points[adjacent_edges[edge]];
+					edge_groups[edge] = ++edge_group_count;
+
+					expand_edge_group(
+						adjacency_list,
+						polyhedron->clockwise_edges,
+						polyhedron->edge_selections,
+						polyhedron->vertex_points,
+						edge,
+						edge_group_count,
+						edge_groups);
 				}
-				// Otherwise, create a new point for this edge ...
+				else
 				{
-					new_edge_points[edge] = points.size();
-
-					points.push_back(k3d::mix(points[start_point_index], points[end_point_index], position));
-					point_selection.push_back(1);
-					remove_points.push_back(false);
-					point_map.push_back(new_edge_points[edge]);
-
-					k3d::uint_t point_indices[2] = { start_point_index, end_point_index };
-					k3d::double_t point_weights[2] = { position, 1.0 - position };
-
-					point_attributes.push_back(2, point_indices, point_weights);
+					edge_groups[edge] = 0;
 				}
+			}
 
-				point_map[start_point_index] = new_edge_points[edge];
-				point_map[end_point_index] = new_edge_points[edge];
+			// Keep track of edges to be deleted ...
+			k3d::mesh::bools_t remove_edges(polyhedron->clockwise_edges.size(), false);
 
-				remove_edges[edge] = true;
+			// For each edge group ...
+			for(k3d::uint_t edge_group = 1; edge_group <= edge_group_count; ++edge_group)
+			{
+				// Prepare to create a new point, based on an average of all the points in the edge group ...
+				const k3d::uint_t new_point = points.size();
+
+				k3d::mesh::indices_t point_indices;
+				for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+				{
+					if(edge_groups[edge] != edge_group)
+						continue;
+
+					point_indices.push_back(polyhedron->vertex_points[edge]);
+					point_indices.push_back(polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]);
+
+					point_map[polyhedron->vertex_points[edge]] = new_point;
+					point_map[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]] = new_point;
+
+					remove_edges[edge] = true;
+				}
+				k3d::mesh::weights_t point_weights(point_indices.size(), 1.0 / point_indices.size());
+
+				// Compute the new point position ...
+				k3d::point3 average(0, 0, 0);
+				for(k3d::uint_t i = 0; i != point_indices.size(); ++i)
+					average += k3d::to_vector(point_weights[i] * points[point_indices[i]]);
+
+				// Create the new point ...
+				points.push_back(average);
+				point_selection.push_back(1);
+				remove_points.push_back(false);
+				point_attributes.push_back(point_indices.size(), &point_indices[0], &point_weights[0]);
 			}
 
 			// Don't explicitly delete any loops ...
@@ -177,9 +231,6 @@ public:
 
 		return factory;
 	}
-
-private:
-	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_position;
 };
 
 /////////////////////////////////////////////////////////////////////////////
