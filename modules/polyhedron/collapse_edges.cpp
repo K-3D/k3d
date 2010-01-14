@@ -58,37 +58,35 @@ public:
 	}
 
 	static void expand_edge_group(
+		const k3d::polyhedron::primitive& Polyhedron,
 		const std::vector<k3d::mesh::indices_t>& AdjacencyList,
-		const k3d::mesh::indices_t& ClockwiseEdges,
-		const k3d::mesh::selection_t& EdgeSelections,
-		const k3d::mesh::indices_t& VertexPoints,
 		const k3d::uint_t Edge,
 		const k3d::uint_t EdgeGroup,
 		std::vector<boost::optional<k3d::uint_t> >& EdgeGroups
 		)
 	{
 		{
-			const k3d::mesh::indices_t& neighbors = AdjacencyList[VertexPoints[Edge]];
+			const k3d::mesh::indices_t& neighbors = AdjacencyList[Polyhedron.vertex_points[Edge]];
 			for(k3d::uint_t i = 0; i != neighbors.size(); ++i)
 			{
 				const k3d::uint_t neighbor = neighbors[i];
-				if(!EdgeGroups[neighbor] && EdgeSelections[neighbor])
+				if(!EdgeGroups[neighbor] && Polyhedron.edge_selections[neighbor])
 				{
 					EdgeGroups[neighbor] = EdgeGroup;
-					expand_edge_group(AdjacencyList, ClockwiseEdges, EdgeSelections, VertexPoints, neighbor, EdgeGroup, EdgeGroups);
+					expand_edge_group(Polyhedron, AdjacencyList, neighbor, EdgeGroup, EdgeGroups);
 				}
 			}
 		}
 
 		{
-			const k3d::mesh::indices_t& neighbors = AdjacencyList[VertexPoints[ClockwiseEdges[Edge]]];
+			const k3d::mesh::indices_t& neighbors = AdjacencyList[Polyhedron.vertex_points[Polyhedron.clockwise_edges[Edge]]];
 			for(k3d::uint_t i = 0; i != neighbors.size(); ++i)
 			{
 				const k3d::uint_t neighbor = neighbors[i];
-				if(!EdgeGroups[neighbor] && EdgeSelections[neighbor])
+				if(!EdgeGroups[neighbor] && Polyhedron.edge_selections[neighbor])
 				{
 					EdgeGroups[neighbor] = EdgeGroup;
-					expand_edge_group(AdjacencyList, ClockwiseEdges, EdgeSelections, VertexPoints, neighbor, EdgeGroup, EdgeGroups);
+					expand_edge_group(Polyhedron, AdjacencyList, neighbor, EdgeGroup, EdgeGroups);
 				}
 			}
 		}
@@ -142,15 +140,7 @@ public:
 				if(polyhedron->edge_selections[edge])
 				{
 					edge_groups[edge] = ++edge_group_count;
-
-					expand_edge_group(
-						adjacency_list,
-						polyhedron->clockwise_edges,
-						polyhedron->edge_selections,
-						polyhedron->vertex_points,
-						edge,
-						edge_group_count,
-						edge_groups);
+					expand_edge_group(*polyhedron, adjacency_list, edge, edge_group_count, edge_groups);
 				}
 				else
 				{
@@ -193,6 +183,14 @@ public:
 				point_selection.push_back(1);
 				remove_points.push_back(false);
 				point_attributes.push_back(point_indices.size(), &point_indices[0], &point_weights[0]);
+			}
+
+			// Implicitly delete edges that have been collapsed onto a single point ...
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+			{
+				if(point_map[polyhedron->vertex_points[edge]] != point_map[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]])
+					continue;
+				remove_edges[edge] = true;
 			}
 
 			// Don't explicitly delete any loops ...
