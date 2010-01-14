@@ -124,7 +124,7 @@ public:
 				k3d::mesh::indices_t point_first_faces;
 				k3d::mesh::counts_t point_face_counts;
 				k3d::mesh::indices_t point_faces;
-				k3d::polyhedron::create_vertex_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->vertex_points, polyhedron->clockwise_edges, points, point_first_faces, point_face_counts, point_faces);
+				k3d::polyhedron::create_point_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->vertex_points, polyhedron->clockwise_edges, points, point_first_faces, point_face_counts, point_faces);
 
 				for(k3d::uint_t face = face_begin; face != face_end; ++face)
 				{

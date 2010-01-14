@@ -210,9 +210,18 @@ void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::
 void create_edge_count_lookup(const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::counts_t& Counts);
 
 /// Initialize arrays for fast lookup from a vertex to its adjacent faces
-void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces);
+void create_point_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces);
+
+/// Creates an adjacency list for fast lookup from a vertex to its out-edges.
+void create_point_out_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList);
+/// Creates an adjacency list for fast lookup from a vertex to its in-edges.
+void create_point_in_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList);
+/// Creates an adjacency list for fast lookup from a vertex to its incident (in- or out-) edges.
+void create_point_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList);
+
 /// Initialize arrays for fast lookup from a point index to all edges that start from it. If PointEdgeCounts is filled (by create_vertex_valence_lookup) it is used, otherwise it is created
-void create_vertex_edge_lookup(const mesh::indices_t& VertexPoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts);
+/** \deprecated Use create_point_out_edge_lookup() instead */
+void create_point_edge_lookup(const mesh::indices_t& VertexPoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts);
 
 /// Initialize Valences array for constant time lookup of vertex valence (number of incoming edges)
 /**
@@ -220,7 +229,8 @@ void create_vertex_edge_lookup(const mesh::indices_t& VertexPoints, mesh::indice
  * \param VertexPoints The indices of the edge points
  * \param Valences will store the number of edges for each point
  */
-void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& VertexPoints, mesh::counts_t& Valences);
+/** \deprecated Use create_point_in_edge_lookup() instead */
+void create_point_valence_lookup(const uint_t PointCount, const mesh::indices_t& VertexPoints, mesh::counts_t& Valences);
 
 /// Initialise boundary_faces array for constant time lookup of faces that are on the mesh boundary. BoundaryEdges and AdjacentEdges can be created using create_edge_adjacency_lookup
 void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, mesh::bools_t& BoundaryFaces);

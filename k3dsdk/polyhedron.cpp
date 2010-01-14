@@ -1272,10 +1272,10 @@ private:
 void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges)
 {
 	mesh::counts_t valences;
-	create_vertex_valence_lookup(0, VertexPoints, valences);
+	create_point_valence_lookup(0, VertexPoints, valences);
 	mesh::indices_t first_edges; // first edge in point_edges for each point
 	mesh::indices_t point_edges;
-	create_vertex_edge_lookup(VertexPoints, point_edges, first_edges, valences);
+	create_point_edge_lookup(VertexPoints, point_edges, first_edges, valences);
 
 	BoundaryEdges.assign(VertexPoints.size(), true);
 	AdjacentEdges.assign(VertexPoints.size(), 0);
@@ -1338,9 +1338,9 @@ void create_edge_count_lookup(const mesh::indices_t& LoopFirstEdges, const mesh:
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// create_vertex_face_lookup
+// create_point_face_lookup
 
-void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces)
+void create_point_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces)
 {
 	std::vector<std::vector<uint_t> > adjacency_list(Points.size());
 
@@ -1379,12 +1379,60 @@ void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// create_vertex_edge_lookup
+// create_point_out_edge_lookup
 
-void create_vertex_edge_lookup(const mesh::indices_t& VertexPoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts)
+void create_point_out_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList)
 {
+	AdjacencyList.resize(Mesh.points->size());
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + Polyhedron.clockwise_edges.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		AdjacencyList[Polyhedron.vertex_points[edge]].push_back(edge);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_point_in_edge_lookup
+
+void create_point_in_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList)
+{
+	AdjacencyList.resize(Mesh.points->size());
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + Polyhedron.clockwise_edges.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		AdjacencyList[Polyhedron.vertex_points[Polyhedron.clockwise_edges[edge]]].push_back(edge);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_point_edge_lookup
+
+void create_point_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList)
+{
+	AdjacencyList.resize(Mesh.points->size());
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + Polyhedron.clockwise_edges.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		AdjacencyList[Polyhedron.vertex_points[edge]].push_back(edge);
+		AdjacencyList[Polyhedron.vertex_points[Polyhedron.clockwise_edges[edge]]].push_back(edge);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_point_edge_lookup
+
+void create_point_edge_lookup(const mesh::indices_t& VertexPoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts)
+{
+	log() << warning << k3d_file_reference << " is deprecated" << std::endl;
+
 	if(PointEdgeCounts.empty())
-		create_vertex_valence_lookup(0, VertexPoints, PointEdgeCounts);
+		create_point_valence_lookup(0, VertexPoints, PointEdgeCounts);
 	const uint_t point_count = PointEdgeCounts.size();
 	mesh::counts_t found_edges(point_count, 0);
 	PointFirstEdges.assign(point_count, 0); // first edge in point_edges for each point
@@ -1407,10 +1455,12 @@ void create_vertex_edge_lookup(const mesh::indices_t& VertexPoints, mesh::indice
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// create_vertex_valence_lookup
+// create_point_valence_lookup
 
-void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& VertexPoints, mesh::counts_t& Valences)
+void create_point_valence_lookup(const uint_t PointCount, const mesh::indices_t& VertexPoints, mesh::counts_t& Valences)
 {
+	log() << warning << k3d_file_reference << " is deprecated" << std::endl;
+
 	Valences.assign(PointCount, 0);
 	
 	// Add 1 for each edge that starts at a point

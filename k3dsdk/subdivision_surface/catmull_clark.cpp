@@ -982,7 +982,7 @@ public:
 			timer.restart();
 			k3d::mesh::bools_t boundary_edges;
 			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron.vertex_points, input_polyhedron.clockwise_edges, boundary_edges, topology_data.companions);
-			k3d::polyhedron::create_vertex_face_lookup(input_polyhedron.face_first_loops,
+			k3d::polyhedron::create_point_face_lookup(input_polyhedron.face_first_loops,
 					input_polyhedron.face_loop_counts,
 					input_polyhedron.loop_first_edges,
 					input_polyhedron.vertex_points,
@@ -1083,7 +1083,7 @@ public:
 			
 			// Calculate vertex valences, needed for corner point updates.
 			timer.restart();
-			k3d::polyhedron::create_vertex_valence_lookup(input_points.size(), input_polyhedron.vertex_points, topology_data.vertex_valences);
+			k3d::polyhedron::create_point_valence_lookup(input_points.size(), input_polyhedron.vertex_points, topology_data.vertex_valences);
 			detail::create_vertex_edge_lookup(input_polyhedron.vertex_points, topology_data.vertex_valences, topology_data.point_first_edges, topology_data.point_edges);
 			vertex_valences_time += timer.elapsed();
 
