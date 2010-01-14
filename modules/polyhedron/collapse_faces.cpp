@@ -30,186 +30,16 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
+
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
 
 namespace polyhedron
 {
-
-/*
-namespace detail
-{
-
-typedef std::list<k3d::legacy::split_edge*> edges_t;
-typedef std::set<k3d::legacy::split_edge*> face_edges_t;
-
-typedef std::map<k3d::legacy::point*, k3d::legacy::point*> point_map_t;
-
-/// Insert a collapsed edge to point map
-void insert_collapsed_edge(k3d::legacy::point* Start, k3d::legacy::point* End, point_map_t& PointMap)
-{
-	PointMap.insert(std::make_pair(Start, End));
-
-	// Make sure successive collapses point to the right endpoint
-	bool found_update;
-	do
-	{
-		found_update = false;
-
-		for(point_map_t::iterator edge = PointMap.begin(); edge != PointMap.end(); ++edge)
-		{
-			k3d::legacy::point* end_point = edge->second;
-
-			point_map_t::iterator collapsed_edge = PointMap.find(end_point);
-			if(collapsed_edge != PointMap.end())
-			{
-				found_update = true;
-
-				// Replace endpoint with final one
-				edge->second = collapsed_edge->second;
-
-				// Prevent loops
-				if(edge->first == edge->second)
-				{
-					PointMap.erase(edge);
-					break;
-				}
-			}
-		}
-	}
-	while(found_update);
-}
-
-/// Collapses given edge, selects its (possible) companion for later collapsing
-// returns true if the face is flattened and removed, false otherwise
-bool collapse_split_edge(k3d::legacy::face* Face, k3d::legacy::split_edge* Edge, point_map_t& PointMap)
-{
-	// Map start_point to end_point
-	insert_collapsed_edge(Edge->vertex, Edge->face_clockwise->vertex, PointMap);
-
-	// Select companion for deletion
-	if(Edge->companion)
-	{
-		Edge->companion->companion = 0;
-		Edge->companion->selection_weight = 1.0;
-	}
-
-	// If face has more than 3 edges, just delete Edge
-	if(helpers::edge_number(Edge) > 3)
-	{
-		k3d::legacy::split_edge* anticlockwise = k3d::legacy::face_anticlockwise(Edge);
-		anticlockwise->face_clockwise = Edge->face_clockwise;
-
-		if(Face->first_edge == Edge)
-			Face->first_edge = anticlockwise;
-
-		delete Edge;
-
-		return false;
-	}
-
-	// Flatten triangle ...
-	k3d::legacy::split_edge* glue_edge1 = Edge->face_clockwise;
-	k3d::legacy::split_edge* glue_edge2 = Edge->face_clockwise->face_clockwise;
-	assert_warning(glue_edge2->face_clockwise == Edge);
-
-	// Save selection
-	bool selected = false;
-	if(glue_edge1->selection_weight || glue_edge2->selection_weight)
-		selected = true;
-
-	// Glue the two other edges
-	k3d::legacy::split_edge* companion1 = glue_edge1->companion;
-	k3d::legacy::split_edge* companion2 = glue_edge2->companion;
-
-	if(companion1)
-		companion1->companion = companion2;
-	if(companion2)
-		companion2->companion = companion1;
-
-	// Set selection
-	if(selected)
-	{
-		if(companion1)
-			companion1->selection_weight = 1.0;
-		if(companion2)
-			companion2->selection_weight = 1.0;
-	}
-
-	// Delete face
-	delete Edge;
-	glue_edge1->companion = 0;
-	delete glue_edge1;
-	glue_edge2->companion = 0;
-	delete glue_edge2;
-	Face->first_edge = 0;
-
-	return true;
-}
-
-/// Collapses first selected edge found and its companion, returns false when no selected edge is found
-bool collapse_selected_edge(k3d::legacy::polyhedron& Polyhedron, point_map_t& PointMap)
-{
-	k3d::legacy::polyhedron::faces_t::iterator face;
-	k3d::legacy::split_edge* selected_edge = 0;
-	k3d::legacy::face* edge_face = 0;
-	for(face = Polyhedron.faces.begin(); face != Polyhedron.faces.end(); ++face)
-	{
-		k3d::legacy::split_edge* edge = (*face)->first_edge;
-		do
-		{
-			if(edge->selection_weight || (edge->companion && edge->companion->selection_weight))
-			{
-				selected_edge = edge;
-				edge_face = *face;
-
-				goto FoundEdge;
-			}
-
-			edge = edge->face_clockwise;
-		}
-		while(edge != (*face)->first_edge);
-	}
-
-	return false;
-
-	FoundEdge:
-
-	// Save companion
-	k3d::legacy::split_edge* companion = selected_edge->companion;
-
-	// Collapse edge
-	if(collapse_split_edge(*face, selected_edge, PointMap))
-	{
-		delete *face;
-		Polyhedron.faces.erase(face);
-
-		return true;
-	}
-
-	// Collapse companion
-	if(!companion)
-		return true;
-
-	// Find companion's face
-	for(face = Polyhedron.faces.begin(); face != Polyhedron.faces.end(); ++face)
-		if(helpers::edge_in_face(companion, (*face)->first_edge))
-			break;
-
-	return_val_if_fail(face != Polyhedron.faces.end(), false);
-
-	if(collapse_split_edge(*face, companion, PointMap))
-	{
-		delete *face;
-		Polyhedron.faces.erase(face);
-	}
-
-	return true;
-}
-
-} // namespace detail
-*/
 
 /////////////////////////////////////////////////////////////////////////////
 // collapse_faces
@@ -227,194 +57,162 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 	}
 
+	static void expand_face_group(
+		const k3d::polyhedron::primitive& Polyhedron,
+		const std::vector<k3d::mesh::indices_t>& AdjacencyList,
+		const k3d::uint_t Face,
+		const k3d::uint_t FaceGroup,
+		std::vector<boost::optional<k3d::uint_t> >& FaceGroups
+		)
+	{
+		const k3d::uint_t first_edge = Polyhedron.loop_first_edges[Polyhedron.face_first_loops[Face]];
+		for(k3d::uint_t edge = first_edge; ; )
+		{
+			const k3d::mesh::indices_t& neighbors = AdjacencyList[Polyhedron.vertex_points[edge]];
+			for(k3d::uint_t i = 0; i != neighbors.size(); ++i)
+			{
+				const k3d::uint_t neighbor = neighbors[i];
+				if(!FaceGroups[neighbor] && Polyhedron.face_selections[neighbor])
+				{
+					FaceGroups[neighbor] = FaceGroup;
+					expand_face_group(Polyhedron, AdjacencyList, neighbor, FaceGroup, FaceGroups);
+				}
+			}
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
+		}
+	}
+
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-/*
-		// Change face selection to an edge selection, then apply CollapseEdges
-		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
-		{
-			for(k3d::legacy::polyhedron::faces_t::iterator face = (*polyhedron)->faces.begin(); face != (*polyhedron)->faces.end(); ++face)
-			{
-				const double weight = (*face)->selection_weight ? 1.0 : 0.0;
+		if(!Output.points)
+			return;
+		if(!Output.point_selection)
+			return;
 
-				k3d::legacy::split_edge* edge = (*face)->first_edge;
-				do
+		k3d::mesh::points_t& points = Output.points.writable();
+		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
+		k3d::table_copier point_attributes(Output.point_attributes);
+
+		// Don't explicitly remove any points ...
+		k3d::mesh::bools_t remove_points(points.size(), false);
+
+		// Create a mapping from old points to new points ...
+		const k3d::uint_t point_begin = 0;
+		const k3d::uint_t point_end = point_begin + points.size();
+		k3d::mesh::indices_t point_map(points.size());
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
+			point_map[point] = point;
+
+		// For each polyhedron ...
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
+			if(!polyhedron)
+				continue;
+
+			// Keep track of faces to be deleted ...
+			k3d::mesh::bools_t remove_faces(polyhedron->face_shells.size(), false);
+			
+			// Compute a point-face adjacency list ...
+			std::vector<k3d::mesh::indices_t> adjacency_list;
+			k3d::polyhedron::create_point_face_lookup(Output, *polyhedron, adjacency_list);
+
+			// Label groups of selected, adjacent faces ...
+			std::vector<boost::optional<k3d::uint_t> > face_groups(polyhedron->face_shells.size());
+			k3d::uint_t face_group_count = 0;
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
+			{
+				if(face_groups[face])
+					continue;
+
+				if(polyhedron->face_selections[face])
 				{
-					edge->selection_weight = weight;
-
-					edge = edge->face_clockwise;
+					face_groups[face] = ++face_group_count;
+					expand_face_group(*polyhedron, adjacency_list, face, face_group_count, face_groups);
 				}
-				while(edge != (*face)->first_edge);
+				else
+				{
+					face_groups[face] = 0;
+				}
 			}
-		}
 
-		// Keep track of replaced points
-		detail::point_map_t point_map;
-
-		// Collapse edges
-		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
-		{
-			bool found_edge = false;
-			do
+			// For each face group ...
+			for(k3d::uint_t face_group = 1; face_group <= face_group_count; ++face_group)
 			{
-				found_edge = detail::collapse_selected_edge(**polyhedron, point_map);
-			}
-			while(found_edge);
-		}
+				// Prepare to create a new point, based on an average of all the points in the group ...
+				const k3d::uint_t new_point = points.size();
 
-		// Update point positions
-		typedef std::vector<k3d::legacy::point*> point_list_t;
-		typedef std::map<k3d::legacy::point*, point_list_t> collapsed_points_t;
-		collapsed_points_t collapsed_points;
-		for(detail::point_map_t::iterator pair = point_map.begin(); pair != point_map.end(); ++pair)
-		{
-			// List original positions for each final point
-			collapsed_points_t::iterator list = collapsed_points.find(pair->second);
-			if(list == collapsed_points.end())
+				k3d::mesh::indices_t point_indices;
+				for(k3d::uint_t face = face_begin; face != face_end; ++face)
+				{
+					if(face_groups[face] != face_group)
+						continue;
+
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
+					for(k3d::uint_t edge = first_edge; ; )
+					{
+						point_indices.push_back(polyhedron->vertex_points[edge]);
+						point_map[polyhedron->vertex_points[edge]] = new_point;
+
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
+
+					remove_faces[face] = true;
+				}
+				k3d::mesh::weights_t point_weights(point_indices.size(), 1.0 / point_indices.size());
+
+				// Compute the new point position ...
+				k3d::point3 average(0, 0, 0);
+				for(k3d::uint_t i = 0; i != point_indices.size(); ++i)
+					average += k3d::to_vector(point_weights[i] * points[point_indices[i]]);
+
+				// Create the new point ...
+				points.push_back(average);
+				point_selection.push_back(1);
+				remove_points.push_back(false);
+				point_attributes.push_back(point_indices.size(), &point_indices[0], &point_weights[0]);
+			}
+
+			// Implicitly delete edges that have been collapsed onto a single point ...
+			k3d::mesh::bools_t remove_edges(polyhedron->clockwise_edges.size(), false);
+			const k3d::uint_t edge_begin = 0;
+			const k3d::uint_t edge_end = edge_begin + polyhedron->clockwise_edges.size();
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 			{
-				point_list_t first_position;
-				first_position.push_back(pair->first);
-
-				collapsed_points.insert(std::make_pair(pair->second, first_position));
+				if(point_map[polyhedron->vertex_points[edge]] != point_map[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]])
+					continue;
+				remove_edges[edge] = true;
 			}
-			else
-			{
-				list->second.push_back(pair->first);
-			}
+
+			// Don't explicitly delete any loops ...
+			k3d::mesh::bools_t remove_loops(polyhedron->loop_first_edges.size(), false);
+
+			// Make it happen ...
+			k3d::polyhedron::delete_components(Output, *polyhedron, remove_points, remove_edges, remove_loops, remove_faces);
 		}
 
-		for(collapsed_points_t::iterator pair = collapsed_points.begin(); pair != collapsed_points.end(); ++pair)
-		{
-			point_list_t& list = pair->second;
-			k3d::legacy::point* end = pair->first;
+		// Map old points to new points ...
+		k3d::mesh::remap_points(Output, point_map);
 
-			// More than one point were collapsed to the destination, set centroid
-			k3d::point3 sum = end->position;
-			for(point_list_t::const_iterator vertex = list.begin(); vertex != list.end(); ++vertex)
-				sum += k3d::to_vector((*vertex)->position);
-
-			end->position = sum / static_cast<double>((list.size() + 1));
-		}
-
-		// Replace removed points in geometric primitives
-		k3d::legacy::for_each_component(Mesh, replace_removed_points(point_map));
-
-		// Delete removed points and select points resulting from collapsed edges
-		for(detail::point_map_t::iterator point = point_map.begin(); point != point_map.end(); ++point)
-		{
-			Mesh.points.erase(std::remove(Mesh.points.begin(), Mesh.points.end(), point->first), Mesh.points.end());
-
-			point->second->selection_weight = 1.0;
-		}
-
-		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron = Mesh.polyhedra.begin(); polyhedron != Mesh.polyhedra.end(); ++polyhedron)
-			assert_warning(k3d::legacy::is_valid(**polyhedron));
-*/
+		// Remove unused points ...
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
-
-/*
-	class replace_removed_points
-	{
-	public:
-		replace_removed_points(detail::point_map_t& PointMap) :
-			point_map(PointMap)
-		{
-		}
-
-		void operator()(k3d::legacy::point&) { }
-		void operator()(k3d::legacy::face&) { }
-		void operator()(k3d::legacy::split_edge& Edge)
-		{
-			point = point_map.find(Edge.vertex);
-			if(point != point_map.end())
-			{
-				Edge.vertex = point->second;
-			}
-		}
-		void operator()(k3d::legacy::linear_curve& Curve)
-		{
-			for(k3d::legacy::linear_curve::control_points_t::iterator curve_point = Curve.control_points.begin(); curve_point != Curve.control_points.end(); ++curve_point)
-			{
-				point = point_map.find(*curve_point);
-				if(point != point_map.end())
-				{
-					*curve_point = point->second;
-				}
-			}
-		}
-		void operator()(k3d::legacy::linear_curve_group&) { }
-		void operator()(k3d::legacy::cubic_curve& Curve)
-		{
-			for(k3d::legacy::cubic_curve::control_points_t::iterator curve_point = Curve.control_points.begin(); curve_point != Curve.control_points.end(); ++curve_point)
-			{
-				point = point_map.find(*curve_point);
-				if(point != point_map.end())
-				{
-					*curve_point = point->second;
-				}
-			}
-		}
-		void operator()(k3d::legacy::cubic_curve_group&) { }
-		void operator()(k3d::legacy::nucurve& Curve)
-		{
-			for(k3d::legacy::nucurve::control_points_t::iterator curve_point = Curve.control_points.begin(); curve_point != Curve.control_points.end(); ++curve_point)
-			{
-				point = point_map.find(curve_point->position);
-				if(point != point_map.end())
-				{
-					curve_point->position = point->second;
-				}
-			}
-		}
-		void operator()(k3d::legacy::nucurve_group&) { }
-		void operator()(k3d::legacy::bilinear_patch& Patch)
-		{
-			for(k3d::legacy::bilinear_patch::control_points_t::iterator control_point = Patch.control_points.begin(); control_point != Patch.control_points.end(); ++control_point)
-			{
-				point = point_map.find(*control_point);
-				if(point != point_map.end())
-				{
-					*control_point = point->second;
-				}
-			}
-		}
-		void operator()(k3d::legacy::bicubic_patch& Patch)
-		{
-			for(k3d::legacy::bicubic_patch::control_points_t::iterator control_point = Patch.control_points.begin(); control_point != Patch.control_points.end(); ++control_point)
-			{
-				point = point_map.find(*control_point);
-				if(point != point_map.end())
-				{
-					*control_point = point->second;
-				}
-			}
-		}
-		void operator()(k3d::legacy::nupatch& Patch)
-		{
-			for(k3d::legacy::nupatch::control_points_t::iterator control_point = Patch.control_points.begin(); control_point != Patch.control_points.end(); ++control_point)
-			{
-				point = point_map.find(control_point->position);
-				if(point != point_map.end())
-				{
-					control_point->position = point->second;
-				}
-			}
-		}
-		void operator()(k3d::legacy::polyhedron&) { }
-		void operator()(k3d::legacy::mesh&) { }
-
-	private:
-		detail::point_map_t& point_map;
-		detail::point_map_t::iterator point;
-	};
-*/
 
 	k3d::iplugin_factory& factory()
 	{
