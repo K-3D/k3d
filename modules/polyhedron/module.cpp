@@ -29,7 +29,7 @@ namespace module
 namespace polyhedron
 {
 
-extern k3d::iplugin_factory& bevel_faces_factory();
+//extern k3d::iplugin_factory& bevel_faces_factory();
 extern k3d::iplugin_factory& bevel_points_factory();
 extern k3d::iplugin_factory& bridge_edges_factory();
 extern k3d::iplugin_factory& cap_holes_factory();
@@ -40,7 +40,7 @@ extern k3d::iplugin_factory& connect_vertices_factory();
 extern k3d::iplugin_factory& delete_components_factory();
 extern k3d::iplugin_factory& dissolve_components_factory();
 extern k3d::iplugin_factory& extrude_faces_factory();
-extern k3d::iplugin_factory& fillet_edges_factory();
+//extern k3d::iplugin_factory& fillet_edges_factory();
 extern k3d::iplugin_factory& flip_orientation_factory();
 extern k3d::iplugin_factory& make_sds_factory();
 extern k3d::iplugin_factory& merge_collinear_edges_factory();
@@ -58,7 +58,7 @@ extern k3d::iplugin_factory& triangulate_faces_factory();
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::polyhedron::bevel_faces_factory());
+//	Registry.register_factory(module::polyhedron::bevel_faces_factory());
 	Registry.register_factory(module::polyhedron::bevel_points_factory());
 	Registry.register_factory(module::polyhedron::bridge_edges_factory());
 	Registry.register_factory(module::polyhedron::cap_holes_factory());
@@ -69,7 +69,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::polyhedron::delete_components_factory());
 	Registry.register_factory(module::polyhedron::dissolve_components_factory());
 	Registry.register_factory(module::polyhedron::extrude_faces_factory());
-	Registry.register_factory(module::polyhedron::fillet_edges_factory());
+//	Registry.register_factory(module::polyhedron::fillet_edges_factory());
 	Registry.register_factory(module::polyhedron::flip_orientation_factory());
 	Registry.register_factory(module::polyhedron::make_sds_factory());
 	Registry.register_factory(module::polyhedron::merge_collinear_edges_factory());
