@@ -47,8 +47,12 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
+					<table type="edge">
+						<array name="Cs" type="k3d::color">1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1</array>
+					</table>
+					<table type="face">
+						<array name="Cs" type="k3d::color">1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1</array>
+					</table>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>
@@ -94,8 +98,12 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
+					<table type="edge">
+						<array name="Cs" type="k3d::color">1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1</array>
+					</table>
+					<table type="face">
+						<array name="Cs" type="k3d::color">1 0 0 1 1 0 0 1 0 0 1 1 0 0 1</array>
+					</table>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>
@@ -141,8 +149,12 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
+					<table type="edge">
+						<array name="Cs" type="k3d::color">1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0</array>
+					</table>
+					<table type="face">
+						<array name="Cs" type="k3d::color">1 0 0 1 1 0 0 1 0 0 1 1 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 0 1 0 0 1 1 0 0 1</array>
+					</table>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>
