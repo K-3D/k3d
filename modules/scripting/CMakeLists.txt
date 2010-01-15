@@ -16,7 +16,7 @@ K3D_COMPILE_RESOURCE(RESOURCES transform_modifier_script.py "/module/scripting/t
 K3D_COMPILE_RESOURCE(RESOURCES transform_source_script.py "/module/scripting/transform_source_script.py")
 K3D_COMPILE_RESOURCE(RESOURCES vector3_source_script.py "/module/scripting/vector3_source_script.py")
 
-K3D_BUILD_MODULE(k3d-scripting ${RESOURCES})
+K3D_BUILD_MODULE(k3d-scripting EXTRA_SOURCES ${RESOURCES})
 K3D_CREATE_MODULE_PROXY(k3d-scripting)
 TARGET_LINK_LIBRARIES(k3d-scripting k3dsdk-resource)
 
