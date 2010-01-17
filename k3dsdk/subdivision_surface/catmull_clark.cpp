@@ -25,6 +25,9 @@
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imaterial.h>
+#include <k3dsdk/parallel/blocked_range.h>
+#include <k3dsdk/parallel/parallel_for.h>
+#include <k3dsdk/parallel/threads.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/subdivision_surface/catmull_clark.h>
@@ -359,14 +362,14 @@ public:
 				m_output_face_shells(OutputFaceShells)
 				{}
 	
-	void operator()(const k3d::uint_t Polyhedron, const k3d::uint_t Face)
+	void operator()(const k3d::uint_t Face)
 	{
 		const k3d::uint_t first_new_face = Face == 0 ? 0 : m_face_subface_counts[Face - 1];
 		const k3d::uint_t first_new_loop = Face == 0 ? 0 : m_face_subloop_counts[Face - 1];
 
 		if(!m_mesh_arrays.is_affected(Face))
 		{ // copy unaffected face, splitting edges adjacent to affected faces
-			copy_face(Polyhedron, Face);
+			copy_face(Face);
 		}
 		else
 		{ // subdivide affected faces
@@ -418,7 +421,7 @@ public:
 
 private:
 	/// Copies the face to the correct location in the output
-	void copy_face(const k3d::uint_t Polyhedron, const k3d::uint_t Face)
+	void copy_face(const k3d::uint_t Face)
 	{
 		const k3d::uint_t first_new_edge = Face == 0 ? 0 : m_face_edge_counts[Face - 1];
 		const k3d::uint_t first_new_face = Face == 0 ? 0 : m_face_subface_counts[Face - 1];
@@ -867,6 +870,41 @@ private:
 	k3d::table_copier& m_point_attributes_mixer;
 };
 
+/// Helper for TBB
+class corner_worker
+{
+public:
+	corner_worker(const k3d::mesh::indices_t& VertexPoints, corner_point_calculator& CornerCalculator) : m_vertex_points(VertexPoints), m_corner_calculator(CornerCalculator) {}
+	void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
+	{
+		const k3d::uint_t point_begin = range.begin();
+		const k3d::uint_t point_end = range.end();
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
+		{
+			m_corner_calculator(m_vertex_points[point]);
+		}
+	}
+private:
+	const k3d::mesh::indices_t& m_vertex_points;
+	corner_point_calculator& m_corner_calculator;
+};
+
+template<typename FunctorT>
+struct worker
+{
+	FunctorT& f;
+	worker(FunctorT& F) : f(F) {}
+	void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
+	{
+		const k3d::uint_t begin = range.begin();
+		const k3d::uint_t end = range.end();
+		for(k3d::uint_t i = begin; i != end; ++i)
+		{
+			f(i);
+		}
+	}
+};
+
 } // namespace detail
 
 class catmull_clark_subdivider::implementation
@@ -935,7 +973,10 @@ public:
 						face_subloop_counts,
 						face_edge_counts,
 						face_point_counts);
-			for(k3d::uint_t face = 0; face != input_face_count; ++face) per_face_component_counter(face);
+			k3d::parallel::parallel_for(
+				k3d::parallel::blocked_range<k3d::uint_t>(0, input_face_count, k3d::parallel::grain_size()),
+				detail::worker<detail::per_face_component_counter>(per_face_component_counter));
+
 			// Turn these counts into cumulative sums
 			detail::cumulative_sum(topology_data.face_subface_counts);
 			detail::cumulative_sum(face_subloop_counts);
@@ -954,7 +995,9 @@ public:
 					topology_data.corner_points,
 					topology_data.edge_midpoints,
 					topology_data.face_centers);
-			for(k3d::uint_t face = 0; face != input_face_count; ++face) point_index_calculator(face);
+			k3d::parallel::parallel_for(
+				k3d::parallel::blocked_range<k3d::uint_t>(0, input_face_count, k3d::parallel::grain_size()),
+				detail::worker<detail::point_index_calculator>(point_index_calculator));
 					
 			// Allocate required memory
 			output_points.resize(face_point_counts.back());
@@ -991,10 +1034,9 @@ public:
 			// Connect face centers to edge midpoints
 			const k3d::uint_t face_start = 0;
 			const k3d::uint_t face_end = face_start + input_polyhedron.face_shells.size();
-			for(k3d::uint_t face = face_start; face != face_end; ++face)
-			{
-				topology_subdivider(0, face);
-			}
+			k3d::parallel::parallel_for(
+				k3d::parallel::blocked_range<k3d::uint_t>(face_start, face_end, k3d::parallel::grain_size()),
+				detail::worker<detail::topology_subdivider>(topology_subdivider));
 
 			// Set the per-polyhedron arrays
 			output_polyhedron.shell_types = input_polyhedron.shell_types;
@@ -1073,7 +1115,9 @@ public:
 					edge_attributes_copier,
 					vertex_attributes_copier,
 					point_data_copier);
-			for(k3d::uint_t face = 0; face != face_count; ++face) face_center_calculator(face);
+			k3d::parallel::parallel_for(
+				k3d::parallel::blocked_range<k3d::uint_t>(0, face_count, k3d::parallel::grain_size()),
+				detail::worker<detail::face_center_calculator>(face_center_calculator));
 	
 			// Calculate edge midpoints
 			detail::edge_midpoint_calculator edge_midpoint_calculator(
@@ -1091,7 +1135,9 @@ public:
 					vertex_attributes_copier,
 					point_data_copier,
 					point_data_mixer);
-			for(k3d::uint_t face = 0; face != face_count; ++face) edge_midpoint_calculator(face);
+			k3d::parallel::parallel_for(
+				k3d::parallel::blocked_range<k3d::uint_t>(0, face_count, k3d::parallel::grain_size()),
+				detail::worker<detail::edge_midpoint_calculator>(edge_midpoint_calculator));
 
 			// Calculate new point positions
 			detail::corner_point_calculator corner_point_calculator(
@@ -1107,10 +1153,9 @@ public:
 					point_data_mixer);
 			const k3d::uint_t points_begin = 0;
 			const k3d::uint_t points_end = input_polyhedron.vertex_points.size();
-			for(k3d::uint_t point_idx = points_begin; point_idx != points_end; ++point_idx)
-			{
-				corner_point_calculator(input_polyhedron.vertex_points[point_idx]);
-			}
+			k3d::parallel::parallel_for(
+				k3d::parallel::blocked_range<k3d::uint_t>(points_begin, points_end, k3d::parallel::grain_size()),
+				detail::corner_worker(input_polyhedron.vertex_points, corner_point_calculator));
 		}
 	}
 	
