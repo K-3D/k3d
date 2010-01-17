@@ -184,10 +184,6 @@ bool_t is_solid(const const_primitive& Polyhedron);
 should consider whether SDS should be set on a per-shell basis? */
 bool_t is_sds(const const_primitive& Polyhedron);
 
-/// Returns true iff the given edges are on the same loop.
-bool_t same_loop(const mesh::indices_t& ClockwiseEdges, const uint_t EdgeA, const uint_t EdgeB);
-/// Returns the previous (counterclockwise) edge on the same loop.
-uint_t counterclockwise_edge(const mesh::indices_t& ClockwiseEdges, const uint_t Edge);
 /// Initializes arrays for constant-time lookup of counterclockwise edges.
 void create_counterclockwise_edge_lookup(const mesh::indices_t& ClockwiseEdges, mesh::indices_t& counterclockwise_edges);
 
