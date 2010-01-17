@@ -58,10 +58,8 @@ class nef_visitor
 	typedef typename nef_t::SHalfedge_around_facet_const_circulator SHalfedge_around_facet_const_circulator;
 public:
 	nef_visitor(k3d::polyhedron::primitive& Polyhedron, const CGAL::Object_index<Vertex_const_iterator>& VertexIndices)
-	: m_polyhedron(Polyhedron), m_vertex_indices(VertexIndices), m_edge(0)
+	: m_polyhedron(Polyhedron), m_vertex_indices(VertexIndices), m_edge(0), m_shell(Polyhedron.shell_types.size())
 	{
-		m_polyhedron.shell_first_faces.push_back(0);
-		m_polyhedron.shell_face_counts.push_back(0);
 		m_polyhedron.shell_types.push_back(k3d::polyhedron::POLYGONS);
 	}
 	
@@ -93,7 +91,7 @@ public:
 		m_polyhedron.face_loop_counts.push_back(1);
 		m_polyhedron.face_materials.push_back(static_cast<k3d::imaterial*>(0));
 		m_polyhedron.face_selections.push_back(0.0);
-		++m_polyhedron.shell_face_counts.back();
+		m_polyhedron.face_shells.push_back(m_shell);
 		++fc;
 		CGAL_For_all(fc, f->facet_cycles_end())
 		{
@@ -125,6 +123,7 @@ private:
 	k3d::polyhedron::primitive& m_polyhedron;
 	const CGAL::Object_index<Vertex_const_iterator>& m_vertex_indices;
 	k3d::uint_t m_edge;
+	const k3d::uint_t m_shell;
 };
 
 /// Converts a Nef_polyhedron to a k3d mesh

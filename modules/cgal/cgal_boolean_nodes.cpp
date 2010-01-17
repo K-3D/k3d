@@ -91,7 +91,7 @@ void merge_collinear_edges(const k3d::mesh::points_t& Points, k3d::polyhedron::p
 	k3d::polyhedron::create_edge_adjacency_lookup(Polyhedron.vertex_points, Polyhedron.clockwise_edges, boundary_edges, companions);
 	
 	k3d::mesh::counts_t vertex_valences;
-	k3d::polyhedron::create_vertex_valence_lookup(Points.size(), Polyhedron.vertex_points, vertex_valences);
+	k3d::polyhedron::create_point_valence_lookup(Points.size(), Polyhedron.vertex_points, vertex_valences);
 	k3d::mesh::indices_t redundant_edges;
 	k3d::polyhedron::mark_collinear_edges(redundant_edges, input_edge_selection, Points, Polyhedron.vertex_points, Polyhedron.clockwise_edges, vertex_valences, boundary_edges, companions, Threshold);
 
@@ -143,7 +143,9 @@ public:
 				document().pipeline_profiler().start_execution(*this, "Simplify output");
 				detail::merge_coplanar_faces(*Output.points, *output_polyhedron, m_threshold.pipeline_value());
 				detail::merge_collinear_edges(*Output.points, *output_polyhedron, m_threshold.pipeline_value());
-				k3d::mesh::delete_unused_points(Output);
+				k3d::mesh::bools_t unused_points;
+				k3d::mesh::lookup_unused_points(Output, unused_points);
+				k3d::mesh::delete_points(Output, unused_points);
 				document().pipeline_profiler().finish_execution(*this, "Simplify output");
 			}
 		}

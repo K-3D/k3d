@@ -33,6 +33,8 @@ namespace detail
 template<class ArrayT> void cumulative_sum(const ArrayT& InputArray, ArrayT& OutputArray)
 {
 	return_if_fail(InputArray.size() == OutputArray.size());
+	if(InputArray.empty())
+		return;
 	const uint_t array_begin = 0;
 	const uint_t array_end = InputArray.size();
 	OutputArray[0] = InputArray[0];
@@ -201,6 +203,8 @@ assert_not_implemented();
 	uint_t last_delete_count = 0;
 	for(uint_t polyhedron = 0; polyhedron != first_faces.size(); ++polyhedron)
 	{
+		if(face_counts[polyhedron] == 0)
+			continue;
 		const uint_t last_face = first_faces[polyhedron] + face_counts[polyhedron] - 1;
 		const uint_t new_face_count = face_counts[polyhedron] - (faces_to_delete_sum[last_face] - last_delete_count);
 		last_delete_count = faces_to_delete_sum[last_face];
