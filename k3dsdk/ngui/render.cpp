@@ -311,7 +311,7 @@ interface_t* pick_render_engine(document_state& DocumentState, const std::vector
 	dialog.set_border_width(5);
 	dialog.get_vbox()->pack_start(*Gtk::manage(new Gtk::Label(Message)), Gtk::PACK_SHRINK, 5);
 	dialog.get_vbox()->pack_start(combo, Gtk::PACK_SHRINK, 5);
-	dialog.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+	dialog.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK)->grab_focus();
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 
 	dialog.set_position(Gtk::WIN_POS_CENTER);
