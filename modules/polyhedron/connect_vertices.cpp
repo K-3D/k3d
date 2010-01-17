@@ -31,6 +31,7 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -72,47 +73,86 @@ public:
 			if(!polyhedron)
 				continue;
 
-			// Keep track of newly-created geometry ...
-			new_edges_t new_edges;
-			new_faces_t new_faces;
-
-			// For each shell ...
-			const k3d::uint_t shell_begin = 0;
-			const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();
-			for(k3d::uint_t shell = shell_begin; shell != shell_end; ++shell)
+			// For each face ...
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				// For each face ...
-				const k3d::uint_t face_begin = 0;
-				const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
-				for(k3d::uint_t face = face_begin; face != face_end; ++face)
-				{
-					if(polyhedron->face_shells[face] != shell)
-						continue;
+				// Organize the face edges into groups of alternating selected and unselected edges ...
+				const edge_groups_t edge_groups = get_edge_groups(point_selection, *polyhedron, face);
 
-					const edge_groups_t edge_groups = get_edge_groups(point_selection, *polyhedron, face);
-					if(4 == edge_groups.size() && edge_groups[0].size() == edge_groups[2].size())
+				// If we can't figure-out unambiguously which edges to connect, skip this face ...
+				if(4 != edge_groups.size())
+					continue;
+				if(edge_groups[0].size() != edge_groups[2].size())
+					continue;
+
+				// Get ready to update face attributes ...
+				k3d::table_copier face_attributes(polyhedron->face_attributes);
+				k3d::table_copier edge_attributes(polyhedron->edge_attributes);
+				k3d::table_copier vertex_attributes(polyhedron->vertex_attributes);
+
+				// Lookup counterclockwise edges ...
+				k3d::mesh::indices_t counterclockwise_edges;
+				k3d::polyhedron::create_counterclockwise_edge_lookup(polyhedron->clockwise_edges, counterclockwise_edges);
+
+				// Split the face ...
+				const k3d::uint_t split_count = edge_groups[0].size();
+				for(k3d::uint_t i = 0; i != split_count; ++i)
+				{
+					const k3d::uint_t edge1 = edge_groups[0][split_count - i - 1];
+					const k3d::uint_t edge2 = edge_groups[2][i];
+
+					const k3d::uint_t ccw_edge1 = counterclockwise_edges[edge1];
+					const k3d::uint_t ccw_edge2 = counterclockwise_edges[edge2];
+
+					const k3d::uint_t new_edge1 = polyhedron->clockwise_edges.size();
+					polyhedron->clockwise_edges.push_back(edge2);
+					polyhedron->edge_selections.push_back(1);
+
 					{
-						const k3d::uint_t count = edge_groups[0].size();
-						for(k3d::uint_t i = 0; i != count; ++i)
-						{
-							split_face(*polyhedron, shell, face, edge_groups[0][count - i - 1], edge_groups[2][i], new_faces, new_edges);
-						}
+						const k3d::uint_t edge_indices[2] = { ccw_edge1, edge2 };
+						const k3d::double_t edge_weights[2] = { 0.5, 0.5 };
+						edge_attributes.push_back(2, edge_indices, edge_weights);
 					}
+
+					polyhedron->vertex_points.push_back(polyhedron->vertex_points[edge1]);
+					polyhedron->vertex_selections.push_back(0);
+					vertex_attributes.push_back(edge1);
+
+					const k3d::uint_t new_edge2 = polyhedron->clockwise_edges.size();
+					polyhedron->clockwise_edges.push_back(edge1);
+					polyhedron->edge_selections.push_back(1);
+
+					{
+						const k3d::uint_t edge_indices[2] = { ccw_edge2, edge1 };
+						const k3d::double_t edge_weights[2] = { 0.5, 0.5 };
+						edge_attributes.push_back(2, edge_indices, edge_weights);
+					}
+
+					polyhedron->vertex_points.push_back(polyhedron->vertex_points[edge2]);
+					polyhedron->vertex_selections.push_back(0);
+					vertex_attributes.push_back(edge2);
+
+					polyhedron->clockwise_edges[ccw_edge1] = new_edge1;
+					polyhedron->clockwise_edges[ccw_edge2] = new_edge2;
+
+					polyhedron->face_shells.push_back(polyhedron->face_shells[face]);
+					polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+					polyhedron->face_loop_counts.push_back(1);
+					polyhedron->face_selections.push_back(0);
+					polyhedron->face_materials.push_back(polyhedron->face_materials[face]);
+					face_attributes.push_back(face);
+
+					polyhedron->loop_first_edges.push_back(edge1);
+
+					polyhedron->loop_first_edges[polyhedron->face_first_loops[face]] = ccw_edge1;
 				}
 			}
-
-			// Select new edges ...
-			const k3d::uint_t edge_begin = 0;
-			const k3d::uint_t edge_end = edge_begin + new_edges.size();
-			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
-				polyhedron->edge_selections[new_edges[edge]] = 1;
 		}
 
 		// Deselect output points ...
-		const k3d::uint_t point_begin = 0;
-		const k3d::uint_t point_end = point_begin + point_selection.size();
-		for(k3d::uint_t point = point_begin; point != point_end; ++point)
-			point_selection[point] = 0;
+		std::fill(point_selection.begin(), point_selection.end(), 0);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -134,9 +174,6 @@ public:
 	}
 
 private:
-	typedef k3d::mesh::indices_t new_faces_t;
-	typedef k3d::mesh::indices_t new_edges_t;
-
 	typedef k3d::mesh::indices_t edge_group_t;
 	typedef std::vector<edge_group_t> edge_groups_t;
 
@@ -195,44 +232,6 @@ private:
 		}
 
 		return edge_groups;
-	}
-
-	/// Connects two vertices belonging to the same face
-	void split_face(k3d::polyhedron::primitive& Polyhedron, const k3d::uint_t Shell, const k3d::uint_t Face, const k3d::uint_t Edge1, const k3d::uint_t Edge2, new_faces_t& NewFaces, new_edges_t& NewEdges)
-	{
-		return_if_fail(k3d::polyhedron::same_loop(Polyhedron.clockwise_edges, Edge1, Edge2));
-		const k3d::uint_t ccw_edge1 = k3d::polyhedron::counterclockwise_edge(Polyhedron.clockwise_edges, Edge1);
-		const k3d::uint_t ccw_edge2 = k3d::polyhedron::counterclockwise_edge(Polyhedron.clockwise_edges, Edge2);
-
-		const k3d::uint_t new_edge1 = Polyhedron.clockwise_edges.size();
-		Polyhedron.clockwise_edges.push_back(Edge2);
-		Polyhedron.edge_selections.push_back(0);
-		Polyhedron.vertex_points.push_back(Polyhedron.vertex_points[Edge1]);
-		Polyhedron.vertex_selections.push_back(0);
-
-		const k3d::uint_t new_edge2 = Polyhedron.clockwise_edges.size();
-		Polyhedron.clockwise_edges.push_back(Edge1);
-		Polyhedron.edge_selections.push_back(0);
-		Polyhedron.vertex_points.push_back(Polyhedron.vertex_points[Edge2]);
-		Polyhedron.vertex_selections.push_back(0);
-
-		Polyhedron.clockwise_edges[ccw_edge1] = new_edge1;
-		Polyhedron.clockwise_edges[ccw_edge2] = new_edge2;
-
-		const k3d::uint_t new_face = Polyhedron.face_first_loops.size();
-
-		Polyhedron.face_shells.push_back(Shell);
-		Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
-		Polyhedron.face_loop_counts.push_back(1);
-		Polyhedron.face_selections.push_back(0);
-		Polyhedron.face_materials.push_back(Polyhedron.face_materials[Face]);
-		Polyhedron.loop_first_edges.push_back(Edge1);
-		if(Polyhedron.loop_first_edges[Polyhedron.face_first_loops[Face]] == Edge1)
-			Polyhedron.loop_first_edges[Polyhedron.face_first_loops[Face]] = new_edge1;
-
-		NewFaces.push_back(new_face);
-		NewEdges.push_back(new_edge1);
-		NewEdges.push_back(new_edge2);
 	}
 };
 
