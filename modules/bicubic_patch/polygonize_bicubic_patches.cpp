@@ -31,6 +31,7 @@
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -59,6 +60,7 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		// Copy point data only ...
 		Output = k3d::mesh();
 		Output.points = Input.points;
 		Output.point_selection = Input.point_selection;
@@ -66,8 +68,10 @@ public:
 
 		const k3d::int32_t subdivisions = m_subdivisions.pipeline_value();
 
+		// For each primitive ...
 		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
+			// Convert bicubic patch primitives to polyhedron primitives, passing-through all other primitive types ...
 			boost::scoped_ptr<k3d::bicubic_patch::const_primitive> bicubic_patch(k3d::bicubic_patch::validate(Output, **primitive));
 			if(!bicubic_patch)
 			{
@@ -75,10 +79,15 @@ public:
 				continue;
 			}
 
+			// Create a new polyhedron and prepare to copy attributes ...
 			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+			polyhedron->face_attributes = bicubic_patch->patch_attributes.clone_types();
+			k3d::table_copier face_attributes(bicubic_patch->patch_attributes, polyhedron->face_attributes);
 
+			// Prepare to create new points ...
 			k3d::mesh::points_t& points = Output.points.writable();
 			k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
+			k3d::table_copier point_attributes(Output.point_attributes);
 
 			const k3d::uint_t patch_begin = 0;
 			const k3d::uint_t patch_end = patch_begin + bicubic_patch->patch_selections.size();
@@ -88,10 +97,10 @@ public:
 
 				for(k3d::int32_t j = 0; j <= subdivisions; ++j)
 				{
-					const k3d::double_t u = static_cast<k3d::double_t>(j) / static_cast<k3d::double_t>(subdivisions);
+					const k3d::double_t u = k3d::ratio(j, subdivisions);
 					for(k3d::int32_t k = 0; k <= subdivisions; ++k)
 					{
-						const k3d::double_t v = static_cast<k3d::double_t>(k) / static_cast<k3d::double_t>(subdivisions);
+						const k3d::double_t v = k3d::ratio(k, subdivisions);
 
 						k3d::double_t U[4], V[4];
 						U[0] = (1-u)*(1-u)*(1-u);
@@ -103,18 +112,23 @@ public:
 						V[2] = 3*v*v*(1-v);
 						V[3] = v*v*v;
 
-						k3d::point3 new_point(0, 0, 0);
-						for(unsigned long l = 0; l < 4; ++l)
+						k3d::mesh::indices_t point_indices;
+						k3d::mesh::weights_t point_weights;
+						for(k3d::int32_t l = 0; l < 4; ++l)
 						{
-							for(unsigned long m = 0; m < 4; ++m)
+							for(k3d::int32_t m = 0; m < 4; ++m)
 							{
-								const k3d::point3 position = points[bicubic_patch->patch_points[(patch * 16) + (l * 4) + m]];
-								new_point += k3d::to_vector(position * U[l] * V[m]);
+								point_indices.push_back(bicubic_patch->patch_points[(patch * 16) + (l * 4) + m]);
+								point_weights.push_back(U[l] * V[m]);
 							}
 						}
+						k3d::point3 new_point(0, 0, 0);
+						for(k3d::uint_t i = 0; i != point_indices.size(); ++i)
+							new_point += k3d::to_vector(point_weights[i] * points[point_indices[i]]);
 
 						points.push_back(new_point);
 						point_selection.push_back(1);
+						point_attributes.push_back(point_indices.size(), &point_indices[0], &point_weights[0]);
 					}
 				}
 
@@ -127,6 +141,7 @@ public:
 						polyhedron->face_loop_counts.push_back(1);
 						polyhedron->face_selections.push_back(1);
 						polyhedron->face_materials.push_back(bicubic_patch->patch_materials[patch]);
+						face_attributes.push_back(patch);
 						
 						polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
