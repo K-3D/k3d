@@ -1013,15 +1013,11 @@ public:
 	find_companion_worker(
 		const mesh::indices_t& VertexPoints,
 		const mesh::indices_t& ClockwiseEdges,
-		const mesh::counts_t& Valences,
-		const mesh::indices_t& FirstEdges,
-		const mesh::indices_t& PointEdges,
+		const std::vector<mesh::indices_t>& PointEdges,
 		mesh::bools_t& BoundaryEdges,
 		mesh::indices_t& AdjacentEdges) :
 			m_edge_points(VertexPoints),
 			m_clockwise_edges(ClockwiseEdges),
-			m_valences(Valences),
-			m_first_edges(FirstEdges),
 			m_point_edges(PointEdges),
 			m_boundary_edges(BoundaryEdges),
 			m_adjacent_edges(AdjacentEdges)
@@ -1037,12 +1033,13 @@ public:
 			const uint_t vertex1 = m_edge_points[edge];
 			const uint_t vertex2 = m_edge_points[m_clockwise_edges[edge]];
 
-			const uint_t first_index = m_first_edges[vertex2];
-			const uint_t last_index = first_index + m_valences[vertex2];
+			const mesh::indices_t& point_edges = m_point_edges[vertex2];
+			const uint_t first_index = 0;
+			const uint_t last_index = point_edges.size();
 			m_adjacent_edges[edge] = edge;
 			for(uint_t i = first_index; i != last_index; ++i)
 			{
-				const uint_t companion = m_point_edges[i];
+				const uint_t companion = point_edges[i];
 				if(m_edge_points[m_clockwise_edges[companion]] == vertex1)
 				{
 					m_boundary_edges[edge] = false;
@@ -1056,9 +1053,7 @@ public:
 private:
 	const mesh::indices_t& m_edge_points;
 	const mesh::indices_t& m_clockwise_edges;
-	const mesh::counts_t& m_valences;
-	const mesh::indices_t& m_first_edges;
-	const mesh::indices_t& m_point_edges;
+	const std::vector<mesh::indices_t>& m_point_edges;
 	mesh::bools_t& m_boundary_edges;
 	mesh::indices_t& m_adjacent_edges;
 };
@@ -1269,13 +1264,21 @@ private:
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create_edge_adjacency_lookup
 
+void create_point_out_edge_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, std::vector<mesh::indices_t>& AdjacencyList)
+{
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + ClockwiseEdges.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		AdjacencyList[VertexPoints[edge]].push_back(edge);
+	}
+}
+
 void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges)
 {
-	mesh::counts_t valences;
-	create_point_valence_lookup(0, VertexPoints, valences);
-	mesh::indices_t first_edges; // first edge in point_edges for each point
-	mesh::indices_t point_edges;
-	create_point_edge_lookup(VertexPoints, point_edges, first_edges, valences);
+	const k3d::uint_t count = *std::max_element(VertexPoints.begin(), VertexPoints.end()) + 1;
+	std::vector<mesh::indices_t> point_edges(count);
+	create_point_out_edge_lookup(VertexPoints, ClockwiseEdges, point_edges);
 
 	BoundaryEdges.assign(VertexPoints.size(), true);
 	AdjacentEdges.assign(VertexPoints.size(), 0);
@@ -1286,7 +1289,7 @@ void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mes
 	// Making this parallel decreases running time by 20 % on a Pentium D. 
 	k3d::parallel::parallel_for(
 				k3d::parallel::blocked_range<uint_t>(edge_begin, edge_end, k3d::parallel::grain_size()),
-				detail::find_companion_worker(VertexPoints, ClockwiseEdges, valences, first_edges, point_edges, BoundaryEdges, AdjacentEdges));
+				detail::find_companion_worker(VertexPoints, ClockwiseEdges, point_edges, BoundaryEdges, AdjacentEdges));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -1411,13 +1414,7 @@ void create_point_face_lookup(const mesh& Mesh, const const_primitive& Polyhedro
 void create_point_out_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList)
 {
 	AdjacencyList.resize(Mesh.points->size());
-
-	const uint_t edge_begin = 0;
-	const uint_t edge_end = edge_begin + Polyhedron.clockwise_edges.size();
-	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
-	{
-		AdjacencyList[Polyhedron.vertex_points[edge]].push_back(edge);
-	}
+	create_point_out_edge_lookup(Polyhedron.vertex_points, Polyhedron.clockwise_edges, AdjacencyList);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
