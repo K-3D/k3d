@@ -3,7 +3,7 @@ title: Fix MergeCollinearEdges.
 desc: Need to update MergeCollinearEdges to match changes to the polyhedron schema for shells.
 type: :task
 component: K-3D
-release: 0.8.0.0
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -19,4 +19,8 @@ log_events:
 - - 2010-01-01 03:18:58.036546 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - edited title
+  - ""
+- - 2010-01-17 16:54:15.430299 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
   - ""
