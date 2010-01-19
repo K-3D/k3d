@@ -15,8 +15,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2010-01-01 03:48:25.796512 Z
 references: []
 
@@ -25,4 +25,8 @@ log_events:
 - - 2010-01-01 03:48:26.509507 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2010-01-19 03:53:50.509215 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
   - ""
