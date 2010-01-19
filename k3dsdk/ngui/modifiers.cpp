@@ -35,7 +35,6 @@
 #include <k3dsdk/ireset_properties.h>
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/modifiers.h>
 #include <k3dsdk/ngui/panel_mediator.h>

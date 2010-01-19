@@ -1,5 +1,4 @@
 #include <k3dsdk/data.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/vectors.h>
 
 #include <iostream>

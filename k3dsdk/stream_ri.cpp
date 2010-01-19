@@ -24,7 +24,6 @@
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/stream_ri.h>
 #include <k3dsdk/stream_io_ri.h>
 #include <k3dsdk/types_ri.h>

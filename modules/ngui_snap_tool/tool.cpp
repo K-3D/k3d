@@ -49,6 +49,7 @@
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/plane.h>
 #include <k3dsdk/properties.h>
+#include <k3dsdk/selectable.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/xml.h>
 

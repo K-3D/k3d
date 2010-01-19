@@ -48,7 +48,6 @@
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
 #include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/ngui/application_state.h>
 #include <k3dsdk/ngui/context_menu.h>

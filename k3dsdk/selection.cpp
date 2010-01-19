@@ -21,7 +21,6 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iomanip.h>
 #include <k3dsdk/iproperty.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/selection.h>
 

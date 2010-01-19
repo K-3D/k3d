@@ -35,7 +35,6 @@
 #include <k3dsdk/utility.h>
 
 // The following includes are needed to compare typeinfo of properties in skip_nodes
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh.h>
 
 namespace k3d

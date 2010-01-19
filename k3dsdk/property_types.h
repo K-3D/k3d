@@ -30,7 +30,6 @@
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/itexture_ri.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/types.h>
@@ -44,7 +43,7 @@ namespace property
 {
 
 /// Enumerates all of the types that can be stored using user properties.
-typedef boost::mpl::vector18<
+typedef boost::mpl::vector17<
 	k3d::bool_t,
 	k3d::color,
 	k3d::double_t,
@@ -53,7 +52,6 @@ typedef boost::mpl::vector18<
 	k3d::imaterial*,
 	k3d::inode*,
 	k3d::int32_t,
-	k3d::legacy::mesh*,
 	k3d::matrix4,
 	k3d::mesh*,
 	k3d::normal3,

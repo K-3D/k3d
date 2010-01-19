@@ -77,7 +77,6 @@
 #include <k3dsdk/iuri_handler.h>
 #include <k3dsdk/ivector3_source.h>
 #include <k3dsdk/ivolume_shader_ri.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/rectangle.h>
@@ -222,8 +221,6 @@ void initialize_types()
 	register_type(typeid(k3d::iunknown*), "k3d::iunknown*");
 	register_type(typeid(k3d::iuri_handler), "k3d::iuri_handler");
 	register_type(typeid(k3d::ivector3_source), "k3d::ivector3_source");
-	register_type(typeid(k3d::legacy::mesh), "k3d::legacy::mesh");
-	register_type(typeid(k3d::legacy::mesh*), "k3d::legacy::mesh*");
 	register_type(typeid(k3d::matrix4), "k3d::matrix4");
 	register_type(typeid(k3d::mesh), "k3d::mesh");
 	register_type(typeid(k3d::mesh*), "k3d::mesh*");

@@ -30,7 +30,6 @@
 #include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/keyboard.h>

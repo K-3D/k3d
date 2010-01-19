@@ -38,7 +38,6 @@
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/itransform_sink.h>
 #include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/nurbs_curve.h>

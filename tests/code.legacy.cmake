@@ -3,30 +3,14 @@
 SET(ERROR_COUNT 0)
 SET(SKIP_FILES
 	"^[.]hg/.*$"
-	"^k3dsdk/geometry.cpp$"
-	"^k3dsdk/geometry.h$"
 	"^k3dsdk/iselectable.h$"
-	"^k3dsdk/legacy_mesh.cpp$"
-	"^k3dsdk/legacy_mesh_modifier.h$"
-	"^k3dsdk/mesh.cpp$"
-	"^k3dsdk/mesh.h$"
-	"^k3dsdk/ngui/auto_property_page.cpp$"
 	"^k3dsdk/ngui/document_state.cpp$"
-	"^k3dsdk/properties.cpp$"
-	"^k3dsdk/property_types.h$"
 	"^k3dsdk/selectable.h$"
 	"^k3dsdk/serialization_xml.cpp$"
-	"^k3dsdk/type_registry.cpp$"
 	"^modules/polyhedron/bevel_faces.cpp$"
 	"^modules/polyhedron/dissolve_components.cpp$"
 	"^modules/polyhedron/fillet_edges.cpp$"
-	"^modules/polyhedron/helpers.cpp$"
-	"^modules/polyhedron/helpers.h$"
-	"^modules/test/legacy_mesh_conversion.cpp$"
-	"^modules/test/memory_pools.cpp$"
 	"^tests/code.legacy.cmake$"
-	"^tests/document.stress.read_all_properties.py$"
-	"^tests/python.api.user_properties.py$"
 	)
 
 FILE(GLOB_RECURSE SOURCE_FILES "*")

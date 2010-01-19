@@ -10,7 +10,7 @@ result = 0
 
 doc = k3d.new_document()
 
-unsupported_types = [ "k3d::legacy::mesh*", "std::vector<k3d::point3>", "k3d::typed_array<unsigned int>", "std::vector<unsigned int>", "" ]
+unsupported_types = [ "std::vector<k3d::point3>", "k3d::typed_array<unsigned int>", "std::vector<unsigned int>", "" ]
 
 factories = k3d.plugins()
 for factory in factories:
