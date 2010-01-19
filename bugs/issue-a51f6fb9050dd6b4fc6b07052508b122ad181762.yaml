@@ -1,0 +1,20 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Transform manipulators don't appear when selecting in transform mode
+desc: |-
+  When starting from an empty selection, selecting something while the transform modifier is active does not
+  make the manipulators appear.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Bart Janssens <bart.janssens@lid.kviv.be>
+status: :unstarted
+disposition: 
+creation_time: 2010-01-19 07:11:57.663235 Z
+references: []
+
+id: a51f6fb9050dd6b4fc6b07052508b122ad181762
+log_events: 
+- - 2010-01-19 07:12:03.535418 Z
+  - Bart Janssens <bart.janssens@lid.kviv.be>
+  - created
+  - ""
