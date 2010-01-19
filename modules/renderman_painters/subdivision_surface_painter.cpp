@@ -70,6 +70,7 @@ public:
 			const k3d::mesh::points_t& points = *Mesh.points;
 		
 			const strings_t* const interpolateboundary_tags = polyhedron->constant_attributes.lookup<strings_t>("interpolateboundary");
+			const k3d::mesh::doubles_t* const creases = polyhedron->edge_attributes.lookup<k3d::mesh::doubles_t>("crease");
 
 			const k3d::uint_t shell_begin = 0;
 			const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();
@@ -102,6 +103,11 @@ public:
 
 					k3d::typed_array<k3d::ri::point>* const ri_points = new k3d::typed_array<k3d::ri::point>(points);
 
+					k3d::ri::strings tags;
+					k3d::ri::unsigned_integers tag_counts;
+					k3d::ri::integers tag_integers;
+					k3d::ri::reals tag_reals;
+
 					for(k3d::uint_t face = faces_begin; face != faces_end; ++face)
 					{
 						if(polyhedron->face_shells[face] != shell)
@@ -118,6 +124,19 @@ public:
 						{
 							++vertex_count;
 							vertex_ids.push_back(polyhedron->vertex_points[edge]);
+							if(creases)
+							{
+								const k3d::double_t crease_value = creases->at(edge);
+								if(crease_value)
+								{
+									tags.push_back("crease");
+									tag_counts.push_back(2);
+									tag_counts.push_back(1);
+									tag_integers.push_back(polyhedron->vertex_points[edge]);
+									tag_integers.push_back(polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]);
+									tag_reals.push_back(crease_value);
+								}
+							}
 
 							edge = polyhedron->clockwise_edges[edge];
 							if(edge == first_edge)
@@ -127,11 +146,6 @@ public:
 						vertex_counts.push_back(vertex_count);
 					}
 
-					k3d::ri::strings tags;
-					k3d::ri::unsigned_integers tag_counts;
-					k3d::ri::integers tag_integers;
-					k3d::ri::reals tag_reals;
-					
 					if (interpolateboundary_tags)
 					{
 						tags.push_back(interpolateboundary_tags->at(shell));
