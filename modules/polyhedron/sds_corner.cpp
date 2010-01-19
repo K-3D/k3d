@@ -68,19 +68,28 @@ public:
 
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		if(!Output.point_selection)
-			return;
-		const k3d::mesh::selection_t& point_selection = *Output.point_selection;
-
 		const k3d::double_t sharpness = m_sharpness.pipeline_value();
 
-		const k3d::uint_t point_count = point_selection.size();
-		k3d::mesh::doubles_t& corners = Output.point_attributes.create<k3d::mesh::doubles_t>("corner", new k3d::mesh::doubles_t(point_count));
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
+			if(!polyhedron)
+				continue;
 
-		const k3d::uint_t point_begin = 0;
-		const k3d::uint_t point_end = point_begin + point_count;
-		for(k3d::uint_t point = point_begin; point != point_end; ++point)
-			corners[point] = point_selection[point] ? sharpness : 0.0;
+			const k3d::uint_t edge_count = polyhedron->edge_selections.size();
+			k3d::mesh::doubles_t* corners_ptr = polyhedron->vertex_attributes.writable<k3d::mesh::doubles_t>("corner");
+			k3d::mesh::doubles_t& corners = corners_ptr ? *corners_ptr : polyhedron->vertex_attributes.create<k3d::mesh::doubles_t>("corner", new k3d::mesh::doubles_t(edge_count));
+			if(!corners_ptr)
+				corners.assign(corners.size(), 0);
+
+			const k3d::uint_t edge_begin = 0;
+			const k3d::uint_t edge_end = edge_begin + edge_count;
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+			{
+				if(Output.point_selection->at(polyhedron->vertex_points[edge]))
+					corners[edge] = sharpness;
+			}
+		}
 	}
 
 	static k3d::iplugin_factory& get_factory()

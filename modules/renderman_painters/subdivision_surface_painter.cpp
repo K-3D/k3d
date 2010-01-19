@@ -71,6 +71,7 @@ public:
 		
 			const strings_t* const interpolateboundary_tags = polyhedron->constant_attributes.lookup<strings_t>("interpolateboundary");
 			const k3d::mesh::doubles_t* const creases = polyhedron->edge_attributes.lookup<k3d::mesh::doubles_t>("crease");
+			const k3d::mesh::doubles_t* const corners = polyhedron->vertex_attributes.lookup<k3d::mesh::doubles_t>("corner");
 
 			const k3d::uint_t shell_begin = 0;
 			const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();
@@ -108,6 +109,9 @@ public:
 					k3d::ri::integers tag_integers;
 					k3d::ri::reals tag_reals;
 
+					typedef std::map<k3d::uint_t, k3d::double_t> corners_t;
+					corners_t corner_values;
+
 					for(k3d::uint_t face = faces_begin; face != faces_end; ++face)
 					{
 						if(polyhedron->face_shells[face] != shell)
@@ -138,6 +142,15 @@ public:
 								}
 							}
 
+							if(corners)
+							{
+								const k3d::double_t corner_value = corners->at(edge);
+								if(corner_value)
+								{
+									corner_values[polyhedron->vertex_points[edge]] = corner_value;
+								}
+							}
+
 							edge = polyhedron->clockwise_edges[edge];
 							if(edge == first_edge)
 								break;
@@ -151,6 +164,18 @@ public:
 						tags.push_back(interpolateboundary_tags->at(shell));
 						tag_counts.push_back(0);
 						tag_counts.push_back(0);
+					}
+
+					if(corners)
+					{
+						tags.push_back("corner");
+						tag_counts.push_back(corner_values.size());
+						tag_counts.push_back(corner_values.size());
+					}
+					for(corners_t::const_iterator corner = corner_values.begin(); corner != corner_values.end(); ++corner)
+					{
+						tag_integers.push_back(corner->first);
+						tag_reals.push_back(corner->second);
 					}
 
 					k3d::ri::parameter_list parameters;
