@@ -72,6 +72,7 @@ public:
 			const strings_t* const interpolateboundary_tags = polyhedron->constant_attributes.lookup<strings_t>("interpolateboundary");
 			const k3d::mesh::doubles_t* const creases = polyhedron->edge_attributes.lookup<k3d::mesh::doubles_t>("crease");
 			const k3d::mesh::doubles_t* const corners = polyhedron->vertex_attributes.lookup<k3d::mesh::doubles_t>("corner");
+			const k3d::mesh::bools_t* const holes = polyhedron->face_attributes.lookup<k3d::mesh::bools_t>("hole");
 
 			const k3d::uint_t shell_begin = 0;
 			const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();
@@ -111,6 +112,8 @@ public:
 
 					typedef std::map<k3d::uint_t, k3d::double_t> corners_t;
 					corners_t corner_values;
+
+					k3d::mesh::indices_t hole_indices;
 
 					for(k3d::uint_t face = faces_begin; face != faces_end; ++face)
 					{
@@ -156,6 +159,8 @@ public:
 								break;
 						}
 
+						if(holes && holes->at(face))
+							hole_indices.push_back(vertex_counts.size());
 						vertex_counts.push_back(vertex_count);
 					}
 
@@ -176,6 +181,14 @@ public:
 					{
 						tag_integers.push_back(corner->first);
 						tag_reals.push_back(corner->second);
+					}
+
+					if(holes)
+					{
+						tags.push_back("hole");
+						tag_counts.push_back(hole_indices.size());
+						tag_counts.push_back(0);
+						tag_integers.insert(tag_integers.end(), hole_indices.begin(), hole_indices.end());
 					}
 
 					k3d::ri::parameter_list parameters;

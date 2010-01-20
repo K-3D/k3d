@@ -77,9 +77,7 @@ public:
 
 			const k3d::uint_t edge_count = polyhedron->edge_selections.size();
 			k3d::mesh::doubles_t* creases_ptr = polyhedron->edge_attributes.writable<k3d::mesh::doubles_t>("crease");
-			k3d::mesh::doubles_t& creases = creases_ptr ? *creases_ptr : polyhedron->edge_attributes.create<k3d::mesh::doubles_t>("crease", new k3d::mesh::doubles_t(edge_count));
-			if(!creases_ptr)
-				creases.assign(creases.size(), 0);
+			k3d::mesh::doubles_t& creases = creases_ptr ? *creases_ptr : polyhedron->edge_attributes.create<k3d::mesh::doubles_t>("crease", new k3d::mesh::doubles_t(edge_count, 0));
 
 			const k3d::uint_t edge_begin = 0;
 			const k3d::uint_t edge_end = edge_begin + edge_count;

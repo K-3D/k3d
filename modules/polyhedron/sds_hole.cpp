@@ -72,12 +72,16 @@ public:
 				continue;
 
 			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
-			k3d::mesh::bools_t& holes = polyhedron->face_attributes.create<k3d::mesh::bools_t>("hole", new k3d::mesh::bools_t(face_count));
+			k3d::mesh::bools_t* holes_ptr = polyhedron->face_attributes.writable<k3d::mesh::bools_t>("hole");
+			k3d::mesh::bools_t& holes = holes_ptr ? *holes_ptr : polyhedron->face_attributes.create<k3d::mesh::bools_t>("hole", new k3d::mesh::bools_t(face_count, false));
 
 			const k3d::uint_t face_begin = 0;
 			const k3d::uint_t face_end = face_begin + face_count;
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
-				holes[face] = polyhedron->face_selections[face] ? true : false;
+			{
+				if(polyhedron->face_selections[face])
+					holes[face] = true;
+			}
 		}
 	}
 
