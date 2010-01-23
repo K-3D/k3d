@@ -59,7 +59,7 @@ public:
 	{
 	}
 
-	const k3d::bool_t installed()
+	k3d::bool_t installed()
 	{
 		const k3d::filesystem::path aqsis = k3d::system::install_path() / k3d::filesystem::generic_path(k3d::system::executable_name("bin/aqsis"));
 		if(!k3d::filesystem::exists(aqsis))
@@ -72,7 +72,7 @@ public:
 		return true;
 	}
 
-	const k3d::bool_t compile_shader(const k3d::filesystem::path& Shader)
+	k3d::bool_t compile_shader(const k3d::filesystem::path& Shader)
 	{
 		const k3d::filesystem::path aqsl = k3d::system::install_path() / k3d::filesystem::generic_path("bin/aqsl");
 
@@ -96,7 +96,7 @@ public:
 		return true;
 	}
 
-	const k3d::bool_t render(k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& RIB)
+	k3d::bool_t render(k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& RIB)
 	{
 		const k3d::filesystem::path aqsis = k3d::system::install_path() / k3d::filesystem::generic_path("bin/aqsis");
 		const k3d::filesystem::path displays = k3d::system::install_path() / k3d::filesystem::generic_path("bin");

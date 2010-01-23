@@ -1082,7 +1082,7 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 		k3d::selection::record record = k3d::selection::record::empty_record();
 		record.tokens.push_back(k3d::selection::token(NODE, node_id));
 		record.tokens.push_back(k3d::selection::token(MESH, mesh_id));
-		record.tokens.push_back(k3d::selection::token(POINT, point_id));
+		record.tokens.push_back(k3d::selection::token(k3d::selection::POINT, point_id));
 		return record;
 	}
 
