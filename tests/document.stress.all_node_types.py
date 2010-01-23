@@ -5,11 +5,8 @@ import sys
 
 doc = k3d.new_document();
 
-factories = k3d.plugin.factory.lookup()
-for factory in factories:
+for factory in sorted(k3d.plugin.factory.lookup(), lambda x, y: x.name() < y.name()):
 	if factory.is_document_plugin():
-		sys.stderr.write(factory.name() + "\n")
-		sys.stderr.flush()
-
+		k3d.log.info("Creating " + factory.name())
 		node = doc.new_node(factory)
 
