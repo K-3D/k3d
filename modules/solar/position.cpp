@@ -132,9 +132,9 @@ private:
 			m_computed_data->latitude = k3d::degrees(m_latitude.pipeline_value());
 			m_computed_data->longitude = k3d::degrees(m_longitude.pipeline_value());
 
-			const double_t input_seconds = m_time.pipeline_value();
-			const double_t input_whole_seconds = std::floor(input_seconds);
-			const double_t input_fractional_seconds = input_seconds - input_whole_seconds;
+			const k3d::double_t input_seconds = m_time.pipeline_value();
+			const k3d::double_t input_whole_seconds = std::floor(input_seconds);
+			const k3d::double_t input_fractional_seconds = input_seconds - input_whole_seconds;
 
 			boost::posix_time::ptime input_time = boost::posix_time::from_time_t(static_cast<time_t>(input_whole_seconds));
 			input_time += boost::posix_time::time_duration(0, 0, 0, input_fractional_seconds * boost::posix_time::time_duration::ticks_per_second());
