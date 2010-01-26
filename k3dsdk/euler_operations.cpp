@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3dsdk/euler_operations.h>
+#include <k3dsdk/table_copier.h>
 
 #include <set>
 
@@ -126,10 +127,9 @@ void remove_deleted_geometry(polyhedron::primitive& Output,
 		const mesh::indices_t& LoopsToDelete,
 		const mesh::indices_t& EdgesToDelete,
 		const mesh::indices_t& LoopFaces,
-		const mesh::selection_t& FaceSelection)
+		const mesh::selection_t& FaceSelection,
+		const mesh::indices_t& FaceShells)
 {
-assert_not_implemented();
-/*
 	const uint_t edge_count = EdgePoints.size();
 	const uint_t face_count = FaceFirstLoops.size();
 	mesh::counts_t edges_to_delete_sum(edge_count);
@@ -143,7 +143,19 @@ assert_not_implemented();
 	output_face_loop_counts.clear();
 	mesh::selection_t& output_face_selection = Output.face_selections;
 	output_face_selection.clear();
+	Output.face_shells.clear();
 	mesh::indices_t face_map(face_count);
+
+	const k3d::table input_edge_attributes = Output.edge_attributes;
+	const k3d::table input_vertex_attributes = Output.vertex_attributes;
+	const k3d::table input_face_attributes = Output.face_attributes;
+	Output.edge_attributes = input_edge_attributes.clone_types();
+	Output.vertex_attributes = input_vertex_attributes.clone_types();
+	Output.face_attributes = input_face_attributes.clone_types();
+	k3d::table_copier edge_copier(input_edge_attributes, Output.edge_attributes);
+	k3d::table_copier vertex_copier(input_vertex_attributes, Output.vertex_attributes);
+	k3d::table_copier face_copier(input_face_attributes, Output.face_attributes);
+
 	for(uint_t loop = 0; loop != LoopFirstEdges.size(); ++loop)
 	{
 		if(!LoopsToDelete[loop] && !FacesToDelete[LoopFaces[loop]])
@@ -156,6 +168,8 @@ assert_not_implemented();
 				output_face_first_loops.push_back(output_loop_first_edges.size());
 				output_face_loop_counts.push_back(FaceLoopCounts[face]);
 				output_face_selection.push_back(FaceSelection[face]);
+				face_copier.push_back(face);
+				Output.face_shells.push_back(FaceShells[face]);
 				return_if_fail(!EdgesToDelete[LoopFirstEdges[loop]]);
 				output_loop_first_edges.push_back(LoopFirstEdges[loop] - edges_to_delete_sum[LoopFirstEdges[loop]]);
 				output_loop_first_edges.resize(output_loop_first_edges.size() + FaceLoopCounts[face] - 1);
@@ -186,37 +200,39 @@ assert_not_implemented();
 		{
 			output_edge_points.push_back(EdgePoints[edge]);
 			output_clockwise_edges.push_back(ClockwiseEdges[edge] - edges_to_delete_sum[ClockwiseEdges[edge]]);
+			edge_copier.push_back(edge);
+			vertex_copier.push_back(edge);
 		}
 	}
-	const mesh::indices_t first_faces = Output.shell_first_faces;
-	const mesh::indices_t face_counts = Output.shell_face_counts;
-	const typed_array<int32_t> types = Output.shell_types;
-	mesh::indices_t& output_first_faces = Output.shell_first_faces;
-	output_first_faces.clear();
-	mesh::indices_t& output_face_counts = Output.shell_face_counts;
-	output_face_counts.clear();
-	typed_array<int32_t>& output_types = Output.shell_types;
-	output_types.clear();
-	mesh::counts_t faces_to_delete_sum(FacesToDelete.size());
-	detail::cumulative_sum(FacesToDelete, faces_to_delete_sum);
-	uint_t new_first_face = 0;
-	uint_t last_delete_count = 0;
-	for(uint_t polyhedron = 0; polyhedron != first_faces.size(); ++polyhedron)
+	std::set<uint_t> shells_to_erase;
+	const uint_t shell_count = Output.shell_types.size();
+	for(uint_t shell_idx = 0; shell_idx != shell_count; ++shell_idx)
 	{
-		if(face_counts[polyhedron] == 0)
-			continue;
-		const uint_t last_face = first_faces[polyhedron] + face_counts[polyhedron] - 1;
-		const uint_t new_face_count = face_counts[polyhedron] - (faces_to_delete_sum[last_face] - last_delete_count);
-		last_delete_count = faces_to_delete_sum[last_face];
-		if(new_face_count != 0)
+		if(!std::count(Output.face_shells.begin(), Output.face_shells.end(), shell_idx))
 		{
-			output_first_faces.push_back(new_first_face);
-			output_face_counts.push_back(new_face_count);
-			output_types.push_back(types[polyhedron]);
-			new_first_face += new_face_count; 
+			shells_to_erase.insert(shell_idx);
 		}
 	}
-*/
+	for(std::set<uint_t>::const_reverse_iterator it = shells_to_erase.rbegin(); it != shells_to_erase.rend(); ++it)
+	{
+		const uint_t faces_end = Output.face_shells.size();
+		for(uint_t face = 0; face != faces_end; ++face)
+		{
+			if(Output.face_shells[face] > *it)
+				--Output.face_shells[face];
+		}
+	}
+	for(typed_array<int32_t>::iterator shell = Output.shell_types.begin(); shell != Output.shell_types.end();)
+	{
+		if(shells_to_erase.count(shell - Output.shell_types.begin()))
+		{
+			shell = Output.shell_types.erase(shell);
+		}
+		else
+		{
+			++shell;
+		}
+	}
 }
 
 /// Creates lookup arrays linking edges to their loops, and loops to their faces
@@ -411,7 +427,8 @@ void kill_edge_make_loop(polyhedron::primitive& Output, const mesh::indices_t& E
 	mesh::indices_t edges_to_delete_sum(edges_to_delete.size());
 	detail::cumulative_sum(edges_to_delete, edges_to_delete_sum);
 	// Update the output arrays
-	detail::remove_deleted_geometry(Output, face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, faces_to_delete, loops_to_delete, edges_to_delete, loop_faces, face_selection);
+	const k3d::mesh::indices_t face_shells = Output.face_shells;
+	detail::remove_deleted_geometry(Output, face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, faces_to_delete, loops_to_delete, edges_to_delete, loop_faces, face_selection, face_shells);
 	Output.face_materials.assign(Output.face_first_loops.size(), static_cast<imaterial*>(0));
 	Output.edge_selections.assign(Output.vertex_points.size(), 0.0);
 	Output.vertex_selections.assign(Output.vertex_points.size(), 0.0);
@@ -531,7 +548,8 @@ void kill_edge_and_vertex(polyhedron::primitive& Output, const mesh::indices_t& 
 	}
 	
 	// Update output arrays
-	detail::remove_deleted_geometry(Output,face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, faces_to_delete, loops_to_delete, edges_to_delete, loop_faces, face_selection);
+	const k3d::mesh::indices_t face_shells = Output.face_shells;
+	detail::remove_deleted_geometry(Output,face_first_loops, face_loop_counts, loop_first_edges, edge_points, clockwise_edges, faces_to_delete, loops_to_delete, edges_to_delete, loop_faces, face_selection, face_shells);
 	Output.face_materials.assign(Output.face_first_loops.size(), static_cast<imaterial*>(0));
 	Output.edge_selections.assign(Output.clockwise_edges.size(), 0.0);
 	Output.vertex_selections.assign(Output.clockwise_edges.size(), 0.0);

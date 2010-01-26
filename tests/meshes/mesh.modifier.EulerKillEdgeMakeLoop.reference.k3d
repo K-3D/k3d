@@ -3,7 +3,9 @@
 	<mesh_arrays>
 		<points>5 5 0 1.6666666666666665 5 0 -1.6666666666666665 5 0 -5 5 0 5 1.6666666666666665 0 1.6666666666666665 1.6666666666666665 0 -1.6666666666666665 1.6666666666666665 0 -5 1.6666666666666665 0 5 -1.6666666666666665 -0 1.6666666666666665 -1.6666666666666665 -0 -1.6666666666666665 -1.6666666666666665 0 -5 -1.6666666666666665 0 5 -5 -0 1.6666666666666665 -5 -0 -1.6666666666666665 -5 0 -5 -5 0</points>
 		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</point_selection>
-		<point_attributes/>
+		<point_attributes>
+			<array name="index" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15</array>
+		</point_attributes>
 		<primitives>
 			<primitive type="polyhedron">
 				<structure>
@@ -24,13 +26,12 @@
 								<pair name="k3d:role">k3d:selection</pair>
 							</metadata>
 						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0</array>
 					</table>
 					<table type="loop">
 						<array name="loop_first_edges" type="k3d::uint_t">17 13 8</array>
 					</table>
 					<table type="shell">
-						<array name="shell_face_counts" type="k3d::uint_t">2</array>
-						<array name="shell_first_faces" type="k3d::uint_t">0</array>
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
@@ -47,10 +48,18 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
-					<table type="edge"/>
-					<table type="face"/>
-					<table type="vertex"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">0 3 4 6 8 9 13 15 16 17 18 19 21 23 26 27 28 30 33 34</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">0 4</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">0 3 4 6 8 9 13 15 16 17 18 19 21 23 26 27 28 30 33 34</array>
+					</table>
 				</attributes>
 			</primitive>
 		</primitives>
