@@ -16,11 +16,11 @@ torus = document.new_node("PolyTorus")
 torus.u_segments = 8
 torus.v_segments = 4
 
-first_boolean = document.new_node("CGALBoolean")
+first_boolean = document.new_node("CARVEBoolean")
 first_boolean.type = "difference"
 first_boolean.create_property("k3d::mesh*", "input_1", "Input 1", "")
 first_boolean.create_property("k3d::mesh*", "input_2", "Input 2", "")
-second_boolean = document.new_node("CGALBoolean")
+second_boolean = document.new_node("CARVEBoolean")
 second_boolean.type = "reverse_difference"
 second_boolean.create_property("k3d::mesh*", "input_1", "Input 1", "")
 second_boolean.create_property("k3d::mesh*", "input_2", "Input 2", "")
@@ -32,4 +32,4 @@ document.set_dependency(second_boolean.get_property("input_2"), first_boolean.ge
 
 
 testing.require_valid_mesh(document, second_boolean.get_property("output_mesh"))
-testing.mesh_reference_comparison(document, second_boolean.get_property("output_mesh"), "mesh.modifier.CGALBoolean.cylinders", 1)
+testing.mesh_reference_comparison(document, second_boolean.get_property("output_mesh"), "mesh.modifier.CARVEBoolean.cylinders", 1)

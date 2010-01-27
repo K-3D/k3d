@@ -306,16 +306,8 @@ private:
 		
 		const k3d::iproperty_collection::properties_t properties = k3d::property::user_properties(*static_cast<k3d::iproperty_collection*>(this));
 		boolean_functor functor(boolean_type, Node);
-		if (boolean_type == BOOLEAN_REVERSE_DIFFERENCE)
-		{
-			for(k3d::iproperty_collection::properties_t::const_reverse_iterator property = properties.rbegin(); property != properties.rend(); ++property)
-				functor(*property);
-		}
-		else
-		{
-			for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-				functor(*property);
-		}
+		for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+			functor(*property);
 			
 		k3d::mesh::points_t vertices;
 		k3d::mesh::counts_t vertex_counts;
