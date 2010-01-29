@@ -1247,7 +1247,9 @@ void create_point_out_edge_lookup(const mesh::indices_t& VertexPoints, const mes
 
 void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges)
 {
-	const k3d::uint_t count = *std::max_element(VertexPoints.begin(), VertexPoints.end()) + 1;
+	const k3d::uint_t count = VertexPoints.empty() ? 0 : *std::max_element(VertexPoints.begin(), VertexPoints.end()) + 1;
+	if(!count)
+		return;
 	std::vector<mesh::indices_t> point_edges(count);
 	create_point_out_edge_lookup(VertexPoints, ClockwiseEdges, point_edges);
 
