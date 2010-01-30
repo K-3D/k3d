@@ -134,24 +134,24 @@ public:
 		{
 			do_boolean(Output, *this);
 
-			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron;
-			for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
-			{
-				// We only get the first polyhedron
-				output_polyhedron.reset(k3d::polyhedron::validate(Output, primitive->writable()));
-				if(output_polyhedron.get())
-					break;
-			}
-			if(Output.points && output_polyhedron.get())
-			{
-				document().pipeline_profiler().start_execution(*this, "Simplify output");
-				detail::merge_coplanar_faces(*Output.points, *output_polyhedron, m_threshold.pipeline_value());
-				detail::merge_collinear_edges(*Output.points, *output_polyhedron, m_threshold.pipeline_value());
-				k3d::mesh::bools_t unused_points;
-				k3d::mesh::lookup_unused_points(Output, unused_points);
-				k3d::mesh::delete_points(Output, unused_points);
-				document().pipeline_profiler().finish_execution(*this, "Simplify output");
-			}
+//			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron;
+//			for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+//			{
+//				// We only get the first polyhedron
+//				output_polyhedron.reset(k3d::polyhedron::validate(Output, primitive->writable()));
+//				if(output_polyhedron.get())
+//					break;
+//			}
+//			if(Output.points && output_polyhedron.get())
+//			{
+//				document().pipeline_profiler().start_execution(*this, "Simplify output");
+//				detail::merge_coplanar_faces(*Output.points, *output_polyhedron, m_threshold.pipeline_value());
+//				detail::merge_collinear_edges(*Output.points, *output_polyhedron, m_threshold.pipeline_value());
+//				k3d::mesh::bools_t unused_points;
+//				k3d::mesh::lookup_unused_points(Output, unused_points);
+//				k3d::mesh::delete_points(Output, unused_points);
+//				document().pipeline_profiler().finish_execution(*this, "Simplify output");
+//			}
 		}
 		catch (std::exception& E)
 		{
@@ -213,9 +213,13 @@ private:
 				if(!polyhedron.get())
 					return;
 				return_if_fail(k3d::polyhedron::is_solid(*polyhedron));
-				polyhedron->face_selections.assign(polyhedron->face_selections.size(), 1.0);
+				const k3d::uint_t input_face_count = polyhedron->face_selections.size();
+				for(k3d::uint_t face = 0; face != input_face_count; ++face)
+				{
+						polyhedron->face_selections[face] = polyhedron->face_loop_counts[face] > 1 ? 1.0 : 0.0;
+				}
 				
-				// First triangulate inputs
+				// We triangulate the holes
 				k3d::mesh triangulated_mesh;
 				
 				k3d::string_t boolean_op = k3d::string_cast(m_sequence - 1);
@@ -239,18 +243,19 @@ private:
 				faces.reserve(face_count);
 				for(k3d::uint_t face = 0; face != face_count; ++face)
 				{
+					assert_error(triangulated_polyhedron->face_loop_counts[face] == 1);
 					const k3d::uint_t loop = triangulated_polyhedron->face_first_loops[face];
 					const k3d::uint_t first_edge = triangulated_polyhedron->loop_first_edges[loop];
-					k3d::mesh::indices_t corners;
+					std::vector<const vertex_t *> corners;
 					for(k3d::uint_t edge = first_edge; ;)
 					{
-						corners.push_back(triangulated_polyhedron->vertex_points[edge]);
+						corners.push_back(&vertices[triangulated_polyhedron->vertex_points[edge]]);
 
 						edge = triangulated_polyhedron->clockwise_edges[edge];
 						if(edge == first_edge)
 							break;
 					}
-					faces.push_back(face_t(&vertices[corners[0]], &vertices[corners[1]], &vertices[corners[2]]));
+					faces.push_back(face_t(corners));
 				}
 				if (!m_result)
 				{
@@ -308,6 +313,10 @@ private:
 		boolean_functor functor(boolean_type, Node);
 		for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
 			functor(*property);
+
+		document().pipeline_profiler().start_execution(*this, "Canonicalize");
+		functor.result().canonicalize();
+		document().pipeline_profiler().finish_execution(*this, "Canonicalize");
 			
 		k3d::mesh::points_t vertices;
 		k3d::mesh::counts_t vertex_counts;
