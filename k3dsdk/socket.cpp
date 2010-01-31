@@ -30,7 +30,7 @@
 
 #ifdef K3D_API_WIN32
 
-	#include "winsock2.h"
+	#include <winsock2.h>
 
 #else // K3D_API_WIN32
 
