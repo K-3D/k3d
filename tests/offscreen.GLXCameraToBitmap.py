@@ -24,5 +24,5 @@ camera_to_bitmap = doc.new_node("GLXCameraToBitmap")
 camera_to_bitmap.camera = camera
 camera_to_bitmap.render_engine = render_engine
 
-testing.image_comparison(doc, camera_to_bitmap.get_property("output_bitmap"), "offscreen.GLXCameraToBitmap", 0.009)
+testing.require_similar_bitmap(doc, camera_to_bitmap.get_property("output_bitmap"), "offscreen.GLXCameraToBitmap", 0.009)
 

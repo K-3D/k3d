@@ -8,5 +8,5 @@ setup.source.width = 2
 setup.source.height = 3
 setup.source.depth = 4
 
-testing.mesh_volume_comparison(setup.modifier.volume, 24.0)
+testing.require_mesh_volume(setup.modifier.volume, 24.0)
 

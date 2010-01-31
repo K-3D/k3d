@@ -59,9 +59,9 @@ public:
 		k3d::pixel operator()(const k3d::pixel& Input) const
 		{
 			return k3d::pixel(
-				boost::gil::get_color(Input, boost::gil::red_t()) - value,
-				boost::gil::get_color(Input, boost::gil::green_t()) - value,
-				boost::gil::get_color(Input, boost::gil::blue_t()) - value,
+				std::max(0.0, boost::gil::get_color(Input, boost::gil::red_t()) - value),
+				std::max(0.0, boost::gil::get_color(Input, boost::gil::green_t()) - value),
+				std::max(0.0, boost::gil::get_color(Input, boost::gil::blue_t()) - value),
 				boost::gil::get_color(Input, boost::gil::alpha_t()));
 		}
 

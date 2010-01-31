@@ -62,16 +62,111 @@ def create_opengl_engine(document):
 
 	return render_engine
 
-def setup_bitmap_reader_test(reader_name, source_file):
+#####################################################################################33
+# Bitmap-related testing
+
+def setup_bitmap_test(nodes):
+	if len(nodes) < 1:
+		raise Exception("Bitmap test requires at least one node.")
+
 	class result_object:
 		pass
 
 	result = result_object
 	result.document = k3d.new_document()
-	result.source = result.document.new_node(reader_name)
-	result.source.file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + source_file)
+	result.nodes = [] 
 
+	for node in nodes:
+		result.nodes.append(result.document.new_node(node))
+		if len(result.nodes) > 1:
+			result.document.set_dependency(result.nodes[-1].get_property("input_bitmap"), result.nodes[-2].get_property("output_bitmap"))
+
+	result.source = result.nodes[0]
+
+	if len(nodes) == 3:
+		result.modifier = result.nodes[1]
+
+	if len(nodes) > 1:
+		result.sink = result.nodes[-1]
+	
 	return result
+
+def setup_bitmap_source_test(source_name):
+	result = setup_bitmap_test([source_name])
+	return result
+
+def setup_bitmap_reader_test(reader_name, source_file):
+	result = setup_bitmap_test([reader_name])
+	result.reader = result.source
+	result.reader.file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + source_file)
+	return result
+
+def setup_bitmap_modifier_test(source_name, modifier_name):
+	result = setup_bitmap_test([source_name, modifier_name])
+	result.modifier = result.sink
+	return result
+
+def require_bitmap_size(bitmap, width, height):
+	print """<DartMeasurement name="Bitmap Width" type="numeric/float">""" + str(bitmap.width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Bitmap Height" type="numeric/float">""" + str(bitmap.height()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Target Width" type="numeric/float">""" + str(width) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Target Height" type="numeric/float">""" + str(height) + """</DartMeasurement>"""
+	sys.stdout.flush()
+	
+	if bitmap.width() != width or bitmap.height() != height:
+		raise "bitmap dimensions incorrect"
+
+def require_similar_bitmap(document, image_property, image_name, threshold):
+	output_file = k3d.filesystem.generic_path(binary_path() + "/bitmaps/" + image_name + ".reference.png")
+	reference_file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + image_name + ".reference.png")
+	difference_file = k3d.filesystem.generic_path(binary_path() + "/bitmaps/differences/" + image_name + ".png")
+
+	reference = document.new_node("PNGBitmapReader")
+	reference.file = reference_file
+	reference_property = reference.get_property("output_bitmap")
+
+	difference = document.new_node("BitmapPerceptualDifference")
+	difference.field_of_view = 10.0
+	difference.luminance = 100
+	difference_property = difference.get_property("output_bitmap")
+	document.set_dependency(difference.get_property("input_a"), image_property)
+	document.set_dependency(difference.get_property("input_b"), reference_property)
+
+	image_writer = document.new_node("PNGBitmapWriter")
+	image_writer.file = output_file
+	document.set_dependency(image_writer.get_property("input_bitmap"), image_property)
+
+	difference_writer = document.new_node("PNGBitmapWriter")
+	difference_writer.file= difference_file
+	document.set_dependency(difference_writer.get_property("input_bitmap"), difference_property)
+
+	pixel_count = image_property.pipeline_value().width() * image_property.pipeline_value().height()
+	pixel_difference = difference.difference
+	difference_measurement = float(pixel_difference) / float(pixel_count)
+
+	print """<DartMeasurement name="Source Width" type="numeric/float">""" + str(image_property.pipeline_value().width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Source Height" type="numeric/float">""" + str(image_property.pipeline_value().height()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Reference Width" type="numeric/float">""" + str(reference_property.pipeline_value().width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Reference Height" type="numeric/float">""" + str(reference_property.pipeline_value().height()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Difference Width" type="numeric/float">""" + str(difference_property.pipeline_value().width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Difference Height" type="numeric/float">""" + str(difference_property.pipeline_value().height()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Pixel Difference" type="numeric/float">""" + str(pixel_difference) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Threshold" type="numeric/float">""" + str(threshold) + """</DartMeasurement>"""
+	print """<DartMeasurementFile name="Output Image" type="image/png">""" + str(output_file) + """</DartMeasurementFile>"""
+	print """<DartMeasurementFile name="Reference Image" type="image/png">""" + str(reference_file) + """</DartMeasurementFile>"""
+	print """<DartMeasurementFile name="Difference Image" type="image/png">""" + str(difference_file) + """</DartMeasurementFile>"""
+	sys.stdout.flush()
+
+	if not os.path.exists(str(reference_file)):
+		raise Exception("missing reference file: " + str(reference_file))
+
+	if difference_measurement > threshold:
+		raise Exception("pixel difference exceeds threshold")
+
+#####################################################################################33
+# Mesh-related testing
 
 def setup_mesh_test(nodes):
 	if len(nodes) < 1:
@@ -99,26 +194,16 @@ def setup_mesh_test(nodes):
 	
 	return result
 
+def setup_mesh_source_test(source_name):
+	result = setup_mesh_test([source_name])
+	return result
+
 def setup_mesh_reader_test(reader_name, source_file):
 	result = setup_mesh_test([reader_name])
 	result.reader = result.source
 	result.reader.file = k3d.filesystem.generic_path(source_path() + "/meshes/" + source_file)
 	result.reader.center = False
 	result.reader.scale_to_size = False
-	return result
-
-def setup_mesh_source_test(source_name):
-	result = setup_mesh_test([source_name])
-	return result
-
-def setup_scalar_source_test(source_name):
-	class result_object:
-		pass
-
-	result = result_object
-	result.document = k3d.new_document()
-	result.source = result.document.new_node(source_name)
-
 	return result
 
 def setup_mesh_modifier_test(source_name, modifier_name):
@@ -165,17 +250,14 @@ def setup_mesh_writer_test(nodes, reader, target_file):
 
 	return result
 
-def bitmap_size_comparison(bitmap, width, height):
-	print """<DartMeasurement name="Bitmap Width" type="numeric/float">""" + str(bitmap.width()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Bitmap Height" type="numeric/float">""" + str(bitmap.height()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Target Width" type="numeric/float">""" + str(width) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Target Height" type="numeric/float">""" + str(height) + """</DartMeasurement>"""
-	sys.stdout.flush()
-	
-	if bitmap.width() != width or bitmap.height() != height:
-		raise "bitmap dimensions incorrect"
+def require_valid_mesh(document, input_mesh):
+	primitives = document.new_node("ValidMeshes")
+	primitives.create_property("k3d::mesh*", "input_mesh", "Input Mesh", "First input mesh")
+	document.set_dependency(primitives.get_property("input_mesh"), input_mesh)
+	if not primitives.valid:
+		raise Exception("invalid or unknown primitive type in mesh")
 
-def mesh_area_comparison(calculated_area, expected_area):
+def require_mesh_area(calculated_area, expected_area):
 	print """<DartMeasurement name="Calculated Area" type="numeric/float">""" + str(calculated_area) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Expected Area" type="numeric/float">""" + str(expected_area) + """</DartMeasurement>"""
 	sys.stdout.flush()
@@ -183,12 +265,13 @@ def mesh_area_comparison(calculated_area, expected_area):
 	if calculated_area != expected_area:
 		raise Exception("incorrect mesh area")
 
-def require_valid_mesh(document, input_mesh):
-	primitives = document.new_node("ValidMeshes")
-	primitives.create_property("k3d::mesh*", "input_mesh", "Input Mesh", "First input mesh")
-	document.set_dependency(primitives.get_property("input_mesh"), input_mesh)
-	if not primitives.valid:
-		raise Exception("invalid or unknown primitive type in mesh")
+def require_mesh_volume(calculated_volume, expected_volume):
+	print """<DartMeasurement name="Calculated Volume" type="numeric/float">""" + str(calculated_volume) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Expected Volume" type="numeric/float">""" + str(expected_volume) + """</DartMeasurement>"""
+	sys.stdout.flush()
+
+	if calculated_volume != expected_volume:
+		raise Exception("incorrect mesh volume")
 
 def mesh_reference_comparison(document, input_mesh, base_mesh_name, threshold, platform = platform_agnostic):
 	mesh_name = base_mesh_name + ".reference" + platform()
@@ -201,14 +284,14 @@ def mesh_reference_comparison(document, input_mesh, base_mesh_name, threshold, p
 	output.file = output_path
 	document.set_dependency(output.get_property("input_mesh"), input_mesh)
 
-	if not os.path.exists(str(reference_path)):
-		raise Exception("missing reference file: " + str(reference_path))
-
 	reference = document.new_node("K3DMeshReader")
 	reference.center = False
 	reference.scale_to_size = False
 	reference.material = document.get_node("Material")
 	reference.file = reference_path
+
+	if not os.path.exists(str(reference_path)):
+		raise Exception("missing reference file: " + str(reference_path))
 
 	difference = get_mesh_difference(document, input_mesh, reference.get_property("output_mesh"), threshold)
 
@@ -225,14 +308,6 @@ def mesh_reference_comparison(document, input_mesh, base_mesh_name, threshold, p
 
 	output_mesh_difference(input_mesh.pipeline_value(), reference.output_mesh, threshold)
 	raise Exception("output mesh differs from reference")
-
-def mesh_volume_comparison(calculated_volume, expected_volume):
-	print """<DartMeasurement name="Calculated Volume" type="numeric/float">""" + str(calculated_volume) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Expected Volume" type="numeric/float">""" + str(expected_volume) + """</DartMeasurement>"""
-	sys.stdout.flush()
-
-	if calculated_volume != expected_volume:
-		raise Exception("incorrect mesh volume")
 
 """
 	setup a difference node between two meshes
@@ -255,6 +330,29 @@ def output_mesh_difference(input_mesh, reference_mesh, threshold, name = "Mesh D
 	print difflib.HtmlDiff().make_file(str(input_mesh).splitlines(1), str(reference_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
 	print """]]></DartMeasurement>\n"""
 	sys.stdout.flush()
+
+#####################################################################################33
+# Scalar-related testing
+
+def setup_scalar_source_test(source_name):
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = k3d.new_document()
+	result.source = result.document.new_node(source_name)
+
+	return result
+
+def require_scalar_value(value, expected_value):
+	print """<DartMeasurement name="Value" type="numeric/float">""" + str(value) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Expected Value" type="numeric/float">""" + str(expected_value) + """</DartMeasurement>"""
+	if value != expected_value:
+		raise Exception("value does not match expected value")
+
+
+#####################################################################################33
+# Deprecated stuff
 
 def bitmap_perceptual_difference(document, input_image1, input_image2, threshold=1e-8):
 	difference = document.new_node("BitmapPerceptualDifference")
@@ -299,59 +397,6 @@ def bitmap_compare_plugin_outputs(referenceName, pluginToTest, pluginPropertyVal
 
 	# calculate the perceptual difference
 	bitmap_perceptual_difference(document, referenceNode.get_property("output_bitmap"), testNode.get_property("output_bitmap"))
-
-def image_comparison(document, image_property, image_name, threshold):
-
-	output_file = k3d.filesystem.generic_path(binary_path() + "/" + image_name + ".output.png")
-	reference_file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + image_name + ".reference.png")
-	difference_file = k3d.filesystem.generic_path(binary_path() + "/" + image_name + ".difference.png")
-
-	reference = document.new_node("PNGBitmapReader")
-	reference.file = reference_file
-	reference_property = reference.get_property("output_bitmap")
-
-	difference = document.new_node("BitmapPerceptualDifference")
-	difference.field_of_view = 10.0
-	difference.luminance = 100
-	difference_property = difference.get_property("output_bitmap")
-	document.set_dependency(difference.get_property("input_a"), image_property)
-	document.set_dependency(difference.get_property("input_b"), reference_property)
-
-	image_writer = document.new_node("PNGBitmapWriter")
-	image_writer.file = output_file
-	document.set_dependency(image_writer.get_property("input_bitmap"), image_property)
-
-	difference_writer = document.new_node("PNGBitmapWriter")
-	difference_writer.file= difference_file
-	document.set_dependency(difference_writer.get_property("input_bitmap"), difference_property)
-
-	pixel_count = image_property.pipeline_value().width() * image_property.pipeline_value().height()
-	pixel_difference = difference.difference
-	difference_measurement = float(pixel_difference) / float(pixel_count)
-
-	print """<DartMeasurement name="Source Width" type="numeric/float">""" + str(image_property.pipeline_value().width()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Source Height" type="numeric/float">""" + str(image_property.pipeline_value().height()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Reference Width" type="numeric/float">""" + str(reference_property.pipeline_value().width()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Reference Height" type="numeric/float">""" + str(reference_property.pipeline_value().height()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Difference Width" type="numeric/float">""" + str(difference_property.pipeline_value().width()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Difference Height" type="numeric/float">""" + str(difference_property.pipeline_value().height()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Pixel Difference" type="numeric/float">""" + str(pixel_difference) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Threshold" type="numeric/float">""" + str(threshold) + """</DartMeasurement>"""
-	print """<DartMeasurementFile name="Output Image" type="image/png">""" + str(output_file) + """</DartMeasurementFile>"""
-	print """<DartMeasurementFile name="Reference Image" type="image/png">""" + str(reference_file) + """</DartMeasurementFile>"""
-	print """<DartMeasurementFile name="Difference Image" type="image/png">""" + str(difference_file) + """</DartMeasurementFile>"""
-	sys.stdout.flush()
-
-	if difference_measurement > threshold:
-		raise Exception("pixel difference exceeds threshold")
-
-def scalar_comparison(value, expected_value):
-	print """<DartMeasurement name="Value" type="numeric/float">""" + str(value) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Expected Value" type="numeric/float">""" + str(expected_value) + """</DartMeasurement>"""
-	if value != expected_value:
-		raise Exception("value does not match expected value")
 
 def bitmap_modifier_benchmark(BitmapModifier):
 	sys.stdout.write("""<DartMeasurement name="Timing" type="text/html"><![CDATA[\n""")

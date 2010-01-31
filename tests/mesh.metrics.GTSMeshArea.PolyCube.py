@@ -8,5 +8,5 @@ setup.source.width = 1
 setup.source.height = 1
 setup.source.depth = 1
 
-testing.mesh_area_comparison(setup.modifier.area, 6.0)
+testing.require_mesh_area(setup.modifier.area, 6.0)
 

@@ -36,5 +36,5 @@ Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color
 modifier = document.new_node("GTSMeshArea")
 document.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
 
-testing.mesh_area_comparison(modifier.area, 50.0)
+testing.require_mesh_area(modifier.area, 50.0)
 

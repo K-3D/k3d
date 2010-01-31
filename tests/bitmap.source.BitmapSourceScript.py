@@ -3,7 +3,6 @@
 import k3d
 import testing
 
-doc = k3d.new_document()
-source = doc.new_node("BitmapSourceScript")
-testing.image_comparison(doc, source.get_property("output_bitmap"), "BitmapSourceScript", 0)
+setup = testing.setup_bitmap_source_test("BitmapSourceScript")
+testing.require_similar_bitmap(setup.document, setup.source.get_property("output_bitmap"), "BitmapSourceScript", 0)
 
