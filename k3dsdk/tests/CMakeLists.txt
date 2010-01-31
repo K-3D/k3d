@@ -11,7 +11,7 @@ LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 LINK_LIBRARIES(k3dsdk)
 
 ADD_EXECUTABLE(test-difference difference.cpp)
-ADD_TEST(k3dsdk.equal.almost ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test-almost-equal)
+ADD_TEST(k3dsdk.difference ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test-difference)
 
 ADD_EXECUTABLE(test-array-metadata array_metadata.cpp)
 ADD_TEST(k3dsdk.array.metadata ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test-array-metadata)
