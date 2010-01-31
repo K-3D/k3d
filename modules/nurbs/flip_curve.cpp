@@ -67,20 +67,21 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+
 		if(!Output.points.get())
 			return;
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
 		for(k3d::uint_t prim_idx = 0; prim_idx != Output.primitives.size(); ++prim_idx)
 		{
 			boost::scoped_ptr<k3d::nurbs_curve::primitive> curve_prim(k3d::nurbs_curve::validate(Output, Output.primitives[prim_idx]));
-			if(curve_prim)
+			if(!curve_prim)
+				continue;
+
+			for(k3d::uint_t curve = 0; curve != curve_prim->curve_first_points.size(); ++curve)
 			{
-				for(k3d::uint_t curve = 0; curve != curve_prim->curve_first_points.size(); ++curve)
-				{
-					if(curve_prim->curve_selections[curve])
-						module::nurbs::flip_curve(*curve_prim, curve);
-				}
+				if(curve_prim->curve_selections[curve])
+					module::nurbs::flip_curve(*curve_prim, curve);
 			}
 		}
 	}
