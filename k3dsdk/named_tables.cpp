@@ -44,7 +44,7 @@ void named_tables::difference(const named_tables& Other, bool_t& Equal, uint64_t
 	if(size() != Other.size())
 		Equal = false;
 
-	for(named_tables::const_iterator a = begin(), b = Other.begin(); a != end() && b != end(); ++a, ++b)
+	for(named_tables::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
 		// Each pair of tables must have equal names
 		if(a->first != b->first)
