@@ -15,5 +15,5 @@ setup.modifier.amplitude_z = 2
 
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.LinearPointNoise", 1, testing.platform_specific)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.LinearPointNoise", 1, testing.platform_specific)
 

@@ -6,5 +6,5 @@ setup = testing.setup_mesh_source_test("Newell")
 setup.source.type = "teapot"
 
 testing.require_valid_mesh(setup.document, setup.source.get_property("output_mesh"))
-testing.mesh_reference_comparison(setup.document, setup.source.get_property("output_mesh"), "mesh.source.Newell.teapot", 1)
+testing.require_similar_mesh(setup.document, setup.source.get_property("output_mesh"), "mesh.source.Newell.teapot", 1)
 

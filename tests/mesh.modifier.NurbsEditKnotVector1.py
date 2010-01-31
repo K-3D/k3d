@@ -14,5 +14,5 @@ setup.modifier.knot_vector = [0, 0, 0, 0.1, 0.2, 0.25, 0.3, 0.3, 0.8, 0.8, 1, 1,
 
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsEditKnotVector", 1)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.NurbsEditKnotVector", 1)
 

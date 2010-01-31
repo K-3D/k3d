@@ -32,5 +32,5 @@ document.set_dependency(merge_mesh.get_property("input_mesh1"), modifier1.get_pr
 document.set_dependency(merge_mesh.get_property("input_mesh2"), modifier2.get_property("output_mesh"))
 
 testing.require_valid_mesh(document, merge_mesh.get_property("output_mesh"))
-testing.mesh_reference_comparison(document, merge_mesh.get_property("output_mesh"), "mesh.modifier.MergeMesh.generic", 2)
+testing.require_similar_mesh(document, merge_mesh.get_property("output_mesh"), "mesh.modifier.MergeMesh.generic", 2)
 

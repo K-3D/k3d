@@ -20,5 +20,5 @@ setup.modifier2.center_z = True
 
 
 testing.require_valid_mesh(setup.document, setup.modifier2.get_property("output_mesh"))
-testing.mesh_reference_comparison(setup.document, setup.modifier2.get_property("output_mesh"), "mesh.modifier.CenterPoints", 1)
+testing.require_similar_mesh(setup.document, setup.modifier2.get_property("output_mesh"), "mesh.modifier.CenterPoints", 1)
 

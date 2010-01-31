@@ -13,4 +13,4 @@ setup.modifier.input_matrix = k3d.translate3(k3d.vector3(0, 0, 1))
 
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TransformPoints", 1)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TransformPoints", 1)

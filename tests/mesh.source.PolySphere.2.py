@@ -8,5 +8,5 @@ setup.source.type = "quad_only_sphere"
 
 
 testing.require_valid_mesh(setup.document, setup.source.get_property("output_mesh"))
-testing.mesh_reference_comparison(setup.document, setup.source.get_property("output_mesh"), "mesh.source.PolySphere.2", 1, testing.platform_specific)
+testing.require_similar_mesh(setup.document, setup.source.get_property("output_mesh"), "mesh.source.PolySphere.2", 1, testing.platform_specific)
 

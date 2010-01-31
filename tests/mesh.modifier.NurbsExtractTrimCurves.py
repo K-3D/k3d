@@ -28,4 +28,4 @@ document.set_dependency(extract_trim.get_property("input_mesh"), modifier.get_pr
 
 
 testing.require_valid_mesh(document, extract_trim.get_property("output_mesh"))
-testing.mesh_reference_comparison(document, extract_trim.get_property("output_mesh"), "mesh.modifier.NurbsExtractTrimCurves", 1)
+testing.require_similar_mesh(document, extract_trim.get_property("output_mesh"), "mesh.modifier.NurbsExtractTrimCurves", 1)

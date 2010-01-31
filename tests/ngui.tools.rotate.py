@@ -31,4 +31,4 @@ k3d.atk.root().frame("Untitled Document 1").filler("vbox").panel("main").split_p
 k3d.atk.root().frame("Untitled Document 1").filler("vbox").panel("main").split_pane("main").split_pane("bottom").split_pane("top").split_pane("left").split_pane("bottom").panel("NGUIToolPropertiesPanel").filler("vbox").panel("content").filler(0).filler("vbox").scroll_pane(0).viewport(0).filler("rotate_tool").panel("Builtin Properties").panel(0).panel("rotation_control").panel(2).push_button("up").click()
 
 tweakpoints = doc.get_node("Rotate PolyCube Instance components")
-testing.mesh_reference_comparison(doc, tweakpoints.get_property("output_mesh"), "ngui.tools.rotate", 1)
+testing.require_similar_mesh(doc, tweakpoints.get_property("output_mesh"), "ngui.tools.rotate", 1)

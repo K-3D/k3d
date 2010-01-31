@@ -21,4 +21,4 @@ document.set_dependency(cgal_boolean.get_property("input_2"), small_cube.get_pro
 
 
 testing.require_valid_mesh(document, cgal_boolean.get_property("output_mesh"))
-testing.mesh_reference_comparison(document, cgal_boolean.get_property("output_mesh"), "mesh.modifier.CGALBoolean.cubes", 1)
+testing.require_similar_mesh(document, cgal_boolean.get_property("output_mesh"), "mesh.modifier.CGALBoolean.cubes", 1)

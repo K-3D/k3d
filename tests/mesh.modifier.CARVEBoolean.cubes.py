@@ -21,4 +21,4 @@ document.set_dependency(carve_boolean.get_property("input_2"), small_cube.get_pr
 
 
 testing.require_valid_mesh(document, carve_boolean.get_property("output_mesh"))
-testing.mesh_reference_comparison(document, carve_boolean.get_property("output_mesh"), "mesh.modifier.CARVEBoolean.cubes", 1)
+testing.require_similar_mesh(document, carve_boolean.get_property("output_mesh"), "mesh.modifier.CARVEBoolean.cubes", 1)

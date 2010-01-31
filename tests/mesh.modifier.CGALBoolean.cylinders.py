@@ -32,4 +32,4 @@ document.set_dependency(second_boolean.get_property("input_2"), first_boolean.ge
 
 
 testing.require_valid_mesh(document, second_boolean.get_property("output_mesh"))
-testing.mesh_reference_comparison(document, second_boolean.get_property("output_mesh"), "mesh.modifier.CGALBoolean.cylinders", 1)
+testing.require_similar_mesh(document, second_boolean.get_property("output_mesh"), "mesh.modifier.CGALBoolean.cylinders", 1)

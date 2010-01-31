@@ -32,4 +32,4 @@ document.set_dependency(merge_mesh.get_property("input_mesh3"), transform2.get_p
 document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
-testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsSkinnedSurface", 1)
+testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsSkinnedSurface", 1)

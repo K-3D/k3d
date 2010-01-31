@@ -11,5 +11,5 @@ setup.modifier.operator = "greater_or_equal"
 
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SelectNSided", 1)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SelectNSided", 1)
 

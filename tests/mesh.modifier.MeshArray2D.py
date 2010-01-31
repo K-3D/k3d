@@ -9,5 +9,5 @@ setup.modifier.layout = setup.document.new_node("TranslateArray2D")
 
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.mesh_reference_comparison(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.MeshArray2D", 1)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.MeshArray2D", 1)
 

@@ -18,4 +18,4 @@ modifier.level = 2
 document.set_dependency(modifier.get_property("input_mesh"), reader.get_property("output_mesh"))
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
-testing.mesh_reference_comparison(document, modifier.get_property("output_mesh"), "mesh.modifier.CatmullClark.complex", 2)
+testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.CatmullClark.complex", 2)
