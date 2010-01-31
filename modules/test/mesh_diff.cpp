@@ -47,16 +47,23 @@ class mesh_diff :
 public:
 	mesh_diff(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_threshold(init_owner(*this) + init_name("threshold") + init_label(_("Threshold")) + init_description(_("Sets the maximum allowable difference between floating-point numbers")) + init_value(0) + init_constraint(constraint::minimum<k3d::int32_t>(0))),
-		m_equal(init_owner(*this) + init_name("equal") + init_label(_("Equal")) + init_description(_("True iff all input meshes are completely equivalent")) + init_value(true)),
+		m_threshold(init_owner(*this) + init_name("threshold") + init_label(_("Threshold")) + init_description(_("Sets the maximum allowable difference between floating-point numbers.")) + init_value(0) + init_constraint(constraint::minimum<k3d::int32_t>(0))),
+		m_difference(init_owner(*this) + init_name("difference") + init_label(_("Difference")) + init_description(_("Difference in Units in the Last Place.")) + init_value(static_cast<k3d::uint64_t>(0))),
+		m_equal(init_owner(*this) + init_name("equal") + init_label(_("Equal")) + init_description(_("True iff all input meshes are completely equivalent.")) + init_value(true)),
 		m_user_property_changed_signal(*this)
 	{
+		m_threshold.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_difference.make_slot()));
+		m_user_property_changed_signal.connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_difference.make_slot()));
+
 		m_threshold.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_equal.make_slot()));
 		m_user_property_changed_signal.connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_equal.make_slot()));
 
-		m_equal.set_update_slot(sigc::mem_fun(*this, &mesh_diff::execute));
+		m_difference.set_update_slot(sigc::mem_fun(*this, &mesh_diff::execute_difference));
+		m_equal.set_update_slot(sigc::mem_fun(*this, &mesh_diff::execute_equal));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -74,38 +81,52 @@ public:
 
 private:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_threshold;
+	k3d_data(k3d::uint64_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_difference;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_equal;
 	k3d::user_property_changed_signal m_user_property_changed_signal;
 
-	void execute(const std::vector<k3d::ihint*>& Hints, k3d::bool_t& Output)
+	void difference(k3d::bool_t& Equal, k3d::uint64_t& ULPS)
 	{
-		Output = true;
-		const k3d::int32_t threshold = m_threshold.pipeline_value();
-
 		const k3d::mesh* first_mesh = 0;
 		const k3d::iproperty_collection::properties_t& properties = node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator prop = properties.begin(); prop != properties.end(); ++prop)
 		{
 			k3d::iproperty& property = **prop;
-			if(property.property_type() == typeid(k3d::mesh*))
+			if(property.property_type() != typeid(k3d::mesh*))
+				continue;
+
+			const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
+			if(!mesh)
+				continue;
+
+			if(first_mesh)
 			{
-				if(first_mesh)
-				{
-					if(const k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property)))
-					{
-						if(!k3d::almost_equal<k3d::mesh>(threshold)(*first_mesh, *mesh))
-						{
-							Output = false;
-							return;
-						}
-					}
-				}
-				else
-				{
-					first_mesh = boost::any_cast<k3d::mesh*>(k3d::property::pipeline_value(property));
-				}
+				k3d::difference(*first_mesh, *mesh, Equal, ULPS);
+			}
+			else
+			{
+				first_mesh = mesh;
 			}
 		}
+	}
+
+	void execute_difference(const std::vector<k3d::ihint*>& Hints, k3d::uint64_t& Output)
+	{
+		k3d::bool_t equal = true;
+		k3d::uint64_t ulps = 0;
+		difference(equal, ulps);
+		Output = ulps;
+	}
+
+	void execute_equal(const std::vector<k3d::ihint*>& Hints, k3d::bool_t& Output)
+	{
+		k3d::bool_t equal = true;
+		k3d::uint64_t ulps = 0;
+		difference(equal, ulps);
+
+		Output = equal;
+		if(ulps > m_threshold.pipeline_value())
+			Output = false;
 	}
 };
 

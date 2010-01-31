@@ -34,200 +34,63 @@
 namespace k3d
 {
 
-namespace detail
-{
-
-/*
 ////////////////////////////////////////////////////////////////////////////////////////////
-// print_array
+// difference
 
-class print_array
-{
-public:
-	print_array(std::ostream& Stream, const string_t& ArrayName, const array& Array, bool_t& Printed) :
-		m_stream(Stream),
-		m_array_name(ArrayName),
-		m_array(Array),
-		m_printed(Printed)
-	{
-		// Special-case k3d::uint_t_array so the type is labeled correctly ...
-		if(const uint_t_array* const array = dynamic_cast<const uint_t_array*>(&m_array))
-		{
-			m_printed = true;
-			m_stream << standard_indent << "array \"" << m_array_name << "\" [k3d::uint_t] (" << m_array.size() << "):\n";
-			m_stream << push_indent;
-			
-			block_output<uint_t>(array->begin(), array->end(), m_stream, " ");
-			print_metadata();
-
-			m_stream << pop_indent;
-		}
-	}
-
-	template<typename T>
-	void operator()(T)
-	{
-		if(m_printed)
-			return;
-
-		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
-		{
-			m_printed = true;
-			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
-			m_stream << push_indent;
-
-			block_output<T>(array->begin(), array->end(), m_stream, " ");
-			print_metadata();
-
-			m_stream << pop_indent;
-		}
-	}
-
-	/// Special-case printing of 8-bit integers so they aren't printed as characters
-	void operator()(int8_t)
-	{
-		typedef int8_t T;
-
-		if(m_printed)
-			return;
-
-		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
-		{
-			m_printed = true;
-			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
-			m_stream << push_indent;
-
-			block_output<int16_t>(array->begin(), array->end(), m_stream, " ");
-			print_metadata();
-
-			m_stream << pop_indent;
-		}
-	}
-
-	/// Special-case printing of 8-bit unsigned integers so they aren't printed as characters
-	void operator()(uint8_t)
-	{
-		typedef uint8_t T;
-
-		if(m_printed)
-			return;
-
-		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
-		{
-			m_printed = true;
-			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
-			m_stream << push_indent;
-
-			block_output<uint16_t>(array->begin(), array->end(), m_stream, " ");
-			print_metadata();
-
-			m_stream << pop_indent;
-		}
-	}
-
-	/// Special-case printing of strings so whitespace is handled correctly
-	void operator()(string_t)
-	{
-		typedef string_t T;
-
-		if(m_printed)
-			return;
-
-		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
-		{
-			m_printed = true;
-			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
-			m_stream << push_indent;
-
-			string_block_output(array->begin(), array->end(), m_stream, " ");
-			print_metadata();
-
-			m_stream << pop_indent;
-		}
-	}
-
-private:
-	void print_metadata()
-	{
-		const array::metadata_t metadata = m_array.get_metadata();
-		for(array::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
-			m_stream << standard_indent << "metadata: " << pair->first << " = " << pair->second << "\n";
-	}
-
-	std::ostream& m_stream;
-	const string_t& m_array_name;
-	const array& m_array;
-	bool_t& m_printed;
-};
-*/
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+/// Return the difference between two shared arrays (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
 template<typename T>
-bool_t almost_equal(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, const uint64_t Threshold)
+void difference(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, bool_t& Equal, uint64_t& ULPS)
 {
 	if(A.get() == B.get())
-		return true;
+		return;
 
 	if(A && B)
-		return A->almost_equal(*B, Threshold);
-
-	return false;
+		A->difference(*B, Equal, ULPS);
+	else
+		Equal = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
+// difference
 
-/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
-bool_t almost_equal(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, const uint64_t Threshold)
+/// Return the difference between two shared arrays (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+void difference(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, bool_t& Equal, uint64_t& ULPS)
 {
 	if(A.get() == B.get())
-		return true;
+		return;
 
 	if(A && B)
-		return A->almost_equal(*B, Threshold);
-
-	return false;
+		A->difference(*B, Equal, ULPS);
+	else
+		Equal = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
+// difference
 
-/// Return true iff two shared objects are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+/// Return the difference between two shared objects (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
 template<typename T>
-bool_t almost_equal(const pipeline_data<T>& A, const pipeline_data<T>& B, const uint64_t Threshold)
+void difference(const pipeline_data<T>& A, const pipeline_data<T>& B, bool_t& Equal, uint64_t& ULPS)
 {
 	if(A.get() == B.get())
-		return true;
+		return;
 
 	if(A && B)
-		return k3d::almost_equal<T>(Threshold)(*A, *B);
-
-	return false;
+		k3d::difference(*A, *B, Equal, ULPS);
+	else
+		Equal = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
+// difference
 
-/// Return true iff two sets of attributes arrays are equivalent (we provide this function mainly for consistency).
+/// Return the difference between two sets of primitives.
 
-bool_t almost_equal(const mesh::table_t& A, const mesh::table_t& B, const uint64_t Threshold)
+void difference(const mesh::primitives_t& A, const mesh::primitives_t& B, bool_t& Equal, uint64_t& ULPS)
 {
-	return k3d::almost_equal<mesh::table_t>(Threshold)(A, B);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-/// Return true iff two sets of primitives are equivalent.
-
-bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t& B, const uint64_t Threshold)
-{
-	// If we have differing numbers of primitives, they definitely aren't equal
+	// If they have differing numbers of primitives, they definitely aren't equal
 	if(A.size() != B.size())
-		return false;
+		Equal = false;
 
 	for(mesh::primitives_t::const_iterator a = A.begin(), b = B.begin(); a != A.end() && b != B.end(); ++a, ++b)
 	{
@@ -238,21 +101,15 @@ bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t& B, co
 		// Perform element-wise comparisons of the two primitives ...
 		if(a->get() && b->get())
 		{
-			if(!(**a).almost_equal((**b), Threshold))
-				return false;
+			(**a).difference((**b), Equal, ULPS);
 		}
 		// One array was NULL and the other wasn't
 		else if(a->get() || b->get())
 		{
-			return false;
+			Equal = false;
 		}
 	}
-
-	return true;
 }
-
-
-} // namespace detail
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh
@@ -261,14 +118,12 @@ mesh::mesh()
 {
 }
 
-bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) const
+void mesh::difference(const mesh& Other, bool_t& Equal, uint64_t& ULPS) const
 {
-	return
-		detail::almost_equal(points, Other.points, Threshold) &&
-		detail::almost_equal(point_selection, Other.point_selection, Threshold) &&
-		detail::almost_equal(point_attributes, Other.point_attributes, Threshold) &&
-		detail::almost_equal(primitives, Other.primitives, Threshold)
-		;
+	k3d::difference(points, Other.points, Equal, ULPS);
+	k3d::difference(point_selection, Other.point_selection, Equal, ULPS);
+	k3d::difference(point_attributes, Other.point_attributes, Equal, ULPS);
+	k3d::difference(primitives, Other.primitives, Equal, ULPS);
 }
 
 namespace detail
@@ -530,12 +385,11 @@ mesh::primitive::primitive(const string_t& Type) :
 {
 }
 
-bool_t mesh::primitive::almost_equal(const primitive& Other, const uint64_t Threshold) const
+void mesh::primitive::difference(const primitive& Other, bool_t& Equal, uint64_t& ULPS) const
 {
-	return
-		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&
-		k3d::almost_equal<named_tables_t>(Threshold)(structure, Other.structure) &&
-		k3d::almost_equal<named_tables_t>(Threshold)(attributes, Other.attributes);
+	k3d::difference(type, Other.type, Equal, ULPS);
+	k3d::difference(structure, Other.structure, Equal, ULPS);
+	k3d::difference(attributes, Other.attributes, Equal, ULPS);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

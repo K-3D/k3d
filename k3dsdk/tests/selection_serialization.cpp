@@ -47,8 +47,6 @@ int main(int argc, char* argv[])
 {
 	try
 	{
-		const k3d::string_t type_string = k3d::string_cast(static_cast<k3d::selection::type>(-1));
-
 		k3d::selection::set a;
 		k3d::selection::storage& points = a.create("points");
 		k3d::uint_t_array& begin = points.structure.create<k3d::uint_t_array>("begin");
@@ -69,13 +67,22 @@ int main(int argc, char* argv[])
 		k3d::xml::element xml("selection");
 		k3d::xml::save(a, xml, save_context);
 
+		k3d::bool_t equal;
+		k3d::uint64_t ulps;
+
 		k3d::selection::set b;
-		test_expression(!b.almost_equal(a, 0));
+		equal = true;
+		ulps = 0;
+		k3d::difference(b, a, equal, ulps);
+		test_expression(!equal);
 
 		k3d::ipersistent::load_context load_context(root_path, lookup);
 		k3d::xml::load(b, xml, load_context);
 
-		test_expression(b.almost_equal(a, 0));
+		equal = true;
+		ulps = 0;
+		k3d::difference(b, a, equal, ulps);
+		test_expression(equal);
 	}
 	catch(std::exception& e)
 	{

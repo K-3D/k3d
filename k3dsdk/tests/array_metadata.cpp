@@ -52,17 +52,32 @@ int main(int argc, char* argv[])
 		test_expression(d->get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::point_indices_domain());
 
 		// Verify that metadata is handled correctly when testing for equality ...
+		k3d::bool_t equal;
+		k3d::uint64_t ulps;
+
 		k3d::uint_t_array e = a;
-		test_expression(e.almost_equal(a, 0));
+		equal = true;
+		ulps = 0;
+		k3d::difference(e, a, equal, ulps);
+		test_expression(equal);
 		
 		e.set_metadata_value("foo", "bar");
-		test_expression(!e.almost_equal(a, 0));
+		equal = true;
+		ulps = 0;
+		k3d::difference(e, a, equal, ulps);
+		test_expression(!equal);
 
 		e.erase_metadata_value("foo");
-		test_expression(e.almost_equal(a, 0));
+		equal = true;
+		ulps = 0;
+		k3d::difference(e, a, equal, ulps);
+		test_expression(equal);
 
 		e.set_metadata_value(k3d::metadata::key::domain(), "../array[@name=\"clockwise_edges\"]/indices()");
-		test_expression(!e.almost_equal(a, 0));
+		equal = true;
+		ulps = 0;
+		k3d::difference(e, a, equal, ulps);
+		test_expression(!equal);
 	}
 	catch(std::exception& e)
 	{

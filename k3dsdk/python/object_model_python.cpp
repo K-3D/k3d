@@ -316,14 +316,28 @@ object module_open_document(const k3d::filesystem::path& Path)
 	return wrap(document);
 }
 
-const bool_t module_almost_equal_mesh(const_mesh_wrapper& A, const_mesh_wrapper& B, const uint64_t Threshold)
+dict module_difference_const_mesh(const_mesh_wrapper& A, const_mesh_wrapper& B)
 {
-	return k3d::almost_equal<k3d::mesh>(Threshold)(A.wrapped(), B.wrapped());
+	k3d::bool_t equal = true;
+	k3d::uint64_t ulps = 0;
+	k3d::difference(A.wrapped(), B.wrapped(), equal, ulps);
+
+	dict result;
+	result["equal"] = equal;
+	result["ulps"] = ulps;
+	return result;
 }
 
-const bool_t module_almost_equal_mesh2(mesh_wrapper& A, mesh_wrapper& B, const uint64_t Threshold)
+dict module_difference_mesh(mesh_wrapper& A, mesh_wrapper& B)
 {
-	return k3d::almost_equal<k3d::mesh>(Threshold)(A.wrapped(), B.wrapped());
+	k3d::bool_t equal = true;
+	k3d::uint64_t ulps = 0;
+	k3d::difference(A.wrapped(), B.wrapped(), equal, ulps);
+
+	dict result;
+	result["equal"] = equal;
+	result["ulps"] = ulps;
+	return result;
 }
 
 const k3d::vector3 module_to_vector3(const k3d::point3& v)
@@ -409,10 +423,6 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_teapot();
 	define_namespace_torus();
 
-	def("almost_equal", module_almost_equal_mesh,
-		"Tests two meshes for equality using fuzzy-comparisons for floating-point types.");
-	def("almost_equal", module_almost_equal_mesh2,
-		"Tests two meshes for equality using fuzzy-comparisons for floating-point types.");
 	def("batch_mode", k3d::batch_mode,
 		"Returns True if batch (no user intervention) mode is enabled for the user interface.\n"
 		"@note: Well-behaved scripts should not prompt the user for input if batch mode is enabled.");
@@ -424,6 +434,10 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns the root(s) of the command node hierarchy.");
 	def("create_plugin", module_create_plugin,
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
+	def("difference", module_difference_const_mesh,
+		"Returns the difference between two meshes using fuzzy-comparisons for floating-point types.");
+	def("difference", module_difference_mesh,
+		"Returns the difference between two meshes using fuzzy-comparisons for floating-point types.");
 	def("documents", module_documents,
 		"Returns a list containing all open documents.");
 	def("execute_script", module_execute_script,

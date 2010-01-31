@@ -194,8 +194,8 @@ public:
 	/// Stores array data that defines the selection.
 	named_arrays structure;
 
-	/// Compares two selections for equality using the fuzzy semantics of almost_equal.
-	bool_t almost_equal(const storage& Other, const uint64_t Threshold) const;
+	/// Returns the difference between two selections using the fuzzy semantics of k3d::difference().
+	void difference(const storage& Other, bool_t& Equal, uint64_t& ULPS) const;
 };
 
 /// Stream serialization
@@ -209,8 +209,8 @@ public:
 	/// Create a new selection, appending it to the collection.
 	storage& create(const string_t& Type);
 
-	/// Compares two selection sets for equality using the fuzzy semantics of almost_equal.
-	bool_t almost_equal(const set& Other, const uint64_t Threshold) const;
+	/// Returns the difference between two selection sets using the fuzzy semantics of k3d::difference().
+	void difference(const set& Other, bool_t& Equal, uint64_t& ULPS) const;
 
 	/// Combines two selection sets by appending one to another.
 	static void append(const set& Source, set& Target);
@@ -221,45 +221,17 @@ std::ostream& operator<<(std::ostream& Stream, const set& RHS);
 
 } // namespace selection
 
-/// Specialization of almost_equal that tests k3d::selection::storage for equality
-template<>
-class almost_equal<selection::storage>
+/// Specialization of difference for k3d::selection::storage
+inline void difference(const k3d::selection::storage& A, const k3d::selection::storage& B, bool_t& Equal, uint64_t& ULPS)
 {
-	typedef selection::storage T;
+	A.difference(B, Equal, ULPS);
+}
 
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
-
-/// Specialization of almost_equal that tests k3d::selection::set for equality
-template<>
-class almost_equal<selection::set>
+/// Specialization of difference for k3d::selection::set
+inline void difference(const k3d::selection::set& A, const k3d::selection::set& B, bool_t& Equal, uint64_t& ULPS)
 {
-	typedef selection::set T;
-
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
+	A.difference(B, Equal, ULPS);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // selection_set_serialization

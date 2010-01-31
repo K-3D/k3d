@@ -99,8 +99,8 @@ public:
 		/// Stores array data that defines the primitive's attributes.
 		named_tables_t attributes;
 
-		/// Compares two primitives for equality using the fuzzy semantics of almost_equal.
-		bool_t almost_equal(const primitive& Other, const uint64_t Threshold) const;
+		/// Returns the difference between two primitives using the fuzzy semantics of difference().
+		void difference(const primitive& Other, bool_t& Equal, uint64_t& ULPS) const;
 	};
 
 	/// Defines storage for a collection of primitives.
@@ -121,8 +121,8 @@ public:
 	/// Stores mesh primitives.
 	primitives_t primitives;
 
-	/// Compares two meshes for equality using the fuzzy semantics of almost_equal.
-	bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;
+	/// Returns the difference between two meshes using the fuzzy semantics of difference().
+	void difference(const mesh& Other, bool_t& Equal, uint64_t& ULPS) const;
 
 	/// Returns a bounding-box containing every point in the given mesh.
 	static const bounding_box3 bounds(const mesh& Mesh);
@@ -203,45 +203,17 @@ public:
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS);
 std::ostream& operator<<(std::ostream& Stream, const mesh::primitive& RHS);
 
-/// Specialization of almost_equal that tests k3d::mesh for equality
-template<>
-class almost_equal<mesh>
+/// Specialization of difference for k3d::mesh
+inline void difference(const k3d::mesh& A, const k3d::mesh& B, bool_t& Equal, uint64_t& ULPS)
 {
-	typedef mesh T;
+	A.difference(B, Equal, ULPS);
+}
 
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
-
-/// Specialization of almost_equal that tests k3d::mesh::primitive for equality
-template<>
-class almost_equal<mesh::primitive>
+/// Specialization of difference for k3d::mesh::primitive
+inline void difference(const k3d::mesh::primitive& A, const k3d::mesh::primitive& B, bool_t& Equal, uint64_t& ULPS)
 {
-	typedef mesh::primitive T;
-
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
+	A.difference(B, Equal, ULPS);
+}
 
 } // namespace k3d
 

@@ -362,12 +362,10 @@ storage::storage(const string_t& Type) :
 {
 }
 
-bool_t storage::almost_equal(const storage& Other, const uint64_t Threshold) const
+void storage::difference(const storage& Other, bool_t& Equal, uint64_t& ULPS) const
 {
-	return
-		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&
-		k3d::almost_equal<named_arrays>(Threshold)(structure, Other.structure)
-		;
+	k3d::difference(type, Other.type, Equal, ULPS);
+	k3d::difference(structure, Other.structure, Equal, ULPS);
 }
 
 std::ostream& operator<<(std::ostream& Stream, const storage& RHS)
@@ -388,19 +386,14 @@ storage& set::create(const string_t& Type)
 	return back().create(new storage(Type));
 }
 
-bool_t set::almost_equal(const set& Other, const uint64_t Threshold) const
+void set::difference(const set& Other, bool_t& Equal, uint64_t& ULPS) const
 {
 	if(size() != Other.size())
-		return false;
+		Equal = false;
 
 	const set& self = *this;
 	for(uint_t i = 0; i != self.size(); ++i)
-	{
-		if(!k3d::almost_equal<storage>(Threshold)(*self[i], *Other[i]))
-			return false;
-	}
-
-	return true;
+		k3d::difference(*self[i], *Other[i], Equal, ULPS);
 }
 
 void set::append(const set& Source, set& Target)
