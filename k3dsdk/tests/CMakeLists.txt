@@ -4,6 +4,8 @@ INCLUDE_DIRECTORIES(${k3d_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${k3dsdk_BINARY_DIR})
 INCLUDE_DIRECTORIES(${K3D_BOOST_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${K3D_SIGC_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 LINK_DIRECTORIES(${K3D_BOOST_LIB_DIRS})
 LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
@@ -64,4 +66,10 @@ ADD_TEST(k3dsdk.document-upgrade ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test-document
 
 ADD_EXECUTABLE(test-pipeline-data pipeline_data.cpp)
 ADD_TEST(k3dsdk.pipeline-data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test-pipeline-data)
+
+ADD_LIBRARY(shared-dynamic-cast SHARED shared_dynamic_cast_library.cpp)
+GET_TARGET_PROPERTY(SHARED_DYNAMIC_CAST_LIBRARY shared-dynamic-cast LOCATION)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/shared_dynamic_cast_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/shared_dynamic_cast_config.h)
+ADD_EXECUTABLE(test-shared-dynamic-cast shared_dynamic_cast.cpp)
+ADD_TEST(k3dsdk.shared-dynamic-cast ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test-shared-dynamic-cast)
 
