@@ -1,0 +1,30 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Errors creating VirtualOpenGLSDSPainter on FreeBSD
+desc: |-
+  Problem loading the VirtualOpenGLSDSFacePainter plugin on FreeBSD
+  ERROR: /home/jared/k3d/modules/virtual_opengl_painters/sds_point_painter.cpp line 73: assertion
+  
+  delegate' failed
+  ERROR: Error creating document plugin: VirtualOpenGLSDSPointPainter
+  ERROR: /home/jared/k3d/modules/virtual_opengl_painters/sds_edge_painter.cpp line 73: assertion `delegate' failed
+  ERROR: Error creating document plugin: VirtualOpenGLSDSEdgePainter
+  ERROR: /home/jared/k3d/modules/virtual_opengl_painters/sds_face_painter.cpp line 73: assertion `delegate' failed
+  ERROR: Error creating document plugin: VirtualOpenGLSDSFacePainter
+  
+  ... this may be as simple as enabling / disabling some modules by default.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-03 02:04:10.510360 Z
+references: []
+
+id: 9b2e091f7e3b9e36ff649b48155458080d7da913
+log_events: 
+- - 2010-02-03 02:04:11.830300 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 

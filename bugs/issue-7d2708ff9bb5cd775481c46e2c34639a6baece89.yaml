@@ -1,0 +1,25 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: NGUI startup fails on FreeBSD.
+desc: |-
+  During startup on FreeBSD 8, initialization of the user interface plugin fails, generating the following error message:
+  
+  CRITICAL: Caught exception [std::runtime_error] - UI plugin module [/home/jared/k3d-build/lib/k3d/plugins/k3d-ngui.module] does not implement k3d::iuser_interface
+  *** Error code 1
+  
+  ... this error means that a dynamic_cast to k3d::iuser_interface is failing, which should never happen since we know that the NGUI does, in fact, implement k3d::iuser_interface.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-03 02:02:04.445265 Z
+references: []
+
+id: 7d2708ff9bb5cd775481c46e2c34639a6baece89
+log_events: 
+- - 2010-02-03 02:02:11.021207 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 
