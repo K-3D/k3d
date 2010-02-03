@@ -1,27 +1,15 @@
-#include <k3d-platform-config.h>
 #include <shared_dynamic_cast_config.h>
 #include <shared_dynamic_cast_library.h>
+
 #include <iostream>
 #include <stdexcept>
 
-#if defined K3D_API_WIN32
-	#include <k3dsdk/win32.h>
-#else // !K3D_API_WIN32
-	#include <dlfcn.h>
-#endif // !K3D_API_WIN32
+#include <dlfcn.h>
 
 int main(int argc, char* argv[])
 {
 	try
 	{
-#if defined K3D_API_WIN32
-		SetErrorMode(SetErrorMode(SEM_FAILCRITICALERRORS)); // Disable error dialogs when loading DLLs
-		const HINSTANCE module = LoadLibrary(SHARED_DYNAMIC_CAST_LIBRARY);
-		if(!module)
-			throw std::runtime_error(GetLastError());
-
-#else // !K3D_API_WIN32
-
 		void* const module = dlopen(SHARED_DYNAMIC_CAST_LIBRARY, RTLD_GLOBAL | RTLD_LAZY);
 		if(!module)
 			throw std::runtime_error(dlerror());
@@ -37,8 +25,6 @@ int main(int argc, char* argv[])
 		k3d::istuff* const stuff = dynamic_cast<k3d::istuff*>(unknown);
 		if(!stuff)
 			throw std::runtime_error("Dynamic casting failed.");
-
-#endif // !K3D_API_WIN32
 
 		std::cerr << "Success!" << std::endl;
 		return 0;
