@@ -129,7 +129,9 @@ inline int64_t ordered_integer(const double_t& Value)
 /// Specialization of difference that tests double_t
 inline void difference(const double_t& A, const double_t& B, bool_t& Equal, uint64_t& ULPS)
 {
-	const int64_t ulps = std::abs(ordered_integer(A) - ordered_integer(B));
+	const int64_t a = ordered_integer(A);
+	const int64_t b = ordered_integer(B);
+	const int64_t ulps = a > b ? a - b : b - a;
 	if(ulps <= ULPS)
 		return;
 
