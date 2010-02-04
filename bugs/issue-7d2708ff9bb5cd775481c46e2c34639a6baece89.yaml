@@ -22,4 +22,8 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - created
   - ""
+- - 2010-02-04 02:22:55.512064 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - commented
+  - It looks like this problem is solved using the description at http://gcc.gnu.org/faq.html#dso ... in light of what the FAQ says, it's surprising that this has ever worked with any gcc build !?
 claimer: 
