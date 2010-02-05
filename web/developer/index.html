@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<title>K-3D Developer</title>
 		<link rel="icon" type="image/png" href="k3d.png" />
 		<link rel="stylesheet" type="text/css" href="k3d.css" />
@@ -9,11 +9,11 @@
 	</head>
 
 	<body>
-<%include file="navigation.xhtml"/>
+<%include file="navigation.html"/>
 
 		<div id="main">
 			<div id="left">
-				<h2>Seven Degrees of Freedom</h2>
+				<h2>Use The Source!</h2>
 				<p>K-3D is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>.  The source code
 				is licensed using the <a href="http://www.gnu.org/licenses/gpl-faq.html">GNU General Public License</a>.</p>
 
@@ -23,6 +23,15 @@
 				<a href="http://www.apple.com">MacOS X</a>,
 				<a href="http://www.microsoft.com/windows">Microsoft Windows</a>,
 				and other platforms.</p>
+
+				<p>We use <a href="http://mercurial.selenic.com/">Mercurial</a> for source-code management,
+				<a href="http://cmake.org">CMake</a> for our build system, and <a href="http://gtkmm.org">gtkmm</a>
+				for our user interface toolkit.  Required dependencies include <a href="http://boost.org">Boost</a>,
+				<a href="http://opengl.org">OpenGL</a>, and <a href="http://libsigc.sourceforge.net">libsigc++</a>.
+				</p>
+				<p>K-3D can be optionally built with integration for Collada, DBus, GLX, Gnome VFS, GTS, ImageMagick,
+				ODE, OpenCASCADE, OpenEXR, and more ...
+				</p>
 			</div>
 
 			<div id="right">
@@ -51,6 +60,25 @@ $ cd k3d-build
 $ make install
 </pre>
 				</p>
+				<p><em>Make changes to the K-3D sources:</em>
+<pre>
+$ cd k3d
+$ (edit files)
+$ hg add (new files)
+$ hg rm (files to be deleted)
+$ hg commit -m 'My changes'
+</pre>
+				</p>
+
+				<p><em>Create a patch from the most recent commit:</em>
+<pre>
+$ cd k3d
+$ hg export tip &gt; my.patch
+</pre>
+				</p>
+
+				<p><em>For more on using Mercurial see the <a href="http://mercurial.selenic.com/guide/">guide</a>.</em></p>
+
 			</div>
 		</div>
 
