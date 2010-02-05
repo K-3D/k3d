@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: help() in python shell locks up K-3D with 0% CPU	usage.
+desc: ""
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-02-05 07:57:21.457261 Z
+references: []
+
+id: 810cbd67c6f6737ee2900a8a85fd107e81a416bf
+log_events: 
+- - 2010-02-05 07:57:22.321223 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-02-05 07:57:56.969314 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - Disabled interactive help() in the Python Shell.
+claimer: 
