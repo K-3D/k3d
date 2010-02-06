@@ -1,5 +1,4 @@
 INSTALL_GLOB(*.k3d share/k3d/documents)
 
-#ADD_SUBDIRECTORY(animation)
-#ADD_SUBDIRECTORY(shader_examples)
+ADD_SUBDIRECTORY(animation)
 
