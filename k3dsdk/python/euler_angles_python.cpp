@@ -150,8 +150,9 @@ const std::string euler_angles::str() const
 
 	return buffer.str();
 }
+*/
 
-const euler_angles operator+(const euler_angles& LHS, const euler_angles& RHS)
+const euler_angles euler_angles_add(const euler_angles& LHS, const euler_angles& RHS)
 {
 	if(LHS.order != RHS.order)
 		throw std::invalid_argument("argument order must match");
@@ -160,16 +161,15 @@ const euler_angles operator+(const euler_angles& LHS, const euler_angles& RHS)
 	return k3d::euler_angles(LHS[0] + RHS[0], LHS[1] + RHS[1], LHS[2] + RHS[2], LHS.order);
 }
 
-const euler_angles operator*(const euler_angles& LHS, const double RHS)
+const euler_angles euler_angles_mul(const euler_angles& LHS, const double_t RHS)
 {
 	return k3d::euler_angles(LHS[0] * RHS, LHS[1] * RHS, LHS[2] * RHS, LHS.order);
 }
 
-const euler_angles operator*(const double LHS, const euler_angles& RHS)
+const euler_angles euler_angles_rmul(const double_t LHS, const euler_angles& RHS)
 {
-	return RHS * LHS;
+	return euler_angles_mul(RHS, LHS);
 }
-*/
 
 void define_class_euler_angles()
 {
@@ -180,9 +180,9 @@ void define_class_euler_angles()
 		.def("__len__", &utility::constant_len_len<k3d::euler_angles, 3>)
 		.def("__getitem__", &utility::constant_len_get_item<k3d::euler_angles, 3, k3d::double_t>)
 		.def("__setitem__", &utility::constant_len_set_item<k3d::euler_angles, 3, k3d::double_t>)
-//		.def(self + self)
-//		.def(self * double())
-//		.def(double() * self)
+		.def("__add__", &euler_angles_add)
+		.def("__mul__", &euler_angles_mul)
+		.def("__rmul__", &euler_angles_rmul)
 		.def(self_ns::str(self))
 		;
 
