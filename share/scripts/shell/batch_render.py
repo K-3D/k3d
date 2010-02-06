@@ -21,7 +21,7 @@ import k3d
 import os
 
 # Load our "template" document.  We assume that the document already contains  materials / lighting / render options to suit.
-document = k3d.open_document(k3d.share_path() / k3d.filesystem.generic_path("documents/batch_render.k3d"))
+document = k3d.open_document(k3d.share_path() / k3d.filesystem.generic_path("scripts/shell/batch_render.k3d"))
 
 # Load an external OBJ file into the document.
 obj_reader = document.get_node("OBJMeshReader")

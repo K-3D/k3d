@@ -1,3 +1,2 @@
-FILE(GLOB PNG_FILES *.png)
-INSTALL(FILES ${PNG_FILES} DESTINATION share/k3d/ngui/rasterized)
+INSTALL_GLOB(*.png share/k3d/ngui/rasterized)
 
