@@ -1,5 +1,5 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: help() in python shell locks up K-3D with 0% CPU	usage.
+title: help() in python shell locks up K-3D with 0% CPU usage.
 desc: ""
 type: :bugfix
 component: K-3D
