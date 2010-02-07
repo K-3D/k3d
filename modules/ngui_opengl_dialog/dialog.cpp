@@ -70,6 +70,7 @@ public:
 		set_title(_("OpenGL Information"));
 		set_role("opengl_information");
 		set_position(Gtk::WIN_POS_CENTER);
+		set_default_size(300, 400);
 
 		Gtk::TextView* const text_view = new Gtk::TextView();
 		text_view->set_editable(false);
