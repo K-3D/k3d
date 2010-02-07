@@ -92,6 +92,13 @@ public:
 	/// Connect a slot to a signal that will be emitted whenever the convert selection mode changes.
 	sigc::connection connect_convert_selection_changed_signal(const sigc::slot<void, ihint*>& Slot);
 
+	/// Returns whether edge selections should be automatically expanded to include adjacent edges.
+	bool_t select_adjacent_edges();
+	/// Sets whether edge selections should be automatically expanded to include adjacent edges.
+	void set_select_adjacent_edges(const bool_t Expand);
+	/// Connect a slot to a signal that will be emitted whenever the adjacent edge selection state changes.
+	sigc::connection connect_select_adjacent_edges_changed_signal(const sigc::slot<void, ihint*>& Slot);
+
 	/// Returns the current set of selected nodes.
 	const nodes_t selected_nodes();
 
