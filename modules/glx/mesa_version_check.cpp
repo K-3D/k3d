@@ -32,6 +32,7 @@
 #include <k3dsdk/user_interface.h>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/assign/list_of.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <iostream>
@@ -59,7 +60,7 @@ public:
 
 		try
 		{
-			if(vendor == "Tungsten Graphics, Inc")
+			if(vendor == "Tungsten Graphics, Inc" || vendor == "Mesa Project")
 			{
 				std::vector<k3d::string_t> tokens;
 				boost::split(tokens, version, boost::is_any_of(" "));
@@ -96,8 +97,6 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		k3d::iplugin_factory::metadata_t metadata;
-		metadata["k3d:application-start"] = "";
 		static k3d::application_plugin_factory<mesa_version_check,
 			k3d::interface_list<k3d::iunknown> > factory(
 				k3d::uuid(0xaf73ea67, 0x444f8519, 0x9bddf492, 0x305853a8),
@@ -105,7 +104,7 @@ public:
 				_("Checks Mesa version and warns if it is known to contain bugs affecting K-3D"),
 				"Desktop",
 				k3d::iplugin_factory::EXPERIMENTAL,
-				metadata);
+				boost::assign::map_list_of("ngui:opengl-start", "true"));
 
 		return factory;
 	}

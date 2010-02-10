@@ -35,6 +35,8 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iprojection.h>
+#include <k3dsdk/iscript_engine.h>
+#include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/linear_curve.h>
@@ -1335,6 +1337,32 @@ bool control::on_redraw()
 		{
 			k3d::log() << error << "GLEW init failed: " << glewGetErrorString(err) << std::endl;
 			assert_not_reached();
+		}
+
+		// Create opengl-start plugins ...
+		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
+		for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		{
+			k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
+
+			if(!metadata.count("ngui:opengl-start"))
+				continue;
+
+			k3d::log() << info << "Creating plugin [" << (**factory).name() << "] via ngui:opengl-start" << std::endl;
+
+			boost::scoped_ptr<k3d::iunknown> plugin(k3d::plugin::create(**factory));
+			if(!plugin)
+			{
+				k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via ngui:opengl-start" << std::endl;
+				continue;
+			}
+
+			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin.get()))
+			{
+				k3d::iscript_engine::context_t context;
+				context["Command"] = k3d::string_t("ngui:opengl-start");
+				scripted_action->execute(context);
+			}
 		}
 	}
 
