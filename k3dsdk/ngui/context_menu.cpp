@@ -46,7 +46,7 @@
 #include <k3dsdk/itransform_source.h>
 #include <k3dsdk/ngui/check_menu_item.h>
 #include <k3dsdk/ngui/context_menu.h>
-#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/ngui/icons.h>
@@ -491,13 +491,13 @@ private:
 	/// Instantiates selected meshes
 	void on_instantiate()
 	{
-		instantiate_selected_nodes(m_document_state);
+		pipeline::instantiate_selected_nodes(m_document_state.document());
 	}
 
 	/// Duplicates selected meshes
 	void on_duplicate()
 	{
-		duplicate_selected_nodes(m_document_state);
+		pipeline::duplicate_selected_nodes(m_document_state.document());
 	}
 	
 	/// Easy animation of transformation matrix

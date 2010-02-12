@@ -40,6 +40,7 @@
 #include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/nodes.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
@@ -219,7 +220,7 @@ void modify_selected_meshes(document_state& DocumentState, iplugin_factory* Modi
 		ipipeline::dependencies_t dependencies;
 		const nodes_t selected_nodes = selection::state(DocumentState.document()).selected_nodes();
 		// Create the node
-		inode* multi_sink = DocumentState.create_node(Modifier);
+		inode* multi_sink = pipeline::create_node(document, *Modifier);
 		record_state_change_set changeset(document, string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), K3D_CHANGE_SET_CONTEXT);
 		nodes_t nodes_to_delete;
 		for(nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
