@@ -257,27 +257,7 @@ inode* create_node(idocument& Document, iplugin_factory& Factory)
 	}
 
 	// By default, make the new node visible in any node collection sinks that already exist ...
-	const k3d::inode_collection::nodes_t::const_iterator doc_node_end = Document.nodes().collection().end();
-	for(k3d::inode_collection::nodes_t::const_iterator doc_node = Document.nodes().collection().begin(); doc_node != doc_node_end; ++doc_node)
-	{
-		if(k3d::inode_collection_sink* const node_collection_sink = dynamic_cast<k3d::inode_collection_sink*>(*doc_node))
-		{
-			const k3d::inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
-			for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-			{
-				if(k3d::inode_collection_property* const node_collection_property = dynamic_cast<k3d::inode_collection_property*>(*property))
-				{
-					k3d::inode_collection_property::nodes_t nodes = k3d::property::internal_value<k3d::inode_collection_property::nodes_t>(**property);
-					for(k3d::uint_t i = 0; i != new_nodes.size(); ++i)
-					{
-						if(node_collection_property->property_allow(*new_nodes[i]))
-							nodes.push_back(new_nodes[i]);
-					}
-					k3d::property::set_internal_value(**property, nodes);
-				}
-			}
-		}
-	}
+	show_nodes(Document, new_nodes);
 
 	// Give nodes a chance to initialize their property values based on their inputs, if any ...
 	if(k3d::ireset_properties* const reset_properties = dynamic_cast<k3d::ireset_properties*>(node))
@@ -293,6 +273,31 @@ inode* create_node(idocument& Document, iplugin_factory& Factory)
 	k3d::gl::redraw_all(Document, k3d::gl::irender_viewport::ASYNCHRONOUS);
 
 	return node;
+}
+
+void show_nodes(idocument& Document, const std::vector<inode*>& Nodes)
+{
+	const inode_collection::nodes_t::const_iterator doc_node_end = Document.nodes().collection().end();
+	for(inode_collection::nodes_t::const_iterator doc_node = Document.nodes().collection().begin(); doc_node != doc_node_end; ++doc_node)
+	{
+		if(inode_collection_sink* const node_collection_sink = dynamic_cast<inode_collection_sink*>(*doc_node))
+		{
+			const inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
+			for(inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+			{
+				if(inode_collection_property* const node_collection_property = dynamic_cast<inode_collection_property*>(*property))
+				{
+					inode_collection_property::nodes_t nodes = property::internal_value<inode_collection_property::nodes_t>(**property);
+					for(uint_t i = 0; i != Nodes.size(); ++i)
+					{
+						if(node_collection_property->property_allow(*Nodes[i]))
+							nodes.push_back(Nodes[i]);
+					}
+					property::set_internal_value(**property, nodes);
+				}
+			}
+		}
+	}
 }
 
 /// Duplicates first node's transformation into a FrozenTransformationa and connects it to second node
@@ -423,6 +428,8 @@ void instantiate_selected_nodes(idocument& Document)
 		}
 	}
 
+	show_nodes(Document, new_nodes);
+
 	// Show the new instance properties if only one was processed
 	if(new_nodes.size() == 1)
 		panel::mediator(Document).set_focus(**new_nodes.begin());
@@ -460,6 +467,8 @@ void duplicate_selected_nodes(idocument& Document)
 			new_nodes.push_back(new_node);
 		}
 	}
+
+	show_nodes(Document, new_nodes);
 
 	// Show duplicated node properties if only one was processed
 	if(new_nodes.size() == 1)
