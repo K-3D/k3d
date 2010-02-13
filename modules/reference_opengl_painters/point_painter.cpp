@@ -10,7 +10,7 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
@@ -101,13 +101,13 @@ public:
 		const k3d::uint_t point_end = points.size();
 		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-      k3d::gl::push_selection_token(k3d::selection::POINT, point);
+			k3d::gl::push_selection_token(k3d::selection::POINT, point);
 
-      glBegin(GL_POINTS);
-      k3d::gl::vertex3d(points[point]);
-      glEnd();
+			glBegin(GL_POINTS);
+			k3d::gl::vertex3d(points[point]);
+			glEnd();
 
-      k3d::gl::pop_selection_token(); // k3d::selection::POINT
+			k3d::gl::pop_selection_token(); // k3d::selection::POINT
 		}
 	}
 
