@@ -30,3 +30,8 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - created
   - ""
+- - 2010-02-13 01:25:48.086236 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - commented
+  - Turning-off K3D_BUILD_ADVANCED_OPENGL_PAINTERS fixes this issue, need to figure-out where things are going wrong ... VBO point painters?
+claimer: 
