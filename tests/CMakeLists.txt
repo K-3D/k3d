@@ -72,6 +72,8 @@ K3D_ADD_CMAKE_TEST(code.printf ${CMAKE_CURRENT_SOURCE_DIR}/code.printf.cmake ${C
 K3D_ADD_CMAKE_TEST(code.quoted_includes ${CMAKE_CURRENT_SOURCE_DIR}/code.quoted_includes.cmake ${CMAKE_SOURCE_DIR})
 K3D_ADD_CMAKE_TEST(code.typed_array.uint_t ${CMAKE_CURRENT_SOURCE_DIR}/code.typed_array.uint_t.cmake ${CMAKE_SOURCE_DIR})
 
+ADD_TEST(k3d-uuidgen.startup ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/k3d-uuidgen)
+
 K3D_ADD_TEST(test.startup)
 
 K3D_ADD_TEST(test.script.detect.lang.null SCRIPT XFAIL)
