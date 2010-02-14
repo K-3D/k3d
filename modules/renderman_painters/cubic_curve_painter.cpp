@@ -123,7 +123,7 @@ public:
 			"RenderManCubicCurvePainter",
 			_("Renders cubic curves"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

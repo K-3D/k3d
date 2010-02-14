@@ -187,7 +187,7 @@ public:
 			"OpenGLSpherePainter",
 			_("Renders sphere primitives using OpoenGL"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

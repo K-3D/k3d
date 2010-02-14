@@ -183,7 +183,7 @@ public:
 			"Logo",
 			"Creates the K-3D logo using quadric primitives.",
 			"Quadric",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
