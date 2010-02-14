@@ -80,8 +80,8 @@ bool execute_script(const k3d::script::code& Script, const std::string& ScriptNa
 	{
 		error_message(
 			_("Could not determine scripting language.  K-3D supports multiple scripting languages, but the language for this script was "
-			"not recognized. Most K-3D script engines use some type of \"magic token\" at the beginning of a script to recognize it, e.g. \"#k3dscript\" "
-			"in the first 12 characters of a script for K-3D's built-in K3DScript engine.  If you are writing a K-3D script, check the documentation "
+			"not recognized. Most K-3D script engines use some type of \"magic token\" at the beginning of a script to recognize it, e.g. \"#python\" "
+			"in the first 7 characters of a script for K-3D's Python engine.  If you are writing a K-3D script, check the documentation "
 			"for the scripting language you're writing in to see how to make it recognizable."));
 		return false;
 	}

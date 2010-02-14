@@ -135,7 +135,6 @@ OPTION(K3D_BUILD_INDIGO_MODULE "Build the Indigo render engine integration modul
 OPTION(K3D_BUILD_INOTIFY_MODULE "Build the inotify file change notification module" ${K3D_INOTIFY_FOUND})
 OPTION(K3D_BUILD_JPEG_IO_MODULE "Build the jpeg file format module" ${K3D_JPEG_FOUND})
 OPTION(K3D_BUILD_K3D_IO_MODULE "Build the K-3D file format module" ON)
-OPTION(K3D_BUILD_K3DSCRIPT_MODULE "Build the k3dscript scripting language module" ON)
 OPTION(K3D_BUILD_LINEAR_CURVE_MODULE "Build the linear curve plugin module" ON)
 OPTION(K3D_BUILD_LIPSYNC_MODULE "Build the lip synchronization tools module" ON)
 OPTION(K3D_BUILD_LSYSTEM_MODULE "Build the l-system parser module" ON)
