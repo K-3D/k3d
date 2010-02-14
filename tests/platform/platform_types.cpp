@@ -45,6 +45,8 @@ boost::format format("%1% %|30t|%2% %|55t|%3%");
 
 void print_headers()
 {
+	std::cout << "CTEST_FULL_OUTPUT\n\n";
+
 	std::cout << format % "type" % "actual type" % "size" << "\n";
 }
 
