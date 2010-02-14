@@ -1,10 +1,9 @@
+K3D_TEST(platform.configuration PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/platform_configuration.py LABELS platform)
+
 INCLUDE_DIRECTORIES(${k3d_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${k3d_BINARY_DIR}/k3dsdk)
 INCLUDE_DIRECTORIES(${K3D_BOOST_INCLUDE_DIRS})
 
-K3D_ADD_TEST(platform_configuration.py PYTHON LABELS platform)
-
-ADD_EXECUTABLE(test-types platform_types.cpp)
-ADD_TEST(platform.types ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test-types)
-SET_TESTS_PROPERTIES(platform.types PROPERTIES LABELS platform)
+ADD_EXECUTABLE(test-platform-types platform_types.cpp)
+K3D_TEST(platform.types TARGET test-platform-types LABELS platform)
 
