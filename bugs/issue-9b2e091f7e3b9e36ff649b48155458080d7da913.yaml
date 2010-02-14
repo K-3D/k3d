@@ -21,8 +21,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2010-02-03 02:04:10.510360 Z
 references: []
 
@@ -36,4 +36,8 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - edited title, description
   - ""
+- - 2010-02-14 01:34:32.062239 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - In the short-term, we've disabled all of the experimental painters and enabled the SDS painters, so the advanced painter module can be enabled by default.
 claimer: 

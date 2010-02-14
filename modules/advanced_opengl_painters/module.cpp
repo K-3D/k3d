@@ -41,7 +41,7 @@ extern k3d::iplugin_factory& sds_point_painter_factory();
 //extern k3d::iplugin_factory& textured_face_painter_factory();
 //extern k3d::iplugin_factory& vbo_edge_painter_factory();
 //extern k3d::iplugin_factory& vbo_face_painter_factory();
-extern k3d::iplugin_factory& vbo_point_painter_factory();
+//extern k3d::iplugin_factory& vbo_point_painter_factory();
 //extern k3d::iplugin_factory& vbo_sds_edge_painter_factory();
 //extern k3d::iplugin_factory& vbo_sds_face_painter_factory();
 //extern k3d::iplugin_factory& vbo_sds_point_painter_factory();
@@ -62,7 +62,7 @@ K3D_MODULE_START(Registry)
 //	Registry.register_factory(module::opengl::painters::textured_face_painter_factory());
 //	Registry.register_factory(module::opengl::painters::vbo_edge_painter_factory());
 //	Registry.register_factory(module::opengl::painters::vbo_face_painter_factory());
-	Registry.register_factory(module::opengl::painters::vbo_point_painter_factory());
+//	Registry.register_factory(module::opengl::painters::vbo_point_painter_factory());
 //	Registry.register_factory(module::opengl::painters::vbo_sds_edge_painter_factory());
 //	Registry.register_factory(module::opengl::painters::vbo_sds_face_painter_factory());
 //	Registry.register_factory(module::opengl::painters::vbo_sds_point_painter_factory());

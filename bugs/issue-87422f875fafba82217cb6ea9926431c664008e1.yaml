@@ -17,7 +17,7 @@ desc: |-
   * Make selections in both instances - works fine.
 type: :bugfix
 component: K-3D
-release: 0.8.0.0
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -34,4 +34,8 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - commented
   - Turning-off K3D_BUILD_ADVANCED_OPENGL_PAINTERS fixes this issue, need to figure-out where things are going wrong ... VBO point painters?
+- - 2010-02-14 01:35:45.277214 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
+  - We've disabled the experimental VBO points painter, so this will only be an issue when it is finally ready to be released.
 claimer: 
