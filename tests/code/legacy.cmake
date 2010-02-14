@@ -10,7 +10,7 @@ SET(SKIP_FILES
 	"^modules/polyhedron/bevel_faces.cpp$"
 	"^modules/polyhedron/dissolve_components.cpp$"
 	"^modules/polyhedron/fillet_edges.cpp$"
-	"^tests/code.legacy.cmake$"
+	"^tests/code/legacy.cmake$"
 	)
 
 FILE(GLOB_RECURSE SOURCE_FILES "*")

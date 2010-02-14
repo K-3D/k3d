@@ -4,7 +4,7 @@ SET(ERROR_COUNT 0)
 SET(SKIP_FILES
 	"[.]svn"
 	"^modules/inotify/inotify-cxx.h$"
-	"^tests/code.pretty_function.cmake$"
+	"^tests/code/pretty_function.cmake$"
 	)
 
 FILE(GLOB_RECURSE SOURCE_FILES "*")

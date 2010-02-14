@@ -29,8 +29,8 @@ SET(SKIP_FILES
 	"^modules/pyui/user_interface.cpp$"
 	"^modules/renderman_painters/scripted_painter.cpp$"
 	"^renderframe/main.cpp$"
-	"^tests/CMakeLists.txt$"
-	"^tests/code.const_cast.cmake$"
+	"^tests/code/CMakeLists.txt$"
+	"^tests/code/const_cast.cmake$"
 	)
 
 FILE(GLOB_RECURSE SOURCE_FILES "*")

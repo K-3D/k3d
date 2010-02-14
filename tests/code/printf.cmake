@@ -22,8 +22,8 @@ SET(SKIP_FILES
 	"^modules/scalar/format_scalar.cpp$"
 	"^modules/solar/solpos/solpos.cpp$"
 	"^share/shaders/k3d_tile.h$"
-	"^tests/code.printf.cmake$"
-	"^tests/CMakeLists.txt$"
+	"^tests/code/printf.cmake$"
+	"^tests/code/CMakeLists.txt$"
 	)
 
 FILE(GLOB_RECURSE SOURCE_FILES "*")

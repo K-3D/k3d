@@ -25,7 +25,8 @@ SET(SKIP_FILES
 	"^share/scripts/shell/simple_rpc.py$"
 	"^sl2xml/main.cpp$"
 	"^tests/CMakeLists.txt$"
-	"^tests/code.exit.cmake$"
+	"^tests/code/CMakeLists.txt$"
+	"^tests/code/exit.cmake$"
 	"^tests/document.stress.read_all_properties.py$"
 	"^tests/python.api.module.py$"
 	)

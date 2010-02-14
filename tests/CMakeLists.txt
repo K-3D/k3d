@@ -64,18 +64,6 @@ MACRO(K3D_ADD_CMAKE_TEST TEST_NAME TEST_SCRIPT TEST_WORKING_DIRECTORY)
 	ADD_TEST(${TEST_NAME} "${CMAKE_COMMAND}" -E chdir "${TEST_WORKING_DIRECTORY}" "${CMAKE_COMMAND}" -P "${TEST_SCRIPT}")
 ENDMACRO(K3D_ADD_CMAKE_TEST)
 
-K3D_ADD_CMAKE_TEST(code.const_cast ${CMAKE_CURRENT_SOURCE_DIR}/code.const_cast.cmake ${CMAKE_SOURCE_DIR})
-K3D_ADD_CMAKE_TEST(code.exit ${CMAKE_CURRENT_SOURCE_DIR}/code.exit.cmake ${CMAKE_SOURCE_DIR})
-K3D_ADD_CMAKE_TEST(code.filename.case ${CMAKE_CURRENT_SOURCE_DIR}/code.filename.case.cmake ${CMAKE_SOURCE_DIR})
-K3D_ADD_CMAKE_TEST(code.filename.length ${CMAKE_CURRENT_SOURCE_DIR}/code.filename.length.cmake ${CMAKE_SOURCE_DIR})
-K3D_ADD_CMAKE_TEST(code.header_guard ${CMAKE_CURRENT_SOURCE_DIR}/code.header_guard.cmake ${CMAKE_SOURCE_DIR})
-K3D_ADD_CMAKE_TEST(code.legacy ${CMAKE_CURRENT_SOURCE_DIR}/code.legacy.cmake ${CMAKE_SOURCE_DIR})
-K3D_ADD_CMAKE_TEST(code.line_endings ${CMAKE_CURRENT_SOURCE_DIR}/code.line_endings.cmake ${CMAKE_SOURCE_DIR})
-K3D_ADD_CMAKE_TEST(code.pretty_function ${CMAKE_CURRENT_SOURCE_DIR}/code.pretty_function.cmake ${CMAKE_SOURCE_DIR})
-K3D_ADD_CMAKE_TEST(code.printf ${CMAKE_CURRENT_SOURCE_DIR}/code.printf.cmake ${CMAKE_SOURCE_DIR})
-K3D_ADD_CMAKE_TEST(code.quoted_includes ${CMAKE_CURRENT_SOURCE_DIR}/code.quoted_includes.cmake ${CMAKE_SOURCE_DIR})
-K3D_ADD_CMAKE_TEST(code.typed_array.uint_t ${CMAKE_CURRENT_SOURCE_DIR}/code.typed_array.uint_t.cmake ${CMAKE_SOURCE_DIR})
-
 ADD_TEST(k3d-uuidgen.startup ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/k3d-uuidgen)
 
 K3D_ADD_TEST(test.startup)
@@ -432,4 +420,5 @@ FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/meshes)
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/meshes/differences)
 
 ADD_SUBDIRECTORY(platform)
+ADD_SUBDIRECTORY(code)
 

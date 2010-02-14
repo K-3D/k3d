@@ -1,0 +1,12 @@
+K3D_ADD_CMAKE_TEST(code.const_cast ${CMAKE_CURRENT_SOURCE_DIR}/const_cast.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.exit ${CMAKE_CURRENT_SOURCE_DIR}/exit.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.filename.case ${CMAKE_CURRENT_SOURCE_DIR}/filename_case.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.filename.length ${CMAKE_CURRENT_SOURCE_DIR}/filename_length.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.header_guard ${CMAKE_CURRENT_SOURCE_DIR}/header_guard.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.legacy ${CMAKE_CURRENT_SOURCE_DIR}/legacy.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.line_endings ${CMAKE_CURRENT_SOURCE_DIR}/line_endings.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.pretty_function ${CMAKE_CURRENT_SOURCE_DIR}/pretty_function.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.printf ${CMAKE_CURRENT_SOURCE_DIR}/printf.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.quoted_includes ${CMAKE_CURRENT_SOURCE_DIR}/quoted_includes.cmake ${CMAKE_SOURCE_DIR})
+K3D_ADD_CMAKE_TEST(code.typed_array.uint_t ${CMAKE_CURRENT_SOURCE_DIR}/typed_array_uint_t.cmake ${CMAKE_SOURCE_DIR})
+
