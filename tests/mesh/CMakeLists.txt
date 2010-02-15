@@ -584,6 +584,11 @@ K3D_TEST(mesh.modifier.CARVEBoolean.cylinders
 	REQUIRES K3D_BUILD_CARVE_MODULE
 	LABELS mesh modifier)
 
+K3D_TEST(mesh.modifier.CARVEBoolean.ply 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CARVEBoolean.ply.py
+	REQUIRES K3D_BUILD_CARVE_MODULE K3D_BUILD_PLY_IO_MODULE
+	LABELS mesh modifier)
+
 K3D_TEST(mesh.modifier.CGALBoolean.benchmark 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CGALBoolean.benchmark.py
 	REQUIRES K3D_BUILD_CGAL_MODULE
