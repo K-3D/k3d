@@ -28,7 +28,7 @@ SET(SKIP_FILES
 	"^tests/code/CMakeLists.txt$"
 	"^tests/code/exit.cmake$"
 	"^tests/document.stress.read_all_properties.py$"
-	"^tests/python.api.module.py$"
+	"^tests/python/module.py$"
 	)
 
 FILE(GLOB_RECURSE SOURCE_FILES "*")
