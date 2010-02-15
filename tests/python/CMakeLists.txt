@@ -1,0 +1,10 @@
+K3D_TEST(python.api.module K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/module.py LABELS python)
+K3D_TEST(python.api.angle_axis K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/angle_axis.py LABELS python)
+K3D_TEST(python.api.get_dependency K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/get_dependency.py LABELS python)
+K3D_TEST(python.api.named_arrays K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/named_arrays.py LABELS python)
+K3D_TEST(python.api.node.selection K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/node_selection.py LABELS python)
+K3D_TEST(python.api.property.value K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/property_value.py LABELS python)
+K3D_TEST(python.api.renderman.attributes K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/renderman_attributes.py LABELS python)
+K3D_TEST(python.api.renderman.options K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/renderman_options.py LABELS python)
+K3D_TEST(python.api.user_properties K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/user_properties.py LABELS python)
+

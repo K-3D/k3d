@@ -1,10 +1,10 @@
-PROJECT(k3d-tests)
+PROJECT(tests)
 
 INCLUDE(K3DParseArguments)
 
 # Provides a consistent interface for running all K-3D tests
 FUNCTION(K3D_TEST TEST_NAME)
-	K3D_PARSE_ARGUMENTS(TEST "TARGET;CMAKE_SCRIPT;PYTHON_SCRIPT;REQUIRES;LABELS;WORKING_DIRECTORY;ARGUMENTS" "XFAIL" ${ARGN})
+	K3D_PARSE_ARGUMENTS(TEST "TARGET;CMAKE_SCRIPT;PYTHON_SCRIPT;K3D_PYTHON_SCRIPT;REQUIRES;LABELS;WORKING_DIRECTORY;ARGUMENTS" "XFAIL" ${ARGN})
 
 	FOREACH(REQUIREMENT ${TEST_REQUIRES})
 		IF(NOT ${REQUIREMENT})
@@ -26,6 +26,19 @@ FUNCTION(K3D_TEST TEST_NAME)
 		ADD_TEST(${TEST_NAME} "${CMAKE_COMMAND}" -E chdir "${TEST_WORKING_DIRECTORY}" "${CMAKE_COMMAND}" -P "${TEST_CMAKE_SCRIPT}")
 	ELSEIF(TEST_PYTHON_SCRIPT)
 		ADD_TEST(${TEST_NAME} "${PYTHON_COMMAND}" "${TEST_PYTHON_SCRIPT}")
+	ELSEIF(TEST_K3D_PYTHON_SCRIPT)
+		ADD_TEST(${TEST_NAME}
+			${k3d_BINARY_DIR}/bin/k3d
+			--log-level=debug
+			--plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins
+			--share=${k3d_SOURCE_DIR}/share
+			--ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-nui.module
+			--script=${TEST_K3D_PYTHON_SCRIPT}
+			--setenv "PYTHONPATH=${tests_SOURCE_DIR}"
+			--setenv "K3D_TEST_SOURCE_PATH=${tests_SOURCE_DIR}"
+			--setenv "K3D_TEST_BINARY_PATH=${tests_BINARY_DIR}"
+			--exit
+			)
 	ENDIF()
 
 	IF(TEST_LABELS)
@@ -51,8 +64,11 @@ ADD_SUBDIRECTORY(platform)
 # Run tests that enforce coding-standards
 ADD_SUBDIRECTORY(code)
 
-# Run tests that exercise the SDK
+# Run tests that exercise the C++ SDK
 ADD_SUBDIRECTORY(sdk)
+
+# Run tests that exercise the Python SDK
+ADD_SUBDIRECTORY(python)
 
 # Run tests that do a simple "smoke-check" on binaries ...
 K3D_TEST(startup.k3d-uuidgen TARGET k3d-uuidgen LABELS startup uuid)
@@ -400,16 +416,6 @@ K3D_ADD_TEST(offscreen.GLXCameraToBitmap.py PYTHON REQUIRES K3D_BUILD_GLX_MODULE
 K3D_ADD_TEST(offscreen.OpenGLFramebufferCameraToBitmap.py PYTHON REQUIRES K3D_BUILD_OPENGL_FRAMEBUFFER_MODULE)
 K3D_ADD_TEST(offscreen.VirtualCameraToBitmap.py PYTHON REQUIRES K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE)
 K3D_ADD_TEST(offscreen.WGLCameraToBitmap.py PYTHON REQUIRES K3D_BUILD_WGL_MODULE)
-
-K3D_ADD_TEST(python.api.module.py PYTHON)
-K3D_ADD_TEST(python.api.angle_axis.py PYTHON)
-K3D_ADD_TEST(python.api.get_dependency.py PYTHON)
-K3D_ADD_TEST(python.api.named_arrays.py PYTHON)
-K3D_ADD_TEST(python.api.node.selection.py PYTHON)
-K3D_ADD_TEST(python.api.property.value.py PYTHON)
-K3D_ADD_TEST(python.api.renderman.attributes.py PYTHON)
-K3D_ADD_TEST(python.api.renderman.options.py PYTHON)
-K3D_ADD_TEST(python.api.user_properties.py PYTHON)
 
 K3D_ADD_TEST(ngui.tools.move.py PYTHON NGUI)
 K3D_ADD_TEST(ngui.tools.rotate.py PYTHON NGUI)
