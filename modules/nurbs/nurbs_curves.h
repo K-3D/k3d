@@ -30,6 +30,7 @@
 #include <k3dsdk/metadata.h>
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/nurbs_curve.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/scoped_ptr.hpp>
 #include <stdexcept>
@@ -43,8 +44,68 @@ namespace nurbs
 /// Storage for an array of 4D points
 typedef k3d::typed_array<k3d::point4> points4_t;
 
-/// Adds the given curve to the other primitive and mesh
-void add_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve);
+/// Convenient storage for all components and attributes of a single curve
+/**
+ * Points are represented in homogeneous coordinates, with the 4th coordinate being the weight.
+ * If a single point is referenced more than once by the curve, it is duplicated in this representation,
+ * so vertex and point attributes both have the same size.
+ */
+struct curve_arrays
+{
+	typedef std::vector<k3d::point4> points4_t;
+	points4_t points;
+	k3d::mesh::knots_t knots;
+	k3d::table point_attributes;
+	k3d::table curve_attributes;
+	k3d::table parameter_attributes;
+	k3d::table vertex_attributes;
+	k3d::uint_t order;
+
+	curve_arrays() {}
+
+	/// Sets up arrays with the given number of control points and order, leaving the knot vector empty
+	curve_arrays(const k3d::uint_t PointCount, const k3d::uint_t Order);
+
+	/// Extract attributes and components from the given mesh and curve
+	curve_arrays(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Primitive, const k3d::uint_t Curve, const k3d::bool_t NormalizeKnots = false);
+
+	/// Verifies correct array lengths
+	const k3d::bool_t validate() const;
+
+	/// Adds the represented curve to a mesh
+	void add_curve(k3d::mesh& Mesh, k3d::nurbs_curve::primitive& Primitive);
+
+	/// Resize all arrays, ensuring knot length = Size+Order
+	void resize(const k3d::uint_t Size, const k3d::uint_t Order);
+};
+
+/// Copy structure and attributes between curves
+/**
+ * Convenient copying class that treats points, point attributes and vertex attributes in one go.
+ */
+class curve_copier
+{
+public:
+	curve_copier(const curve_arrays& Source, curve_arrays& Destination);
+
+	/// Appends the given index value from each source array to each corresponding target array.
+	void push_back(const k3d::uint_t Index);
+	/// Computes a weighted sum of N values from each source array and appends the result to the corresponding target array.
+	void push_back(const k3d::uint_t Count, const k3d::uint_t* Indices, const k3d::double_t* Weights);
+	/// Copies the given source index value from each source array to the TargetIndex in each corresponding target array.
+	void copy(const k3d::uint_t SourceIndex, const k3d::uint_t TargetIndex);
+	/// Computes a weighted sum of N values from each source array and copies the result to the corresponding target array at the given TargetIndex.
+	void copy(const k3d::uint_t Count, const k3d::uint_t* Indices, const k3d::double_t* Weights, const k3d::uint_t TargetIndex);
+
+private:
+	const curve_arrays& m_source;
+	curve_arrays& m_destination;
+	boost::scoped_ptr<k3d::table_copier> m_point_attribute_copier;
+	boost::scoped_ptr<k3d::table_copier> m_vertex_attribute_copier;
+};
+
+/// Copies a curve from one primitive to another
+void copy_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve);
 
 /// Deletes a curve
 void delete_curve(k3d::nurbs_curve::primitive& Curves, const k3d::uint_t Curve);
@@ -105,7 +166,7 @@ void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 const k3d::uint_t multiplicity(const k3d::mesh::knots_t& Knots, const k3d::double_t u, const k3d::uint_t Begin, const k3d::uint_t Count);
 
 /// Extracts the points, knots and weights arrays from the given curve in the given mesh and curve primitive
-void extract_curve_arrays(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::bool_t NormalizeKnots = false);
+void extract_curve_arrays(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, k3d::table& PointAttributes, const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::bool_t NormalizeKnots = false);
 
 /// Appends new knots found in the given curve to the given output knot vector.
 void append_common_knot_vector(k3d::mesh::knots_t& CommonKnotVector, const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
@@ -124,6 +185,9 @@ k3d::bool_t is_closed(const k3d::nurbs_curve::const_primitive& NurbsCurves, cons
 
 /// Evaluate the postion (x*weight, y*weight, z*weight, weight) using the given curve arrays
 const k3d::point4 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U);
+
+/// Evaluate the value of an attribute at the given parameter value, appending it to the end of the table
+void evaluate_attribute(k3d::table& PointAttributes, const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U);
 
 /// Get the normalized tangent vector at the given location on the curve
 const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU = 0.00001);

@@ -284,13 +284,18 @@ void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_
 	}
 
 	// Move leftover attributes into their final positions ...
-	table_copier point_attributes(Mesh.point_attributes);
-	for(uint_t point = point_begin; point != point_end; ++point)
+	const k3d::bool_t valid_point_attribs = Mesh.point_attributes.row_count() == point_end;
+	assert_error(valid_point_attribs);
+	if(valid_point_attribs)
 	{
-		if(Points[point])
-			continue;
+		table_copier point_attributes(Mesh.point_attributes);
+		for(uint_t point = point_begin; point != point_end; ++point)
+		{
+			if(Points[point])
+				continue;
 
-		point_attributes.copy(point, PointMap[point]);
+			point_attributes.copy(point, PointMap[point]);
+		}
 	}
 
 	// Update generic mesh primitives so they use the correct indices ...

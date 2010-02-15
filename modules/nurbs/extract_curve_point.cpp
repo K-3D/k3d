@@ -40,6 +40,7 @@
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/point3.h>
 #include <k3dsdk/selection.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -78,7 +79,7 @@ public:
 		k3d::mesh::points_t& points = Output.points.writable();
 		k3d::mesh::selection_t& point_selections = Output.point_selection.writable();
 		const k3d::double_t u = m_parameter.pipeline_value();
-		visit_selected_curves(Output, curve_point_extractor(points, u));
+		visit_selected_curves(Output, curve_point_extractor(points, Output.point_attributes, u));
 		point_selections.resize(points.size(), 1.0);
 	}
 
@@ -98,18 +99,23 @@ private:
 	// Extracts points at the given U value
 	struct curve_point_extractor
 	{
-		curve_point_extractor(k3d::mesh::points_t& Points, const k3d::double_t U) : points(Points), u(U) {}
+		curve_point_extractor(k3d::mesh::points_t& Points, k3d::table& PointAttributes, const k3d::double_t U) : points(Points), point_attributes(PointAttributes), u(U) {}
 		void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
 		{
 			k3d::mesh::points_t curve_points;
 			k3d::mesh::weights_t curve_weights;
 			k3d::mesh::knots_t curve_knots;
-			extract_curve_arrays(curve_points, curve_knots, curve_weights, Mesh, Curves, Curve, true);
+			k3d::table curve_point_attributes;
+			extract_curve_arrays(curve_points, curve_knots, curve_weights, curve_point_attributes, Mesh, Curves, Curve, true);
 			const k3d::point4 p = evaluate_position(curve_points, curve_weights, curve_knots, u);
+			evaluate_attribute(curve_point_attributes, curve_points, curve_weights, curve_knots, u);
 			const k3d::double_t w = p[3];
 			points.push_back(k3d::point3(p[0]/w,p[1]/w,p[2]/w));
+			k3d::table_copier copier(curve_point_attributes, point_attributes);
+			copier.push_back(curve_points.size()-1);
 		}
 		k3d::mesh::points_t& points;
+		k3d::table& point_attributes;
 		const k3d::double_t u;
 	};
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_parameter;

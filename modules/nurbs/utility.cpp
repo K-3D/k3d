@@ -57,7 +57,8 @@ void knot_vector_merger::operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::pri
 	k3d::mesh::points_t points;
 	k3d::mesh::knots_t knots;
 	k3d::mesh::weights_t weights;
-	extract_curve_arrays(points, knots, weights, InputMesh, InputCurves, Curve, true);
+	k3d::table point_attributes; // TODO: Use this
+	extract_curve_arrays(points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, true);
 	if(unified_knots.size() < knots.size())
 		throw std::runtime_error("Unified knot vector is too short");
 	// First, we check if the old knot vector has knots that are not in the common knot vector (i.e. knots that were added manually using knot vector editing)

@@ -130,12 +130,12 @@ private:
 		{
 			if(paths.curve_first_points.empty())
 			{
-				add_curve(mesh, paths, Mesh, Curves, Curve);
+				copy_curve(mesh, paths, Mesh, Curves, Curve);
 				paths.material = Curves.material;
 			}
 			else
 			{
-				add_curve(mesh, sweep_curves, Mesh, Curves, Curve);
+				copy_curve(mesh, sweep_curves, Mesh, Curves, Curve);
 				sweep_curves.material = Curves.material;
 			}
 		}

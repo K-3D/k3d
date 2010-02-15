@@ -126,12 +126,12 @@ void modify_selected_curves(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, F
 					catch(std::runtime_error& E)
 					{
 						k3d::log() << error << "Error modifiying curve " << curve << " of primitive " << prim_idx << ": " << E.what() << std::endl;
-						add_curve(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
+						copy_curve(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
 					}
 				}
 				else
 				{
-					add_curve(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
+					copy_curve(OutputMesh, *output_curves, InputMesh, *input_curves, curve);
 				}
 				output_curves->curve_selections.back() = curve_selections[curve];
 			}
@@ -266,7 +266,7 @@ struct selected_curve_extractor
 	selected_curve_extractor(k3d::mesh& Mesh, k3d::nurbs_curve::primitive& Curves) : mesh(Mesh), curves(Curves) {}
 	void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
 	{
-		add_curve(mesh, curves, Mesh, Curves, Curve);
+		copy_curve(mesh, curves, Mesh, Curves, Curve);
 		curves.material.back() = Curves.material.back();
 	}
 	k3d::mesh& mesh;

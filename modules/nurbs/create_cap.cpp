@@ -160,7 +160,8 @@ public:
 				k3d::mesh::points_t points;
 				k3d::mesh::weights_t weights;
 				k3d::mesh::knots_t knots;
-				extract_curve_arrays(points, knots, weights, merged_mesh, *const_merged_curves, curve, true);
+				k3d::table point_attributes; // Unused
+				extract_curve_arrays(points, knots, weights, point_attributes, merged_mesh, *const_merged_curves, curve, true);
 				// Get the plane the curve lies in
 				extract_plane(origin, normal, u_axis, v_axis, parameter_points, points, m_u_offset.pipeline_value());
 				// Get the bounding box for the curve points in this plane
