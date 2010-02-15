@@ -32,6 +32,7 @@
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/image_toggle_button.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/ngui/render.h>
 #include <k3dsdk/ngui/scripting.h>
 #include <k3dsdk/ngui/selection.h>
@@ -566,7 +567,8 @@ struct implementation
 
 	void on_create_node(k3d::iplugin_factory* const Factory)
 	{
-		m_document_state.create_node(Factory);
+		return_if_fail(Factory);
+		k3d::ngui::pipeline::create_node(m_document_state.document(), *Factory);
 	}
 
 	/// Unparents all selected nodes

@@ -124,7 +124,7 @@ public:
 			"RenderManBicubicPatchPainter",
 			_("Renders bicubic patches"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

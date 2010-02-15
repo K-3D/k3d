@@ -1,5 +1,6 @@
 #include "PreviewSphere.h"
 #include <k3dsdk/inode_collection_sink.h>
+#include <k3dsdk/ngui/pipeline.h>
 
 namespace module
 {
@@ -17,7 +18,7 @@ void PreviewSphere::init(k3d::string_t _node_name, k3d::string_t _meta_nametag, 
     = dynamic_cast<k3d::inode*>(k3d::plugin::create("Sphere", 
                                                     m_document_state->document(), 
                                                     _node_name));
-  m_doc_node = m_document_state->instantiate_mesh(sphere);
+  m_doc_node = k3d::ngui::pipeline::instantiate_mesh(m_document_state->document(), *sphere);
   return_if_fail(m_doc_node);
   k3d::property::set_internal_value(*m_doc_node, "gl_painter", static_cast<k3d::inode*>(0));
     

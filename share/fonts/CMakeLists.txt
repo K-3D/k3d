@@ -1,3 +1,2 @@
-FILE(GLOB FONTS *.ttf)
-INSTALL(FILES ${FONTS} DESTINATION share/k3d/fonts)
+INSTALL_GLOB(*.ttf share/k3d/fonts)
 

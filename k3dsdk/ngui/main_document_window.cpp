@@ -52,7 +52,7 @@
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/ngui/application_state.h>
 #include <k3dsdk/ngui/check_menu_item.h>
-#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/ngui/document.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
@@ -1593,12 +1593,12 @@ private:
 
 	void on_instantiate()
 	{
-		instantiate_selected_nodes(m_document_state);
+		pipeline::instantiate_selected_nodes(m_document_state.document());
 	}
 
 	void on_duplicate()
 	{
-		duplicate_selected_nodes(m_document_state);
+		pipeline::duplicate_selected_nodes(m_document_state.document());
 	}
 
 	void on_delete()
@@ -2210,7 +2210,8 @@ private:
 
 	void on_create_node(k3d::iplugin_factory* const Factory)
 	{
-		m_document_state.create_node(Factory);
+		return_if_fail(Factory);
+		pipeline::create_node(m_document_state.document(), *Factory);
 	}
 
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)

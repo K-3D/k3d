@@ -195,7 +195,7 @@ public:
 			"OpenGLHyperboloidPainter",
 			_("Renders hyperboloid primitives using OpenGL"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

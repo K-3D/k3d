@@ -72,7 +72,6 @@ public:
 		if(test_type(".jpg", "image/jpeg", File, FileType)) return true;
 		if(test_type(".jpeg", "image/jpeg", File, FileType)) return true;
 		if(test_type(".k3d", "application/x-k3d", File, FileType)) return true;
-		if(test_type(".k3dscript", "text/x-k3dscript", File, FileType)) return true;
 		if(test_type(".png", "image/png", File, FileType)) return true;
 		if(test_type(".pnm", "image/x-portable-anymap", File, FileType)) return true;
 		if(test_type(".py", "text/x-python", File, FileType)) return true;
@@ -112,7 +111,6 @@ public:
 	k3d::bool_t identify_mime_type(const k3d::string_t& Data, k3d::string_t& DataType)
 	{
 		if(test_type("#python", "text/x-python", Data, DataType)) return true;
-		if(test_type("#k3dscript", "text/x-k3dscript", Data, DataType)) return true;
 
 		return false;
 	}

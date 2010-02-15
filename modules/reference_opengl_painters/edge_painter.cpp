@@ -140,7 +140,7 @@ public:
 			"OpenGLEdgePainter",
 			_("Renders mesh edges (OpenGL 1.1)"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

@@ -8,8 +8,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2010-02-03 01:58:46.629278 Z
 references: []
 
@@ -19,4 +19,8 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - created
   - ""
+- - 2010-02-06 06:04:53.400647 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - Forcing GTK to load atk-bridge at startup when the user didn't have accessibility turned-on for their desktop caused these warning messages.  We dont' actually need atk-bridge, since we call ATK interfaces directly in-process.  So turning this off fixes everything.
 claimer: 

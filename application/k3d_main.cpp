@@ -208,8 +208,8 @@ void set_default_options(bool& Quit, bool& Error)
 	if(!k3d::system::getenv("K3D_USER_INTERFACE_PATH").empty())
 		g_user_interface_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::system::getenv("K3D_USER_INTERFACE_PATH")));
 
-	// Needed for ATK events on non-gnome systems
-	k3d::system::setenv("GTK_MODULES", "gail:atk-bridge");
+	// This ensures that we can use ATK for testing, even when the user hasn't enabled desktop accessibility.
+	k3d::system::setenv("GTK_MODULES", "gail");
 }
 
 /////////////////////////////////////////////////////////////////////////////

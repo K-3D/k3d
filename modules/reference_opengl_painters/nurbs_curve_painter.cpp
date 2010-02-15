@@ -213,7 +213,7 @@ public:
 			"OpenGLNURBSCurvePainter",
 			_("Renders NURBS curves"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

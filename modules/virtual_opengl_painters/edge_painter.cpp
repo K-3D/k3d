@@ -49,7 +49,7 @@ public:
 			"VirtualOpenGLEdgePainter",
 			_("Renders mesh edges"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL),
+			k3d::iplugin_factory::STABLE),
 		delegate(0)
 	{
 		// Note ... this ctor may be executed before k3d::application is initialized, so

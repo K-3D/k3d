@@ -200,7 +200,7 @@ public:
 			"RenderManNURBSPatchPainter",
 			_("Renders NURBS patches"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

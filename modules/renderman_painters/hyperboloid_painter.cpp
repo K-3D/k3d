@@ -113,7 +113,7 @@ public:
 			"RenderManHyperboloidPainter",
 			_("Renders hyperboloid primitives"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

@@ -384,6 +384,124 @@ struct select_component
 	const double_t weight;
 };
 
+/// Policy class that updates a mesh_selection to select the given edges
+struct select_edges
+{
+	select_edges(const bool_t SelectAdjacent, const double_t Weight) :
+		select_adjacent(SelectAdjacent),
+		weight(Weight)
+	{
+	}
+
+	const k3d::selection::set operator()(k3d::inode* const Node, const k3d::mesh& Mesh, const k3d::selection::set& CurrentSelection, const k3d::selection::records& InteractiveSelection) const
+	{
+		k3d::selection::set results = CurrentSelection;
+
+		// Extract the set of edges to be selected ...
+		mesh::indices_t edges;
+		mesh::indices_t edge_primitives;
+		for(k3d::selection::records::const_iterator record = InteractiveSelection.begin(); record != InteractiveSelection.end(); ++record)
+		{
+			if(k3d::selection::get_node(*record) != Node)
+				continue;
+
+			for(k3d::selection::record::tokens_t::const_iterator primitive_token = record->tokens.begin(); primitive_token != record->tokens.end(); ++primitive_token)
+			{
+				if(primitive_token->type != k3d::selection::PRIMITIVE)
+					continue;
+
+				for(k3d::selection::record::tokens_t::const_iterator edge_token = primitive_token + 1; edge_token != record->tokens.end(); ++edge_token)
+				{
+					if(edge_token->type != k3d::selection::EDGE)
+						continue;
+
+					edges.push_back(edge_token->id);
+					edge_primitives.push_back(primitive_token->id);
+
+					break;	
+				}
+
+				break;
+			}
+		}
+
+		// Get the set of unique primitives ...
+		std::set<uint_t> primitives(edge_primitives.begin(), edge_primitives.end());
+
+		// Optionally select adjacent edges ...
+		if(select_adjacent)
+		{
+			const uint_t edge_begin = 0;
+			const uint_t edge_end = edge_begin + edges.size();
+
+			for(std::set<uint_t>::const_iterator primitive = primitives.begin(); primitive != primitives.end(); ++primitive)
+			{
+				if(Mesh.primitives.size() <= *primitive)
+					continue;
+
+				boost::scoped_ptr<polyhedron::const_primitive> polyhedron(polyhedron::validate(Mesh, *Mesh.primitives[*primitive]));
+				if(!polyhedron)
+					continue;
+
+				mesh::bools_t boundary_edges;
+				mesh::indices_t adjacent_edges;
+				polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
+
+				std::set<uint_t> primitive_edges;
+				for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+				{
+					if(edge_primitives[edge] != *primitive)
+						continue;
+					primitive_edges.insert(edges[edge]);
+				}
+
+				for(std::set<uint_t>::const_iterator edge = primitive_edges.begin(); edge != primitive_edges.end(); ++edge)
+				{
+					if(boundary_edges[*edge])
+						continue;
+					if(primitive_edges.count(adjacent_edges[*edge]))
+						continue;
+
+					edges.push_back(adjacent_edges[*edge]);
+					edge_primitives.push_back(*primitive);
+				}
+			}
+		}
+
+		// Add all our edges to the output selection ...
+		if(edges.size())
+		{
+			const uint_t edge_begin = 0;
+			const uint_t edge_end = edge_begin + edges.size();
+
+			boost::scoped_ptr<geometry::primitive_selection::storage> primitive_selection(geometry::primitive_selection::create(results));
+
+			for(std::set<uint_t>::const_iterator primitive = primitives.begin(); primitive != primitives.end(); ++primitive)
+			{
+				primitive_selection->primitive_begin.push_back(*primitive);
+				primitive_selection->primitive_end.push_back(*primitive + 1);
+				primitive_selection->primitive_selection_type.push_back(k3d::selection::EDGE);
+				primitive_selection->primitive_first_range.push_back(primitive_selection->index_begin.size());
+				primitive_selection->primitive_range_count.push_back(0);
+				for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+				{
+					if(edge_primitives[edge] != *primitive)
+						continue;
+					primitive_selection->primitive_range_count.back() += 1;
+					primitive_selection->index_begin.push_back(edges[edge]);
+					primitive_selection->index_end.push_back(edges[edge] + 1);
+					primitive_selection->weight.push_back(weight);
+				}
+			}
+		}
+
+		return results;
+	}
+
+	const bool_t select_adjacent;
+	const double_t weight;
+};
+
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
@@ -391,7 +509,7 @@ struct select_component
 
 std::ostream& operator<<(std::ostream& Stream, const mode& RHS)
 {
-				switch(RHS)
+	switch(RHS)
 	{
 		case CURVE:
 			Stream << "curve";
@@ -416,32 +534,32 @@ std::ostream& operator<<(std::ostream& Stream, const mode& RHS)
 			break;
 	}
 
-				return Stream;
+	return Stream;
 }
 
 std::istream& operator>>(std::istream& Stream, mode& RHS)
 {
-				std::string text;
-				Stream >> text;
+	std::string text;
+	Stream >> text;
 
-				if(text == "curve")
-					RHS = CURVE;
-				else if(text == "face")
-					RHS = FACE;
-				else if(text == "node")
-					RHS = NODE;
-				else if(text == "patch")
-					RHS = PATCH;
-				else if(text == "point")
-					RHS = POINT;
-				else if(text == "edge")
-					RHS = EDGE;
-				else if(text == "surface")
-					RHS = SURFACE;
-				else
-					log() << error << "Unknown enumeration [" << text << "]"<< std::endl;
+	if(text == "curve")
+		RHS = CURVE;
+	else if(text == "face")
+		RHS = FACE;
+	else if(text == "node")
+		RHS = NODE;
+	else if(text == "patch")
+		RHS = PATCH;
+	else if(text == "point")
+		RHS = POINT;
+	else if(text == "edge")
+		RHS = EDGE;
+	else if(text == "surface")
+		RHS = SURFACE;
+	else
+		log() << error << "Unknown enumeration [" << text << "]"<< std::endl;
 
-				return Stream;
+	return Stream;
 }
 
 /// Provides human-readable labels for the selection::mode enumeration
@@ -540,12 +658,16 @@ public:
 	/// Defines storage for the document-wide convert-selection mode
 	k3d_data(bool_t, immutable_name, explicit_change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) convert_selection;
 
+	/// Defines storage for the document-wide select-adjacent-edges state
+	k3d_data(bool_t, immutable_name, explicit_change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) select_adjacent_edges;
+
 private:
 	implementation(idocument& Document) :
 		document(Document),
 		current_mode(init_name("selection_mode") + init_label(_("Selection Type")) + init_description(_("Sets selection mode (nodes, faces, edges, points, etc)")) + init_value(selection::NODE) + init_values(mode_values())),
 		keep_selection(init_name("keep_selection") + init_label(_("Keep Selection")) + init_description(_("Keep the current selection when changing the selection mode.")) + init_value(false)),
 		convert_selection(init_name("convert_selection") + init_label(_("Convert Selection")) + init_description(_("Convert the current selection when changing the selection mode.")) + init_value(true)),
+		select_adjacent_edges(init_name("select_adjacent_edges") + init_label(_("Select Adjacent Edges")) + init_description(_("When selecting edges, automatically expand the selection to include adjacent edges.")) + init_value(true)),
 		m_node_selection(0),
 		m_rubber_band(0)
 	{
@@ -720,6 +842,21 @@ sigc::connection state::connect_convert_selection_changed_signal(const sigc::slo
 	return internal.convert_selection.changed_signal().connect(Slot);
 }
 
+bool_t state::select_adjacent_edges()
+{
+	return internal.select_adjacent_edges.internal_value();
+}
+
+void state::set_select_adjacent_edges(const bool_t Expand)
+{
+	internal.select_adjacent_edges.set_value(Expand);
+}
+
+sigc::connection state::connect_select_adjacent_edges_changed_signal(const sigc::slot<void, ihint*>& Slot)
+{
+	return internal.select_adjacent_edges.changed_signal().connect(Slot);
+}
+
 const nodes_t state::selected_nodes()
 {
 	return internal.selected_nodes();
@@ -756,7 +893,7 @@ void state::select(const k3d::selection::records& Selection)
 			detail::merge_interactive_selection(selected_nodes(), detail::select_points(1.0), Selection);
 			break;
 		case EDGE:
-			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::EDGE, 1.0), Selection);
+			detail::merge_interactive_selection(selected_nodes(), detail::select_edges(internal.select_adjacent_edges.internal_value(), 1.0), Selection);
 			break;
 		case SURFACE:
 			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::SURFACE, 1.0), Selection);
@@ -1201,7 +1338,7 @@ void state::deselect(const k3d::selection::records& Selection)
 			detail::merge_interactive_selection(selected_nodes(), detail::select_points(0.0), Selection);
 			break;
 		case EDGE:
-			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::EDGE, 0.0), Selection);
+			detail::merge_interactive_selection(selected_nodes(), detail::select_edges(internal.select_adjacent_edges.internal_value(), 0.0), Selection);
 			break;
 		case SURFACE:
 			detail::merge_interactive_selection(selected_nodes(), detail::select_component(k3d::selection::SURFACE, 0.0), Selection);

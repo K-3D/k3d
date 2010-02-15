@@ -1,4 +1,3 @@
-FILE(GLOB SL_FILES *.sl)
-FILE(GLOB SLMETA_FILES *.slmeta)
-INSTALL(FILES ${SL_FILES} ${SLMETA_FILES} DESTINATION share/k3d/shaders/surface)
+INSTALL_GLOB(*.sl share/k3d/shaders/surface)
+INSTALL_GLOB(*.slmeta share/k3d/shaders/surface)
 

@@ -5,7 +5,7 @@ desc: |-
   make the manipulators appear.
 type: :bugfix
 component: K-3D
-release: 0.8.0.0
+release: 1.0.0.0
 reporter: Bart Janssens <bart.janssens@lid.kviv.be>
 status: :unstarted
 disposition: 
@@ -18,3 +18,8 @@ log_events:
   - Bart Janssens <bart.janssens@lid.kviv.be>
   - created
   - ""
+- - 2010-02-12 06:54:12.782219 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
+  - ""
+claimer: 

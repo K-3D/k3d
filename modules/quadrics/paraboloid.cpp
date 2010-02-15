@@ -95,7 +95,7 @@ public:
 			"Paraboloid",
 			"Creates a paraboloid primitive",
 			"Quadric",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
