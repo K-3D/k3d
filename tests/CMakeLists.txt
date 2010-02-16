@@ -4,7 +4,7 @@ INCLUDE(K3DParseArguments)
 
 # Provides a consistent interface for running all K-3D tests
 FUNCTION(K3D_TEST TEST_NAME)
-	K3D_PARSE_ARGUMENTS(TEST "TARGET;CMAKE_SCRIPT;PYTHON_SCRIPT;K3D_PYTHON_SCRIPT;REQUIRES;LABELS;WORKING_DIRECTORY;ARGUMENTS" "XFAIL" ${ARGN})
+	K3D_PARSE_ARGUMENTS(TEST "TARGET;CMAKE_SCRIPT;PYTHON_SCRIPT;K3D_PYTHON_SCRIPT;REQUIRES;LABELS;WORKING_DIRECTORY;ARGUMENTS" "NGUI;XFAIL" ${ARGN})
 
 	FOREACH(REQUIREMENT ${TEST_REQUIRES})
 		IF(NOT ${REQUIREMENT})
@@ -27,18 +27,29 @@ FUNCTION(K3D_TEST TEST_NAME)
 	ELSEIF(TEST_PYTHON_SCRIPT)
 		ADD_TEST(${TEST_NAME} "${PYTHON_COMMAND}" "${TEST_PYTHON_SCRIPT}")
 	ELSEIF(TEST_K3D_PYTHON_SCRIPT)
+		SET(TEST_UI --ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-nui.module)
+		IF(TEST_NGUI)
+			IF(NOT K3D_BUILD_NGUI_MODULE)
+				RETURN()
+			ENDIF()
+			SET(TEST_UI --ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-ngui.module --batch --no-custom-layouts --no-splash)
+		ENDIF()
+
 		ADD_TEST(${TEST_NAME}
 			${k3d_BINARY_DIR}/bin/k3d
 			--log-level=debug
 			--plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins
 			--share=${k3d_SOURCE_DIR}/share
-			--ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-nui.module
+			${TEST_UI}
 			--script=${TEST_K3D_PYTHON_SCRIPT}
 			--setenv "PYTHONPATH=${tests_SOURCE_DIR}"
 			--setenv "K3D_TEST_SOURCE_PATH=${tests_SOURCE_DIR}"
 			--setenv "K3D_TEST_BINARY_PATH=${tests_BINARY_DIR}"
 			--exit
 			)
+	ELSE()
+		MESSAGE(SEND_ERROR "Unknown K3D_TEST type")
+		RETURN()
 	ENDIF()
 
 	IF(TEST_LABELS)
@@ -122,6 +133,9 @@ ADD_SUBDIRECTORY(platform)
 # Run tests that enforce coding-standards
 ADD_SUBDIRECTORY(code)
 
+# Run tests that verify the functionality of the testing system itself
+ADD_SUBDIRECTORY(testing)
+
 # Run tests that exercise the C++ SDK
 ADD_SUBDIRECTORY(sdk)
 
@@ -131,26 +145,37 @@ ADD_SUBDIRECTORY(python)
 # Run tests that do a simple "smoke-check" on binaries ...
 K3D_TEST(startup.k3d-uuidgen TARGET k3d-uuidgen LABELS startup uuid)
 
+# Run tests that exercise double-related functionality
+ADD_SUBDIRECTORY(double)
+
+ADD_SUBDIRECTORY(int32)
+
+ADD_SUBDIRECTORY(color)
+
+ADD_SUBDIRECTORY(vector3)
+
+# Run tests that exercise matrix-related functionality
+ADD_SUBDIRECTORY(matrix)
+
+ADD_SUBDIRECTORY(string)
+
 # Run tests that exercise bitmap-related functionality
 ADD_SUBDIRECTORY(bitmap)
 
 # Run tests that exercise mesh-related functionality
 ADD_SUBDIRECTORY(mesh)
 
+# Run tests that exercise parallel computation ...
+ADD_SUBDIRECTORY(parallel)
+
+# Run tests that exercise offscreen rendering ...
+ADD_SUBDIRECTORY(offscreen)
+
+# Run tests that exercise the standard user interface ...
+ADD_SUBDIRECTORY(ngui)
+
 #############################################################################333
 # Tests waiting to be reorganized ...
-
-K3D_ADD_TEST(test.startup)
-
-K3D_ADD_TEST(test.script.detect.lang.null SCRIPT XFAIL)
-K3D_ADD_TEST(test.script.detect.lang.python.py PYTHON)
-K3D_ADD_TEST(test.script.failure.lang.python.py PYTHON XFAIL)
-K3D_ADD_TEST(test.script.failure.lang.python.exception.py PYTHON XFAIL)
-
-K3D_ADD_TEST(test.measurements.py PYTHON)
-K3D_ADD_TEST(test.PipelineProfiler.py PYTHON)
-
-K3D_ADD_TEST(property.linking.enumeration.py PYTHON)
 
 K3D_ADD_TEST(document.create.py PYTHON)
 K3D_ADD_TEST(document.stress.high_node_count.py PYTHON)
@@ -161,36 +186,9 @@ K3D_ADD_TEST(document.serialization.properties.py PYTHON)
 
 K3D_ADD_TEST(document.importer.bogus_input.py PYTHON)
 
-K3D_ADD_TEST(color.source.ColorSourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
-K3D_ADD_TEST(double.source.DoubleSourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
-K3D_ADD_TEST(int32.source.Int32SourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
-K3D_ADD_TEST(string.source.StringSourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
-K3D_ADD_TEST(vector3.source.Vector3SourceScript.py PYTHON REQUIRES K3D_BUILD_SCRIPTING_MODULE)
-
 K3D_ADD_TEST(anim.AnimationTrack.py PYTHON REQUIRES K3D_BUILD_ANIMATION_MODULE)
-
-K3D_ADD_TEST(core.FrozenTransformation.py PYTHON REQUIRES K3D_BUILD_CORE_MODULE)
-
-K3D_ADD_TEST(test.mesh.solid.py PYTHON)
-K3D_ADD_TEST(test.mesh.solid.failure.py PYTHON)
 
 K3D_ADD_TEST(notifier.InotifyFileChangeNotifier.py PYTHON REQUIRES K3D_BUILD_INOTIFY_MODULE)
 
-K3D_ADD_TEST(parallel.grain_size.ScalePoints.py PYTHON REQUIRES K3D_ENABLE_PARALLEL)
-K3D_ADD_TEST(parallel.thread_count.ScalePoints.py PYTHON REQUIRES K3D_ENABLE_PARALLEL)
-
-K3D_ADD_TEST(offscreen.GLXCameraToBitmap.py PYTHON REQUIRES K3D_BUILD_GLX_MODULE)
-K3D_ADD_TEST(offscreen.OpenGLFramebufferCameraToBitmap.py PYTHON REQUIRES K3D_BUILD_OPENGL_FRAMEBUFFER_MODULE)
-K3D_ADD_TEST(offscreen.VirtualCameraToBitmap.py PYTHON REQUIRES K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE)
-K3D_ADD_TEST(offscreen.WGLCameraToBitmap.py PYTHON REQUIRES K3D_BUILD_WGL_MODULE)
-
-K3D_ADD_TEST(ngui.tools.move.py PYTHON NGUI)
-K3D_ADD_TEST(ngui.tools.rotate.py PYTHON NGUI)
-
-K3D_ADD_TEST(cuda.mesh.Conversion.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE REQUIRES K3D_BUILD_CUDA_MODULE)
-
 K3D_ADD_TEST(benchmark.CompareResults.py PYTHON REQUIRES K3D_BUILD_CUDA_MODULE)
-
-K3D_ADD_TEST(scalar.source.PapagayoLipsyncReader.py PYTHON REQUIRES K3D_BUILD_LIPSYNC_MODULE)
-K3D_ADD_TEST(scalar.source.ScalarExpression.py PYTHON REQUIRES K3D_BUILD_SCALAR_MODULE)
 

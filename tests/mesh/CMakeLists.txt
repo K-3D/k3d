@@ -15,6 +15,14 @@ K3D_TEST(mesh.diff.MeshDiff
 	REQUIRES K3D_BUILD_TEST_MODULE
 	LABELS mesh modifier)
 
+K3D_TEST(mesh.solid
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.solid.py
+	LABELS mesh)
+
+K3D_TEST(mesh.solid.failure
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.solid.failure.py
+	LABELS mesh)
+
 K3D_TEST(mesh.selection.null 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.selection.null.py
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE
@@ -239,11 +247,6 @@ K3D_TEST(mesh.source.Hyperboloid
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Hyperboloid.py
 	REQUIRES K3D_BUILD_QUADRICS_MODULE
 	LABELS mesh source Hyperboloid)
-
-K3D_TEST(mesh.source.InvertMatrix
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.InvertMatrix.py
-	REQUIRES K3D_BUILD_MATRIX_MODULE
-	LABELS mesh source InvertMatrix)
 
 K3D_TEST(mesh.source.KnotCurve
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.KnotCurve.py
@@ -1108,6 +1111,8 @@ K3D_TEST(mesh.modifier.CUDA.Breakdown
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CUDA.Breakdown.py
 	REQUIRES K3D_BUILD_CUDA_MODULE
 	LABELS mesh modifier)
+
+K3D_ADD_TEST(cuda.mesh.Conversion.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE REQUIRES K3D_BUILD_CUDA_MODULE)
 
 
 
