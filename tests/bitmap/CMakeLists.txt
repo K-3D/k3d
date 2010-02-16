@@ -111,92 +111,95 @@ K3D_TEST(bitmap.modifier.BitmapThreshold
 K3D_TEST(bitmap.modifier.CUDABitmapAdd 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapAdd.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapMultiply 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapMultiply.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapSubtract 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapSubtract.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapColorMonochrome 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapColorMonochrome.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapGamma 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapGamma.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapInvert 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapInvert.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapMatteColorDiff 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapMatteColorDiff.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapMatteInvert 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapMatteInvert.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapThreshold 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapThreshold.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapAdd.benchmark 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapAdd.benchmark.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapMultiply.benchmark 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapMultiply.benchmark.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapSubtract.benchmark 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapSubtract.benchmark.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapColorMonochrome.benchmark 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapColorMonochrome.benchmark.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapGamma.benchmark 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapGamma.benchmark.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapInvert.benchmark 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapInvert.benchmark.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapMatteColorDiff.benchmark 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapMatteColorDiff.benchmark.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapMatteInvert.benchmark 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapInvert.benchmark.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
 K3D_TEST(bitmap.modifier.CUDABitmapThreshold.benchmark 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.CUDABitmapThreshold.benchmark.py
 	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
-	LABELS bitmap modifier)
+	LABELS bitmap modifier cuda)
 
-# K3D_ADD_TEST(bitmap.modifier.BenchmarkComparison PYTHON REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE)
+K3D_TEST(bitmap.modifier.BenchmarkComparison
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/bitmap.modifier.BenchmarkComparison.py
+	REQUIRES K3D_BUILD_BITMAP_MODULE K3D_BUILD_CUDA_MODULE
+	LABELS bitmap cuda)
 

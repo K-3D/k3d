@@ -27,7 +27,7 @@ SET(SKIP_FILES
 	"^tests/CMakeLists.txt$"
 	"^tests/code/CMakeLists.txt$"
 	"^tests/code/exit.cmake$"
-	"^tests/document.stress.read_all_properties.py$"
+	"^tests/other/document.stress.read_all_properties.py$"
 	"^tests/python/module.py$"
 	)
 
