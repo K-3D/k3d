@@ -23,45 +23,56 @@ K3D_TEST(mesh.solid.failure
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.solid.failure.py
 	LABELS mesh)
 
+
+
+
+
+
+
 K3D_TEST(mesh.selection.null 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.selection.null.py
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier selection)
 
 K3D_TEST(mesh.selection.none 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.selection.none.py
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier selection)
 
 K3D_TEST(mesh.selection.all 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.selection.all.py
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier selection)
 
 K3D_TEST(mesh.selection.points 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.selection.points.py
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier selection)
 
 K3D_TEST(mesh.selection.GrowSelection 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.selection.GrowSelection.py
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE K3D_BUILD_SELECTION_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier selection)
+
+
+
+
+
 
 K3D_TEST(mesh.metrics.GTSMeshArea.PolyCube 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.metrics.GTSMeshArea.PolyCube.py
 	REQUIRES K3D_BUILD_GTS_MODULE K3D_BUILD_POLYHEDRON_SOURCES_MODULE
-	LABELS mesh modifier)
+	LABELS mesh metric)
 
 K3D_TEST(mesh.metrics.GTSMeshArea.self_intersection 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.metrics.GTSMeshArea.self_intersection.py
 	REQUIRES K3D_BUILD_GTS_MODULE K3D_BUILD_POLYHEDRON_SOURCES_MODULE
-	LABELS mesh modifier)
+	LABELS mesh metric)
 
 K3D_TEST(mesh.metrics.GTSMeshVolume.PolyCube 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.metrics.GTSMeshVolume.PolyCube.py
 	REQUIRES K3D_BUILD_GTS_MODULE K3D_BUILD_POLYHEDRON_SOURCES_MODULE
-	LABELS mesh modifier)
+	LABELS mesh metric)
 
 
 
@@ -217,6 +228,15 @@ K3D_TEST(mesh.source.MeshSourceScript.tori
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.MeshSourceScript.tori.py
 	REQUIRES K3D_BUILD_SCRIPTING_MODULE
 	LABELS mesh source MeshSourceScript)
+
+
+
+
+
+
+
+
+
 
 K3D_TEST(mesh.source.BlobbyEllipsoid
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.BlobbyEllipsoid.py
@@ -431,6 +451,15 @@ K3D_TEST(mesh.source.Torus
 K3D_TEST(mesh.source.reader.bogus_input
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.reader.bogus_input.py
 	LABELS mesh source)
+
+
+
+
+
+
+
+
+
 
 K3D_TEST(mesh.source.CUDAPolyGrid
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.CUDAPolyGrid.py
@@ -1062,6 +1091,17 @@ K3D_TEST(mesh.modifier.Weld
 	REQUIRES K3D_BUILD_MESH_MODULE
 	LABELS mesh modifier)
 
+
+
+
+
+
+
+
+
+
+
+
 K3D_TEST(mesh.modifier.CUDATransformPoints 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CUDATransformPoints.py
 	REQUIRES K3D_BUILD_DEFORMATION_MODULE K3D_BUILD_CUDA_MODULE
@@ -1112,7 +1152,10 @@ K3D_TEST(mesh.modifier.CUDA.Breakdown
 	REQUIRES K3D_BUILD_CUDA_MODULE
 	LABELS mesh modifier)
 
-K3D_ADD_TEST(cuda.mesh.Conversion.py PYTHON REQUIRES K3D_BUILD_MESH_MODULE REQUIRES K3D_BUILD_CUDA_MODULE)
+K3D_TEST(mesh.modifier.CUDAConversion
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CUDAConversion.py
+	REQUIRES K3D_BUILD_MESH_MODULE K3D_BUILD_CUDA_MODULE
+	LABELS mesh modifier cuda)
 
 
 
