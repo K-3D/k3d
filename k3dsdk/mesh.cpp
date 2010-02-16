@@ -284,9 +284,8 @@ void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_
 	}
 
 	// Move leftover attributes into their final positions ...
-	const k3d::bool_t valid_point_attribs = Mesh.point_attributes.row_count() == point_end;
-	assert_error(valid_point_attribs);
-	if(valid_point_attribs)
+	assert_error(Mesh.point_attributes.empty() || Mesh.point_attributes.row_count() == point_end);
+	if(Mesh.point_attributes.row_count() == point_end)
 	{
 		table_copier point_attributes(Mesh.point_attributes);
 		for(uint_t point = point_begin; point != point_end; ++point)
