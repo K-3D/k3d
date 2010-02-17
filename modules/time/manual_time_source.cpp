@@ -79,7 +79,7 @@ public:
 			"ManualTimeSource",
 			_("Provides a time source for a K-3D document"),
 			"Animation",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
