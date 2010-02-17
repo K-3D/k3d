@@ -103,7 +103,7 @@ public:
 				"OpenGLVersionCheck",
 				_("Checks OpenGL version and warns if it is known to contain bugs affecting K-3D"),
 				"Desktop",
-				k3d::iplugin_factory::EXPERIMENTAL,
+				k3d::iplugin_factory::STABLE,
 				boost::assign::map_list_of("ngui:opengl-start", "true"));
 
 		return factory;
