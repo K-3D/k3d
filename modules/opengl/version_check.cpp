@@ -40,13 +40,13 @@
 namespace module
 {
 
-namespace glx
+namespace opengl
 {
 
-class mesa_version_check : public k3d::iunknown
+class version_check : public k3d::iunknown
 {
 public:
-	mesa_version_check()
+	version_check()
 	{
 		if(!glewGetContext())
 		{
@@ -97,11 +97,11 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<mesa_version_check,
+		static k3d::application_plugin_factory<version_check,
 			k3d::interface_list<k3d::iunknown> > factory(
 				k3d::uuid(0xaf73ea67, 0x444f8519, 0x9bddf492, 0x305853a8),
-				"MesaVersionCheck",
-				_("Checks Mesa version and warns if it is known to contain bugs affecting K-3D"),
+				"OpenGLVersionCheck",
+				_("Checks OpenGL version and warns if it is known to contain bugs affecting K-3D"),
 				"Desktop",
 				k3d::iplugin_factory::EXPERIMENTAL,
 				boost::assign::map_list_of("ngui:opengl-start", "true"));
@@ -110,11 +110,11 @@ public:
 	}
 };
 
-k3d::iplugin_factory& mesa_version_check_factory()
+k3d::iplugin_factory& version_check_factory()
 {
-	return mesa_version_check::get_factory();
+	return version_check::get_factory();
 }
 
-} // namespace glx
+} // namespace opengl
 
 } // namespace module
