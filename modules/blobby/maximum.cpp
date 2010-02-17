@@ -93,7 +93,7 @@ public:
 			"BlobbyMaximum",
 			_("Combines blobbies using the Maximum operator."),
 			"Blobby",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

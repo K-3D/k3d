@@ -93,7 +93,7 @@ public:
 			"BlobbyAdd",
 			_("Combines blobbies using the Addition operator."),
 			"Blobby",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
