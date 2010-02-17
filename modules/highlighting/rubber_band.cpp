@@ -156,7 +156,7 @@ public:
 			"RubberBand",
 			_("Displays a rubber-band box in the viewport."),
 			"Annotation",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
