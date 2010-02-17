@@ -263,38 +263,32 @@ void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points)
 
 void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_t& PointMap)
 {
+	// Enforce preconditions ...
+	return_if_fail(Mesh.points);
+	return_if_fail(Mesh.point_selection);
+	return_if_fail(!Mesh.point_attributes.column_count() || Mesh.point_attributes.row_count() == Mesh.points->size());
+
 	// Count how many points will be left when we're done ...
 	const uint_t points_remaining = std::count(Points.begin(), Points.end(), false);
 
 	// Create a mapping from current point indices to indices after we've removed points ...
 	create_index_removal_map(Points, PointMap);
 
-	// Move leftover points (and point selections) into their final positions ...
+	// Move leftover points, point selections, and attributes into their final positions ...
 	mesh::points_t& points = Mesh.points.writable();
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
+	table_copier point_attributes(Mesh.point_attributes);
+
 	const uint_t point_begin = 0;
 	const uint_t point_end = point_begin + Points.size();
 	for(uint_t point = point_begin; point != point_end; ++point)
 	{
-		if(!Points[point])
-		{
-			points[PointMap[point]] = points[point];
-			point_selection[PointMap[point]] = point_selection[point];
-		}
-	}
-
-	// Move leftover attributes into their final positions ...
-	assert_error(Mesh.point_attributes.empty() || Mesh.point_attributes.row_count() == point_end);
-	if(Mesh.point_attributes.row_count() == point_end)
-	{
-		table_copier point_attributes(Mesh.point_attributes);
-		for(uint_t point = point_begin; point != point_end; ++point)
-		{
-			if(Points[point])
-				continue;
-
-			point_attributes.copy(point, PointMap[point]);
-		}
+		if(Points[point])
+			continue;
+		
+		points[PointMap[point]] = points[point];
+		point_selection[PointMap[point]] = point_selection[point];
+		point_attributes.copy(point, PointMap[point]);
 	}
 
 	// Update generic mesh primitives so they use the correct indices ...
