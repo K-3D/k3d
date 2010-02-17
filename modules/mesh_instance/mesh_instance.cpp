@@ -230,7 +230,7 @@ public:
 				"MeshInstance",
 				_("Renders an instance of a geometric mesh"),
 				"Mesh",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
