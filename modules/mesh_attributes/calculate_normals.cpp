@@ -56,7 +56,7 @@ public:
 		m_face(init_owner(*this) + init_name("face") + init_label(_("Face Normals")) + init_description(_("Generate per-face normals.")) + init_value(false)),
 		m_varying(init_owner(*this) + init_name("varying") + init_label(_("Varying Normals")) + init_description(_("Generate varying (per-vertex) normals.")) + init_value(true)),
 		m_vertex(init_owner(*this) + init_name("vertex") + init_label(_("Vertex Normals")) + init_description(_("Generate vertex normals.")) + init_value(false)),
-		m_face_array(init_owner(*this) + init_name("face_array") + init_label(_("Uniform Array Name")) + init_description(_("Face output array name.")) + init_value(k3d::string_t("N"))),
+		m_face_array(init_owner(*this) + init_name("face_array") + init_label(_("Face Array Name")) + init_description(_("Face output array name.")) + init_value(k3d::string_t("N"))),
 		m_varying_array(init_owner(*this) + init_name("varying_array") + init_label(_("Face-Varying Array Name")) + init_description(_("Varying output array name.")) + init_value(k3d::string_t("N"))),
 		m_vertex_array(init_owner(*this) + init_name("vertex_array") + init_label(_("Vertex Array Name")) + init_description(_("Vertex output array name.")) + init_value(k3d::string_t("N")))
 	{
@@ -203,7 +203,7 @@ public:
 				"CalculateNormals",
 				_("Calculates a variety of polygon normals"),
 				"Mesh",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
