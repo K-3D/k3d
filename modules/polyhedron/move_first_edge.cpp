@@ -87,7 +87,7 @@ public:
 				continue;
 
 			k3d::mesh::counts_t counts;
-			k3d::polyhedron::create_edge_count_lookup(polyhedron->loop_first_edges, polyhedron->clockwise_edges, counts);
+			k3d::polyhedron::create_loop_edge_count_lookup(*polyhedron, counts);
 
 			const k3d::uint_t face_begin = 0;
 			const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();

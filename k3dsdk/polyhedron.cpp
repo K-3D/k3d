@@ -1293,20 +1293,20 @@ void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::
 	}
 }
 
-void create_edge_count_lookup(const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::counts_t& Counts)
+void create_loop_edge_count_lookup(const const_primitive& Polyhedron, mesh::counts_t& LoopEdgeCounts)
 {
-	Counts.assign(LoopFirstEdges.size(), 0);
+	LoopEdgeCounts.assign(Polyhedron.loop_first_edges.size(), 0);
 
 	const uint_t loop_begin = 0;
-	const uint_t loop_end = loop_begin + LoopFirstEdges.size();
+	const uint_t loop_end = loop_begin + Polyhedron.loop_first_edges.size();
 	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 	{
-		const uint_t first_edge = LoopFirstEdges[loop];
+		const uint_t first_edge = Polyhedron.loop_first_edges[loop];
 		for(uint_t edge = first_edge; ;)
 		{
-			++Counts[loop];
+			++LoopEdgeCounts[loop];
 
-			edge = ClockwiseEdges[edge];
+			edge = Polyhedron.clockwise_edges[edge];
 			if(edge == first_edge)
 				break;
 		}

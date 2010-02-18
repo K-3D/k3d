@@ -202,8 +202,8 @@ void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mes
 /// Initializes an array for constant-time lookup from an edge to the face that owns it
 void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::indices_t& EdgeFaces);
 
-/// Initializes an array for constant-time lookup from a loop to its edge count
-void create_edge_count_lookup(const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::counts_t& Counts);
+/// Initializes an array for constant-time lookup from loops to edge counts
+void create_loop_edge_count_lookup(const const_primitive& Polyhedron, mesh::counts_t& LoopEdgeCounts);
 
 /// Initialize arrays for fast lookup from a vertex to its adjacent faces
 /** \deprecated Use the adjacency-list version of create_point_face_lookup() instead */
