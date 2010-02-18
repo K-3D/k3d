@@ -52,7 +52,7 @@
 #include <k3dsdk/irender_camera_animation.h>
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_camera_preview.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/network_render_farm.h>
@@ -738,7 +738,7 @@ private:
 			if(!perspective)
 				throw std::runtime_error("A perspective projection is required.");
 
-			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output());
+			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().matrix_source_output());
 			const k3d::point3 camera_from = k3d::position(camera_matrix);
 			const k3d::point3 camera_to = camera_from + (camera_matrix * k3d::vector3(0, 0, 1));
 			const k3d::vector3 camera_up = camera_matrix * k3d::vector3(0, 1, 0);

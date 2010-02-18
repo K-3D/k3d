@@ -530,7 +530,7 @@ void ContentPanel::renderInit()
                                             k3d::inode_collection_property
                                             ::nodes_t(0, (*node)));
         }//if
-      else if((*node)->factory().implements(typeid(k3d::itransform_sink)))
+      else if((*node)->factory().implements(typeid(k3d::imatrix_sink)))
         {
           k3d::property::set_internal_value(*m_engine, 
                                             "visible_nodes", 

@@ -23,7 +23,7 @@
 #include <k3dsdk/hints.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/iprojection.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>
@@ -323,7 +323,7 @@ void normal_cache::on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
 
 bool backfacing(const k3d::point3& Point, k3d::icamera& Camera, const k3d::normal3& Normal)
 {
-	k3d::point3 eye = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output()) * k3d::point3(0,0,0);
+	k3d::point3 eye = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().matrix_source_output()) * k3d::point3(0,0,0);
 	try
 	{
 		k3d::iperspective& perspective = dynamic_cast<k3d::iperspective&>(Camera.projection());

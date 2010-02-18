@@ -138,8 +138,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<snap,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 				k3d::uuid(0x176d4553, 0x65fc48ca, 0x845a8160, 0xd31b41ae),
 				"Snap",
 				_("Snaps one node to another"),

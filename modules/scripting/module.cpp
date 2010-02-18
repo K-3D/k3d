@@ -44,8 +44,8 @@ extern k3d::iplugin_factory& mesh_source_script_factory();
 extern k3d::iplugin_factory& null_output_script_factory();
 extern k3d::iplugin_factory& render_engine_script_factory();
 extern k3d::iplugin_factory& string_source_script_factory();
-extern k3d::iplugin_factory& transform_modifier_script_factory();
-extern k3d::iplugin_factory& transform_source_script_factory();
+extern k3d::iplugin_factory& matrix_modifier_script_factory();
+extern k3d::iplugin_factory& matrix_source_script_factory();
 extern k3d::iplugin_factory& vector3_source_script_factory();
 
 } // namespace scripting
@@ -67,8 +67,8 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::scripting::null_output_script_factory());
 	Registry.register_factory(module::scripting::render_engine_script_factory());
 	Registry.register_factory(module::scripting::string_source_script_factory());
-	Registry.register_factory(module::scripting::transform_modifier_script_factory());
-	Registry.register_factory(module::scripting::transform_source_script_factory());
+	Registry.register_factory(module::scripting::matrix_modifier_script_factory());
+	Registry.register_factory(module::scripting::matrix_source_script_factory());
 	Registry.register_factory(module::scripting::vector3_source_script_factory());
 K3D_MODULE_END
 

@@ -39,7 +39,7 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/basic_input_model.h>

@@ -60,7 +60,7 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<view,
-			k3d::interface_list<k3d::itransform_source> > factory(
+			k3d::interface_list<k3d::imatrix_source> > factory(
 				k3d::uuid(0x8c5f4eef, 0xa858499f, 0x83774152, 0x147b7fe2),
 				"MatrixView",
 				_("Generates a viewing matrix from a position, a look vector, and an up vector"),

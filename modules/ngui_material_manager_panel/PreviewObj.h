@@ -31,7 +31,7 @@
 #include <k3dsdk/properties.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/transform.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 #include <k3dsdk/irender_camera_frame.h>
 
 

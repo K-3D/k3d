@@ -46,8 +46,8 @@
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/ngui/application_state.h>
@@ -2155,7 +2155,7 @@ private:
 		return_if_fail(viewport_control);
 		k3d::icamera* camera = viewport_control->camera();
 
-		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().transform_source_output()));
+		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().matrix_source_output()));
 		const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 		const k3d::point3 world_target = boost::any_cast<k3d::point3>(camera->world_target().property_internal_value());
 		const double distance = k3d::distance(world_position, world_target);

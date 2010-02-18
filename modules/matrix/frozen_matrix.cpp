@@ -26,8 +26,8 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/hints.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/value_demand_storage.h>
@@ -43,8 +43,8 @@ namespace matrix
 
 class frozen_matrix :
 	public k3d::node,
-	public k3d::itransform_source,
-	public k3d::itransform_sink
+	public k3d::imatrix_source,
+	public k3d::imatrix_sink
 {
 	typedef k3d::node base;
 
@@ -63,12 +63,12 @@ public:
 		m_output.set_update_slot(sigc::mem_fun(*this, &frozen_matrix::execute));
 	}
 
-	k3d::iproperty& transform_source_output()
+	k3d::iproperty& matrix_source_output()
 	{
 		return m_output;
 	}
 
-	k3d::iproperty& transform_sink_input()
+	k3d::iproperty& matrix_sink_input()
 	{
 		return m_input;
 	}
@@ -76,8 +76,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<frozen_matrix,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 				k3d::classes::FrozenTransformation(),
 				"FrozenMatrix",
 				_("Stores an arbitrary transformation matrix"),

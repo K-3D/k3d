@@ -55,7 +55,7 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<inverse,
-			k3d::interface_list<k3d::itransform_sink, k3d::interface_list<k3d::itransform_source> > > factory(
+			k3d::interface_list<k3d::imatrix_sink, k3d::interface_list<k3d::imatrix_source> > > factory(
 			k3d::uuid(0x9582e25c, 0xcf41e6fb, 0xc796fd94, 0x35a89d33),
 			"MatrixInverse",
 			_("Computes the inverse of a matrix."),

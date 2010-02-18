@@ -40,7 +40,7 @@
 #include <k3dsdk/isnap_source.h>
 #include <k3dsdk/isnap_target.h>
 #include <k3dsdk/isnappable.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/interactive.h>
@@ -139,9 +139,9 @@ void snap_tool_detail::transform_target::start_transform()
 
 const k3d::matrix4 upstream_matrix(k3d::inode& Node)
 {
-	if(k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(&Node))
+	if(k3d::imatrix_sink* const downstream_sink = dynamic_cast<k3d::imatrix_sink*>(&Node))
 	{
-		if(k3d::iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_sink->transform_sink_input()))
+		if(k3d::iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_sink->matrix_sink_input()))
 			return boost::any_cast<k3d::matrix4>(upstream_output->property_internal_value());
 	}
 
@@ -1002,7 +1002,7 @@ void snap_tool_detail::get_current_selection()
 		{
 			if(!dynamic_cast<k3d::gl::irenderable*>(*node))
 				continue;
-			if(!dynamic_cast<k3d::itransform_sink*>(*node))
+			if(!dynamic_cast<k3d::imatrix_sink*>(*node))
 				continue;
 
 			m_targets.push_back(new transform_target(*node));

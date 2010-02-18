@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares itransform_source, an interface for objects that can act as a source of transformation data
+		\brief Declares imatrix_source, an interface for objects that can act as a source of transformation data
 		\author Tim Shead (tshead@k-3d.com)
 */
 
@@ -34,17 +34,17 @@ namespace k3d
 class iproperty;
 
 /// Abstract interface for objects that can act as a source of transformation data
-class itransform_source :
+class imatrix_source :
 	public virtual iunknown
 {
 public:
-	virtual iproperty& transform_source_output() = 0;
+	virtual iproperty& matrix_source_output() = 0;
 
 protected:
-	itransform_source() {}
-	itransform_source(const itransform_source& Other) : iunknown(Other) {}
-	itransform_source& operator=(const itransform_source&) { return *this; }
-	virtual ~itransform_source() {}
+	imatrix_source() {}
+	imatrix_source(const imatrix_source& Other) : iunknown(Other) {}
+	imatrix_source& operator=(const imatrix_source&) { return *this; }
+	virtual ~imatrix_source() {}
 };
 
 } // namespace k3d

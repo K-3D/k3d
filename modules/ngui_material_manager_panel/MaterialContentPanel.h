@@ -27,7 +27,7 @@
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/image_toggle_button.h>
 #include <k3dsdk/ngui/text.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 
 #include "ContentPanel.h"
 #include "MaterialObj.h"

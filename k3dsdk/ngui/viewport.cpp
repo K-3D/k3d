@@ -38,7 +38,7 @@
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/linear_curve.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/ngui/document_state.h>

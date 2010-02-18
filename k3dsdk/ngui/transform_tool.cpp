@@ -46,8 +46,8 @@
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iprojection.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/properties.h>
@@ -391,9 +391,9 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 		// Check for an existing transform modifier
 		k3d::inode* upstream_node = 0;
 		
-		k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(node);
+		k3d::imatrix_sink* const downstream_sink = dynamic_cast<k3d::imatrix_sink*>(node);
 		return_val_if_fail(downstream_sink, false);
-		k3d::iproperty& downstream_input = downstream_sink->transform_sink_input();
+		k3d::iproperty& downstream_input = downstream_sink->matrix_sink_input();
 		k3d::iproperty* upstream_output = node->document().pipeline().dependency(downstream_input);
 
 		// Check upstream object
@@ -425,8 +425,8 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 				return_val_if_fail(modifier, false);
 			
 				k3d::ipipeline::dependencies_t dependencies;
-				dependencies.insert(std::make_pair(&dynamic_cast<k3d::itransform_sink*>(modifier)->transform_sink_input(), upstream_output));
-				dependencies.insert(std::make_pair(&downstream_input2, &dynamic_cast<k3d::itransform_source*>(modifier)->transform_source_output()));
+				dependencies.insert(std::make_pair(&dynamic_cast<k3d::imatrix_sink*>(modifier)->matrix_sink_input(), upstream_output));
+				dependencies.insert(std::make_pair(&downstream_input2, &dynamic_cast<k3d::imatrix_source*>(modifier)->matrix_source_output()));
 				node->document().pipeline().set_dependencies(dependencies);
 			
 				return true;
@@ -1211,7 +1211,7 @@ void transform_tool::get_current_selection()
 		{
 			if(!dynamic_cast<k3d::gl::irenderable*>(*node))
 				continue;
-			if(!dynamic_cast<k3d::itransform_sink*>(*node))
+			if(!dynamic_cast<k3d::imatrix_sink*>(*node))
 				continue;
 
 			m_targets.push_back(new transform_target(*node));

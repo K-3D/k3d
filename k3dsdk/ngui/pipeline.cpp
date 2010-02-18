@@ -37,8 +37,8 @@
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/ireset_properties.h>
 #include <k3dsdk/itime_sink.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/modifiers.h>
 #include <k3dsdk/ngui/panel_mediator.h>
@@ -319,13 +319,13 @@ void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocum
 	frozen_transformation->set_name(k3d::unique_name(Document.nodes(), ToNode.name() + " Transformation"));
 
 	// Connect new FrozenTransformation and ToNode
-	k3d::itransform_sink* const transformation_sink = dynamic_cast<k3d::itransform_sink*>(&ToNode);
+	k3d::imatrix_sink* const transformation_sink = dynamic_cast<k3d::imatrix_sink*>(&ToNode);
 	return_if_fail(transformation_sink);
-	k3d::itransform_source* const transformation_source = dynamic_cast<k3d::itransform_source*>(frozen_transformation);
+	k3d::imatrix_source* const transformation_source = dynamic_cast<k3d::imatrix_source*>(frozen_transformation);
 	return_if_fail(transformation_source);
 
 	k3d::ipipeline::dependencies_t dependencies;
-	dependencies.insert(std::make_pair(&transformation_sink->transform_sink_input(), &transformation_source->transform_source_output()));
+	dependencies.insert(std::make_pair(&transformation_sink->matrix_sink_input(), &transformation_source->matrix_source_output()));
 	Document.pipeline().set_dependencies(dependencies);
 
 	// Copy transformation value
@@ -356,12 +356,12 @@ inode* instantiate_mesh(idocument& Document, inode& Node)
 			mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), Document, k3d::unique_name(Document.nodes(), Node.name() + " Instance"));
 			
 		k3d::iproperty* instance_mesh_source_property = &dynamic_cast<k3d::imesh_source*>(mesh_instance)->mesh_source_output();
-		k3d::iproperty* instance_transform_source_property = &dynamic_cast<k3d::itransform_source*>(mesh_instance)->transform_source_output();
+		k3d::iproperty* instance_matrix_source_property = &dynamic_cast<k3d::imatrix_source*>(mesh_instance)->matrix_source_output();
 		
-		k3d::itransform_source* transform_source = dynamic_cast<k3d::itransform_source*>(&Node);
-		k3d::iproperty* transform_source_property = 0;
-		if(transform_source)
-			transform_source_property = &(transform_source->transform_source_output());
+		k3d::imatrix_source* matrix_source = dynamic_cast<k3d::imatrix_source*>(&Node);
+		k3d::iproperty* matrix_source_property = 0;
+		if(matrix_source)
+			matrix_source_property = &(matrix_source->matrix_source_output());
 		
 		// Connect the MeshInstance outputs to the inputs of the downstream node, if any
 		k3d::ipipeline::dependencies_t new_dependencies;
@@ -372,10 +372,10 @@ inode* instantiate_mesh(idocument& Document, inode& Node)
 				dependency->first->property_set_dependency(0);
 				new_dependencies.insert(std::make_pair(dependency->first, instance_mesh_source_property));
 			}
-			if(transform_source_property && dependency->second == transform_source_property)
+			if(matrix_source_property && dependency->second == matrix_source_property)
 			{
 				dependency->first->property_set_dependency(0);
-				new_dependencies.insert(std::make_pair(dependency->first, instance_transform_source_property));
+				new_dependencies.insert(std::make_pair(dependency->first, instance_matrix_source_property));
 			}
 		}
 		pipeline.set_dependencies(new_dependencies);

@@ -21,7 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Declares itransform_sink, an interface for objects that can act as consumers of transform data
+		\brief Declares imatrix_sink, an interface for objects that can act as consumers of transform data
 		\author Tim Shead (tshead@k-3d.com)
 */
 
@@ -34,17 +34,17 @@ namespace k3d
 class iproperty;
 
 /// Abstract interface for objects that can act as consumers of transformation data
-class itransform_sink :
+class imatrix_sink :
 	public virtual iunknown
 {
 public:
-	virtual iproperty& transform_sink_input() = 0;
+	virtual iproperty& matrix_sink_input() = 0;
 
 protected:
-	itransform_sink() {}
-	itransform_sink(const itransform_sink& Other) : iunknown(Other) {}
-	itransform_sink& operator=(const itransform_sink&) { return *this; }
-	virtual ~itransform_sink() {}
+	imatrix_sink() {}
+	imatrix_sink(const imatrix_sink& Other) : iunknown(Other) {}
+	imatrix_sink& operator=(const imatrix_sink&) { return *this; }
+	virtual ~imatrix_sink() {}
 };
 
 } // namespace k3d

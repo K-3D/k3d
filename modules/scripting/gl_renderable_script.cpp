@@ -79,8 +79,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<gl_renderable_script,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 			k3d::uuid(0xd57c84cc, 0xa9474b12, 0xa344763c, 0x8f4e7c8e),
 			"GLRenderableScript",
 			_("Scripted OpenGL Drawable"),

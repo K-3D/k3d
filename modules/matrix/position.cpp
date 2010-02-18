@@ -64,8 +64,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<position,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 				k3d::classes::Position(),
 				"MatrixPosition",
 				_("Creates a position transform matrix"),

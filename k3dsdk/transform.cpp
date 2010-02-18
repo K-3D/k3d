@@ -29,8 +29,8 @@
 #include <k3dsdk/ikeyframer.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iparentable.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/transform.h>
@@ -45,10 +45,10 @@ namespace detail
 
 const matrix4 upstream_matrix(inode& Node)
 {
-	itransform_sink* const downstream_sink = dynamic_cast<itransform_sink*>(&Node);
+	imatrix_sink* const downstream_sink = dynamic_cast<imatrix_sink*>(&Node);
 	return_val_if_fail(downstream_sink, k3d::identity3());
 
-	iproperty& downstream_input = downstream_sink->transform_sink_input();
+	iproperty& downstream_input = downstream_sink->matrix_sink_input();
 	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 	if(upstream_output)
 		return boost::any_cast<k3d::matrix4>(upstream_output->property_internal_value());
@@ -58,10 +58,10 @@ const matrix4 upstream_matrix(inode& Node)
 
 inode* upstream_frozen_transformation(inode& Node)
 {
-	itransform_sink* const downstream_sink = dynamic_cast<itransform_sink*>(&Node);
+	imatrix_sink* const downstream_sink = dynamic_cast<imatrix_sink*>(&Node);
 	return_val_if_fail(downstream_sink, 0);
 
-	iproperty& downstream_input = downstream_sink->transform_sink_input();
+	iproperty& downstream_input = downstream_sink->matrix_sink_input();
 	iproperty* upstream_output = Node.document().pipeline().dependency(downstream_input);
 	
 	// Return the directly connected transformation matrix, if there is one
@@ -85,21 +85,21 @@ inode* upstream_frozen_transformation(inode& Node)
 
 inode* insert_transform_modifier(inode& Node)
 {
-	itransform_sink* const downstream_sink = dynamic_cast<itransform_sink*>(&Node);
+	imatrix_sink* const downstream_sink = dynamic_cast<imatrix_sink*>(&Node);
 	return_val_if_fail(downstream_sink, 0);
 
-	iproperty& downstream_input = downstream_sink->transform_sink_input();
+	iproperty& downstream_input = downstream_sink->matrix_sink_input();
 	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 
 	inode* const modifier = plugin::create<inode>(classes::FrozenTransformation(), Node.document(), _("Transformation"));
 	return_val_if_fail(modifier, 0);
-	itransform_sink* const modifier_sink = dynamic_cast<itransform_sink*>(modifier);
+	imatrix_sink* const modifier_sink = dynamic_cast<imatrix_sink*>(modifier);
 	return_val_if_fail(modifier_sink, 0);
-	itransform_source* const modifier_source = dynamic_cast<itransform_source*>(modifier);
+	imatrix_source* const modifier_source = dynamic_cast<imatrix_source*>(modifier);
 
 	ipipeline::dependencies_t dependencies;
-	dependencies.insert(std::make_pair(&modifier_sink->transform_sink_input(), upstream_output));
-	dependencies.insert(std::make_pair(&downstream_input, &modifier_source->transform_source_output()));
+	dependencies.insert(std::make_pair(&modifier_sink->matrix_sink_input(), upstream_output));
+	dependencies.insert(std::make_pair(&downstream_input, &modifier_source->matrix_source_output()));
 	Node.document().pipeline().set_dependencies(dependencies);
 
 	return modifier;

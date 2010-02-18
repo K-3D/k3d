@@ -37,7 +37,7 @@
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/properties.h>

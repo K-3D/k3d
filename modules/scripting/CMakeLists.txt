@@ -12,8 +12,8 @@ K3D_COMPILE_RESOURCE(RESOURCES mesh_source_script.py "/module/scripting/mesh_sou
 K3D_COMPILE_RESOURCE(RESOURCES null_output_script.py "/module/scripting/null_output_script.py")
 K3D_COMPILE_RESOURCE(RESOURCES render_engine_script.py "/module/scripting/render_engine_script.py")
 K3D_COMPILE_RESOURCE(RESOURCES string_source_script.py "/module/scripting/string_source_script.py")
-K3D_COMPILE_RESOURCE(RESOURCES transform_modifier_script.py "/module/scripting/transform_modifier_script.py")
-K3D_COMPILE_RESOURCE(RESOURCES transform_source_script.py "/module/scripting/transform_source_script.py")
+K3D_COMPILE_RESOURCE(RESOURCES matrix_modifier_script.py "/module/scripting/matrix_modifier_script.py")
+K3D_COMPILE_RESOURCE(RESOURCES matrix_source_script.py "/module/scripting/matrix_source_script.py")
 K3D_COMPILE_RESOURCE(RESOURCES vector3_source_script.py "/module/scripting/vector3_source_script.py")
 
 K3D_BUILD_MODULE(k3d-scripting EXTRA_SOURCES ${RESOURCES})

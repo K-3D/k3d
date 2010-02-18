@@ -55,8 +55,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<look,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 				k3d::uuid(0x4e2a30f5, 0x6d7d47ad, 0x943ccd36, 0x4b305b55),
 				"MatrixLook",
 				_("Creates a transformation matrix that looks from one to another."),

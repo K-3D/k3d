@@ -98,8 +98,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<sun_light,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 				k3d::uuid(0x9a48777d, 0xa68345b5, 0xacb9fc07, 0x8af3e7f6),
 				"YafraySunLight",
 				_("Yafray Sun Light"),
