@@ -35,13 +35,13 @@
 namespace module
 {
 
-namespace core
+namespace matrix
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// frozen_transformation
+// frozen_matrix
 
-class frozen_transformation :
+class frozen_matrix :
 	public k3d::node,
 	public k3d::itransform_source,
 	public k3d::itransform_sink
@@ -49,7 +49,7 @@ class frozen_transformation :
 	typedef k3d::node base;
 
 public:
-	frozen_transformation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	frozen_matrix(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_input(init_owner(*this) + init_name("input_matrix") + init_label(_("Input matrix")) + init_description(_("Input matrix")) + init_value(k3d::identity3())),
 		m_matrix(init_owner(*this) + init_name("matrix") + init_label(_("Matrix")) + init_description(_("Transformation matrix")) + init_value(k3d::identity3())),
@@ -60,7 +60,7 @@ public:
 		m_matrix.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_output.make_slot()));
 
-		m_output.set_update_slot(sigc::mem_fun(*this, &frozen_transformation::execute));
+		m_output.set_update_slot(sigc::mem_fun(*this, &frozen_matrix::execute));
 	}
 
 	k3d::iproperty& transform_source_output()
@@ -75,11 +75,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<frozen_transformation,
+		static k3d::document_plugin_factory<frozen_matrix,
 			k3d::interface_list<k3d::itransform_source,
 			k3d::interface_list<k3d::itransform_sink > > > factory(
 				k3d::classes::FrozenTransformation(),
-				"FrozenTransformation",
+				"FrozenMatrix",
 				_("Stores an arbitrary transformation matrix"),
 				"Transform",
 				k3d::iplugin_factory::STABLE);
@@ -101,14 +101,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// frozen_transformation_factory
+// frozen_matrix_factory
 
-k3d::iplugin_factory& frozen_transformation_factory()
+k3d::iplugin_factory& frozen_matrix_factory()
 {
-	return frozen_transformation::get_factory();
+	return frozen_matrix::get_factory();
 }
 
-} // namespace core
+} // namespace matrix
 
 } // namespace module
 

@@ -32,16 +32,10 @@ namespace core
 extern k3d::iplugin_factory& axes_factory();
 extern k3d::iplugin_factory& camera_factory();
 extern k3d::iplugin_factory& color_property_factory();
-extern k3d::iplugin_factory& frozen_transformation_factory();
-extern k3d::iplugin_factory& look_at_factory();
 extern k3d::iplugin_factory& multi_material_factory();
 extern k3d::iplugin_factory& null_factory();
-extern k3d::iplugin_factory& orientation_factory();
-extern k3d::iplugin_factory& position_factory();
 extern k3d::iplugin_factory& print_stdout_factory();
-extern k3d::iplugin_factory& scale_factory();
 extern k3d::iplugin_factory& snap_factory();
-extern k3d::iplugin_factory& view_matrix_factory();
 
 } // namespace core
 
@@ -51,15 +45,9 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::core::axes_factory());
 	Registry.register_factory(module::core::camera_factory());
 	Registry.register_factory(module::core::color_property_factory());
-	Registry.register_factory(module::core::frozen_transformation_factory());
-	Registry.register_factory(module::core::look_at_factory());
 	Registry.register_factory(module::core::multi_material_factory());
 	Registry.register_factory(module::core::null_factory());
-	Registry.register_factory(module::core::orientation_factory());
-	Registry.register_factory(module::core::position_factory());
 	Registry.register_factory(module::core::print_stdout_factory());
-	Registry.register_factory(module::core::scale_factory());
 	Registry.register_factory(module::core::snap_factory());
-	Registry.register_factory(module::core::view_matrix_factory());
 K3D_MODULE_END
 

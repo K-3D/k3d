@@ -29,13 +29,25 @@ namespace module
 namespace matrix
 {
 
-extern k3d::iplugin_factory& invert_matrix_factory();
+extern k3d::iplugin_factory& frozen_matrix_factory();
+extern k3d::iplugin_factory& inverse_factory();
+extern k3d::iplugin_factory& look_factory();
+extern k3d::iplugin_factory& orientation_factory();
+extern k3d::iplugin_factory& position_factory();
+extern k3d::iplugin_factory& scale_factory();
+extern k3d::iplugin_factory& view_factory();
 
 } // namespace matrix
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::matrix::invert_matrix_factory());
+	Registry.register_factory(module::matrix::frozen_matrix_factory());
+	Registry.register_factory(module::matrix::inverse_factory());
+	Registry.register_factory(module::matrix::look_factory());
+	Registry.register_factory(module::matrix::orientation_factory());
+	Registry.register_factory(module::matrix::position_factory());
+	Registry.register_factory(module::matrix::scale_factory());
+	Registry.register_factory(module::matrix::view_factory());
 K3D_MODULE_END
 

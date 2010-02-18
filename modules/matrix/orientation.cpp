@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,38 +18,38 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/transformable.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/transformable.h>
 
 namespace module
 {
 
-namespace core
+namespace matrix
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// scale
+// orientation
 
-class scale :
+class orientation :
 	public k3d::transformable<k3d::node >
 {
 	typedef k3d::transformable<k3d::node > base;
 
 public:
-	scale(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	orientation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_space(init_owner(*this) + init_name("space") + init_label(_("Coordinate space")) + init_description(_("Coordinate space (matrix)")) + init_value(k3d::identity3())),
-		m_x(init_owner(*this) + init_name("x") + init_label(_("X")) + init_description(_("X scaling")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
-		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y scaling")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
-		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z scaling")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar)))
+		m_space(init_owner(*this) + init_name("space") + init_label(_("Coordinate space")) + init_description(_("Coordinate space")) + init_value(k3d::identity3())),
+		m_x(init_owner(*this) + init_name("x") + init_label(_("X")) + init_description(_("X rotation angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
+		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y rotation angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
+		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z rotation angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
 	{
 		m_space.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_matrix_slot()));
@@ -63,12 +63,12 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<scale,
+		static k3d::document_plugin_factory<orientation,
 			k3d::interface_list<k3d::itransform_source,
 			k3d::interface_list<k3d::itransform_sink > > > factory(
-				k3d::classes::Scale(),
-				"Scale",
-				_("Creates a scale transform matrix"),
+				k3d::classes::Orientation(),
+				"MatrixOrientation",
+				_("Creates an orientation transform matrix"),
 				"Transform",
 				k3d::iplugin_factory::STABLE);
 
@@ -83,20 +83,20 @@ private:
 
 	void on_update_matrix(const k3d::matrix4& Input, k3d::matrix4& Output)
 	{
-		Output = Input * m_space.pipeline_value() * k3d::scale3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value()) * k3d::inverse(m_space.pipeline_value());
+		Output = Input * m_space.pipeline_value() * rotate3(k3d::point3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value())) * k3d::inverse(m_space.pipeline_value());
 	}
 
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// scale_factory
+// orientation_factory
 
-k3d::iplugin_factory& scale_factory()
+k3d::iplugin_factory& orientation_factory()
 {
-	return scale::get_factory();
+	return orientation::get_factory();
 }
 
-} // namespace core
+} // namespace matrix
 
 } // namespace module
 

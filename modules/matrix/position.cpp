@@ -32,7 +32,7 @@
 namespace module
 {
 
-namespace core
+namespace matrix
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ public:
 			k3d::interface_list<k3d::itransform_source,
 			k3d::interface_list<k3d::itransform_sink > > > factory(
 				k3d::classes::Position(),
-				"Position",
+				"MatrixPosition",
 				_("Creates a position transform matrix"),
 				"Transform",
 				k3d::iplugin_factory::STABLE);
@@ -96,7 +96,7 @@ k3d::iplugin_factory& position_factory()
 	return position::get_factory();
 }
 
-} // namespace core
+} // namespace matrix
 
 } // namespace module
 

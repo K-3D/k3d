@@ -32,19 +32,19 @@
 namespace module
 {
 
-namespace core
+namespace matrix
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// look_at
+// look
 
-class look_at :
+class look :
 	public k3d::transformable<k3d::node >
 {
 	typedef k3d::transformable<k3d::node > base;
 
 public:
-	look_at(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	look(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_target(init_owner(*this) + init_name("target_matrix") + init_label(_("Target matrix")) + init_description(_("Target matrix")) + init_value(k3d::identity3()))
 	{
@@ -54,12 +54,12 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<look_at,
+		static k3d::document_plugin_factory<look,
 			k3d::interface_list<k3d::itransform_source,
 			k3d::interface_list<k3d::itransform_sink > > > factory(
 				k3d::uuid(0x4e2a30f5, 0x6d7d47ad, 0x943ccd36, 0x4b305b55),
-				"LookAt",
-				_("Orients a transformation matrix to look at another"),
+				"MatrixLook",
+				_("Creates a transformation matrix that looks from one to another."),
 				"Transform",
 				k3d::iplugin_factory::STABLE);
 
@@ -82,14 +82,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// look_at_factory
+// look_factory
 
-k3d::iplugin_factory& look_at_factory()
+k3d::iplugin_factory& look_factory()
 {
-	return look_at::get_factory();
+	return look::get_factory();
 }
 
-} // namespace core
+} // namespace matrix
 
 } // namespace module
 

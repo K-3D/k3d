@@ -31,19 +31,19 @@
 namespace module
 {
 
-namespace core
+namespace matrix
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// view_matrix
+// view
 
-class view_matrix :
+class view :
 	public k3d::transformable<k3d::node >
 {
 	typedef k3d::transformable<k3d::node > base;
 
 public:
-	view_matrix(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	view(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_position(init_owner(*this) + init_name("position") + init_label(_("Position")) + init_description(_("Position")) + init_value(k3d::identity3())),
 		m_look(init_owner(*this) + init_name("look") + init_label(_("Look Position")) + init_description(_("Look Position")) + init_value(k3d::translate3(k3d::vector3(0, 0, 1)))),
@@ -59,11 +59,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<view_matrix,
+		static k3d::document_plugin_factory<view,
 			k3d::interface_list<k3d::itransform_source> > factory(
 				k3d::uuid(0x8c5f4eef, 0xa858499f, 0x83774152, 0x147b7fe2),
-				"ViewMatrix",
-				_("Generates a transformation matrix from a position, a look vector, and an up vector"),
+				"MatrixView",
+				_("Generates a viewing matrix from a position, a look vector, and an up vector"),
 				"Transform",
 				k3d::iplugin_factory::STABLE);
 
@@ -86,14 +86,14 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// view_matrix_factory
+// view_factory
 
-k3d::iplugin_factory& view_matrix_factory()
+k3d::iplugin_factory& view_factory()
 {
-	return view_matrix::get_factory();
+	return view::get_factory();
 }
 
-} // namespace core
+} // namespace matrix
 
 } // namespace module
 

@@ -34,15 +34,15 @@ namespace matrix
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// invert_matrix
+// inverse
 
-class invert_matrix :
+class inverse :
 	public k3d::transformable<k3d::node >
 {
 	typedef k3d::transformable<k3d::node > base;
 
 public:
-	invert_matrix(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	inverse(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -54,13 +54,13 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<invert_matrix,
+		static k3d::document_plugin_factory<inverse,
 			k3d::interface_list<k3d::itransform_sink, k3d::interface_list<k3d::itransform_source> > > factory(
 			k3d::uuid(0x9582e25c, 0xcf41e6fb, 0xc796fd94, 0x35a89d33),
-			"InvertMatrix",
-			_("Inverts a matrix mathematically speaking"),
+			"MatrixInverse",
+			_("Computes the inverse of a matrix."),
 			"Matrix",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
@@ -73,11 +73,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// invert_matrix_factory
+// inverse_factory
 
-k3d::iplugin_factory& invert_matrix_factory()
+k3d::iplugin_factory& inverse_factory()
 {
-	return invert_matrix::get_factory();
+	return inverse::get_factory();
 }
 
 } // namespace matrix

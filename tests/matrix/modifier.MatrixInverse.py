@@ -29,7 +29,7 @@ row = matrix[1]; row[0] = 2; row[1] = 2; row[2] =  2; row[3] = 3; matrix[1] = ro
 row = matrix[2]; row[0] = 3; row[1] = 7; row[2] =  2; row[3] = 2; matrix[2] = row
 row = matrix[3]; row[0] = 4; row[1] = 8; row[2] =  4; row[3] = 1; matrix[3] = row
 
-setup = setup_matrix_modifier_test("InvertMatrix", matrix)
+setup = setup_matrix_modifier_test("MatrixInverse", matrix)
 
 matrix_compare = k3d.matrix4()
 row = matrix_compare[0]; row[0] = -0.525; row[1] = 0.45;  row[2] =  0.475; row[3] = -0.20000000000000007; matrix_compare[0] = row
