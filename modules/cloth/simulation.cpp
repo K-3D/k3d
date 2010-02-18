@@ -40,12 +40,12 @@ namespace module
 namespace cloth
 {
 
-class cloth_plugin :
+class simulation :
 	public k3d::mesh_deformation_modifier
 {
 	typedef k3d::mesh_deformation_modifier base;
 public:
-	cloth_plugin(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	simulation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_time(init_owner(*this) + init_name("time") + init_label(_("Time")) + init_description(_("Controls the current time displayed in the viewports.")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::time))),
 		m_damping(init_owner(*this) + init_name("damping") + init_label(_("Damping")) + init_description(_("Damping of cloth")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
@@ -58,7 +58,7 @@ public:
 		first_time = true;
 	}
 
-	~cloth_plugin()
+	~simulation()
 	{
 		k3d::log() << debug << "ClothModifier plug-in terminated" << std::endl;
 	}
@@ -91,13 +91,13 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<cloth_plugin,
+		static k3d::document_plugin_factory<simulation,
 				k3d::interface_list<k3d::imesh_source,
 				k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0xd6a72aa4, 0x9e426c45, 0x2429eaab, 0x634a2ff8),
-				"ClothModifier",
-				_("Cloth Simulation Modifier(currently for grids only)"),
 				"ClothSimulation",
+				_("Cloth simulation (currently for grids only)"),
+				"Simulation",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
@@ -115,7 +115,7 @@ public:
 } // namespace module
 
 K3D_MODULE_START(Registry)
-        Registry.register_factory(module::cloth::cloth_plugin::get_factory());
+        Registry.register_factory(module::cloth::simulation::get_factory());
 K3D_MODULE_END
 
 

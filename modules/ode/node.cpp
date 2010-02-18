@@ -152,7 +152,7 @@ public:
 				k3d::uuid(0x8d0deddb, 0x10409128, 0x04d1b2b1, 0x62c4cda1),
 				"ODEPhysicalNode",
 				_("Rigid-body dynamics object."),
-				"ODE",
+				"Simulation",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
