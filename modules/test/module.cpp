@@ -35,6 +35,7 @@ extern k3d::iplugin_factory& mesh_diff_factory();
 extern k3d::iplugin_factory& mesh_to_stdout_factory();
 extern k3d::iplugin_factory& pipeline_profiler_factory();
 extern k3d::iplugin_factory& selection_to_stdout_factory();
+extern k3d::iplugin_factory& string_to_stdout_factory();
 extern k3d::iplugin_factory& valid_meshes_factory();
 
 } // namespace test
@@ -48,6 +49,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::test::mesh_to_stdout_factory());
 	Registry.register_factory(module::test::pipeline_profiler_factory());
 	Registry.register_factory(module::test::selection_to_stdout_factory());
+	Registry.register_factory(module::test::string_to_stdout_factory());
 	Registry.register_factory(module::test::valid_meshes_factory());
 K3D_MODULE_END
 

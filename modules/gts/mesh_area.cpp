@@ -75,7 +75,7 @@ public:
 				k3d::uuid(0x9a340565, 0x47498847, 0x8979d2a1, 0x25f072d9),
 				"GTSMeshArea",
 				_("Calculates input mesh area"),
-				"Metrics",
+				"Mesh",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

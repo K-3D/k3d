@@ -31,19 +31,19 @@
 namespace module
 {
 
-namespace core
+namespace test
 {
 
-class print_stdout :
+class string_to_stdout :
 	public k3d::node
 {
 	typedef k3d::node base;
 public:
-	print_stdout(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	string_to_stdout(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_input(init_owner(*this) + init_name("input") + init_label(_("Input")) + init_description(_("Prints input string to console's stdout")) + init_value(std::string("")))
 	{
-		m_input.changed_signal().connect(sigc::mem_fun(*this, &print_stdout::on_input_changed));
+		m_input.changed_signal().connect(sigc::mem_fun(*this, &string_to_stdout::on_input_changed));
 	}
 
 	void on_input_changed(k3d::iunknown*)
@@ -53,11 +53,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<print_stdout > factory(
+		static k3d::document_plugin_factory<string_to_stdout > factory(
 			k3d::uuid(0x9fdbe940, 0x7f394ad7, 0x8654d53c, 0xe33b7a9a),
-			"PrintStdout",
+			"StringToStdout",
 			_("Prints an input string value to stdout"),
-			"Scalar",
+			"Test",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -67,12 +67,12 @@ private:
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_input;
 };
 
-k3d::iplugin_factory& print_stdout_factory()
+k3d::iplugin_factory& string_to_stdout_factory()
 {
-	return print_stdout::get_factory();
+	return string_to_stdout::get_factory();
 }
 
-} //namespace core
+} //namespace test
 
 } // namespace module
 

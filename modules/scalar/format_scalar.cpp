@@ -60,7 +60,7 @@ public:
 			k3d::uuid(0x3af7d777, 0x691d41b0, 0xaa801d59, 0x7ee4180e),
 			"FormatScalar",
 			_("Converts a scalar to a string using printf() style formatting"),
-			"Scalar",
+			"Scalar String",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

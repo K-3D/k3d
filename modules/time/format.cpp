@@ -61,7 +61,7 @@ public:
 			k3d::uuid(0x40d699fb, 0xeb12444f, 0xa84df477, 0x5cca00f9),
 			"FormatTime",
 			_("Converts a scalar to a string using strftime()-style formatting"),
-			"Scalar",
+			"String",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
