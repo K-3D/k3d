@@ -33,12 +33,12 @@ namespace scalar
 {
 
 /// Takes two doubles as input and produce their sum as output
-class scalar_add :
+class add :
 	public k3d::scalar_source
 {
 	typedef k3d::scalar_source base;
 public:
-	scalar_add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	add(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, _("Sum of inputs.")),
 		m_input1(init_owner(*this) + init_name("input1") + init_label(_("Input 1")) + init_description(_("First input float")) + init_value(0.0)),
 		m_input2(init_owner(*this) + init_name("input2") + init_label(_("Input 2")) + init_description(_("Second input float")) + init_value(0.0))
@@ -51,11 +51,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<scalar_add > factory(
+		static k3d::document_plugin_factory<add > factory(
 			k3d::uuid(0xe2d5e227, 0x98a6424f, 0xae607c8c, 0xc4e99bec),
-			"ScalarAdd",
-			_("Add two scalar inputs and produce their sum as output"),
-			"Scalar",
+			"DoubleAdd",
+			_("Add two double inputs and produce their sum as output"),
+			"Double",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -71,9 +71,9 @@ private:
 	}
 };
 
-k3d::iplugin_factory& scalar_add_factory()
+k3d::iplugin_factory& add_factory()
 {
-	return scalar_add::get_factory();
+	return add::get_factory();
 }
 
 } //namespace scalar

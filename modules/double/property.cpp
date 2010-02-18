@@ -33,13 +33,13 @@ namespace module
 namespace scalar
 {
 
-class scalar_property :
+class property :
 	public k3d::node
 {
 	typedef k3d::node base;
 
 public:
-	scalar_property(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	property(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_value(init_owner(*this) + init_name("value") + init_label(_("Output value")) + init_description(_("Outputs the value exposed by this property")) + init_value(1.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)))
 	{
@@ -47,11 +47,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<scalar_property > factory(
+		static k3d::document_plugin_factory<property > factory(
 			k3d::uuid(0x35b28760,0x0547458f,0xb4e3d324,0x84ae3545),
-			"ScalarProperty",
-			_("Provides a source object to link scalar properties to"),
-			"Scalar",
+			"DoubleProperty",
+			_("Provides a source object to link double properties to"),
+			"Double",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -62,9 +62,9 @@ private:
 	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_value;
 };
 
-k3d::iplugin_factory& scalar_property_factory()
+k3d::iplugin_factory& property_factory()
 {
-	return scalar_property::get_factory();
+	return property::get_factory();
 }
 
 } //namespace scalar

@@ -32,14 +32,14 @@ namespace module
 namespace scalar
 {
 
-/// An object that take two doubles as input and produce their product as output
-class scalar_multiply :
+/// An object that take two doubles as input and produce their quotient as output
+class divide :
 	public k3d::scalar_source
 {
 	typedef k3d::scalar_source base;
 public:
-	scalar_multiply(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document, _("Product of inputs.")),
+	divide(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+		base(Factory, Document, _("Quotient of inputs")),
 		m_input1(init_owner(*this) + init_name("input1") + init_label(_("Input 1")) + init_description(_("First input float")) + init_value(0.0)),
 		m_input2(init_owner(*this) + init_name("input2") + init_label(_("Input 2")) + init_description(_("Second input float")) + init_value(1.0))
 	{
@@ -49,33 +49,34 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_value_slot()));
 	}
 
-	// return the factory at module registration time
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<scalar_multiply > factory(
-			k3d::uuid(0xd5d068d2, 0xb4f2470d, 0xb99280ae, 0x1b092e59),
-			"ScalarMultiply",
-			_("Multiply two scalar inputs and produce their product as output"),
-			"Scalar",
+		static k3d::document_plugin_factory<divide > factory(
+			k3d::uuid(0xa797e7a9, 0x237f45a8, 0xa6ee43b3, 0xfd58596f),
+			"DoubleDivide",
+			_("Divide two double inputs and produce their quotient as output"),
+			"Double",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
 
-	// Implementation of the factory method required by the k3dinode interface:
 private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_input1;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_input2;
 
 	void on_update_value(k3d::double_t& Output)
 	{
-		Output = m_input1.pipeline_value() * m_input2.pipeline_value();
+		const k3d::double_t input1 = m_input1.pipeline_value();
+		const k3d::double_t input2 = m_input2.pipeline_value();
+
+		Output = input2 != 0 ?  input1 / input2 : input1;
 	}
 };
 
-k3d::iplugin_factory& scalar_multiply_factory()
+k3d::iplugin_factory& divide_factory()
 {
-	return scalar_multiply::get_factory();
+	return divide::get_factory();
 }
 
 } //namespace scalar

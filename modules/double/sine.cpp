@@ -35,12 +35,12 @@ namespace scalar
 {
 
 /// Applies the sine() operator to input value
-class scalar_sine :
+class sine :
 	public k3d::scalar_source
 {
 	typedef k3d::scalar_source base;
 public:
-	scalar_sine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	sine(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, _("Sine wave function applied to input.")),
 		m_input(init_owner(*this) + init_name("input") + init_label(_("Input value")) + init_description(_("Input value")) + init_value(0.0))
 	{
@@ -50,11 +50,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<scalar_sine > factory(
+		static k3d::document_plugin_factory<sine > factory(
 			k3d::uuid(0xb00248d6, 0x9d6843d5, 0xab5a24bc, 0x852519e5),
-			"ScalarSine",
+			"DoubleSine",
 			_("Applies a sine function to its input"),
-			"Scalar",
+			"Double",
 			k3d::iplugin_factory::STABLE);
 		return factory;
 	}
@@ -68,9 +68,9 @@ private:
 	}
 };
 
-k3d::iplugin_factory& scalar_sine_factory()
+k3d::iplugin_factory& sine_factory()
 {
-	return scalar_sine::get_factory();
+	return sine::get_factory();
 }
 
 } //namespace scalar

@@ -38,12 +38,12 @@ namespace module
 namespace scalar
 {
 
-class scalar_expression :
+class expression :
 	public k3d::scalar_source
 {
 	typedef k3d::scalar_source base;
 public:
-	scalar_expression(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	expression(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, _("Output value.")),
 		m_expression(init_owner(*this) + init_name("expression") + init_label(_("Expression")) + init_description(_("Expression to be evaluated.")) + init_value(std::string(_("cos(pi/2)")))),
 		m_user_property_changed_signal(*this)
@@ -56,11 +56,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<scalar_expression > factory(
+		static k3d::document_plugin_factory<expression > factory(
 			k3d::uuid(0x53de65d7, 0xee4a01e2, 0x259127b2, 0x676834f8),
-			"ScalarExpression",
-			_("Calculates a C-style expression, returning a scalar value as output"),
-			"Scalar",
+			"DoubleExpression",
+			_("Calculates a C-style expression, returning a double value as output"),
+			"Double",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -108,9 +108,9 @@ private:
 
 };
 
-k3d::iplugin_factory& scalar_expression_factory()
+k3d::iplugin_factory& expression_factory()
 {
-	return scalar_expression::get_factory();
+	return expression::get_factory();
 }
 
 } //namespace scalar

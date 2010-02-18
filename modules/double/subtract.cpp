@@ -32,16 +32,16 @@ namespace module
 namespace scalar
 {
 
-/// An object that take two doubles as input and produce their quotient as output
-class scalar_div :
+/// An object that take two doubles as input and produce their difference as output
+class subtract :
 	public k3d::scalar_source
 {
 	typedef k3d::scalar_source base;
 public:
-	scalar_div(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document, _("Quotient of inputs")),
+	subtract(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+		base(Factory, Document, _("Difference of inputs.")),
 		m_input1(init_owner(*this) + init_name("input1") + init_label(_("Input 1")) + init_description(_("First input float")) + init_value(0.0)),
-		m_input2(init_owner(*this) + init_name("input2") + init_label(_("Input 2")) + init_description(_("Second input float")) + init_value(1.0))
+		m_input2(init_owner(*this) + init_name("input2") + init_label(_("Input 2")) + init_description(_("Second input float")) + init_value(0.0))
 	{
 		m_input1.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_value_slot()));
@@ -51,11 +51,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<scalar_div > factory(
-			k3d::uuid(0xa797e7a9, 0x237f45a8, 0xa6ee43b3, 0xfd58596f),
-			"ScalarDivide",
-			_("Divide two scalar inputs and produce their quotient as output"),
-			"Scalar",
+		static k3d::document_plugin_factory<subtract > factory(
+			k3d::uuid(0x2b788bf5, 0x09e44dd4, 0x866a2d39, 0x1b782873),
+			"DoubleSubtract",
+			_("Subtract two double inputs and produce their difference as output"),
+			"Double",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -67,19 +67,16 @@ private:
 
 	void on_update_value(k3d::double_t& Output)
 	{
-		const k3d::double_t input1 = m_input1.pipeline_value();
-		const k3d::double_t input2 = m_input2.pipeline_value();
-
-		Output = input2 != 0 ?  input1 / input2 : input1;
+		Output = m_input1.pipeline_value() - m_input2.pipeline_value();
 	}
 };
 
-k3d::iplugin_factory& scalar_div_factory()
+k3d::iplugin_factory& subtract_factory()
 {
-	return scalar_div::get_factory();
+	return subtract::get_factory();
 }
 
-} //namespace scalar
+} // namespace scalar
 
 } // namespace module
 

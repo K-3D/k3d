@@ -35,12 +35,12 @@ namespace scalar
 {
 
 /// An object that take two doubles as input and produce their remainder as output
-class scalar_modulo :
+class modulo :
 	public k3d::scalar_source
 {
 	typedef k3d::scalar_source base;
 public:
-	scalar_modulo(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	modulo(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document, _("Remainder of inputs.")),
 		m_input1(init_owner(*this) + init_name("input1") + init_label(_("Input 1")) + init_description(_("First input float")) + init_value(0.0)),
 		m_input2(init_owner(*this) + init_name("input2") + init_label(_("Input 2")) + init_description(_("Second input float")) + init_value(1.0))
@@ -53,11 +53,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<scalar_modulo > factory(
+		static k3d::document_plugin_factory<modulo > factory(
 			k3d::uuid(0x7c6cb94a, 0xe20d4fa2, 0xb56f0f2a, 0x50e822a0),
-			"ScalarModulo",
-			_("Modulo two scalar inputs and produce their remainder as output"),
-			"Scalar",
+			"DoubleModulo",
+			_("Modulo two double inputs and produce their remainder as output"),
+			"Double",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -77,9 +77,9 @@ private:
 
 };
 
-k3d::iplugin_factory& scalar_modulo_factory()
+k3d::iplugin_factory& modulo_factory()
 {
-	return scalar_modulo::get_factory();
+	return modulo::get_factory();
 }
 
 } //namespace scalar

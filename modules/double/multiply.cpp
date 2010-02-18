@@ -32,16 +32,16 @@ namespace module
 namespace scalar
 {
 
-/// An object that take two doubles as input and produce their difference as output
-class scalar_sub :
+/// An object that take two doubles as input and produce their product as output
+class multiply :
 	public k3d::scalar_source
 {
 	typedef k3d::scalar_source base;
 public:
-	scalar_sub(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document, _("Difference of inputs.")),
+	multiply(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+		base(Factory, Document, _("Product of inputs.")),
 		m_input1(init_owner(*this) + init_name("input1") + init_label(_("Input 1")) + init_description(_("First input float")) + init_value(0.0)),
-		m_input2(init_owner(*this) + init_name("input2") + init_label(_("Input 2")) + init_description(_("Second input float")) + init_value(0.0))
+		m_input2(init_owner(*this) + init_name("input2") + init_label(_("Input 2")) + init_description(_("Second input float")) + init_value(1.0))
 	{
 		m_input1.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_value_slot()));
@@ -49,34 +49,36 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_value_slot()));
 	}
 
+	// return the factory at module registration time
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<scalar_sub > factory(
-			k3d::uuid(0x2b788bf5, 0x09e44dd4, 0x866a2d39, 0x1b782873),
-			"ScalarSubtract",
-			_("Subtract two scalar inputs and produce their difference as output"),
-			"Scalar",
+		static k3d::document_plugin_factory<multiply > factory(
+			k3d::uuid(0xd5d068d2, 0xb4f2470d, 0xb99280ae, 0x1b092e59),
+			"DoubleMultiply",
+			_("Multiply two double inputs and produce their product as output"),
+			"Double",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
 
+	// Implementation of the factory method required by the k3dinode interface:
 private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_input1;
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_input2;
 
 	void on_update_value(k3d::double_t& Output)
 	{
-		Output = m_input1.pipeline_value() - m_input2.pipeline_value();
+		Output = m_input1.pipeline_value() * m_input2.pipeline_value();
 	}
 };
 
-k3d::iplugin_factory& scalar_sub_factory()
+k3d::iplugin_factory& multiply_factory()
 {
-	return scalar_sub::get_factory();
+	return multiply::get_factory();
 }
 
-} // namespace scalar
+} //namespace scalar
 
 } // namespace module
 

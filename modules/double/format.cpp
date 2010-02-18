@@ -35,12 +35,12 @@ namespace module
 namespace scalar
 {
 
-class format_scalar :
+class format :
 	public k3d::node
 {
 	typedef k3d::node base;
 public:
-	format_scalar(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	format(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_input(init_owner(*this) + init_name("input") + init_label(_("Input")) + init_description(_("Float value")) + init_value(0.0)),
 		m_format(init_owner(*this) + init_name("format") + init_label(_("Format")) + init_description(_("Format string, printf() like")) + init_value(std::string("%f"))),
@@ -51,16 +51,16 @@ public:
 		m_format.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_output.make_slot()));
 
-		m_output.set_update_slot(sigc::mem_fun(*this, &format_scalar::execute));
+		m_output.set_update_slot(sigc::mem_fun(*this, &format::execute));
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<format_scalar > factory(
+		static k3d::document_plugin_factory<format > factory(
 			k3d::uuid(0x3af7d777, 0x691d41b0, 0xaa801d59, 0x7ee4180e),
-			"FormatScalar",
-			_("Converts a scalar to a string using printf() style formatting"),
-			"Scalar String",
+			"FormatDouble",
+			_("Converts a double to a string using printf() style formatting"),
+			"Double String",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -86,9 +86,9 @@ private:
 
 };
 
-k3d::iplugin_factory& format_scalar_factory()
+k3d::iplugin_factory& format_factory()
 {
-	return format_scalar::get_factory();
+	return format::get_factory();
 }
 
 } //namespace scalar
