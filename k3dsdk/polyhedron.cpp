@@ -1268,24 +1268,24 @@ void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mes
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create_edge_face_lookup
 
-void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::indices_t& EdgeFaces)
+void create_edge_face_lookup(const const_primitive& Polyhedron, mesh::indices_t& EdgeFaces)
 {
-	EdgeFaces.assign(ClockwiseEdges.size(), 0);
+	EdgeFaces.assign(Polyhedron.clockwise_edges.size(), 0);
 
 	const uint_t face_begin = 0;
-	const uint_t face_end = face_begin + FaceFirstLoops.size();
+	const uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
 	for(uint_t face = face_begin; face != face_end; ++face)
 	{
-		const uint_t loop_begin = FaceFirstLoops[face];
-		const uint_t loop_end = loop_begin + FaceLoopCounts[face];
+		const uint_t loop_begin = Polyhedron.face_first_loops[face];
+		const uint_t loop_end = loop_begin + Polyhedron.face_loop_counts[face];
 		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 		{
-			const uint_t first_edge = LoopFirstEdges[loop];
+			const uint_t first_edge = Polyhedron.loop_first_edges[loop];
 			for(uint_t edge = first_edge; ;)
 			{
 				EdgeFaces[edge] = face;
 
-				edge = ClockwiseEdges[edge];
+				edge = Polyhedron.clockwise_edges[edge];
 				if(edge == first_edge)
 					break;
 			}

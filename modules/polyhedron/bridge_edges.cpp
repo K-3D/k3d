@@ -96,7 +96,7 @@ public:
 
 			// Create a lookup from edges to their adjacent faces ...
 			k3d::mesh::indices_t edge_faces;
-			k3d::polyhedron::create_edge_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, edge_faces);
+			k3d::polyhedron::create_edge_face_lookup(*polyhedron, edge_faces);
 
 			// Get the set of selected boundary edges (excluding polygon holes) ...
 			k3d::mesh::indices_t edges;

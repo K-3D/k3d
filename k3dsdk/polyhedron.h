@@ -200,7 +200,7 @@ void create_face_normal_lookup(const mesh& Mesh, const const_primitive& Polyhedr
 void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
 
 /// Initializes an array for constant-time lookup from an edge to the face that owns it
-void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::indices_t& EdgeFaces);
+void create_edge_face_lookup(const const_primitive& Polyhedron, mesh::indices_t& EdgeFaces);
 
 /// Initializes an array for constant-time lookup from loops to edge counts
 void create_loop_edge_count_lookup(const const_primitive& Polyhedron, mesh::counts_t& LoopEdgeCounts);

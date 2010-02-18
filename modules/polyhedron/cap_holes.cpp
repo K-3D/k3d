@@ -87,7 +87,7 @@ public:
 
 			// Create a lookup from edges to faces ...
 			k3d::mesh::indices_t edge_faces;
-			k3d::polyhedron::create_edge_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, edge_faces);	
+			k3d::polyhedron::create_edge_face_lookup(*polyhedron, edge_faces);	
 
 			// Begin with the set of selected edges ...
 			const k3d::uint_t edge_begin = 0;

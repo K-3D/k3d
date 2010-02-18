@@ -118,7 +118,7 @@ public:
 
 			// Create a mapping from edges to faces ...
 			k3d::mesh::indices_t edge_faces;
-			k3d::polyhedron::create_edge_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, edge_faces);
+			k3d::polyhedron::create_edge_face_lookup(*polyhedron, edge_faces);
 
 			// Create mappings from edges to corners ...
 			k3d::mesh::indices_t edge1_corners(polyhedron->clockwise_edges.size(), corners.size());

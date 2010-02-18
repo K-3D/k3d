@@ -98,7 +98,7 @@ public:
 			}
 			
 			k3d::mesh::indices_t edge_faces;
-			k3d::polyhedron::create_edge_face_lookup(input_polyhedron->face_first_loops, input_polyhedron->face_loop_counts, input_polyhedron->loop_first_edges, input_polyhedron->clockwise_edges, edge_faces);
+			k3d::polyhedron::create_edge_face_lookup(*input_polyhedron, edge_faces);
 			k3d::mesh::indices_t redundant_edges;
 			k3d::polyhedron::mark_coplanar_edges(companions, boundary_edges, face_normals, edge_faces, input_face_selection, redundant_edges, m_threshold.pipeline_value());
 		

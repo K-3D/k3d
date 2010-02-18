@@ -178,7 +178,7 @@ void k3d_to_nef(const k3d::mesh::points_t& Points, const k3d::polyhedron::const_
 	
 	// Provide an edge-to-face link
 	k3d::mesh::indices_t face_for_edge;
-	k3d::polyhedron::create_edge_face_lookup(Polyhedron.face_first_loops, Polyhedron.face_loop_counts, Polyhedron.loop_first_edges, Polyhedron.clockwise_edges, face_for_edge);
+	k3d::polyhedron::create_edge_face_lookup(Polyhedron, face_for_edge);
 	
 	// Store an incoming edge for each point
 	k3d::mesh::indices_t first_in_edges(points.size());

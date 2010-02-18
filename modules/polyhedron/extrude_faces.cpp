@@ -109,7 +109,7 @@ public:
 
 			// Compute a mapping from edges to faces ...
 			k3d::mesh::indices_t edge_faces;
-			k3d::polyhedron::create_edge_face_lookup(polyhedron->face_first_loops, polyhedron->face_loop_counts, polyhedron->loop_first_edges, polyhedron->clockwise_edges, edge_faces);
+			k3d::polyhedron::create_edge_face_lookup(*polyhedron, edge_faces);
 
 			// Compute links to adjacent edges ...
 			k3d::mesh::bools_t boundary_edges;

@@ -76,7 +76,7 @@ void merge_coplanar_faces(const k3d::mesh::points_t& Points, k3d::polyhedron::pr
 	}
 	
 	k3d::mesh::indices_t edge_faces;
-	k3d::polyhedron::create_edge_face_lookup(Polyhedron.face_first_loops, Polyhedron.face_loop_counts, Polyhedron.loop_first_edges, Polyhedron.clockwise_edges, edge_faces);
+	k3d::polyhedron::create_edge_face_lookup(Polyhedron, edge_faces);
 	k3d::mesh::indices_t redundant_edges;
 	k3d::polyhedron::mark_coplanar_edges(companions, boundary_edges, face_normals, edge_faces, input_face_selection, redundant_edges, Threshold);
 

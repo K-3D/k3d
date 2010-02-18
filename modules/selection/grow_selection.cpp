@@ -121,7 +121,7 @@ public:
 
 			// Get face-to-edge data
 			k3d::mesh::indices_t edge_faces;
-			k3d::polyhedron::create_edge_face_lookup(output_polyhedron->face_first_loops, output_polyhedron->face_loop_counts, output_polyhedron->loop_first_edges, output_polyhedron->clockwise_edges, edge_faces);
+			k3d::polyhedron::create_edge_face_lookup(*output_polyhedron, edge_faces);
 
 			// Get edge companions
 			k3d::mesh::indices_t adjacent_edges;

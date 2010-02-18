@@ -960,7 +960,7 @@ public:
 
 			// For each edge, get the face it belongs to
 			topology_data.edge_faces.resize(input_edge_count);
-			k3d::polyhedron::create_edge_face_lookup(input_polyhedron.face_first_loops, input_polyhedron.face_loop_counts, input_polyhedron.loop_first_edges, input_polyhedron.clockwise_edges, topology_data.edge_faces);
+			k3d::polyhedron::create_edge_face_lookup(input_polyhedron, topology_data.edge_faces);
 			// Count the number of components of the new mesh per old face
 			topology_data.face_subface_counts.resize(input_face_count);
 			k3d::mesh::indices_t face_subloop_counts(input_face_count);
