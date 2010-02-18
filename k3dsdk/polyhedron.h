@@ -185,7 +185,7 @@ should consider whether SDS should be set on a per-shell basis? */
 bool_t is_sds(const const_primitive& Polyhedron);
 
 /// Initializes arrays for constant-time lookup of counterclockwise edges.
-void create_counterclockwise_edge_lookup(const mesh::indices_t& ClockwiseEdges, mesh::indices_t& counterclockwise_edges);
+void create_counterclockwise_edge_lookup(const const_primitive& Polyhedron, mesh::indices_t& CounterclockwiseEdges);
 
 /// Calculates the center (average) for an edge loop (returns the origin for degenerate cases).
 const point3 center(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);

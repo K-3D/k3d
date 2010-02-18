@@ -94,7 +94,7 @@ public:
 
 				// Lookup counterclockwise edges ...
 				k3d::mesh::indices_t counterclockwise_edges;
-				k3d::polyhedron::create_counterclockwise_edge_lookup(polyhedron->clockwise_edges, counterclockwise_edges);
+				k3d::polyhedron::create_counterclockwise_edge_lookup(*polyhedron, counterclockwise_edges);
 
 				// Split the face ...
 				const k3d::uint_t split_count = edge_groups[0].size();

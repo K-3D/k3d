@@ -106,7 +106,7 @@ private:
 
 			// Compute counterclockwise edges, since STL faces use right-hand (counterclockwise) winding ...
 			k3d::mesh::indices_t counterclockwise_edges;
-			k3d::polyhedron::create_counterclockwise_edge_lookup(polyhedron->clockwise_edges, counterclockwise_edges);
+			k3d::polyhedron::create_counterclockwise_edge_lookup(*polyhedron, counterclockwise_edges);
 
 			// For each group of faces, write-out an STL solid ...
 			const k3d::mesh::points_t& points = *Input.points;

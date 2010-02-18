@@ -118,7 +118,7 @@ public:
 
 			// Compute a mapping from edges to counterclockwise edges ...
 			k3d::mesh::indices_t counterclockwise_edges;
-			k3d::polyhedron::create_counterclockwise_edge_lookup(polyhedron->clockwise_edges, counterclockwise_edges);
+			k3d::polyhedron::create_counterclockwise_edge_lookup(*polyhedron, counterclockwise_edges);
 
 			// Compute face normal vectors ...
 			k3d::mesh::normals_t face_normals;

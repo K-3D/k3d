@@ -867,14 +867,14 @@ bool_t is_sds(const const_primitive& Polyhedron)
 //////////////////////////////////////////////////////////////////////////////
 // create_counterclockwise_edge_lookup
 
-void create_counterclockwise_edge_lookup(const mesh::indices_t& clockwise_edges, mesh::indices_t& counterclockwise_edges)
+void create_counterclockwise_edge_lookup(const const_primitive& Polyhedron, mesh::indices_t& CounterclockwiseEdges)
 {
-	counterclockwise_edges.resize(clockwise_edges.size());
+	CounterclockwiseEdges.resize(Polyhedron.clockwise_edges.size());
 
 	const uint_t edge_begin = 0;
-	const uint_t edge_end = edge_begin + clockwise_edges.size();
+	const uint_t edge_end = edge_begin + Polyhedron.clockwise_edges.size();
 	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
-		counterclockwise_edges[clockwise_edges[edge]] = edge;
+		CounterclockwiseEdges[Polyhedron.clockwise_edges[edge]] = edge;
 }
 
 //////////////////////////////////////////////////////////////////////////////
