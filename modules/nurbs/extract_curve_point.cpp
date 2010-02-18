@@ -106,7 +106,7 @@ private:
 			k3d::mesh::weights_t curve_weights;
 			k3d::mesh::knots_t curve_knots;
 			k3d::table curve_point_attributes;
-			extract_curve_arrays(curve_points, curve_knots, curve_weights, curve_point_attributes, Mesh, Curves, Curve, true);
+			//extract_curve_arrays(curve_points, curve_knots, curve_weights, curve_point_attributes, Mesh, Curves, Curve, true);
 			const k3d::point4 p = evaluate_position(curve_points, curve_weights, curve_knots, u);
 			evaluate_attribute(curve_point_attributes, curve_points, curve_weights, curve_knots, u);
 			const k3d::double_t w = p[3];

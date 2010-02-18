@@ -897,7 +897,7 @@ void append_curve(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, k3
 {
 	if(Points.empty())
 	{
-		extract_curve_arrays(Points, Knots, Weights, PointAttributes, InputMesh, InputCurves, Curve, false);
+		//extract_curve_arrays(Points, Knots, Weights, PointAttributes, InputMesh, InputCurves, Curve, false);
 	}
 	else
 	{
@@ -1192,7 +1192,7 @@ void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 	k3d::mesh::knots_t knots;
 	k3d::mesh::weights_t weights;
 	k3d::table point_attributes;
-	extract_curve_arrays(points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, true);
+	//extract_curve_arrays(points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, true);
 
 	// insert new knots at the requested u-value until the curve interpolates it
 	const k3d::uint_t order = InputCurves.curve_orders[Curve];
@@ -1306,7 +1306,7 @@ void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 	k3d::mesh::weights_t weights;
 	k3d::table point_attributes;
 	const k3d::uint_t order = InputCurves.curve_orders[Curve];
-	extract_curve_arrays(points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, false);
+	//extract_curve_arrays(points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, false);
 	insert_knot(points, knots, weights, u, r, order);
 	curve_arrays new_curve;
 	for(k3d::uint_t i = 0; i != points.size(); ++i)
@@ -1655,7 +1655,7 @@ void polygonize(k3d::mesh& OutputMesh, k3d::linear_curve::primitive& OutputCurve
 	k3d::mesh::weights_t weights;
 	k3d::mesh::knots_t knots;
 	k3d::table point_attributes;
-	extract_curve_arrays(nurbs_points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, true);
+	//extract_curve_arrays(nurbs_points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, true);
 	k3d::mesh::knots_t unique_knots;
 	for(k3d::uint_t i = 0; i < knots.size();)
 	{

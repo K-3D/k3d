@@ -117,7 +117,7 @@ public:
 			k3d::mesh::weights_t weights;
 			k3d::mesh::knots_t knots;
 			k3d::table point_attributes; // Unused for now
-			extract_curve_arrays(points, knots, weights, point_attributes, curves_mesh, *curves_prim, curve, true);
+			//extract_curve_arrays(points, knots, weights, point_attributes, curves_mesh, *curves_prim, curve, true);
 			for(k3d::uint_t prim_idx = 0; prim_idx != Output.primitives.size(); ++prim_idx)
 			{
 				boost::scoped_ptr<k3d::nurbs_patch::primitive> patch_prim(k3d::nurbs_patch::validate(Output, Output.primitives[prim_idx]));

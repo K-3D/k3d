@@ -803,7 +803,7 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 		k3d::mesh::weights_t path_weights;
 		k3d::mesh::knots_t path_knots;
 		k3d::table path_point_attributes;
-		extract_curve_arrays(path_points, path_knots, path_weights, path_point_attributes, InputMesh, Paths, path, true);
+		//extract_curve_arrays(path_points, path_knots, path_weights, path_point_attributes, InputMesh, Paths, path, true);
 		const k3d::uint_t path_point_count = path_points.size();
 		const k3d::uint_t order = Paths.curve_orders[path];
 
@@ -904,7 +904,7 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 			k3d::mesh::weights_t swept_weights;
 			k3d::mesh::knots_t swept_knots;
 			k3d::table swept_point_attributes;
-			extract_curve_arrays(swept_points, swept_knots, swept_weights, swept_point_attributes, InputMesh, SweptCurves, swept_curve, true);
+			//extract_curve_arrays(swept_points, swept_knots, swept_weights, swept_point_attributes, InputMesh, SweptCurves, swept_curve, true);
 			const k3d::uint_t swept_point_count = swept_points.size();
 			if(AlignNormal)
 			{
@@ -1057,7 +1057,7 @@ const k3d::point4 evaluate_position(const k3d::mesh& Mesh, const k3d::nurbs_patc
 	k3d::mesh::weights_t curve_weights;
 	k3d::mesh::knots_t curve_knots;
 	k3d::table curve_point_attributes;
-	extract_curve_arrays(curve_points, curve_knots, curve_weights, curve_point_attributes, curve_mesh, *curve_prim, 0, true);
+	//extract_curve_arrays(curve_points, curve_knots, curve_weights, curve_point_attributes, curve_mesh, *curve_prim, 0, true);
 	return evaluate_position(curve_points, curve_weights, curve_knots, V);
 }
 
@@ -1097,7 +1097,7 @@ void trim_to_nurbs(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCur
 			k3d::mesh::weights_t el_trim_weights;
 			k3d::mesh::knots_t el_trim_knots;
 			k3d::table el_trim_point_attributes;
-			extract_curve_arrays(el_trim_points, el_trim_knots, el_trim_weights, el_trim_point_attributes, tmp_mesh, *elevated_curves, 0, true);
+			//extract_curve_arrays(el_trim_points, el_trim_knots, el_trim_weights, el_trim_point_attributes, tmp_mesh, *elevated_curves, 0, true);
 			k3d::mesh::knots_t u_samples;
 			sample(u_samples, el_trim_knots, Samples);
 			const k3d::uint_t samples_end = u_samples.size();
