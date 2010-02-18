@@ -69,7 +69,7 @@ public:
 				k3d::classes::Scale(),
 				"MatrixScale",
 				_("Creates a scale transform matrix"),
-				"Transform",
+				"Matrix",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

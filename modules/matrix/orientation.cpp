@@ -69,7 +69,7 @@ public:
 				k3d::classes::Orientation(),
 				"MatrixOrientation",
 				_("Creates an orientation transform matrix"),
-				"Transform",
+				"Matrix",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

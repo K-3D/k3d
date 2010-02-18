@@ -60,7 +60,7 @@ public:
 				k3d::uuid(0x4e2a30f5, 0x6d7d47ad, 0x943ccd36, 0x4b305b55),
 				"MatrixLook",
 				_("Creates a transformation matrix that looks from one to another."),
-				"Transform",
+				"Matrix",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

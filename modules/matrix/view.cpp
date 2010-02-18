@@ -64,7 +64,7 @@ public:
 				k3d::uuid(0x8c5f4eef, 0xa858499f, 0x83774152, 0x147b7fe2),
 				"MatrixView",
 				_("Generates a viewing matrix from a position, a look vector, and an up vector"),
-				"Transform",
+				"Matrix",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

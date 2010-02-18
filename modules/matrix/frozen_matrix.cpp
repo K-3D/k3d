@@ -81,7 +81,7 @@ public:
 				k3d::classes::FrozenTransformation(),
 				"FrozenMatrix",
 				_("Stores an arbitrary transformation matrix"),
-				"Transform",
+				"Matrix",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

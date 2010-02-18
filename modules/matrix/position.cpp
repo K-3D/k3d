@@ -69,7 +69,7 @@ public:
 				k3d::classes::Position(),
 				"MatrixPosition",
 				_("Creates a position transform matrix"),
-				"Transform",
+				"Matrix",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;
