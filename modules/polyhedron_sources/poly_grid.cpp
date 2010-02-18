@@ -138,7 +138,7 @@ public:
 			k3d::uuid(0xacb3b4f8, 0x5cd6471c, 0xaed72686, 0xc576987c),
 			"PolyGrid",
 			_("Generates a polygonal grid"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

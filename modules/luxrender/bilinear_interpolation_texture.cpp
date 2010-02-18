@@ -74,7 +74,7 @@ public:
 			k3d::uuid(0x9df9057c, 0x204e6f80, 0x5768e69b, 0xb5ba08ba),
 			"LuxRenderBilinearInterpolationTexture",
 			_("LuxRender Bilinear Interpolation Texture"),
-			"LuxRender Texture",
+			"LuxRender",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

@@ -35,7 +35,7 @@
 namespace module
 {
 
-namespace core
+namespace matrix
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -143,7 +143,7 @@ public:
 				k3d::uuid(0x176d4553, 0x65fc48ca, 0x845a8160, 0xd31b41ae),
 				"Snap",
 				_("Snaps one node to another"),
-				"Snap",
+				"Matrix",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
@@ -225,7 +225,7 @@ k3d::iplugin_factory& snap_factory()
 	return snap::get_factory();
 }
 
-} // namespace core
+} // namespace matrix
 
 } // namespace module
 

@@ -135,7 +135,7 @@ public:
 			k3d::uuid(0x9a5ea45b, 0xebc64e37, 0xa50b287a, 0x89e18b71),
 			"PolyTorus",
 			_("Generates a polygonal torus"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

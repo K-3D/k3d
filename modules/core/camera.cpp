@@ -512,7 +512,7 @@ public:
 				k3d::classes::Camera(),
 				"Camera",
 				_("Camera"),
-				"Camera",
+				"RenderEngine",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

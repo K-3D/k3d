@@ -293,7 +293,7 @@ public:
 			k3d::uuid(0xd8c4d9fd, 0x42334a54, 0xa4b48185, 0xd8506489),
 			"PolyCylinder",
 			_("Generates a polygonal cylinder with optional endcaps"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

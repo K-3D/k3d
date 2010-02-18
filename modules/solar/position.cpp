@@ -99,7 +99,7 @@ public:
 				k3d::uuid(0xc96348f9, 0xc842a921, 0x9389f091, 0xa0c4c1dd),
 				"SolarPosition",
 				_("Calculates the position of the Sun based on observer position, date, and time."),
-				"Metrics",
+				"Simulation",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

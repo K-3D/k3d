@@ -212,7 +212,7 @@ public:
 				k3d::uuid(0xd9900dbf, 0x3d854a36, 0xbd05a3eb, 0x1379a89a),
 				"CapHoles",
 				_("Caps (fills) holes in a polyhedron"),
-				"Polygon",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

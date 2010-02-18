@@ -35,7 +35,6 @@ extern k3d::iplugin_factory& color_property_factory();
 extern k3d::iplugin_factory& multi_material_factory();
 extern k3d::iplugin_factory& null_factory();
 extern k3d::iplugin_factory& print_stdout_factory();
-extern k3d::iplugin_factory& snap_factory();
 
 } // namespace core
 
@@ -48,6 +47,5 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::core::multi_material_factory());
 	Registry.register_factory(module::core::null_factory());
 	Registry.register_factory(module::core::print_stdout_factory());
-	Registry.register_factory(module::core::snap_factory());
 K3D_MODULE_END
 

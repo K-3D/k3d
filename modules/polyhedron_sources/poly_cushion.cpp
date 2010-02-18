@@ -254,7 +254,7 @@ public:
 			k3d::uuid(0xc11b963d, 0x108d471c, 0xa3826195, 0x821116b0),
 			"PolyCushion",
 			_("Generates a polygonal cushion (a cube with rounded edges)"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

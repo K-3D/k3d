@@ -35,6 +35,7 @@ extern k3d::iplugin_factory& look_factory();
 extern k3d::iplugin_factory& orientation_factory();
 extern k3d::iplugin_factory& position_factory();
 extern k3d::iplugin_factory& scale_factory();
+extern k3d::iplugin_factory& snap_factory();
 extern k3d::iplugin_factory& view_factory();
 
 } // namespace matrix
@@ -48,6 +49,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::matrix::orientation_factory());
 	Registry.register_factory(module::matrix::position_factory());
 	Registry.register_factory(module::matrix::scale_factory());
+	Registry.register_factory(module::matrix::snap_factory());
 	Registry.register_factory(module::matrix::view_factory());
 K3D_MODULE_END
 

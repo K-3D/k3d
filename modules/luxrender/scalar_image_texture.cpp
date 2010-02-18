@@ -108,7 +108,7 @@ public:
 			k3d::uuid(0xf730e933, 0xb44761f7, 0x7d5ef696, 0x4290345f),
 			"LuxRenderScalarImageTexture",
 			_("LuxRender Scalar Image Texture"),
-			"LuxRender Texture",
+			"LuxRender",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

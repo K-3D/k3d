@@ -337,7 +337,7 @@ public:
 				k3d::uuid(0xdbd23c4e, 0x7119478c, 0x9ab2ee83, 0x5b56d527),
 				"ExtrudeFaces",
 				_("Extrudes selected faces along their normals"),
-				"Polygon",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

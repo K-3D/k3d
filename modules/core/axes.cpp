@@ -282,7 +282,7 @@ public:
 			k3d::classes::Axes(),
 			"Axes",
 			_("Configurable set of axes to help in visualizing the 3D workspace"),
-			"Utility",
+			"Annotation",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

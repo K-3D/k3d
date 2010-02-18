@@ -1528,7 +1528,7 @@ public:
 			k3d::uuid(0x916c98dd, 0x74f24362, 0x98364c94, 0x2a9f9ae7),
 			"Polyhedron",
 			_("Generates a uniform polyhedron"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
