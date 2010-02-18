@@ -202,7 +202,7 @@ public:
 				k3d::uuid(0xa6d565ee, 0x6b4a065d, 0x2430ca88, 0xb0bd88a1),
 				"CalculateNormals",
 				_("Calculates a variety of polygon normals"),
-				"Mesh",
+				"MeshAttributes",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

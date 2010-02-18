@@ -97,7 +97,7 @@ public:
 				k3d::uuid(0xf4d7f4d5, 0x3a40e51a, 0xfaf269bb, 0x1b68fdfe),
 				"NamedTextArray",
 				_("Creates or updates a named array with string data"),
-				"Named Arrays",
+				"MeshAttributes",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
