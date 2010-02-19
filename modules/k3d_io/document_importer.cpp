@@ -56,7 +56,7 @@ namespace k3d_io
 	
 static void node_execution(k3d::inode& Node, const k3d::string_t& Task, k3d::double_t Time)
 {
-	k3d::log() << debug << Node.name() << " " << Task << " " << Time << std::endl;
+	k3d::log() << info << Node.name() << " " << Task << " " << Time << std::endl;
 }
 
 class document_importer :
@@ -67,7 +67,7 @@ public:
 	{
 		k3d::log() << info << "Reading " << FilePath.native_console_string() << " using " << get_factory().name() << std::endl;
 
-		sigc::connection connection = Document.pipeline_profiler().connect_node_execution_signal(sigc::ptr_fun(&node_execution));
+//		sigc::connection connection = Document.pipeline_profiler().connect_node_execution_signal(sigc::ptr_fun(&node_execution));
 
 		k3d::xml::element xml("k3dml");
 		try
@@ -183,7 +183,7 @@ public:
 			k3d::xml::load_pipeline(Document, *xml_document, context);
 		}
 
-		connection.disconnect();
+//		connection.disconnect();
 
 		return true;
 	}

@@ -141,10 +141,6 @@ void to_mesh(nef_t& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* const Materi
 	
 	k3d::int32_t skip_volumes = nef_t::Infi_box::extended_kernel() ? 2 : 1;
 	
-	//k3d::log() << debug << "--------------- BEGIN OUTPUT NEF ----------------" << std::endl;
-	//k3d::log() << NefPolyhedron << std::endl;
-	//k3d::log() << debug << "---------------- END OUTPUT NEF -----------------" << std::endl;
-	
 	Vertex_const_iterator v;
 	CGAL::Object_index<Vertex_const_iterator> vertex_indices; 
 	CGAL_forall_vertices(v, NefPolyhedron)
@@ -191,9 +187,6 @@ boost::shared_ptr<nef_t> to_nef(const k3d::mesh::points_t Points, const k3d::pol
 	boost::shared_ptr<nef_t> nef(new nef_t(snc));
 	nef->build_external_structure();
 	nef->simplify();
-	//k3d::log() << debug << "--------------- BEGIN INPUT NEF ----------------" << std::endl;
-	//k3d::log() << *nef << std::endl;
-	//k3d::log() << debug << "---------------- END INPUT NEF -----------------" << std::endl;
 	return nef;
 }
 

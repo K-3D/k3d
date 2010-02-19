@@ -24,12 +24,12 @@
 #include <Python.h>
 
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/ievent_loop.h>
+#include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
-
 #include <k3dsdk/python/object_model_python.h>
+#include <k3dsdk/result.h>
 
 #include <iostream>
 
@@ -98,7 +98,7 @@ public:
 
 	void stop_event_loop()
 	{
-		k3d::log() << debug << k3d_file_reference << std::endl;
+		assert_not_implemented();
 	}
 
 	void open_uri(const k3d::string_t& URI)

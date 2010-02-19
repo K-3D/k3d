@@ -252,10 +252,8 @@ void control::on_watch_toggle()
 {
 	if(m_disable_set_value)
 		return;
-	k3d::log() << debug << "doing watch toggle" << std::endl;
 	return_if_fail(m_data.get());
 	m_data->watch(!m_data->is_watched());
-	k3d::log() << debug << "watch toggle finished" << std::endl;
 }
 
 void control::set_value()

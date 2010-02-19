@@ -63,14 +63,14 @@ public:
 		while(k3d::filesystem::exists(profile_path / k3d::filesystem::generic_path(profile_name)))
 			profile_name = prefix + "-" + k3d::string_cast(index++) + "." + suffix;
 
-		k3d::log() << debug << "google_perftools: saving profile data to file " << (profile_path / k3d::filesystem::generic_path(profile_name)).native_console_string() << std::endl;
+		k3d::log() << info << "google_perftools: saving profile data to file " << (profile_path / k3d::filesystem::generic_path(profile_name)).native_console_string() << std::endl;
 
 		ProfilerStart((profile_path / k3d::filesystem::generic_path(profile_name)).native_filesystem_string().c_str());
 	}
 	
 	~google_perftools()
 	{
-		k3d::log() << debug << "google_perftools: Stopping profiler" << std::endl;
+		k3d::log() << info << "google_perftools: Stopping profiler" << std::endl;
 		ProfilerStop();
 	}
 	

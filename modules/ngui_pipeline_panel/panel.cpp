@@ -581,8 +581,6 @@ public:
 			// Get the graph to be rendered ...
 			const k3d::graph::undirected& graph = *boost::any_cast<k3d::graph::undirected*>(k3d::property::pipeline_value(m_tree_layout->output()));
 
-//k3d::log() << debug << "input graph:\n" << graph << std::endl;
-
 			return_if_fail(graph.topology);
 			return_if_fail(graph.vertex_data.count("node"));
 			return_if_fail(graph.vertex_data.count("position"));

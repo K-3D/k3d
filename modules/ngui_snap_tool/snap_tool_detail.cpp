@@ -293,7 +293,6 @@ unsigned long snap_tool_detail::mesh_target::target_number()
 
 void snap_tool_detail::mesh_target::reset_selection()
 {
-k3d::log() << debug << K3D_CHANGE_SET_CONTEXT << std::endl;
 	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_internal_value());
 	return_if_fail(mesh);
 

@@ -179,8 +179,7 @@ public:
 		append_line("import k3d");
 		append_line("");
 
-		// Set up ATK event listeners
-		k3d::log() << debug << "Listening to " << atk_get_toolkit_name() << " " << atk_get_toolkit_version() << std::endl;
+		k3d::log() << info << "Listening to " << atk_get_toolkit_name() << " " << atk_get_toolkit_version() << std::endl;
 
 		add_event_listeners();
 		m_record_connection = action_recorded_signal().connect(sigc::mem_fun(*this, &dialog::on_action_recorded));

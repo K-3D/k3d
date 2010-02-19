@@ -149,9 +149,6 @@ void traverse_selected_face_points(const k3d::mesh& Mesh, visitor_t& Visitor)
 /// Computes the average position of selected nodes, returns false when no selected node was found.
 bool selection_position(const selection::mode& SelectionMode, const k3d::nodes_t& Selection, k3d::bounding_box3& BoundingBox, k3d::mesh::points_t& Points)
 {
-	if (Selection.empty())
-		k3d::log() << debug << "Empty node selection!" << std::endl;
-	
 	// Expand the bounding box around the selection
 	for(k3d::nodes_t::const_iterator node = Selection.begin(); node != Selection.end(); ++node)
 	{
@@ -202,7 +199,6 @@ bool selection_position(const selection::mode& SelectionMode, const k3d::nodes_t
 	// Nothing was selected...
 	if (BoundingBox.empty())
 	{
-		k3d::log() << debug << "Empty bbox" << std::endl;
 		return false;
 	}
 	

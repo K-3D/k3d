@@ -460,7 +460,7 @@ void replace_point(k3d::nurbs_curve::primitive& NurbsCurve, k3d::uint_t newIndex
 					}
 				}
 				else
-					k3d::log() << debug << "nurbs_curves: replace_point: Should split up the curve here" << std::endl;
+					k3d::log() << error << "nurbs_curves: replace_point: Should split up the curve here" << std::endl;
 			}
 		}
 	}
@@ -1092,7 +1092,7 @@ void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::me
 
 	if(s + r > Order - 1)
 	{
-		k3d::log() << debug << "insert_knot: No knot inserted: target multiplicity " << s + r << " for knot " << u << " exceeds curve degree " << Order-1 << std::endl;
+		k3d::log() << error << "insert_knot: No knot inserted: target multiplicity " << s + r << " for knot " << u << " exceeds curve degree " << Order-1 << std::endl;
 		return;
 	}
 
@@ -1644,8 +1644,8 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 	}
 	catch(std::exception& E)
 	{
-		k3d::log() << debug << "error solving system: " << E.what() << std::endl;
-		k3d::log() << debug << "matrix: " << A << std::endl;
+		k3d::log() << error << "error solving system: " << E.what() << std::endl;
+		k3d::log() << error << "matrix: " << A << std::endl;
 	}
 }
 

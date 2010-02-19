@@ -77,7 +77,6 @@ public:
 		selected_curves->material.push_back(0);
 		visit_selected_curves(Output, selected_curve_extractor(selected_curves_mesh, *selected_curves));
 		delete_selected_curves(Output);
-		k3d::log() << debug << "found " << selected_curves->curve_first_points.size() << " curves" << std::endl;
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> output_curves(k3d::nurbs_curve::create(Output));
 		module::nurbs::merge_connected_curves(Output, *output_curves, selected_curves_mesh, 0);
 		if(output_curves->material.empty())

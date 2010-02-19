@@ -149,8 +149,6 @@ public:
 		std::ostringstream console_command;
 		console_command << "__incomplete = __console.push(\"\"\"" << command << "\"\"\")";
 
-//		k3d::log() << debug << console_command.str() << std::endl;
-
 		k3d::iscript_engine::context_t context;
 		context["__incomplete"] = false;
 		context["__close"] = false;
