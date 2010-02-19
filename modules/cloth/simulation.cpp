@@ -54,13 +54,7 @@ public:
 	{
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 		m_time.changed_signal().connect(make_update_mesh_slot());
-		k3d::log() << debug << "ClothModifier plug-in started" << std::endl;
 		first_time = true;
-	}
-
-	~simulation()
-	{
-		k3d::log() << debug << "ClothModifier plug-in terminated" << std::endl;
 	}
 
 	void on_deform_mesh(const k3d::mesh& InputMesh, const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
