@@ -136,9 +136,10 @@ public:
 		const k3d::uint_t point_offset = points.size();
 		for(unsigned int v = 0; v < Model.vert_count(); ++v)
 		{
-		       k3d::point3 position(Model.vertex(v));
-		       position[0] = -position[0];
-		       points.push_back(position);
+			k3d::point3 position(Model.vertex(v));
+			position[0] = -position[0];
+			points.push_back(position);
+			point_selection.push_back(0);
 		}
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Mesh));
