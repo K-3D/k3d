@@ -96,7 +96,9 @@ private:
 		knot_inserter(const k3d::double_t U, const k3d::uint_t R) : u(U), r(R) {}
 		void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
 		{
-			module::nurbs::insert_knot(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve, u, r);
+			curve_arrays curve(InputMesh, InputCurves, Curve);
+			module::nurbs::insert_knot(curve, u, r);
+			curve.add_curve(OutputMesh, OutputCurves);
 		}
 		const k3d::double_t u;
 		const k3d::uint_t r;

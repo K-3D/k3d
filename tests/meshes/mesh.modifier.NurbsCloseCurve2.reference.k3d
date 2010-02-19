@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <k3dml>
 	<mesh_arrays>
-		<points>5 5.0000000000255174 0 -2.5517059846396142e-11 5 0 -5.0000000000510338 4.9999999999744826 -0 -5 -5.1034119692792285e-11 -0 -4.9999999999489662 -5.0000000000765512 0 7.6551179539188427e-11 -5 0 5.0000000001020686 -4.9999999999234488 0 5 5.1034119692792285e-11 0</points>
+		<points>5 5.1034119692792285e-11 0 5 5.0000000000255174 0 -2.5517059846396142e-11 5 0 -5.0000000000510338 4.9999999999744826 -0 -5 -5.1034119692792285e-11 -0 -4.9999999999489662 -5.0000000000765512 0 7.6551179539188427e-11 -5 0 5.0000000001020686 -4.9999999999234488 0</points>
 		<point_selection>0 0 0 0 0 0 0 0</point_selection>
 		<point_attributes>
-			<array name="index" type="k3d::uint_t">1 2 3 4 5 6 7 80</array>
+			<array name="index" type="k3d::uint_t">4 0 2 2 4 4 6 5</array>
 		</point_attributes>
 		<primitives>
 			<primitive type="nurbs_curve">
@@ -28,7 +28,7 @@
 					</table>
 					<table type="vertex">
 						<array name="curve_point_weights" type="k3d::double_t">1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1</array>
-						<array name="curve_points" type="k3d::uint_t">7 0 1 2 3 4 5 6 7
+						<array name="curve_points" type="k3d::uint_t">0 1 2 3 4 5 6 7 0
 							<metadata>
 								<pair name="k3d:domain">k3d:point-indices</pair>
 							</metadata>
@@ -36,12 +36,16 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant">
+					<table type="constant"/>
+					<table type="curve">
 						<array name="index" type="k3d::uint_t">0</array>
 					</table>
-					<table type="curve"/>
-					<table type="parameter"/>
-					<table type="vertex"/>
+					<table type="parameter">
+						<array name="index" type="k3d::uint_t">0 1</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">4 0 2 2 4 4 6 5 6</array>
+					</table>
 				</attributes>
 			</primitive>
 		</primitives>

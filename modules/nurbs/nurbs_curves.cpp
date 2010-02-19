@@ -159,10 +159,10 @@ const k3d::bool_t curve_arrays::validate() const
 {
 	return_val_if_fail(order + points.size() == knots.size(), false);
 
-	return_val_if_fail(points.size() == point_attributes.row_count(), false);
-	return_val_if_fail(curve_attributes.row_count() == 1, false);
-	return_val_if_fail(parameter_attributes.row_count() == 2, false);
-	return_val_if_fail(vertex_attributes.row_count() == points.size(), false);
+	return_val_if_fail(point_attributes.empty() || points.size() == point_attributes.row_count(), false);
+	return_val_if_fail(curve_attributes.empty() || curve_attributes.row_count() == 1, false);
+	return_val_if_fail(parameter_attributes.empty() || parameter_attributes.row_count() == 2, false);
+	return_val_if_fail(vertex_attributes.empty() || vertex_attributes.row_count() == points.size(), false);
 
 	return true;
 }
@@ -415,55 +415,9 @@ void normalize_knot_vector(k3d::nurbs_curve::primitive& NurbsCurve, const k3d::u
 	std::transform(curve_knots_begin, curve_knots_end, curve_knots_begin, knot_normalizer(min, max));
 }
 
-void replace_point(k3d::nurbs_curve::primitive& NurbsCurve, k3d::uint_t newIndex, k3d::uint_t curve, k3d::uint_t point, bool continuous)
+void normalize_knot_vector(k3d::mesh::knots_t& Knots)
 {
-	const k3d::uint_t curve_point_begin = NurbsCurve.curve_first_points[curve];
-	const k3d::uint_t curve_point_end = curve_point_begin + NurbsCurve.curve_point_counts[curve];
-
-	for (k3d::uint_t points = curve_point_begin; points < curve_point_end; ++points)
-	{
-		if (NurbsCurve.curve_points[points] == point)
-		{
-			//we found the index pointing to point1
-			NurbsCurve.curve_points[points] = newIndex;
-			if (continuous)
-			{
-
-				const k3d::uint_t curve_knots_begin = NurbsCurve.curve_first_knots[curve];
-				const k3d::uint_t curve_knots_end = curve_knots_begin + curve_point_end - curve_point_begin + NurbsCurve.curve_orders[curve];
-
-				const k3d::uint_t order = NurbsCurve.curve_orders[curve];
-				const k3d::uint_t half_order = static_cast<k3d::uint_t>(floor(0.5 * order));
-				const k3d::uint_t pos = half_order + (points - curve_point_begin) + curve_knots_begin;
-				float knot_at_pos = NurbsCurve.curve_knots[points - curve_point_begin + curve_knots_begin + half_order];
-
-				if (pos - curve_knots_begin < order)
-				{
-					for (k3d::uint_t x = curve_knots_begin; x < order + curve_knots_begin; ++x)
-						NurbsCurve.curve_knots[x] = knot_at_pos;
-					k3d::uint_t knot_pos = order + curve_knots_begin;
-					while ((NurbsCurve.curve_knots[knot_pos + 1] - NurbsCurve.curve_knots[knot_pos] > 2) && (knot_pos < curve_knots_end - 1))
-					{
-						NurbsCurve.curve_knots[knot_pos + 1] = NurbsCurve.curve_knots[knot_pos] + 2;
-						knot_pos++;
-					}
-				}
-				else if (pos - curve_knots_begin + order < curve_knots_end)
-				{
-					for (k3d::uint_t x = curve_knots_end - 1; x > curve_knots_end - order; --x)
-						NurbsCurve.curve_knots[x] = knot_at_pos;
-					k3d::uint_t knot_pos = curve_knots_end - order;
-					while ((NurbsCurve.curve_knots[knot_pos] - NurbsCurve.curve_knots[knot_pos - 1] > 2) && (knot_pos < curve_knots_begin))
-					{
-						NurbsCurve.curve_knots[knot_pos - 1] = NurbsCurve.curve_knots[knot_pos] - 2;
-						knot_pos--;
-					}
-				}
-				else
-					k3d::log() << debug << "nurbs_curves: replace_point: Should split up the curve here" << std::endl;
-			}
-		}
-	}
+	std::transform(Knots.begin(), Knots.end(), Knots.begin(), knot_normalizer(Knots.front(), Knots.back()));
 }
 
 void close_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::bool_t keep_ends)
@@ -475,80 +429,71 @@ void close_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 			else . replace them by their arithmetical middle
 	*/
 
-	copy_curve(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve);
-
-	const k3d::uint_t curve = OutputCurves.curve_first_points.size() - 1;
-	OutputCurves.curve_selections[curve] = 1.0;
-
-	const k3d::uint_t curve_points_begin = OutputCurves.curve_first_points[curve];
-	const k3d::uint_t curve_points_end = curve_points_begin + OutputCurves.curve_point_counts[curve];
-
-	const k3d::uint_t curve_knots_begin = OutputCurves.curve_first_knots[curve];
-	const k3d::uint_t curve_knots_end = curve_knots_begin + (curve_points_end - curve_points_begin) + OutputCurves.curve_orders[curve];
-
-	k3d::point3 new_point = (OutputMesh.points->at(OutputCurves.curve_points[curve_points_begin]) + OutputMesh.points->at(OutputCurves.curve_points[curve_points_end - 1])) * 0.5;
-	OutputMesh.points.writable().push_back(new_point);
-	OutputMesh.point_selection.writable().push_back(0.0);
-
-	k3d::uint_t new_index = OutputMesh.points->size() - 1;
+	// Weights and indices for the middle of the endpoints
+	const k3d::uint_t point_count = InputCurves.curve_point_counts[Curve];
+	const k3d::uint_t indices[] = {0, point_count - 1};
+	const k3d::double_t weights[] = {0.5, 0.5};
 
 	if (!keep_ends)
 	{
-		replace_point(OutputCurves, new_index, curve, OutputCurves.curve_points[curve_points_begin], true);
-		replace_point(OutputCurves, new_index, curve, OutputCurves.curve_points[curve_points_end - 1], true);
+		// New end points become the arithmetic mean of the old points
+		curve_arrays curve(InputMesh, InputCurves, Curve);
+		curve_copier copier(curve, curve);
+		copier.copy(2, indices, weights, 0);
+		copier.copy(2, indices, weights, point_count - 1);
+		curve.add_curve(OutputMesh, OutputCurves);
 	}
 	else
 	{
-		normalize_knot_vector(OutputCurves, curve);
-		k3d::uint_t order = OutputCurves.curve_orders[curve];
+		const curve_arrays input_curve(InputMesh, InputCurves, Curve, true);
+		curve_arrays output_curve;
+		curve_copier input_copier(input_curve, output_curve);
+		output_curve.order = input_curve.order;
+		const k3d::uint_t point_count = input_curve.points.size();
 		//take the first knot different from 0 and the last one different from 1.0, double the
-		k3d::uint_t first = curve_knots_begin;
+		k3d::uint_t first = 0;
+		const k3d::uint_t knots_end = input_curve.knots.size();
 
-		while (OutputCurves.curve_knots[first] == 0.0 && first < curve_knots_end)
+		while (input_curve.knots[first] == 0.0 && first < knots_end)
 		{
 			first++;
 		}
 
-		k3d::uint_t last = curve_knots_end - 1;
+		k3d::uint_t last = knots_end - 1;
 
-		while (OutputCurves.curve_knots[last] == 1.0 && last >= curve_knots_begin)
+		while (input_curve.knots[last] == 1.0 && last != 0)
 		{
 			last--;
 		}
-		//insert knot at the end
-		double diff = 1.0 - OutputCurves.curve_knots[last];
 
-		for (k3d::uint_t i = last + 1; i < curve_knots_end; i++)
-			OutputCurves.curve_knots[i] += diff;
+		output_curve.knots = input_curve.knots;
+		//insert knot at the end
+		double diff = 1.0 - input_curve.knots[last];
+
+		for (k3d::uint_t i = last + 1; i < knots_end; i++)
+			output_curve.knots[i] += diff;
 
 		//insert knot at the beginning
-		diff = OutputCurves.curve_knots[first];
+		diff = input_curve.knots[first];
 
-		for (int i = first - 1; i >= static_cast<int>(curve_knots_begin); i--)
+		for (int i = first - 1; i >= 0; i--)
 		{
-			OutputCurves.curve_knots[i] -= diff;
+			output_curve.knots[i] -= diff;
 		}
 
-		k3d::mesh::knots_t::iterator last_iter = OutputCurves.curve_knots.begin() + last + 1;
-		OutputCurves.curve_knots.insert(last_iter, 1.0);
-		k3d::mesh::knots_t::iterator first_iter = OutputCurves.curve_knots.begin() + first;
-		OutputCurves.curve_knots.insert(first_iter, 0.0);
+		k3d::mesh::knots_t::iterator last_iter = output_curve.knots.begin() + last + 1;
+		output_curve.knots.insert(last_iter, 1.0);
+		k3d::mesh::knots_t::iterator first_iter = output_curve.knots.begin() + first;
+		output_curve.knots.insert(first_iter, 0.0);
 
 		//insert point indices to the new point
-		k3d::mesh::indices_t::iterator point_iter = OutputCurves.curve_points.begin() + curve_points_begin;
-		OutputCurves.curve_points.insert(point_iter, new_index);
+		input_copier.push_back(2, indices, weights); // First point becomes the midpoint
+		for(k3d::uint_t i = 0; i != point_count; ++i) // Copy the original points
+			input_copier.push_back(i);
+		input_copier.push_back(2, indices, weights); // Last point is also the aveerage of the old endpoints
 
-		point_iter = OutputCurves.curve_points.begin() + curve_points_end + 1; //because we've already inserted one point
-		OutputCurves.curve_points.insert(point_iter, new_index);
-
-		k3d::mesh::weights_t::iterator weights_iter = OutputCurves.curve_point_weights.begin() + curve_points_begin;
-		OutputCurves.curve_point_weights.insert(weights_iter, 1.0);
-		weights_iter = OutputCurves.curve_point_weights.begin() + curve_points_end;
-		OutputCurves.curve_point_weights.insert(weights_iter, 1.0);
-
-		OutputCurves.curve_point_counts[curve] += 2;
-
-		normalize_knot_vector(OutputCurves, curve);
+		normalize_knot_vector(output_curve.knots);
+		output_curve.add_curve(OutputMesh, OutputCurves);
 	}
 }
 
@@ -610,21 +555,20 @@ void log_points(const curve_arrays::points4_t& Points)
 	}
 }
 
-void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::uint_t Elevations)
+void elevate_curve_degree(curve_arrays& Curve, const k3d::uint_t Elevations)
 {
-	curve_arrays input_curve(InputMesh, InputCurves, Curve);
 	for(k3d::uint_t level = 0; level != Elevations; ++level)
 	{
 		const int t = 1;
-		int power = input_curve.order - 1;
-		const k3d::uint_t nr_points = input_curve.points.size();
+		int power = Curve.order - 1;
+		const k3d::uint_t nr_points = Curve.points.size();
 
 		std::vector<std::vector<double> > bezalfs(power + t + 1, std::vector<double>(power + 1, 1.0));
-		curve_arrays bpts(power + 1, input_curve.order);
-		curve_arrays ebpts(power + t + 1, input_curve.order);
-		curve_arrays next_bpts(power - 1, input_curve.order);
+		curve_arrays bpts(power + 1, Curve.order);
+		curve_arrays ebpts(power + t + 1, Curve.order);
+		curve_arrays next_bpts(power - 1, Curve.order);
 
-		curve_copier bpts_input_copier(input_curve, bpts);
+		curve_copier bpts_input_copier(Curve, bpts);
 		curve_copier bpts_self_copier(bpts, bpts);
 		curve_copier next_bpts_bpts_copier(bpts, next_bpts);
 		curve_copier bpts_next_copier(next_bpts, bpts);
@@ -633,10 +577,10 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 
 		std::vector<double> alphas(power - 1, 0.0);
 
-		curve_arrays new_curve(2*(nr_points + t), input_curve.order + 1);
-		new_curve.knots.assign(2*(nr_points + input_curve.order + t), 0.0);
+		curve_arrays new_curve(2*(nr_points + t), Curve.order + 1);
+		new_curve.knots.assign(2*(nr_points + Curve.order + t), 0.0);
 
-		curve_copier new_point_input_copier(input_curve, new_curve);
+		curve_copier new_point_input_copier(Curve, new_curve);
 		curve_copier new_point_self_copier(new_curve, new_curve);
 		curve_copier new_point_ebpts_copier(ebpts, new_curve);
 
@@ -647,9 +591,9 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 		int kind = mh + 1;
 		int r = -1;
 		int a = power;
-		int b = input_curve.order;
+		int b = Curve.order;
 		int cind = 1;
-		double ua = input_curve.knots.front();
+		double ua = Curve.knots.front();
 
 		new_point_input_copier.copy(0, 0);
 
@@ -665,11 +609,11 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 		while (b < m)//big loop through knot vector
 		{
 			int i = b;
-			while (b < m && fabs(input_curve.knots[b] - input_curve.knots[b + 1]) < 0.00001)
+			while (b < m && fabs(Curve.knots[b] - Curve.knots[b + 1]) < 0.00001)
 				b++;
 			int mul = b - i + 1;
 			mh = mh + mul + t;
-			double ub = input_curve.knots[b];
+			double ub = Curve.knots[b];
 			int oldr = r;
 			r = power - mul;
 			//insert knot ub r times
@@ -690,7 +634,7 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 				double numer = ub - ua;
 				for (int k = power; k > mul; k--)
 				{
-					alphas[k - mul - 1] = numer / (input_curve.knots[a + k] - ua);
+					alphas[k - mul - 1] = numer / (Curve.knots[a + k] - ua);
 				}
 				for (int j = 1; j <= r; j++)
 				{
@@ -804,10 +748,16 @@ void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& Ou
 		}//end while loop (b < m)
 
 		const k3d::uint_t new_n = mh - power - t;
-		new_point_input_copier.copy(input_curve.points.size()-1, new_n - 1);
-		new_curve.resize(new_n, input_curve.order + t);
-		input_curve = new_curve;
+		new_point_input_copier.copy(Curve.points.size()-1, new_n - 1);
+		new_curve.resize(new_n, Curve.order + t);
+		Curve = new_curve;
 	}
+}
+
+void elevate_curve_degree(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::uint_t Elevations)
+{
+	curve_arrays input_curve(InputMesh, InputCurves, Curve);
+	elevate_curve_degree(input_curve, Elevations);
 	input_curve.add_curve(OutputMesh, OutputCurves);
 }
 
@@ -835,59 +785,73 @@ void flip_curve(k3d::nurbs_curve::primitive& NurbsCurves, const k3d::uint_t curv
 	std::reverse(point_weights_begin_iter, point_weights_end_iter);
 }
 
+void flip_curve(curve_arrays& Curve)
+{
+	curve_arrays result;
+	result.order = Curve.order;
+	result.knots = Curve.knots;
+
+	const k3d::double_t max_knot = result.knots.back();
+	for(k3d::uint_t i = 0; i != result.knots.size(); ++i) result.knots[i] = max_knot - result.knots[i];
+	std::reverse(result.knots.begin(), result.knots.end());
+
+	curve_copier copier(Curve, result);
+	const k3d::uint_t point_count = Curve.points.size();
+	for(k3d::uint_t i = 0; i != point_count; ++i)
+		copier.push_back(point_count - 1 - i);
+
+	Curve = result;
+}
+
 void connect_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::uint_t Primitive1Index, const k3d::uint_t Curve1Index, const k3d::bool_t Curve1FirstPointSelection, const k3d::uint_t Primitive2Index, const k3d::uint_t Curve2Index, const k3d::bool_t Curve2FirstPointSelection)
 {
-	k3d::mesh temp_mesh;
-	temp_mesh.points.create();
-	temp_mesh.point_selection.create();
-
-	boost::scoped_ptr<k3d::nurbs_curve::primitive> temp_curves(k3d::nurbs_curve::create(temp_mesh));
 	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves_prim1(k3d::nurbs_curve::validate(InputMesh, *InputMesh.primitives[Primitive1Index]));
 	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves_prim2(k3d::nurbs_curve::validate(InputMesh, *InputMesh.primitives[Primitive2Index]));
 
-	const k3d::uint_t order1 = curves_prim1->curve_orders[Curve1Index];
-	const k3d::uint_t order2 = curves_prim2->curve_orders[Curve2Index];
-	if(order1 < order2)
+	curve_arrays curve1(InputMesh, *curves_prim1, Curve1Index);
+	curve_arrays curve2(InputMesh, *curves_prim2, Curve2Index);
+
+	if(curve1.order < curve2.order)
 	{
-		elevate_curve_degree(temp_mesh, *temp_curves, InputMesh, *curves_prim1, Curve1Index, order2 - order1);
-		copy_curve(temp_mesh, *temp_curves, InputMesh, *curves_prim2, Curve2Index);
+		elevate_curve_degree(curve1, curve2.order - curve1.order);
 	}
 	else
 	{
-		copy_curve(temp_mesh, *temp_curves, InputMesh, *curves_prim1, Curve1Index);
-		elevate_curve_degree(temp_mesh, *temp_curves, InputMesh, *curves_prim2, Curve2Index, order1 - order2);
+		elevate_curve_degree(curve2, curve1.order - curve2.order);
 	}
-
-	const k3d::uint_t order = temp_curves->curve_orders[0]; // both orders are equal now
 
 	if(Curve1FirstPointSelection)
-		flip_curve(*temp_curves, 0);
+		flip_curve(curve1);
 	if(!Curve2FirstPointSelection)
-		flip_curve(*temp_curves, 1);
+		flip_curve(curve2);
 
-	normalize_knot_vector(*temp_curves, 0);
-	normalize_knot_vector(*temp_curves, 1);
+	normalize_knot_vector(curve1.knots);
+	normalize_knot_vector(curve2.knots);
 
 	curve_arrays new_curve;
-	for(k3d::uint_t curve_point = 0; curve_point != temp_curves->curve_points.size(); ++curve_point)
+	curve_copier copier1(curve1, new_curve);
+	curve_copier copier2(curve2, new_curve);
+	new_curve.order = curve1.order; // both orders are equal now
+
+	for(k3d::uint_t point_idx = 0; point_idx != curve1.points.size(); ++point_idx)
 	{
-		k3d::double_t w = temp_curves->curve_point_weights[curve_point];
-		const k3d::point3& p = temp_mesh.points->at(temp_curves->curve_points[curve_point]);
-		new_curve.points.push_back(k3d::point4(p[0]*w, p[1]*w, p[2]*w, w));
+		copier1.push_back(point_idx);
+	}
+	for(k3d::uint_t point_idx = 0; point_idx != curve2.points.size(); ++point_idx)
+	{
+		copier2.push_back(point_idx);
 	}
 
-	for(k3d::uint_t i = 0; i != temp_curves->curve_point_counts[0]; ++i)
+	for(k3d::uint_t i = 0; i != curve1.points.size(); ++i)
 	{
-		new_curve.knots.push_back(temp_curves->curve_knots[i]);
+		new_curve.knots.push_back(curve1.knots[i]);
 	}
-	const k3d::uint_t knots2_begin = temp_curves->curve_first_knots[1] + order;
-	const k3d::double_t step = (1 + temp_curves->curve_knots[knots2_begin] - new_curve.knots.back()) / (order + 1);
-	for(k3d::uint_t i = 0; i != order; ++i)
+	const k3d::uint_t knots2_begin = new_curve.order;
+	const k3d::double_t step = (1 + curve2.knots[knots2_begin] - new_curve.knots.back()) / (new_curve.order + 1);
+	for(k3d::uint_t i = 0; i != new_curve.order; ++i)
 		new_curve.knots.push_back(new_curve.knots.back() + step);
-	for(k3d::uint_t i = 0; i != temp_curves->curve_point_counts[1]; ++i)
-		new_curve.knots.push_back(1 + temp_curves->curve_knots[knots2_begin + i]);
-
-	new_curve.resize(new_curve.points.size(), order);
+	for(k3d::uint_t i = 0; i != curve2.points.size(); ++i)
+		new_curve.knots.push_back(1 + curve2.knots[knots2_begin + i]);
 
 	new_curve.add_curve(OutputMesh, OutputCurves);
 }
@@ -1078,21 +1042,22 @@ const k3d::uint_t multiplicity(const k3d::mesh::knots_t& Knots, const k3d::doubl
     Implementation of Algorithm "CurveKnotInsertion" from
     "The NURBS book", page 151, by Piegl and Tiller
 **/
-void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, const k3d::double_t u, const k3d::uint_t r, const k3d::uint_t Order)
+void insert_knot(curve_arrays& Curve, const k3d::double_t u, const k3d::uint_t r)
 {
-	const k3d::uint_t nr_points = Points.size();
-	k3d::mesh::knots_t normalized_knots(Knots.size());
-	std::transform(Knots.begin(), Knots.end(), normalized_knots.begin(), knot_normalizer(Knots.front(), Knots.back()));
+	curve_arrays result;
+	result.order = Curve.order;
+	const k3d::uint_t nr_points = Curve.points.size();
+	normalize_knot_vector(Curve.knots);
 
-	k3d::mesh::knots_t::iterator knot_u = std::find_if(normalized_knots.begin(), normalized_knots.end(), find_first_knot_after(u));
-	const k3d::uint_t s = std::count_if(normalized_knots.begin(), normalized_knots.end(), find_knot_multiplicity(u));
+	k3d::mesh::knots_t::iterator knot_u = std::find_if(Curve.knots.begin(), Curve.knots.end(), find_first_knot_after(u));
+	const k3d::uint_t s = std::count_if(Curve.knots.begin(), Curve.knots.end(), find_knot_multiplicity(u));
 
 	//we found the first knot greater than u or we're at the end so thats our k now
-	int k = knot_u - normalized_knots.begin() - 1;
+	int k = knot_u - Curve.knots.begin() - 1;
 
-	if(s + r > Order - 1)
+	if(s + r > Curve.order - 1)
 	{
-		k3d::log() << debug << "insert_knot: No knot inserted: target multiplicity " << s + r << " for knot " << u << " exceeds curve degree " << Order-1 << std::endl;
+		k3d::log() << debug << "insert_knot: No knot inserted: target multiplicity " << s + r << " for knot " << u << " exceeds curve degree " << Curve.order-1 << std::endl;
 		return;
 	}
 
@@ -1100,72 +1065,59 @@ void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::me
 	//Algorithm from "The NURBS book" page 151
 	//*******************************************************************
 
-	k3d::uint_t mp = normalized_knots.size();
+	k3d::uint_t mp = Curve.knots.size();
 	k3d::uint_t nq = nr_points + r;
 
-	Knots.clear();
-	Knots.insert(Knots.end(), normalized_knots.begin(), knot_u);
+	result.knots.insert(result.knots.end(), Curve.knots.begin(), knot_u);
 	for (k3d::uint_t i = 1; i <= r; i++)
 	{
-		Knots.push_back(u);
+		result.knots.push_back(u);
 	}
-	Knots.insert(Knots.end(), knot_u, normalized_knots.end());
+	result.knots.insert(result.knots.end(), knot_u, Curve.knots.end());
 
-	std::vector<k3d::point4> points(nq);
-	for (k3d::uint_t i = 0; i <= k + 1 - Order; i++)
+	curve_copier result_input_copier(Curve, result);
+	result.resize(nq, result.order);
+
+	for (k3d::uint_t i = 0; i <= k + 1 - result.order; i++)
 	{
-		const k3d::point3& p = Points[i];
-		points[i] = k3d::point4(p[0], p[1], p[2], Weights[i]);
+		result_input_copier.copy(i, i);
 	}
 
 	for (k3d::uint_t i = k - s; i < nr_points; i++)
 	{
-		const k3d::point3& p = Points[i];
-		points[i + r] = k3d::point4(p[0], p[1], p[2], Weights[i]);
+		result_input_copier.copy(i, i + r);
 	}
 
-	std::vector<k3d::point4> tmp;
-	for (k3d::uint_t i = 0; i <= Order - 1 - s; i++)
+	curve_arrays tmp;
+	curve_copier tmp_input_copier(Curve, tmp);
+	curve_copier tmp_self_copier(tmp, tmp);
+	curve_copier result_tmp_copier(tmp, result);
+	for (k3d::uint_t i = 0; i <= Curve.order - 1 - s; i++)
 	{
-		const k3d::point3& p = Points[i + k - (Order - 1)];
-		const k3d::double_t w = Weights[i + k - (Order - 1)];
-		tmp.push_back(k3d::point4(w*p[0], w*p[1], w*p[2], w));
+		tmp_input_copier.push_back(i + k - (Curve.order - 1));
 	}
 	k3d::uint_t L = 0;
 
 	for (k3d::uint_t j = 1; j <= r; j++)
 	{
-		L = k - (Order - 1) + j;
+		L = k - (Curve.order - 1) + j;
 		double alpha = 0.0;
-		for (k3d::uint_t i = 0; i <= Order - 1 - j - s; i++)
+		for (k3d::uint_t i = 0; i <= Curve.order - 1 - j - s; i++)
 		{
-			alpha = (u - normalized_knots[L + i]) / (normalized_knots[i + k + 1] - normalized_knots[L + i]);
-			tmp[i] = alpha * tmp[i + 1] + (1.0 - alpha) * tmp[i];
+			alpha = (u - Curve.knots[L + i]) / (Curve.knots[i + k + 1] - Curve.knots[L + i]);
+			k3d::uint_t indices[] = {i + 1, i};
+			k3d::double_t weights[] = {alpha, 1.0 - alpha};
+			tmp_self_copier.copy(2, indices, weights, i);
 		}
-		const k3d::point4& t1 = tmp[0];
-		double w = t1[3];
-		points[L] = k3d::point4(t1[0] / w, t1[1] / w, t1[2] / w, w);
-		const k3d::point4& t2 = tmp[Order - 1 - j - s];
-		w = t2[3];
-		points[k + r - j - s] = k3d::point4(t2[0] / w, t2[1] / w, t2[2] / w, w);
+		result_tmp_copier.copy(0, L);
+		result_tmp_copier.copy(Curve.order - 1 - j - s, k + r - j - s);
 	}
 
 	for (k3d::uint_t i = L + 1; i < k - s; i++)
 	{
-		const k3d::point4& t = tmp[i - L];
-		double w = t[3];
-		points[i] = k3d::point4(t[0] / w, t[1] / w, t[2] / w, w);
+		result_tmp_copier.copy(i - L, i);
 	}
-
-	const k3d::uint_t new_point_count = points.size();
-	Points.resize(new_point_count);
-	Weights.resize(new_point_count);
-	for(k3d::uint_t i = 0; i != new_point_count; ++i)
-	{
-		const k3d::point4& p = points[i];
-		Weights[i] = p[3];
-		Points[i] = k3d::point3(p[0], p[1], p[2]);
-	}
+	Curve = result;
 }
 
 k3d::bool_t is_closed(const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve)
@@ -1188,112 +1140,61 @@ void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 	}
 
 	// Curve arrays for the original curve
-	k3d::mesh::points_t points;
-	k3d::mesh::knots_t knots;
-	k3d::mesh::weights_t weights;
-	k3d::table point_attributes;
-	extract_curve_arrays(points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, true);
+	curve_arrays input_curve(InputMesh, InputCurves, Curve, true);
 
 	// insert new knots at the requested u-value until the curve interpolates it
-	const k3d::uint_t order = InputCurves.curve_orders[Curve];
-	const k3d::uint_t mul = multiplicity(knots, u, 0, knots.size());
+	const k3d::uint_t order = input_curve.order;
+	const k3d::uint_t mul = multiplicity(input_curve.knots, u, 0, input_curve.knots.size());
 	if(mul < (order - 1))
 	{
-		insert_knot(points, knots, weights, u, order - mul - 1, order);
+		insert_knot(input_curve, u, order - mul - 1);
 	}
 	// locate the first knot after the u-value
-	const k3d::mesh::knots_t::iterator split_knot = std::find_if(knots.begin(), knots.end(), find_first_knot_after(u));
+	const k3d::mesh::knots_t::iterator split_knot = std::find_if(input_curve.knots.begin(), input_curve.knots.end(), find_first_knot_after(u));
 
 	if(is_closed(InputCurves, Curve))
 	{
-		k3d::mesh::points_t new_points;
-		k3d::mesh::weights_t new_weights;
-		const k3d::mesh::points_t::iterator split_point = points.begin() + (split_knot - knots.begin()) - order;
-		const k3d::mesh::weights_t::iterator split_weight = weights.begin() + (split_knot - knots.begin()) - order;
-		new_points.insert(new_points.end(), split_point, points.end());
-		new_weights.insert(new_weights.end(), split_weight, weights.end());
-		new_points.insert(new_points.end(), points.begin() + 1 , split_point + 1);
-		new_weights.insert(new_weights.end(), weights.begin() + 1, split_weight + 1);
-
-		k3d::table new_point_attributes = point_attributes.clone_types();
-		k3d::table_copier point_attribute_copier(point_attributes, new_point_attributes);
-		const k3d::uint_t attrib_begin = split_knot - knots.begin() - order;
-		const k3d::uint_t attrib_end = points.size();
-		for(k3d::uint_t i = attrib_begin; i != attrib_end; ++i)
-			point_attribute_copier.push_back(i);
-		for(k3d::uint_t i = 1; i != attrib_begin + 1; ++i)
-			point_attribute_copier.push_back(i);
-
 		curve_arrays new_curve;
-		new_curve.order = order;
-		for(k3d::uint_t i = 0; i != new_points.size(); ++i)
-		{
-			const k3d::point3& p = new_points[i];
-			const k3d::double_t w = new_weights[i];
-			new_curve.points.push_back(k3d::point4(p[0]*w, p[1]*w, p[2]*w, w));
-		}
-		new_curve.point_attributes = new_point_attributes;
-		new_curve.knots = knots;
-		new_curve.resize(new_points.size(), order);
+		new_curve.order = input_curve.order;
+		new_curve.knots = input_curve.knots;
+		curve_copier copier(input_curve, new_curve);
+		const k3d::uint_t split_point = (split_knot - input_curve.knots.begin()) - order;
+		const k3d::uint_t points_end = input_curve.points.size();
+		for(k3d::uint_t i = split_point; i != points_end; ++i)
+			copier.push_back(i);
+		for(k3d::uint_t i = 1; i != split_point + 1; ++i)
+			copier.push_back(i);
+
 		new_curve.add_curve(OutputMesh, OutputCurves);
 	}
 	else
 	{
 		// First curve: all knots up to and including the last knot with multiplicity u
-		k3d::mesh::knots_t first_knots;
-		k3d::mesh::points_t first_points;
-		k3d::mesh::weights_t first_weights;
-		first_knots.insert(first_knots.begin(), knots.begin(), split_knot);
-		first_knots.push_back(first_knots.back()); // Clamp knot vector by increasing the multiplicity to become equal to the order
-		first_points.insert(first_points.end(), points.begin(), points.begin() + first_knots.size() - order);
-		first_weights.insert(first_weights.end(), weights.begin(), weights.begin() + first_knots.size() - order);
+		curve_arrays first_curve;
+		first_curve.order = input_curve.order;
+		curve_copier first_copier(input_curve, first_curve);
+
+		first_curve.knots.insert(first_curve.knots.begin(), input_curve.knots.begin(), split_knot);
+		first_curve.knots.push_back(first_curve.knots.back()); // Clamp knot vector by increasing the multiplicity to become equal to the order
+		const k3d::uint_t points_end = first_curve.knots.size() - order;
+		for(k3d::uint_t i = 0; i != points_end; ++i)
+			first_copier.push_back(i);
+
+
 
 		// Second curve: start with order times the u-knot, then take all remaining knots
-		k3d::mesh::knots_t second_knots;
-		k3d::mesh::points_t second_points;
-		k3d::mesh::weights_t second_weights;
-		second_knots.insert(second_knots.end(), order, u);
-		second_knots.insert(second_knots.end(), split_knot, knots.end());
-		second_points.insert(second_points.end(), points.begin() + first_knots.size() - order - 1, points.end());
-		second_weights.insert(second_weights.end(), weights.begin() + first_knots.size() - order - 1, weights.end());
+		curve_arrays second_curve;
+		second_curve.order = input_curve.order;
+		curve_copier second_copier(input_curve, second_curve);
 
-		// Deal with point attributes
-		k3d::table first_point_attributes = point_attributes.clone_types();
-		k3d::table second_point_attributes = point_attributes.clone_types();
-		k3d::table_copier first_copier(point_attributes, first_point_attributes);
-		k3d::table_copier second_copier(point_attributes, second_point_attributes);
-		const k3d::uint_t first_end = first_points.size();
-		for(k3d::uint_t i = 0; i != first_end; ++i)
-			first_copier.push_back(i);
-		const k3d::uint_t second_begin = first_end - 1;
-		const k3d::uint_t second_end = points.size();
-		for(k3d::uint_t i = second_begin; i != second_end; ++i)
+		second_curve.knots.insert(second_curve.knots.end(), order, u);
+		second_curve.knots.insert(second_curve.knots.end(), split_knot, input_curve.knots.end());
+		const k3d::uint_t points_begin = first_curve.knots.size() - order - 1;
+		for(k3d::uint_t i = points_begin; i != input_curve.points.size(); ++i)
 			second_copier.push_back(i);
 
-		curve_arrays new_curve;
-		new_curve.order = order;
-		for(k3d::uint_t i = 0; i != first_points.size(); ++i)
-		{
-			const k3d::point3& p = first_points[i];
-			const k3d::double_t w = first_weights[i];
-			new_curve.points.push_back(k3d::point4(p[0]*w, p[1]*w, p[2]*w, w));
-		}
-		new_curve.point_attributes = first_point_attributes;
-		new_curve.knots = first_knots;
-		new_curve.resize(first_points.size(), order);
-		new_curve.add_curve(OutputMesh, OutputCurves);
-		OutputCurves.curve_selections.back() = 1.0;
-		new_curve.points.clear();
-		for(k3d::uint_t i = 0; i != second_points.size(); ++i)
-		{
-			const k3d::point3& p = second_points[i];
-			const k3d::double_t w = second_weights[i];
-			new_curve.points.push_back(k3d::point4(p[0]*w, p[1]*w, p[2]*w, w));
-		}
-		new_curve.point_attributes = second_point_attributes;
-		new_curve.knots = second_knots;
-		new_curve.resize(second_points.size(), order);
-		new_curve.add_curve(OutputMesh, OutputCurves);
+		first_curve.add_curve(OutputMesh, OutputCurves);
+		second_curve.add_curve(OutputMesh, OutputCurves);
 	}
 	if(OutputCurves.material.empty())
 		OutputCurves.material.push_back(InputCurves.material.back());
@@ -1301,24 +1202,9 @@ void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 
 void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u, const k3d::uint_t r)
 {
-	k3d::mesh::points_t points;
-	k3d::mesh::knots_t knots;
-	k3d::mesh::weights_t weights;
-	k3d::table point_attributes;
-	const k3d::uint_t order = InputCurves.curve_orders[Curve];
-	extract_curve_arrays(points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, false);
-	insert_knot(points, knots, weights, u, r, order);
-	curve_arrays new_curve;
-	for(k3d::uint_t i = 0; i != points.size(); ++i)
-	{
-		const k3d::point3& p = points[i];
-		const k3d::double_t w = weights[i];
-		new_curve.points.push_back(k3d::point4(p[0]*w, p[1]*w, p[2]*w, w));
-	}
-	new_curve.point_attributes = point_attributes;
-	new_curve.knots = knots;
-	new_curve.resize(points.size(), order);
-	new_curve.add_curve(OutputMesh, OutputCurves);
+	curve_arrays curve(InputMesh, InputCurves, Curve);
+	insert_knot(curve, u, r);
+	curve.add_curve(OutputMesh, OutputCurves);
 }
 
 void append_common_knot_vector(k3d::mesh::knots_t& CommonKnotVector, const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve)

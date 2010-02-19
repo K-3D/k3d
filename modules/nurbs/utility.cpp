@@ -54,11 +54,8 @@ knot_vector_merger::knot_vector_merger(const k3d::mesh::knots_t& UnifiedKnots, c
 
 void knot_vector_merger::operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
 {
-	k3d::mesh::points_t points;
-	k3d::mesh::knots_t knots;
-	k3d::mesh::weights_t weights;
-	k3d::table point_attributes; // TODO: Use this
-	extract_curve_arrays(points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, true);
+	curve_arrays curve(InputMesh, InputCurves, Curve, true);
+	k3d::mesh::knots_t& knots = curve.knots;
 	if(unified_knots.size() < knots.size())
 		throw std::runtime_error("Unified knot vector is too short");
 	// First, we check if the old knot vector has knots that are not in the common knot vector (i.e. knots that were added manually using knot vector editing)
@@ -88,9 +85,9 @@ void knot_vector_merger::operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::pri
 		if(old_mul > new_mul)
 			throw std::runtime_error("Error inserting knots when creating a common knot vector");
 		if(old_mul < new_mul)
-			insert_knot(points, knots, weights, u, 1, order);
+			insert_knot(curve, u, 1);
 	}
-	k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, order, points, weights, knots);
+	curve.add_curve(OutputMesh, OutputCurves);
 }
 
 } //namespace nurbs

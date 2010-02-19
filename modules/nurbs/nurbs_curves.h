@@ -147,12 +147,14 @@ void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& 
 
 ///Insert a knot into a curve, makes use of the algorithm in "The NURBS book" by A. Piegl and W. Tiller
 /**
- * \param curve The curve
+ * \param Curve The curve
  * \param u The u-value where to insert the knot
  * \param r The multiplicity of the new knot
  */
+void insert_knot(curve_arrays& Curve, const k3d::double_t u, const k3d::uint_t r);
+
+/// Knot insertion for a mesh
 void insert_knot(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u, const k3d::uint_t r);
-void insert_knot(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, const k3d::double_t u, const k3d::uint_t r, const k3d::uint_t Order);
 
 /// Splits a curve at the given u parameter value
 void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, k3d::uint_t Curve, const k3d::double_t u);
