@@ -58,7 +58,7 @@ public:
 			"StringToStdout",
 			_("Prints an input string value to stdout"),
 			"Test",
-			k3d::iplugin_factory::STABLE);
+			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}

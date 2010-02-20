@@ -74,7 +74,7 @@ public:
 				"MeshDiff",
 				_("Compares meshes for equivalence"),
 				"Test",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
