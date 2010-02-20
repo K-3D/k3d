@@ -125,7 +125,7 @@ public:
 			"PolyIcosahedron",
 			_("Generates a polygonal sphere by recursive subdivision of an isocahedron"),
 			"Polyhedron",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
