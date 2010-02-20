@@ -5,6 +5,7 @@ SET(SKIP_FILES
 	"^docs/sample_module/module.cpp$"
 	"^k3dsdk/log.cpp$"
 	"^modules/advanced_opengl_painters/attic/.*$"
+  "^modules/cuda/.*$"
 	"^modules/development/.*$"
 	"^modules/ngui/user_interface.cpp$"
 	)

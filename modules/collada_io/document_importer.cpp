@@ -252,7 +252,6 @@ public:
 			domGeometry_Array geometries = library_geometries[j]->getGeometry_array();
 			for(int i=0; i<geometries.getCount(); i++)
 			{
-				//k3d::log() << debug << "A geometry" << std::endl;
 				collada_objs.push_back(collada_obj(Document,*geometries[i]));
 			}
 		}
@@ -290,7 +289,6 @@ public:
 			domVisual_scene_Array visual_scenes = library_visual_scenes[j]->getVisual_scene_array();
 			for(int k=0; k<visual_scenes.getCount(); k++)
 			{
-				//k3d::log() << debug << "A visual_scene" << std::endl;
 				domNode_Array scene_nodes = visual_scenes[k]->getNode_array();
 				for(int i=0; i<scene_nodes.getCount(); i++)
 				{
@@ -307,10 +305,6 @@ public:
 		//k3d::inode* const mesh_node = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("Scale"), Document, "MyScale");
 		//mesh_node->set_property("name", "Bla");
 		k3d::iplugin_factory *factory = k3d::plugin::factory::lookup("Scale");
-		if(!factory)
-			k3d::log() << debug << "No factory found" << std::endl;
-		else
-			k3d::log() << debug << "Factory found" << std::endl;
 */
 
 		// destroy the objects we created during the conversion process

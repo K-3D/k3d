@@ -47,7 +47,6 @@ namespace io
 
 	intGeometry::intGeometry(domGeometry& geomElement, const k3d::matrix4& ccst)
 	{
-		//k3d::log() << debug << "una geom" << std::endl;
 		domMesh *meshElement = geomElement.getMesh();
 
 		k3d::mesh::points_t& points = Mesh.points.create();
