@@ -65,7 +65,7 @@ inode* upstream_frozen_transformation(inode& Node)
 	iproperty* upstream_output = Node.document().pipeline().dependency(downstream_input);
 	
 	// Return the directly connected transformation matrix, if there is one
-	if(upstream_output && upstream_output->property_node() && upstream_output->property_node()->factory().factory_id() == classes::FrozenTransformation())
+	if(upstream_output && upstream_output->property_node() && upstream_output->property_node()->factory().factory_id() == classes::FrozenMatrix())
 		return upstream_output->property_node();
 	
 	// Otherwise check if an animation track was inserted before the modifier
@@ -75,7 +75,7 @@ inode* upstream_frozen_transformation(inode& Node)
 		if(keyframer)
 		{
 			upstream_output = Node.document().pipeline().dependency(keyframer->input_property());
-			if(upstream_output && upstream_output->property_node() && upstream_output->property_node()->factory().factory_id() == classes::FrozenTransformation())
+			if(upstream_output && upstream_output->property_node() && upstream_output->property_node()->factory().factory_id() == classes::FrozenMatrix())
 				return upstream_output->property_node();
 		}
 	}
@@ -91,7 +91,7 @@ inode* insert_transform_modifier(inode& Node)
 	iproperty& downstream_input = downstream_sink->matrix_sink_input();
 	iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_input);
 
-	inode* const modifier = plugin::create<inode>(classes::FrozenTransformation(), Node.document(), _("Transformation"));
+	inode* const modifier = plugin::create<inode>(classes::FrozenMatrix(), Node.document(), _("Transformation"));
 	return_val_if_fail(modifier, 0);
 	imatrix_sink* const modifier_sink = dynamic_cast<imatrix_sink*>(modifier);
 	return_val_if_fail(modifier_sink, 0);
@@ -136,7 +136,7 @@ k3d::inode* set_matrix(iunknown& Node, const matrix4& Matrix)
 	inode* const node = dynamic_cast<inode*>(&Node);
 	return_val_if_fail(node, 0);
 
-	// Check for an upstream FrozenTransformation modifier
+	// Check for an upstream FrozenMatrix modifier
 	if(inode* const modifier = detail::upstream_frozen_transformation(*node))
 	{
 		const k3d::matrix4 upstream_matrix = detail::upstream_matrix(*modifier);

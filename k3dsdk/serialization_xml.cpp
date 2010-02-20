@@ -707,7 +707,7 @@ void upgrade_transformable_nodes(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "Transformation"),
-				attribute("factory", classes::FrozenTransformation()),
+				attribute("factory", classes::FrozenMatrix()),
 				attribute("id", next_node_id),
 				element("properties",
 					element("property", string_cast(identity3()),

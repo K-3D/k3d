@@ -1,5 +1,5 @@
-#ifndef K3DSDK_TRANSFORM_SOURCE_H
-#define K3DSDK_TRANSFORM_SOURCE_H
+#ifndef K3DSDK_MATRIX_SOURCE_H
+#define K3DSDK_MATRIX_SOURCE_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -68,5 +68,5 @@ private:
 
 } // namespace k3d
 
-#endif // !K3DSDK_TRANSFORM_SOURCE_H
+#endif // !K3DSDK_MATRIX_SOURCE_H
 

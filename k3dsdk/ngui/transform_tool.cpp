@@ -315,7 +315,7 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 
 	void transform_tool::transform_target::start_move()
 	{
-		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Move "))
+		if(create_transform_modifier(k3d::classes::FrozenMatrix(), "Move "))
 			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3()));
 
 		// Setup matrices
@@ -335,7 +335,7 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 
 	void transform_tool::transform_target::start_rotation()
 	{
-		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Rotate "))
+		if(create_transform_modifier(k3d::classes::FrozenMatrix(), "Rotate "))
 			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3()));
 
 		// Setup matrices
@@ -357,7 +357,7 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 
 	void transform_tool::transform_target::start_scaling()
 	{
-		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Scale "))
+		if(create_transform_modifier(k3d::classes::FrozenMatrix(), "Scale "))
 			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3()));
 
 		// Setup matrices

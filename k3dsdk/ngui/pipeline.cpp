@@ -300,7 +300,7 @@ void show_nodes(idocument& Document, const std::vector<inode*>& Nodes)
 	}
 }
 
-/// Duplicates first node's transformation into a FrozenTransformationa and connects it to second node
+/// Duplicates first node's transformation into a FrozenMatrixa and connects it to second node
 void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocument& Document)
 {
 	// Check for "input_matrix" property
@@ -312,13 +312,13 @@ void freeze_transformation(k3d::inode& FromNode, k3d::inode& ToNode, k3d::idocum
 	if(!Document.pipeline().dependency(*transformation_property))
 		return;
 
-	// Duplicate input matrix into a new FrozenTransformation
-	k3d::inode* frozen_transformation = k3d::plugin::create<k3d::inode>(k3d::classes::FrozenTransformation(), Document);
+	// Duplicate input matrix into a new FrozenMatrix
+	k3d::inode* frozen_transformation = k3d::plugin::create<k3d::inode>(k3d::classes::FrozenMatrix(), Document);
 	return_if_fail(frozen_transformation);
 
 	frozen_transformation->set_name(k3d::unique_name(Document.nodes(), ToNode.name() + " Transformation"));
 
-	// Connect new FrozenTransformation and ToNode
+	// Connect new FrozenMatrix and ToNode
 	k3d::imatrix_sink* const transformation_sink = dynamic_cast<k3d::imatrix_sink*>(&ToNode);
 	return_if_fail(transformation_sink);
 	k3d::imatrix_source* const transformation_source = dynamic_cast<k3d::imatrix_source*>(frozen_transformation);

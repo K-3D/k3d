@@ -101,7 +101,7 @@ void unparent(k3d::inode& Node)
 	{
 		if(k3d::imatrix_sink* const matrix_sink = dynamic_cast<k3d::imatrix_sink*>(history.front()))
 		{
-			const transform_modifier modifier = create_transform_modifier(Node.document(), k3d::classes::FrozenTransformation(), "Unparent Compensation");
+			const transform_modifier modifier = create_transform_modifier(Node.document(), k3d::classes::FrozenMatrix(), "Unparent Compensation");
 			if(modifier)
 			{
 				k3d::property::set_internal_value(*modifier.node, "matrix", unparent_compensation);

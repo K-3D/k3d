@@ -7,7 +7,7 @@ document = k3d.new_document()
 
 time_source = document.new_node("TimeSource")
 instance = document.new_node("MeshInstance")
-transform = document.new_node("FrozenTransformation")
+transform = document.new_node("FrozenMatrix")
 track = document.new_node("AnimationTrackDoubleMatrix4")
 interpolator = document.new_node("InterpolatorDoubleMatrix4Linear")
 track.interpolator = interpolator

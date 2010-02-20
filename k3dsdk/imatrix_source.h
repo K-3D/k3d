@@ -1,5 +1,5 @@
-#ifndef K3DSDK_ITRANSFORM_SOURCE_H
-#define K3DSDK_ITRANSFORM_SOURCE_H
+#ifndef K3DSDK_IMATRIX_SOURCE_H
+#define K3DSDK_IMATRIX_SOURCE_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -49,5 +49,5 @@ protected:
 
 } // namespace k3d
 
-#endif // !K3DSDK_ITRANSFORM_SOURCE_H
+#endif // !K3DSDK_IMATRIX_SOURCE_H
 

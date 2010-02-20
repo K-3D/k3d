@@ -257,14 +257,14 @@ bool snap_tool_detail::transform_target::create_transform_modifier(const std::st
 	// Check for an existing transform modifier
 	k3d::inode* upstream_node = upstream_transform_modifier(*node);
 	/** \todo check for same name too */
-	if(upstream_node && (k3d::classes::FrozenTransformation() == upstream_node->factory().factory_id()))
+	if(upstream_node && (k3d::classes::FrozenMatrix() == upstream_node->factory().factory_id()))
 	{
 		set_transform_modifier(upstream_node);
 		return false;
 	}
 
 	const std::string modifier_name = Name + node->name();
-	set_transform_modifier(insert_transform_modifier(*node, k3d::classes::FrozenTransformation(), modifier_name));
+	set_transform_modifier(insert_transform_modifier(*node, k3d::classes::FrozenMatrix(), modifier_name));
 
 	return true;
 }

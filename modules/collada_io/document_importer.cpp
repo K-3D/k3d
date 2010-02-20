@@ -155,7 +155,7 @@ void node_recursion(k3d::idocument& Document, std::vector<collada_obj> &collada_
 
 	std::stringstream trans_name;
 	trans_name << "COLLADA " << node.getName() << " Transformation";
-	k3d::inode *frozen_trans = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("FrozenTransformation"), Document, k3d::unique_name(Document.nodes(),trans_name.str()));
+	k3d::inode *frozen_trans = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("FrozenMatrix"), Document, k3d::unique_name(Document.nodes(),trans_name.str()));
 	k3d::property::set_internal_value(*frozen_trans, "matrix", mcurrent);
 	k3d::imatrix_source* const matrix_source = dynamic_cast<k3d::imatrix_source*>(frozen_trans);
 

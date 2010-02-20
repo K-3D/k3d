@@ -78,7 +78,7 @@ public:
 		static k3d::document_plugin_factory<frozen_matrix,
 			k3d::interface_list<k3d::imatrix_source,
 			k3d::interface_list<k3d::imatrix_sink > > > factory(
-				k3d::classes::FrozenTransformation(),
+				k3d::classes::FrozenMatrix(),
 				"FrozenMatrix",
 				_("Stores an arbitrary transformation matrix"),
 				"Matrix",
