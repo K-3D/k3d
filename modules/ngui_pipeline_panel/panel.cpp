@@ -677,7 +677,7 @@ public:
 			"NGUIPipelinePanel",
 			_("Displays the visualization pipeline"),
 			"NGUI Panel",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Pipeline"));
 
 		return factory;

@@ -152,7 +152,7 @@ public:
 			"NGUIRectangleControl",
 			_("Provides a custom property control for k3d::rectangle properties."),
 			"NGUI Control",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "property-control")("ngui:property-type", "k3d::rectangle"));
 
 		return factory;

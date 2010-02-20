@@ -228,7 +228,7 @@ public:
 			"NGUIParentTool",
 			_("Provides interactive controls for reparenting nodes."),
 			"NGUI Tool",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "tool"));
 
 		return factory;

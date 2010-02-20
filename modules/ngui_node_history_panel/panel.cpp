@@ -395,7 +395,7 @@ public:
 			"NGUINodeHistoryPanel",
 			_("Displays a hierarchical list of node inputs"),
 			"NGUI Panel",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Node History"));
 
 		return factory;

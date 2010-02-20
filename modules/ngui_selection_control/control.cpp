@@ -141,7 +141,7 @@ public:
 			"NGUISelectionControl",
 			_("Provides a standard control for selection properties."),
 			"NGUI Control",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "property-control")("ngui:property-type", "k3d::selection::set"));
 
 		return factory;
