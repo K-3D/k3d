@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2005, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,7 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\brief Implements a 3D function plotter able to be animated.
 	\author Timothy M. Shead (tshead@k-3d.com) Most of the code used for poly_grid
 	\author Joaquín Duo (joaduo@lugmen.org.ar) Adaptation to the function parser
 */
@@ -57,26 +56,26 @@ class surface_plot :
 public:
 	surface_plot(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_function(init_owner(*this) + init_name("function") + init_label(_("Function")) + init_description(_("Function to be plotted. C-like notation")) + init_value(std::string(_("cos(sqrt(u^2+v^2))")))),
-		m_columns(init_owner(*this) + init_name("columns") + init_label(_("Columns")) + init_description(_("Column number")) + init_value(15) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_rows(init_owner(*this) + init_name("rows") + init_label(_("Rows")) + init_description(_("Row number")) + init_value(15) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Grid width")) + init_value(20.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_height(init_owner(*this) + init_name("height") + init_label(_("Height")) + init_description(_("Grid height")) + init_value(20.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_orientation(init_owner(*this) + init_name("orientation") + init_label(_("Orientation")) + init_description(_("Orientation type (forward or backward along X, Y or Z axis)")) + init_value(k3d::PZ) + init_enumeration(k3d::signed_axis_values())),
+		m_function(init_owner(*this) + init_name("function") + init_label(_("Function")) + init_description(_("Function to be plotted, in terms of u, v, and any scalar user properties added to the node.")) + init_value(k3d::string_t(_("cos(sqrt(u^2+v^2))")))),
+		m_u_samples(init_owner(*this) + init_name("u_samples") + init_label(_("U Samples")) + init_description(_("Number of samples along the u dimension.")) + init_value(15) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_v_samples(init_owner(*this) + init_name("v_samples") + init_label(_("V Samples")) + init_description(_("Number of samples along the v dimension.")) + init_value(15) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_u_size(init_owner(*this) + init_name("u_size") + init_label(_("U Size")) + init_description(_("Plot size along the u dimension.")) + init_value(20.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_v_size(init_owner(*this) + init_name("v_size") + init_label(_("V Size")) + init_description(_("Plot size along the v dimension.")) + init_value(20.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_orientation(init_owner(*this) + init_name("orientation") + init_label(_("Orientation")) + init_description(_("Plot orientation (positive or negative along the X, Y or Z axis).")) + init_value(k3d::PZ) + init_enumeration(k3d::signed_axis_values())),
 		m_user_property_changed_signal(*this)
 	{
-		m_columns.changed_signal().connect(k3d::hint::converter<
+		m_u_samples.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
-		m_rows.changed_signal().connect(k3d::hint::converter<
+		m_v_samples.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_update_mesh_slot()));
 		m_material.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 		
 		m_function.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
-		m_width.changed_signal().connect(k3d::hint::converter<
+		m_u_size.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
-		m_height.changed_signal().connect(k3d::hint::converter<
+		m_v_size.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
 		m_orientation.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
@@ -91,15 +90,15 @@ public:
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-		k3d::polyhedron::add_grid(Output, *polyhedron, 0, m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
+		k3d::polyhedron::add_grid(Output, *polyhedron, 0, m_v_samples.pipeline_value(), m_u_samples.pipeline_value(), m_material.pipeline_value());
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
 	{
-		const std::string function = m_function.pipeline_value();
+		const k3d::string_t function = m_function.pipeline_value();
 
-		std::string variables("u,v");
-		std::vector<double> values(2, 0.0);
+		k3d::string_t variables("u,v");
+		std::vector<k3d::double_t> values(2, 0.0);
 
 		const k3d::iproperty_collection::properties_t& properties = k3d::node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
@@ -107,14 +106,14 @@ public:
 			if(!dynamic_cast<k3d::iuser_property*>(*property))
 				continue;
 
-			if((**property).property_type() != typeid(double))
+			if((**property).property_type() != typeid(k3d::double_t))
 			{
 				k3d::log() << warning << factory().name() << ": user property [" << (**property).property_name() << "] with unsupported type [" << k3d::demangle((**property).property_type()) << "] will be ignored" << std::endl;
 				continue;
 			}
 
 			variables += "," + (**property).property_name();
-			values.push_back(k3d::property::pipeline_value<double>(**property));
+			values.push_back(k3d::property::pipeline_value<k3d::double_t>(**property));
 		}
 
 		k3d::expression::parser parser;
@@ -124,10 +123,10 @@ public:
 			return;
 		}
 
-		const unsigned long point_rows = m_rows.pipeline_value() + 1;
-		const unsigned long point_columns = m_columns.pipeline_value() + 1;
-		const double width = m_width.pipeline_value();
-		const double height = m_height.pipeline_value();
+		const k3d::int32_t point_v_samples = m_v_samples.pipeline_value() + 1;
+		const k3d::int32_t point_u_samples = m_u_samples.pipeline_value() + 1;
+		const k3d::double_t u_size = m_u_size.pipeline_value();
+		const k3d::double_t v_size = m_v_size.pipeline_value();
 		const k3d::signed_axis orientation = m_orientation.pipeline_value();
 
 		k3d::vector3 i, j, k;
@@ -166,20 +165,20 @@ public:
 		}
 
 		k3d::mesh::points_t::iterator point = const_cast<k3d::mesh::points_t&>(*Output.points).begin();
-		for(unsigned long row = 0; row != point_rows; ++row)
+		for(k3d::int32_t row = 0; row != point_v_samples; ++row)
 		{
-			const double row_percent = static_cast<double>(row) / static_cast<double>(point_rows - 1);
+			const k3d::double_t row_percent = k3d::ratio(row, point_v_samples - 1);
 			
-			for(unsigned long column = 0; column != point_columns; ++column)
+			for(k3d::int32_t column = 0; column != point_u_samples; ++column)
 			{
-				const double column_percent = static_cast<double>(column) / static_cast<double>(point_columns - 1);
+				const k3d::double_t column_percent = k3d::ratio(column, point_u_samples - 1);
 
-				const double u = k3d::mix(-0.5 * width, 0.5 * width, column_percent);
-				const double v = k3d::mix(-0.5 * height, 0.5 * height, row_percent);
+				const k3d::double_t u = k3d::mix(-0.5 * u_size, 0.5 * u_size, column_percent);
+				const k3d::double_t v = k3d::mix(-0.5 * v_size, 0.5 * v_size, row_percent);
 
 				values[0] = u;
 				values[1] = v;
-				const double w = parser.evaluate(&values[0]);
+				const k3d::double_t w = parser.evaluate(&values[0]);
 
 				*point++ = k3d::to_point((u * i) + (v * j) + (w * k));
 			}
@@ -193,17 +192,17 @@ public:
 			"SurfacePlot",
 			_("Creates a 3D surface plot."),
 			"Math",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
 
 private:
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_function;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_columns;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_rows;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_width;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_height;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_function;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_samples;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_v_samples;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_u_size;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_v_size;
 	k3d_data(k3d::signed_axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_orientation;
 
 	k3d::user_property_changed_signal m_user_property_changed_signal;
