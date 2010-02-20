@@ -666,6 +666,11 @@ K3D_TEST(mesh.modifier.CylindricalWavePoints
 	REQUIRES K3D_BUILD_DEFORMATION_MODULE
 	LABELS mesh modifier)
 
+K3D_TEST(mesh.modifier.DeformationExpression 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.DeformationExpression.py
+	REQUIRES K3D_BUILD_DEFORMATION_MODULE
+	LABELS mesh modifier DeformationExpression)
+
 K3D_TEST(mesh.modifier.Delete.point 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.Delete.point.py
 	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
