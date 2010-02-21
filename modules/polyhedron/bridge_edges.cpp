@@ -268,7 +268,7 @@ public:
 				"BridgeEdges",
 				"Creates new polygons bridging two sets of connected border edges",
 				"Polyhedron",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
