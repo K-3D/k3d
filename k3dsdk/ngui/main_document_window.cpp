@@ -2210,18 +2210,26 @@ private:
 
 	void on_create_node(k3d::iplugin_factory* const Factory)
 	{
-		return_if_fail(Factory);
+		if(cancel_plugin(*Factory))
+			return;
+
 		pipeline::create_node(m_document_state.document(), *Factory);
 	}
 
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)
 	{
+		if(cancel_plugin(*Modifier))
+			return;
+
 		modify_selected_meshes(m_document_state, Modifier);
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_modify_transformations(k3d::iplugin_factory* Modifier)
 	{
+		if(cancel_plugin(*Modifier))
+			return;
+
 		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 
 		k3d::inode* new_modifier;

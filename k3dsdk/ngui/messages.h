@@ -2,7 +2,7 @@
 #define K3DSDK_NGUI_MESSAGES_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,9 +21,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/types.h>
 #include <k3dsdk/ustring.h>
 
 #include <string>
@@ -31,6 +32,8 @@
 
 namespace k3d
 {
+
+class iplugin_factory;
 
 namespace ngui
 {
@@ -50,6 +53,9 @@ void error_message(const std::string& Message, const std::string& SecondaryMessa
 unsigned int query_message(const std::string& Message, const unsigned int DefaultOption, const std::vector<std::string>& Options);
 /// Displays an information "nag" message in a modal dialog box
 void nag_message(const std::string& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage = k3d::ustring());
+
+/// Warns the user before creating an experimental or deprecated plugin, and gives them a chance to cancel.  Returns true iff the user decided to cancel.
+bool_t cancel_plugin(iplugin_factory& Factory);
 
 } // namespace ngui
 

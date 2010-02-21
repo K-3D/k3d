@@ -576,6 +576,9 @@ private:
 	/// Modify selected meshes
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)
 	{
+		if(cancel_plugin(*Modifier))
+			return;
+
 		modify_selected_meshes(m_document_state, Modifier);
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
@@ -583,7 +586,8 @@ private:
 	/// Modify selected transforms
 	void on_modifier_transform(k3d::iplugin_factory* Modifier)
 	{
-		return_if_fail(Modifier);
+		if(cancel_plugin(*Modifier))
+			return;
 
 		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 
