@@ -1,0 +1,19 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Add a nag message when using experimental plugins.
+desc: Like it says.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-21 05:46:25.778913 Z
+references: []
+
+id: 83af56cb47d6d6414fdc911fd5ae4ea45b23691b
+log_events: 
+- - 2010-02-21 05:46:26.330843 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 
