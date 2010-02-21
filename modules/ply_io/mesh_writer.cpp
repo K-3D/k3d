@@ -62,7 +62,7 @@ public:
 			"PLYMeshWriter",
 			_("Mesh writer that saves external Stanford PLY (.ply) files"),
 			"MeshWriter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
