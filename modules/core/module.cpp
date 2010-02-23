@@ -31,7 +31,6 @@ namespace core
 
 extern k3d::iplugin_factory& axes_factory();
 extern k3d::iplugin_factory& camera_factory();
-extern k3d::iplugin_factory& color_property_factory();
 extern k3d::iplugin_factory& multi_material_factory();
 extern k3d::iplugin_factory& null_factory();
 
@@ -42,7 +41,6 @@ extern k3d::iplugin_factory& null_factory();
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::core::axes_factory());
 	Registry.register_factory(module::core::camera_factory());
-	Registry.register_factory(module::core::color_property_factory());
 	Registry.register_factory(module::core::multi_material_factory());
 	Registry.register_factory(module::core::null_factory());
 K3D_MODULE_END

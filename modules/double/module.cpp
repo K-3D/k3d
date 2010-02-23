@@ -35,7 +35,6 @@ extern k3d::iplugin_factory& expression_factory();
 extern k3d::iplugin_factory& double_to_string_factory();
 extern k3d::iplugin_factory& modulo_factory();
 extern k3d::iplugin_factory& multiply_factory();
-extern k3d::iplugin_factory& property_factory();
 extern k3d::iplugin_factory& sine_factory();
 extern k3d::iplugin_factory& subtract_factory();
 
@@ -50,7 +49,6 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::scalar::double_to_string_factory());
 	Registry.register_factory(module::scalar::modulo_factory());
 	Registry.register_factory(module::scalar::multiply_factory());
-	Registry.register_factory(module::scalar::property_factory());
 	Registry.register_factory(module::scalar::sine_factory());
 	Registry.register_factory(module::scalar::subtract_factory());
 K3D_MODULE_END
