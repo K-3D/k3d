@@ -746,10 +746,10 @@ K3D_TEST(mesh.modifier.LinearWavePoints
 	REQUIRES K3D_BUILD_DEFORMATION_MODULE
 	LABELS mesh modifier)
 
-K3D_TEST(mesh.modifier.MakeParticles 
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.MakeParticles.py
+K3D_TEST(mesh.modifier.PointsToParticles 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.PointsToParticles.py
 	REQUIRES K3D_BUILD_PARTICLE_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier particles PointsToParticles)
 
 K3D_TEST(mesh.modifier.PolyToBilinear 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.PolyToBilinear.py

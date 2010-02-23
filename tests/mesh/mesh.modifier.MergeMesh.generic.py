@@ -15,10 +15,10 @@ source2.width = 4.0
 source2.height = 4.0
 source2.depth = 4.0
 
-modifier1 = document.new_node("MakeParticles")
+modifier1 = document.new_node("PointsToParticles")
 modifier1.width = 2.0
 
-modifier2 = document.new_node("MakeParticles")
+modifier2 = document.new_node("PointsToParticles")
 modifier2.width = 3.0
 
 document.set_dependency(modifier1.get_property("input_mesh"), source1.get_property("output_mesh"))
