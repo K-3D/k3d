@@ -268,20 +268,20 @@ K3D_TEST(mesh.source.Hyperboloid
 	REQUIRES K3D_BUILD_QUADRICS_MODULE
 	LABELS mesh source Hyperboloid)
 
-K3D_TEST(mesh.source.KnotCurve
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.KnotCurve.py
+K3D_TEST(mesh.source.LinearKnot
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/source.LinearKnot.py
 	REQUIRES K3D_BUILD_LINEAR_CURVE_MODULE
-	LABELS mesh source KnotCurve)
+	LABELS mesh source LinearKnot)
 
 K3D_TEST(mesh.source.LSystemParser
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.LSystemParser.py
 	REQUIRES K3D_BUILD_LSYSTEM_MODULE
 	LABELS mesh source LSystemParser)
 
-K3D_TEST(mesh.source.LissajousCurve
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.LissajousCurve.py
+K3D_TEST(mesh.source.LinearLissajousCurve
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/source.LinearLissajousCurve.py
 	REQUIRES K3D_BUILD_LINEAR_CURVE_MODULE
-	LABELS mesh source LissajousCurve)
+	LABELS mesh source LinearLissajousCurve)
 
 K3D_TEST(mesh.source.Newell.teacup
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Newell.teacup.py
@@ -966,10 +966,10 @@ K3D_TEST(mesh.modifier.PointsToBlobby
 	REQUIRES K3D_BUILD_BLOBBY_MODULE
 	LABELS mesh modifier)
 
-K3D_TEST(mesh.modifier.PolygonizeBicubicPatches 
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.PolygonizeBicubicPatches.py
+K3D_TEST(mesh.modifier.BicubicToPoly 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.BicubicToPoly.py
 	REQUIRES K3D_BUILD_BICUBIC_PATCH_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier BicubicToPoly)
 
 K3D_TEST(mesh.modifier.QSlim 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.QSlim.py

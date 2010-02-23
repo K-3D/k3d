@@ -42,15 +42,15 @@ namespace bicubic_patch
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// polygonize_bicubic_patches
+// bicubic_to_poly
 
-class polygonize_bicubic_patches :
+class bicubic_to_poly :
 	public k3d::mesh_modifier<k3d::node >
 {
 	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
-	polygonize_bicubic_patches(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	bicubic_to_poly(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_subdivisions(init_owner(*this) + init_name("subdivisions") + init_label(_("Subdivisions")) + init_description(_("Patch subdivision number")) + init_value(3) + init_step_increment(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_units(typeid(k3d::measurement::scalar)))
 	{
@@ -182,13 +182,13 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<polygonize_bicubic_patches,
+		static k3d::document_plugin_factory<bicubic_to_poly,
 				k3d::interface_list<k3d::imesh_source,
 				k3d::interface_list<k3d::imesh_sink> > > factory(
 				k3d::uuid(0xbd6bdff8, 0xb4374eb1, 0xad39f4ad, 0x87209e59),
-				"PolygonizeBicubicPatches",
+				"BicubicToPoly",
 				_("Polygonizes bicubic patches"),
-				"Patch",
+				"BicubicPatch",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -199,11 +199,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// polygonize_bicubic_patches_factory
+// bicubic_to_poly_factory
 
-k3d::iplugin_factory& polygonize_bicubic_patches_factory()
+k3d::iplugin_factory& bicubic_to_poly_factory()
 {
-	return polygonize_bicubic_patches::get_factory();
+	return bicubic_to_poly::get_factory();
 }
 
 } // namespace bicubic_patch
