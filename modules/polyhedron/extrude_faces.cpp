@@ -56,7 +56,7 @@ public:
 	extrude_faces(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_segments(init_owner(*this) + init_name("segments") + init_label(_("Segments")) + init_description(_("Segment number between original and new faces.")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_group_faces(init_owner(*this) + init_name("group_faces") + init_label(_("Group Faces")) + init_description(_("Group neighboring faces together.")) + init_value(true)),
+		m_group_faces(init_owner(*this) + init_name("group_faces") + init_label(_("Group Faces")) + init_description(_("Group neighboring faces together.")) + init_value(false)),
 		m_group_normals(init_owner(*this) + init_name("group_normals") + init_label(_("Group Normals")) + init_description(_("When grouping neighboring faces together, use the same (averaged) normal vector for every face in the group.")) + init_value(false)),
 		m_select_new_faces(init_owner(*this) + init_name("select_new_faces") + init_label(_("Select New Faces")) + init_description(_("Select newly-created faces.")) + init_value(false)),
 		m_distance(init_owner(*this) + init_name("distance") + init_label(_("Distance")) + init_description(_("Distance between original and new faces")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
