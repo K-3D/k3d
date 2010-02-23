@@ -33,6 +33,7 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/optional.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -106,6 +107,12 @@ public:
 			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
 			if(!polyhedron)
 				continue;
+
+			// Get ready to copy attributes ...
+			k3d::table_copier point_attributes(Output.point_attributes);
+			k3d::table_copier edge_attributes(polyhedron->edge_attributes);
+			k3d::table_copier vertex_attributes(polyhedron->vertex_attributes);
+			k3d::table_copier face_attributes(polyhedron->face_attributes);
 
 			// Compute a mapping from edges to faces ...
 			k3d::mesh::indices_t edge_faces;
@@ -202,6 +209,7 @@ public:
 									k3d::ratio(segment + 1, segments)));
 							points.push_back(k3d::point3());
 							point_selection.push_back(0);
+							point_attributes.push_back(polyhedron->vertex_points[edge]);
 						}
 
 						layer_vertex_points[segment + 1][edge] = *layer_points[polyhedron->vertex_points[edge]];
@@ -219,6 +227,7 @@ public:
 								k3d::ratio(segment + 1, segments)));
 						points.push_back(k3d::point3());
 						point_selection.push_back(0);
+						point_attributes.push_back(polyhedron->vertex_points[edge]);
 					}
 				}
 			}
@@ -278,10 +287,20 @@ public:
 								polyhedron->edge_selections.push_back(0);
 								polyhedron->edge_selections.push_back(0);
 
+								edge_attributes.push_back(edge);
+								edge_attributes.push_back(edge);
+								edge_attributes.push_back(edge);
+								edge_attributes.push_back(edge);
+
 								polyhedron->vertex_points.push_back(layer_vertex_points[segment + 1][polyhedron->clockwise_edges[edge]]);
 								polyhedron->vertex_points.push_back(layer_vertex_points[segment + 1][edge]);
 								polyhedron->vertex_points.push_back(layer_vertex_points[segment][edge]);
 								polyhedron->vertex_points.push_back(layer_vertex_points[segment][polyhedron->clockwise_edges[edge]]);
+
+								vertex_attributes.push_back(polyhedron->clockwise_edges[edge]);
+								vertex_attributes.push_back(edge);
+								vertex_attributes.push_back(edge);
+								vertex_attributes.push_back(polyhedron->clockwise_edges[edge]);
 
 								polyhedron->vertex_selections.push_back(0);
 								polyhedron->vertex_selections.push_back(0);
@@ -293,6 +312,8 @@ public:
 								polyhedron->face_loop_counts.push_back(1);
 								polyhedron->face_selections.push_back(select_new_faces ? 1 : 0);
 								polyhedron->face_materials.push_back(polyhedron->face_materials[face]);
+
+								face_attributes.push_back(face);
 
 								polyhedron->loop_first_edges.push_back(new_first_edge);
 							}
