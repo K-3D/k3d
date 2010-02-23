@@ -40,15 +40,15 @@ namespace bilinear_patch
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// make_bilinear_patches
+// poly_to_bilinear
 
-class make_bilinear_patches:
+class poly_to_bilinear:
 	public k3d::mesh_modifier<k3d::node >
 {
 	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
-	make_bilinear_patches(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_to_bilinear(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
 	}
@@ -121,13 +121,13 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<make_bilinear_patches,
+		static k3d::document_plugin_factory<poly_to_bilinear,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink> > > factory(
 				k3d::uuid(0xe99f3672, 0x6e85457d, 0x9ce1f9dc, 0x6bb71691),
-				"MakeBilinearPatches",
-				_("Converts input quadrilaterals to bilinear patches"),
-				"Patch",
+				"PolyToBilinear",
+				_("Converts input quadrilaterals to bilinear patches."),
+				"Bilinear",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -135,11 +135,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// make_bilinear_patches_factory
+// poly_to_bilinear_factory
 
-k3d::iplugin_factory& make_bilinear_patches_factory()
+k3d::iplugin_factory& poly_to_bilinear_factory()
 {
-	return make_bilinear_patches::get_factory();
+	return poly_to_bilinear::get_factory();
 }
 
 } // namespace bilinear_patch

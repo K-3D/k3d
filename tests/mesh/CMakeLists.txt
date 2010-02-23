@@ -731,10 +731,10 @@ K3D_TEST(mesh.modifier.MakeParticles
 	REQUIRES K3D_BUILD_PARTICLE_MODULE
 	LABELS mesh modifier)
 
-K3D_TEST(mesh.modifier.MakeBilinearPatches 
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.MakeBilinearPatches.py
+K3D_TEST(mesh.modifier.PolyToBilinear 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.PolyToBilinear.py
 	REQUIRES K3D_BUILD_BILINEAR_PATCH_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier PolyToBilinear)
 
 K3D_TEST(mesh.modifier.MergeCollinearEdges 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.MergeCollinearEdges.py
