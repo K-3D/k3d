@@ -1,0 +1,19 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Add support for binary STL files to STLMeshReader and STLMeshWriter."
+desc: Like it says.
+type: :feature
+component: K-3D
+release: 1.0.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-23 03:49:39.323943 Z
+references: []
+
+id: a8c5a1d70781b39476748bd155c24a309d8ff50f
+log_events: 
+- - 2010-02-23 03:49:39.970843 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 
