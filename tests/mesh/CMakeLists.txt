@@ -238,6 +238,66 @@ K3D_TEST(mesh.source.MeshSourceScript.tori
 
 
 
+
+
+
+K3D_TEST(mesh.source.QuadricCone
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.QuadricCone.py
+	REQUIRES K3D_BUILD_QUADRICS_MODULE
+	LABELS mesh source quadric QuadricCone)
+
+K3D_TEST(mesh.source.QuadricCylinder
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.QuadricCylinder.py
+	REQUIRES K3D_BUILD_QUADRICS_MODULE
+	LABELS mesh source quadric QuadricCylinder)
+
+K3D_TEST(mesh.source.QuadricDisk
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.QuadricDisk.py
+	REQUIRES K3D_BUILD_QUADRICS_MODULE
+	LABELS mesh source quadric QuadricDisk)
+
+K3D_TEST(mesh.source.QuadricLogo
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.QuadricLogo.py
+	REQUIRES K3D_BUILD_QUADRICS_MODULE
+	LABELS mesh source quadric QuadricLogo)
+
+K3D_TEST(mesh.source.QuadricHyperboloid
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.QuadricHyperboloid.py
+	REQUIRES K3D_BUILD_QUADRICS_MODULE
+	LABELS mesh source quadric QuadricHyperboloid)
+
+K3D_TEST(mesh.source.QuadricParaboloid
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.QuadricParaboloid.py
+	REQUIRES K3D_BUILD_QUADRICS_MODULE
+	LABELS mesh source quadric QuadricParaboloid)
+
+K3D_TEST(mesh.source.QuadricSphere
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.QuadricSphere.py
+	REQUIRES K3D_BUILD_QUADRICS_MODULE
+	LABELS mesh source quadric QuadricSphere)
+
+K3D_TEST(mesh.source.QuadricTorus
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.QuadricTorus.py
+	REQUIRES K3D_BUILD_QUADRICS_MODULE
+	LABELS mesh source quadric QuadricTorus)
+
+
+
+
+
+
+K3D_TEST(mesh.source.Teapot
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Teapot.py
+	REQUIRES K3D_BUILD_QUADRICS_MODULE
+	LABELS mesh source teapot Teapot)
+
+
+
+
+
+
+
+
 K3D_TEST(mesh.source.BlobbyEllipsoid
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.BlobbyEllipsoid.py
 	REQUIRES K3D_BUILD_BLOBBY_MODULE
@@ -247,26 +307,6 @@ K3D_TEST(mesh.source.BlobbySegment
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.BlobbySegment.py
 	REQUIRES K3D_BUILD_BLOBBY_MODULE
 	LABELS mesh source BlobbySegment) 
-
-K3D_TEST(mesh.source.Cone
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Cone.py
-	REQUIRES K3D_BUILD_QUADRICS_MODULE
-	LABELS mesh source Cone)
-
-K3D_TEST(mesh.source.Cylinder
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Cylinder.py
-	REQUIRES K3D_BUILD_QUADRICS_MODULE
-	LABELS mesh source Cylinder)
-
-K3D_TEST(mesh.source.Disk
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Disk.py
-	REQUIRES K3D_BUILD_QUADRICS_MODULE
-	LABELS mesh source Disk)
-
-K3D_TEST(mesh.source.Hyperboloid
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Hyperboloid.py
-	REQUIRES K3D_BUILD_QUADRICS_MODULE
-	LABELS mesh source Hyperboloid)
 
 K3D_TEST(mesh.source.LinearKnot
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/source.LinearKnot.py
@@ -353,11 +393,6 @@ K3D_TEST(mesh.source.NurbsTorus
 	REQUIRES K3D_BUILD_NURBS_SOURCES_MODULE
 	LABELS mesh source NurbsTorus)
 
-K3D_TEST(mesh.source.Paraboloid
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Paraboloid.py
-	REQUIRES K3D_BUILD_QUADRICS_MODULE
-	LABELS mesh source Paraboloid)
-
 K3D_TEST(mesh.source.PolyCone
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.PolyCone.py
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE
@@ -428,25 +463,10 @@ K3D_TEST(mesh.source.Polyhedron
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE
 	LABELS mesh source Polyhedron)
 
-K3D_TEST(mesh.source.Sphere
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Sphere.py
-	REQUIRES K3D_BUILD_QUADRICS_MODULE
-	LABELS mesh source Sphere)
-
 K3D_TEST(mesh.source.SurfacePlot
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.SurfacePlot.py
 	REQUIRES K3D_BUILD_PLOT_MODULE
 	LABELS mesh source SurfacePlot)
-
-K3D_TEST(mesh.source.Teapot
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Teapot.py
-	REQUIRES K3D_BUILD_QUADRICS_MODULE
-	LABELS mesh source Teapot)
-
-K3D_TEST(mesh.source.Torus
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Torus.py
-	REQUIRES K3D_BUILD_QUADRICS_MODULE
-	LABELS mesh source Torus)
 
 K3D_TEST(mesh.source.reader.bogus_input
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.reader.bogus_input.py

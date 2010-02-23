@@ -88,7 +88,7 @@ public:
 	{
 		static k3d::document_plugin_factory<hyperboloid > factory(
 			k3d::uuid(0x78f63f30, 0xf545949b, 0x90c91ba0, 0x76a065c9),
-			"Hyperboloid",
+			"QuadricHyperboloid",
 			"Creates a hyperboloid primitive",
 			"Quadric",
 			k3d::iplugin_factory::STABLE);

@@ -51,7 +51,7 @@ class logo :
 public:
 	logo(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Controls the radius of the output logo.")) + init_value(5.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
+		m_radius(init_owner(*this) + init_name("radius") + init_label(_("Radius")) + init_description(_("Controls the radius of the output logo.")) + init_value(10.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
 		m_material.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
@@ -180,7 +180,7 @@ public:
 	{
 		static k3d::document_plugin_factory<logo > factory(
 			k3d::uuid(0xefc80ecb, 0x9340c5b0, 0x0061109e, 0xc97591a3),
-			"Logo",
+			"QuadricLogo",
 			"Creates the K-3D logo using quadric primitives.",
 			"Quadric",
 			k3d::iplugin_factory::STABLE);

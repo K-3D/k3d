@@ -92,7 +92,7 @@ public:
 	{
 		static k3d::document_plugin_factory<paraboloid > factory(
 			k3d::uuid(0x12d75d62, 0x574c5065, 0xd670e780, 0x7099afda),
-			"Paraboloid",
+			"QuadricParaboloid",
 			"Creates a paraboloid primitive",
 			"Quadric",
 			k3d::iplugin_factory::STABLE);

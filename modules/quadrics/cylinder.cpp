@@ -92,7 +92,7 @@ public:
 	{
 		static k3d::document_plugin_factory<cylinder > factory(
 			k3d::uuid(0x347ffdff, 0x7c4daf2f, 0x8bbce1a4, 0xc5f9af00),
-			"Cylinder",
+			"QuadricCylinder",
 			"Creates a cylinder primitive",
 			"Quadric",
 			k3d::iplugin_factory::STABLE);
