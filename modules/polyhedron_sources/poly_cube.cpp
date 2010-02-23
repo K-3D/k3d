@@ -41,15 +41,15 @@ namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// poly_cube_implementation
+// poly_cube
 
-class poly_cube_implementation :
+class poly_cube :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	poly_cube_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_cube(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_columns(init_owner(*this) + init_name("columns") + init_label(_("Columns")) + init_description(_("Column number (X axis)")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_rows(init_owner(*this) + init_name("rows") + init_label(_("Rows")) + init_description(_("Row number (Y axis)")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -256,7 +256,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<poly_cube_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<poly_cube, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x7ec966d1, 0xd78a445c, 0x8806b8a3, 0x5593f241),
 			"PolyCube",
 			_("Generates a polygonal cube"),
@@ -280,7 +280,7 @@ private:
 
 k3d::iplugin_factory& poly_cube_factory()
 {
-	return poly_cube_implementation::get_factory();
+	return poly_cube::get_factory();
 }
 
 } // namespace sources

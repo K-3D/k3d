@@ -43,15 +43,15 @@ namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// poly_cushion_implementation
+// poly_cushion
 
-class poly_cushion_implementation :
+class poly_cushion :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	poly_cushion_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_cushion(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_length_segments(init_owner(*this) + init_name("length_segments") + init_label(_("Length segments")) + init_description(_("Length segments")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
 		m_radial_segments(init_owner(*this) + init_name("radial_segments") + init_label(_("Radial segments")) + init_description(_("Radial segments")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
@@ -250,7 +250,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<poly_cushion_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<poly_cushion, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0xc11b963d, 0x108d471c, 0xa3826195, 0x821116b0),
 			"PolyCushion",
 			_("Generates a polygonal cushion (a cube with rounded edges)"),
@@ -274,7 +274,7 @@ private:
 
 k3d::iplugin_factory& poly_cushion_factory()
 {
-	return poly_cushion_implementation::get_factory();
+	return poly_cushion::get_factory();
 }
 
 } // namespace sources

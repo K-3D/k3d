@@ -42,15 +42,15 @@ namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// poly_cone_implementation
+// poly_cone
 
-class poly_cone_implementation :
+class poly_cone :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	poly_cone_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_cone(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("U segments")) + init_description(_("Columns")) + init_value(32) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("V segments")) + init_description(_("Rows")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -172,7 +172,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<poly_cone_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<poly_cone, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x7c41b43f, 0x385143ab, 0x86969795, 0x368d6199),
 			"PolyCone",
 			_("Generates a polygonal cone with optional endcap"),
@@ -197,7 +197,7 @@ private:
 
 k3d::iplugin_factory& poly_cone_factory()
 {
-	return poly_cone_implementation::get_factory();
+	return poly_cone::get_factory();
 }
 
 } // namespace sources

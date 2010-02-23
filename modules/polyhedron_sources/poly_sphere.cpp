@@ -41,15 +41,15 @@ namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// poly_sphere_implementation
+// poly_sphere
 
-class poly_sphere_implementation :
+class poly_sphere :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	poly_sphere_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_sphere(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("U segments")) + init_description(_("Columns")) + init_value(32) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("V segments")) + init_description(_("Rows")) + init_value(16) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -335,7 +335,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<poly_sphere_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<poly_sphere, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x919c3786, 0x619e4e84, 0xb4ad868f, 0x1e77e67c),
 			"PolySphere",
 			_("Generates a polygonal sphere"),
@@ -416,7 +416,7 @@ private:
 
 k3d::iplugin_factory& poly_sphere_factory()
 {
-	return poly_sphere_implementation::get_factory();
+	return poly_sphere::get_factory();
 }
 
 } // namespace sources

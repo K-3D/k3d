@@ -42,15 +42,15 @@ namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// poly_torus_implementation
+// poly_torus
 
-class poly_torus_implementation :
+class poly_torus :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	poly_torus_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_torus(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("U segments")) + init_description(_("Columns")) + init_value(32) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("V segments")) + init_description(_("Rows")) + init_value(16) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -131,7 +131,7 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<poly_torus_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<poly_torus, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x9a5ea45b, 0xebc64e37, 0xa50b287a, 0x89e18b71),
 			"PolyTorus",
 			_("Generates a polygonal torus"),
@@ -155,7 +155,7 @@ private:
 
 k3d::iplugin_factory& poly_torus_factory()
 {
-	return poly_torus_implementation::get_factory();
+	return poly_torus::get_factory();
 }
 
 } // namespace sources
