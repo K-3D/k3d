@@ -512,7 +512,7 @@ public:
 				k3d::uuid(0xb9d4d815, 0x241c473d, 0xa22d3523, 0x406fa390),
 				"SubdivideFaces",
 				"Subdivides faces by creating new center / midpoints.",
-				"Mesh",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

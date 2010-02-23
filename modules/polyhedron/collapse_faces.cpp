@@ -227,7 +227,7 @@ public:
 				k3d::uuid(0x13f8a224, 0x5e284ac4, 0xb5b58ebd, 0x10f65bb6),
 				"CollapseFaces",
 				"For each selected face, collapses its vertices to the centroid",
-				"Mesh",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

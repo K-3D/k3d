@@ -167,7 +167,7 @@ public:
 				k3d::uuid(0xbbe1c426, 0x07a54105, 0xbbdb5e49, 0xcaf1825e),
 				"ConnectVertices",
 				"Creates edges between selected vertices",
-				"Mesh",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

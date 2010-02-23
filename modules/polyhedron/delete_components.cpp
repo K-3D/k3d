@@ -118,7 +118,7 @@ public:
 				k3d::uuid(0x2d738b7a, 0x6f473349, 0x53a066ad, 0xa857f734),
 				"Delete",
 				"Deletes selected faces, edges and vertices",
-				"Mesh",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

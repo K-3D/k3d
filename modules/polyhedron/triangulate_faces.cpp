@@ -78,7 +78,7 @@ public:
 			k3d::uuid(0x871ccafd, 0xc944da92, 0xcdf9f2b4, 0xcbc40cd8),
 			"TriangulateFaces",
 			_("Converts input faces into triangles"),
-			"Mesh",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

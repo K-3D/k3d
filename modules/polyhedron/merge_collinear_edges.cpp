@@ -114,7 +114,7 @@ public:
 				k3d::uuid(0x8b4b5184, 0x42454f3d, 0x227bbf86, 0x72f2b933),
 				"MergeCollinearEdges",
 				_("Merges edges that are collinear, up to a threshold"),
-				"Mesh",
+				"Polyhedron",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

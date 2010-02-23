@@ -122,7 +122,7 @@ public:
 				k3d::uuid(0xba2b777f, 0xad4d6bbb, 0x04277595, 0x88105177),
 				"MergeCoplanarFaces",
 				_("Merges faces that are coplanar, up to a given threshold"),
-				"Mesh",
+				"Polyhedron",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

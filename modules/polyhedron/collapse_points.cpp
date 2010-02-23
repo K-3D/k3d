@@ -163,7 +163,7 @@ public:
 				k3d::uuid(0x915ba4d4, 0xd4154a12, 0x938bec97, 0x60f819f3),
 				"CollapsePoints",
 				"Merge selected points into one point, positioned at the average position of the selected points.",
-				"Mesh",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

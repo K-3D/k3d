@@ -159,7 +159,7 @@ public:
 				k3d::uuid(0x62de51ff, 0xe70f423a, 0x953d899a, 0x1dbf5c38),
 				"SubdivideEdges",
 				"Subdivides selected edges by adding points.",
-				"Mesh",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

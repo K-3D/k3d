@@ -224,7 +224,7 @@ public:
 					k3d::uuid(0xa5252071, 0xa3484315, 0x9c9daf1c, 0x786042a3),
 					"CollapseEdges",
 					"For each selected edge, collapses its two vertices into one",
-					"Mesh",
+					"Polyhedron",
 					k3d::iplugin_factory::STABLE);
 
 		return factory;
