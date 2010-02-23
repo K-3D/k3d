@@ -36,15 +36,15 @@ namespace module
 namespace time
 {
 
-class format :
+class time_to_string :
 	public k3d::node
 {
 	typedef k3d::node base;
 public:
-	format(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	time_to_string(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_input(init_owner(*this) + init_name("input") + init_label(_("Input")) + init_description(_("Timestamp value, or 0 to use current system time")) + init_value(0.0)),
-		m_format(init_owner(*this) + init_name("format") + init_label(_("Format")) + init_description(_("strftime() format string")) + init_value(std::string("%H:%M:%S"))),
+		m_format(init_owner(*this) + init_name("format") + init_label(_("Format")) + init_description(_("strftime() time_to_string string")) + init_value(std::string("%H:%M:%S"))),
 		m_output(init_owner(*this) + init_name("output") + init_label(_("Output string")) + init_description(_("strftime() output string (read only)")) + init_value(k3d::string_t()))
 	{
 		m_input.changed_signal().connect(k3d::hint::converter<
@@ -52,14 +52,14 @@ public:
 		m_format.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_output.make_slot()));
 
-		m_output.set_update_slot(sigc::mem_fun(*this, &format::execute));
+		m_output.set_update_slot(sigc::mem_fun(*this, &time_to_string::execute));
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<format > factory(
+		static k3d::document_plugin_factory<time_to_string > factory(
 			k3d::uuid(0x40d699fb, 0xeb12444f, 0xa84df477, 0x5cca00f9),
-			"FormatTime",
+			"TimeToString",
 			_("Converts a scalar to a string using strftime()-style formatting"),
 			"String",
 			k3d::iplugin_factory::STABLE);
@@ -104,9 +104,9 @@ private:
 	}
 };
 
-k3d::iplugin_factory& format_factory()
+k3d::iplugin_factory& time_to_string_factory()
 {
-	return format::get_factory();
+	return time_to_string::get_factory();
 }
 
 } //namespace time

@@ -406,7 +406,7 @@
 					<property name="frame_rate">1</property>
 				</properties>
 			</node>
-			<node name="FormatTime" factory="40d699fb eb12444f a84df477 5cca00f9" id="63">
+			<node name="TimeToString" factory="40d699fb eb12444f a84df477 5cca00f9" id="63">
 				<properties>
 					<property name="input">0</property>
 					<property name="format">%H:%M:%S Z</property>
