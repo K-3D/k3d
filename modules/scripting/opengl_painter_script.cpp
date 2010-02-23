@@ -22,13 +22,14 @@
 */
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
+#include <k3dsdk/imesh_painter_gl.h>
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_node.h>
 #include <k3dsdk/selection.h>
-#include <k3dsdk/transformable.h>
 
 namespace module
 {
@@ -37,38 +38,49 @@ namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// gl_renderable_script
+// opengl_painter_script
 
-class gl_renderable_script :
-	public k3d::scripted_node<k3d::gl::renderable<k3d::transformable<k3d::node > > >
+class opengl_painter_script :
+	public k3d::scripted_node<k3d::node >,
+	public k3d::gl::imesh_painter
 {
-	typedef k3d::scripted_node<k3d::gl::renderable<k3d::transformable<k3d::node > > > base;
+	typedef k3d::scripted_node<k3d::node > base;
 
 public:
-	gl_renderable_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	opengl_painter_script(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		set_script(k3d::resource::get_string("/module/scripting/gl_renderable_script.py"));
+		set_script(k3d::resource::get_string("/module/scripting/opengl_painter_script.py"));
 	}
 
-	void on_gl_draw(const k3d::gl::render_state& State)
+	void paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
+		context["Mesh"] = &Mesh;
+		context["PaintMesh"] = true;
+		context["SelectMesh"] = false;
 		execute_script(context);
 	}
 
-	void on_gl_select(const k3d::gl::render_state& State, const k3d::gl::selection_state& SelectState)
+	void select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		k3d::gl::push_selection_token(this);
 
 		k3d::iscript_engine::context_t context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
+		context["Mesh"] = &Mesh;
+		context["PaintMesh"] = false;
+		context["SelectMesh"] = true;
 		execute_script(context);
 
 		k3d::gl::pop_selection_token();
+	}
+
+	void mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
+	{
 	}
 
 	k3d::iplugin_factory& factory()
@@ -78,13 +90,12 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<gl_renderable_script,
-			k3d::interface_list<k3d::imatrix_source,
-			k3d::interface_list<k3d::imatrix_sink > > > factory(
-			k3d::uuid(0xd57c84cc, 0xa9474b12, 0xa344763c, 0x8f4e7c8e),
-			"GLRenderableScript",
-			_("Scripted OpenGL Drawable"),
-			"OpenGL Script",
+		static k3d::document_plugin_factory<opengl_painter_script,
+			k3d::interface_list<k3d::gl::imesh_painter > > factory(
+			k3d::uuid(0xd841c417, 0x889a44d7, 0x8fe520eb, 0xf26dc650),
+			"OpenGLPainterScript",
+			_("Scripted Mesh Painter"),
+			"OpenGL Painter Script",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -92,11 +103,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// gl_renderable_script_factory
+// opengl_painter_script_factory
 
-k3d::iplugin_factory& gl_renderable_script_factory()
+k3d::iplugin_factory& opengl_painter_script_factory()
 {
-	return gl_renderable_script::get_factory();
+	return opengl_painter_script::get_factory();
 }
 
 } // namespace scripting
