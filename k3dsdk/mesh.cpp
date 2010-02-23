@@ -267,7 +267,7 @@ void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_
 	return_if_fail(Mesh.points);
 	return_if_fail(Mesh.point_selection);
 	return_if_fail(Mesh.points->size() == Mesh.point_selection->size());
-	return_if_fail(Mesh.points->size() == Mesh.point_attributes.row_count() || 0 == Mesh.point_attributes.row_count());
+	return_if_fail(Mesh.points->size() == Mesh.point_attributes.row_count() || 0 == Mesh.point_attributes.column_count());
 
 	// Count how many points will be left when we're done ...
 	const uint_t points_remaining = std::count(Points.begin(), Points.end(), false);
