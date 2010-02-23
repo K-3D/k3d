@@ -40,15 +40,15 @@ namespace mesh
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// weld
+// weld_points
 
-class weld :
+class weld_points :
 	public k3d::mesh_modifier<k3d::node >
 {
 	typedef k3d::mesh_modifier<k3d::node > base;
 
 public:
-	weld(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	weld_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_distance(init_owner(*this) + init_name("distance") + init_label(_("Distance")) + init_description(_("Maximum distance between points")) + init_value(0.001) + init_step_increment(0.0001) + init_units(typeid(k3d::measurement::distance)) + init_constraint(constraint::minimum<k3d::double_t>(0.0)))
 	{
@@ -100,31 +100,31 @@ public:
 			point_map[point] = point;
 
 		// Update the point map to eliminate "duplicate" points ... warning: this is O(N^2)!!!
-		k3d::uint_t weld_count = 0;
+		k3d::uint_t weld_points_count = 0;
 		const k3d::double_t distance = m_distance.pipeline_value();
 		for(k3d::uint_t point1 = point_begin; point1 != point_end; ++point1)
 		{
-			// Skip points that have already been welded ...
+			// Skip points that have already been weld_pointsed ...
 			if(point_map[point1] != point1)
 				continue;
 
 			for(k3d::uint_t point2 = point1 + 1; point2 != point_end; ++point2)
 			{
-				// Skip points that have already been welded ...
+				// Skip points that have already been weld_pointsed ...
 				if(point_map[point2] != point2)
 					continue;
 
 				const k3d::vector3 delta = points[point2] - points[point1];
 				if(std::fabs(delta[0]) < distance && std::fabs(delta[1]) < distance && std::fabs(delta[2]) < distance)
 				{
-					++weld_count;
+					++weld_points_count;
 					point_map[point2] = point1;
 				}
 			}
 		}
 
-		// If we didn't find any points to weld, we're done ...
-		if(!weld_count)
+		// If we didn't find any points to weld_points, we're done ...
+		if(!weld_points_count)
 			return;
 
 		// Remap primitive points so that they no longer reference "duplicate" points ... 
@@ -143,11 +143,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<weld,
+		static k3d::document_plugin_factory<weld_points,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0xacfb8148, 0x4f404ca1, 0x937564e3, 0x2977984c),
-				"Weld",
+				"WeldPoints",
 				_("Eliminates points with duplicate 3D coordinates"),
 				"Mesh",
 				k3d::iplugin_factory::STABLE);
@@ -160,11 +160,11 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// weld_factory
+// weld_points_factory
 
-k3d::iplugin_factory& weld_factory()
+k3d::iplugin_factory& weld_points_factory()
 {
-	return weld::get_factory();
+	return weld_points::get_factory();
 }
 
 } // namespace mesh

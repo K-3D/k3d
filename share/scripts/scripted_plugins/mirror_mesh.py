@@ -43,7 +43,7 @@ class MirrorMesh:
 		self.mesh_instance.ri_painter = self.get_node("RenderMan Default Painter")
 		self.connect_nodes("mesh_instance","input_mesh","old_mesh_instance","output_mesh")
 	def create_nodes(self):
-		self.create_node("Weld", "weld", "Weld", "Weld Points Modifier")
+		self.create_node("WeldPoints", "weld", "WeldPoints", "Weld Points Modifier")
 		self.create_node("MergeMesh", "merge_mesh", "MergeMesh", "MergeMesh Modifier")
 		self.create_merge_mesh_inputs()
 		self.create_node("TransformPoints", "transform_points", "Transformation Mirror", "TransformPoints Modifier")

@@ -1096,8 +1096,8 @@ K3D_TEST(mesh.modifier.TwistPoints
 	REQUIRES K3D_BUILD_DEFORMATION_MODULE
 	LABELS mesh modifier)
 
-K3D_TEST(mesh.modifier.Weld 
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.Weld.py
+K3D_TEST(mesh.modifier.WeldPoints 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.WeldPoints.py
 	REQUIRES K3D_BUILD_MESH_MODULE
 	LABELS mesh modifier)
 
