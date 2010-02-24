@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <k3dsdk/almost_equal.h>
+#include <k3dsdk/difference.h>
 #include <k3dsdk/array.h>
 
 #include <algorithm>
@@ -118,26 +118,38 @@ public:
 		return base_type::empty();
 	}
 
-	bool_t almost_equal(const array& Other, const uint64_t Threshold) const
+	void difference(const array& Other, bool_t& Equal, uint64_t& ULPS) const
 	{
 		const this_type* const other = dynamic_cast<const this_type*>(&Other);
 		if(!other)
-			return false;
+		{
+			Equal = false;
+			return;
+		}
 
-		return almost_equal(*other, Threshold);
+		difference(*other, Equal, ULPS);
 	}
 
-	bool_t almost_equal(const this_type& Other, const uint64_t Threshold) const
+	void difference(const this_type& Other, bool_t& Equal, uint64_t& ULPS) const
 	{
-		if(base_type::size() != Other.size())
-			return false;
-
 		if(metadata != Other.metadata)
-			return false;
+			Equal = false;
 
-		return std::equal(base_type::begin(), base_type::end(), Other.begin(), k3d::almost_equal<uint_t>(Threshold));
+		if(base_type::size() != Other.size())
+		{
+			Equal = false;
+			return;
+		}
+
+		range_difference(base_type::begin(), base_type::end(), Other.begin(), Equal, ULPS);
 	}
 };
+
+/// Specialization of difference for k3d::uint_t_array
+inline void difference(const uint_t_array& A, const uint_t_array& B, bool_t& Equal, uint64_t& ULPS)
+{
+	A.difference(B, Equal, ULPS);
+}
 
 } // namespace k3d
 

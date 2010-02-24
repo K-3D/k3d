@@ -23,6 +23,7 @@
 */
 
 #include "nurbs_curves.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -75,7 +76,10 @@ public:
 
 		modify_selected_curves(Input, Output, curve_closer(m_keep_ends.pipeline_value()));
 		replace_duplicate_points(Output);
-		k3d::mesh::delete_unused_points(Output);
+
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	static k3d::iplugin_factory& get_factory()

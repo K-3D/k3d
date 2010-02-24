@@ -88,7 +88,7 @@ public:
 //				ri_uniform_attributes.add_arrays(nurbs->uniform_attributes);
 
 				array_copier ri_varying_attributes;
-				ri_varying_attributes.add_arrays(nurbs->varying_attributes);
+				ri_varying_attributes.add_arrays(nurbs->parameter_attributes);
 
 				array_copier ri_vertex_attributes;
 				ri_vertex_attributes.add_arrays(Mesh.point_attributes);
@@ -200,7 +200,7 @@ public:
 			"RenderManNURBSPatchPainter",
 			_("Renders NURBS patches"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

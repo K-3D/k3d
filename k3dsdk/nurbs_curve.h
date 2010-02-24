@@ -28,6 +28,8 @@ namespace k3d
 namespace nurbs_curve
 {
 
+class primitive;
+
 /// Gathers the member arrays of a nurbs_curve primitive into a convenient package
 class const_primitive
 {
@@ -44,9 +46,11 @@ public:
 		const mesh::knots_t& CurveKnots,
 		const mesh::table_t& ConstantAttributes,
 		const mesh::table_t& CurveAttributes,
-		const mesh::table_t& VaryingAttributes,
+		const mesh::table_t& ParameterAttributes,
 		const mesh::table_t& VertexAttributes
 		);
+
+	const_primitive(const primitive& Primitive);
 
 	const mesh::materials_t& material;
 	const mesh::indices_t& curve_first_points;
@@ -59,7 +63,7 @@ public:
 	const mesh::knots_t& curve_knots;
 	const mesh::table_t& constant_attributes;
 	const mesh::table_t& curve_attributes;
-	const mesh::table_t& varying_attributes;
+	const mesh::table_t& parameter_attributes;
 	const mesh::table_t& vertex_attributes;
 };
 
@@ -79,7 +83,7 @@ public:
 		mesh::knots_t& CurveKnots,
 		mesh::table_t& ConstantAttributes,
 		mesh::table_t& CurveAttributes,
-		mesh::table_t& VaryingAttributes,
+		mesh::table_t& ParameterAttributes,
 		mesh::table_t& VertexAttributes
 		);
 
@@ -95,7 +99,7 @@ public:
 	mesh::knots_t& curve_knots;
 	mesh::table_t& constant_attributes;
 	mesh::table_t& curve_attributes;
-	mesh::table_t& varying_attributes;
+	mesh::table_t& parameter_attributes;
 	mesh::table_t& vertex_attributes;
 };
 

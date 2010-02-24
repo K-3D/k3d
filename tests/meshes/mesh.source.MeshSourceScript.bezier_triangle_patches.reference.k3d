@@ -28,8 +28,8 @@
 				</structure>
 				<attributes>
 					<table type="constant"/>
+					<table type="parameter"/>
 					<table type="patch"/>
-					<table type="varying"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>

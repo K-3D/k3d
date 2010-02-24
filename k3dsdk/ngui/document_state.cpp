@@ -47,12 +47,11 @@
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
-#include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/ngui/application_state.h>
 #include <k3dsdk/ngui/context_menu.h>
-#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/move_tool.h>
 #include <k3dsdk/ngui/panel_mediator.h>
@@ -278,196 +277,6 @@ assert_not_implemented();
 	document_state::clear_cursor_signal_t& clear_cursor_signal()
 	{
 		return m_clear_cursor_signal;
-	}
-
-	k3d::inode* default_gl_painter()
-	{
-		const std::vector<k3d::inode*> nodes = k3d::node::lookup(m_document, "GL Default Painter");
-	        return (1 == nodes.size()) ? nodes[0] : 0;
-	}
-
-	k3d::inode* default_ri_painter()
-	{
-		const std::vector<k3d::inode*> nodes = k3d::node::lookup(m_document, "RenderMan Default Painter");
-	        return (1 == nodes.size()) ? nodes[0] : 0;
-	}
-	
-	k3d::inode* instantiate_mesh(k3d::inode* Node)
-	{
-		k3d::inode* mesh_instance = 0;
-		k3d::iproperty* mesh_source_property = 0;
-		if(k3d::classes::MeshInstance() == Node->factory().factory_id()) // Instantiate the input in case of a mesh instance
-		{
-			k3d::imesh_sink* sink = dynamic_cast<k3d::imesh_sink*>(Node);
-			mesh_source_property = Node->document().pipeline().dependency(sink->mesh_sink_input());
-			if(mesh_source_property)
-				mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), Node->name() + " Instance"));
-		}
-		else
-		{
-			k3d::ipipeline& pipeline = Node->document().pipeline();
-			const k3d::ipipeline::dependencies_t& dependencies = pipeline.dependencies();
-			k3d::imesh_source* mesh_source = dynamic_cast<k3d::imesh_source*>(Node);
-			if(!mesh_source)
-				return 0;
-			mesh_source_property = &(mesh_source->mesh_source_output());
-			if(mesh_source_property)
-				mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), Node->name() + " Instance"));
-				
-			k3d::iproperty* instance_mesh_source_property = &dynamic_cast<k3d::imesh_source*>(mesh_instance)->mesh_source_output();
-			k3d::iproperty* instance_transform_source_property = &dynamic_cast<k3d::itransform_source*>(mesh_instance)->transform_source_output();
-			
-			k3d::itransform_source* transform_source = dynamic_cast<k3d::itransform_source*>(Node);
-			k3d::iproperty* transform_source_property = 0;
-			if(transform_source)
-				transform_source_property = &(transform_source->transform_source_output());
-			
-			// Connect the MeshInstance outputs to the inputs of the downstream node, if any
-			k3d::ipipeline::dependencies_t new_dependencies;
-			for(k3d::ipipeline::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
-			{
-				if(dependency->second == mesh_source_property)
-				{
-					dependency->first->property_set_dependency(0);
-					new_dependencies.insert(std::make_pair(dependency->first, instance_mesh_source_property));
-				}
-				if(transform_source_property && dependency->second == transform_source_property)
-				{
-					dependency->first->property_set_dependency(0);
-					new_dependencies.insert(std::make_pair(dependency->first, instance_transform_source_property));
-				}
-			}
-			pipeline.set_dependencies(new_dependencies);
-			
-		}
-		 
-		if(!mesh_source_property)
-			return 0;
-		
-		// Assign a default painter ...
-		k3d::property::set_internal_value(*mesh_instance, "gl_painter", default_gl_painter());
-		k3d::property::set_internal_value(*mesh_instance, "ri_painter", default_ri_painter());
-
-		// Connect the mesh instance to the source ...
-		k3d::ipipeline::dependencies_t dependencies;
-		k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(mesh_instance);
-		if(mesh_sink)
-			dependencies.insert(std::make_pair(&mesh_sink->mesh_sink_input(), mesh_source_property));
-		Node->document().pipeline().set_dependencies(dependencies);
-		
-		freeze_transformation(*Node, *mesh_instance, m_document);
-		
-		return mesh_instance;
-	}
-
-	k3d::inode* create_node(k3d::iplugin_factory* Factory)
-	{
-		return_val_if_fail(Factory, 0);
-
-		// Switch to node selection mode
-		if(selection::NODE != selection::state(document()).current_mode())
-			selection::state(document()).set_current_mode(selection::NODE);
-
-		// Create the requested node ...
-		k3d::record_state_change_set changeset(m_document, k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), K3D_CHANGE_SET_CONTEXT);
-		const std::string node_name = k3d::unique_name(m_document.nodes(), Factory->name());
-		k3d::inode* const node = k3d::plugin::create<k3d::inode>(*Factory, m_document, node_name);
-		return_val_if_fail(node, 0);
-
-		// Keep track of the node to be selected ...
-		k3d::inode* to_be_selected = node;
-
-		// Keep track of every new node created ...
-		std::vector<k3d::inode*> new_nodes;
-		new_nodes.push_back(node);
-
-		// Prepare to make connections to other nodes ...
-		k3d::ipipeline::dependencies_t dependencies;
-
-		// If the new node is a mesh source (but not a MeshInstance!), create a MeshInstance node and attach it so it's immediately visible ...
-		k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(node);
-		if(mesh_source && k3d::classes::MeshInstance() != Factory->factory_id())
-		{
-			// Create a mesh instance ...
-			k3d::inode* const mesh_instance = instantiate_mesh(node);
-			return_val_if_fail(mesh_instance, 0);
-			new_nodes.push_back(mesh_instance);
-
-			// In this case, we want to select the mesh instance instead of the mesh source ...
-			to_be_selected = mesh_instance;
-		}
-
-		// If the new node is a material sink, assign a default material ...
-		if(k3d::imaterial_sink* const material_sink = dynamic_cast<k3d::imaterial_sink*>(node))
-		{
-			const std::vector<k3d::imaterial*> materials = k3d::node::lookup<k3d::imaterial>(m_document);
-			if(materials.size())
-				k3d::property::set_internal_value(material_sink->material_sink_input(), dynamic_cast<k3d::inode*>(*materials.rbegin()));
-		}
-
-		// If the new node is a time sink, connect it to the document time source ...
-		if(k3d::itime_sink* const time_sink = dynamic_cast<k3d::itime_sink*>(node))
-			dependencies.insert(std::make_pair(&time_sink->time_sink_input(), k3d::get_time(m_document)));
-
-		if(!dependencies.empty())
-			m_document.pipeline().set_dependencies(dependencies);
-
-		// If the new node is a camera, orient it horizontally
-		if(k3d::classes::Camera() == Factory->factory_id())
-			k3d::set_matrix(*node, k3d::rotate3(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
-		
-		// If the new node is a multiple mesh sink, add two mesh inputs
-		if(Factory->implements(typeid(k3d::imulti_mesh_sink)))
-		{
-			k3d::property::create<k3d::mesh*>(*node, "input_mesh1", "Input Mesh 1", "", static_cast<k3d::mesh*>(0));
-			k3d::property::create<k3d::mesh*>(*node, "input_mesh2", "Input Mesh 2", "", static_cast<k3d::mesh*>(0));
-		}
-
-		// If the new node is a render-engine, default to making every node in the document visible ...
-		if(k3d::inode_collection_sink* const node_collection_sink = dynamic_cast<k3d::inode_collection_sink*>(node))
-		{
-			const k3d::inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
-			for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-				k3d::property::set_internal_value(**property, document().nodes().collection());
-		}
-
-		// By default, make the new node visible in any node collection sinks that already exist ...
-		const k3d::inode_collection::nodes_t::const_iterator doc_node_end = document().nodes().collection().end();
-		for(k3d::inode_collection::nodes_t::const_iterator doc_node = document().nodes().collection().begin(); doc_node != doc_node_end; ++doc_node)
-		{
-			if(k3d::inode_collection_sink* const node_collection_sink = dynamic_cast<k3d::inode_collection_sink*>(*doc_node))
-			{
-				const k3d::inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
-				for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-				{
-					if(k3d::inode_collection_property* const node_collection_property = dynamic_cast<k3d::inode_collection_property*>(*property))
-					{
-						k3d::inode_collection_property::nodes_t nodes = k3d::property::internal_value<k3d::inode_collection_property::nodes_t>(**property);
-						for(k3d::uint_t i = 0; i != new_nodes.size(); ++i)
-						{
-							if(node_collection_property->property_allow(*new_nodes[i]))
-								nodes.push_back(new_nodes[i]);
-						}
-						k3d::property::set_internal_value(**property, nodes);
-					}
-				}
-			}
-		}
-
-		// Give nodes a chance to initialize their property values based on their inputs, if any ...
-		if(k3d::ireset_properties* const reset_properties = dynamic_cast<k3d::ireset_properties*>(node))
-			reset_properties->reset_properties();
-
-		// Replace the current selection
-		selection::state(document()).deselect_all();
-		selection::state(document()).select(*to_be_selected);
-
-		// Make the newly-created node properties visible ...
-		panel::mediator(document()).set_focus(*node);
-
-		k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::ASYNCHRONOUS);
-
-		return node;
 	}
 
 	void popup_context_menu(const bool UserAction)
@@ -747,16 +556,6 @@ document_state::set_cursor_signal_t& document_state::set_cursor_signal()
 document_state::clear_cursor_signal_t& document_state::clear_cursor_signal()
 {
 	return m_implementation->clear_cursor_signal();
-}
-
-k3d::inode* document_state::create_node(k3d::iplugin_factory* Factory)
-{
-	return m_implementation->create_node(Factory);
-}
-
-k3d::inode* document_state::instantiate_mesh(k3d::inode* Node)
-{
-	return m_implementation->instantiate_mesh(Node);
 }
 
 void document_state::popup_context_menu(const bool UserAction)

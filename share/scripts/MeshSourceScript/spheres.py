@@ -7,7 +7,7 @@ k3d.check_node_environment(locals(), "MeshSourceScript")
 
 # Construct a sphere mesh primitive ...
 sphere = k3d.sphere.create(Output)
-color = sphere.varying_attributes().create("Cs", "k3d::color")
+color = sphere.parameter_attributes().create("Cs", "k3d::color")
 
 # Add two spheres ...
 sphere.matrices().append(k3d.translate3(k3d.vector3(-3, 0, 0)))

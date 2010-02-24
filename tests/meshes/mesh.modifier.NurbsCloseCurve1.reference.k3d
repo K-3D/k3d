@@ -3,7 +3,9 @@
 	<mesh_arrays>
 		<points>0 0 0 1 0 0 2 0 0 3 0 0 1.5 0 0</points>
 		<point_selection>0 0 0 0 0</point_selection>
-		<point_attributes/>
+		<point_attributes>
+			<array name="index" type="k3d::uint_t">0 1 2 3 0</array>
+		</point_attributes>
 		<primitives>
 			<primitive type="nurbs_curve">
 				<structure>
@@ -34,9 +36,11 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
 					<table type="curve"/>
-					<table type="varying"/>
+					<table type="parameter"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>

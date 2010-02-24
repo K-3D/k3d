@@ -31,8 +31,8 @@
 #include <k3dsdk/iparentable.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
@@ -106,8 +106,8 @@ struct implementation
 		m_set_parent = false;
 		m_document_state.clear_cursor_signal().emit();
 
-		k3d::itransform_source* const transform_source = dynamic_cast<k3d::itransform_source*>(&Parent);
-		return_if_fail(transform_source);
+		k3d::imatrix_source* const matrix_source = dynamic_cast<k3d::imatrix_source*>(&Parent);
+		return_if_fail(matrix_source);
 
 		const k3d::matrix4 parent_compensation = k3d::inverse(k3d::node_to_world_matrix(Parent));
 
@@ -129,14 +129,14 @@ struct implementation
 			const transform_history_t history = parent_to_node_history(**node);
 			if(!history.empty())
 			{
-				if(k3d::itransform_sink* const transform_sink = dynamic_cast<k3d::itransform_sink*>(history.front()))
+				if(k3d::imatrix_sink* const matrix_sink = dynamic_cast<k3d::imatrix_sink*>(history.front()))
 				{
-					const transform_modifier modifier = create_transform_modifier(m_document_state.document(), k3d::classes::FrozenTransformation(), "Parent Compensation");
+					const transform_modifier modifier = create_transform_modifier(m_document_state.document(), k3d::classes::FrozenMatrix(), "Parent Compensation");
 					if(modifier)
 					{
 						k3d::property::set_internal_value(*modifier.node, "matrix", parent_compensation);
-						dependencies.insert(std::make_pair(&transform_sink->transform_sink_input(), &modifier.source->transform_source_output()));
-						dependencies.insert(std::make_pair(&modifier.sink->transform_sink_input(), &transform_source->transform_source_output()));
+						dependencies.insert(std::make_pair(&matrix_sink->matrix_sink_input(), &modifier.source->matrix_source_output()));
+						dependencies.insert(std::make_pair(&modifier.sink->matrix_sink_input(), &matrix_source->matrix_source_output()));
 					}
 				}
 			}
@@ -228,7 +228,7 @@ public:
 			"NGUIParentTool",
 			_("Provides interactive controls for reparenting nodes."),
 			"NGUI Tool",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "tool"));
 
 		return factory;

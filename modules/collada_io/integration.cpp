@@ -179,7 +179,6 @@ Node::Node(domNode& node, const k3d::matrix4& mat)
 			k3d::log() << "Invalid <instance_light> element\n";
 			return;
 		}
-		k3d::log() << debug << "A light" << std::endl;
 		lights.push_back(&lookup<intLight, domLight>(*light, mcurrent));
 	}
 
@@ -193,7 +192,6 @@ Node::Node(domNode& node, const k3d::matrix4& mat)
 			k3d::log() << "Invalid <instance_camera> element\n";
 			return;
 		}
-		k3d::log() << debug << "A camera" << std::endl;
 		cameras.push_back(&lookup<intCamera, domCamera>(*camera, mcurrent));
 	}
 }

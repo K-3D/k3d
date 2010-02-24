@@ -79,7 +79,7 @@ public:
 			ri_uniform_attributes.add_arrays(cubic_curve->curve_attributes);
 			
 			array_copier ri_varying_attributes;
-			ri_varying_attributes.add_arrays(cubic_curve->varying_attributes);
+			ri_varying_attributes.add_arrays(cubic_curve->parameter_attributes);
 
 			array_copier ri_vertex_attributes;
 			ri_vertex_attributes.add_arrays(vertex_attributes);
@@ -123,7 +123,7 @@ public:
 			"RenderManCubicCurvePainter",
 			_("Renders cubic curves"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

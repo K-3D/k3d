@@ -41,15 +41,15 @@ namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// poly_cube_implementation
+// poly_cube
 
-class poly_cube_implementation :
+class poly_cube :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	poly_cube_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_cube(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_columns(init_owner(*this) + init_name("columns") + init_label(_("Columns")) + init_description(_("Column number (X axis)")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_rows(init_owner(*this) + init_name("rows") + init_label(_("Rows")) + init_description(_("Row number (Y axis)")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -93,11 +93,8 @@ public:
 		// We model a cube as a cylinder ...
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-
-		k3d::polyhedron::add_cylinder(Output, *polyhedron, slices, circumference, material);
+		k3d::polyhedron::add_cylinder(Output, *polyhedron, 0, slices, circumference, material);
 
 		k3d::mesh::points_t& points = Output.points.writable();
 		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
@@ -132,6 +129,7 @@ public:
 				k3d::polyhedron::add_quadrilateral(
 					Output,
 					*polyhedron,
+					0,
 					top_map[(row + 0) * point_columns + (column + 0)],
 					top_map[(row + 0) * point_columns + (column + 1)],
 					top_map[(row + 1) * point_columns + (column + 1)],
@@ -170,6 +168,7 @@ public:
 				k3d::polyhedron::add_quadrilateral(
 					Output,
 					*polyhedron,
+					0,
 					bottom_map[(row + 0) * point_columns + (column + 0)],
 					bottom_map[(row + 0) * point_columns + (column + 1)],
 					bottom_map[(row + 1) * point_columns + (column + 1)],
@@ -257,11 +256,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<poly_cube_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<poly_cube, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x7ec966d1, 0xd78a445c, 0x8806b8a3, 0x5593f241),
 			"PolyCube",
 			_("Generates a polygonal cube"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -281,7 +280,7 @@ private:
 
 k3d::iplugin_factory& poly_cube_factory()
 {
-	return poly_cube_implementation::get_factory();
+	return poly_cube::get_factory();
 }
 
 } // namespace sources

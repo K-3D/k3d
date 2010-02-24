@@ -91,7 +91,7 @@ public:
 			"RenderManMultiPainter",
 			_("Distributes rendering across multiple mesh painters"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

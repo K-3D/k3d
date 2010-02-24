@@ -25,6 +25,7 @@
 */
 
 #include <k3dsdk/iunknown.h>
+#include <vector>
 
 namespace k3d
 {

@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Restore BridgeFaces
+desc: Now that I understand how BridgeFaces differs from BridgeEdges, bring it back.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-02-21 06:15:36.907229 Z
+references: []
+
+id: 4a7cea3d5863e1dec9aa8e78e239963e9c451926
+log_events: 
+- - 2010-02-21 06:15:37.562852 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-02-24 08:18:57.627879 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""
+claimer: 

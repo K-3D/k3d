@@ -88,10 +88,10 @@ public:
 	{
 		static k3d::document_plugin_factory<cone > factory(
 			k3d::uuid(0x61f3952d, 0x294a5474, 0xf8a17585, 0x4cbecead),
-			"Cone",
+			"QuadricCone",
 			"Creates a cone primitive",
 			"Quadric",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

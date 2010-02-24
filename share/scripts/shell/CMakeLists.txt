@@ -1,3 +1,3 @@
-FILE(GLOB PY_FILES *.py)
-INSTALL(FILES ${PY_FILES} DESTINATION share/k3d/scripts/shell)
+INSTALL_GLOB(*.py share/k3d/scripts/shell)
+INSTALL_GLOB(*.k3d share/k3d/scripts/shell)
 

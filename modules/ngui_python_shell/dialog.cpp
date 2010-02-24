@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -118,6 +118,7 @@ public:
 
 		engine->execute(get_factory().name(), "def quit():\n  global __close\n  __close = True\n", context);
 		engine->execute(get_factory().name(), "def exit():\n  global __close\n  __close = True\n", context);
+		engine->execute(get_factory().name(), "def help(target=None):\n  if target:\n    __builtins__.help(target)\n  else:\n    sys.stderr.write(\"Python online help isn't available in the K-3D Python Shell.\\n\")\n", context);
 
 		engine->execute(get_factory().name(), "import sys\n", context);
 		engine->execute(get_factory().name(), "print \"Python \" + sys.version + \" on \" + sys.platform", context, &stdout_slot, &stderr_slot);
@@ -147,8 +148,6 @@ public:
 
 		std::ostringstream console_command;
 		console_command << "__incomplete = __console.push(\"\"\"" << command << "\"\"\")";
-
-//		k3d::log() << debug << console_command.str() << std::endl;
 
 		k3d::iscript_engine::context_t context;
 		context["__incomplete"] = false;

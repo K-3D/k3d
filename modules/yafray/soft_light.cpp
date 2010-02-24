@@ -104,8 +104,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<soft_light,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 				k3d::uuid(0x2fcaffb5, 0xed294a0d, 0x82133a8f, 0x48df4988),
 				"YafraySoftLight",
 				_("Yafray Soft Light"),

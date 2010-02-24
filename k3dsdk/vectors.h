@@ -47,7 +47,7 @@
 
 // Modified by Tim Shead for use with K-3D, January 1998
 
-#include <k3dsdk/almost_equal.h>
+#include <k3dsdk/difference.h>
 #include <k3dsdk/normal3.h>
 #include <k3dsdk/point2.h>
 #include <k3dsdk/point3.h>

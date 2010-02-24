@@ -42,12 +42,11 @@
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/ngui/check_menu_item.h>
 #include <k3dsdk/ngui/context_menu.h>
-#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/ngui/icons.h>
@@ -253,7 +252,7 @@ public:
 
 			if(dynamic_cast<k3d::imesh_sink*>(*node))
 				++selected_mesh_counter;
-			if(dynamic_cast<k3d::itransform_sink*>(*node))
+			if(dynamic_cast<k3d::imatrix_sink*>(*node))
 				++selected_transform_counter;
 		}
 
@@ -492,13 +491,13 @@ private:
 	/// Instantiates selected meshes
 	void on_instantiate()
 	{
-		instantiate_selected_nodes(m_document_state);
+		pipeline::instantiate_selected_nodes(m_document_state.document());
 	}
 
 	/// Duplicates selected meshes
 	void on_duplicate()
 	{
-		duplicate_selected_nodes(m_document_state);
+		pipeline::duplicate_selected_nodes(m_document_state.document());
 	}
 	
 	/// Easy animation of transformation matrix
@@ -510,10 +509,10 @@ private:
 			k3d::inode* upstream_node = 0;
 			
 			// Check if the selected node can be transformed
-			k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(*node);
+			k3d::imatrix_sink* const downstream_sink = dynamic_cast<k3d::imatrix_sink*>(*node);
 			if (!downstream_sink)
 				continue;
-			k3d::iproperty& downstream_input = downstream_sink->transform_sink_input();
+			k3d::iproperty& downstream_input = downstream_sink->matrix_sink_input();
 			k3d::iproperty* upstream_output = (*node)->document().pipeline().dependency(downstream_input);
 	
 			// Check upstream object
@@ -577,6 +576,9 @@ private:
 	/// Modify selected meshes
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)
 	{
+		if(cancel_plugin(*Modifier))
+			return;
+
 		modify_selected_meshes(m_document_state, Modifier);
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
@@ -584,7 +586,8 @@ private:
 	/// Modify selected transforms
 	void on_modifier_transform(k3d::iplugin_factory* Modifier)
 	{
-		return_if_fail(Modifier);
+		if(cancel_plugin(*Modifier))
+			return;
 
 		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 

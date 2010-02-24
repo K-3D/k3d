@@ -27,8 +27,8 @@
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/hints.h>
-#include <k3dsdk/itransform_source.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_source.h>
+#include <k3dsdk/imatrix_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/value_demand_storage.h>
 
@@ -43,8 +43,8 @@ namespace ode
 
 class node :
 	public k3d::node,
-	public k3d::itransform_source,
-	public k3d::itransform_sink
+	public k3d::imatrix_source,
+	public k3d::imatrix_sink
 {
 	typedef k3d::node base;
 
@@ -70,12 +70,12 @@ public:
 		m_output.set_update_slot(sigc::mem_fun(*this, &node::execute));
 	}
 
-	k3d::iproperty& transform_source_output()
+	k3d::iproperty& matrix_source_output()
 	{
 		return m_output;
 	}
 
-	k3d::iproperty& transform_sink_input()
+	k3d::iproperty& matrix_sink_input()
 	{
 		return m_input;
 	}
@@ -147,12 +147,12 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<node,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 				k3d::uuid(0x8d0deddb, 0x10409128, 0x04d1b2b1, 0x62c4cda1),
 				"ODEPhysicalNode",
 				_("Rigid-body dynamics object."),
-				"ODE",
+				"Simulation",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

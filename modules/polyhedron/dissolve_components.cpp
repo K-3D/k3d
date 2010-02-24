@@ -18,20 +18,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/hints.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/utility.h>
+#include <k3dsdk/polyhedron.h>
 
-#include "helpers.h"
-
-#include <list>
-#include <set>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -39,6 +38,7 @@ namespace module
 namespace polyhedron
 {
 
+/*
 namespace detail
 {
 
@@ -548,51 +548,112 @@ void dissolve_polyhedron(k3d::legacy::polyhedron& Polyhedron, k3d::legacy::mesh&
 }
 
 } // namespace detail
+*/
 
 /////////////////////////////////////////////////////////////////////////////
-// dissolve_components_implementation
+// dissolve_components
 
-class dissolve_components_implementation :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
+class dissolve_components :
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
 
 public:
-	dissolve_components_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	dissolve_components(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
+		Output = Input;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+
+		if(!Output.points)
+			return;
+		if(!Output.point_selection)
+			return;
+
+/*
+		// Keep track of points to be removed ...
+		k3d::mesh::bools_t remove_points(Output.points->size());
+
+		// For each polyhedron ...
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
+			if(!polyhedron)
+				continue;
+
+			// Lookup adjacent edges ...
+			k3d::mesh::bools_t boundary_edges;
+			k3d::mesh::indices_t adjacent_edges;
+			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
+
+			// Lookup edge faces ...
+			k3d::mesh::indices_t edge_faces;
+			k3d::polyhedron::create_edge_face_lookup(*polyhedron, edge_faces);
+
+			// Mark edges that were explicitly chosen by the user ...
+			k3d::mesh::bools_t remove_edges(polyhedron->edge_selections.begin(), polyhedron->edge_selections.end());
+
+			// Keep track of faces to be deleted ...
+			k3d::mesh::bools_t remove_faces(polyhedron->face_shells.size(), false);
+
+			// Fixup edge loops ...
+			k3d::mesh::indices_t clockwise_edges = polyhedron->clockwise_edges;
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+			{
+				for(k3d::uint_t clockwise_edge = polyhedron->clockwise_edges[edge]; clockwise_edge != edge; clockwise_edge = polyhedron->clockwise_edges[clockwise_edge])
+				{
+					if(remove_edges[clockwise_edge])
+						continue;
+
+					clockwise_edges[edge] = clockwise_edge;
+					break;
+				}
+			}
+
+			// Keep track of loops to be deleted ...
+			k3d::mesh::bools_t remove_loops(polyhedron->loop_first_edges.size(), false);
+
+			// Make it happen ...
+			k3d::polyhedron::delete_components(Output, *polyhedron, remove_points, remove_edges, remove_loops, remove_faces);
+		}
+
+		// Mark points to be implicitly removed because they're no-longer used ...
+		k3d::mesh::bools_t unused_point;
+		k3d::mesh::lookup_unused_points(Output, unused_point);
+		const k3d::uint_t point_begin = 0;
+		const k3d::uint_t point_end = point_begin + Output.points->size();
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
+		{
+			if(!unused_point[point])
+				continue;
+
+			remove_points[point] = true;
+		}	
+
+		// Delete points ...
+		k3d::mesh::delete_points(Output, remove_points);
+*/
 	}
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Mesh);
-
-		for(k3d::legacy::mesh::polyhedra_t::iterator p = Mesh.polyhedra.begin(); p != Mesh.polyhedra.end(); ++p)
-			detail::dissolve_polyhedron(**p, Mesh);
-	}
-
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<dissolve_components_implementation,
+		static k3d::document_plugin_factory<dissolve_components,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x6c639ea2, 0x6ab542c2, 0xa8f2f2d6, 0xf5265e7c),
 				"Dissolve",
 				"Dissolves selected faces, edges and vertices",
-				"Polygon",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -604,7 +665,7 @@ public:
 
 k3d::iplugin_factory& dissolve_components_factory()
 {
-	return dissolve_components_implementation::get_factory();
+	return dissolve_components::get_factory();
 }
 
 } // namespace polyhedron

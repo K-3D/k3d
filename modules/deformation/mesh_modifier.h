@@ -52,7 +52,6 @@ public:
 		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<mesh*>(0)),
 		m_output_mesh(init_owner(*this) + init_name("output_mesh") + init_label(_("Output Mesh")) + init_description(_("Output mesh")))
 	{
-		k3d::log() << debug << "this is the mesh_modifier sandbox" << std::endl;
 		m_input_mesh.changed_signal().connect(hint::converter<
 				hint::convert<hint::mesh_geometry_changed, hint::unchanged,
 				hint::convert<hint::mesh_topology_changed, hint::unchanged,

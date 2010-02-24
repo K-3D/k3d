@@ -29,13 +29,13 @@ namespace module
 namespace particle
 {
 
-extern k3d::iplugin_factory& make_particles_factory();
+extern k3d::iplugin_factory& points_to_particles_factory();
 
 } // namespace particle
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::particle::make_particles_factory());
+	Registry.register_factory(module::particle::points_to_particles_factory());
 K3D_MODULE_END
 

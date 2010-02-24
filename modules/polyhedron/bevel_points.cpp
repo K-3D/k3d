@@ -18,21 +18,25 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar <romainbehar@yahoo.com>
+	\author Romain Behar <romainbehar@yahoo.com>
+	\author Timothy M. Shead <tshead@k-3d.com>
 */
-
-#include "helpers.h"
 
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/imaterial.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/material_sink.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/utility.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
+
+#include <boost/optional.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -41,400 +45,339 @@ namespace polyhedron
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// bevel_points_implementation
+// bevel_points
 
-class bevel_points_implementation :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::material_sink<k3d::node > > >
+class bevel_points :
+	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::material_sink<k3d::node > > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::material_sink<k3d::node > > > base;
+	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::material_sink<k3d::node > > > base;
 
 public:
-	bevel_points_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	bevel_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_offset(init_owner(*this) + init_name("offset") + init_label(_("Offset")) + init_description(_("Offset along external edges")) + init_value(0.3) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
-		m_distance(init_owner(*this) + init_name("distance") + init_label(_("Distance")) + init_description(_("Use distance instead of edge offset")) + init_value(false))
+		m_distance(init_owner(*this) + init_name("distance") + init_label(_("Distance")) + init_description(_("Offset distance along edges.")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
+		m_fraction(init_owner(*this) + init_name("fraction") + init_label(_("Fraction")) + init_description(_("Offset position as a fraction of edge length.")) + init_value(0.1) + init_step_increment(0.05) + init_units(typeid(k3d::measurement::scalar))),
+		m_cap(init_owner(*this) + init_name("cap") + init_label(_("Cap")) + init_description(_("Cap each bevelled point with a new face.")) + init_value(true))
 	{
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
-
-		m_material.changed_signal().connect(make_update_mesh_slot());
-		m_offset.changed_signal().connect(make_update_mesh_slot());
-		m_distance.changed_signal().connect(make_update_mesh_slot());
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
+		m_distance.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
+		m_fraction.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_geometry_changed> >(make_update_mesh_slot()));
+		m_cap.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
-	}
-
-	void on_initialize_mesh(const k3d::legacy::mesh& Input, k3d::legacy::mesh& Output)
-	{
-		// Clear previously cached data
-		m_bevel_points.clear();
-		m_new_faces.clear();
-
 		// Create output geometry
-		k3d::legacy::deep_copy(Input, Output);
+		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron_i = Output.polyhedra.begin(); polyhedron_i != Output.polyhedra.end(); ++polyhedron_i)
-		{
-			k3d::legacy::polyhedron& polyhedron = **polyhedron_i;
+		if(!Output.points)
+			return;
+		if(!Output.point_selection)
+			return;
 
-			// Get selected points and edges ending at them
-			points_t points;
-			point_edge_map_t point_edge_map;
-			for(k3d::legacy::polyhedron::faces_t::iterator face = polyhedron.faces.begin(); face != polyhedron.faces.end(); ++face)
+		// Clear previously cached data
+		bevel_vertices.clear();
+
+		k3d::imaterial* const material = m_material.pipeline_value();
+		const k3d::bool_t cap = m_cap.pipeline_value();
+
+		k3d::mesh::points_t& points = Output.points.writable();
+		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
+
+		// For each polyhedron ...
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
+			if(!polyhedron)
+				continue;
+
+			// Identify face "corners" to be bevelled ...
+			bevel_corners corners;
+
+			const k3d::uint_t edge_begin = 0;
+			const k3d::uint_t edge_end = edge_begin + polyhedron->clockwise_edges.size();
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 			{
-				k3d::legacy::split_edge* edge = (*face)->first_edge;
-				do
+				if(!point_selection[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]])
+					continue;
+
+				corners.push_back(bevel_corner(edge, polyhedron->clockwise_edges[edge]));
+			}
+
+			// Create a mapping from edges to adjacent edges ...
+			k3d::mesh::bools_t boundary_edges;
+			k3d::mesh::indices_t adjacent_edges;
+			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
+
+			// Create a mapping from edges to faces ...
+			k3d::mesh::indices_t edge_faces;
+			k3d::polyhedron::create_edge_face_lookup(*polyhedron, edge_faces);
+
+			// Create mappings from edges to corners ...
+			k3d::mesh::indices_t edge1_corners(polyhedron->clockwise_edges.size(), corners.size());
+			k3d::mesh::indices_t edge2_corners(polyhedron->clockwise_edges.size(), corners.size());
+			for(k3d::uint_t corner = 0; corner != corners.size(); ++corner)
+			{
+				edge1_corners[corners[corner].edge1] = corner;
+				edge2_corners[corners[corner].edge2] = corner;
+			}
+
+			// Get ready to copy attributes ...
+			k3d::table_copier point_attributes(Output.point_attributes);
+			k3d::table_copier edge_attributes(polyhedron->edge_attributes);
+			k3d::table_copier vertex_attributes(polyhedron->vertex_attributes);
+			k3d::table_copier face_attributes(polyhedron->face_attributes);
+
+			// Create new bevel points, being careful to avoid duplicating adjacent points ...
+			for(bevel_corners::iterator corner = corners.begin(); corner != corners.end(); ++corner)
+			{
+				if(!corner->point1)
 				{
-					// For every edge ending with a selected vertex ...
-					k3d::legacy::point* endpoint = edge->face_clockwise->vertex;
-					if(endpoint->selection_weight)
+					const k3d::uint_t new_point = points.size();
+
+					corner->point1 = new_point;
+
+					if(!boundary_edges[corner->edge1])
+						corners[edge2_corners[adjacent_edges[corner->edge1]]].point2 = new_point;
+
+					bevel_vertices.push_back(
+						bevel_vertex(
+							new_point,
+							points[polyhedron->vertex_points[corner->edge2]],
+							points[polyhedron->vertex_points[corner->edge1]]));
+					points.push_back(k3d::point3());
+					point_selection.push_back(1);
+
+					point_attributes.push_back(polyhedron->vertex_points[corner->edge2]);
+				}
+
+				if(!corner->point2)
+				{
+					const k3d::uint_t new_point = points.size();
+
+					corner->point2 = new_point;
+
+					if(!boundary_edges[corner->edge2])
+						corners[edge1_corners[adjacent_edges[corner->edge2]]].point1 = new_point;
+
+					bevel_vertices.push_back(
+						bevel_vertex(
+							new_point,
+							points[polyhedron->vertex_points[corner->edge2]],
+							points[polyhedron->vertex_points[polyhedron->clockwise_edges[corner->edge2]]]));
+					points.push_back(k3d::point3());
+					point_selection.push_back(1);
+
+					point_attributes.push_back(polyhedron->vertex_points[corner->edge2]);
+				}
+			}
+
+			// Create a bevel edge for each face corner ...
+			for(bevel_corners::iterator corner = corners.begin(); corner != corners.end(); ++corner)
+			{
+				corner->new_edge = polyhedron->clockwise_edges.size();
+
+				polyhedron->clockwise_edges[corner->edge1] = *corner->new_edge;
+
+				polyhedron->clockwise_edges.push_back(corner->edge2);
+				polyhedron->edge_selections.push_back(1);
+				polyhedron->vertex_points.push_back(*corner->point1);
+				polyhedron->vertex_selections.push_back(0);
+
+				k3d::uint_t edge_indices[2] = { corner->edge1, corner->edge2 };
+				k3d::double_t edge_weights[2] = { 0.5, 0.5 };
+				edge_attributes.push_back(2, edge_indices, edge_weights);
+
+				vertex_attributes.push_back(corner->edge2);
+
+				polyhedron->vertex_points[corner->edge2] = *corner->point2;
+			}
+
+			// Optionally create bevel faces ...
+			if(cap)
+			{
+				// Create a face for each group of adjacent corners ...
+				k3d::mesh::bools_t used_corners(corners.size(), false);
+				for(k3d::uint_t start_corner = 0; start_corner != corners.size(); ++start_corner)
+				{
+					if(used_corners[start_corner])
+						continue;
+
+					k3d::bool_t loop = false;
+					k3d::mesh::indices_t clockwise_corners;
+
+					// Follow adjacent corners in the clockwise direction until we either hit
+					// the polyhedron boundary or create a loop ...
+					for(k3d::uint_t adjacent_corner = start_corner; ;)
 					{
-						// Add edge to the point-edge map ...
-						if(point_edge_map.count(endpoint))
+						clockwise_corners.push_back(adjacent_corner);
+						used_corners[adjacent_corner] = true;
+
+						if(boundary_edges[corners[adjacent_corner].edge1])
+							break;
+
+						adjacent_corner = edge2_corners[adjacent_edges[corners[adjacent_corner].edge1]];
+						if(adjacent_corner == start_corner)
 						{
-							point_edge_map[endpoint].push_back(edge);
-						}
-						else
-						{
-							points.push_back(endpoint);
-							point_edge_map.insert(std::make_pair(endpoint, edges_t(1, edge)));
+							loop = true;
+							break;
 						}
 					}
 
-					edge = edge->face_clockwise;
+					// If we didn't create a loop, follow adjacent corners in the counter-clockwise
+					// direction until we hit the polyhedron boundary ...
+					if(!loop)
+					{
+						for(k3d::uint_t adjacent_corner = start_corner; ;)
+						{
+							if(boundary_edges[corners[adjacent_corner].edge2])
+								break;
+
+							adjacent_corner = edge1_corners[adjacent_edges[corners[adjacent_corner].edge2]];
+
+							clockwise_corners.insert(clockwise_corners.begin(), adjacent_corner);
+							used_corners[adjacent_corner] = true;
+						}
+					}
+
+					// Create a new face ...
+					polyhedron->face_shells.push_back(polyhedron->face_shells[edge_faces[corners[clockwise_corners[0]].edge1]]);
+					polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+					polyhedron->face_loop_counts.push_back(1);
+					polyhedron->face_selections.push_back(1);
+					polyhedron->face_materials.push_back(material);
+
+					// Create new face attributes ...
+					k3d::mesh::indices_t face_indices(clockwise_corners.size());
+					for(k3d::uint_t corner = 0; corner != clockwise_corners.size(); ++corner)
+						face_indices[corner] = edge_faces[corners[clockwise_corners[corner]].edge1];
+					k3d::mesh::weights_t face_weights(clockwise_corners.size(), 1.0 / clockwise_corners.size());
+					face_attributes.push_back(clockwise_corners.size(), &face_indices[0], &face_weights[0]);
+
+					polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
+
+					const k3d::uint_t first_edge = polyhedron->clockwise_edges.size();
+					for(k3d::uint_t corner = 0; corner != clockwise_corners.size(); ++corner)
+					{
+						polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+						polyhedron->edge_selections.push_back(1);
+						polyhedron->vertex_points.push_back(*corners[clockwise_corners[corner]].point2);
+						polyhedron->vertex_selections.push_back(0);
+
+						k3d::uint_t edge_indices[2] = { corners[clockwise_corners[corner]].edge1, corners[clockwise_corners[corner]].edge2 };
+						k3d::double_t edge_weights[2] = { 0.5, 0.5 };
+						edge_attributes.push_back(2, edge_indices, edge_weights);
+
+						vertex_attributes.push_back(corners[clockwise_corners[corner]].edge2);
+					}
+					if(loop)
+					{
+						polyhedron->clockwise_edges.back() = first_edge;
+					}
+					else
+					{
+						polyhedron->clockwise_edges.push_back(first_edge);
+						polyhedron->edge_selections.push_back(1);
+						polyhedron->vertex_points.push_back(*corners[clockwise_corners.back()].point1);
+						polyhedron->vertex_selections.push_back(0);
+
+						k3d::uint_t edge_indices[2] = { corners[clockwise_corners.front()].edge2, corners[clockwise_corners.back()].edge1 };
+						k3d::double_t edge_weights[2] = { 0.5, 0.5 };
+						edge_attributes.push_back(2, edge_indices, edge_weights);
+
+						vertex_attributes.push_back(corners[clockwise_corners.back()].edge2);
+					}
 				}
-				while(edge != (*face)->first_edge);
 			}
-
-			// Bevel points
-			faces_t new_faces;
-			bevel_points(points, point_edge_map, Output, m_bevel_points, new_faces);
-
-			// Save new faces
-			polyhedron.faces.insert(polyhedron.faces.end(), new_faces.begin(), new_faces.end());
-			m_new_faces.insert(m_new_faces.end(), new_faces.begin(), new_faces.end());
-
-			assert_warning(k3d::legacy::is_valid(polyhedron));
 		}
 
-		// Update output selection
-		for(faces_t::iterator face = m_new_faces.begin(); face != m_new_faces.end(); ++face)
-			(*face)->selection_weight = 1.0;
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points, point_map);
 	}
 
-	void on_update_mesh(const k3d::legacy::mesh& Input, k3d::legacy::mesh& Output)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		const double offset = m_offset.pipeline_value();
-		const bool distance = m_distance.pipeline_value();
-		k3d::imaterial* const material = m_material.pipeline_value();
+		const k3d::double_t distance = m_distance.pipeline_value();
+		const k3d::double_t fraction = m_fraction.pipeline_value();
 
-		for(bevel_points_t::iterator bevel_point = m_bevel_points.begin(); bevel_point != m_bevel_points.end(); ++bevel_point)
-			bevel_point->update(offset, distance);
+		k3d::mesh::points_t& points = Output.points.writable();
 
-		for(faces_t::iterator face = m_new_faces.begin(); face != m_new_faces.end(); ++face)
-			(*face)->material = material;
+		const k3d::uint_t vertex_begin = 0;
+		const k3d::uint_t vertex_end = vertex_begin + bevel_vertices.size();
+		for(k3d::uint_t vertex_index = vertex_begin; vertex_index != vertex_end; ++vertex_index)
+		{
+			const bevel_vertex& vertex = bevel_vertices[vertex_index];
+
+			points[point_map[vertex.point]] =
+				k3d::mix(vertex.start, vertex.end, fraction)
+				+ (k3d::normalize(vertex.end - vertex.start) * distance);
+		}
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bevel_points_implementation,
+		static k3d::document_plugin_factory<bevel_points,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x5a578576, 0xc207453f, 0xa7a2b9ae, 0xfb1ad739),
 				"BevelPoints",
 				"Bevels a surface at each selected point",
-				"Polygon",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
 
 private:
-	/// Caches new geometry for better interactive performance
-	class bevel_point
+	/// Caches polyhedron "corners" that are to be bevelled
+	struct bevel_corner
 	{
-	public:
-		bevel_point(const k3d::point3& StartPosition, const k3d::point3& EndPosition, k3d::legacy::point* Point) :
-			start_position(StartPosition),
-			end_position(EndPosition),
-			point(Point)
+		bevel_corner(const k3d::uint_t Edge1, const k3d::uint_t Edge2) :
+			edge1(Edge1),
+			edge2(Edge2)
 		{
 		}
 
-		void update(const double Offset, const bool Distance)
-		{
-			double edge_offset = Offset;
-			if(!Distance)
-			{
-				// Offset gives position on the edge
-				if(Offset > 1)
-					edge_offset = 1;
-			}
-			else
-			{
-				// Offset is a length from start_position
-				const double length = k3d::distance(end_position, start_position);
-				if(length)
-					edge_offset = Offset / length;
-			}
-
-			point->position = start_position + (end_position - start_position) * edge_offset;
-		}
-
-	private:
-		k3d::point3 start_position;
-		k3d::point3 end_position;
-		k3d::legacy::point* point;
+		k3d::uint_t edge1;
+		boost::optional<k3d::uint_t> point1;
+		boost::optional<k3d::uint_t> new_edge;
+		boost::optional<k3d::uint_t> point2;
+		k3d::uint_t edge2;
 	};
 
-	typedef std::vector<k3d::legacy::face*> faces_t;
-	typedef std::vector<k3d::legacy::split_edge*> edges_t;
-	typedef std::vector<k3d::legacy::point*> points_t;
-	typedef std::map<k3d::legacy::point*, edges_t> point_edge_map_t;
-	typedef std::vector<bevel_point> bevel_points_t;
+	typedef std::vector<bevel_corner> bevel_corners;
 
-	/// Caches edge start and end for easy update
-	k3d::legacy::point* save_edge(k3d::legacy::split_edge* Edge, bevel_points_t& BevelPoints, const bool Invert = false)
+	/// Caches new points for better interactive performance
+	struct bevel_vertex
 	{
-		const k3d::point3& start_position = Edge->vertex->position;
-		const k3d::point3& end_position = Edge->face_clockwise->vertex->position;
-
-		k3d::legacy::point* new_point = new k3d::legacy::point(start_position);
-		assert_warning(new_point);
-
-		if(!Invert)
-			BevelPoints.push_back(bevel_point(end_position, start_position, new_point));
-		else
-			BevelPoints.push_back(bevel_point(start_position, end_position, new_point));
-
-		return new_point;
-	}
-
-	void bevel_points(const points_t& Points, const point_edge_map_t& PointEdgeMap, k3d::legacy::mesh& Mesh, bevel_points_t& BevelPoints, faces_t& NewFaces)
-	{
-		// Create new points and save original edge positions before bevelling
-		typedef std::vector<k3d::legacy::point*> points_t;
-		points_t new_points;
-		points_t border_new_points;
-
-		points_t interior_points;
-		edges_t interior_edges;
-		points_t border_points;
-		typedef std::vector<edges_t> edge_lists_t;
-		edge_lists_t border_edges;
-		for(points_t::const_iterator point = Points.begin(); point != Points.end(); ++point)
+		bevel_vertex(const k3d::uint_t Point, const k3d::point3& Start, const k3d::point3& End) :
+			point(Point),
+			start(Start),
+			end(End)
 		{
-			const edges_t& edges = PointEdgeMap.find(*point)->second;
-
-			// Don't bevel single points
-			if(edges.size() == 1)
-				continue;
-
-			// Separate interior points from border points
-			k3d::legacy::split_edge* start_edge = edges.front();
-			const bool interior = (0 != helpers::vertex_valency(start_edge->face_clockwise));
-			edges_t point_edges;
-			if(interior)
-			{
-				interior_points.push_back(*point);
-				interior_edges.push_back(start_edge);
-
-				k3d::legacy::split_edge* edge = start_edge;
-				do
-				{
-					new_points.push_back(save_edge(edge, BevelPoints));
-
-					edge = edge->face_clockwise->companion;
-				}
-				while(edge != start_edge);
-			}
-			else
-			{
-				// Save border edges only, each one will give a triangle fan
-				edges_t fan_starts;
-				for(edges_t::const_iterator edge = edges.begin(); edge != edges.end(); ++edge)
-				{
-					if(!(*edge)->companion)
-					{
-						fan_starts.push_back(*edge);
-
-						k3d::legacy::split_edge* fan_edge = *edge;
-						do
-						{
-							border_new_points.push_back(save_edge(fan_edge, BevelPoints));
-
-							fan_edge = fan_edge->face_clockwise->companion;
-							return_if_fail(fan_edge);
-						}
-						while(fan_edge->face_clockwise->companion);
-
-						// Save two last edges, i
-						border_new_points.push_back(save_edge(fan_edge, BevelPoints));
-						border_new_points.push_back(save_edge(fan_edge->face_clockwise, BevelPoints, true));
-					}
-				}
-
-				assert_warning(fan_starts.size());
-				if(fan_starts.size())
-				{
-					border_points.push_back(*point);
-					border_edges.push_back(fan_starts);
-				}
-			}
 		}
 
-		// Actually bevel points
-		points_t::iterator new_point = new_points.begin();
-		points_t::iterator bevel_point = interior_points.begin();
-		edges_t::iterator start_edge = interior_edges.begin();
-		for(; bevel_point != interior_points.end(); ++bevel_point, ++start_edge)
-		{
-			k3d::legacy::point* vertex = *bevel_point;
+		k3d::uint_t point;
+		k3d::point3 start;
+		k3d::point3 end;
+	};
 
-			// Save edges with selected vertex as endpoint
-			edges_t old_edges;
+	/// Caches new points for better interactive performance
+	std::vector<bevel_vertex> bevel_vertices;
+	/// Caches a mapping from the original input point indices to the new output point indices (because we delete existing points)
+	k3d::mesh::indices_t point_map;
 
-			k3d::legacy::split_edge* edge = *start_edge;
-			do
-			{
-				old_edges.push_back(edge);
-				edge = edge->face_clockwise->companion;
-			}
-			while(edge != *start_edge);
-
-			// For each edge, append a new edge
-			edges_t bevel_edges;
-			points_t current_new_points;
-
-			for(edges_t::iterator edge_i = old_edges.begin(); edge_i != old_edges.end(); ++edge_i)
-			{
-				edge = *edge_i;
-
-				// Add new split_edge
-				k3d::legacy::split_edge* new_edge = new k3d::legacy::split_edge(*new_point);
-				new_edge->face_clockwise = edge->face_clockwise;
-				edge->face_clockwise = new_edge;
-
-				current_new_points.push_back(*new_point);
-				++new_point;
-
-				// Save edges to update them afterwards
-				bevel_edges.push_back(new_edge);
-			}
-
-			// Assign new points
-			const unsigned long n = bevel_edges.size();
-			for(unsigned long i = 0; i < n; ++i)
-			{
-				bevel_edges[i]->face_clockwise->vertex = current_new_points[(i + 1)%n];
-			}
-
-			// Delete bevelled point
-			Mesh.points.erase(std::remove(Mesh.points.begin(), Mesh.points.end(), vertex), Mesh.points.end());
-			delete vertex;
-
-			// Create new face
-			k3d::legacy::face* new_face = helpers::fill_hole(bevel_edges.rbegin(), bevel_edges.rend(), 0);
-			NewFaces.push_back(new_face);
-		}
-
-		// Bevel border points
-		points_t::iterator border_new_point = border_new_points.begin();
-		bevel_point = border_points.begin();
-		edge_lists_t::iterator start_edges = border_edges.begin();
-		for(; bevel_point != border_points.end(); ++bevel_point, ++start_edges)
-		{
-			k3d::legacy::point* vertex = *bevel_point;
-			for(edges_t::iterator start_edge = start_edges->begin(); start_edge != start_edges->end(); ++start_edge)
-			{
-				// Save edge fan
-				edges_t old_edges;
-
-				k3d::legacy::split_edge* edge = *start_edge;
-				do
-				{
-					old_edges.push_back(edge);
-
-					edge = edge->face_clockwise->companion;
-				}
-				while(edge->face_clockwise->companion);
-
-				old_edges.push_back(edge);
-
-				// For each edge, append a new edge
-				edges_t bevel_edges;
-				points_t current_new_points;
-
-				for(edges_t::iterator edge_i = old_edges.begin(); edge_i != old_edges.end(); ++edge_i)
-				{
-					edge = *edge_i;
-
-					// Add new split_edge
-					k3d::legacy::split_edge* new_edge = new k3d::legacy::split_edge(*border_new_point);
-					new_edge->face_clockwise = edge->face_clockwise;
-					edge->face_clockwise = new_edge;
-
-					current_new_points.push_back(*border_new_point);
-					++border_new_point;
-
-					// Save edges to update them afterwards
-					bevel_edges.push_back(new_edge);
-				}
-
-				current_new_points.push_back(*border_new_point++);
-
-				// Assign new points
-				const unsigned long n = bevel_edges.size();
-				for(unsigned long i = 0; i < n; ++i)
-				{
-					bevel_edges[i]->face_clockwise->vertex = current_new_points[i + 1];
-				}
-
-				// Create new face
-				edges_t new_edges;
-
-				edges_t::reverse_iterator r_edge = bevel_edges.rbegin();
-				do
-				{
-					k3d::legacy::split_edge* new_edge = new k3d::legacy::split_edge((*r_edge)->face_clockwise->vertex);
-
-					// Set companions
-					k3d::legacy::join_edges(**r_edge, *new_edge);
-
-					new_edges.push_back(new_edge);
-				}
-				while(++r_edge != bevel_edges.rend());
-
-				k3d::legacy::split_edge* new_edge = new k3d::legacy::split_edge((*bevel_edges.begin())->vertex);
-				new_edges.push_back(new_edge);
-
-				// Create new face
-				k3d::legacy::loop_edges(new_edges.begin(), new_edges.end());
-				k3d::legacy::face* new_face = new k3d::legacy::face(new_edges.front(), 0);
-
-				NewFaces.push_back(new_face);
-			}
-
-			// Delete bevelled point
-			Mesh.points.erase(std::remove(Mesh.points.begin(), Mesh.points.end(), vertex), Mesh.points.end());
-			delete vertex;
-		}
-
-		// Add new points
-		Mesh.points.insert(Mesh.points.end(), new_points.begin(), new_points.end());
-		Mesh.points.insert(Mesh.points.end(), border_new_points.begin(), border_new_points.end());
-	}
-
-	bevel_points_t m_bevel_points;
-	faces_t m_new_faces;
-
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_offset;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_distance;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_distance;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_fraction;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_cap;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -442,7 +385,7 @@ private:
 
 k3d::iplugin_factory& bevel_points_factory()
 {
-	return bevel_points_implementation::get_factory();
+	return bevel_points::get_factory();
 }
 
 } // namespace polyhedron

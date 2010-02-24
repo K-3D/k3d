@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Remove legacy code from JoinPoints.
+desc: Like it says.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2009-12-29 03:15:04.101551 Z
+references: []
+
+id: ad39f08267111c35c8e26b5264df5d06af65f718
+log_events: 
+- - 2009-12-29 03:15:04.708447 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-01-10 04:52:01.220464 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""

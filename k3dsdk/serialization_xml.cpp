@@ -36,9 +36,8 @@
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iproperty_collection.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/nurbs_curve.h>
@@ -654,10 +653,10 @@ void upgrade_transformable_nodes(element& XMLDocument)
 		if(!node_id)
 			continue;
 
-		if(!node_factory->implements(typeid(itransform_source)))
+		if(!node_factory->implements(typeid(imatrix_source)))
 			continue;
 
-		if(!node_factory->implements(typeid(itransform_sink)))
+		if(!node_factory->implements(typeid(imatrix_sink)))
 			continue;
 
 		element* const xml_properties = find_element(*xml_node, "properties");
@@ -708,7 +707,7 @@ void upgrade_transformable_nodes(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "Transformation"),
-				attribute("factory", classes::FrozenTransformation()),
+				attribute("factory", classes::FrozenMatrix()),
 				attribute("id", next_node_id),
 				element("properties",
 					element("property", string_cast(identity3()),

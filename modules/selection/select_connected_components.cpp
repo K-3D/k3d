@@ -171,7 +171,7 @@ public:
 				k3d::uuid(0xe54a08e3, 0x014445d3, 0x5395c8a6, 0xb3bfaae3),
 				"SelectConnectedComponents",
 				_("Select all components that are directly or indirectly connected to the selected component"),
-				"Mesh",
+				"Selection",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

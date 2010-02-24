@@ -712,8 +712,8 @@ public:
 		static k3d::document_plugin_factory<newell_primitive, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x274c0cae, 0x2efd5bbf, 0x986a500f, 0xff5e2de6),
 			"Newell",
-			_("Generates Newell primitives as Bezier patches"),
-			"Patch",
+			_("Generates Newell primitives using bicubic patches."),
+			"BicubicPatch",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

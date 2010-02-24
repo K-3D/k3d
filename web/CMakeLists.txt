@@ -7,16 +7,23 @@ SET(planet_OUTPUT_DIR "${web_OUTPUT_DIR}/planet")
 SET(tracker_OUTPUT_DIR "${web_OUTPUT_DIR}/developer/tracker")
 SET(www_OUTPUT_DIR "${web_OUTPUT_DIR}/www")
 
-ADD_CUSTOM_TARGET(web-html
+ADD_CUSTOM_TARGET(www-html
 	COMMAND "${CMAKE_COMMAND}" -E make_directory "${web_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E make_directory "${www_OUTPUT_DIR}"
+	COMMAND "${CMAKE_COMMAND}" -E make_directory "${www_OUTPUT_DIR}/resources"
+	COMMAND "${CMAKE_COMMAND}" -E make_directory "${www_OUTPUT_DIR}/resources/banners"
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/k3d.css" "${www_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/k3d.png" "${www_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/www/logo.png" "${www_OUTPUT_DIR}"
-	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/www/maintenance.xhtml" "${www_OUTPUT_DIR}"
-	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/www" mako-render "donations.xhtml" > "${www_OUTPUT_DIR}/donations.xhtml"
-	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/www" mako-render "downloads.xhtml" > "${www_OUTPUT_DIR}/downloads.xhtml"
-	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/www" mako-render "index.xhtml" > "${www_OUTPUT_DIR}/index.xhtml"
+	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/www/maintenance.html" "${www_OUTPUT_DIR}"
+	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/www/resources/banner" "${www_OUTPUT_DIR}/resources"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${www_OUTPUT_DIR}/resources" chmod a+x banner
+	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/www/resources/banners/moon.jpeg" "${www_OUTPUT_DIR}/resources/banners/moon.jpeg"
+	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/www/resources/banners/submarine.jpeg" "${www_OUTPUT_DIR}/resources/banners/submarine.jpeg"
+	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/www/resources/banners/town.jpeg" "${www_OUTPUT_DIR}/resources/banners/town.jpeg"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/www" mako-render "donations.html" > "${www_OUTPUT_DIR}/donations.html"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/www" mako-render "downloads.html" > "${www_OUTPUT_DIR}/downloads.html"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/www" mako-render "index.html" > "${www_OUTPUT_DIR}/index.html"
 	)
 
 ADD_CUSTOM_TARGET(planet-html
@@ -37,11 +44,10 @@ ADD_CUSTOM_TARGET(developer-html
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/k3d.png" "${developer_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/developer/developer.css" "${developer_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/developer/logo.png" "${developer_OUTPUT_DIR}"
-	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "dashboard.xhtml" > "${developer_OUTPUT_DIR}/dashboard.xhtml"
-	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "dashboard-index.xhtml" > "${developer_OUTPUT_DIR}/dashboard-index.xhtml"
-	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "index.xhtml" > "${developer_OUTPUT_DIR}/index.xhtml"
-	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "source.xhtml" > "${developer_OUTPUT_DIR}/source.xhtml"
-	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "documentation.xhtml" > "${developer_OUTPUT_DIR}/documentation.xhtml"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "dashboard.html" > "${developer_OUTPUT_DIR}/dashboard.html"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "dashboard-index.html" > "${developer_OUTPUT_DIR}/dashboard-index.html"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "index.html" > "${developer_OUTPUT_DIR}/index.html"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" mako-render "documentation.html" > "${developer_OUTPUT_DIR}/documentation.html"
 	)
 
 ADD_CUSTOM_TARGET(tracker-html

@@ -54,7 +54,7 @@ namespace painters
 
 static void on_nurbs_error(GLenum ErrorCode)
 {
-	k3d::log() << debug << "NURBS curve error: " << gluErrorString(ErrorCode) << std::endl;
+	k3d::log() << error << "NURBS curve error: " << gluErrorString(ErrorCode) << std::endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -88,11 +88,7 @@ public:
 		{
 			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(Mesh, **primitive));
 			if(!nurbs_curve)
-			{
-				if((*primitive)->type == "nurbs_curve")
-					k3d::log() << debug << "NurbsCurvePainter: found an invalid NURBS primitive" << std::endl;
 				continue;
-			}
 
 			const k3d::mesh::points_t& points = *Mesh.points;
 
@@ -150,11 +146,7 @@ public:
 		{
 			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(Mesh, **primitive));
 			if(!nurbs_curve)
-			{
-				if((*primitive)->type == "nurbs_curve")
-					k3d::log() << debug << "NurbsCurvePainter: found an invalid NURBS primitive" << std::endl;
 				continue;
-			}
 
 			const k3d::mesh::points_t& points = *Mesh.points;
 
@@ -213,7 +205,7 @@ public:
 			"OpenGLNURBSCurvePainter",
 			_("Renders NURBS curves"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

@@ -26,14 +26,14 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
 #include <k3dsdk/hints.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/scoped_ptr.hpp>
-
-#include <vector>
 
 namespace module
 {
@@ -45,14 +45,16 @@ namespace polyhedron
 // bridge_edges
 
 class bridge_edges :
-	public k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > >
+	public k3d::mesh_selection_sink<k3d::material_sink<k3d::mesh_modifier<k3d::node > > >
 {
-	typedef k3d::mesh_selection_sink<k3d::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::material_sink<k3d::mesh_modifier<k3d::node > > > base;
 
 public:
 	bridge_edges(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 	}
@@ -78,6 +80,8 @@ public:
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
+		k3d::imaterial* const material = m_material.pipeline_value();
+
 		// For each polyhedron ...
 		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
 		{
@@ -89,6 +93,10 @@ public:
 			k3d::mesh::bools_t boundary_edges;
 			k3d::mesh::indices_t adjacent_edges;
 			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
+
+			// Create a lookup from edges to their adjacent faces ...
+			k3d::mesh::indices_t edge_faces;
+			k3d::polyhedron::create_edge_face_lookup(*polyhedron, edge_faces);
 
 			// Get the set of selected boundary edges (excluding polygon holes) ...
 			k3d::mesh::indices_t edges;
@@ -165,18 +173,47 @@ public:
 				continue;
 			}
 
+			// Both groups of edges must be members of the same shell ...
+			if(polyhedron->face_shells[edge_faces[grouped_edges.front().front().edge]] != polyhedron->face_shells[edge_faces[grouped_edges.back().front().edge]])
+			{
+				k3d::log() << warning << "Cannot bridge across polyhedron shells." << std::endl;
+				continue;
+			}
+
+			// Get ready to copy attributes ...
+			k3d::table_copier face_attributes(polyhedron->face_attributes);
+			k3d::table_copier edge_attributes(polyhedron->edge_attributes);
+			k3d::table_copier vertex_attributes(polyhedron->vertex_attributes);
+
+			k3d::mesh::indices_t cross_edges(2);
+			k3d::mesh::weights_t cross_edge_weights(2, 0.5);
+
 			// Create a new polygon bridge ...
+			polyhedron->face_shells.push_back(polyhedron->face_shells[edge_faces[grouped_edges.front().front().edge]]);
 			polyhedron->face_first_loops.push_back(polyhedron->face_loop_counts.size());
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(1);
-			polyhedron->face_materials.push_back(0);
+			polyhedron->face_materials.push_back(material);
 			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
+
+			k3d::mesh::indices_t face_indices;
+			for(adjacency_list::iterator edge = grouped_edges.front().begin(); edge != grouped_edges.front().end(); ++edge)
+				face_indices.push_back(edge_faces[edge->edge]);
+			for(adjacency_list::iterator edge = grouped_edges.back().begin(); edge != grouped_edges.back().end(); ++edge)
+				face_indices.push_back(edge_faces[edge->edge]);
+			k3d::mesh::weights_t face_weights(face_indices.size(), 1.0 / face_indices.size());
+			face_attributes.push_back(face_indices.size(), &face_indices[0], &face_weights[0]);
 
 			// Create the first cross edge ...
 			polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 			polyhedron->edge_selections.push_back(0);
 			polyhedron->vertex_points.push_back(grouped_edges.front().front().start_point);
 			polyhedron->vertex_selections.push_back(0);
+
+			cross_edges[0] = grouped_edges.front().front().edge;
+			cross_edges[1] = grouped_edges.back().back().edge;
+			edge_attributes.push_back(2, &cross_edges[0], &cross_edge_weights[0]);
+			vertex_attributes.push_back(grouped_edges.front().front().edge);
 
 			// Create the first set of parallel edges ...
 			for(adjacency_list::reverse_iterator edge = grouped_edges.back().rbegin(); edge != grouped_edges.back().rend(); ++edge)
@@ -185,6 +222,9 @@ public:
 				polyhedron->edge_selections.push_back(0);
 				polyhedron->vertex_points.push_back(edge->end_point);
 				polyhedron->vertex_selections.push_back(0);
+
+				edge_attributes.push_back(edge->edge);
+				vertex_attributes.push_back(polyhedron->clockwise_edges[edge->edge]);
 			}
 
 			// Create the second cross edge ...
@@ -193,6 +233,11 @@ public:
 			polyhedron->vertex_points.push_back(grouped_edges.back().front().start_point);
 			polyhedron->vertex_selections.push_back(0);
 
+			cross_edges[0] = grouped_edges.back().front().edge;
+			cross_edges[1] = grouped_edges.front().back().edge;
+			edge_attributes.push_back(2, &cross_edges[0], &cross_edge_weights[0]);
+			vertex_attributes.push_back(grouped_edges.back().front().edge);
+
 			// Create the second set of parallel edges ...
 			for(adjacency_list::reverse_iterator edge = grouped_edges.front().rbegin(); edge != grouped_edges.front().rend(); ++edge)
 			{
@@ -200,13 +245,13 @@ public:
 				polyhedron->edge_selections.push_back(0);
 				polyhedron->vertex_points.push_back(edge->end_point);
 				polyhedron->vertex_selections.push_back(0);
+
+				edge_attributes.push_back(edge->edge);
+				vertex_attributes.push_back(polyhedron->clockwise_edges[edge->edge]);
 			}
 
 			// Close the edge loop ...
 			polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
-
-			// Finalize the shell ...
-			polyhedron->shell_face_counts.back() += 1;
 		}
 	}
 
@@ -222,8 +267,8 @@ public:
 				k3d::uuid(0xa360bb82, 0x223a46df, 0x91e4b594, 0xf9b6b7a3),
 				"BridgeEdges",
 				"Creates new polygons bridging two sets of connected border edges",
-				"Polygon",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				"Polyhedron",
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

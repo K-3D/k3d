@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>1 5 0 -1 5 0 -3 5 0 -5 5 0 1 3 0 -1 3 0 -3 3 0 -5 3 0 5 1 0 3 1 0 1 1 0 -5 1 0 5 -1 -0 3 -1 -0 5 -3 -0 3 -3 -0 5 -5 -0 3 -5 -0 1 -5 -0 4 4 0 -2 -2 0</points>
+		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1</point_selection>
+		<point_attributes>
+			<array name="index" type="k3d::uint_t">2 3 4 5 8 9 10 11 12 13 14 17 18 19 24 25 30 31 32 2 17</array>
+		</point_attributes>
+		<primitives>
+			<primitive type="polyhedron">
+				<structure>
+					<table type="edge">
+						<array name="clockwise_edges" type="k3d::uint_t">1 2 0 4 5 6 3 8 9 10 7 12 13 14 11 16 17 15 19 20 21 18 23 24 25 22 27 28 26 30 31 32 29 34 35 36 33 38 39 40 37 42 43 44 41 46 47 45 49 50 51 48 53 54 55 52</array>
+						<array name="edge_selections" type="k3d::double_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+							<metadata>
+								<pair name="k3d:role">k3d:selection</pair>
+							</metadata>
+						</array>
+					</table>
+					<table type="face">
+						<array name="face_first_loops" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14</array>
+						<array name="face_loop_counts" type="k3d::uint_t">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</array>
+						<array name="face_materials" type="k3d::imaterial*">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</array>
+						<array name="face_selections" type="k3d::double_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+							<metadata>
+								<pair name="k3d:role">k3d:selection</pair>
+							</metadata>
+						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</array>
+					</table>
+					<table type="loop">
+						<array name="loop_first_edges" type="k3d::uint_t">0 3 7 11 15 18 22 26 29 33 37 41 45 48 52</array>
+					</table>
+					<table type="shell">
+						<array name="shell_types" type="k3d::int32_t">0</array>
+					</table>
+					<table type="vertex">
+						<array name="vertex_points" type="k3d::uint_t">19 0 4 0 1 5 4 1 2 6 5 2 3 7 6 19 9 8 19 4 10 9 4 5 20 10 5 6 20 6 7 11 20 8 9 13 12 9 10 20 13 12 13 15 14 13 20 15 14 15 17 16 15 20 18 17
+							<metadata>
+								<pair name="k3d:domain">k3d:point-indices</pair>
+							</metadata>
+						</array>
+						<array name="vertex_selections" type="k3d::double_t">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+							<metadata>
+								<pair name="k3d:role">k3d:selection</pair>
+							</metadata>
+						</array>
+					</table>
+				</structure>
+				<attributes>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
+					<table type="edge">
+						<array name="index" type="k3d::uint_t">4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 21 22 23 24 25 26 27 28 29 30 31 32 33 35 36 37 38 39 40 41 42 43 44 45 46 47 60 61 62 63 64 66 67 80 81 82 83 84 85 86 87</array>
+					</table>
+					<table type="face">
+						<array name="index" type="k3d::uint_t">1 2 3 4 5 6 7 8 9 10 11 15 16 20 21</array>
+					</table>
+					<table type="vertex">
+						<array name="index" type="k3d::uint_t">4 5 6 8 9 10 11 12 13 14 15 16 17 18 19 21 22 23 24 25 26 27 28 29 30 31 32 33 35 36 37 38 39 40 41 42 43 44 45 46 47 60 61 62 63 64 66 67 80 81 82 83 84 85 86 87</array>
+					</table>
+				</attributes>
+			</primitive>
+		</primitives>
+	</mesh_arrays>
+</k3dml>

@@ -106,7 +106,7 @@ public:
 			k3d::mesh::indices_t point_edges_out;
 			k3d::mesh::indices_t point_first_edges_out;
 			k3d::mesh::indices_t point_edge_counts_out;
-			k3d::polyhedron::create_vertex_edge_lookup(output_polyhedron->vertex_points, point_edges_out, point_first_edges_out, point_edge_counts_out);
+			k3d::polyhedron::create_point_edge_lookup(output_polyhedron->vertex_points, point_edges_out, point_first_edges_out, point_edge_counts_out);
 
 			// Get point-to-edge lookup data for incoming edges
 			k3d::mesh::indices_t vertex_points_in(edge_count);
@@ -117,11 +117,11 @@ public:
 			k3d::mesh::indices_t point_edges_in;
 			k3d::mesh::indices_t point_first_edges_in;
 			k3d::mesh::indices_t point_edge_counts_in;
-			k3d::polyhedron::create_vertex_edge_lookup(vertex_points_in, point_edges_in, point_first_edges_in, point_edge_counts_in);
+			k3d::polyhedron::create_point_edge_lookup(vertex_points_in, point_edges_in, point_first_edges_in, point_edge_counts_in);
 
 			// Get face-to-edge data
 			k3d::mesh::indices_t edge_faces;
-			k3d::polyhedron::create_edge_face_lookup(output_polyhedron->face_first_loops, output_polyhedron->face_loop_counts, output_polyhedron->loop_first_edges, output_polyhedron->clockwise_edges, edge_faces);
+			k3d::polyhedron::create_edge_face_lookup(*output_polyhedron, edge_faces);
 
 			// Get edge companions
 			k3d::mesh::indices_t adjacent_edges;

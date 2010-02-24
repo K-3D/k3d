@@ -277,12 +277,12 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<axes,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > >factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > >factory(
 			k3d::classes::Axes(),
 			"Axes",
 			_("Configurable set of axes to help in visualizing the 3D workspace"),
-			"Utility",
+			"Annotation",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

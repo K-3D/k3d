@@ -43,15 +43,15 @@ namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// poly_cushion_implementation
+// poly_cushion
 
-class poly_cushion_implementation :
+class poly_cushion :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	poly_cushion_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_cushion(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_length_segments(init_owner(*this) + init_name("length_segments") + init_label(_("Length segments")) + init_description(_("Length segments")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
 		m_radial_segments(init_owner(*this) + init_name("radial_segments") + init_label(_("Radial segments")) + init_description(_("Radial segments")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1.0) + init_units(typeid(k3d::measurement::scalar))),
@@ -84,12 +84,12 @@ public:
 
 	void add_face(k3d::mesh& Mesh, k3d::polyhedron::primitive& Polyhedron, const unsigned long v1, const unsigned long v2, const unsigned long v3, k3d::imaterial* const Material)
 	{
-		k3d::polyhedron::add_triangle(Mesh, Polyhedron, v1, v2, v3, Material);
+		k3d::polyhedron::add_triangle(Mesh, Polyhedron, 0, v1, v2, v3, Material);
 	}
 
 	void add_face(k3d::mesh& Mesh, k3d::polyhedron::primitive& Polyhedron, const unsigned long v1, const unsigned long v2, const unsigned long v3, const unsigned long v4, k3d::imaterial* const Material)
 	{
-		k3d::polyhedron::add_quadrilateral(Mesh, Polyhedron, v1, v2, v3, v4, Material);
+		k3d::polyhedron::add_quadrilateral(Mesh, Polyhedron, 0, v1, v2, v3, v4, Material);
 	}
 
 	void on_update_mesh_topology(k3d::mesh& Output)
@@ -100,8 +100,6 @@ public:
 		k3d::mesh::selection_t& point_selection = Output.point_selection.create();
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
 		k3d::imaterial* const material = m_material.pipeline_value();
@@ -252,11 +250,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<poly_cushion_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<poly_cushion, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0xc11b963d, 0x108d471c, 0xa3826195, 0x821116b0),
 			"PolyCushion",
 			_("Generates a polygonal cushion (a cube with rounded edges)"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -276,7 +274,7 @@ private:
 
 k3d::iplugin_factory& poly_cushion_factory()
 {
-	return poly_cushion_implementation::get_factory();
+	return poly_cushion::get_factory();
 }
 
 } // namespace sources

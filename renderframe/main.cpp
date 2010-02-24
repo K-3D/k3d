@@ -156,7 +156,7 @@ bool exec_command(const element& XMLCommand, const k3d::filesystem::path& FrameD
   for(std::vector<k3d::string_t>::const_iterator argument = arguments.begin(); argument != arguments.end(); ++argument)
   	command_line += *argument + " ";
   
-  k3d::log() << debug << "Executing " << command_line << std::endl;
+  k3d::log() << info << "Executing " << command_line << std::endl;
   
   std::vector<char> env;
   for(std::vector<k3d::string_t>::const_iterator el = environment.begin(); el != environment.end(); ++el)

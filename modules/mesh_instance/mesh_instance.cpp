@@ -224,13 +224,13 @@ public:
 		static k3d::document_plugin_factory<mesh_instance,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > > > factory(
 				k3d::classes::MeshInstance(),
 				"MeshInstance",
 				_("Renders an instance of a geometric mesh"),
 				"Mesh",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

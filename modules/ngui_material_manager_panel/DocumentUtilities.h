@@ -38,7 +38,7 @@
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/share.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 
 using namespace k3d::ngui;
 

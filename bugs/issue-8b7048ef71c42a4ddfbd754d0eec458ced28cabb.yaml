@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Fix the Delete modifier implementation.
+desc: Need to update the Delete implementation to handle changes to the polyhedron schema for shells.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-01-01 03:14:42.452522 Z
+references: []
+
+id: 8b7048ef71c42a4ddfbd754d0eec458ced28cabb
+log_events: 
+- - 2010-01-01 03:14:43.245471 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-01-01 19:32:19.028475 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""

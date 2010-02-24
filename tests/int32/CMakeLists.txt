@@ -1,0 +1,5 @@
+K3D_TEST(int32.source.Int32SourceScript
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/source.Int32SourceScript.py
+	REQUIRES K3D_BUILD_SCRIPTING_MODULE
+	LABELS int32 source Int32SourceScript)
+

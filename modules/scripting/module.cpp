@@ -36,16 +36,16 @@ extern k3d::iplugin_factory& bitmap_source_script_factory();
 extern k3d::iplugin_factory& color_source_script_factory();
 extern k3d::iplugin_factory& command_node_script_factory();
 extern k3d::iplugin_factory& double_source_script_factory();
-extern k3d::iplugin_factory& gl_renderable_script_factory();
 extern k3d::iplugin_factory& int32_source_script_factory();
+extern k3d::iplugin_factory& matrix_modifier_script_factory();
+extern k3d::iplugin_factory& matrix_source_script_factory();
 extern k3d::iplugin_factory& mesh_modifier_script_factory();
-extern k3d::iplugin_factory& mesh_painter_script_factory();
 extern k3d::iplugin_factory& mesh_source_script_factory();
 extern k3d::iplugin_factory& null_output_script_factory();
+extern k3d::iplugin_factory& opengl_painter_script_factory();
+extern k3d::iplugin_factory& opengl_renderable_script_factory();
 extern k3d::iplugin_factory& render_engine_script_factory();
 extern k3d::iplugin_factory& string_source_script_factory();
-extern k3d::iplugin_factory& transform_modifier_script_factory();
-extern k3d::iplugin_factory& transform_source_script_factory();
 extern k3d::iplugin_factory& vector3_source_script_factory();
 
 } // namespace scripting
@@ -59,16 +59,16 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::scripting::color_source_script_factory());
 	Registry.register_factory(module::scripting::command_node_script_factory());
 	Registry.register_factory(module::scripting::double_source_script_factory());
-	Registry.register_factory(module::scripting::gl_renderable_script_factory());
 	Registry.register_factory(module::scripting::int32_source_script_factory());
+	Registry.register_factory(module::scripting::matrix_modifier_script_factory());
+	Registry.register_factory(module::scripting::matrix_source_script_factory());
 	Registry.register_factory(module::scripting::mesh_modifier_script_factory());
-	Registry.register_factory(module::scripting::mesh_painter_script_factory());
 	Registry.register_factory(module::scripting::mesh_source_script_factory());
 	Registry.register_factory(module::scripting::null_output_script_factory());
+	Registry.register_factory(module::scripting::opengl_painter_script_factory());
+	Registry.register_factory(module::scripting::opengl_renderable_script_factory());
 	Registry.register_factory(module::scripting::render_engine_script_factory());
 	Registry.register_factory(module::scripting::string_source_script_factory());
-	Registry.register_factory(module::scripting::transform_modifier_script_factory());
-	Registry.register_factory(module::scripting::transform_source_script_factory());
 	Registry.register_factory(module::scripting::vector3_source_script_factory());
 K3D_MODULE_END
 

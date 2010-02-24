@@ -1451,7 +1451,7 @@ public:
 					k3d::uuid(0x29672638, 0x932544bb, 0xa6b229a9, 0xca30dfc2),
 					"FilletEdges",
 					"Creates rounded surfaces along selected edges",
-					"Mesh",
+					"Polyhedron",
 					k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

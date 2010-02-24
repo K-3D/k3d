@@ -1,0 +1,41 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Problems selecting points in instanced geometry.
+desc: |-
+  Steps to reproduce:
+  
+  * Start K-3D.
+  * Create a PolyCube.
+  * Right click on the cube and choose Instantiate.
+  * Use the Translate Tool to offset the new instance so it doesn't overlap with the original.
+  * Choose Select > Points.
+  * Try to select some points in the new instance - doesn't work.
+  * Choose Select > Nodes.
+  * Shift-click on the original instance so both instances are selected.
+  * Choose Select > Points.
+  * Try to select some points in the original instance - corresponding points in both instances are selected.
+  * Choose Select > Edges.
+  * Make selections in both instances - works fine.
+type: :bugfix
+component: K-3D
+release: 1.0.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-01-02 00:18:21.628527 Z
+references: []
+
+id: 87422f875fafba82217cb6ea9926431c664008e1
+log_events: 
+- - 2010-01-02 00:18:22.388479 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-02-13 01:25:48.086236 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - commented
+  - Turning-off K3D_BUILD_ADVANCED_OPENGL_PAINTERS fixes this issue, need to figure-out where things are going wrong ... VBO point painters?
+- - 2010-02-14 01:35:45.277214 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
+  - We've disabled the experimental VBO points painter, so this will only be an issue when it is finally ready to be released.
+claimer: 

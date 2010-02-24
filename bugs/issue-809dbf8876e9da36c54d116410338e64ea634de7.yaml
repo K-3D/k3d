@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Fix SubdivideFaces.
+desc: Need to update SubdivideFaces to match changes to the polyhedron schema for shells.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-01-01 03:17:29.412511 Z
+references: []
+
+id: 809dbf8876e9da36c54d116410338e64ea634de7
+log_events: 
+- - 2010-01-01 03:17:29.860444 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-01-15 04:46:22.046305 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""

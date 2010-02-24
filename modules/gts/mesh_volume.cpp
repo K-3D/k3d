@@ -75,7 +75,7 @@ public:
 				k3d::uuid(0x905f24ef, 0x344f1c6f, 0x3242b79d, 0xeb8b0a57),
 				"GTSMeshVolume",
 				_("Calculates input mesh volume"),
-				"Metrics",
+				"Mesh",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

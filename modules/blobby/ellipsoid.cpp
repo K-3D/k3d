@@ -90,7 +90,7 @@ public:
 		Output = k3d::mesh();
 
 		boost::scoped_ptr<k3d::blobby::primitive> blobby(k3d::blobby::create(Output));
-		k3d::typed_array<k3d::color>& varying_colors = blobby->varying_attributes.create<k3d::typed_array<k3d::color> >("Cs");
+		k3d::typed_array<k3d::color>& parameter_colors = blobby->parameter_attributes.create<k3d::typed_array<k3d::color> >("Cs");
 
 		blobby->first_primitives.push_back(blobby->primitives.size());
 		blobby->primitive_counts.push_back(1);
@@ -105,7 +105,7 @@ public:
 		k3d::matrix4 matrix = k3d::transpose(k3d::translate3(x, y, z) * k3d::scale3(size_x, size_y, size_z));
 		blobby->floats.insert(blobby->floats.end(), static_cast<double*>(matrix), static_cast<double*>(matrix) + 16);
 
-		varying_colors.push_back(color);
+		parameter_colors.push_back(color);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)

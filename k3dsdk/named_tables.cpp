@@ -38,30 +38,21 @@ table* named_tables::writable(const string_t& Name)
 	return result == end() ? static_cast<table*>(0) : &result->second;
 }
 
-bool_t named_tables::almost_equal(const named_tables& Other, const uint64_t Threshold) const
+void named_tables::difference(const named_tables& Other, bool_t& Equal, uint64_t& ULPS) const
 {
-	// If our sizes differ, we definitely ain't equal
+	// If we have differing numbers of tables, we definitely aren't equal
 	if(size() != Other.size())
-		return false;
+		Equal = false;
 
-	// Test each pair ...
-	named_tables::const_iterator a, b;
-	for(a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
+	for(named_tables::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
-		// Each pair must have equal names
+		// Each pair of tables must have equal names
 		if(a->first != b->first)
-			return false;
+			Equal = false;
 
-		// Perform element-wise comparisons of each pair
-		if(!a->second.almost_equal(b->second, Threshold))
-			return false;
+		// Perform element-wise comparisons of the tables 
+		a->second.difference(b->second, Equal, ULPS);
 	}
-
-	// If we have any leftovers, we're not equal ...
-	if(a != end() || b != Other.end())
-		return false;
-
-	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +61,7 @@ bool_t named_tables::almost_equal(const named_tables& Other, const uint64_t Thre
 std::ostream& operator<<(std::ostream& Stream, const named_tables& RHS)
 {
 	for(named_tables::const_iterator attributes = RHS.begin(); attributes != RHS.end(); ++attributes)
-		Stream << standard_indent << "attributes \"" << attributes->first << "\"" << attributes->second << "\n";
+		Stream << standard_indent << "table \"" << attributes->first << "\"\n" << push_indent << attributes->second << pop_indent << "\n";
 
 	return Stream;
 }

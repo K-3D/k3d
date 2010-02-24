@@ -503,9 +503,9 @@ k3d::selection::set create(const double_t Weight)
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::CURVE, Weight);
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::EDGE, Weight);
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::FACE, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::PARAMETER, Weight);
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::PATCH, Weight);
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::SURFACE, Weight);
-	primitive_selection::append(*primitive_selection_storage, k3d::selection::VARYING, Weight);
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::VERTEX, Weight);
 
 	return result;
@@ -529,11 +529,6 @@ void merge(const k3d::selection::set& Set, mesh& Mesh)
 			continue;
 		}
 	}
-}
-
-void merge(const k3d::selection::set& Set, legacy::mesh& Mesh)
-{
-	assert_not_implemented();
 }
 
 } // namespace selection

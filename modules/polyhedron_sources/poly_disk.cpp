@@ -43,15 +43,15 @@ namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// poly_disk_implementation
+// poly_disk
 
-class poly_disk_implementation :
+class poly_disk :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	poly_disk_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_disk(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("u_segments")) + init_description(_("Radial Segments")) + init_value(16) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("v_segments")) + init_description(_("Radial Segments")) + init_value(2) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -80,12 +80,8 @@ public:
 		const k3d::int32_t v_segments = m_v_segments.pipeline_value();
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
-
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-
-		k3d::polyhedron::add_cylinder(Output, *polyhedron, v_segments, u_segments, material);
+		k3d::polyhedron::add_cylinder(Output, *polyhedron, 0, v_segments, u_segments, material);
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -120,11 +116,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<poly_disk_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<poly_disk, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0xbfe3e783, 0x2a7a4f51, 0xb696858a, 0xb41d794f),
 			"PolyDisk",
 			_("Generates a polygonal disk"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -142,7 +138,7 @@ private:
 
 k3d::iplugin_factory& poly_disk_factory()
 {
-	return poly_disk_implementation::get_factory();
+	return poly_disk::get_factory();
 }
 
 } // namespace sources

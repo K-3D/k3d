@@ -86,7 +86,7 @@ public:
 			"RenderManScriptedPainter",
 			_("Uses a script to render meshes"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

@@ -356,11 +356,6 @@ public:
 		create_property<mesh*, user_property<k3d_data(mesh*, immutable_name, change_signal, with_undo, local_storage, no_constraint, read_only_property, user_mesh_serialization)> >(DefaultValue);
 	}
 
-	void operator()(legacy::mesh* DefaultValue) const
-	{
-		create_property<legacy::mesh*, user_property<k3d_data(legacy::mesh*, immutable_name, change_signal, with_undo, local_storage, no_constraint, read_only_property, user_mesh_serialization)> >(DefaultValue);
-	}
-
 	void operator()(imaterial* DefaultValue) const
 	{
 		create_property<imaterial*, user_property<k3d_data(imaterial*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, user_node_serialization)> >(DefaultValue);

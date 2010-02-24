@@ -31,8 +31,8 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iparentable.h>
 #include <k3dsdk/iproperty.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/transform.h>
@@ -55,11 +55,11 @@ const transform_history_t parent_to_node_history(k3d::inode& Object)
 	{
 		results.push_back(object);
 
-		k3d::itransform_sink* const transform_sink = dynamic_cast<k3d::itransform_sink*>(object);
-		if(!transform_sink)
+		k3d::imatrix_sink* const matrix_sink = dynamic_cast<k3d::imatrix_sink*>(object);
+		if(!matrix_sink)
 			break;
 
-		k3d::iproperty* const dependency = Object.document().pipeline().dependency(transform_sink->transform_sink_input());
+		k3d::iproperty* const dependency = Object.document().pipeline().dependency(matrix_sink->matrix_sink_input());
 		if(!dependency)
 			break;
 
@@ -99,15 +99,15 @@ void unparent(k3d::inode& Node)
 	const transform_history_t history = parent_to_node_history(Node);
 	if(!history.empty())
 	{
-		if(k3d::itransform_sink* const transform_sink = dynamic_cast<k3d::itransform_sink*>(history.front()))
+		if(k3d::imatrix_sink* const matrix_sink = dynamic_cast<k3d::imatrix_sink*>(history.front()))
 		{
-			const transform_modifier modifier = create_transform_modifier(Node.document(), k3d::classes::FrozenTransformation(), "Unparent Compensation");
+			const transform_modifier modifier = create_transform_modifier(Node.document(), k3d::classes::FrozenMatrix(), "Unparent Compensation");
 			if(modifier)
 			{
 				k3d::property::set_internal_value(*modifier.node, "matrix", unparent_compensation);
 
 				k3d::ipipeline::dependencies_t dependencies;
-				dependencies.insert(std::make_pair(&transform_sink->transform_sink_input(), &modifier.source->transform_source_output()));
+				dependencies.insert(std::make_pair(&matrix_sink->matrix_sink_input(), &modifier.source->matrix_source_output()));
 				Node.document().pipeline().set_dependencies(dependencies);
 			}
 		}

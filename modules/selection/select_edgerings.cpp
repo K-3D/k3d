@@ -84,7 +84,7 @@ private:
 			k3d::mesh::counts_t valences;
 
 			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, companions);
-			k3d::polyhedron::create_vertex_valence_lookup(Output.points->size(), polyhedron->vertex_points, valences);
+			k3d::polyhedron::create_point_valence_lookup(Output.points->size(), polyhedron->vertex_points, valences);
 			
 			const k3d::mesh::selection_t original_edge_selections = polyhedron->edge_selections;
 

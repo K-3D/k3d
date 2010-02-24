@@ -1434,15 +1434,15 @@ namespace detail
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
-// polyhedron_implementation
+// polyhedron
 
-class polyhedron_implementation :
+class polyhedron :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	polyhedron_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	polyhedron(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_document(Document),
 		m_number(init_owner(*this) + init_name("number") + init_label(_("Number")) + init_description(_("Polyhedron Number")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1, constraint::maximum<k3d::int32_t>(80))) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -1491,6 +1491,7 @@ public:
 			if(!m_PolyhedronPaths[i].size())
 				continue;
 
+			primitive->face_shells.push_back(0);
 			primitive->face_first_loops.push_back(primitive->loop_first_edges.size());
 			primitive->face_loop_counts.push_back(1);
 			primitive->face_selections.push_back(0);
@@ -1514,8 +1515,6 @@ public:
 			colors.push_back(detail::colors[color_index]);
 		}
 
-		primitive->shell_first_faces.push_back(0);
-		primitive->shell_face_counts.push_back(primitive->face_first_loops.size());
 		primitive->shell_types.push_back(k3d::polyhedron::POLYGONS);
 	}
 
@@ -1525,11 +1524,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<polyhedron_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<polyhedron, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x916c98dd, 0x74f24362, 0x98364c94, 0x2a9f9ae7),
 			"Polyhedron",
 			_("Generates a uniform polyhedron"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -1928,7 +1927,7 @@ private:
 
 k3d::iplugin_factory& polyhedron_factory()
 {
-	return polyhedron_implementation::get_factory();
+	return polyhedron::get_factory();
 }
 
 } // namespace sources

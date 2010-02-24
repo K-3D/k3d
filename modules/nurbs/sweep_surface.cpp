@@ -21,7 +21,9 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_patch_modifier.h"
+#include "nurbs_curves.h"
+#include "nurbs_patches.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -56,61 +58,52 @@ class sweep_surface :
 public:
 	sweep_surface(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_swap(init_owner(*this) + init_name(_("swap")) + init_label(_("Swap the curves?")) + init_description(_("Exchanges the profile curve and the traverse curve")) + init_value(false)),
-		m_create_caps(init_owner(*this) + init_name(_("create_caps")) + init_label(_("Create caps?")) + init_description(_("Create caps at both ends of the revolved curve?")) + init_value(false)),
-		m_segments(init_owner(*this) + init_name(_("segments")) + init_label(_("Segments")) + init_description(_("The more segments the better the result")) + init_value(10) + init_constraint(constraint::minimum(3))),
-		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the original curves")) + init_value(true))
+		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete the Curve")) + init_description(_("Delete the original curves")) + init_value(true)),
+		m_samples(init_owner(*this) + init_name("samples") + init_label(_("Samples")) + init_description(_("The number of samples per span")) + init_value(200) + init_constraint(constraint::minimum(10)) + init_step_increment(50) + init_units(typeid(k3d::measurement::scalar))),
+		m_align_normal(init_owner(*this) + init_name(_("align_normal")) + init_label(_("Align Normal")) + init_description(_("Align the curve normal, insted of preserving the start alignment")) + init_value(true))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-		m_create_caps.changed_signal().connect(make_update_mesh_slot());
-		m_swap.changed_signal().connect(make_update_mesh_slot());
-		m_segments.changed_signal().connect(make_update_mesh_slot());
 		m_delete_original.changed_signal().connect(make_update_mesh_slot());
+		m_samples.changed_signal().connect(make_update_mesh_slot());
+		m_align_normal.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		Output = Input;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
+		if(!Output.points.get())
 			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+		boost::scoped_ptr<k3d::nurbs_patch::primitive> output_patches(k3d::nurbs_patch::create(Output));
 
-		std::vector<k3d::uint_t> curves;
+		k3d::mesh selected_curves_mesh;
+		selected_curves_mesh.points.create();
+		selected_curves_mesh.point_selection.create();
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> paths(k3d::nurbs_curve::create(selected_curves_mesh));
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> sweep_curves(k3d::nurbs_curve::create(selected_curves_mesh));
+		visit_selected_curves(Output, curve_extractor(selected_curves_mesh, *paths, *sweep_curves));
 
-		const k3d::uint_t curve_begin = 0;
-		const k3d::uint_t curve_end = nurbs->curve_first_knots.size();
-		for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_paths(k3d::nurbs_curve::validate(selected_curves_mesh, *selected_curves_mesh.primitives.front()));
+		boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_sweep_curves(k3d::nurbs_curve::validate(selected_curves_mesh, *selected_curves_mesh.primitives.back()));
+
+		return_if_fail(const_paths);
+		return_if_fail(const_sweep_curves);
+
+		sweep(Output, *output_patches, selected_curves_mesh, *const_sweep_curves, *const_paths, m_samples.pipeline_value(), m_align_normal.pipeline_value());
+
+		if(m_delete_original.pipeline_value())
 		{
-			if (nurbs->curve_selections[curve] > 0.0)
-				curves.push_back(curve);
+			delete_selected_curves(Output);
 		}
+		delete_empty_primitives(Output);
 
-		if (curves.size() != 2)
-		{
-			k3d::log() << error << nurbs_debug << "You need to select 2 curves!\n" << std::endl;
-		}
-		else
-		{
-			nurbs_curve_modifier mod(Output, *nurbs);
-			if (m_swap.pipeline_value())
-				mod.sweep_surface(curves[0], curves[1], m_segments.pipeline_value(), m_create_caps.pipeline_value());
-			else
-				mod.sweep_surface(curves[1], curves[0], m_segments.pipeline_value(), m_create_caps.pipeline_value());
-
-			if (m_delete_original.pipeline_value())
-			{
-				mod.delete_curve(curves[0]);
-				mod.delete_curve(curves[1]);
-			}
-		}
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -126,10 +119,31 @@ public:
 	}
 
 private:
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_create_caps;
-	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_segments;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_swap;
+	/// Extracts the first curve as a path, and the rest as curves that sweep it
+	struct curve_extractor
+	{
+		k3d::mesh& mesh;
+		k3d::nurbs_curve::primitive& paths;
+		k3d::nurbs_curve::primitive& sweep_curves;
+		curve_extractor(k3d::mesh& Mesh, k3d::nurbs_curve::primitive& Paths, k3d::nurbs_curve::primitive& SweepCurves) : mesh(Mesh), paths(Paths), sweep_curves(SweepCurves) {}
+		void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
+		{
+			if(paths.curve_first_points.empty())
+			{
+				copy_curve(mesh, paths, Mesh, Curves, Curve);
+				paths.material = Curves.material;
+			}
+			else
+			{
+				copy_curve(mesh, sweep_curves, Mesh, Curves, Curve);
+				sweep_curves.material = Curves.material;
+			}
+		}
+	};
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_samples;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_align_normal;
+
 };
 
 k3d::iplugin_factory& sweep_surface_factory()

@@ -35,7 +35,7 @@
 					<table type="curve">
 						<array name="Cs" type="k3d::color">1 1 0 1 1 0.20000000000000001 1 1 0.40000000000000002 1 1 0.60000000000000009 1 1 0.80000000000000004</array>
 					</table>
-					<table type="varying"/>
+					<table type="parameter"/>
 					<table type="vertex"/>
 				</attributes>
 			</primitive>

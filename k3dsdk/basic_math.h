@@ -24,6 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/types.h>
+
 #include <algorithm>
 #include <cmath>
 

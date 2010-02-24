@@ -176,7 +176,7 @@ public:
 				k3d::uuid(0x0df159e6, 0x4d49063c, 0x391217b5, 0x8079599e),
 				"ODESimulation",
 				_("Rigid-body dynamics simulation."),
-				"ODE",
+				"Simulation",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

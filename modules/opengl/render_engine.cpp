@@ -38,7 +38,7 @@
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/irender_viewport_gl.h>
 #include <k3dsdk/irenderable_gl.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
@@ -608,7 +608,7 @@ private:
 		glLoadIdentity();
 		if(orthographic)
 		{
-			const k3d::matrix4 transform_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output());
+			const k3d::matrix4 transform_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().matrix_source_output());
 			const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 			const k3d::point3 world_target = boost::any_cast<k3d::point3>(Camera.world_target().property_internal_value());
 			const double distance = k3d::distance(world_position, world_target);
@@ -705,7 +705,7 @@ private:
 		if(!Select)
 			detail::gl_setup_lights(m_headlight.pipeline_value());
 
-		const k3d::matrix4 transform_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output());
+		const k3d::matrix4 transform_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().matrix_source_output());
 		const k3d::angle_axis orientation(k3d::euler_angles(transform_matrix, k3d::euler_angles::ZXYstatic));
 		const k3d::point3 position(k3d::position(transform_matrix));
 

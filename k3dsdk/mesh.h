@@ -35,8 +35,6 @@ namespace k3d
 class imaterial;
 class mesh_selection;
 
-namespace legacy { class mesh; }
-
 ////////////////////////////////////////////////////////////////////////////////
 // mesh
 
@@ -101,8 +99,8 @@ public:
 		/// Stores array data that defines the primitive's attributes.
 		named_tables_t attributes;
 
-		/// Compares two primitives for equality using the fuzzy semantics of almost_equal.
-		bool_t almost_equal(const primitive& Other, const uint64_t Threshold) const;
+		/// Returns the difference between two primitives using the fuzzy semantics of difference().
+		void difference(const primitive& Other, bool_t& Equal, uint64_t& ULPS) const;
 	};
 
 	/// Defines storage for a collection of primitives.
@@ -123,20 +121,26 @@ public:
 	/// Stores mesh primitives.
 	primitives_t primitives;
 
-	/// Compares two meshes for equality using the fuzzy semantics of almost_equal.
-	bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;
-
-	/// Conversion from a legacy mesh to a new mesh.
-	mesh& operator=(const k3d::legacy::mesh& RHS);
+	/// Returns the difference between two meshes using the fuzzy semantics of difference().
+	void difference(const mesh& Other, bool_t& Equal, uint64_t& ULPS) const;
 
 	/// Returns a bounding-box containing every point in the given mesh.
 	static const bounding_box3 bounds(const mesh& Mesh);
 	/// Returns a bounding-box containing every point in the given array.
 	static const bounding_box3 bounds(const points_t& Points);
+
+	/// Converts a bitmap marking indices to be removed from a contiguous set into a map.
+	static void create_index_removal_map(const mesh::bools_t& KeepIndices, mesh::indices_t& IndexMap);
+	/// Converts a bitmap marking indices in a range to a set of selected indices.
+	static void create_index_list(const mesh::bools_t& SelectedIndices, mesh::indices_t& IndexSet);
 	/// Initialize an array to mark unused mesh points (points not used by any primitive).
 	static void lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints);
-	/// Remove unused points from a mesh, adjusting point indices in all remaining primitives.
-	static void delete_unused_points(mesh& Mesh);
+	/// Remaps point indices in every primitive in a mesh.
+	static void remap_points(mesh& Mesh, const mesh::indices_t& PointMap);
+	/// Remove points from a mesh, adjusting point indices in all remaining primitives.
+	static void delete_points(mesh& Mesh, const mesh::bools_t& Points);
+	/// Remove points from a mesh, adjusting point indices in all remaining primitives, returning an array that maps original point indices to new point indices.
+	static void delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_t& PointMap);
 	/// Performs a deep-copy from one mesh to another (the new mesh doesn't share any memory with the old).
 	static void deep_copy(const mesh& From, mesh& To);
 
@@ -199,45 +203,17 @@ public:
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS);
 std::ostream& operator<<(std::ostream& Stream, const mesh::primitive& RHS);
 
-/// Specialization of almost_equal that tests k3d::mesh for equality
-template<>
-class almost_equal<mesh>
+/// Specialization of difference for k3d::mesh
+inline void difference(const k3d::mesh& A, const k3d::mesh& B, bool_t& Equal, uint64_t& ULPS)
 {
-	typedef mesh T;
+	A.difference(B, Equal, ULPS);
+}
 
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
-
-/// Specialization of almost_equal that tests k3d::mesh::primitive for equality
-template<>
-class almost_equal<mesh::primitive>
+/// Specialization of difference for k3d::mesh::primitive
+inline void difference(const k3d::mesh::primitive& A, const k3d::mesh::primitive& B, bool_t& Equal, uint64_t& ULPS)
 {
-	typedef mesh::primitive T;
-
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
+	A.difference(B, Equal, ULPS);
+}
 
 } // namespace k3d
 

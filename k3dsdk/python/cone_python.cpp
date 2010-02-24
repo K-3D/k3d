@@ -50,7 +50,7 @@ public:
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 	class primitive
@@ -66,7 +66,7 @@ public:
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 
@@ -105,7 +105,7 @@ void define_namespace_cone()
 		.def("selections", &cone::const_primitive::selections)
 		.def("constant_attributes", &cone::const_primitive::constant_attributes)
 		.def("surface_attributes", &cone::const_primitive::surface_attributes)
-		.def("varying_attributes", &cone::const_primitive::varying_attributes)
+		.def("parameter_attributes", &cone::const_primitive::parameter_attributes)
 		;
 
 	class_<cone::primitive::wrapper>("primitive", no_init)
@@ -117,7 +117,7 @@ void define_namespace_cone()
 		.def("selections", &cone::primitive::selections)
 		.def("constant_attributes", &cone::primitive::constant_attributes)
 		.def("surface_attributes", &cone::primitive::surface_attributes)
-		.def("varying_attributes", &cone::primitive::varying_attributes)
+		.def("parameter_attributes", &cone::primitive::parameter_attributes)
 		;
 }
 

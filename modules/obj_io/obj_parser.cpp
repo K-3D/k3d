@@ -360,87 +360,87 @@ void obj_parser::on_vertex_coordinates(const k3d::point4& Vertex)
 
 void print_obj::on_curve_surface_end()
 {
-	k3d::log() << debug << "on_curve_surface_end" << std::endl;
+	k3d::log() << info << "on_curve_surface_end" << std::endl;
 }
 
 void print_obj::on_curve_surface_type(const k3d::string_t& Type)
 {
-	k3d::log() << debug << "on_curve_surface_type " << Type << std::endl;
+	k3d::log() << info << "on_curve_surface_type " << Type << std::endl;
 }
 
 void print_obj::on_degree(const k3d::uint_t& UDegree, const k3d::uint_t& VDegree)
 {
-	k3d::log() << debug << "on_degree " << UDegree << " " << VDegree << std::endl;
+	k3d::log() << info << "on_degree " << UDegree << " " << VDegree << std::endl;
 }
 
 void print_obj::on_face(const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates, const k3d::mesh::indices_t& NormalCoordinates)
 {
-	k3d::log() << debug << "on_face ";
+	k3d::log() << info << "on_face ";
 	std::copy(VertexCoordinates.begin(), VertexCoordinates.end(), std::ostream_iterator<k3d::uint_t>(k3d::log(), " "));
 	k3d::log() << std::endl;
 }
 
 void print_obj::on_group(const k3d::string_t& Name)
 {
-	k3d::log() << debug << "on_group " << Name << std::endl;
+	k3d::log() << info << "on_group " << Name << std::endl;
 }
 
 void print_obj::on_line(const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates)
 {
-	k3d::log() << debug << "on_line ";
+	k3d::log() << info << "on_line ";
 	std::copy(VertexCoordinates.begin(), VertexCoordinates.end(), std::ostream_iterator<k3d::uint_t>(k3d::log(), " "));
 	k3d::log() << std::endl;
 }
 
 void print_obj::on_material_library(const k3d::string_t& Name)
 {
-	k3d::log() << debug << "on_material_library " << Name << std::endl;
+	k3d::log() << info << "on_material_library " << Name << std::endl;
 }
 
 void print_obj::on_normal_coordinates(const k3d::normal3& Normal)
 {
-	k3d::log() << debug << "on_normal_coordinates " << Normal << std::endl;
+	k3d::log() << info << "on_normal_coordinates " << Normal << std::endl;
 }
 
 void print_obj::on_object(const k3d::string_t& Name)
 {
-	k3d::log() << debug << "on_object " << Name << std::endl;
+	k3d::log() << info << "on_object " << Name << std::endl;
 }
 
 void print_obj::on_parameter(const k3d::string_t& Direction, const k3d::mesh::knots_t& Knots)
 {
-	k3d::log() << debug << "on_parameter " << Direction << " " << std::endl;
+	k3d::log() << info << "on_parameter " << Direction << " " << std::endl;
 	std::copy(Knots.begin(), Knots.end(), std::ostream_iterator<k3d::double_t>(k3d::log(), " "));
 	k3d::log() << std::endl;
 }
 
 void print_obj::on_points(const k3d::mesh::indices_t& VertexCoordinates)
 {
-	k3d::log() << debug << "on_points ";
+	k3d::log() << info << "on_points ";
 	std::copy(VertexCoordinates.begin(), VertexCoordinates.end(), std::ostream_iterator<k3d::uint_t>(k3d::log(), " "));
 	k3d::log() << std::endl;
 }
 
 void print_obj::on_surface(const k3d::double_t& S0, const k3d::double_t& S1, const k3d::double_t& T0, const k3d::double_t& T1, const k3d::mesh::indices_t& VertexCoordinates, const k3d::mesh::indices_t& TextureCoordinates, const k3d::mesh::indices_t& NormalCoordinates)
 {
-	k3d::log() << debug << "on_surface " << S0 << " " << S1 << " " << T0 << " " << T1 << " ";
+	k3d::log() << info << "on_surface " << S0 << " " << S1 << " " << T0 << " " << T1 << " ";
 	std::copy(VertexCoordinates.begin(), VertexCoordinates.end(), std::ostream_iterator<k3d::uint_t>(k3d::log(), " "));
 	k3d::log() << std::endl;
 }
 
 void print_obj::on_texture_coordinates(const k3d::texture3& Texture)
 {
-	k3d::log() << debug << "on_texture_coordinates " << Texture << std::endl;
+	k3d::log() << info << "on_texture_coordinates " << Texture << std::endl;
 }
 
 void print_obj::on_use_material(const k3d::string_t& Name)
 {
-	k3d::log() << debug << "on_use_material " << Name << std::endl;
+	k3d::log() << info << "on_use_material " << Name << std::endl;
 }
 
 void print_obj::on_vertex_coordinates(const k3d::point4& Vertex)
 {
-	k3d::log() << debug << "on_vertex_coordinates " << Vertex << std::endl;
+	k3d::log() << info << "on_vertex_coordinates " << Vertex << std::endl;
 }
 
 } // namespace io

@@ -1,0 +1,10 @@
+K3D_TEST(ngui.MoveTool
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/MoveTool.py
+	NGUI
+	LABELS ngui tool)
+
+K3D_TEST(ngui.RotateTool
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/RotateTool.py
+	NGUI
+	LABELS ngui tool)
+

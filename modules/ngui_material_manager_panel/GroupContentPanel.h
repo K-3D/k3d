@@ -26,7 +26,7 @@
 #include <gtkmm/textview.h>
 
 #include <k3dsdk/ngui/text.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 
 #include <sstream>
 

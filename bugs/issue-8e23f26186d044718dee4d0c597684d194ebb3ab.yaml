@@ -5,8 +5,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-08-02 21:17:24.375092 Z
 references: []
 
@@ -15,4 +15,12 @@ log_events:
 - - 2009-08-02 21:17:25.359020 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2010-01-11 06:56:37.845209 Z
+  - Bart Janssens <bart.janssens@lid.kviv.be>
+  - changed status from unstarted to in_progress
+  - ""
+- - 2010-01-12 07:21:33.075814 Z
+  - Bart Janssens <bart.janssens@lid.kviv.be>
+  - closed with disposition fixed
   - ""

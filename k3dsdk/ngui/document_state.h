@@ -117,12 +117,6 @@ public:
 	/// Sets focused viewport
 	void set_focus_viewport(viewport::control* Viewport) { m_focus_viewport = Viewport; }
 
-	/// Creates the requested node, attach a MeshInstance iff it's a mesh source
-	k3d::inode* create_node(k3d::iplugin_factory* const Factory);
-	
-	/// Instantiates the given node, returning the mesh instance if it was a mesh or null otherwise
-	k3d::inode* instantiate_mesh(k3d::inode* Node);
-
 	/// Shows context menu, pass false in interactive mode
 	void popup_context_menu(const bool UserAction = true);
 

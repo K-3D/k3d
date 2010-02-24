@@ -35,32 +35,18 @@ public:
 	const table* lookup(const string_t& Name) const;
 	/// Return an attribute_array by name, or NULL
 	table* writable(const string_t& Name);
-	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
-	bool_t almost_equal(const named_tables& Other, const uint64_t Threshold) const;
+	/// Returns the difference between two collections, using the imprecise semantics of difference().
+	void difference(const named_tables& Other, bool_t& Equal, uint64_t& ULPS) const;
 };
 
 /// Serialization
 std::ostream& operator<<(std::ostream& Stream, const named_tables& RHS);
 
-/// Specialization of almost_equal that tests named_tables for equality
-template<>
-class almost_equal<named_tables>
+/// Specialization of difference for k3d::named_tables
+inline void difference(const named_tables& A, const named_tables& B, bool_t& Equal, uint64_t& ULPS)
 {
-	typedef named_tables T;
-
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
+	A.difference(B, Equal, ULPS);
+}
 
 } // namespace k3d
 

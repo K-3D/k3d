@@ -62,43 +62,40 @@ public:
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		m_subdividers.clear();
-		Output = Input;
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+		k3d::mesh mesh_merged_selection = Input;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), mesh_merged_selection);
 		const k3d::uint_t level = m_level.pipeline_value();
-		for(k3d::mesh::primitives_t::const_iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		const k3d::uint_t primitive_count = mesh_merged_selection.primitives.size();
+		for(k3d::uint_t prim_idx = 0; prim_idx != primitive_count; ++prim_idx)
 		{
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Output, **primitive));
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(mesh_merged_selection, *mesh_merged_selection.primitives[prim_idx]));
 			if(!polyhedron.get())
 				continue;
-			m_subdividers[primitive->get()].set_levels(level);
-			m_subdividers[primitive->get()].create_mesh(*Output.points, *polyhedron, polyhedron->face_selections, this);
+			m_subdividers[prim_idx].set_levels(level);
+			m_subdividers[prim_idx].create_mesh(*mesh_merged_selection.points, *polyhedron, polyhedron->face_selections, this);
 		}
-		k3d::mesh::selection_t& output_point_selection = Output.point_selection.create();
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		k3d::mesh::primitives_t::const_iterator input_primitive = Input.primitives.begin();
-		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		k3d::mesh mesh_merged_selection = Input;
+		Output = mesh_merged_selection;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), mesh_merged_selection);
+		const k3d::uint_t primitive_count = mesh_merged_selection.primitives.size();
+		k3d::mesh::points_t& output_points = Output.points.writable();
+		for(k3d::uint_t prim_idx = 0; prim_idx != primitive_count; ++prim_idx)
 		{
-			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
-			if(!polyhedron.get())
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(mesh_merged_selection, *mesh_merged_selection.primitives[prim_idx]));
+			if(!input_polyhedron.get())
 				continue;
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input, **input_primitive));
-			polyhedron->face_selections = input_polyhedron->face_selections;
-			++input_primitive;
+			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::create(Output.primitives[prim_idx].create()));
+			m_subdividers[prim_idx].update_mesh(*mesh_merged_selection.points, *input_polyhedron, mesh_merged_selection.point_attributes, input_polyhedron->face_selections, this);
+			m_subdividers[prim_idx].copy_output(output_points, *output_polyhedron, Output.point_attributes);
 		}
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
-		Output.points = Input.points;
-		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
-		{
-			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
-			if(!polyhedron.get())
-				continue;
-			m_subdividers[primitive->get()].update_mesh(*Output.points, *polyhedron, Output.point_attributes, polyhedron->face_selections, this);
-			m_subdividers[primitive->get()].copy_output(Output.points.create(), *polyhedron, Output.point_attributes);
-			Output.point_selection.writable().resize(Output.points->size());
-		}
+		Output.point_selection.writable().resize(output_points.size(), 0.0);
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 
@@ -118,7 +115,7 @@ public:
 
 private:
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_level;
-	boost::ptr_map<const k3d::mesh::primitive*, k3d::sds::catmull_clark_subdivider> m_subdividers;
+	boost::ptr_map<const k3d::uint_t, k3d::sds::catmull_clark_subdivider> m_subdividers;
 };
 
 /////////////////////////////////////////////////////////////////////////////

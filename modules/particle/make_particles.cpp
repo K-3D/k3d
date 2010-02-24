@@ -40,15 +40,15 @@ namespace particle
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// make_particles
+// points_to_particles
 
-class make_particles :
+class points_to_particles :
 	public k3d::material_sink<k3d::mesh_modifier<k3d::node> >
 {
 	typedef k3d::material_sink<k3d::mesh_modifier<k3d::node> > base;
 
 public:
-	make_particles(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	points_to_particles(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_width(init_owner(*this) + init_name("width") + init_label(_("Width")) + init_description(_("Controls the width of the output points.")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
@@ -83,13 +83,13 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<make_particles,
+		static k3d::document_plugin_factory<points_to_particles,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink> > > factory(
 				k3d::uuid(0x3e4086fe, 0x0246f9ab, 0xeef01f8a, 0xf5cf5cff),
-				"MakeParticles",
+				"PointsToParticles",
 				_("Converts input geometric points into a single group of particles."),
-				"Mesh",
+				"Particles",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -99,11 +99,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// make_particles_factory
+// points_to_particles_factory
 
-k3d::iplugin_factory& make_particles_factory()
+k3d::iplugin_factory& points_to_particles_factory()
 {
-	return make_particles::get_factory();
+	return points_to_particles::get_factory();
 }
 
 } // namespace particle

@@ -77,12 +77,8 @@ public:
 	{
 		Output = k3d::mesh();
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
-
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-
-		k3d::polyhedron::add_grid(Output, *polyhedron, m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
+		k3d::polyhedron::add_grid(Output, *polyhedron, 0, m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -142,7 +138,7 @@ public:
 			k3d::uuid(0xacb3b4f8, 0x5cd6471c, 0xaed72686, 0xc576987c),
 			"PolyGrid",
 			_("Generates a polygonal grid"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

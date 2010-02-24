@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>K-3D Issue - ${issue["title"] | h}</title>
+		<link rel="icon" type="image/png" href="../k3d.png" />
+		<link rel="stylesheet" type="text/css" href="../k3d.css" />
+		<link rel="stylesheet" type="text/css" href="../developer.css" />
+		<link rel="stylesheet" type="text/css" href="tracker.css" />
+	</head>
+
+<%
+import datetime
+
+keywords = { ":unstarted":"Unstarted", ":closed":"Closed", ":bugfix":"Bugfix", ":task":"Task", ":feature":"Feature" }
+
+%>
+
+	<body>
+<%include file="navigation.html"/>
+
+		<div id="main" class="tracker">
+			<h2>Issue - ${issue["title"] | h}</h2>
+			<p>${issue["desc"] | h}</p>	
+
+			<h3>Details</h3>
+			<dl>
+				<dt>Id:</dt>
+				<dd>${issue["id"] | h}</dd>
+
+				<dt>Type:</dt>
+				<dd>${keywords[issue["type"]] | h}</dd>
+
+				<dt>Creation Time:</dt>
+				<dd>${issue["creation_time"].strftime("%Y-%m-%d %H:%M UTC") | h}</dd>
+
+				<dt>Reporter:</dt>
+				<dd>${issue["reporter"] | h}</dd>
+
+				<dt>Release:</dt>
+				% if release:
+				<dd><a href="${release['filename'] | h}">${issue["release"] | h}</a></dd>
+				% else:
+				<dd>None</dd>
+				% endif
+
+				<dt>Status:</dt>
+				<dd>${keywords[issue["status"]] | h}</dd>
+			</dl>
+
+			<h3>Issue Log</h3>
+
+			<table>
+				<tbody>
+				% for event in issue["log_events"]:
+					<tr><td>${event[0].strftime("%Y-%m-%d %H:%M UTC") | h}</td><td>${event[1] | h}</td><td>${event[2] | h}</td></tr>
+				% endfor
+				</tbody>
+			</table>
+		</div>
+		<div id="footer">
+			<p class="generated">${datetime.datetime.utcnow().strftime("Updated %B %d, %Y %H:%M UTC") | h}</p>
+		</div>
+
+		<script type="text/javascript" src="http://www.google-analytics.com/ga.js"/>
+		<script type="text/javascript">
+			try { var pageTracker = _gat._getTracker("UA-3773195-1"); pageTracker._trackPageview(); } catch(err) { }
+		</script>
+	</body>
+</html>
+

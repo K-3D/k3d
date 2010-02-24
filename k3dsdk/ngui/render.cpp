@@ -44,6 +44,7 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
@@ -199,7 +200,7 @@ k3d::icamera* pick_camera(document_state& DocumentState, const std::vector<k3d::
 			return dynamic_cast<k3d::icamera*>(node);
 
 		if(k3d::iplugin_factory* const factory = combo.get_active()->get_value(columns.factory))
-			return dynamic_cast<k3d::icamera*>(DocumentState.create_node(factory));
+			return dynamic_cast<k3d::icamera*>(pipeline::create_node(DocumentState.document(), *factory));
 	}
 
 	return 0;
@@ -311,7 +312,7 @@ interface_t* pick_render_engine(document_state& DocumentState, const std::vector
 	dialog.set_border_width(5);
 	dialog.get_vbox()->pack_start(*Gtk::manage(new Gtk::Label(Message)), Gtk::PACK_SHRINK, 5);
 	dialog.get_vbox()->pack_start(combo, Gtk::PACK_SHRINK, 5);
-	dialog.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
+	dialog.add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK)->grab_focus();
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 
 	dialog.set_position(Gtk::WIN_POS_CENTER);

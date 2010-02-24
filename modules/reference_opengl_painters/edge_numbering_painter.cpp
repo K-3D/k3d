@@ -189,7 +189,7 @@ public:
 			"OpenGLEdgeNumberingPainter",
 			_("Numbers polyhedron edges"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

@@ -41,15 +41,15 @@ namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// poly_cylinder_implementation
+// poly_cylinder
 
-class poly_cylinder_implementation :
+class poly_cylinder :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	poly_cylinder_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_cylinder(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("U segments")) + init_description(_("Columns")) + init_value(32) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("V segments")) + init_description(_("Rows")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -105,11 +105,8 @@ public:
 
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(0);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
-
-		k3d::polyhedron::add_cylinder(Output, *polyhedron, v_segments, u_segments, material);
+		k3d::polyhedron::add_cylinder(Output, *polyhedron, 0, v_segments, u_segments, material);
 
 		k3d::mesh::points_t& points = Output.points.writable();
 		k3d::mesh::selection_t& point_selection = Output.point_selection.writable();
@@ -142,6 +139,7 @@ public:
 		{
 			if(!top_segments)
 			{
+				polyhedron->face_shells.push_back(0);
 				polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 				polyhedron->face_loop_counts.push_back(1);
 				polyhedron->face_selections.push_back(0);
@@ -184,6 +182,7 @@ public:
 						k3d::polyhedron::add_quadrilateral(
 							Output,
 							*polyhedron,
+							0,
 							last_ring_point_offset + (u + 1) % u_segments,
 							last_ring_point_offset + (u + 0) % u_segments,
 							current_ring_point_offset + (u + 0) % u_segments,
@@ -200,6 +199,7 @@ public:
 					k3d::polyhedron::add_triangle(
 						Output,
 						*polyhedron,
+						0, 
 						current_ring_point_offset + (u + 1) % u_segments,
 						current_ring_point_offset + (u + 0) % u_segments,
 						middle_point_index,
@@ -213,6 +213,7 @@ public:
 		{
 			if(!bottom_segments)
 			{
+				polyhedron->face_shells.push_back(0);
 				polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 				polyhedron->face_loop_counts.push_back(1);
 				polyhedron->face_selections.push_back(0);
@@ -255,6 +256,7 @@ public:
 						k3d::polyhedron::add_quadrilateral(
 							Output,
 							*polyhedron,
+							0,
 							last_ring_point_offset + (u + 0) % u_segments,
 							last_ring_point_offset + (u + 1) % u_segments,
 							current_ring_point_offset + (u + 1) % u_segments,
@@ -271,6 +273,7 @@ public:
 					k3d::polyhedron::add_triangle(
 						Output,
 						*polyhedron,
+						0,
 						current_ring_point_offset + (u + 0) % u_segments,
 						current_ring_point_offset + (u + 1) % u_segments,
 						middle_point_index,
@@ -278,8 +281,6 @@ public:
 				}
 			}
 		}
-
-		polyhedron->shell_face_counts.back() = polyhedron->face_first_loops.size();
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -288,11 +289,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<poly_cylinder_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<poly_cylinder, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0xd8c4d9fd, 0x42334a54, 0xa4b48185, 0xd8506489),
 			"PolyCylinder",
 			_("Generates a polygonal cylinder with optional endcaps"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -316,7 +317,7 @@ private:
 
 k3d::iplugin_factory& poly_cylinder_factory()
 {
-	return poly_cylinder_implementation::get_factory();
+	return poly_cylinder::get_factory();
 }
 
 } // namespace sources

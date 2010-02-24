@@ -25,7 +25,6 @@
 namespace k3d
 {
 
-namespace legacy { class mesh; }
 namespace selection { class set; }
 namespace selection { class storage; }
 
@@ -186,8 +185,6 @@ namespace selection
 k3d::selection::set create(const double_t Weight);
 /// Merges a selection set with the selections in a mesh.
 void merge(const k3d::selection::set& Set, mesh& Mesh);
-/// Merges a selection set with the selections in a mesh.
-void merge(const k3d::selection::set& Set, legacy::mesh& Mesh);
 
 } // namespace selection
 

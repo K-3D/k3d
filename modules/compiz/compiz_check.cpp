@@ -29,6 +29,8 @@
 #include <k3dsdk/types.h>
 #include <k3dsdk/user_interface.h>
 
+#include <boost/assign/list_of.hpp>
+
 #include <stdexcept>
 
 #include <dbus/dbus-glib.h>
@@ -45,6 +47,8 @@ class compiz_check :
 public:
 	compiz_check()
 	{
+		g_type_init();
+
 		GError* error = 0;
 		DBusGConnection* const connection = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
 		if(connection)
@@ -88,16 +92,14 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 	{
-		k3d::iplugin_factory::metadata_t metadata;
-		metadata["k3d:application-start"] = "";
 		static k3d::application_plugin_factory<compiz_check,
 			k3d::interface_list<k3d::iunknown> > factory(
 				k3d::uuid(0x0f389f4a, 0xaf41ac00, 0xfc7fe4bf, 0x3524c1eb),
 				"CompizCheck",
 				_("Warns users that the Compiz window manager may interfere with OpenGL rendering in K-3D"),
 				"Desktop",
-				k3d::iplugin_factory::EXPERIMENTAL,
-				metadata);
+				k3d::iplugin_factory::STABLE,
+				boost::assign::map_list_of("ngui:application-start", "true"));
 
 		return factory;
 	}

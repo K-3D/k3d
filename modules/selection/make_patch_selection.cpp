@@ -137,7 +137,7 @@ public:
 				"MakePatchSelection",
 				_("Converts point selections to patch selections."),
 				"Selection",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

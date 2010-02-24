@@ -47,7 +47,7 @@ const_primitive::const_primitive(
 	const mesh::indices_t& Operands,
 	const mesh::table_t& ConstantAttributes,
 	const mesh::table_t& SurfaceAttributes,
-	const mesh::table_t& VaryingAttributes,
+	const mesh::table_t& ParameterAttributes,
 	const mesh::table_t& VertexAttributes
 		) :
 	first_primitives(FirstPrimitives),
@@ -65,7 +65,7 @@ const_primitive::const_primitive(
 	operands(Operands),
 	constant_attributes(ConstantAttributes),
 	surface_attributes(SurfaceAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -89,7 +89,7 @@ primitive::primitive(
 	mesh::indices_t& Operands,
 	mesh::table_t& ConstantAttributes,
 	mesh::table_t& SurfaceAttributes,
-	mesh::table_t& VaryingAttributes,
+	mesh::table_t& ParameterAttributes,
 	mesh::table_t& VertexAttributes
 		) :
 	first_primitives(FirstPrimitives),
@@ -107,7 +107,7 @@ primitive::primitive(
 	operands(Operands),
 	constant_attributes(ConstantAttributes),
 	surface_attributes(SurfaceAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -135,7 +135,7 @@ primitive* create(mesh& Mesh)
 		generic_primitive.structure["operand"].create<mesh::indices_t>("operands"),
 		generic_primitive.attributes["constant"],
 		generic_primitive.attributes["surface"],
-		generic_primitive.attributes["varying"],
+		generic_primitive.attributes["parameter"],
 		generic_primitive.attributes["vertex"]
 		);
 
@@ -162,7 +162,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		const mesh::table_t& surface_attributes = require_attributes(Primitive, "surface");
-		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		const mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		const mesh::indices_t& first_primitives = require_array<mesh::indices_t>(Primitive, surface_structure, "first_primitives");
@@ -181,7 +181,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		/** \todo Validate table lengths here */
 
-		return new const_primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, surface_attributes, varying_attributes, vertex_attributes);
+		return new const_primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, surface_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -208,7 +208,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		mesh::table_t& surface_attributes = require_attributes(Primitive, "surface");
-		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		mesh::indices_t& first_primitives = require_array<mesh::indices_t>(Primitive, surface_structure, "first_primitives");
@@ -227,7 +227,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		/** \todo Validate table lengths here */
 
-		return new primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, surface_attributes, varying_attributes, vertex_attributes);
+		return new primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, surface_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{

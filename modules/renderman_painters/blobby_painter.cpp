@@ -78,7 +78,7 @@ public:
 				ri_uniform_attributes.add_arrays(primitive->surface_attributes);
 
 				array_copier ri_varying_attributes;
-				ri_varying_attributes.add_arrays(primitive->varying_attributes);
+				ri_varying_attributes.add_arrays(primitive->parameter_attributes);
 
 				array_copier ri_vertex_attributes;
 				ri_vertex_attributes.add_arrays(primitive->vertex_attributes);
@@ -145,7 +145,7 @@ public:
 			"RenderManBlobbyPainter",
 			_("Renders blobbies (implicit surfaces)"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

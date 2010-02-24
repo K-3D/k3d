@@ -56,7 +56,7 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_engine_ri.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/log.h>

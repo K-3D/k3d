@@ -1271,22 +1271,11 @@ inline std::istream& operator>>(std::istream& Stream, euler_angles& Arg)
 	return Stream;
 }
 
-/// Specialization of almost_equal that tests two matrix4 objects for near-equality
-template<>
-class almost_equal<matrix4>
+/// Specialization of difference for matrix4 
+inline void difference(const matrix4& A, const matrix4& B, bool_t& Equal, uint64_t& ULPS)
 {
-	typedef matrix4 T;
-public:
-	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return std::equal(A.v, A.v + 4, B.v, almost_equal<vector4>(threshold));
-	}
-
-private:
-	const boost::uint64_t threshold;
-};
-
+	range_difference(A.v, A.v + 4, B.v, Equal, ULPS);
+}
 } // namespace k3d
 
 #endif // !K3DSDK_ALGEBRA_H

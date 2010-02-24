@@ -73,7 +73,7 @@ public:
 		static object point_selections(wrapper& Self) { return wrap(Self.wrapped().point_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 	class primitive
@@ -111,7 +111,7 @@ public:
 		static object point_selections(wrapper& Self) { return wrap(Self.wrapped().point_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 
@@ -172,7 +172,7 @@ void define_namespace_nurbs_patch()
 		.def("point_selections", &nurbs_patch::const_primitive::point_selections)
 		.def("constant_attributes", &nurbs_patch::const_primitive::constant_attributes)
 		.def("patch_attributes", &nurbs_patch::const_primitive::patch_attributes)
-		.def("varying_attributes", &nurbs_patch::const_primitive::varying_attributes)
+		.def("parameter_attributes", &nurbs_patch::const_primitive::parameter_attributes)
 		;
 
 	class_<nurbs_patch::primitive::wrapper>("primitive", no_init)
@@ -206,7 +206,7 @@ void define_namespace_nurbs_patch()
 		.def("point_selections", &nurbs_patch::primitive::point_selections)
 		.def("constant_attributes", &nurbs_patch::primitive::constant_attributes)
 		.def("patch_attributes", &nurbs_patch::primitive::patch_attributes)
-		.def("varying_attributes", &nurbs_patch::primitive::varying_attributes)
+		.def("parameter_attributes", &nurbs_patch::primitive::parameter_attributes)
 		;
 }
 

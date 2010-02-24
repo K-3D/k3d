@@ -65,7 +65,7 @@ const_primitive::const_primitive(
 	const mesh::selection_t& PointSelections,
 	const mesh::table_t& ConstantAttributes,
 	const mesh::table_t& PatchAttributes,
-	const mesh::table_t& VaryingAttributes,
+	const mesh::table_t& ParameterAttributes,
 	const mesh::table_t& VertexAttributes
 		) :
 	patch_first_points(PatchFirstPoints),
@@ -98,8 +98,44 @@ const_primitive::const_primitive(
 	point_selections(PointSelections),
 	constant_attributes(ConstantAttributes),
 	patch_attributes(PatchAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
+{
+}
+
+const_primitive::const_primitive(primitive& Primitive) :
+		patch_first_points(Primitive.patch_first_points),
+		patch_u_point_counts(Primitive.patch_u_point_counts),
+		patch_v_point_counts(Primitive.patch_v_point_counts),
+		patch_u_orders(Primitive.patch_u_orders),
+		patch_v_orders(Primitive.patch_v_orders),
+		patch_u_first_knots(Primitive.patch_u_first_knots),
+		patch_v_first_knots(Primitive.patch_v_first_knots),
+		patch_selections(Primitive.patch_selections),
+		patch_materials(Primitive.patch_materials),
+		patch_points(Primitive.patch_points),
+		patch_point_weights(Primitive.patch_point_weights),
+		patch_u_knots(Primitive.patch_u_knots),
+		patch_v_knots(Primitive.patch_v_knots),
+		patch_first_trim_loops(Primitive.patch_first_trim_loops),
+		patch_trim_loop_counts(Primitive.patch_trim_loop_counts),
+		trim_loop_first_curves(Primitive.trim_loop_first_curves),
+		trim_loop_curve_counts(Primitive.trim_loop_curve_counts),
+		trim_loop_selections(Primitive.trim_loop_selections),
+		curve_first_points(Primitive.curve_first_points),
+		curve_point_counts(Primitive.curve_point_counts),
+		curve_orders(Primitive.curve_orders),
+		curve_first_knots(Primitive.curve_first_knots),
+		curve_selections(Primitive.curve_selections),
+		curve_points(Primitive.curve_points),
+		curve_point_weights(Primitive.curve_point_weights),
+		curve_knots(Primitive.curve_knots),
+		points(Primitive.points),
+		point_selections(Primitive.point_selections),
+		constant_attributes(Primitive.constant_attributes),
+		patch_attributes(Primitive.patch_attributes),
+		parameter_attributes(Primitive.parameter_attributes),
+		vertex_attributes(Primitive.vertex_attributes)
 {
 }
 
@@ -137,7 +173,7 @@ primitive::primitive(
 	mesh::selection_t& PointSelections,
 	mesh::table_t& ConstantAttributes,
 	mesh::table_t& PatchAttributes,
-	mesh::table_t& VaryingAttributes,
+	mesh::table_t& ParameterAttributes,
 	mesh::table_t& VertexAttributes
 		) :
 	patch_first_points(PatchFirstPoints),
@@ -170,7 +206,7 @@ primitive::primitive(
 	point_selections(PointSelections),
 	constant_attributes(ConstantAttributes),
 	patch_attributes(PatchAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -181,40 +217,46 @@ primitive::primitive(
 primitive* create(mesh& Mesh)
 {
 	mesh::primitive& generic_primitive = Mesh.primitives.create("nurbs_patch");
+	return create(generic_primitive);
+}
+
+primitive* create(mesh::primitive& Primitive)
+{
+	return_val_if_fail(Primitive.type == "nurbs_patch", 0);
 
 	primitive* const result = new primitive(
-		generic_primitive.structure["patch"].create<mesh::indices_t>("patch_first_points"),
-		generic_primitive.structure["patch"].create<mesh::counts_t>("patch_u_point_counts"),
-		generic_primitive.structure["patch"].create<mesh::counts_t>("patch_v_point_counts"),
-		generic_primitive.structure["patch"].create<mesh::orders_t>("patch_u_orders"),
-		generic_primitive.structure["patch"].create<mesh::orders_t>("patch_v_orders"),
-		generic_primitive.structure["patch"].create<mesh::indices_t>("patch_u_first_knots"),
-		generic_primitive.structure["patch"].create<mesh::indices_t>("patch_v_first_knots"),
-		generic_primitive.structure["patch"].create<mesh::selection_t>("patch_selections"),
-		generic_primitive.structure["patch"].create<mesh::materials_t>("patch_materials"),
-		generic_primitive.structure["vertex"].create<mesh::indices_t>("patch_points"),
-		generic_primitive.structure["vertex"].create<mesh::weights_t>("patch_point_weights"),
-		generic_primitive.structure["u_knot"].create<mesh::knots_t>("patch_u_knots"),
-		generic_primitive.structure["v_knot"].create<mesh::knots_t>("patch_v_knots"),
-		generic_primitive.structure["patch"].create<mesh::indices_t>("patch_first_trim_loops"),
-		generic_primitive.structure["patch"].create<mesh::counts_t>("patch_trim_loop_counts"),
-		generic_primitive.structure["trim_loop"].create<mesh::indices_t>("trim_loop_first_curves"),
-		generic_primitive.structure["trim_loop"].create<mesh::counts_t>("trim_loop_curve_counts"),
-		generic_primitive.structure["trim_loop"].create<mesh::selection_t>("trim_loop_selections"),
-		generic_primitive.structure["trim_uniform"].create<mesh::indices_t>("curve_first_points"),
-		generic_primitive.structure["trim_uniform"].create<mesh::counts_t>("curve_point_counts"),
-		generic_primitive.structure["trim_uniform"].create<mesh::orders_t>("curve_orders"),
-		generic_primitive.structure["trim_uniform"].create<mesh::indices_t>("curve_first_knots"),
-		generic_primitive.structure["trim_uniform"].create<mesh::selection_t>("curve_selections"),
-		generic_primitive.structure["trim_vertex"].create<mesh::indices_t>("curve_points"),
-		generic_primitive.structure["trim_vertex"].create<mesh::weights_t>("curve_point_weights"),
-		generic_primitive.structure["trim_knot"].create<mesh::knots_t>("curve_knots"),
-		generic_primitive.structure["trim_point"].create<mesh::points_2d_t>("points"),
-		generic_primitive.structure["trim_point"].create<mesh::selection_t>("point_selections"),
-		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["patch"],
-		generic_primitive.attributes["varying"],
-		generic_primitive.attributes["vertex"]
+		Primitive.structure["patch"].create<mesh::indices_t>("patch_first_points"),
+		Primitive.structure["patch"].create<mesh::counts_t>("patch_u_point_counts"),
+		Primitive.structure["patch"].create<mesh::counts_t>("patch_v_point_counts"),
+		Primitive.structure["patch"].create<mesh::orders_t>("patch_u_orders"),
+		Primitive.structure["patch"].create<mesh::orders_t>("patch_v_orders"),
+		Primitive.structure["patch"].create<mesh::indices_t>("patch_u_first_knots"),
+		Primitive.structure["patch"].create<mesh::indices_t>("patch_v_first_knots"),
+		Primitive.structure["patch"].create<mesh::selection_t>("patch_selections"),
+		Primitive.structure["patch"].create<mesh::materials_t>("patch_materials"),
+		Primitive.structure["vertex"].create<mesh::indices_t>("patch_points"),
+		Primitive.structure["vertex"].create<mesh::weights_t>("patch_point_weights"),
+		Primitive.structure["u_knot"].create<mesh::knots_t>("patch_u_knots"),
+		Primitive.structure["v_knot"].create<mesh::knots_t>("patch_v_knots"),
+		Primitive.structure["patch"].create<mesh::indices_t>("patch_first_trim_loops"),
+		Primitive.structure["patch"].create<mesh::counts_t>("patch_trim_loop_counts"),
+		Primitive.structure["trim_loop"].create<mesh::indices_t>("trim_loop_first_curves"),
+		Primitive.structure["trim_loop"].create<mesh::counts_t>("trim_loop_curve_counts"),
+		Primitive.structure["trim_loop"].create<mesh::selection_t>("trim_loop_selections"),
+		Primitive.structure["trim_uniform"].create<mesh::indices_t>("curve_first_points"),
+		Primitive.structure["trim_uniform"].create<mesh::counts_t>("curve_point_counts"),
+		Primitive.structure["trim_uniform"].create<mesh::orders_t>("curve_orders"),
+		Primitive.structure["trim_uniform"].create<mesh::indices_t>("curve_first_knots"),
+		Primitive.structure["trim_uniform"].create<mesh::selection_t>("curve_selections"),
+		Primitive.structure["trim_vertex"].create<mesh::indices_t>("curve_points"),
+		Primitive.structure["trim_vertex"].create<mesh::weights_t>("curve_point_weights"),
+		Primitive.structure["trim_knot"].create<mesh::knots_t>("curve_knots"),
+		Primitive.structure["trim_point"].create<mesh::points_2d_t>("points"),
+		Primitive.structure["trim_point"].create<mesh::selection_t>("point_selections"),
+		Primitive.attributes["constant"],
+		Primitive.attributes["patch"],
+		Primitive.attributes["parameter"],
+		Primitive.attributes["vertex"]
 		);
 
 	result->patch_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
@@ -247,7 +289,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		const mesh::table_t& patch_attributes = require_attributes(Primitive, "patch");
-		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		const mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		const mesh::indices_t& patch_first_points = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_first_points");
@@ -288,19 +330,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		require_table_row_count(Primitive, v_knot_structure, "v_knot",
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
-
-		const uint_t u_segments
-			= patch_u_point_counts.size()
-			+ std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)
-			- std::accumulate(patch_u_orders.begin(), patch_u_orders.end(), 0);
-
-		const uint_t v_segments
-			= patch_v_point_counts.size()
-			+ std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
-			- std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0);
-
-		require_table_row_count(Primitive, patch_attributes, "patch", u_segments * v_segments);
-		require_table_row_count(Primitive, varying_attributes, "varying", 4 * (u_segments * v_segments));
+		require_table_row_count(Primitive, parameter_attributes, "parameter", patch_structure.row_count() * 4);
 
 	return new const_primitive(
 		patch_first_points,
@@ -333,7 +363,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		point_selections,
 		constant_attributes,
 		patch_attributes,
-		varying_attributes,
+		parameter_attributes,
 		vertex_attributes);
 	}
 	catch(std::exception& e)
@@ -365,7 +395,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		mesh::table_t& patch_attributes = require_attributes(Primitive, "patch");
-		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		mesh::indices_t& patch_first_points = require_array<mesh::indices_t>(Primitive, patch_structure, "patch_first_points");
@@ -406,19 +436,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		require_table_row_count(Primitive, v_knot_structure, "v_knot",
 			std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
 			+ std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0));
-
-		const uint_t u_segments
-			= patch_u_point_counts.size()
-			+ std::accumulate(patch_u_point_counts.begin(), patch_u_point_counts.end(), 0)
-			- std::accumulate(patch_u_orders.begin(), patch_u_orders.end(), 0);
-
-		const uint_t v_segments
-			= patch_v_point_counts.size()
-			+ std::accumulate(patch_v_point_counts.begin(), patch_v_point_counts.end(), 0)
-			- std::accumulate(patch_v_orders.begin(), patch_v_orders.end(), 0);
-
-		require_table_row_count(Primitive, patch_attributes, "patch", u_segments * v_segments);
-		require_table_row_count(Primitive, varying_attributes, "varying", 4 * (u_segments * v_segments));
+		require_table_row_count(Primitive, parameter_attributes, "parameter", patch_structure.row_count() * 4);
 
 	return new primitive(
 		patch_first_points,
@@ -451,7 +469,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		point_selections,
 		constant_attributes,
 		patch_attributes,
-		varying_attributes,
+		parameter_attributes,
 		vertex_attributes);
 	}
 	catch(std::exception& e)

@@ -46,13 +46,13 @@
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/ngui/application_state.h>
 #include <k3dsdk/ngui/check_menu_item.h>
-#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/ngui/document.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
@@ -1593,12 +1593,12 @@ private:
 
 	void on_instantiate()
 	{
-		instantiate_selected_nodes(m_document_state);
+		pipeline::instantiate_selected_nodes(m_document_state.document());
 	}
 
 	void on_duplicate()
 	{
-		duplicate_selected_nodes(m_document_state);
+		pipeline::duplicate_selected_nodes(m_document_state.document());
 	}
 
 	void on_delete()
@@ -2155,7 +2155,7 @@ private:
 		return_if_fail(viewport_control);
 		k3d::icamera* camera = viewport_control->camera();
 
-		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().transform_source_output()));
+		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().matrix_source_output()));
 		const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 		const k3d::point3 world_target = boost::any_cast<k3d::point3>(camera->world_target().property_internal_value());
 		const double distance = k3d::distance(world_position, world_target);
@@ -2210,29 +2210,26 @@ private:
 
 	void on_create_node(k3d::iplugin_factory* const Factory)
 	{
-		m_document_state.create_node(Factory);
+		if(cancel_plugin(*Factory))
+			return;
+
+		pipeline::create_node(m_document_state.document(), *Factory);
 	}
 
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)
 	{
-		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
+		if(cancel_plugin(*Modifier))
+			return;
 
-		k3d::inode* new_modifier;
-		for(k3d::nodes_t::iterator selected_node = selected_nodes.begin(); selected_node != selected_nodes.end(); ++selected_node)
-		{
-			new_modifier = modify_mesh(m_document_state, **selected_node, Modifier);
-			assert_warning(new_modifier);
-		}
-
-		// Show the new modifier properties if only one was processed
-		if(selected_nodes.size() == 1)
-			panel::mediator(m_document_state.document()).set_focus(*new_modifier);
-
+		modify_selected_meshes(m_document_state, Modifier);
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_modify_transformations(k3d::iplugin_factory* Modifier)
 	{
+		if(cancel_plugin(*Modifier))
+			return;
+
 		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 
 		k3d::inode* new_modifier;

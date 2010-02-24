@@ -47,7 +47,7 @@
 
 // Modified by Tim Shead for use with K-3D, January 1998
 
-#include <k3dsdk/almost_equal.h>
+#include <k3dsdk/difference.h>
 #include <k3dsdk/result.h>
 
 #include <boost/io/ios_state.hpp>
@@ -240,21 +240,11 @@ inline const vector3 spherical(const vector3& Vector)
 */
 }
 
-/// Specialization of almost_equal that tests two vector3 objects for near-equality
-template<>
-class almost_equal<vector3>
+/// Specialization of difference for vector3 
+inline void difference(const vector3& A, const vector3& B, bool_t& Equal, uint64_t& ULPS)
 {
-	typedef vector3 T;
-public:
-	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return std::equal(A.n, A.n + 3, B.n, almost_equal<double_t>(threshold));
-	}
-
-private:
-	const boost::uint64_t threshold;
-};
+	range_difference(A.n, A.n + 3, B.n, Equal, ULPS);
+}
 
 } // namespace k3d
 

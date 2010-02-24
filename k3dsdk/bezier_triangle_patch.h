@@ -45,7 +45,7 @@ public:
 		const mesh::weights_t& PatchPointWeights,
 		const mesh::table_t& ConstantAttributes,
 		const mesh::table_t& PatchAttributes,
-		const mesh::table_t& VaryingAttributes,
+		const mesh::table_t& ParameterAttributes,
 		const mesh::table_t& VertexAttributes
 		);
 
@@ -57,7 +57,7 @@ public:
 	const mesh::weights_t& patch_point_weights;
 	const mesh::table_t& constant_attributes;
 	const mesh::table_t& patch_attributes;
-	const mesh::table_t& varying_attributes;
+	const mesh::table_t& parameter_attributes;
 	const mesh::table_t& vertex_attributes;
 };
 
@@ -74,7 +74,7 @@ public:
 		mesh::weights_t& PatchPointWeights,
 		mesh::table_t& ConstantAttributes,
 		mesh::table_t& PatchAttributes,
-		mesh::table_t& VaryingAttributes,
+		mesh::table_t& ParameterAttributes,
 		mesh::table_t& VertexAttributes
 		);
 
@@ -86,7 +86,7 @@ public:
 	mesh::weights_t& patch_point_weights;
 	mesh::table_t& constant_attributes;
 	mesh::table_t& patch_attributes;
-	mesh::table_t& varying_attributes;
+	mesh::table_t& parameter_attributes;
 	mesh::table_t& vertex_attributes;
 };
 

@@ -93,7 +93,7 @@ public:
 			"BlobbyMultiply",
 			_("Combines blobbies using the Multiplication operator."),
 			"Blobby",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

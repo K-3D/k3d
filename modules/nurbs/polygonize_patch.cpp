@@ -21,7 +21,8 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_patch_modifier.h"
+#include "nurbs_patches.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -37,6 +38,7 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/point3.h>
+#include <k3dsdk/polyhedron.h>
 #include <k3dsdk/selection.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -56,42 +58,68 @@ class polygonize_patch :
 public:
 	polygonize_patch(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 			base(Factory, Document),
-			m_segments(init_owner(*this) + init_name(_("segments")) + init_label(_("Segments")) + init_description(_("The more segments the better the result")) + init_value(5) + init_constraint(constraint::minimum(3))),
-			m_delete_orig(init_owner(*this) + init_name(_("delete_orig")) + init_label(_("Delete original?")) + init_description(_("Delete original NURBS curve?")) + init_value(true)),
-			m_flip(init_owner(*this) + init_name(_("flip")) + init_label(_("Flip Vertex order?")) + init_description(_("A face is only visible if its vertices are ordered counter-clockwise. If you don't see the side of the mesh you need, just check this to make all faces look to the other side")) + init_value(false))
+			m_u_samples(init_owner(*this) + init_name(_("u_samples")) + init_label(_("U Samples")) + init_description(_("Samples per knot interval in the U direction. More is better")) + init_value(5) + init_constraint(constraint::minimum(1))),
+			m_v_samples(init_owner(*this) + init_name(_("v_samples")) + init_label(_("V Samples")) + init_description(_("Samples per knot interval in the V direction. More is better")) + init_value(5) + init_constraint(constraint::minimum(1))),
+			m_delete_orig(init_owner(*this) + init_name(_("delete_orig")) + init_label(_("Delete original?")) + init_description(_("Delete original NURBS curve?")) + init_value(true))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-		m_segments.changed_signal().connect(make_update_mesh_slot());
+		m_u_samples.changed_signal().connect(make_update_mesh_slot());
+		m_v_samples.changed_signal().connect(make_update_mesh_slot());
 		m_delete_orig.changed_signal().connect(make_update_mesh_slot());
-		m_flip.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		Output = Input;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		MY_DEBUG << "polygonize_patch::on_update_mesh" << std::endl;
-		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(get_first_nurbs_patch(Output));
-		if(!nurbs)
+		k3d::mesh temp = Input;
+		if(!temp.points.get())
 			return;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), temp);
+		Output = temp;
+		Output.primitives.clear();
 
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+		const k3d::uint_t u_samples = m_u_samples.pipeline_value();
+		const k3d::uint_t v_samples = m_v_samples.pipeline_value();
 
-		nurbs_patch_modifier mod(Output, *nurbs);
-		int my_patch = mod.get_selected_patch();
-
-		if (my_patch < 0)
+		const k3d::uint_t prim_count = temp.primitives.size();
+		for(k3d::uint_t prim_idx = 0; prim_idx != prim_count; ++prim_idx)
 		{
-			k3d::log() << error << nurbs_debug << "You need to select exactly one patch!" << std::endl;
-			return;
+			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> patches(k3d::nurbs_patch::validate(temp, *temp.primitives[prim_idx]));
+			if(patches)
+			{
+				boost::scoped_ptr<k3d::nurbs_patch::primitive> output_patches(k3d::nurbs_patch::create(Output));
+				k3d::mesh::points_t vertices;
+				k3d::mesh::counts_t vertex_counts;
+				k3d::mesh::indices_t vertex_indices;
+				for(k3d::uint_t patch = 0; patch != patches->patch_first_points.size(); ++patch)
+				{
+					// Copy existing patches, if required
+					if(!patches->patch_selections[patch] || !m_delete_orig.pipeline_value())
+						add_patch(Output, *output_patches, temp, *patches, patch);
+					if(patches->patch_selections[patch])
+					{
+						polygonize(vertices, vertex_counts, vertex_indices, temp, *patches, patch, u_samples, v_samples);
+					}
+				}
+				if(!vertices.empty())
+				{
+					return_if_fail(patches->patch_materials.size());
+					boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output, vertices, vertex_counts, vertex_indices, patches->patch_materials.front()));
+				}
+			}
+			else
+			{
+				Output.primitives.push_back(temp.primitives[prim_idx]);
+			}
 		}
+		delete_empty_primitives(Output);
 
-		mod.polygonize_patch(my_patch, m_segments.pipeline_value(), m_delete_orig.pipeline_value(), m_flip.pipeline_value());
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -107,9 +135,9 @@ public:
 	}
 
 private:
-	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_segments;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_u_samples;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_v_samples;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_orig;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_flip;
 };
 
 k3d::iplugin_factory& polygonize_patch_factory()

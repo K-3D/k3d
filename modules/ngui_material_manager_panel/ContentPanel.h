@@ -37,7 +37,7 @@
 #include <k3dsdk/ilight_shader_ri.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/share.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 
 #include <gtkmm.h>
 

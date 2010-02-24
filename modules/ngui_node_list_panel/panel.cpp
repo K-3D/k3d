@@ -203,7 +203,7 @@ public:
 			"NGUINodeListPanel",
 			_("Displays the document nodes as a flat list"),
 			"NGUI Panel",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Node List"));
 
 		return factory;

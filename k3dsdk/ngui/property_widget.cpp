@@ -34,7 +34,7 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/iproperty.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/messages.h>

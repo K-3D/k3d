@@ -44,7 +44,6 @@ def benchmark_path():
 	return b_path
 
 def create_camera(document):
-	
 	camera_view = document.new_node("ViewMatrix")
 	camera_view.position = k3d.translate3(k3d.vector3(-10, -15, 10))
 	camera_view.look = k3d.identity3()
@@ -56,7 +55,6 @@ def create_camera(document):
 	return camera
 
 def create_opengl_engine(document):
-	
 	render_engine = document.new_node("OpenGLEngine")
 	render_engine.draw_aimpoint = False
 	render_engine.draw_crop_window = False
@@ -64,224 +62,51 @@ def create_opengl_engine(document):
 
 	return render_engine
 
-def create_default_painter(document):
-	
-	use_vbo = False
-	try:
-		if (os.environ['USE_VBO']):
-			use_vbo = True
-	except KeyError:
+#####################################################################################33
+# Bitmap-related testing
+
+def setup_bitmap_test(nodes):
+	if len(nodes) < 1:
+		raise Exception("Bitmap test requires at least one node.")
+
+	class result_object:
 		pass
-	   
-	if (not use_vbo):
-		edge_painter = document.new_node("OpenGLEdgePainter")
-		face_painter = document.new_node("OpenGLFacePainter")
-	else:
-		edge_painter = document.new_node("VBOEdgePainter")
-		face_painter = document.new_node("VBOFacePainterFlatNormals")
 
-		edge_painter.unselected_mesh_color = k3d.color(0, 0, 0)
-		edge_painter.selected_mesh_color = k3d.color(1, 1, 1)
-		edge_painter.selected_component_color = k3d.color(1, 0, 0)
-		
-		face_painter.unselected_mesh_color = k3d.color(0.8, 0.8, 0.8)
-		face_painter.selected_mesh_color = k3d.color(0.8, 0.8, 0.8)
-		face_painter.selected_component_color = k3d.color(1, 0, 0)
-		
-	nurbs_curve_painter = document.new_node("OpenGLNURBSCurvePainter")
-	nurbs_patch_painter = document.new_node("OpenGLNURBSPatchPainter")
+	result = result_object
+	result.document = k3d.new_document()
+	result.nodes = [] 
 
-	painter = document.new_node("OpenGLMultiPainter")
+	for node in nodes:
+		result.nodes.append(result.document.new_node(node))
+		if len(result.nodes) > 1:
+			result.document.set_dependency(result.nodes[-1].get_property("input_bitmap"), result.nodes[-2].get_property("output_bitmap"))
 
-	painter.create_property("k3d::gl::imesh_painter*", "edges", "Edges", "Edge Painter")
-	painter.create_property("k3d::gl::imesh_painter*", "faces", "Faces", "Face Painter")
-	painter.create_property("k3d::gl::imesh_painter*", "nurbs_curves", "NURBS Curves", "NURBS Curve Painter")
-	painter.create_property("k3d::gl::imesh_painter*", "nurbs_patches", "NURBS Patches", "NURBS Patche Painter")
+	result.source = result.nodes[0]
+
+	if len(nodes) == 3:
+		result.modifier = result.nodes[1]
+
+	if len(nodes) > 1:
+		result.sink = result.nodes[-1]
 	
-	painter.edges = edge_painter
-	painter.faces = face_painter
-	painter.nurbs_curves = nurbs_curve_painter
-	painter.nurbs_patches = nurbs_patch_painter
+	return result
 
-	return painter
+def setup_bitmap_source_test(source_name):
+	result = setup_bitmap_test([source_name])
+	return result
 
 def setup_bitmap_reader_test(reader_name, source_file):
-	doc = k3d.new_document()
-	reader = doc.new_node(reader_name)
-	reader.file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + source_file)
-
-	class result_object:
-		pass
-
-	result = result_object
-	result.document = doc
-	result.reader = reader
-
+	result = setup_bitmap_test([reader_name])
+	result.reader = result.source
+	result.reader.file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + source_file)
 	return result
 
-def setup_mesh_reader_test(reader_name, source_file):
-	doc = k3d.new_document()
-	reader = doc.new_node(reader_name)
-	reader.file = k3d.filesystem.generic_path(source_path() + "/meshes/" + source_file)
-	reader.center = False
-	reader.scale_to_size = False
-
-	class result_object:
-		pass
-
-	result = result_object
-	result.document = doc
-	result.reader = reader
-
+def setup_bitmap_modifier_test(source_name, modifier_name):
+	result = setup_bitmap_test([source_name, modifier_name])
+	result.modifier = result.sink
 	return result
 
-def setup_mesh_source_test(source_name):
-	doc = k3d.new_document()
-
-	source = doc.new_node(source_name)
-
-	class result_object:
-		pass
-
-	result = result_object
-	result.document = doc
-	result.source = source
-	result.output_mesh = source.get_property("output_mesh").pipeline_value()
-
-	return result
-
-def setup_mesh_source_image_test(source_name):
-	doc = k3d.new_document()
-
-	axes = doc.new_node("Axes")
-	axes.xyplane = False
-
-	painter = create_default_painter(doc)
-
-	source = doc.new_node(source_name)
-
-	mesh_instance = doc.new_node("MeshInstance")
-	mesh_instance.gl_painter = painter
-	doc.set_dependency(mesh_instance.get_property("input_mesh"), source.get_property("output_mesh"))
-
-	camera = create_camera(doc)
-	render_engine = create_opengl_engine(doc)
-
-	camera_to_bitmap = doc.new_node("VirtualCameraToBitmap")
-	camera_to_bitmap.camera = camera
-	camera_to_bitmap.render_engine = render_engine
-
-	class result_object:
-		pass
-
-	result = result_object
-	result.document = doc
-	result.axes = axes
-	result.painter = painter
-	result.source = source
-	result.mesh_instance = mesh_instance
-	result.camera = camera
-	result.render_engine = render_engine
-	result.camera_to_bitmap = camera_to_bitmap
-
-	return result
-
-def setup_mesh_modifier_test(source_name, modifier_name):
-	doc = k3d.new_document()
-
-	source = doc.new_node(source_name)
-
-	modifier = doc.new_node(modifier_name)
-	doc.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
-
-	class result_object:
-		pass
-
-	result = result_object
-	result.document = doc
-	result.source = source
-	result.modifier = modifier
-
-	return result
-
-def setup_mesh_modifier_test2(source_name, modifier1_name, modifier2_name):
-	doc = k3d.new_document()
-
-	source = doc.new_node(source_name)
-
-	modifier1 = doc.new_node(modifier1_name)
-	doc.set_dependency(modifier1.get_property("input_mesh"), source.get_property("output_mesh"))
-
-	modifier2 = doc.new_node(modifier2_name)
-	doc.set_dependency(modifier2.get_property("input_mesh"), modifier1.get_property("output_mesh"))
-
-	class result_object:
-		pass
-
-	result = result_object
-	result.document = doc
-	result.source = source
-	result.modifier1 = modifier1
-	result.modifier2 = modifier2
-
-	return result
-
-def setup_mesh_modifier_image_test(source_name, modifier_name):
-	doc = k3d.new_document()
-
-	axes = doc.new_node("Axes")
-	axes.xyplane = False
-
-	painter = create_default_painter(doc)
-
-	source = doc.new_node(source_name)
-
-	modifier = doc.new_node(modifier_name)
-	doc.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
-
-	mesh_instance = doc.new_node("MeshInstance")
-	mesh_instance.gl_painter = painter
-	doc.set_dependency(mesh_instance.get_property("input_mesh"), modifier.get_property("output_mesh"))
-
-	camera = create_camera(doc)
-	render_engine = create_opengl_engine(doc)
-
-	camera_to_bitmap = doc.new_node("CameraToBitmap")
-	camera_to_bitmap.camera = camera
-	camera_to_bitmap.render_engine = render_engine
-
-	class result_object:
-		pass
-
-	result = result_object
-	result.document = doc
-	result.axes = axes
-	result.painter = painter
-	result.source = source
-	result.modifier = modifier
-	result.mesh_instance = mesh_instance
-	result.camera = camera
-	result.render_engine = render_engine
-	result.camera_to_bitmap = camera_to_bitmap
-
-	return result
-
-def setup_scalar_source_test(source_name):
-	doc = k3d.new_document()
-
-	source = doc.new_node(source_name)
-
-	class result_object:
-		pass
-
-	result = result_object
-	result.document = doc
-	result.source = source
-
-	return result
-
-def bitmap_size_comparison(bitmap, width, height):
-
+def require_bitmap_size(bitmap, width, height):
 	print """<DartMeasurement name="Bitmap Width" type="numeric/float">""" + str(bitmap.width()) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Bitmap Height" type="numeric/float">""" + str(bitmap.height()) + """</DartMeasurement>"""
 	print """<DartMeasurement name="Target Width" type="numeric/float">""" + str(width) + """</DartMeasurement>"""
@@ -291,8 +116,164 @@ def bitmap_size_comparison(bitmap, width, height):
 	if bitmap.width() != width or bitmap.height() != height:
 		raise "bitmap dimensions incorrect"
 
-def mesh_comparison_to_reference(document, input_mesh, base_mesh_name, threshold, platform = platform_agnostic):
+def require_similar_bitmap(document, image_property, image_name, threshold):
+	output_file = k3d.filesystem.generic_path(binary_path() + "/bitmaps/" + image_name + ".reference.png")
+	reference_file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + image_name + ".reference.png")
+	difference_file = k3d.filesystem.generic_path(binary_path() + "/bitmaps/differences/" + image_name + ".png")
 
+	reference = document.new_node("PNGBitmapReader")
+	reference.file = reference_file
+	reference_property = reference.get_property("output_bitmap")
+
+	difference = document.new_node("BitmapPerceptualDifference")
+	difference.field_of_view = 10.0
+	difference.luminance = 100
+	difference_property = difference.get_property("output_bitmap")
+	document.set_dependency(difference.get_property("input_a"), image_property)
+	document.set_dependency(difference.get_property("input_b"), reference_property)
+
+	image_writer = document.new_node("PNGBitmapWriter")
+	image_writer.file = output_file
+	document.set_dependency(image_writer.get_property("input_bitmap"), image_property)
+
+	difference_writer = document.new_node("PNGBitmapWriter")
+	difference_writer.file= difference_file
+	document.set_dependency(difference_writer.get_property("input_bitmap"), difference_property)
+
+	pixel_count = image_property.pipeline_value().width() * image_property.pipeline_value().height()
+	pixel_difference = difference.difference
+	difference_measurement = float(pixel_difference) / float(pixel_count)
+
+	print """<DartMeasurement name="Source Width" type="numeric/float">""" + str(image_property.pipeline_value().width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Source Height" type="numeric/float">""" + str(image_property.pipeline_value().height()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Reference Width" type="numeric/float">""" + str(reference_property.pipeline_value().width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Reference Height" type="numeric/float">""" + str(reference_property.pipeline_value().height()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Difference Width" type="numeric/float">""" + str(difference_property.pipeline_value().width()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Difference Height" type="numeric/float">""" + str(difference_property.pipeline_value().height()) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Pixel Difference" type="numeric/float">""" + str(pixel_difference) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Threshold" type="numeric/float">""" + str(threshold) + """</DartMeasurement>"""
+	print """<DartMeasurementFile name="Output Image" type="image/png">""" + str(output_file) + """</DartMeasurementFile>"""
+	print """<DartMeasurementFile name="Reference Image" type="image/png">""" + str(reference_file) + """</DartMeasurementFile>"""
+	print """<DartMeasurementFile name="Difference Image" type="image/png">""" + str(difference_file) + """</DartMeasurementFile>"""
+	sys.stdout.flush()
+
+	if not os.path.exists(str(reference_file)):
+		raise Exception("missing reference file: " + str(reference_file))
+
+	if difference_measurement > threshold:
+		raise Exception("pixel difference exceeds threshold")
+
+#####################################################################################33
+# Mesh-related testing
+
+def setup_mesh_test(nodes):
+	if len(nodes) < 1:
+		raise Exception("Mesh test requires at least one node.")
+
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = k3d.new_document()
+	result.nodes = [] 
+
+	for node in nodes:
+		result.nodes.append(result.document.new_node(node))
+		if len(result.nodes) > 1:
+			result.document.set_dependency(result.nodes[-1].get_property("input_mesh"), result.nodes[-2].get_property("output_mesh"))
+
+	result.source = result.nodes[0]
+
+	if len(nodes) == 3:
+		result.modifier = result.nodes[1]
+
+	if len(nodes) > 1:
+		result.sink = result.nodes[-1]
+	
+	return result
+
+def setup_mesh_source_test(source_name):
+	result = setup_mesh_test([source_name])
+	return result
+
+def setup_mesh_reader_test(reader_name, source_file):
+	result = setup_mesh_test([reader_name])
+	result.reader = result.source
+	result.reader.file = k3d.filesystem.generic_path(source_path() + "/meshes/" + source_file)
+	result.reader.center = False
+	result.reader.scale_to_size = False
+	return result
+
+def setup_mesh_modifier_test(source_name, modifier_name):
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = k3d.new_document()
+	result.source = result.document.new_node(source_name)
+	result.add_index_attributes = result.document.new_node("AddIndexAttributes")
+	result.modifier = result.document.new_node(modifier_name)
+	result.document.set_dependency(result.modifier.get_property("input_mesh"), result.add_index_attributes.get_property("output_mesh"))
+	result.document.set_dependency(result.add_index_attributes.get_property("input_mesh"), result.source.get_property("output_mesh"))
+
+	return result
+
+def setup_mesh_modifier_test2(source_name, modifier1_name, modifier2_name):
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = k3d.new_document()
+	result.source = result.document.new_node(source_name)
+	result.add_index_attributes = result.document.new_node("AddIndexAttributes")
+	result.modifier1 = result.document.new_node(modifier1_name)
+	result.modifier2 = result.document.new_node(modifier2_name)
+	result.document.set_dependency(result.modifier2.get_property("input_mesh"), result.modifier1.get_property("output_mesh"))
+	result.document.set_dependency(result.modifier1.get_property("input_mesh"), result.add_index_attributes.get_property("output_mesh"))
+	result.document.set_dependency(result.add_index_attributes.get_property("input_mesh"), result.source.get_property("output_mesh"))
+
+	return result
+
+def setup_mesh_writer_test(nodes, reader, target_file):
+	if len(nodes) < 2:
+		raise Exception("Mesh writer test requires at least two nodes.")
+
+	result = setup_mesh_test(nodes)
+	result.writer = result.sink
+	result.writer.file = k3d.filesystem.generic_path(binary_path() + "/meshes/" + target_file)
+	result.reader = result.document.new_node(reader)
+	result.reader.file = k3d.filesystem.generic_path(binary_path() + "/meshes/" + target_file)
+	result.reader.center = False
+	result.reader.scale_to_size = False
+
+	return result
+
+def require_valid_mesh(document, input_mesh):
+	primitives = document.new_node("ValidMeshes")
+	primitives.create_property("k3d::mesh*", "input_mesh", "Input Mesh", "First input mesh")
+	document.set_dependency(primitives.get_property("input_mesh"), input_mesh)
+	if not primitives.valid:
+		raise Exception("invalid or unknown primitive type in mesh")
+
+def require_mesh_area(calculated_area, expected_area):
+	print """<DartMeasurement name="Calculated Area" type="numeric/float">""" + str(calculated_area) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Expected Area" type="numeric/float">""" + str(expected_area) + """</DartMeasurement>"""
+	sys.stdout.flush()
+
+	if calculated_area != expected_area:
+		raise Exception("incorrect mesh area")
+
+def require_mesh_volume(calculated_volume, expected_volume):
+	print """<DartMeasurement name="Calculated Volume" type="numeric/float">""" + str(calculated_volume) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Expected Volume" type="numeric/float">""" + str(expected_volume) + """</DartMeasurement>"""
+	sys.stdout.flush()
+
+	if calculated_volume != expected_volume:
+		raise Exception("incorrect mesh volume")
+
+def require_similar_mesh(document, input_mesh, base_mesh_name, threshold, platform = platform_agnostic):
 	mesh_name = base_mesh_name + ".reference" + platform()
 
 	output_path = k3d.filesystem.generic_path(binary_path() + "/meshes/" + mesh_name + ".k3d")
@@ -303,16 +284,19 @@ def mesh_comparison_to_reference(document, input_mesh, base_mesh_name, threshold
 	output.file = output_path
 	document.set_dependency(output.get_property("input_mesh"), input_mesh)
 
-	if not os.path.exists(str(reference_path)):
-		raise Exception("missing reference file: " + str(reference_path))
-
 	reference = document.new_node("K3DMeshReader")
 	reference.center = False
 	reference.scale_to_size = False
 	reference.material = document.get_node("Material")
 	reference.file = reference_path
 
+	if not os.path.exists(str(reference_path)):
+		raise Exception("missing reference file: " + str(reference_path))
+
 	difference = get_mesh_difference(document, input_mesh, reference.get_property("output_mesh"), threshold)
+
+	print """<DartMeasurement name="Mesh Equal" type="numeric/integer">""" + str(difference.equal) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Mesh Difference" type="numeric/integer">""" + str(difference.difference) + """</DartMeasurement>"""
 
 	if not difference.get_property("input_a").pipeline_value() or not difference.get_property("input_b").pipeline_value():
 		raise Exception("missing mesh comparison input")
@@ -350,17 +334,28 @@ def output_mesh_difference(input_mesh, reference_mesh, threshold, name = "Mesh D
 	print """]]></DartMeasurement>\n"""
 	sys.stdout.flush()
 
-def mesh_area_comparison(calculated_area, expected_area):
-	if calculated_area != expected_area:
-		print """<DartMeasurement name="Calculated Area" type="numeric/float">""" + str(calculated_area) + """</DartMeasurement>"""
-		print """<DartMeasurement name="Expected Area" type="numeric/float">""" + str(expected_area) + """</DartMeasurement>"""
-		raise Exception("incorrect mesh area")
+#####################################################################################33
+# Scalar-related testing
 
-def mesh_volume_comparison(calculated_volume, expected_volume):
-	if calculated_volume != expected_volume:
-		print """<DartMeasurement name="Calculated Volume" type="numeric/float">""" + str(calculated_volume) + """</DartMeasurement>"""
-		print """<DartMeasurement name="Expected Volume" type="numeric/float">""" + str(expected_volume) + """</DartMeasurement>"""
-		raise Exception("incorrect mesh volume")
+def setup_scalar_source_test(source_name):
+	class result_object:
+		pass
+
+	result = result_object
+	result.document = k3d.new_document()
+	result.source = result.document.new_node(source_name)
+
+	return result
+
+def require_scalar_value(value, expected_value):
+	print """<DartMeasurement name="Value" type="numeric/float">""" + str(value) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Expected Value" type="numeric/float">""" + str(expected_value) + """</DartMeasurement>"""
+	if value != expected_value:
+		raise Exception("value does not match expected value")
+
+
+#####################################################################################33
+# Deprecated stuff
 
 def bitmap_perceptual_difference(document, input_image1, input_image2, threshold=1e-8):
 	difference = document.new_node("BitmapPerceptualDifference")
@@ -405,59 +400,6 @@ def bitmap_compare_plugin_outputs(referenceName, pluginToTest, pluginPropertyVal
 
 	# calculate the perceptual difference
 	bitmap_perceptual_difference(document, referenceNode.get_property("output_bitmap"), testNode.get_property("output_bitmap"))
-
-def image_comparison(document, image_property, image_name, threshold):
-
-	output_file = k3d.filesystem.generic_path(binary_path() + "/" + image_name + ".output.png")
-	reference_file = k3d.filesystem.generic_path(source_path() + "/bitmaps/" + image_name + ".reference.png")
-	difference_file = k3d.filesystem.generic_path(binary_path() + "/" + image_name + ".difference.png")
-
-	reference = document.new_node("PNGBitmapReader")
-	reference.file = reference_file
-	reference_property = reference.get_property("output_bitmap")
-
-	difference = document.new_node("BitmapPerceptualDifference")
-	difference.field_of_view = 10.0
-	difference.luminance = 100
-	difference_property = difference.get_property("output_bitmap")
-	document.set_dependency(difference.get_property("input_a"), image_property)
-	document.set_dependency(difference.get_property("input_b"), reference_property)
-
-	image_writer = document.new_node("PNGBitmapWriter")
-	image_writer.file = output_file
-	document.set_dependency(image_writer.get_property("input_bitmap"), image_property)
-
-	difference_writer = document.new_node("PNGBitmapWriter")
-	difference_writer.file= difference_file
-	document.set_dependency(difference_writer.get_property("input_bitmap"), difference_property)
-
-	pixel_count = image_property.pipeline_value().width() * image_property.pipeline_value().height()
-	pixel_difference = difference.difference
-	difference_measurement = float(pixel_difference) / float(pixel_count)
-
-	print """<DartMeasurement name="Source Width" type="numeric/float">""" + str(image_property.pipeline_value().width()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Source Height" type="numeric/float">""" + str(image_property.pipeline_value().height()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Reference Width" type="numeric/float">""" + str(reference_property.pipeline_value().width()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Reference Height" type="numeric/float">""" + str(reference_property.pipeline_value().height()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Difference Width" type="numeric/float">""" + str(difference_property.pipeline_value().width()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Difference Height" type="numeric/float">""" + str(difference_property.pipeline_value().height()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Pixel Difference" type="numeric/float">""" + str(pixel_difference) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Threshold" type="numeric/float">""" + str(threshold) + """</DartMeasurement>"""
-	print """<DartMeasurementFile name="Output Image" type="image/png">""" + str(output_file) + """</DartMeasurementFile>"""
-	print """<DartMeasurementFile name="Reference Image" type="image/png">""" + str(reference_file) + """</DartMeasurementFile>"""
-	print """<DartMeasurementFile name="Difference Image" type="image/png">""" + str(difference_file) + """</DartMeasurementFile>"""
-	sys.stdout.flush()
-
-	if difference_measurement > threshold:
-		raise Exception("pixel difference exceeds threshold")
-
-def scalar_comparison(value, expected_value):
-	print """<DartMeasurement name="Value" type="numeric/float">""" + str(value) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Expected Value" type="numeric/float">""" + str(expected_value) + """</DartMeasurement>"""
-	if value != expected_value:
-		raise Exception("value does not match expected value")
 
 def bitmap_modifier_benchmark(BitmapModifier):
 	sys.stdout.write("""<DartMeasurement name="Timing" type="text/html"><![CDATA[\n""")

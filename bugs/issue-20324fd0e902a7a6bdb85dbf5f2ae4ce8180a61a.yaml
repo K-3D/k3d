@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Fix CatmullClark implementation.
+desc: Need to update the CatmullClark implementation to handle changes to the polyhedron schema for shells.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-01-01 03:13:49.689458 Z
+references: []
+
+id: 20324fd0e902a7a6bdb85dbf5f2ae4ce8180a61a
+log_events: 
+- - 2010-01-01 03:13:50.285467 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-01-19 03:50:27.733213 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""

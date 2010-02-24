@@ -90,7 +90,7 @@ public:
 			"BlobbySubtract",
 			_("Combines blobbies using the Subtraction operator."),
 			"Blobby",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

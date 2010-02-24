@@ -40,7 +40,7 @@
 #include <k3dsdk/isnap_source.h>
 #include <k3dsdk/isnap_target.h>
 #include <k3dsdk/isnappable.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/interactive.h>
@@ -139,9 +139,9 @@ void snap_tool_detail::transform_target::start_transform()
 
 const k3d::matrix4 upstream_matrix(k3d::inode& Node)
 {
-	if(k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(&Node))
+	if(k3d::imatrix_sink* const downstream_sink = dynamic_cast<k3d::imatrix_sink*>(&Node))
 	{
-		if(k3d::iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_sink->transform_sink_input()))
+		if(k3d::iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_sink->matrix_sink_input()))
 			return boost::any_cast<k3d::matrix4>(upstream_output->property_internal_value());
 	}
 
@@ -257,14 +257,14 @@ bool snap_tool_detail::transform_target::create_transform_modifier(const std::st
 	// Check for an existing transform modifier
 	k3d::inode* upstream_node = upstream_transform_modifier(*node);
 	/** \todo check for same name too */
-	if(upstream_node && (k3d::classes::FrozenTransformation() == upstream_node->factory().factory_id()))
+	if(upstream_node && (k3d::classes::FrozenMatrix() == upstream_node->factory().factory_id()))
 	{
 		set_transform_modifier(upstream_node);
 		return false;
 	}
 
 	const std::string modifier_name = Name + node->name();
-	set_transform_modifier(insert_transform_modifier(*node, k3d::classes::FrozenTransformation(), modifier_name));
+	set_transform_modifier(insert_transform_modifier(*node, k3d::classes::FrozenMatrix(), modifier_name));
 
 	return true;
 }
@@ -293,7 +293,6 @@ unsigned long snap_tool_detail::mesh_target::target_number()
 
 void snap_tool_detail::mesh_target::reset_selection()
 {
-k3d::log() << debug << K3D_CHANGE_SET_CONTEXT << std::endl;
 	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_internal_value());
 	return_if_fail(mesh);
 
@@ -1002,7 +1001,7 @@ void snap_tool_detail::get_current_selection()
 		{
 			if(!dynamic_cast<k3d::gl::irenderable*>(*node))
 				continue;
-			if(!dynamic_cast<k3d::itransform_sink*>(*node))
+			if(!dynamic_cast<k3d::imatrix_sink*>(*node))
 				continue;
 
 			m_targets.push_back(new transform_target(*node));

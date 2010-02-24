@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>K-3D Release ${release["name"] | h}</title>
+		<link rel="icon" type="image/png" href="../k3d.png" />
+		<link rel="stylesheet" type="text/css" href="../k3d.css" />
+		<link rel="stylesheet" type="text/css" href="../developer.css" />
+		<link rel="stylesheet" type="text/css" href="tracker.css" />
+	</head>
+
+<%
+import datetime
+%>
+
+	<body>
+<%include file="navigation.html"/>
+
+		<div id="main" class="tracker">
+			<h2>Release ${release["name"] | h}</h2>
+
+<%
+
+closed_issues = filter(lambda issue: issue["status"] == ":closed", issues)
+open_issues = filter(lambda issue: issue["status"] != ":closed", issues)
+
+issue_count = len(issues)
+closed_count = len(closed_issues)
+open_count = len(open_issues)
+
+closed_percent = closed_count * 100 / issue_count if issue_count else 100
+open_percent = open_count * 100 / issue_count if issue_count else 100
+
+keywords = { ":released":"Released", ":unreleased":"Unreleased" }
+
+%>
+
+			<h3>Details</h3>
+			<dl>
+				<dt>Status:</dt>
+				<dd>${keywords[release["status"]] | h}</dd>
+
+				<dt>Progress:</dt>
+				% if release["status"] != ":released":
+				<dd><span class="progress-closed-issues">${"&nbsp;" * closed_percent}</span><span class="progress-open-issues">${"&nbsp;" * open_percent}</span>${closed_count} / ${issue_count | h} (${closed_percent | h}%)</dd>
+				% else:
+				<dd>${release["release_time"].strftime("Released %B %d, %Y") | h}</dd>
+				% endif
+			</dl>
+
+			<h3>Open Issues</h3>
+			% if len(open_issues):
+			<table>
+				<tbody>
+				% for issue in sorted(open_issues, lambda lhs, rhs: cmp(lhs["creation_time"], rhs["creation_time"]), reverse=True):
+					<tr><td>${issue['creation_time'].date() | h}</td><td><a href="${issue['filename']}">${issue['title'] | h}</a></td></tr>
+				% endfor
+				</tbody>
+			</table>
+			% else:
+			<p>No open issues.</p>
+			% endif	
+			
+			<h3>Closed Issues</h3>
+			% if len(closed_issues):
+			<table>
+				<tbody>
+				% for issue in sorted(closed_issues, lambda lhs, rhs: cmp(lhs["creation_time"], rhs["creation_time"]), reverse=True):
+					<tr><td>${issue['creation_time'].date() | h}</td><td><a href="${issue['filename']}">${issue['title'] | h}</a></td></tr>
+				% endfor
+				</tbody>
+			</table>
+			% else:
+			<p>No closed issues.</p>
+			% endif
+
+			<h3>Release Log</h3>
+			<table>
+				<tbody>
+				% for event in release["log_events"]:
+					<tr><td>${event[0].strftime("%Y-%m-%d %H:%M UTC") | h}</td><td>${event[1] | h}</td><td>${event[2] | h}</td></tr>
+				% endfor
+				</tbody>
+			</table>
+		</div>
+		<div id="footer">
+			<p class="generated">${datetime.datetime.utcnow().strftime("Updated %B %d, %Y %H:%M UTC") | h}</p>
+		</div>
+
+		<script type="text/javascript" src="http://www.google-analytics.com/ga.js"/>
+		<script type="text/javascript">
+			try { var pageTracker = _gat._getTracker("UA-3773195-1"); pageTracker._trackPageview(); } catch(err) { }
+		</script>
+	</body>
+</html>
+

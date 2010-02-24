@@ -246,6 +246,7 @@ bool add_geometry(unsigned long Color, const context& Context)
 
 	for(unsigned long t = 0; t < polygons.size(); t++)
 	{
+		Context.polyhedron.face_shells.push_back(0);
 		Context.polyhedron.face_first_loops.push_back(Context.polyhedron.loop_first_edges.size());
 		Context.polyhedron.face_loop_counts.push_back(1);
 		Context.polyhedron.face_selections.push_back(0);
@@ -1694,8 +1695,6 @@ public:
 
 		lparser::l_parser(random_seed, closed_form, 0, mutations, mutation_seed, max_stack_size, lparser::context(points, point_selection, *polyhedron, material), m_orientation.pipeline_value(), m_flip_normals.pipeline_value());
 
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(polyhedron->face_first_loops.size());
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
 		// Cache first bounding box to allow growth
@@ -1729,7 +1728,7 @@ public:
 			k3d::uuid(0xa637e99d, 0x707c4342, 0x8c6d4d15, 0x78c9054a),
 			"LSystemParser",
 			_("Generates an L-System object from a configuration file"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

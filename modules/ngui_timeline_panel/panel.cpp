@@ -294,7 +294,6 @@ public:
 
 	void on_playback_mode_changed(k3d::iunknown*)
 	{
-//k3d::log() << debug << m_playback_mode.pipeline_value() << std::endl;
 		switch(m_playback_mode.internal_value())
 		{
 			case LOOP_REVERSE_PLAY:
@@ -328,8 +327,6 @@ public:
 
 		return_if_fail(frame_rate != 0.0);
 		const double frame_length = 1.0 / frame_rate;
-
-//k3d::log() << debug << start_time << " " << end_time << " " << frame_length << " " << time << std::endl;
 
 		switch(m_playback_mode.internal_value())
 		{
@@ -517,7 +514,7 @@ public:
 			"NGUITimelinePanel",
 			_("Provides a panel for manipulating the current time"),
 			"NGUI Panel",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Timeline"));
 
 		return factory;

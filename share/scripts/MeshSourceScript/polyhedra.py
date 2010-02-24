@@ -14,13 +14,12 @@ for i in range(2):
 	# Create an (optional) array to store per-face colors ...
 	Cs = polyhedron.face_attributes().create("Cs", "k3d::color")
 
-	polyhedron.shell_first_faces().append(len(polyhedron.face_first_loops()))
-	polyhedron.shell_face_counts().append(3)
 	polyhedron.shell_types().append(k3d.polyhedron.shell_type.POLYGONS)
 
 	# Create three faces in each polyhedron ...
 	for j in range(3):
 		# Each face has a single loop (its exterior boundary) ...
+		polyhedron.face_shells().append(0)
 		polyhedron.face_first_loops().append(len(polyhedron.loop_first_edges()))
 		polyhedron.face_loop_counts().append(1)
 		polyhedron.face_materials().append(None)

@@ -76,12 +76,16 @@ public:
 				continue;
 
 			const k3d::uint_t edge_count = polyhedron->edge_selections.size();
-			k3d::mesh::doubles_t& creases = polyhedron->edge_attributes.create<k3d::mesh::doubles_t>("crease", new k3d::mesh::doubles_t(edge_count));
+			k3d::mesh::doubles_t* creases_ptr = polyhedron->edge_attributes.writable<k3d::mesh::doubles_t>("crease");
+			k3d::mesh::doubles_t& creases = creases_ptr ? *creases_ptr : polyhedron->edge_attributes.create<k3d::mesh::doubles_t>("crease", new k3d::mesh::doubles_t(edge_count, 0));
 
 			const k3d::uint_t edge_begin = 0;
 			const k3d::uint_t edge_end = edge_begin + edge_count;
 			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
-				creases[edge] = polyhedron->edge_selections[edge] ? sharpness : 0;
+			{
+				if(polyhedron->edge_selections[edge])
+					creases[edge] = sharpness;
+			}
 		}
 	}
 

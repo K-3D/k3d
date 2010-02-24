@@ -100,7 +100,7 @@ public:
 				"MakeEdgeSelection",
 				_("Converts primitive selections to edge selections."),
 				"Selection",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

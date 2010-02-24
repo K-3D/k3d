@@ -94,27 +94,23 @@ public:
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonOffset(1.0, 1.0);
 			
-			const k3d::uint_t shell_count = polyhedron->shell_first_faces.size();
-			for(k3d::uint_t shell = 0; shell != shell_count; ++shell)
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				const k3d::uint_t face_begin = polyhedron->shell_first_faces[shell];
-				const k3d::uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
-				for(k3d::uint_t face = face_begin; face != face_end; ++face)
+				k3d::gl::normal3d(normals[face]);
+	
+				glBegin(GL_POLYGON);
+				const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
+				for(k3d::uint_t edge = first_edge; ; )
 				{
-					k3d::gl::normal3d(normals[face]);
-		
-					glBegin(GL_POLYGON);
-					const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
-					for(k3d::uint_t edge = first_edge; ; )
-					{
-						k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, color(shell, face, edge));
-						k3d::gl::vertex3d(points[polyhedron->vertex_points[edge]]);
-						edge = polyhedron->clockwise_edges[edge];
-						if(edge == first_edge)
-							break;
-					}
-					glEnd();
+					k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, color(face, edge));
+					k3d::gl::vertex3d(points[polyhedron->vertex_points[edge]]);
+					edge = polyhedron->clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
 				}
+				glEnd();
 			}
 		}
 	}
@@ -272,14 +268,14 @@ private:
 			}
 		}
 		
-		const k3d::color operator()(const k3d::uint_t Shell, const k3d::uint_t Face, const k3d::uint_t Edge)
+		const k3d::color operator()(const k3d::uint_t Face, const k3d::uint_t Edge)
 		{
 			if(!m_color_array)
 				return k3d::color(0.9,0.9,0.9);
 			switch(m_array_type)
 			{
 			case CONSTANT:
-				return m_color_array->at(Shell);
+				return m_color_array->at(0);
 			case FACE:
 				return m_color_array->at(Face);
 			case VARYING:

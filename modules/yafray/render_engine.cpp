@@ -46,7 +46,7 @@
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/irenderable_gl.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/network_render_farm.h>
@@ -462,7 +462,7 @@ private:
 			if(!camera_node)
 				throw std::runtime_error("camera not a node");
 
-			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output());
+			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().matrix_source_output());
 			const k3d::point3 camera_position = k3d::position(camera_matrix);
 			const k3d::point3 camera_to_vector = camera_matrix * k3d::point3(0, 0, 1);
 			const k3d::point3 camera_up_vector = camera_matrix * k3d::point3(0, 1, 0);

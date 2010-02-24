@@ -101,8 +101,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<renderman_script,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 			k3d::uuid(0xded017f6, 0xa08849fd, 0xa9d8dd63, 0xe3cd6f1d),
 			"RenderManScript",
 			_("Creates RenderMan output under script control"),

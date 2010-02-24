@@ -33,14 +33,14 @@
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/ireset_properties.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/modifiers.h>
 #include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/nodes.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
@@ -92,8 +92,8 @@ const factories_t& transform_modifiers()
 	static factories_t modifiers;
 	if(modifiers.empty())
 	{
-		const plugin::factory::collection_t data_source_modifiers = plugin::factory::lookup<itransform_source>();
-		const plugin::factory::collection_t data_sink_modifiers = plugin::factory::lookup<itransform_sink>();
+		const plugin::factory::collection_t data_source_modifiers = plugin::factory::lookup<imatrix_source>();
+		const plugin::factory::collection_t data_sink_modifiers = plugin::factory::lookup<imatrix_sink>();
 		std::set_intersection(data_source_modifiers.begin(), data_source_modifiers.end(), data_sink_modifiers.begin(), data_sink_modifiers.end(), std::inserter(modifiers, modifiers.end()));
 		std::sort(modifiers.begin(), modifiers.end(), detail::sort_by_name());
 	}
@@ -107,10 +107,10 @@ inode* modify_transformation(idocument& Document, inode& Object, iplugin_factory
 	return_val_if_fail(Modifier, 0);
 
 	// Get the upstream and downstream properties ...
-	itransform_sink* const downstream_sink = dynamic_cast<itransform_sink*>(&Object);
+	imatrix_sink* const downstream_sink = dynamic_cast<imatrix_sink*>(&Object);
 	return_val_if_fail(downstream_sink, 0);
 
-	iproperty& downstream_input = downstream_sink->transform_sink_input();
+	iproperty& downstream_input = downstream_sink->matrix_sink_input();
 
 	iproperty* const upstream_output = Document.pipeline().dependency(downstream_input);
 
@@ -125,16 +125,16 @@ inode* modify_transformation(idocument& Document, inode& Object, iplugin_factory
 		return_val_if_fail(modifier, 0);
 
 		// Get its input and output properties ...
-		itransform_sink* const modifier_sink = dynamic_cast<itransform_sink*>(modifier);
+		imatrix_sink* const modifier_sink = dynamic_cast<imatrix_sink*>(modifier);
 		return_val_if_fail(modifier_sink, 0);
-		itransform_source* const modifier_source = dynamic_cast<itransform_source*>(modifier);
+		imatrix_source* const modifier_source = dynamic_cast<imatrix_source*>(modifier);
 		return_val_if_fail(modifier_source, 0);
 
 		// Insert the modifier into the DAG ...
 		ipipeline::dependencies_t dependencies;
 		if(upstream_output)
-			dependencies.insert(std::make_pair(&modifier_sink->transform_sink_input(), upstream_output));
-		dependencies.insert(std::make_pair(&downstream_input, &modifier_source->transform_source_output()));
+			dependencies.insert(std::make_pair(&modifier_sink->matrix_sink_input(), upstream_output));
+		dependencies.insert(std::make_pair(&downstream_input, &modifier_source->matrix_source_output()));
 		Document.pipeline().set_dependencies(dependencies);
 	}
 
@@ -220,7 +220,7 @@ void modify_selected_meshes(document_state& DocumentState, iplugin_factory* Modi
 		ipipeline::dependencies_t dependencies;
 		const nodes_t selected_nodes = selection::state(DocumentState.document()).selected_nodes();
 		// Create the node
-		inode* multi_sink = DocumentState.create_node(Modifier);
+		inode* multi_sink = pipeline::create_node(document, *Modifier);
 		record_state_change_set changeset(document, string_cast(boost::format(_("Add Modifier %1%")) % Modifier->name()), K3D_CHANGE_SET_CONTEXT);
 		nodes_t nodes_to_delete;
 		for(nodes_t::const_iterator node = selected_nodes.begin(); node != selected_nodes.end(); ++node)
@@ -228,24 +228,24 @@ void modify_selected_meshes(document_state& DocumentState, iplugin_factory* Modi
 			imesh_sink* const mesh_sink = dynamic_cast<imesh_sink*>(*node);
 			if(!mesh_sink)
 				continue;
-			itransform_sink* const transform_sink = dynamic_cast<itransform_sink*>(*node);
+			imatrix_sink* const matrix_sink = dynamic_cast<imatrix_sink*>(*node);
 
 			iproperty* source_mesh = document.pipeline().dependency(mesh_sink->mesh_sink_input());
 			if (!source_mesh)
 				continue;
 			
-			if (transform_sink) // Insert a transform node
+			if (matrix_sink) // Insert a transform node
 			{
-				iproperty* const source_transformation = document.pipeline().dependency(transform_sink->transform_sink_input());
+				iproperty* const source_transformation = document.pipeline().dependency(matrix_sink->matrix_sink_input());
 				if (source_transformation)
 				{
 					inode* transform_points = plugin::create<inode>("TransformPoints", document, unique_name(document.nodes(), "TransformPoints"));
 					return_if_fail(transform_points);
-					itransform_sink* transform_points_transform_sink = dynamic_cast<itransform_sink*>(transform_points);
-					return_if_fail(transform_points_transform_sink);
+					imatrix_sink* transform_points_matrix_sink = dynamic_cast<imatrix_sink*>(transform_points);
+					return_if_fail(transform_points_matrix_sink);
 					imesh_sink* transform_points_mesh_sink = dynamic_cast<imesh_sink*>(transform_points);
 					return_if_fail(transform_points_mesh_sink);
-					dependencies.insert(std::make_pair(&transform_points_transform_sink->transform_sink_input(), source_transformation));
+					dependencies.insert(std::make_pair(&transform_points_matrix_sink->matrix_sink_input(), source_transformation));
 					dependencies.insert(std::make_pair(&transform_points_mesh_sink->mesh_sink_input(), source_mesh));
 					imesh_source* transform_points_mesh_source = dynamic_cast<imesh_source*>(transform_points);
 					return_if_fail(transform_points_mesh_source);
@@ -339,9 +339,9 @@ const transform_modifier create_transform_modifier(idocument& Document, const uu
 {
 	inode* const object = plugin::create<inode>(ModifierType, Document, ModifierName);
 	return_val_if_fail(object, transform_modifier());
-	itransform_sink* const sink = dynamic_cast<itransform_sink*>(object);
+	imatrix_sink* const sink = dynamic_cast<imatrix_sink*>(object);
 	return_val_if_fail(sink, transform_modifier());
-	itransform_source* const source = dynamic_cast<itransform_source*>(object);
+	imatrix_source* const source = dynamic_cast<imatrix_source*>(object);
 	return_val_if_fail(source, transform_modifier());
 
 	return transform_modifier(*object, *sink, *source);
@@ -349,18 +349,18 @@ const transform_modifier create_transform_modifier(idocument& Document, const uu
 
 inode* insert_transform_modifier(inode& Object, const uuid& ModifierType, const std::string& ModifierName)
 {
-	itransform_sink* const downstream_sink = dynamic_cast<itransform_sink*>(&Object);
+	imatrix_sink* const downstream_sink = dynamic_cast<imatrix_sink*>(&Object);
 	return_val_if_fail(downstream_sink, 0);
 
-	iproperty& downstream_input = downstream_sink->transform_sink_input();
+	iproperty& downstream_input = downstream_sink->matrix_sink_input();
 	iproperty* const upstream_output = Object.document().pipeline().dependency(downstream_input);
 
 	const transform_modifier modifier = create_transform_modifier(Object.document(), ModifierType, ModifierName);
 	return_val_if_fail(!modifier.empty(), 0);
 
 	ipipeline::dependencies_t dependencies;
-	dependencies.insert(std::make_pair(&modifier.sink->transform_sink_input(), upstream_output));
-	dependencies.insert(std::make_pair(&downstream_input, &modifier.source->transform_source_output()));
+	dependencies.insert(std::make_pair(&modifier.sink->matrix_sink_input(), upstream_output));
+	dependencies.insert(std::make_pair(&downstream_input, &modifier.source->matrix_source_output()));
 	Object.document().pipeline().set_dependencies(dependencies);
 
 	return modifier.node;
@@ -368,10 +368,10 @@ inode* insert_transform_modifier(inode& Object, const uuid& ModifierType, const 
 
 inode* upstream_transform_modifier(inode& Object)
 {
-	itransform_sink* const downstream_sink = dynamic_cast<itransform_sink*>(&Object);
+	imatrix_sink* const downstream_sink = dynamic_cast<imatrix_sink*>(&Object);
 	return_val_if_fail(downstream_sink, 0);
 
-	iproperty& downstream_input = downstream_sink->transform_sink_input();
+	iproperty& downstream_input = downstream_sink->matrix_sink_input();
 	iproperty* const upstream_output = Object.document().pipeline().dependency(downstream_input);
 
 	// Check upstream object

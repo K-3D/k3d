@@ -18,18 +18,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar <romainbehar@yahoo.com>
+	\author Romain Behar <romainbehar@yahoo.com>
+	\author Timothy M. Shead <tshead@k-3d.com>
 */
 
 #include <k3dsdk/basic_math.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
-#include <k3dsdk/legacy_mesh_modifier.h>
+#include <k3dsdk/hints.h>
+#include <k3dsdk/material_sink.h>
+#include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/mesh_selection_sink.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/utility.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
 
-#include <set>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -37,226 +41,196 @@ namespace module
 namespace polyhedron
 {
 
-namespace detail
-{
-
-typedef std::vector<k3d::legacy::split_edge*> polygon_t;
-
-void get_edges(k3d::legacy::face* Face, polygon_t& Polygon)
-{
-	k3d::legacy::split_edge* edge = Face->first_edge;
-	do
-	{
-		Polygon.push_back(edge);
-
-		edge = edge->face_clockwise;
-	}
-	while(edge != Face->first_edge);
-}
-
-/// Finds shortest edge lengths to get most natural bridge
-// returns best start index in Edges2 corresponding to Edges1[0]
-const unsigned long best_bridge_index(polygon_t& Edges1, polygon_t& Edges2)
-{
-	const unsigned long size1 = Edges1.size();
-	const unsigned long size2 = Edges2.size();
-
-	unsigned long best_index = 0;
-	double best_length = 0;
-	for(unsigned long i = 0; i < size1; ++i)
-	{
-		double length = 0;
-		for(unsigned long n = 0; n < size1; ++n)
-		{
-			k3d::legacy::split_edge* edge1 = Edges1[n];
-			k3d::legacy::split_edge* edge2 = Edges2[(i + n) % size2];
-			length += k3d::distance(edge1->vertex->position, edge2->face_clockwise->vertex->position);
-		}
-
-		if(i == 0)
-		{
-			best_index = 0;
-			best_length = length;
-		}
-		else if(length < best_length)
-		{
-			best_index = i;
-			best_length = length;
-		}
-	}
-
-	return best_index;
-}
-
-void bridge(k3d::legacy::face* Face1, k3d::legacy::face* Face2, k3d::legacy::polyhedron* Polyhedron)
-{
-	// Get first face edges
-	polygon_t edges1;
-	get_edges(Face1, edges1);
-
-	// Get second face edges and reverse them
-	polygon_t edges2;
-	get_edges(Face2, edges2);
-	std::reverse(edges2.begin(), edges2.end());
-
-	if(edges1.size() == edges2.size())
-	{
-		const unsigned long start2 = best_bridge_index(edges1, edges2);
-
-		k3d::legacy::split_edge* first_edge = 0;
-		k3d::legacy::split_edge* previous_edge = 0;
-
-		const unsigned long size = edges1.size();
-		for(unsigned long n = 0; n < size; ++n)
-		{
-			k3d::legacy::split_edge* edge1 = edges1[n];
-			k3d::legacy::split_edge* edge2 = edges2[(start2 + n) % size];
-
-			k3d::legacy::split_edge* new_edge1 = new k3d::legacy::split_edge(edge1->vertex);
-			if(edge1->companion)
-			{
-				k3d::legacy::join_edges(*edge1->companion, *new_edge1);
-				edge1->companion = 0;
-			}
-
-			k3d::legacy::split_edge* new_edge2 = new k3d::legacy::split_edge(edge1->face_clockwise->vertex);
-
-			k3d::legacy::split_edge* new_edge3 = new k3d::legacy::split_edge(edge2->vertex);
-			if(edge2->companion)
-			{
-				k3d::legacy::join_edges(*edge2->companion, *new_edge3);
-				edge2->companion = 0;
-			}
-
-			k3d::legacy::split_edge* new_edge4 = new k3d::legacy::split_edge(edge2->face_clockwise->vertex);
-
-			// Set companions
-			if(!previous_edge)
-			{
-				first_edge = new_edge4;
-			}
-			else
-			{
-				k3d::legacy::join_edges(*previous_edge, *new_edge4);
-			}
-
-			previous_edge = new_edge2;
-
-			// Loop edges
-			new_edge1->face_clockwise = new_edge2;
-			new_edge2->face_clockwise = new_edge3;
-			new_edge3->face_clockwise = new_edge4;
-			new_edge4->face_clockwise = new_edge1;
-
-			k3d::legacy::face* new_face = new k3d::legacy::face(new_edge1, Face1->material);
-			Polyhedron->faces.push_back(new_face);
-		}
-
-		k3d::legacy::join_edges(*previous_edge, *first_edge);
-	}
-}
-
-void bridge_faces(k3d::legacy::mesh& Mesh)
-{
-	k3d::legacy::face* face1 = 0;
-	k3d::legacy::polyhedron* polyhedron1 = 0;
-	k3d::legacy::face* face2 = 0;
-	k3d::legacy::polyhedron* polyhedron2 = 0;
-
-	for(k3d::legacy::mesh::polyhedra_t::iterator polyhedron_i = Mesh.polyhedra.begin(); polyhedron_i != Mesh.polyhedra.end(); ++polyhedron_i)
-	{
-		k3d::legacy::polyhedron* polyhedron = *polyhedron_i;
-		for(k3d::legacy::polyhedron::faces_t::iterator face = polyhedron->faces.begin(); face != polyhedron->faces.end(); ++face)
-		{
-			if((*face)->selection_weight)
-			{
-				if(!face1)
-				{
-					face1 = (*face);
-					polyhedron1 = polyhedron;
-					continue;
-				}
-
-				if(!face2)
-				{
-					face2 = (*face);
-					polyhedron2 = polyhedron;
-					goto Bridge;
-				}
-			}
-		}
-	}
-
-	// Bridge first two faces found
-	if(!face1 || !face2)
-		return;
-
-	Bridge:
-
-	// Merge polyhedra if required
-	if(polyhedron1 != polyhedron2)
-	{
-		polyhedron1->faces.insert(polyhedron1->faces.end(), polyhedron2->faces.begin(), polyhedron2->faces.end());
-		Mesh.polyhedra.erase(std::find(Mesh.polyhedra.begin(), Mesh.polyhedra.end(), polyhedron2));
-		polyhedron2->faces.clear();
-		delete polyhedron2;
-	}
-
-	bridge(face1, face2, polyhedron1);
-
-	// Delete faces replaced by bridge
-	k3d::legacy::polyhedron::faces_t& faces = polyhedron1->faces;
-	faces.erase(std::find(faces.begin(), faces.end(), face1));
-	faces.erase(std::find(faces.begin(), faces.end(), face2));
-
-	delete face1;
-	delete face2;
-}
-
-} // namespace detail
-
 /////////////////////////////////////////////////////////////////////////////
-// bridge_faces_implementation
+// bridge_faces
 
-class bridge_faces_implementation :
-	public k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > >
+class bridge_faces :
+	public k3d::mesh_selection_sink<k3d::material_sink<k3d::mesh_modifier<k3d::node > > >
 {
-	typedef k3d::mesh_selection_sink<k3d::legacy::mesh_modifier<k3d::node > > base;
+	typedef k3d::mesh_selection_sink<k3d::material_sink<k3d::mesh_modifier<k3d::node > > > base;
 
 public:
-	bridge_faces_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	bridge_faces(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
-		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
+		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::mesh_topology_changed> >(make_reset_mesh_slot()));
 	}
 
-	/** \todo Improve the implementation so we don't have to do this */
-	k3d::iunknown* on_rewrite_hint(iunknown* const Hint)
+	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		// Force updates to re-allocate our mesh, for simplicity
-		return 0;
+		Output = Input;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+
+		if(!Output.points)
+			return;
+		if(!Output.point_selection)
+			return;
+
+		const k3d::mesh::points_t& points = *Output.points;
+
+		k3d::imaterial* const material = m_material.pipeline_value();
+
+		// Don't explicitly remove any points ...
+		k3d::mesh::bools_t remove_points(points.size(), false);
+
+		// For each polyhedron ...
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
+			if(!polyhedron)
+				continue;
+
+			// Get the set of selected faces ...
+			k3d::mesh::indices_t selected_faces;
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
+			{
+				if(polyhedron->face_selections[face])
+					selected_faces.push_back(face);
+			}
+
+			// We need exactly two faces ...
+			if(selected_faces.size() != 2)
+			{
+				k3d::log() << warning << "To bridge, exactly two faces must be selected." << std::endl;
+				continue;
+			}
+			
+			// Both faces must be members of the same shell ...
+			if(polyhedron->face_shells[selected_faces[0]] != polyhedron->face_shells[selected_faces[1]])
+			{
+				k3d::log() << warning << "Cannot bridge across polyhedron shells." << std::endl;
+				continue;
+			}
+
+			// Lookup loop lengths ...
+			k3d::mesh::counts_t loop_edge_counts;
+			k3d::polyhedron::create_loop_edge_count_lookup(*polyhedron, loop_edge_counts);
+
+			// Both faces must have the same number of edges ...
+			if(loop_edge_counts[polyhedron->face_first_loops[selected_faces[0]]] != loop_edge_counts[polyhedron->face_first_loops[selected_faces[1]]])
+			{
+				k3d::log() << warning << "Cannot bridge faces with different edge counts." << std::endl;
+				continue;
+			}
+
+			// We will explicitly delete the originally selected faces ...
+			k3d::mesh::bools_t remove_faces(polyhedron->face_selections.begin(), polyhedron->face_selections.end());
+
+			// We will need to traverse edges in counterclockwise order for the second face ...
+			k3d::mesh::indices_t counterclockwise_edges;
+			k3d::polyhedron::create_counterclockwise_edge_lookup(*polyhedron, counterclockwise_edges);
+
+			// Find the best starting-vertex for the second face ...
+			const k3d::uint_t first_edge_1 = polyhedron->loop_first_edges[polyhedron->face_first_loops[selected_faces[0]]];
+
+			k3d::uint_t first_edge_2 = polyhedron->loop_first_edges[polyhedron->face_first_loops[selected_faces[1]]];
+			k3d::double_t distance = std::numeric_limits<double>::max();
+			for(k3d::uint_t edge = first_edge_2; ;)
+			{
+				const k3d::double_t d = k3d::length(points[polyhedron->vertex_points[first_edge_1]] - points[polyhedron->vertex_points[edge]]);
+				if(d < distance)
+				{
+					distance = d;
+					first_edge_2 = edge;
+				}
+
+				edge = polyhedron->clockwise_edges[edge];
+				if(edge == first_edge_2)
+					break;
+			}
+
+			// Get ready to copy attributes ...
+			k3d::table_copier face_attributes(polyhedron->face_attributes);
+			k3d::table_copier edge_attributes(polyhedron->edge_attributes);
+			k3d::table_copier vertex_attributes(polyhedron->vertex_attributes);
+
+			// For each edge in the first face ...
+			for(k3d::uint_t edge1 = first_edge_1, edge2 = first_edge_2; ;)
+			{
+				// Create a new bridge face ...
+				polyhedron->face_shells.push_back(polyhedron->face_shells[selected_faces[0]]);
+				polyhedron->face_first_loops.push_back(polyhedron->face_loop_counts.size());
+				polyhedron->face_loop_counts.push_back(1);
+				polyhedron->face_selections.push_back(1);
+				polyhedron->face_materials.push_back(material);
+				polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
+
+				k3d::double_t face_weights[2] = { 0.5, 0.5 };
+				face_attributes.push_back(2, &selected_faces[0], face_weights);
+
+				remove_faces.push_back(false);
+
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+				polyhedron->edge_selections.push_back(0);
+				polyhedron->vertex_points.push_back(polyhedron->vertex_points[edge1]);
+				polyhedron->vertex_selections.push_back(0);
+
+				edge_attributes.push_back(edge1);
+				vertex_attributes.push_back(edge1);
+
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+				polyhedron->edge_selections.push_back(0);
+				polyhedron->vertex_points.push_back(polyhedron->vertex_points[polyhedron->clockwise_edges[edge1]]);
+				polyhedron->vertex_selections.push_back(0);
+
+				edge_attributes.push_back(polyhedron->clockwise_edges[edge1]);
+				vertex_attributes.push_back(polyhedron->clockwise_edges[edge1]);
+
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+				polyhedron->edge_selections.push_back(0);
+				polyhedron->vertex_points.push_back(polyhedron->vertex_points[counterclockwise_edges[edge2]]);
+				polyhedron->vertex_selections.push_back(0);
+
+				edge_attributes.push_back(counterclockwise_edges[edge2]);
+				vertex_attributes.push_back(counterclockwise_edges[edge2]);
+
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+				polyhedron->edge_selections.push_back(0);
+				polyhedron->vertex_points.push_back(polyhedron->vertex_points[edge2]);
+				polyhedron->vertex_selections.push_back(0);
+
+				edge_attributes.push_back(edge2);
+				vertex_attributes.push_back(edge2);
+
+				// Close the edge loop ...
+				polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
+
+				edge1 = polyhedron->clockwise_edges[edge1];
+				if(edge1 == first_edge_1)
+					break;
+
+				edge2 = counterclockwise_edges[edge2];
+			}
+
+			// Don't explicitly delete any edges ...
+			k3d::mesh::bools_t remove_edges(polyhedron->clockwise_edges.size(), false);
+
+			// Don't explicitly delete any loops ...
+			k3d::mesh::bools_t remove_loops(polyhedron->loop_first_edges.size(), false);
+			
+			// Make it happen ...
+			k3d::polyhedron::delete_components(Output, *polyhedron, remove_points, remove_edges, remove_loops, remove_faces);
+		}
 	}
 
-	void on_initialize_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
-	{
-		k3d::legacy::deep_copy(InputMesh, Mesh);
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Mesh);
-		detail::bridge_faces(Mesh);
-	}
-
-	void on_update_mesh(const k3d::legacy::mesh& InputMesh, k3d::legacy::mesh& Mesh)
+	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<bridge_faces_implementation,
+		static k3d::document_plugin_factory<bridge_faces,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x8e744389, 0x5d284d38, 0x95bb89cc, 0x1b9e528e),
 				"BridgeFaces",
 				"Creates new polygons forming a bridge between two selected polygons",
-				"Polygon",
+				"Polyhedron",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
@@ -268,7 +242,7 @@ public:
 
 k3d::iplugin_factory& bridge_faces_factory()
 {
-	return bridge_faces_implementation::get_factory();
+	return bridge_faces::get_factory();
 }
 
 } // namespace polyhedron

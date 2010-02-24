@@ -41,8 +41,8 @@
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
-#include <k3dsdk/itransform_source.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_source.h>
+#include <k3dsdk/imatrix_sink.h>
 
 #include <k3dsdk/plugins.h>
 
@@ -155,9 +155,9 @@ void node_recursion(k3d::idocument& Document, std::vector<collada_obj> &collada_
 
 	std::stringstream trans_name;
 	trans_name << "COLLADA " << node.getName() << " Transformation";
-	k3d::inode *frozen_trans = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("FrozenTransformation"), Document, k3d::unique_name(Document.nodes(),trans_name.str()));
+	k3d::inode *frozen_trans = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("FrozenMatrix"), Document, k3d::unique_name(Document.nodes(),trans_name.str()));
 	k3d::property::set_internal_value(*frozen_trans, "matrix", mcurrent);
-	k3d::itransform_source* const transform_source = dynamic_cast<k3d::itransform_source*>(frozen_trans);
+	k3d::imatrix_source* const matrix_source = dynamic_cast<k3d::imatrix_source*>(frozen_trans);
 
 	k3d::ipipeline::dependencies_t dependencies;
 
@@ -182,9 +182,9 @@ void node_recursion(k3d::idocument& Document, std::vector<collada_obj> &collada_
 
 		dependencies.insert(std::make_pair(&mesh_sink->mesh_sink_input(), lookcollada(collada_objs,instanceGeom->getUrl().getElement()->getAttribute("id")).get_mesh_source_output()));
 
-		k3d::itransform_sink* const transform_sink = dynamic_cast<k3d::itransform_sink*>(mesh_instance);
+		k3d::imatrix_sink* const matrix_sink = dynamic_cast<k3d::imatrix_sink*>(mesh_instance);
 
-		dependencies.insert(std::make_pair(&transform_sink->transform_sink_input(),&transform_source->transform_source_output()));
+		dependencies.insert(std::make_pair(&matrix_sink->matrix_sink_input(),&matrix_source->matrix_source_output()));
 	}
 
 	for (size_t l = 0; l < node.getInstance_camera_array().getCount(); l++)
@@ -195,9 +195,9 @@ void node_recursion(k3d::idocument& Document, std::vector<collada_obj> &collada_
 		cam_name << "COLLADA " << node.getName();
 
 		k3d::inode *camera = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("Camera"), Document, cam_name.str());
-		k3d::itransform_sink* const cam_transform_sink = dynamic_cast<k3d::itransform_sink*>(camera);
+		k3d::imatrix_sink* const cam_matrix_sink = dynamic_cast<k3d::imatrix_sink*>(camera);
 
-		dependencies.insert(std::make_pair(&cam_transform_sink->transform_sink_input(),&transform_source->transform_source_output()));
+		dependencies.insert(std::make_pair(&cam_matrix_sink->matrix_sink_input(),&matrix_source->matrix_source_output()));
 
 		dependencies.insert(std::make_pair(k3d::property::get(*camera,"top"),lookcollada(collada_objs,instanceCam->getUrl().getElement()->getAttribute("id")).get_top()));
 		dependencies.insert(std::make_pair(k3d::property::get(*camera,"bottom"),lookcollada(collada_objs,instanceCam->getUrl().getElement()->getAttribute("id")).get_bottom()));
@@ -215,11 +215,11 @@ void node_recursion(k3d::idocument& Document, std::vector<collada_obj> &collada_
 		light_name << "COLLADA " << node.getName();
 
 		k3d::inode *light = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("RenderManLight"), Document, light_name.str());
-		k3d::itransform_sink* const light_transform_sink = dynamic_cast<k3d::itransform_sink*>(light);
+		k3d::imatrix_sink* const light_matrix_sink = dynamic_cast<k3d::imatrix_sink*>(light);
 
 		k3d::property::set_internal_value(*light, "shader", lookcollada(collada_objs, instanceLight->getUrl().getElement()->getAttribute("id")).get_light_shader());
 
-		dependencies.insert(std::make_pair(&light_transform_sink->transform_sink_input(),&transform_source->transform_source_output()));
+		dependencies.insert(std::make_pair(&light_matrix_sink->matrix_sink_input(),&matrix_source->matrix_source_output()));
 	}
 	Document.pipeline().set_dependencies(dependencies);
 }
@@ -252,7 +252,6 @@ public:
 			domGeometry_Array geometries = library_geometries[j]->getGeometry_array();
 			for(int i=0; i<geometries.getCount(); i++)
 			{
-				//k3d::log() << debug << "A geometry" << std::endl;
 				collada_objs.push_back(collada_obj(Document,*geometries[i]));
 			}
 		}
@@ -290,7 +289,6 @@ public:
 			domVisual_scene_Array visual_scenes = library_visual_scenes[j]->getVisual_scene_array();
 			for(int k=0; k<visual_scenes.getCount(); k++)
 			{
-				//k3d::log() << debug << "A visual_scene" << std::endl;
 				domNode_Array scene_nodes = visual_scenes[k]->getNode_array();
 				for(int i=0; i<scene_nodes.getCount(); i++)
 				{
@@ -307,10 +305,6 @@ public:
 		//k3d::inode* const mesh_node = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("Scale"), Document, "MyScale");
 		//mesh_node->set_property("name", "Bla");
 		k3d::iplugin_factory *factory = k3d::plugin::factory::lookup("Scale");
-		if(!factory)
-			k3d::log() << debug << "No factory found" << std::endl;
-		else
-			k3d::log() << debug << "Factory found" << std::endl;
 */
 
 		// destroy the objects we created during the conversion process

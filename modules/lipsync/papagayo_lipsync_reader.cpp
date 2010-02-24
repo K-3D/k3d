@@ -282,7 +282,7 @@ k3d::iplugin_factory& factory()
 			k3d::uuid(0x9e43b56a, 0x3c4198c9, 0xfd0d46b4, 0xb18446ae),
 			"PapagayoLipsyncReader",
 			_("Load a papagayo lipsync (.dat) file and output its values given a time source"),
-			"Lipsync",
+			"Animation",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

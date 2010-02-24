@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <k3dsdk/almost_equal.h>
+#include <k3dsdk/difference.h>
 #include <k3dsdk/pipeline_data.h>
 #include <map>
 
@@ -58,9 +58,9 @@ public:
 	virtual uint_t size() const = 0;
 	/// Returns true iff this array is empty
 	virtual bool_t empty() const = 0;
-	/// Returns true iff this array is equivalent to another, using the imprecise semantics of almost_equal to compare values.
+	/// Returns the difference between this array and another, using the imprecise semantics of difference()
 	/// \note: Returns false if given an array with a different concrete type.
-	virtual bool_t almost_equal(const array& Other, const uint64_t Threshold) const = 0;
+	virtual void difference(const array& Other, bool_t& Equal, uint64_t& ULPS) const = 0;
 
 	/// Sets a new name-value pair, overwriting the value if the name already exists
 	void set_metadata_value(const string_t& Name, const string_t& Value);
@@ -81,24 +81,11 @@ protected:
 /// Serialization
 std::ostream& operator<<(std::ostream& Stream, const array& RHS);
 
-/// Specialization of almost_equal that tests k3d::array for equality
-template<>
-class almost_equal<array>
+/// Specialization of difference for k3d::array
+inline void difference(const array& A, const array& B, bool_t& Equal, uint64_t& ULPS)
 {
-	typedef array T;
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
+	A.difference(B, Equal, ULPS);
+}
 
 /// Specialization of pipeline_data_traits for use with k3d::array
 template<>

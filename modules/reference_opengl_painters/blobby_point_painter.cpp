@@ -142,7 +142,7 @@ public:
 			const k3d::uint_t primitives_end = primitives_begin + blobby->primitives.size();
 			for(k3d::uint_t primitive = primitives_begin; primitive != primitives_end; ++primitive)
 			{
-				k3d::gl::push_selection_token(k3d::selection::VARYING, primitive);
+				k3d::gl::push_selection_token(k3d::selection::PARAMETER, primitive);
 				k3d::gl::push_selection_token(k3d::selection::POINT, primitive);
 
 				const k3d::uint_t first_float = blobby->primitive_first_floats[primitive];
@@ -193,7 +193,7 @@ public:
 				}
 
 				k3d::gl::pop_selection_token(); // POINT
-				k3d::gl::pop_selection_token(); // VARYING
+				k3d::gl::pop_selection_token(); // PARAMETER
 
 			}
 
@@ -211,7 +211,7 @@ public:
 			"OpenGLBlobbyPointPainter",
 			_("Renders blobby primitives using points and lines"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
