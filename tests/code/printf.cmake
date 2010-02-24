@@ -12,7 +12,7 @@ SET(SKIP_FILES
 	"^k3dsdk/ftgl/src/FTLayout/FTLayoutGlue.cpp$"
 	"^k3dsdk/sgi_tesselator/geom.c$"
 	"^k3dsdk/xml.cpp$"
-	"^modules/double/format.cpp$"
+	"^modules/double/double_to_string.cpp$"
 	"^modules/inotify/inotify-cxx.cpp$"
 	"^modules/lsystem/l_parser.cpp$"
 	"^modules/md2_io/md2.cpp$"
