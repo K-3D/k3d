@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2009, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -123,20 +123,58 @@ public:
 			k3d::mesh::indices_t adjacent_edges;
 			k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, adjacent_edges);
 
-			// Compute a mapping from edges to counterclockwise edges ...
-			k3d::mesh::indices_t counterclockwise_edges;
-			k3d::polyhedron::create_counterclockwise_edge_lookup(*polyhedron, counterclockwise_edges);
+			// Identify edges that will be extruded ...
+			const k3d::uint_t edge_begin = 0;
+			const k3d::uint_t edge_end = edge_begin + polyhedron->clockwise_edges.size();
+			k3d::mesh::bools_t extrusion_edges(polyhedron->clockwise_edges.size(), false);
+			k3d::mesh::bools_t border_edges(polyhedron->clockwise_edges.size(), false);
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+			{
+				// Every edge that's adjacent to a selected face will be an extrusion edge ...
+				if(!polyhedron->face_selections[edge_faces[edge]])
+					continue;
+
+				extrusion_edges[edge] = true;
+
+				// Identify edges on the extrusion boundary ...
+				if(group_faces && !boundary_edges[edge] && polyhedron->face_selections[edge_faces[adjacent_edges[edge]]])
+					continue;
+
+				border_edges[edge] = true;
+			}
+
+			// Identify clockwise boundary edges ...
+			k3d::mesh::indices_t clockwise_border_edges(polyhedron->clockwise_edges.size(), k3d::uint_t(-1));
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+			{
+				if(!border_edges[edge])
+					continue;
+
+				k3d::uint_t clockwise_edge = polyhedron->clockwise_edges[edge];
+				while(!border_edges[clockwise_edge])
+					clockwise_edge = polyhedron->clockwise_edges[adjacent_edges[clockwise_edge]];
+				clockwise_border_edges[edge] = clockwise_edge;
+			}
+
+			// Identify counterclockwise boundary edges ...
+			k3d::mesh::indices_t counterclockwise_border_edges(polyhedron->clockwise_edges.size());
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+			{
+				if(!border_edges[edge])
+					continue;
+
+				counterclockwise_border_edges[clockwise_border_edges[edge]] = edge;
+			}
 
 			// Compute face normal vectors ...
 			k3d::mesh::normals_t face_normals;
 			k3d::polyhedron::create_face_normal_lookup(Output, *polyhedron, face_normals);
 
-			// Compute the normal vector for each edge ...
+			// Compute the normal vector for each vertex ...
 			const k3d::uint_t face_begin = 0;
 			const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
-			const k3d::uint_t edge_begin = 0;
-			const k3d::uint_t edge_end = edge_begin + polyhedron->clockwise_edges.size();
-			k3d::mesh::vectors_t edge_normals(polyhedron->clockwise_edges.size());
+			k3d::mesh::vectors_t vertex_normals(polyhedron->clockwise_edges.size(), k3d::vector3(0, 0, 0));
+			k3d::mesh::vectors_t point_normals(points.size(), k3d::vector3(0, 0, 0));
 			if(group_faces)
 			{
 				if(group_normals)
@@ -149,24 +187,25 @@ public:
 
 						normal += face_normals[face];
 					}
-					std::fill(edge_normals.begin(), edge_normals.end(), k3d::to_vector(k3d::normalize(normal)));
+					std::fill(vertex_normals.begin(), vertex_normals.end(), k3d::to_vector(k3d::normalize(normal)));
+					std::fill(point_normals.begin(), point_normals.end(), k3d::to_vector(k3d::normalize(normal)));
 				}
 				else
 				{
-					// Compute point normal vectors ...
-					k3d::mesh::normals_t point_normals(points.size(), k3d::normal3(0, 0, 0));
+					
 					for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
-						point_normals[polyhedron->vertex_points[edge]] += face_normals[edge_faces[edge]];
-
+						point_normals[polyhedron->vertex_points[edge]] += k3d::to_vector(face_normals[edge_faces[edge]]);
+					for(k3d::uint_t i = 0; i != points.size(); ++i)
+						point_normals[i] = k3d::normalize(point_normals[i]);
 					for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
-						edge_normals[edge] = k3d::to_vector(k3d::normalize(point_normals[polyhedron->vertex_points[edge]]));
+						vertex_normals[edge] = point_normals[polyhedron->vertex_points[edge]];
 				}
 			}
 			else
 			{
 				for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 				{
-					edge_normals[edge] = k3d::to_vector(k3d::normalize(face_normals[edge_faces[edge]]));
+					vertex_normals[edge] = k3d::to_vector(k3d::normalize(face_normals[edge_faces[edge]]));
 				}
 			}
 
@@ -174,155 +213,139 @@ public:
 			k3d::mesh::vectors_t edge_insets(polyhedron->clockwise_edges.size());
 			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 			{
-				const k3d::vector3 e1 = points[polyhedron->vertex_points[edge]] - points[polyhedron->vertex_points[counterclockwise_edges[edge]]];
-				const k3d::vector3 e2 = points[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]] - points[polyhedron->vertex_points[edge]];
-				const k3d::vector3 e3 = k3d::normalize(e1 ^ face_normals[edge_faces[edge]]);
-				const k3d::vector3 e4 = k3d::normalize(e2 ^ face_normals[edge_faces[edge]]);
-				edge_insets[edge] = (-1 / std::cos(std::acos(e3 * e4) / 2)) * k3d::normalize(e3 + e4);
+				edge_insets[edge] = k3d::normalize((points[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]] - points[polyhedron->vertex_points[edge]]) ^ face_normals[edge_faces[edge]]);
 			}
 
-			// Create new vertices for each segment ...
+			// Keep track of a mapping from old vertex points to new vertex points ...
+			k3d::mesh::indices_t vertex_point_map(polyhedron->vertex_points.size());
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+				vertex_point_map[edge] = polyhedron->vertex_points[edge];
+
+			// For each segment ...
 			std::vector<k3d::mesh::indices_t> layer_vertex_points(segments + 1, polyhedron->vertex_points);
 			for(k3d::int32_t segment = 0; segment != segments; ++segment)
 			{
 				std::vector<boost::optional<k3d::uint_t> > layer_points(points.size());
 
-				// For each edge adjacent to a selected face ...
+				// Create border-edge vertices ...
 				for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 				{
-					if(!polyhedron->face_selections[edge_faces[edge]])
+					if(!border_edges[edge])
 						continue;
 
-					// Create new vertices ...
-					if(group_faces)
-					{
-						if(!layer_points[polyhedron->vertex_points[edge]])
-						{
-							layer_points[polyhedron->vertex_points[edge]] = points.size();
+					const k3d::uint_t old_point = polyhedron->vertex_points[edge];
+					const k3d::uint_t new_point = points.size();
 
-							extrude_vertices.push_back(
-								extrude_vertex(
-									points.size(),
-									points[polyhedron->vertex_points[edge]],
-									edge_normals[edge],
-									k3d::vector3(0, 0, 0),
-									k3d::ratio(segment + 1, segments)));
-							points.push_back(k3d::point3());
-							point_selection.push_back(0);
-							point_attributes.push_back(polyhedron->vertex_points[edge]);
-						}
+					layer_points[old_point] = new_point;
+					vertex_point_map[edge] = new_point;
+					layer_vertex_points[segment + 1][edge] = new_point;
 
-						layer_vertex_points[segment + 1][edge] = *layer_points[polyhedron->vertex_points[edge]];
-					}
-					else
-					{
-						layer_vertex_points[segment + 1][edge] = points.size();
+					const k3d::vector3 inset1 = edge_insets[edge];
+					const k3d::vector3 inset2 = edge_insets[counterclockwise_border_edges[edge]];
 
-						extrude_vertices.push_back(
-							extrude_vertex(
-								points.size(),
-								points[polyhedron->vertex_points[edge]],
-								edge_normals[edge],
-								edge_insets[edge],
-								k3d::ratio(segment + 1, segments)));
-						points.push_back(k3d::point3());
-						point_selection.push_back(0);
-						point_attributes.push_back(polyhedron->vertex_points[edge]);
-					}
+					extrude_vertices.push_back(
+						extrude_vertex(
+							new_point,
+							points[old_point],
+							vertex_normals[edge],
+							(-1 / std::cos(std::acos(inset1 * inset2) / 2)) * k3d::normalize(inset1 + inset2),
+							k3d::ratio(segment + 1, segments)));
+
+					points.push_back(k3d::point3());
+					point_selection.push_back(0);
+					point_attributes.push_back(polyhedron->vertex_points[edge]);
 				}
-			}
 
-			// For each (original) selected face, map the face vertices to their new locations ...
-			for(k3d::uint_t face = face_begin; face != face_end; ++face)
-			{
-				if(!polyhedron->face_selections[face])
-					continue;
-
-				const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-				const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+				// Create interior extrusion-edge vertices ...
+				for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 				{
-					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-					for(k3d::uint_t edge = first_edge; ;)
-					{
-						polyhedron->vertex_points[edge] = layer_vertex_points[segments][edge];
+					if(!extrusion_edges[edge])
+						continue;
 
-						edge = polyhedron->clockwise_edges[edge];
-						if(edge == first_edge)
-							break;
+					if(border_edges[edge])
+						continue;
+
+					const k3d::uint_t old_point = polyhedron->vertex_points[edge];
+					if(group_faces && layer_points[old_point])
+					{
+						vertex_point_map[edge] = *layer_points[old_point];
+						layer_vertex_points[segment + 1][edge] = *layer_points[old_point];
+						continue;
 					}
+
+					const k3d::uint_t new_point = points.size();
+
+					layer_points[old_point] = new_point;
+					vertex_point_map[edge] = new_point;
+					layer_vertex_points[segment + 1][edge] = new_point;
+
+					extrude_vertices.push_back(
+						extrude_vertex(
+							new_point,
+							points[old_point],
+							vertex_normals[edge],
+							k3d::vector3(0, 0, 0),
+							k3d::ratio(segment + 1, segments)));
+
+					points.push_back(k3d::point3());
+					point_selection.push_back(0);
+					point_attributes.push_back(polyhedron->vertex_points[edge]);
 				}
 			}
 
-			// For each (original) selected face, create bevel faces ...
+			// Remap vertices to newly-created points ...
+			for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
+				polyhedron->vertex_points[edge] = vertex_point_map[edge];
+
+			// For each extrusion edge, create bevel faces ...
 			for(k3d::int32_t segment = 0; segment != segments; ++segment)
 			{
-				for(k3d::uint_t face = face_begin; face != face_end; ++face)
+				for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
 				{
-					if(!polyhedron->face_selections[face])
+					if(!border_edges[edge])
 						continue;
 
-					const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-					const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-					for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-					{
-						const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-						for(k3d::uint_t edge = first_edge; ;)
-						{
-							// When grouping, skip interior edges ...
-							if(group_faces && !boundary_edges[edge] && polyhedron->face_selections[edge_faces[adjacent_edges[edge]]])
-							{
-							}
-							else
-							{
-								const k3d::uint_t new_first_edge = polyhedron->clockwise_edges.size();
+					const k3d::uint_t new_first_edge = polyhedron->clockwise_edges.size();
 
-								polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
-								polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
-								polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
-								polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() - 3);
+					polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+					polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+					polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+					polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() - 3);
 
-								polyhedron->edge_selections.push_back(0);
-								polyhedron->edge_selections.push_back(0);
-								polyhedron->edge_selections.push_back(0);
-								polyhedron->edge_selections.push_back(0);
+					polyhedron->edge_selections.push_back(0);
+					polyhedron->edge_selections.push_back(0);
+					polyhedron->edge_selections.push_back(0);
+					polyhedron->edge_selections.push_back(0);
 
-								edge_attributes.push_back(edge);
-								edge_attributes.push_back(edge);
-								edge_attributes.push_back(edge);
-								edge_attributes.push_back(edge);
+					edge_attributes.push_back(edge);
+					edge_attributes.push_back(edge);
+					edge_attributes.push_back(edge);
+					edge_attributes.push_back(edge);
 
-								polyhedron->vertex_points.push_back(layer_vertex_points[segment + 1][polyhedron->clockwise_edges[edge]]);
-								polyhedron->vertex_points.push_back(layer_vertex_points[segment + 1][edge]);
-								polyhedron->vertex_points.push_back(layer_vertex_points[segment][edge]);
-								polyhedron->vertex_points.push_back(layer_vertex_points[segment][polyhedron->clockwise_edges[edge]]);
+					polyhedron->vertex_points.push_back(layer_vertex_points[segment + 1][clockwise_border_edges[edge]]);
+					polyhedron->vertex_points.push_back(layer_vertex_points[segment + 1][edge]);
+					polyhedron->vertex_points.push_back(layer_vertex_points[segment][edge]);
+					polyhedron->vertex_points.push_back(layer_vertex_points[segment][clockwise_border_edges[edge]]);
 
-								vertex_attributes.push_back(polyhedron->clockwise_edges[edge]);
-								vertex_attributes.push_back(edge);
-								vertex_attributes.push_back(edge);
-								vertex_attributes.push_back(polyhedron->clockwise_edges[edge]);
+					vertex_attributes.push_back(clockwise_border_edges[edge]);
+					vertex_attributes.push_back(edge);
+					vertex_attributes.push_back(edge);
+					vertex_attributes.push_back(clockwise_border_edges[edge]);
 
-								polyhedron->vertex_selections.push_back(0);
-								polyhedron->vertex_selections.push_back(0);
-								polyhedron->vertex_selections.push_back(0);
-								polyhedron->vertex_selections.push_back(0);
+					polyhedron->vertex_selections.push_back(0);
+					polyhedron->vertex_selections.push_back(0);
+					polyhedron->vertex_selections.push_back(0);
+					polyhedron->vertex_selections.push_back(0);
 
-								polyhedron->face_shells.push_back(polyhedron->face_shells[face]);
-								polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
-								polyhedron->face_loop_counts.push_back(1);
-								polyhedron->face_selections.push_back(select_new_faces ? 1 : 0);
-								polyhedron->face_materials.push_back(polyhedron->face_materials[face]);
+					polyhedron->face_shells.push_back(polyhedron->face_shells[edge_faces[edge]]);
+					polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+					polyhedron->face_loop_counts.push_back(1);
+					polyhedron->face_selections.push_back(select_new_faces ? 1 : 0);
+					polyhedron->face_materials.push_back(polyhedron->face_materials[edge_faces[edge]]);
 
-								face_attributes.push_back(face);
+					face_attributes.push_back(edge_faces[edge]);
 
-								polyhedron->loop_first_edges.push_back(new_first_edge);
-							}
-
-							edge = polyhedron->clockwise_edges[edge];
-							if(edge == first_edge)
-								break;
-						}
-					}
+					polyhedron->loop_first_edges.push_back(new_first_edge);
 				}
 			}
 		}
@@ -383,6 +406,12 @@ private:
 			inset_direction(InsetDirection),
 			ratio(Ratio)
 		{
+		}
+
+		friend std::ostream& operator<<(std::ostream& Stream, const extrude_vertex& Value)
+		{
+			Stream << Value.point << " | " << Value.start << " | " << Value.extrude_direction << " | " << Value.inset_direction << " | " << Value.ratio;
+			return Stream;
 		}
 
 		k3d::uint_t point;
