@@ -310,7 +310,7 @@ object module_open_document(const k3d::filesystem::path& Path)
 	if(!document)
 		throw std::runtime_error("couldn't create empty document");
 
-	if(!importer->read_file(*document, Path))
+	if(!importer->read_file(Path, *document))
 		throw std::runtime_error("error loading document");
 
 	return wrap(document);

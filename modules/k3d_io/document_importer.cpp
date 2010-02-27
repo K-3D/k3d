@@ -35,6 +35,7 @@
 #include <k3dsdk/inode_collection.h>
 #include <k3dsdk/ipipeline_profiler.h>
 #include <k3dsdk/log.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/persistent_lookup.h>
 #include <k3dsdk/serialization_xml.h>
 #include <k3dsdk/string_modifiers.h>
@@ -63,18 +64,39 @@ class document_importer :
 	public k3d::idocument_importer
 {
 public:
-	k3d::bool_t read_file(k3d::idocument& Document, const k3d::filesystem::path& FilePath)
+	k3d::imetadata::metadata_t get_file_metadata(const k3d::filesystem::path& File)
 	{
-		k3d::log() << info << "Reading " << FilePath.native_console_string() << " using " << get_factory().name() << std::endl;
+		k3d::imetadata::metadata_t metadata;
+
+		try
+		{
+			k3d::xml::element xml("k3dml");
+			k3d::filesystem::igzstream stream(File);
+			k3d::xml::hide_progress progress;
+			k3d::xml::parse(xml, stream, File.native_utf8_string().raw(), progress);
+
+			metadata.insert(std::make_pair(k3d::metadata::key::version(), k3d::xml::attribute_text(xml, "version")));
+		}
+		catch(std::exception& e)
+		{
+			k3d::log() << error << e.what() << std::endl;
+		}
+
+		return metadata;
+	}
+
+	k3d::bool_t read_file(const k3d::filesystem::path& File, k3d::idocument& Document)
+	{
+		k3d::log() << info << "Reading " << File.native_console_string() << " using " << get_factory().name() << std::endl;
 
 //		sigc::connection connection = Document.pipeline_profiler().connect_node_execution_signal(sigc::ptr_fun(&node_execution));
 
 		k3d::xml::element xml("k3dml");
 		try
 		{
-			k3d::filesystem::igzstream stream(FilePath);
+			k3d::filesystem::igzstream stream(File);
 			k3d::xml::hide_progress progress;
-			k3d::xml::parse(xml, stream, FilePath.native_utf8_string().raw(), progress);
+			k3d::xml::parse(xml, stream, File.native_utf8_string().raw(), progress);
 		}
 		catch(std::exception& e)
 		{
@@ -85,16 +107,7 @@ public:
 		// Make sure it's a K3D document ...
 		return_val_if_fail(xml.name == "k3dml", false);
 
-		// Look for a document version ...
-		std::stringstream version(k3d::xml::attribute_text(xml, "version"));
-		unsigned long major_version = 0;
-		unsigned long minor_version = 0;
-		unsigned long revision = 0;
-		unsigned long build = 0;
-		char point;
-		version >> major_version >> point >> minor_version >> point >> revision >> point >> build;
-
-		const k3d::filesystem::path root_path = FilePath.branch_path();
+		const k3d::filesystem::path root_path = File.branch_path();
 		k3d::persistent_lookup persistent_lookup;
 		k3d::ipersistent::load_context context(root_path, persistent_lookup);
 

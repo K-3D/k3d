@@ -41,9 +41,14 @@ namespace python
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // idocument_importer
 
-static bool_t read_file(iunknown_wrapper& Self, idocument_wrapper& Document, const filesystem::path& Path)
+static void get_file_metadata(iunknown_wrapper& Self, const filesystem::path& Path)
 {
-	return Self.wrapped<k3d::idocument_importer>().read_file(Document.wrapped(), Path);
+	Self.wrapped<k3d::idocument_importer>().get_file_metadata(Path);
+}
+
+static bool_t read_file(iunknown_wrapper& Self, const filesystem::path& Path, idocument_wrapper& Document)
+{
+	return Self.wrapped<k3d::idocument_importer>().read_file(Path, Document.wrapped());
 }
 
 void define_methods_idocument_importer(iunknown& Interface, boost::python::object& Instance)

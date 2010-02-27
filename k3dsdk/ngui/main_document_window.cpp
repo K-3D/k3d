@@ -1299,7 +1299,7 @@ private:
 		k3d::idocument* const reverted_document = k3d::application().create_document();
 		return_if_fail(reverted_document);
 
-		if(!importer->read_file(*reverted_document, document_path))
+		if(!importer->read_file(document_path, *reverted_document))
 		{
 			error_message(_("Error reading document.  The document could not be reverted."));
 			return;
@@ -1420,7 +1420,7 @@ private:
 
 		// Make this an undoable operation ...
 		k3d::record_state_change_set change_set(document(), k3d::string_cast(boost::format(_("Import %1%")) % filepath.native_utf8_string().raw()), K3D_CHANGE_SET_CONTEXT);
-		if(!importer->read_file(document(), filepath))
+		if(!importer->read_file(filepath, document()))
 		{
 			error_message(
 				"Error importing file.  If you chose \"Automatic\" as the filter type,\n"

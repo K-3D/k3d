@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<k3dml package="k3d" version="0.7.12.0" host="Linux-2.6.31-14-generic;i686">
+<k3dml package="k3d" version="0.8.0.0" host="Linux-2.6.31-14-generic;i686">
 	<document>
 		<nodes>
 			<node name="Axes" factory="00000001 00000000 00000000 00000001" id="2">

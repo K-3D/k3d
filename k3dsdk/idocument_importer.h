@@ -2,7 +2,7 @@
 #define K3DSDK_IDOCUMENT_IMPORTER_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,6 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/imetadata.h>
 #include <k3dsdk/iunknown.h>
 
 namespace k3d
@@ -32,14 +33,17 @@ namespace k3d
 class idocument;
 namespace filesystem { class path; }
 
-/// Abstract interface for objects that can import data into a K-3D document
+/// Abstract interface for objects that can import data into an existing K-3D document
 class idocument_importer :
 	public virtual iunknown
 {
 public:
 	virtual ~idocument_importer() {}
 
-	virtual bool read_file(idocument& Document, const filesystem::path& File) = 0;
+	/// Return metadata extracted from the file.
+	virtual imetadata::metadata_t get_file_metadata(const filesystem::path& File) = 0;
+	/// Read the file data into a document.
+	virtual bool_t read_file(const filesystem::path& File, idocument& Document) = 0;
 
 protected:
 	idocument_importer() {}
