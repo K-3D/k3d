@@ -48,6 +48,10 @@ const string_t domain();
 /// A common key value will be k3d::metadata::value::selection(), to identify arrays that hold selection state.
 const string_t role();
 
+/// Metadata key "k3d:version" is used to store an arbitrary version string.  It is typically associated with
+/// serialized K-3D documents in native XML format.
+const string_t version();
+
 } // namespace key
 
 namespace value

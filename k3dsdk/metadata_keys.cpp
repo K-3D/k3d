@@ -52,6 +52,11 @@ const string_t role()
 	return "k3d:role";
 }
 
+const string_t version()
+{
+	return "k3d:version";
+}
+
 } // namespace key
 
 namespace value
