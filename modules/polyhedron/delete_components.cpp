@@ -116,7 +116,7 @@ public:
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x2d738b7a, 0x6f473349, 0x53a066ad, 0xa857f734),
-				"Delete",
+				"DeleteComponents",
 				"Deletes selected faces, edges and vertices",
 				"Polyhedron",
 				k3d::iplugin_factory::STABLE);

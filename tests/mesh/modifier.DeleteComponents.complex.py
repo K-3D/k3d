@@ -3,7 +3,7 @@
 import k3d
 import testing
 
-setup = testing.setup_mesh_modifier_test("K3DMeshReader", "Delete")
+setup = testing.setup_mesh_modifier_test("K3DMeshReader", "DeleteComponents")
 setup.source.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/polyhedron.hole.k3d")
 setup.source.center = False
 setup.source.scale_to_size = False
@@ -30,5 +30,5 @@ setup.modifier.mesh_selection = selection
 
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.Delete.complex", 1)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.DeleteComponents.complex", 1)
 

@@ -3,7 +3,7 @@
 import k3d
 import testing
 
-setup = testing.setup_mesh_modifier_test("PolyGrid", "Delete")
+setup = testing.setup_mesh_modifier_test("PolyGrid", "DeleteComponents")
 
 selection = k3d.geometry.selection.create(0)
 point_selection = k3d.geometry.point_selection.create(selection)
@@ -13,5 +13,5 @@ setup.modifier.mesh_selection = selection
 
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.Delete.point", 1)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.DeleteComponents.point", 1)
 

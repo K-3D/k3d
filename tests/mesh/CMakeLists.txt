@@ -696,25 +696,25 @@ K3D_TEST(mesh.modifier.DeformationExpression
 	REQUIRES K3D_BUILD_DEFORMATION_MODULE
 	LABELS mesh modifier DeformationExpression)
 
-K3D_TEST(mesh.modifier.Delete.point 
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.Delete.point.py
+K3D_TEST(mesh.modifier.DeleteComponents.point 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.DeleteComponents.point.py
 	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier DeleteComponents)
 
-K3D_TEST(mesh.modifier.Delete.edge 
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.Delete.edge.py
+K3D_TEST(mesh.modifier.DeleteComponents.edge 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.DeleteComponents.edge.py
 	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier DeleteComponents)
 
-K3D_TEST(mesh.modifier.Delete.face 
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.Delete.face.py
+K3D_TEST(mesh.modifier.DeleteComponents.face 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.DeleteComponents.face.py
 	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier DeleteComponents)
 
-K3D_TEST(mesh.modifier.Delete.complex 
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.Delete.complex.py
+K3D_TEST(mesh.modifier.DeleteComponents.complex 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.DeleteComponents.complex.py
 	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier DeleteComponents)
 
 K3D_TEST(mesh.modifier.EdgesToBlobby 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.EdgesToBlobby.py
