@@ -113,11 +113,9 @@ public:
 				const k3d::point3& p = curves_mesh.points->at(curves_prim->curve_points[i]);
 				trim_points.push_back(k3d::point2((p[0] - x_offset) * x_scale, (p[1] - y_offset) * y_scale));
 			}
-			k3d::mesh::points_t points;
+			curve_arrays input_curve(curves_mesh, *curves_prim, curve, true);
 			k3d::mesh::weights_t weights;
-			k3d::mesh::knots_t knots;
-			k3d::table point_attributes; // Unused for now
-			extract_curve_arrays(points, knots, weights, point_attributes, curves_mesh, *curves_prim, curve, true);
+			input_curve.weights(weights);
 			for(k3d::uint_t prim_idx = 0; prim_idx != Output.primitives.size(); ++prim_idx)
 			{
 				boost::scoped_ptr<k3d::nurbs_patch::primitive> patch_prim(k3d::nurbs_patch::validate(Output, Output.primitives[prim_idx]));
@@ -125,7 +123,7 @@ public:
 				{
 					for(k3d::uint_t patch = 0; patch != patch_prim->patch_first_points.size(); ++patch)
 					{
-						module::nurbs::add_trim_curve(*patch_prim, patch, trim_points, weights, knots, curves_prim->curve_orders[curve], u_offset, v_offset, u_scale, v_scale);
+						module::nurbs::add_trim_curve(*patch_prim, patch, trim_points, weights, input_curve.knots, input_curve.order, u_offset, v_offset, u_scale, v_scale);
 					}
 				}
 			}

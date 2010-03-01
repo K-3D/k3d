@@ -232,6 +232,9 @@ void curve_arrays::add_curve(k3d::mesh& Mesh, k3d::nurbs_curve::primitive& Primi
 	curve_attribute_copier.push_back(0);
 	parameter_attribute_copier.push_back(0);
 	parameter_attribute_copier.push_back(1);
+
+	// Ensure the selection array is correctly sized
+	Primitive.curve_selections.resize(Primitive.curve_first_points.size(), 0.0);
 }
 
 void curve_arrays::resize(const k3d::uint_t Size, const k3d::uint_t Order)
@@ -241,6 +244,96 @@ void curve_arrays::resize(const k3d::uint_t Size, const k3d::uint_t Order)
 	point_attributes.set_row_count(Size);
 	vertex_attributes.set_row_count(Size);
 	order = Order;
+}
+
+const curve_arrays::curve_value curve_arrays::evaluate(const k3d::double_t U) const
+{
+	curve_arrays tmp;
+	curve_copier tmp_copier(*this, tmp);
+	curve_value result;
+	const k3d::uint_t point_count = points.size();
+	if(U <= knots.front())
+	{
+		tmp_copier.push_back(0);
+	}
+	else if(U >= knots.back())
+	{
+		tmp_copier.push_back(point_count - 1);
+	}
+	else
+	{
+		k3d::mesh::knots_t bases;
+		basis_functions(bases, knots, order, U);
+		const k3d::uint_t knot_idx = std::find_if(knots.begin(), knots.end(), find_first_knot_after(U)) - knots.begin();
+		const k3d::uint_t first_point = knot_idx != knots.size() ? knot_idx - order : knot_idx - (2*order);
+		std::vector<k3d::uint_t> indices;
+		for(k3d::uint_t i = 0; i != order; ++i)
+		{
+			indices.push_back(first_point+i);
+		}
+		tmp_copier.push_back(order, &indices[0], &bases[0]);
+	}
+	result.point_attributes = tmp.point_attributes.clone_types();
+	result.vertex_attributes = tmp.vertex_attributes.clone_types();
+	k3d::table_copier point_attribute_copier(tmp.point_attributes, result.point_attributes);
+	k3d::table_copier vertex_attribute_copier(tmp.vertex_attributes, result.vertex_attributes);
+	// "unweight" attributes
+	const k3d::uint_t point_idx = 0;
+	const k3d::double_t weight = 1/result.weight();
+	point_attribute_copier.push_back(1, &point_idx, &weight);
+	vertex_attribute_copier.push_back(1, &point_idx, &weight);
+	result.weighted_position = tmp.points.back();
+	return result;
+}
+
+const k3d::vector3 curve_arrays::tangent(const k3d::double_t U, const k3d::double_t DeltaU) const
+{
+	const k3d::double_t u = U > (1.0 - DeltaU) ? U - DeltaU : U;
+  curve_value v1 = evaluate(u);
+  curve_value v2 = evaluate(u + DeltaU);
+	return k3d::normalize(v2.position() - v1.position());
+}
+
+void curve_arrays::points3(k3d::mesh::points_t& Points) const
+{
+	const k3d::uint_t point_count = points.size();
+	for(k3d::uint_t i = 0; i != point_count; ++i)
+	{
+		const k3d::point4& p = points[i];
+		const k3d::double_t w = p[3];
+		Points.push_back(k3d::point3(p[0]/w, p[1]/w, p[2]/w));
+	}
+}
+
+void curve_arrays::weights(k3d::mesh::weights_t& Weights) const
+{
+	const k3d::uint_t point_count = points.size();
+	for(k3d::uint_t i = 0; i != point_count; ++i)
+		Weights.push_back(points[i][3]);
+}
+
+void curve_arrays::append(const curve_arrays& Other)
+{
+	return_if_fail(Other.validate());
+	if(points.empty())
+	{
+		order = Other.order;
+	}
+	else
+	{
+		return_if_fail(order == Other.order);
+	}
+	const k3d::uint_t other_point_count = Other.points.size();
+	curve_copier copier(Other, *this);
+	for(k3d::uint_t i = (knots.empty() ? 0 : 1); i != other_point_count; ++i)
+		copier.push_back(i);
+	const k3d::uint_t knots_begin = knots.size() ? order : 0;
+	const k3d::uint_t knots_end = knots_begin + other_point_count + (knots.size() ? 0 : order);
+	k3d::double_t knot_offset = knots.size() ? knots.back() - Other.knots.front() : 0;
+	if(!knots.empty())
+		knots.pop_back();
+	for(k3d::uint_t knot = knots_begin; knot != knots_end; ++knot)
+		knots.push_back(Other.knots[knot] + knot_offset);
 }
 
 ////////////////////////
@@ -344,6 +437,7 @@ void copy_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves
 {
 	curve_arrays input_arrays(InputMesh, InputCurves, Curve);
 	input_arrays.add_curve(OutputMesh, OutputCurves);
+	OutputCurves.material = InputCurves.material;
 }
 
 void update_indices(k3d::mesh::indices_t& Indices, const k3d::uint_t Start, const k3d::int32_t Offset)
@@ -856,35 +950,6 @@ void connect_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCu
 	new_curve.add_curve(OutputMesh, OutputCurves);
 }
 
-/// Appends the given curve to the output arrays
-void append_curve(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, k3d::table& PointAttributes, k3d::mesh::knots_t& Knots, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve)
-{
-	if(Points.empty())
-	{
-		extract_curve_arrays(Points, Knots, Weights, PointAttributes, InputMesh, InputCurves, Curve, false);
-	}
-	else
-	{
-		k3d::table_copier point_attribute_copier(InputMesh.point_attributes, PointAttributes);
-		const k3d::uint_t points_begin = InputCurves.curve_first_points[Curve] + 1;
-		const k3d::uint_t points_end = points_begin - 1 + InputCurves.curve_point_counts[Curve];
-		for(k3d::uint_t point_idx = points_begin; point_idx != points_end; ++point_idx)
-		{
-			Points.push_back(InputMesh.points->at(InputCurves.curve_points[point_idx]));
-			Weights.push_back(InputCurves.curve_point_weights[point_idx]);
-			point_attribute_copier.push_back(InputCurves.curve_points[point_idx]);
-		}
-		const k3d::uint_t order = InputCurves.curve_orders[Curve];
-		const k3d::uint_t knots_begin = InputCurves.curve_first_knots[Curve];
-		const k3d::uint_t knots_end = knots_begin + order + InputCurves.curve_point_counts[Curve];
-		k3d::double_t knot_offset = Knots.back() - InputCurves.curve_knots[knots_begin];
-		const k3d::uint_t last_knot = Knots.size() - 1;
-		Knots.resize(Knots.size() + InputCurves.curve_point_counts[Curve] - 1);
-		for(k3d::uint_t knot = knots_begin + order, i = 0; knot != knots_end; ++knot, ++i)
-			Knots[last_knot + i] = InputCurves.curve_knots[knot] + knot_offset;
-	}
-}
-
 void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::uint_t InputCurvesPrimIdx)
 {
 	// make sure all curves are at the same order, and store them in a temporary mesh
@@ -970,10 +1035,7 @@ void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& 
 	{
 		if(added_curves[checked_curve])
 			continue;
-		k3d::mesh::points_t points;
-		k3d::mesh::weights_t weights;
-		k3d::table point_attributes = temp_mesh.point_attributes.clone_types();
-		k3d::mesh::knots_t knots;
+		curve_arrays merged_curve;
 
 		// Find the first curve in this sequence
 		k3d::uint_t first_curve;
@@ -991,7 +1053,8 @@ void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& 
 		// Now append all curves in the sequence to the merged curve
 		for(k3d::uint_t curve = first_curve; ;)
 		{
-			append_curve(points, weights, point_attributes, knots, temp_mesh, *const_temp_curves, curve);
+			curve_arrays tmp_curve(temp_mesh, *const_temp_curves, curve);
+			merged_curve.append(tmp_curve);
 			added_curves[curve] = true;
 
 			if(!connection_points[last_points[curve]])
@@ -1001,17 +1064,7 @@ void merge_connected_curves(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& 
 			if(curve == first_curve)
 				break;
 		}
-		curve_arrays new_curve;
-		for(k3d::uint_t i = 0; i != points.size(); ++i)
-		{
-			const k3d::point3& p = points[i];
-			const k3d::double_t w = weights[i];
-			new_curve.points.push_back(k3d::point4(p[0]*w, p[1]*w, p[2]*w, w));
-		}
-		new_curve.knots = knots;
-		new_curve.point_attributes = point_attributes;
-		new_curve.resize(points.size(), max_order);
-		new_curve.add_curve(OutputMesh, OutputCurves);
+		merged_curve.add_curve(OutputMesh, OutputCurves);
 		OutputCurves.curve_selections.back() = 1.0;
 	}
 	if(OutputCurves.material.empty())
@@ -1275,35 +1328,6 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 	add_curve(OutputMesh, NurbsCurves, Order, points);
 }
 
-const k3d::point4 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U)
-{
-	if(U <= Knots.front())
-	{
-		const k3d::point3& p = Points.front();
-		const k3d::double_t w = Weights.front();
-		return k3d::point4(p[0]*w, p[1]*w, p[2]*w, w);
-	}
-	if(U >= Knots.back())
-	{
-		const k3d::point3& p = Points.back();
-		const k3d::double_t w = Weights.back();
-		return k3d::point4(p[0]*w, p[1]*w, p[2]*w, w);
-	}
-	k3d::mesh::knots_t bases;
-	const k3d::uint_t order = Knots.size() - Points.size();
-	basis_functions(bases, Knots, order, U);
-	const k3d::uint_t knot_idx = std::find_if(Knots.begin(), Knots.end(), find_first_knot_after(U)) - Knots.begin();
-	const k3d::uint_t first_point = knot_idx != Knots.size() ? knot_idx - order : knot_idx - (2*order);
-	k3d::point4 result(0,0,0,0);
-	for(k3d::uint_t i = 0; i != order; ++i)
-	{
-		const k3d::double_t w = Weights[first_point+i];
-		const k3d::point3& pt = Points[first_point+i];
-		result += k3d::to_vector(bases[i]*k3d::point4(pt[0]*w, pt[1]*w, pt[2]*w, w));
-	}
-	return result;
-}
-
 void evaluate_attribute(k3d::table& PointAttributes, const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U)
 {
 	k3d::table_copier point_attribute_copier(PointAttributes);
@@ -1336,14 +1360,7 @@ void evaluate_attribute(k3d::table& PointAttributes, const k3d::mesh::points_t& 
 
 const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU)
 {
-	const k3d::double_t u = U > (1.0 - DeltaU) ? U - DeltaU : U;
-	k3d::point4 p = evaluate_position(Points, Weights, Knots, u);
-	k3d::double_t w = p[3];
-	const k3d::point3 u_point(p[0]/w,p[1]/w,p[2]/w);
-	p = evaluate_position(Points, Weights, Knots, u + DeltaU);;
-	w = p[3];
-	const k3d::point3 du_point(p[0]/w,p[1]/w,p[2]/w);
-	return k3d::normalize(du_point - u_point);
+
 }
 
 void basis_functions(k3d::mesh::knots_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U)
@@ -1537,18 +1554,9 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 
 void polygonize(k3d::mesh& OutputMesh, k3d::linear_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t Curve, const k3d::uint_t Samples)
 {
-	k3d::mesh::points_t nurbs_points;
-	k3d::mesh::weights_t weights;
-	k3d::mesh::knots_t knots;
-	k3d::table point_attributes;
-	extract_curve_arrays(nurbs_points, knots, weights, point_attributes, InputMesh, InputCurves, Curve, true);
-	k3d::mesh::knots_t unique_knots;
-	for(k3d::uint_t i = 0; i < knots.size();)
-	{
-		const k3d::double_t u = knots[i];
-		unique_knots.push_back(u);
-		i += multiplicity(knots, u, i, knots.size());
-	}
+	curve_arrays curve(InputMesh, InputCurves, Curve, true);
+	k3d::mesh::knots_t sample_u_vals;
+	sample(sample_u_vals, curve.knots, Samples);
 
 	OutputCurve.periodic.push_back(false);
 	OutputCurve.material = InputCurves.material;
@@ -1556,22 +1564,24 @@ void polygonize(k3d::mesh& OutputMesh, k3d::linear_curve::primitive& OutputCurve
 	OutputCurve.curve_point_counts.push_back(0);
 	OutputCurve.curve_selections.push_back(InputCurves.curve_selections[Curve]);
 
+	if(OutputMesh.point_attributes.empty())
+		OutputMesh.point_attributes = curve.point_attributes.clone_types();
+	if(OutputCurve.vertex_attributes.empty())
+		OutputCurve.vertex_attributes = curve.vertex_attributes.clone_types();
+
 	k3d::mesh::points_t& points = OutputMesh.points.writable();
-	OutputCurve.curve_points.push_back(points.size());
-	OutputCurve.curve_point_counts.back()++;
-	points.push_back(nurbs_points.front());
-	const k3d::uint_t unique_knots_end = unique_knots.size() - 1;
-	for(k3d::uint_t i = 0; i != unique_knots_end; ++i)
+	const k3d::uint_t samples_end = sample_u_vals.size();
+	for(k3d::uint_t i = 0; i != samples_end; ++i)
 	{
-		const k3d::double_t start_u = unique_knots[i];
-		const k3d::double_t step = (unique_knots[i+1] - start_u) / static_cast<k3d::double_t>(Samples + 1);
-		for(k3d::uint_t sample = 1; sample <= (Samples+1); ++sample)
-		{
-			const k3d::double_t u = start_u + static_cast<k3d::double_t>(sample) * step;
-			OutputCurve.curve_points.push_back(points.size());
-			OutputCurve.curve_point_counts.back()++;
-			points.push_back(dehomogenize(evaluate_position(nurbs_points, weights, knots, u)));
-		}
+		curve_arrays::curve_value val = curve.evaluate(sample_u_vals[i]);
+		OutputCurve.curve_points.push_back(points.size());
+		OutputCurve.curve_point_counts.back()++;
+		points.push_back(val.position());
+
+		k3d::table_copier point_copier(val.point_attributes, OutputMesh.point_attributes);
+		point_copier.push_back(0);
+		k3d::table_copier vertex_copier(val.vertex_attributes, OutputCurve.vertex_attributes);
+		vertex_copier.push_back(0);
 	}
 	OutputMesh.point_selection.writable().resize(points.size(), 1.0);
 }

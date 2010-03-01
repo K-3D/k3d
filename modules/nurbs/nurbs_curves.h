@@ -61,6 +61,26 @@ struct curve_arrays
 	k3d::table vertex_attributes;
 	k3d::uint_t order;
 
+	/// Encapsulates the complete evaluation of position, weight and attributes for a certain parameter value
+	struct curve_value
+	{
+		/// Homogeneous position
+		k3d::point4 weighted_position;
+		k3d::table point_attributes;
+		k3d::table vertex_attributes;
+
+		inline const k3d::double_t weight() const
+		{
+			return weighted_position[3];
+		}
+
+		inline const k3d::point3 position() const
+		{
+			const k3d::double_t w = weight();
+			return k3d::point3(weighted_position[0]/w, weighted_position[1]/w, weighted_position[2]/w);
+		}
+	};
+
 	curve_arrays() {}
 
 	/// Sets up arrays with the given number of control points and order, leaving the knot vector empty
@@ -77,6 +97,21 @@ struct curve_arrays
 
 	/// Resize all arrays, ensuring knot length = Size+Order
 	void resize(const k3d::uint_t Size, const k3d::uint_t Order);
+
+	/// Evaluate the curve at parameter value U
+	const curve_value evaluate(const k3d::double_t U) const;
+
+	/// Normalized tangent at the given parameter value
+	const k3d::vector3 tangent(const k3d::double_t U, const k3d::double_t DeltaU = 0.00001) const;
+
+	/// 3D point coordinates
+	void points3(k3d::mesh::points_t& Points) const;
+
+	/// Extract the weights
+	void weights(k3d::mesh::weights_t& Weights) const;
+
+	/// Append another curve
+	void append(const curve_arrays& Other);
 };
 
 /// Copy structure and attributes between curves
@@ -167,9 +202,6 @@ void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
  */
 const k3d::uint_t multiplicity(const k3d::mesh::knots_t& Knots, const k3d::double_t u, const k3d::uint_t Begin, const k3d::uint_t Count);
 
-/// Extracts the points, knots and weights arrays from the given curve in the given mesh and curve primitive
-void extract_curve_arrays(k3d::mesh::points_t& Points, k3d::mesh::knots_t& Knots, k3d::mesh::weights_t& Weights, k3d::table& PointAttributes, const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t Curve, const k3d::bool_t NormalizeKnots = false);
-
 /// Appends new knots found in the given curve to the given output knot vector.
 void append_common_knot_vector(k3d::mesh::knots_t& CommonKnotVector, const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
 
@@ -184,15 +216,6 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 
 /// True if the given curve is closed
 k3d::bool_t is_closed(const k3d::nurbs_curve::const_primitive& NurbsCurves, const k3d::uint_t Curve);
-
-/// Evaluate the postion (x*weight, y*weight, z*weight, weight) using the given curve arrays
-const k3d::point4 evaluate_position(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U);
-
-/// Evaluate the value of an attribute at the given parameter value, appending it to the end of the table
-void evaluate_attribute(k3d::table& PointAttributes, const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U);
-
-/// Get the normalized tangent vector at the given location on the curve
-const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU = 0.00001);
 
 /// Calculate the non-zero values of the B-spline basis functions at the given parameter value
 void basis_functions(k3d::mesh::knots_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U);

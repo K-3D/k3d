@@ -32,6 +32,8 @@
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
+#include <k3dsdk/table.h>
+#include <k3dsdk/table_copier.h>
 
 #include <boost/scoped_ptr.hpp>
 #include <stdexcept>
@@ -42,32 +44,96 @@ namespace module
 namespace nurbs
 {
 
+// forward declarations
+class curve_arrays;
+
+/// Encapsulates the control point positions, weights and attributes for a single patch
+struct patch_point_data
+{
+	patch_point_data() {}
+	patch_point_data(const k3d::mesh& Mesh, const k3d::nurbs_patch::const_primitive& Primitive, const k3d::uint_t Patch);
+	patch_point_data(const k3d::uint_t Size);
+	const k3d::bool_t validate() const;
+
+	k3d::mesh::points_t points;
+	k3d::mesh::weights_t weights;
+	k3d::table point_attributes;
+	k3d::table vertex_attributes;
+};
+
+/// Copy structure and attributes between patch point data structures
+/**
+ * Convenient copying class that treats points, weights point attributes and vertex attributes in one go.
+ */
+class point_data_copier
+{
+public:
+	point_data_copier(const patch_point_data& Source, patch_point_data& Destination);
+	/// Appends the given index value from each source array to each corresponding target array.
+	void push_back(const k3d::uint_t Index);
+	/// Computes a weighted sum of N values from each source array and appends the result to the corresponding target array.
+	void push_back(const k3d::uint_t Count, const k3d::uint_t* Indices, const k3d::double_t* Weights);
+	/// Copies the given source index value from each source array to the TargetIndex in each corresponding target array.
+	void copy(const k3d::uint_t SourceIndex, const k3d::uint_t TargetIndex);
+	/// Computes a weighted sum of N values from each source array and copies the result to the corresponding target array at the given TargetIndex.
+	void copy(const k3d::uint_t Count, const k3d::uint_t* Indices, const k3d::double_t* Weights, const k3d::uint_t TargetIndex);
+private:
+	const patch_point_data& m_source;
+	patch_point_data& m_destination;
+	boost::scoped_ptr<k3d::table_copier> m_point_attribute_copier;
+	boost::scoped_ptr<k3d::table_copier> m_vertex_attribute_copier;
+};
+
+/// Copy from curve data to patch data
+class curve_point_data_copier
+{
+public:
+	curve_point_data_copier(const curve_arrays& Source, patch_point_data& Destination);
+	/// Appends the given index value from each source array to each corresponding target array.
+	void push_back(const k3d::uint_t Index);
+	/// Computes a weighted sum of N values from each source array and appends the result to the corresponding target array.
+	void push_back(const k3d::uint_t Count, const k3d::uint_t* Indices, const k3d::double_t* Weights);
+	/// Copies the given source index value from each source array to the TargetIndex in each corresponding target array.
+	void copy(const k3d::uint_t SourceIndex, const k3d::uint_t TargetIndex);
+	/// Computes a weighted sum of N values from each source array and copies the result to the corresponding target array at the given TargetIndex.
+	void copy(const k3d::uint_t Count, const k3d::uint_t* Indices, const k3d::double_t* Weights, const k3d::uint_t TargetIndex);
+private:
+	const curve_arrays& m_source;
+	patch_point_data& m_destination;
+	boost::scoped_ptr<k3d::table_copier> m_point_attribute_copier;
+	boost::scoped_ptr<k3d::table_copier> m_vertex_attribute_copier;
+};
+
+/// Extract and store patch and parameter attributes for a single patch
+struct patch_attribute_tables
+{
+	patch_attribute_tables(const k3d::nurbs_patch::const_primitive& Primitive, const k3d::uint_t Patch);
+	k3d::table patch_attributes;
+	k3d::table parameter_attributes;
+};
+
 /// Adds a patch with the given points, weights and knots
 void add_patch(k3d::mesh& Mesh,
 		k3d::nurbs_patch::primitive& NurbsPatches,
-		const k3d::mesh::points_t& ControlPoints,
-		const k3d::mesh::weights_t& Weights,
+		const patch_point_data& PointData,
 		const k3d::mesh::knots_t& UKnots,
 		const k3d::mesh::knots_t& VKnots,
 		const k3d::uint_t UOrder,
-		const k3d::uint_t VOrder);
+		const k3d::uint_t VOrder,
+		const k3d::table& PatchAttributes = k3d::table(),
+		const k3d::table& ParameterAttributes = k3d::table());
 
 /// Copies a patch from one primitive to another
-void add_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch);
+void copy_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch);
 
 void add_trim_curve(k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_t Patch, const k3d::mesh::points_2d_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t UOffset = 0, const k3d::double_t VOffset = 0, const k3d::double_t UScale = 1, const k3d::double_t VScale = 1);
 
 /// Creates a bilinear patch between the given corner points (in counter-clockwise order)
 void create_bilinear_patch(k3d::mesh& OutputMesh,
 		k3d::nurbs_patch::primitive& OutputPatches,
-		const k3d::point3& P1,
-		const k3d::point3& P2,
-		const k3d::point3& P3,
-		const k3d::point3& P4,
-		const k3d::double_t W1 = 1.0,
-		const k3d::double_t W2 = 1.0,
-		const k3d::double_t W3 = 1.0,
-		const k3d::double_t W4 = 1.0);
+		const patch_point_data& PointData,
+		const k3d::table& PatchAttributes,
+		const k3d::table& ParameterAttributes);
 
 /// Traverse each selected curve in SourceCurves along each selected curve in CurvesToTraverse
 void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTraverse, k3d::mesh& OutputMesh);
