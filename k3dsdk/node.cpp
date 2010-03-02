@@ -22,8 +22,10 @@
 */
 
 #include <k3d-i18n-config.h>
+#include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/properties.h>
 
 #include <algorithm>
 #include <iostream>
@@ -150,6 +152,62 @@ const std::vector<inode*> node::lookup(idocument& Document, const string_t& Meta
 	}
 	
 	return result;
+}
+
+void node::show(idocument& Document, inode& Node)
+{
+	show(Document, std::vector<inode*>(1, &Node));
+}
+
+void node::show(idocument& Document, const std::vector<inode*>& Nodes)
+{
+	const std::vector<inode_collection_sink*> sinks = lookup<inode_collection_sink>(Document);
+	for(uint_t i = 0; i != sinks.size(); ++i)
+	{
+		const inode_collection_sink::properties_t properties = sinks[i]->node_collection_properties();
+		for(inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+		{
+			if(inode_collection_property* const node_collection_property = dynamic_cast<inode_collection_property*>(*property))
+			{
+				inode_collection_property::nodes_t nodes = property::internal_value<inode_collection_property::nodes_t>(**property);
+				for(uint_t i = 0; i != Nodes.size(); ++i)
+				{
+					if(node_collection_property->property_allow(*Nodes[i]))
+					{
+						nodes.erase(std::remove(nodes.begin(), nodes.end(), Nodes[i]), nodes.end());
+						nodes.push_back(Nodes[i]);
+					}
+				}
+				property::set_internal_value(**property, nodes);
+			}
+		}
+	}
+}
+
+void node::hide(idocument& Document, inode& Node)
+{
+	hide(Document, std::vector<inode*>(1, &Node));
+}
+
+void node::hide(idocument& Document, const std::vector<inode*>& Nodes)
+{
+	const std::vector<inode_collection_sink*> sinks = lookup<inode_collection_sink>(Document);
+	for(uint_t i = 0; i != sinks.size(); ++i)
+	{
+		const inode_collection_sink::properties_t properties = sinks[i]->node_collection_properties();
+		for(inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+		{
+			if(inode_collection_property* const node_collection_property = dynamic_cast<inode_collection_property*>(*property))
+			{
+				inode_collection_property::nodes_t nodes = property::internal_value<inode_collection_property::nodes_t>(**property);
+				for(uint_t i = 0; i != Nodes.size(); ++i)
+				{
+					nodes.erase(std::remove(nodes.begin(), nodes.end(), Nodes[i]), nodes.end());
+				}
+				property::set_internal_value(**property, nodes);
+			}
+		}
+	}
 }
 
 } // namespace k3d

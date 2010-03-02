@@ -120,6 +120,15 @@ public:
 		return result;
 	}
 
+	/// Makes a node visible (adds it to visibility properties for all node collection sinks)
+	static void show(idocument& Document, inode& Node);
+	/// Makes a collection of nodes visible (adds them to visibility properties for all node collection sinks)
+	static void show(idocument& Document, const std::vector<inode*>& Node);
+	/// Makes a node invisible (removes it from visibility properties for all node collection sinks)
+	static void hide(idocument& Document, inode& Node);
+	/// Makes a collection of nodes invisible (removes them from visibility properties for all node collection sinks)
+	static void hide(idocument& Document, const std::vector<inode*>& Node);
+
 private:
 	void on_deleted();
 

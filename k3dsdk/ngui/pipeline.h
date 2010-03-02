@@ -43,9 +43,6 @@ namespace pipeline
 /// Creates a new node, performing many standard initialization operations.
 inode* create_node(idocument& Document, iplugin_factory& Factory);
 
-/// Makes a set of new nodes visible, adding them to all current render engines.
-void show_nodes(idocument& Document, const std::vector<inode*>& Nodes);
-
 /// Duplicates first node's transformation into a FrozenMatrixa and connects it to second node
 void freeze_transformation(inode& FromNode, inode& ToNode, idocument& Document);
 /// Instantiates the given node, returning the mesh instance if it was a mesh or null otherwise

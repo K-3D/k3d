@@ -64,6 +64,16 @@ public:
 	{
 		return wrap_nodes(k3d::node::lookup(Document.wrapped(), MetadataName, MetadataValue));
 	}
+
+	static void show_one(idocument_wrapper& Document, iunknown_wrapper& Node)
+	{
+		k3d::node::show(Document.wrapped(), Node.wrapped<inode>());
+	}
+
+	static void hide_one(idocument_wrapper& Document, iunknown_wrapper& Node)
+	{
+		k3d::node::hide(Document.wrapped(), Node.wrapped<inode>());
+	}
 };
 
 void define_namespace_node()
@@ -77,7 +87,20 @@ void define_namespace_node()
 			"Returns the set of nodes in a document that match the given node name.")
 		.def("lookup", node::lookup_by_metadata,
 			"Returns the set of nodes in a document that match the given metadata name and value.")
-		.staticmethod("lookup");
+		.staticmethod("lookup")
+
+		.def("show", node::show_one,
+			"Returns the set of all nodes in the given document.")
+//		.def("show", node::show_many,
+//			"Returns the set of nodes in a document that match a specific factory ID.")
+		.staticmethod("show")
+
+		.def("hide", node::hide_one,
+			"Returns the set of nodes in a document that match the given node name.")
+//		.def("hide", node::hide_many,
+//			"Returns the set of nodes in a document that match the given metadata name and value.")
+		.staticmethod("hide")
+		;
 }
 
 } // namespace python
