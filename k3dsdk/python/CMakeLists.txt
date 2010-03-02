@@ -146,6 +146,8 @@ ADD_LIBRARY(k3dsdk-python-b SHARED
 	named_arrays_python.h
 	named_tables_python.cpp
 	named_tables_python.h
+	node_python.cpp
+	node_python.h
 	parallel_python.cpp
 	plugin_python.cpp
 	plugin_python.h

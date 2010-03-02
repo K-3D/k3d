@@ -59,6 +59,7 @@
 #include <k3dsdk/python/mime_python.h>
 #include <k3dsdk/python/named_arrays_python.h>
 #include <k3dsdk/python/named_tables_python.h>
+#include <k3dsdk/python/node_python.h>
 #include <k3dsdk/python/normal3_python.h>
 #include <k3dsdk/python/nurbs_curve_python.h>
 #include <k3dsdk/python/nurbs_patch_python.h>
@@ -409,6 +410,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_linear_curve();
 	define_namespace_log();
 	define_namespace_mime();
+	define_namespace_node();
 	define_namespace_nurbs_curve();
 	define_namespace_nurbs_patch();
 	define_namespace_paraboloid();
