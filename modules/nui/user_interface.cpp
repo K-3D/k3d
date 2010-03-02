@@ -80,14 +80,17 @@ public:
 
 	void message(const k3d::string_t& Message)
 	{
+		std::cout << "MESSAGE: " << Message << std::endl;
 	}
 
 	void warning_message(const k3d::string_t& Message)
 	{
+		std::cout << "WARNING: " << Message << std::endl;
 	}
 
 	void error_message(const k3d::string_t& Message)
 	{
+		std::cout << "ERROR: " << Message << std::endl;
 	}
 
 	k3d::uint_t query_message(const k3d::string_t& Message, const k3d::uint_t DefaultOption, const std::vector<k3d::string_t>& Options)
@@ -97,11 +100,6 @@ public:
 
 	void nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
 	{
-	}
-
-	k3d::bool_t tutorial_message(const k3d::string_t& Message)
-	{
-		return false;
 	}
 
 	k3d::bool_t get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)

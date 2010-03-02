@@ -485,11 +485,6 @@ public:
 		k3d::ngui::nag_message(Type, Message, SecondaryMessage);
 	}
 
-	k3d::bool_t tutorial_message(const k3d::string_t& Message)
-	{
-		return false;
-	}
-
 	k3d::bool_t get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
 	{
 		file_chooser_dialog dialog(Prompt, Type, Mode);
@@ -526,9 +521,6 @@ public:
 
 	k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 	{
-		if(Command == "tutorial_message")
-			return tutorial_message(Arguments) ? RESULT_CONTINUE : RESULT_STOP;
-
 		return base::execute_command(Command, Arguments);
 	}
 

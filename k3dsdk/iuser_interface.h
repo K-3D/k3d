@@ -63,13 +63,6 @@ public:
 	virtual void nag_message(const string_t& Type, const ustring& Message, const ustring& SecondaryMessage = ustring()) = 0;
 
 	/**
-		\brief Displays a message (for tutorial purposes) in a dialog box
-		\param Message the text to display in the dialog box
-		\return true iff the user wants to continue the tutorial, false to quit
-	*/
-	virtual bool_t tutorial_message(const string_t& Message) = 0;
-
-	/**
 		\brief Prompts the user for a filepath, checking for old choices, and storing the current choice for reuse
 		\param Prompt message to display in the file selection dialog
 		\param OldPath initial file path to display in the file selection dialog
