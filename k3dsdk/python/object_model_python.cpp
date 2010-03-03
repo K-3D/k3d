@@ -74,6 +74,7 @@
 #include <k3dsdk/python/polyhedron_python.h>
 #include <k3dsdk/python/resource_python.h>
 #include <k3dsdk/python/ri_python.h>
+#include <k3dsdk/python/script_python.h>
 #include <k3dsdk/python/selection_python.h>
 #include <k3dsdk/python/sphere_python.h>
 #include <k3dsdk/python/teapot_python.h>
@@ -155,37 +156,6 @@ void module_check_node_environment(const dict& Locals, const string_t& PluginTyp
 
 	k3d::user_interface().error_message(k3d::string_cast(boost::format("This script can only be used from within a %1% plugin.") % PluginType));
 	throw std::runtime_error("script can only be run from " + PluginType);
-}
-
-void module_execute_script_context(const string_t& Script, const dict& PythonContext)
-{
-	k3d::iscript_engine::context_t context;
-
-	dict python_context = PythonContext;
-	while(len(python_context))
-	{
-		tuple python_item = python_context.popitem();
-		object python_key = python_item[0];
-		object python_value = python_item[1];
-
-		const string_t key = PyString_AsString(python_key.ptr());
-		boost::any value = python_to_any(python_value);
-
-		context.insert(std::make_pair(key, value));
-	}
-
-	bool recognized = false;
-	bool executed = false;
-	k3d::script::execute(k3d::script::code(Script), "Python Text", context, recognized, executed);
-	if(!recognized)
-		throw std::invalid_argument("Unrecognized scripting language");
-	if(!executed)
-		throw std::runtime_error("Error executing script");
-}
-
-void module_execute_script(const string_t& Script)
-{
-	module_execute_script_context(Script, dict());
 }
 
 const double module_length(const object& Value)
@@ -420,6 +390,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_polyhedron();
 	define_namespace_resource();
 	define_namespace_ri();
+	define_namespace_script();
 	define_namespace_selection();
 	define_namespace_sphere();
 	define_namespace_teapot();
@@ -442,10 +413,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns the difference between two meshes using fuzzy-comparisons for floating-point types.");
 	def("documents", module_documents,
 		"Returns a list containing all open documents.");
-	def("execute_script", module_execute_script,
-		"Executes a script (which does not have to be written in Python).");
-	def("execute_script", module_execute_script_context,
-		"Executes a script (which does not have to be written in Python).");
 	def("exit", module_exit,
 		"Request program exit (may be overridden by user input).");
 	def("get_command_node", module_get_command_node,

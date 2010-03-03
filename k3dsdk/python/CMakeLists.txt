@@ -211,6 +211,8 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	file_signal_python.h
 	object_model_python.cpp
 	object_model_python.h
+	script_python.cpp
+	script_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python)
 TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-primitives)
