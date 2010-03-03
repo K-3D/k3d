@@ -180,8 +180,7 @@ class user_interface :
 
 public:
 	user_interface() :
-		m_show_learning_menu(options::nag("show_learning_menu")),
-		m_record_tutorials(false)
+		m_show_learning_menu(options::nag("show_learning_menu"))
 	{
 		k3d::command_tree().add(*this, "ui", 0);
 
@@ -250,9 +249,7 @@ public:
 			("no-custom-layouts", "Disable custom user interface layouts (useful when playing-back recorded tutorials).")
 			("no-splash", "Disables the startup splash screen.")
 			("open,o", boost::program_options::value<k3d::string_t>(), "Open an existing document.")
-			("record-tutorials", "Immediately opens the tutorial recorder following startup.")
-			("show-tutorials", "Immediately opens the tutorial menu following startup.")
-			("tutorials", boost::program_options::value<k3d::string_t>(), "Overrides the path for loading interactive tutorials.")
+			("show-learning-menu", "Display the learning menu after startup.")
 			;
 	}
 
@@ -333,23 +330,9 @@ public:
 			{
 				show_splash = false;
 			}
-			else if(argument->string_key == "tutorials")
-			{
-				if(argument->value.size() != 1 || argument->value[0].empty())
-				{
-					detail::handle_error("You must supply a single directory path with the --tutorials argument!", Quit, Error);
-					return arguments_t();
-				}
-
-				m_tutorials_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(argument->value[0]));
-			}
-			else if(argument->string_key == "show-tutorials")
+			else if(argument->string_key == "show-learning-menu")
 			{
 				m_show_learning_menu = true;
-			}
-			else if(argument->string_key == "record-tutorials")
-			{
-				m_record_tutorials = true;
 			}
 			else
 			{
@@ -396,13 +379,6 @@ public:
 			Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUILearningDialog");
 			if(!window)
 				k3d::log() << error << "Error creating learning dialog at startup" << std::endl;
-		}
-
-		if(m_record_tutorials)
-		{
-			Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUITutorialRecorderDialog");
-			if(!window)
-				k3d::log() << error << "Error creating tutorial recorder dialog at startup" << std::endl;
 		}
 
 		create_auto_start_plugins();
@@ -600,10 +576,6 @@ private:
 	
 	/// Set to true iff we should display the tutorial menu at startup
 	k3d::bool_t m_show_learning_menu;
-	/// Set to true iff we should begin recording a tutorial immediately at startup
-	k3d::bool_t m_record_tutorials;
-	/// Stores the path where tutorials should be displayed
-	k3d::filesystem::path m_tutorials_path;
 	/// Stores the main loop
 	std::auto_ptr<Gtk::Main> m_main;
 	/// Stores the (optional) splash screen
