@@ -53,7 +53,7 @@ patch_point_data::patch_point_data(const k3d::mesh& Mesh, const k3d::nurbs_patch
 	{
 		points.push_back(Mesh.points->at(Primitive.patch_points[point_idx]));
 		point_attribute_copier.push_back(Primitive.patch_points[point_idx]);
-		weights.push_back(point_idx);
+		weights.push_back(Primitive.patch_point_weights[point_idx]);
 	}
 }
 
@@ -513,12 +513,12 @@ void extract_patch_curve_by_number(k3d::mesh& OutputMesh, k3d::nurbs_curve::prim
 	const k3d::mesh::knots_t& other_knots = UDirection ? InputPatches.patch_v_knots : InputPatches.patch_u_knots;
 	const k3d::uint_t other_order = UDirection ? InputPatches.patch_v_orders[Patch] : InputPatches.patch_u_orders[Patch];
 	const k3d::uint_t other_knots_begin = UDirection ? InputPatches.patch_v_first_knots[Patch] : InputPatches.patch_u_first_knots[Patch];
-	const k3d::double_t u = other_knots[other_order-1 + Curve];
+	const k3d::double_t u = (other_knots[other_order-1 + Curve] - other_knots.front()) / (other_knots.back() - other_knots.front());
 	const k3d::double_t weights[] = {1.0-u, u};
 	output_curve.parameter_attributes = InputPatches.parameter_attributes.clone_types();
 	k3d::table_copier param_copier(InputPatches.parameter_attributes, output_curve.parameter_attributes);
-	param_copier.push_back(1, start_indices, weights);
-	param_copier.push_back(1, end_indices, weights);
+	param_copier.push_back(2, start_indices, weights);
+	param_copier.push_back(2, end_indices, weights);
 
 	output_curve.curve_attributes = InputPatches.patch_attributes.clone(Patch, Patch+1);
 
