@@ -41,10 +41,11 @@ FUNCTION(K3D_TEST TEST_NAME)
 			--plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins
 			--share=${k3d_SOURCE_DIR}/share
 			${TEST_UI}
-			--script-file=${TEST_K3D_PYTHON_SCRIPT}
 			--setenv "PYTHONPATH=${tests_SOURCE_DIR}"
 			--setenv "K3D_TEST_SOURCE_PATH=${tests_SOURCE_DIR}"
 			--setenv "K3D_TEST_BINARY_PATH=${tests_BINARY_DIR}"
+			${TEST_ARGUMENTS}
+			--script-file=${TEST_K3D_PYTHON_SCRIPT}
 			--exit
 			)
 	ELSE()
