@@ -203,23 +203,48 @@ const object any_to_python(const boost::any& Value)
 	throw std::invalid_argument("can't convert unrecognized type [" + demangle(type) + "] to boost::python::object");
 }
 
+#define safe_extract(type, value) { extract<type> extractor(value); if(extractor.check()) return extractor(); }
+
 const boost::any python_to_any(const object& Value)
 {
 	PyObject* const value = Value.ptr();
+
+	if(PyBool_Check(value))
+		return extract<bool_t>(Value)();
+
+	if(PyInt_Check(value))
+		return extract<int32_t>(Value)();
+
+	if(PyFloat_Check(value))
+		return extract<double_t>(Value)();
+
+	if(PyString_Check(value))
+		return extract<string_t>(Value)();
+
+	safe_extract(k3d::filesystem::path, Value);
+	safe_extract(k3d::angle_axis, Value);
+	safe_extract(k3d::color, Value);
+	safe_extract(k3d::point2, Value);
+	safe_extract(k3d::point3, Value);
+	safe_extract(k3d::normal3, Value);
+	safe_extract(k3d::texture3, Value);
+	safe_extract(k3d::vector3, Value);
+	safe_extract(k3d::point4, Value);
+	safe_extract(k3d::matrix4, Value);
+	safe_extract(k3d::euler_angles, Value);
+	safe_extract(k3d::selection::set, Value);
+	safe_extract(k3d::bounding_box3, Value);
+
 	{
 		extract<idocument_wrapper> value(Value);
 		if(value.check())
-		{
 			return boost::any(value().wrapped_ptr());
-		}
 	}
 
 	{
 		extract<iunknown_wrapper> value(Value);
 		if(value.check())
-		{
 			return boost::any(value().wrapped_ptr());
-		}
 	}
 
 	throw std::invalid_argument("can't convert unrecognized python value");

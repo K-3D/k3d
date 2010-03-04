@@ -109,6 +109,8 @@
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_interface.h>
 
+#include <boost/algorithm/string.hpp>
+
 #include <boost/python.hpp>
 using namespace boost::python;
 
@@ -492,25 +494,52 @@ void set_context(const k3d::iscript_engine::context_t& Context, dict& Dictionary
 
 void get_context(dict& Dictionary, k3d::iscript_engine::context_t& Context)
 {
-	for(k3d::iscript_engine::context_t::iterator context = Context.begin(); context != Context.end(); ++context)
-	{
-		const std::type_info& type = context->second.type();
+		k3d::iscript_engine::context_t output_context;
 
-		if(type == typeid(k3d::idocument*))
-			continue;
-		else if(type == typeid(k3d::inode*))
-			continue;
-		else if(type == typeid(k3d::mesh*))
-			continue;
-		else if(type == typeid(const k3d::mesh* const))
-			continue;
-		else if(type == typeid(const k3d::ri::render_state*))
-			continue;
-		else
+		boost::python::list keys = Dictionary.keys();
+		for(int i = 0; i != len(keys); ++i)
 		{
-			context->second = python_to_any(Dictionary[context->first], type);
+			const k3d::string_t key = boost::python::extract<k3d::string_t>(keys[i])();
+			if(boost::algorithm::starts_with(key, "__") && boost::algorithm::ends_with(key, "__"))
+				continue;
+
+			const boost::python::object value = Dictionary[keys[i]];
+
+			if(PyModule_Check(value.ptr()))
+				continue;
+
+			try
+			{
+				output_context.insert(std::make_pair(key, python_to_any(Dictionary[keys[i]])));
+			}
+			catch(std::exception& e)
+			{
+				k3d::log() << error << "Error converting python value [" << key << "]: " << e.what() << std::endl;
+			}
 		}
-	}
+
+		Context = output_context;
+/*
+		for(k3d::iscript_engine::context_t::iterator context = Context.begin(); context != Context.end(); ++context)
+		{
+			const std::type_info& type = context->second.type();
+
+			if(type == typeid(k3d::idocument*))
+				continue;
+			else if(type == typeid(k3d::inode*))
+				continue;
+			else if(type == typeid(k3d::mesh*))
+				continue;
+			else if(type == typeid(const k3d::mesh* const))
+				continue;
+			else if(type == typeid(const k3d::ri::render_state*))
+				continue;
+			else
+			{
+				context->second = python_to_any(Dictionary[context->first], type);
+			}
+		}
+*/
 }
 
 } // namespace python
