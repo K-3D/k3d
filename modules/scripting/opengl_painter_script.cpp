@@ -55,12 +55,12 @@ public:
 
 	void paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Mesh"] = &Mesh;
-		context["PaintMesh"] = true;
-		context["SelectMesh"] = false;
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["mesh"] = &Mesh;
+		context["paint"] = true;
+		context["select"] = false;
 		execute_script(context);
 	}
 
@@ -68,12 +68,12 @@ public:
 	{
 		k3d::gl::push_selection_token(this);
 
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Mesh"] = &Mesh;
-		context["PaintMesh"] = false;
-		context["SelectMesh"] = true;
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["mesh"] = &Mesh;
+		context["paint"] = false;
+		context["select"] = true;
 		execute_script(context);
 
 		k3d::gl::pop_selection_token();

@@ -3,10 +3,10 @@
 from math import radians
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
 # Construct a sphere mesh primitive ...
-hyperboloid = k3d.hyperboloid.create(Output)
+hyperboloid = k3d.hyperboloid.create(context.output)
 color = hyperboloid.parameter_attributes().create("Cs", "k3d::color")
 
 # Add two hyperboloids ...

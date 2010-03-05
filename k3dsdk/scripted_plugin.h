@@ -52,7 +52,7 @@ protected:
 		m_script.set_value(Script);
 	}
 
-	bool execute_script(iscript_engine::context_t& Context)
+	bool execute_script(iscript_engine::context& Context)
 	{
 		const script::code code(m_script.pipeline_value());
 

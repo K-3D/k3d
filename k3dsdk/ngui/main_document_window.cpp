@@ -2260,7 +2260,7 @@ private:
 
 		k3d::filesystem::igzstream file(filepath);
 
-		k3d::iscript_engine::context_t context;
+		k3d::iscript_engine::context context;
 		context["Document"] = &document();
 
 		execute_script(file, filepath.native_utf8_string().raw(), context);
@@ -2299,7 +2299,7 @@ private:
 
 		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin.get()))
 		{
-			k3d::iscript_engine::context_t context;
+			k3d::iscript_engine::context context;
 			context["Command"] = k3d::string_t("action");
 			context["Document"] = &document();
 			scripted_action->execute(context);

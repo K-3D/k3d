@@ -101,7 +101,7 @@ public:
 
 			if(iscripted_action* const scripted_action = dynamic_cast<iscripted_action*>(plugin))
 			{
-				iscript_engine::context_t context;
+				iscript_engine::context context;
 				context["Command"] = string_t("startup");
 				context["Document"] = document;
 				scripted_action->execute(context);
@@ -123,7 +123,7 @@ public:
 		{
 			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin->second))
 			{
-				k3d::iscript_engine::context_t context;
+				k3d::iscript_engine::context context;
 				context["Command"] = k3d::string_t("shutdown");
 				context["Document"] = &Document;
 				scripted_action->execute(context);

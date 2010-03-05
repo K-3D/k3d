@@ -105,7 +105,7 @@ public:
 		return "Python";
 	}
 
-	k3d::bool_t execute(const k3d::string_t& ScriptName, const k3d::string_t& Script, context_t& Context, output_t* Stdout, output_t* Stderr)
+	k3d::bool_t execute(const k3d::string_t& ScriptName, const k3d::string_t& Script, context& Context, output_t* Stdout, output_t* Stderr)
 	{
 		k3d::bool_t succeeded = true;
 
@@ -128,7 +128,7 @@ public:
 				PySys_SetObject(const_cast<char*>("stderr"), boost::python::object(*stderr_signal).ptr());
 			}
 
-			k3d::python::set_context(Context, m_local_dict);
+			m_local_dict["context"] = Context;
 
 			// The embedded python interpreter cannot handle DOS line-endings, see http://sourceforge.net/tracker/?group_id=5470&atid=105470&func=detail&aid=1167922
 			k3d::string_t script = Script;
@@ -148,8 +148,8 @@ public:
 				PyErr_Print();
 			}
 
-			k3d::python::get_context(m_local_dict, Context);
-			
+			Context = boost::python::extract<k3d::iscript_engine::context>(m_local_dict["context"])();
+
 			succeeded = result ? true : false;
 		}
 		catch(std::exception& e)

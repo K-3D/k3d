@@ -1,10 +1,10 @@
 #python
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
 # Construct a teapot mesh primitive ...
-teapot = k3d.teapot.create(Output)
+teapot = k3d.teapot.create(context.output)
 color = teapot.surface_attributes().create("Cs", "k3d::color")
 
 # Add three teapots ...

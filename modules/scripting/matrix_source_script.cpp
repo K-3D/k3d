@@ -74,16 +74,16 @@ public:
 private:
 	void on_update_matrix(k3d::matrix4& Output)
 	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = k3d::identity3();
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["output"] = k3d::identity3();
 
 		execute_script(context);
 
-		if(context["Output"].type() == typeid(k3d::matrix4))
+		if(context["output"].type() == typeid(k3d::matrix4))
 		{
-			Output = boost::any_cast<k3d::matrix4>(context["Output"]);
+			Output = boost::any_cast<k3d::matrix4>(context["output"]);
 			return;
 		}
 

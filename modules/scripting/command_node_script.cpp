@@ -49,9 +49,9 @@ public:
 
 	k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 	{
-		k3d::iscript_engine::context_t context;
-		context["Command"] = Command;
-		context["Arguments"] = Arguments;
+		k3d::iscript_engine::context context;
+		context["command"] = Command;
+		context["arguments"] = Arguments;
 		
 		execute_script(context);
 

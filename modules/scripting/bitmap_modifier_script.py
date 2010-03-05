@@ -2,6 +2,6 @@
 
 import k3d
 
-Output.assign(Input)
+context.output.assign(context.input)
 
 

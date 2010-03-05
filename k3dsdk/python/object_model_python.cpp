@@ -141,11 +141,11 @@ object module_create_plugin(const string_t& Type)
 	throw std::runtime_error("k3d.create_plugin() has been removed, use k3d.plugin.create() instead.");
 }
 
-void module_check_node_environment(const dict& Locals, const string_t& PluginType)
+void module_check_node_environment(const boost::python::object& Context, const string_t& PluginType)
 {
-	if(Locals.has_key("Node"))
+//	if(Locals.has_key("Node"))
 	{
-		object object = Locals.get("Node");
+		boost::python::object object = Context.attr("node");
 		extract<iunknown_wrapper> node(object);
 		if(node.check())
 		{
@@ -469,77 +469,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns the time property for a document (could return NULL)");
 
 	scope().attr("__doc__") = "Provides access to the K-3D API";
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// set_context
-
-void set_context(const k3d::iscript_engine::context_t& Context, dict& Dictionary)
-{
-	for(k3d::iscript_engine::context_t::const_iterator context = Context.begin(); context != Context.end(); ++context)
-	{
-		try
-		{
-			Dictionary[context->first] = any_to_python(context->second);
-		}
-		catch(std::exception& e)
-		{
-			k3d::log() << error << "error marshalling [" << context->first << "] to Python: " << e.what() << std::endl;
-		}
-	}
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// get_context
-
-void get_context(dict& Dictionary, k3d::iscript_engine::context_t& Context)
-{
-		k3d::iscript_engine::context_t output_context;
-
-		boost::python::list keys = Dictionary.keys();
-		for(int i = 0; i != len(keys); ++i)
-		{
-			const k3d::string_t key = boost::python::extract<k3d::string_t>(keys[i])();
-			if(boost::algorithm::starts_with(key, "__") && boost::algorithm::ends_with(key, "__"))
-				continue;
-
-			const boost::python::object value = Dictionary[keys[i]];
-
-			if(PyModule_Check(value.ptr()))
-				continue;
-
-			try
-			{
-				output_context.insert(std::make_pair(key, python_to_any(Dictionary[keys[i]])));
-			}
-			catch(std::exception& e)
-			{
-				k3d::log() << error << "Error converting python value [" << key << "]: " << e.what() << std::endl;
-			}
-		}
-
-		Context = output_context;
-/*
-		for(k3d::iscript_engine::context_t::iterator context = Context.begin(); context != Context.end(); ++context)
-		{
-			const std::type_info& type = context->second.type();
-
-			if(type == typeid(k3d::idocument*))
-				continue;
-			else if(type == typeid(k3d::inode*))
-				continue;
-			else if(type == typeid(k3d::mesh*))
-				continue;
-			else if(type == typeid(const k3d::mesh* const))
-				continue;
-			else if(type == typeid(const k3d::ri::render_state*))
-				continue;
-			else
-			{
-				context->second = python_to_any(Dictionary[context->first], type);
-			}
-		}
-*/
 }
 
 } // namespace python

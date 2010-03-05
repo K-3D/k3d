@@ -3,10 +3,10 @@
 from math import radians
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
 # Construct a sphere mesh primitive ...
-torus = k3d.torus.create(Output)
+torus = k3d.torus.create(context.output)
 color = torus.parameter_attributes().create("Cs", "k3d::color")
 
 # Add two tori ...

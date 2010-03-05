@@ -63,7 +63,7 @@ public:
 		// Get a path where we can store the scripted RIB output ...
 		const k3d::filesystem::path archive_path = RenderState.frame.add_file("scripted_painter");
 
-		k3d::iscript_engine::context_t context;
+		k3d::iscript_engine::context context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
 		context["Input"] = const_cast<k3d::mesh*>(&Mesh);

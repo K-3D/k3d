@@ -1,9 +1,9 @@
 #python
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
-blobby = k3d.blobby.create(Output)
+blobby = k3d.blobby.create(context.output)
 Cs = blobby.parameter_attributes().create("Cs", "k3d::color")
 
 # Add four ellipsoids to the blobby ...
@@ -13,7 +13,7 @@ blobby.first_primitives().append(len(blobby.primitives()))
 blobby.primitive_counts().append(len(ellipsoids) + 1)
 blobby.first_operators().append(len(blobby.operators()))
 blobby.operator_counts().append(1)
-blobby.materials().append(Document.get_node("Material"))
+blobby.materials().append(context.document.get_node("Material"))
 
 for center in ellipsoids:
 	blobby.primitives().append(k3d.blobby.primitive_type.ELLIPSOID)

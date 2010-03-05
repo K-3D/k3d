@@ -36,11 +36,11 @@ namespace ngui
 {
 
 /// Executes a script using a specific language and providing user feedback for errors
-bool execute_script(const k3d::script::code& Script, const std::string& ScriptName, k3d::iscript_engine::context_t& Context, const k3d::script::language& Language);
+bool execute_script(const k3d::script::code& Script, const std::string& ScriptName, k3d::iscript_engine::context& Context, const k3d::script::language& Language);
 /// Executes a script, attempting to automatically recognize the language and providing user feedback for errors
-bool execute_script(const k3d::script::code& Script, const std::string& ScriptName, k3d::iscript_engine::context_t& Context);
+bool execute_script(const k3d::script::code& Script, const std::string& ScriptName, k3d::iscript_engine::context& Context);
 /// Executes a script, attempting to automatically recognize the language and providing user feedback for errors
-bool execute_script(const k3d::filesystem::path& Script, k3d::iscript_engine::context_t& Context);
+bool execute_script(const k3d::filesystem::path& Script, k3d::iscript_engine::context& Context);
 
 } // namespace ngui
 

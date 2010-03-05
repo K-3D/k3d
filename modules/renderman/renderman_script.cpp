@@ -87,7 +87,7 @@ public:
 		// Get a path where we can store the scripted RIB output ...
 		const k3d::filesystem::path archive_path = State.frame.add_file("renderman_script");
 
-		k3d::iscript_engine::context_t context;
+		k3d::iscript_engine::context context;
 		context["Document"] = &document();
 		context["Node"] = static_cast<k3d::inode*>(this);
 		context["Archive"] = archive_path;

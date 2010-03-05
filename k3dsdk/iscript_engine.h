@@ -63,8 +63,12 @@ public:
 	*/
 	virtual const string_t language() = 0;
 
-	/// Defines a collection of named objects to pass to a script that define its context (its execution environment) - how they are used is implementation-dependent (note that the names are merely suggestions, and may be changed or ignored at the whim of the implementation)
-	typedef std::map<string_t, boost::any> context_t;
+	/// Defines a collection of name-value pairs passed to a script that define its context (its execution environment) - how they are used is implementation-dependent (note that the names are merely suggestions, and may be changed or ignored at the whim of the implementation)
+	class context :
+		public std::map<string_t, boost::any>
+	{
+	};
+
 	/// Defines a slot that can be called to redirect script output.
 	typedef sigc::slot<void, const string_t&> output_t;
 	/// Defines a list of possible command completions
@@ -78,7 +82,7 @@ public:
 		\param Stderr Optional slot that will be called with script output.
 		\return true, iff the script was successfully executed without errors (either syntax or runtime)
 	*/
-	virtual bool_t execute(const string_t& ScriptName, const string_t& Script, context_t& Context, output_t* Stdout = 0, output_t* Stderr = 0) = 0;
+	virtual bool_t execute(const string_t& ScriptName, const string_t& Script, context& Context, output_t* Stdout = 0, output_t* Stderr = 0) = 0;
 
 	/**	\brief Requests a cancellation of all running scripts.
 		\return true, iff script cancellation is supported by this engine.

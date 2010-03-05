@@ -52,9 +52,9 @@ public:
 
 	void on_execute(k3d::iunknown*)
 	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
 
 		execute_script(context);
 	}

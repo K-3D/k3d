@@ -485,7 +485,7 @@ const arguments_t parse_runtime_arguments(const arguments_t& Arguments, k3d::boo
 	arguments_t unused;
 
 	// Provide a single script context object that will be used by all scripts, so they can share state ...
-	k3d::iscript_engine::context_t context;
+	k3d::iscript_engine::context context;
 
 	// For each command-line argument ...
 	for(arguments_t::const_iterator argument = Arguments.begin(); argument != Arguments.end(); ++argument)
@@ -613,7 +613,7 @@ void create_auto_start_plugins(auto_start_plugins_t& Plugins)
 
 		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
 		{
-			k3d::iscript_engine::context_t context;
+			k3d::iscript_engine::context context;
 			context["Command"] = k3d::string_t("startup");
 			scripted_action->execute(context);
 		}
@@ -629,7 +629,7 @@ void delete_auto_start_plugins(auto_start_plugins_t& Plugins)
 	{
 		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(*plugin))
 		{
-			k3d::iscript_engine::context_t context;
+			k3d::iscript_engine::context context;
 			context["Command"] = k3d::string_t("shutdown");
 			scripted_action->execute(context);
 		}

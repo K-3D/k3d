@@ -2,7 +2,7 @@
 #define K3DSDK_PYTHON_OBJECT_MODEL_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,26 +24,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/iscript_engine.h>
-namespace boost { namespace python { class dict; } }
-
 extern "C" { void initk3d(); }
-
-
-namespace k3d
-{
-
-namespace python
-{
-
-/// Inserts a script engine context into a Python dict
-void set_context(const iscript_engine::context_t& Context, boost::python::dict& Dictionary);
-/// Reflects changes to a script engine context back into C++ land
-void get_context(boost::python::dict& Dictionary, iscript_engine::context_t& Context);
-
-} // namespace python
-
-} // namespace k3d
 
 #endif // !K3DSDK_PYTHON_OBJECT_MODEL_PYTHON_H
 

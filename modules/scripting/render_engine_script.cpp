@@ -60,12 +60,12 @@ public:
 
 	bool render_frame(const k3d::filesystem::path& OutputImage, const bool ViewImage)
 	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["VisibleNodes"] = m_visible_nodes.property_internal_value();
-		context["OutputImage"] = OutputImage;
-		context["ViewImage"] = ViewImage;
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["visible_nodes"] = m_visible_nodes.property_internal_value();
+		context["output_image"] = OutputImage;
+		context["view_image"] = ViewImage;
 
 		execute_script(context);
 

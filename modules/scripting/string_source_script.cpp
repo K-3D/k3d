@@ -75,16 +75,16 @@ public:
 private:
 	void on_update_string(k3d::string_t& Output)
 	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = std::string("");
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["output"] = std::string("");
 
 		execute_script(context);
 
-		if(context["Output"].type() == typeid(k3d::string_t))
+		if(context["output"].type() == typeid(k3d::string_t))
 		{
-			Output = boost::any_cast<k3d::string_t>(context["Output"]);
+			Output = boost::any_cast<k3d::string_t>(context["output"]);
 			return;
 		}
 

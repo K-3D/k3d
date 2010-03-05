@@ -62,7 +62,7 @@ protected:
 		m_user_property_changed_signal.connect(Slot);
 	}
 
-	bool execute_script(iscript_engine::context_t& Context)
+	bool execute_script(iscript_engine::context& Context)
 	{
 		if(m_executing) // prevent recursion when writing properties in the script (infinite loop!)
 			return true;

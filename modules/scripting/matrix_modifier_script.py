@@ -1,4 +1,4 @@
 #python
 
-Output = Input
+context.output = context.input
 

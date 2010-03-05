@@ -2,5 +2,5 @@
 
 import k3d
 
-Output = k3d.identity3()
+context.output = k3d.identity3()
 

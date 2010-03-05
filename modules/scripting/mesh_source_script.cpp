@@ -56,10 +56,10 @@ public:
 	{
 		Output = k3d::mesh();
 
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = &Output;
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["output"] = &Output;
 
 		execute_script(context);
 	}

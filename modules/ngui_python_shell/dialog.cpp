@@ -112,12 +112,12 @@ public:
 
 		return_if_fail(engine);
 
-		k3d::iscript_engine::context_t context;
+		k3d::iscript_engine::context context;
 		engine->execute(get_factory().name(), "import code\n", context);
 		engine->execute(get_factory().name(), "__console = code.InteractiveConsole(locals())\n", context);
 
-		engine->execute(get_factory().name(), "def quit():\n  global __close\n  __close = True\n", context);
-		engine->execute(get_factory().name(), "def exit():\n  global __close\n  __close = True\n", context);
+		engine->execute(get_factory().name(), "def quit():\n  global context\n  context.__close = True\n", context);
+		engine->execute(get_factory().name(), "def exit():\n  global context\n  context.__close = True\n", context);
 		engine->execute(get_factory().name(), "def help(target=None):\n  if target:\n    __builtins__.help(target)\n  else:\n    sys.stderr.write(\"Python online help isn't available in the K-3D Python Shell.\\n\")\n", context);
 
 		engine->execute(get_factory().name(), "import sys\n", context);
@@ -132,7 +132,7 @@ public:
 		document = Document;
 		if(document)
 		{
-			k3d::iscript_engine::context_t context;
+			k3d::iscript_engine::context context;
 			context["Document"] = document;
 			engine->execute(get_factory().name(), "", context);
 		}
@@ -147,9 +147,9 @@ public:
 		boost::replace_all(command, "\"", "\\\"");
 
 		std::ostringstream console_command;
-		console_command << "__incomplete = __console.push(\"\"\"" << command << "\"\"\")";
+		console_command << "context.__incomplete = __console.push(\"\"\"" << command << "\"\"\")";
 
-		k3d::iscript_engine::context_t context;
+		k3d::iscript_engine::context context;
 		context["__incomplete"] = false;
 		context["__close"] = false;
 

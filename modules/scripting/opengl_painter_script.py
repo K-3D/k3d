@@ -7,7 +7,7 @@ glPointSize(5)
 glColor3d(0, 0, 1)
 
 glBegin(GL_POINTS)
-for point in Mesh.points():
+for point in context.mesh.points():
 	glVertex3d(point[0], point[1], point[2])
 glEnd()
 

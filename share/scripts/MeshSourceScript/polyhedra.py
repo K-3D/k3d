@@ -1,15 +1,15 @@
 #python
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
 # Perform required one-time setup to store geometric points in the mesh ...
-points = Output.create_points()
-point_selection = Output.create_point_selection()
+points = context.output.create_points()
+point_selection = context.output.create_point_selection()
 
 # Create two polyhedra ...
 for i in range(2):
-	polyhedron = k3d.polyhedron.create(Output)
+	polyhedron = k3d.polyhedron.create(context.output)
 
 	# Create an (optional) array to store per-face colors ...
 	Cs = polyhedron.face_attributes().create("Cs", "k3d::color")

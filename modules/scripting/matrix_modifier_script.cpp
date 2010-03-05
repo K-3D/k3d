@@ -72,16 +72,16 @@ private:
 		// Create a new output matrix, ready for modification by the script ...
 		Output = Input;
 
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Input"] = Input;
-		context["Output"] = Output;
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["input"] = Input;
+		context["output"] = Output;
 
 		execute_script(context);
 
-		return_if_fail(context["Output"].type() == typeid(k3d::matrix4));
-		Output = boost::any_cast<k3d::matrix4>(context["Output"]);
+		return_if_fail(context["output"].type() == typeid(k3d::matrix4));
+		Output = boost::any_cast<k3d::matrix4>(context["output"]);
 	}
 };
 
