@@ -51,6 +51,7 @@ public:
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object curve_attributes(wrapper& Self) { return wrap(Self.wrapped().curve_attributes); }
 		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 	class primitive
@@ -67,6 +68,7 @@ public:
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object curve_attributes(wrapper& Self) { return wrap(Self.wrapped().curve_attributes); }
 		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 
@@ -106,6 +108,7 @@ void define_namespace_cubic_curve()
 		.def("constant_attributes", &cubic_curve::const_primitive::constant_attributes)
 		.def("curve_attributes", &cubic_curve::const_primitive::curve_attributes)
 		.def("parameter_attributes", &cubic_curve::const_primitive::parameter_attributes)
+		.def("vertex_attributes", &cubic_curve::const_primitive::vertex_attributes)
 		;
 
 	class_<cubic_curve::primitive::wrapper>("primitive", no_init)
@@ -118,6 +121,7 @@ void define_namespace_cubic_curve()
 		.def("constant_attributes", &cubic_curve::primitive::constant_attributes)
 		.def("curve_attributes", &cubic_curve::primitive::curve_attributes)
 		.def("parameter_attributes", &cubic_curve::primitive::parameter_attributes)
+		.def("vertex_attributes", &cubic_curve::primitive::vertex_attributes)
 		;
 }
 
