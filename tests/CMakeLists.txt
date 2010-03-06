@@ -46,6 +46,7 @@ FUNCTION(K3D_TEST TEST_NAME)
 			--setenv "K3D_TEST_BINARY_PATH=${tests_BINARY_DIR}"
 			${TEST_ARGUMENTS}
 			--script-file=${TEST_K3D_PYTHON_SCRIPT}
+			--batch
 			--exit
 			)
 	ELSE()

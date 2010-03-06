@@ -5,5 +5,5 @@
 
 import k3d
 
-Document = k3d.new_document()
+context.document = k3d.new_document()
 
