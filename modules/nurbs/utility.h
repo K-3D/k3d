@@ -225,6 +225,7 @@ void modify_selected_patches(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, 
 					{
 						Modifier(OutputMesh, *output_patches, InputMesh, *input_patches, patch);
 						output_patches->patch_selections.back() = patch_selections[patch];
+						output_patches->constant_attributes = input_patches->constant_attributes.clone();
 					}
 					catch(std::runtime_error& E)
 					{

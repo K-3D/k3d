@@ -172,12 +172,14 @@
 					</table>
 				</structure>
 				<attributes>
-					<table type="constant"/>
+					<table type="constant">
+						<array name="index" type="k3d::uint_t">0</array>
+					</table>
 					<table type="curve">
 						<array name="index" type="k3d::uint_t">0</array>
 					</table>
 					<table type="parameter">
-						<array name="index" type="k3d::uint_t">1 1</array>
+						<array name="index" type="k3d::uint_t">0 2</array>
 					</table>
 					<table type="vertex">
 						<array name="index" type="k3d::uint_t">4 13 22</array>

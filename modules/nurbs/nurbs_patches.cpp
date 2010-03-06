@@ -327,6 +327,7 @@ void copy_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatche
 	k3d::mesh::knots_t v_knots(InputPatches.patch_v_knots.begin() + v_knots_begin, InputPatches.patch_v_knots.begin() + v_knots_end);
 	add_patch(OutputMesh, OutputPatches, point_data, u_knots, v_knots, u_order, v_order, attributes.patch_attributes, attributes.parameter_attributes);
 	OutputPatches.patch_materials.push_back(InputPatches.patch_materials[Patch]);
+	OutputPatches.constant_attributes = InputPatches.constant_attributes.clone();
 }
 
 void add_trim_curve(k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_t Patch, const k3d::mesh::points_2d_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t UOffset, const k3d::double_t VOffset, const k3d::double_t UScale, const k3d::double_t VScale)
@@ -372,8 +373,6 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::uint_t SourcePrimI
 {
 	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> source_curves(k3d::nurbs_curve::validate(SourceCurves, *SourceCurves.primitives[SourcePrimIdx]));
 	return_if_fail(source_curves);
-	OutputPatches.patch_attributes = source_curves->curve_attributes.clone_types();
-	k3d::table_copier uniform_copier(source_curves->curve_attributes, OutputPatches.patch_attributes);
 
 	for(k3d::mesh::primitives_t::const_iterator trav_primitive = CurvesToTraverse.primitives.begin(); trav_primitive != CurvesToTraverse.primitives.end(); ++trav_primitive)
 	{
@@ -450,15 +449,19 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::uint_t SourcePrimI
 				}
 				k3d::table patch_attributes = curve_to_traverse_arrays.curve_attributes.empty() ? source_curve_arrays.curve_attributes.clone() : curve_to_traverse_arrays.curve_attributes.clone();
 				k3d::table parameter_attributes = curve_to_traverse_arrays.parameter_attributes.clone();
+				if(parameter_attributes.empty())
+				{
+					parameter_attributes = source_curve_arrays.parameter_attributes.clone();
+				}
 				k3d::table_copier v_parameter_copier(source_curve_arrays.parameter_attributes, parameter_attributes);
 				v_parameter_copier.push_back(0);
 				v_parameter_copier.push_back(1);
 				add_patch(OutputMesh, OutputPatches, new_points, u_knots, v_knots, source_curves->curve_orders[source_curve], curves_to_traverse->curve_orders[curve_to_traverse], patch_attributes, parameter_attributes);
-				uniform_copier.push_back(source_curve);
 				OutputPatches.patch_materials.push_back(source_curves->material[0]);
 			}
 		}
 	}
+	OutputPatches.constant_attributes = source_curves->constant_attributes.clone();
 }
 
 void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTraverse, k3d::mesh& OutputMesh)
@@ -508,8 +511,8 @@ void extract_patch_curve_by_number(k3d::mesh& OutputMesh, k3d::nurbs_curve::prim
 	}
 
 	// Calculate the value of the parameter attributes at the start and end of the curve
-	const k3d::uint_t start_indices[] = {Patch*4, UDirection ? Patch*4+1 : Patch*4+2};
-	const k3d::uint_t end_indices[] = {UDirection ? Patch*4+2 : Patch*4+1, Patch*4+3};
+	const k3d::uint_t start_indices[] = {Patch*4, UDirection ? Patch*4+2 : Patch*4+1};
+	const k3d::uint_t end_indices[] = {UDirection ? Patch*4+1 : Patch*4+2, Patch*4+3};
 	const k3d::mesh::knots_t& other_knots = UDirection ? InputPatches.patch_v_knots : InputPatches.patch_u_knots;
 	const k3d::uint_t other_order = UDirection ? InputPatches.patch_v_orders[Patch] : InputPatches.patch_u_orders[Patch];
 	const k3d::uint_t other_knots_begin = UDirection ? InputPatches.patch_v_first_knots[Patch] : InputPatches.patch_u_first_knots[Patch];
@@ -523,6 +526,7 @@ void extract_patch_curve_by_number(k3d::mesh& OutputMesh, k3d::nurbs_curve::prim
 	output_curve.curve_attributes = InputPatches.patch_attributes.clone(Patch, Patch+1);
 
 	output_curve.add_curve(OutputMesh, OutputCurve);
+	OutputCurve.constant_attributes = InputPatches.constant_attributes.clone();
 }
 
 void extract_patch_curve_by_parameter(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch, const k3d::double_t U, const k3d::bool_t UDirection)
@@ -623,7 +627,7 @@ void curves_to_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputP
 		const k3d::uint_t u_knots_begin = InputPatches.patch_u_first_knots[Patch];
 		const k3d::uint_t u_knots_end = u_knots_begin + curve_count + u_order;
 		k3d::mesh::knots_t u_knots(InputPatches.patch_u_knots.begin() + u_knots_begin, InputPatches.patch_u_knots.begin() + u_knots_end);
-		add_patch(OutputMesh, OutputPatches, output_point_data, u_knots, v_knots, u_order, v_order);
+		add_patch(OutputMesh, OutputPatches, output_point_data, u_knots, v_knots, u_order, v_order, patch_attributes, parameter_attributes);
 		OutputPatches.patch_materials.push_back(InputPatches.patch_materials[Patch]);
 		OutputPatches.patch_selections.back() = InputPatches.patch_selections[Patch];
 	}
@@ -638,13 +642,12 @@ void elevate_patch_degree(const k3d::mesh& InputMesh, const k3d::nurbs_patch::co
 	extract_curves(curves_mesh, *curves_prim, InputMesh, InputPatches, Patch, UDirection);
 
 	// Elevate them
-	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_curves_prim(k3d::nurbs_curve::validate(curves_mesh, *curves_mesh.primitives.front()));
 	boost::scoped_ptr<k3d::nurbs_curve::primitive> elevated_curves_prim(k3d::nurbs_curve::create(curves_mesh));
 	elevated_curves_prim->material.push_back(InputPatches.patch_materials[Patch]);
 	const k3d::uint_t curve_count = UDirection ? InputPatches.patch_v_point_counts[Patch] : InputPatches.patch_u_point_counts[Patch];
 	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
 	{
-		elevate_curve_degree(curves_mesh, *elevated_curves_prim, curves_mesh, *const_curves_prim, curve, Elevations);
+		elevate_curve_degree(curves_mesh, *elevated_curves_prim, curves_mesh, *curves_prim, curve, Elevations);
 	}
 
 	curves_to_patch(OutputMesh, OutputPatches, curves_mesh, *elevated_curves_prim, InputPatches, Patch, UDirection);
@@ -695,6 +698,7 @@ void split_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	{
 		split_curve(curves_mesh, *split_curves_prim, curves_mesh, *const_curves_prim, curve, u);
 	}
+	k3d::log() << debug << "curve attribs: " <<split_curves_prim->parameter_attributes << std::endl;
 
 	if(is_closed(*const_curves_prim, 0))
 	{

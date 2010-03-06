@@ -438,6 +438,7 @@ void copy_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves
 	curve_arrays input_arrays(InputMesh, InputCurves, Curve);
 	input_arrays.add_curve(OutputMesh, OutputCurves);
 	OutputCurves.material = InputCurves.material;
+	OutputCurves.curve_selections.back() = InputCurves.curve_selections[Curve];
 }
 
 void update_indices(k3d::mesh::indices_t& Indices, const k3d::uint_t Start, const k3d::int32_t Offset)
@@ -1557,6 +1558,26 @@ void polygonize(k3d::mesh& OutputMesh, k3d::linear_curve::primitive& OutputCurve
 	curve_arrays curve(InputMesh, InputCurves, Curve, true);
 	k3d::mesh::knots_t sample_u_vals;
 	sample(sample_u_vals, curve.knots, Samples);
+
+	if(OutputCurve.parameter_attributes.empty())
+	{
+		OutputCurve.parameter_attributes = curve.parameter_attributes.clone_types();
+		OutputCurve.parameter_attributes.set_row_count(2*OutputCurve.curve_first_points.size());
+	}
+	k3d::table_copier parameter_copier(curve.parameter_attributes, OutputCurve.parameter_attributes);
+	if(!curve.parameter_attributes.empty())
+	{
+		parameter_copier.push_back(0);
+		parameter_copier.push_back(1);
+	}
+
+	if(OutputCurve.curve_attributes.empty())
+	{
+		OutputCurve.curve_attributes = curve.curve_attributes.clone_types();
+		OutputCurve.curve_attributes.set_row_count(2*OutputCurve.curve_first_points.size());
+	}
+	k3d::table_copier curve_copier(curve.curve_attributes, OutputCurve.curve_attributes);
+	if(!curve.curve_attributes.empty()) curve_copier.push_back(0);
 
 	OutputCurve.periodic.push_back(false);
 	OutputCurve.material = InputCurves.material;
