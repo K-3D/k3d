@@ -141,15 +141,14 @@ object module_create_plugin(const string_t& Type)
 	throw std::runtime_error("k3d.create_plugin() has been removed, use k3d.plugin.create() instead.");
 }
 
-void module_check_node_environment(const boost::python::object& Context, const string_t& PluginType)
+void module_check_node_environment(const k3d::iscript_engine::context& Context, const string_t& PluginType)
 {
-//	if(Locals.has_key("Node"))
+	k3d::iscript_engine::context::const_iterator n = Context.find("node");
+	if(n != Context.end())
 	{
-		boost::python::object object = Context.attr("node");
-		extract<iunknown_wrapper> node(object);
-		if(node.check())
+		if(k3d::inode* const node = boost::any_cast<k3d::inode*>(n->second))
 		{
-			if(node().wrapped<k3d::inode>().factory().name() == PluginType)
+			if(node->factory().name() == PluginType)
 			{
 				return;
 			}
