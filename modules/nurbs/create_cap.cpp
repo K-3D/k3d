@@ -159,9 +159,9 @@ public:
 				k3d::mesh::points_2d_t parameter_points;
 				k3d::mesh::points_t points;
 				k3d::mesh::weights_t weights;
-				k3d::mesh::knots_t knots;
-				k3d::table point_attributes; // Unused
-				//extract_curve_arrays(points, knots, weights, point_attributes, merged_mesh, *const_merged_curves, curve, true);
+				curve_arrays merged_arrays(merged_mesh, *const_merged_curves, curve, true);
+				merged_arrays.points3(points);
+				merged_arrays.weights(weights);
 				// Get the plane the curve lies in
 				extract_plane(origin, normal, u_axis, v_axis, parameter_points, points, m_u_offset.pipeline_value());
 				// Get the bounding box for the curve points in this plane
@@ -171,13 +171,20 @@ public:
 				const k3d::double_t v_offset = -bbmin[1];
 				const k3d::double_t u_scale = u_axis.length() / (bbmax[0] - bbmin[0]);
 				const k3d::double_t v_scale = v_axis.length() / (bbmax[1] - bbmin[1]);
-				const k3d::point3 P1 = origin + bbmin[0] * u_axis + bbmin[1] * v_axis;
-				const k3d::point3 P2 = origin + bbmax[0] * u_axis + bbmin[1] * v_axis;
-				const k3d::point3 P3 = origin + bbmax[0] * u_axis + bbmax[1] * v_axis;
-				const k3d::point3 P4 = origin + bbmin[0] * u_axis + bbmax[1] * v_axis;
-				create_bilinear_patch(Output, *output_patches, P1, P2, P3, P4);
+				patch_point_data bilinear_point_data;
+				bilinear_point_data.points.push_back(origin + bbmin[0] * u_axis + bbmin[1] * v_axis);
+				bilinear_point_data.points.push_back(origin + bbmax[0] * u_axis + bbmin[1] * v_axis);
+				bilinear_point_data.points.push_back(origin + bbmin[0] * u_axis + bbmax[1] * v_axis);
+				bilinear_point_data.points.push_back(origin + bbmax[0] * u_axis + bbmax[1] * v_axis);
+				bilinear_point_data.weights.resize(4, 1.0);
+				k3d::table patch_attributes = merged_curves->curve_attributes.clone(curve, curve+1);
+				k3d::table parameter_attributes = merged_curves->parameter_attributes.clone(2*curve, 2*curve+2);
+				k3d::table_copier parameter_copier(merged_curves->parameter_attributes, parameter_attributes);
+				parameter_copier.push_back(2*curve);
+				parameter_copier.push_back(2*curve+1);
+				create_bilinear_patch(Output, *output_patches, bilinear_point_data, patch_attributes, parameter_attributes);
 				output_patches->patch_materials.push_back(merged_curves->material.back());
-				add_trim_curve(*output_patches, output_patches->patch_first_points.size()-1, parameter_points, weights, knots, merged_curves->curve_orders[curve], u_offset, v_offset, u_scale, v_scale);
+				add_trim_curve(*output_patches, output_patches->patch_first_points.size()-1, parameter_points, weights, merged_arrays.knots, merged_curves->curve_orders[curve], u_offset, v_offset, u_scale, v_scale);
 			}
 		}
 

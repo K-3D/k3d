@@ -98,7 +98,7 @@ public:
 				{
 					// Copy existing patches, if required
 					if(!patches->patch_selections[patch] || !m_delete_orig.pipeline_value())
-						add_patch(Output, *output_patches, temp, *patches, patch);
+						copy_patch(Output, *output_patches, temp, *patches, patch);
 					if(patches->patch_selections[patch])
 					{
 						polygonize(vertices, vertex_counts, vertex_indices, temp, *patches, patch, u_samples, v_samples);

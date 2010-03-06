@@ -225,17 +225,18 @@ void modify_selected_patches(const k3d::mesh& InputMesh, k3d::mesh& OutputMesh, 
 					{
 						Modifier(OutputMesh, *output_patches, InputMesh, *input_patches, patch);
 						output_patches->patch_selections.back() = patch_selections[patch];
+						output_patches->constant_attributes = input_patches->constant_attributes.clone();
 					}
 					catch(std::runtime_error& E)
 					{
 						k3d::log() << error << "Error modifying patch " << patch << " of primitive " << prim_idx << ": " << E.what() << std::endl;
-						add_patch(OutputMesh, *output_patches, InputMesh, *input_patches, patch);
+						copy_patch(OutputMesh, *output_patches, InputMesh, *input_patches, patch);
 						output_patches->patch_materials[patch] = input_patches->patch_materials[patch];
 					}
 				}
 				else
 				{
-					add_patch(OutputMesh, *output_patches, InputMesh, *input_patches, patch);
+					copy_patch(OutputMesh, *output_patches, InputMesh, *input_patches, patch);
 					output_patches->patch_materials[patch] = input_patches->patch_materials[patch];
 				}
 			}
@@ -267,7 +268,6 @@ struct selected_curve_extractor
 	void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
 	{
 		copy_curve(mesh, curves, Mesh, Curves, Curve);
-		curves.material.back() = Curves.material.back();
 	}
 	k3d::mesh& mesh;
 	k3d::nurbs_curve::primitive& curves;
