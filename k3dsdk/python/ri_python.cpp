@@ -38,9 +38,9 @@ class ri
 {
 };
 
-static void use_shader(ri_render_state_wrapper& Self, const string_t& Shader)
+static void use_shader(ri_render_state_wrapper& Self, const filesystem::path& Shader)
 {
-	Self.wrapped().shaders.use_shader(filesystem::native_path(ustring::from_utf8(Shader)));
+	Self.wrapped().shaders.use_shader(Shader);
 }
 
 void define_namespace_ri()
