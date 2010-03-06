@@ -22,6 +22,6 @@ carve_boolean.create_property("k3d::mesh*", "input_2", "Input 2", "")
 document.set_dependency(carve_boolean.get_property("input_1"), big_cylinder.get_property("output_mesh"))
 document.set_dependency(carve_boolean.get_property("input_2"), small_cylinder.get_property("output_mesh"))
 
-
 testing.require_valid_mesh(document, carve_boolean.get_property("output_mesh"))
-testing.mesh_reference_comparison(document, carve_boolean.get_property("output_mesh"), "mesh.modifier.CARVEBoolean.ply", 10)
+testing.require_similar_mesh(document, carve_boolean.get_property("output_mesh"), "mesh.modifier.CARVEBoolean.ply", 10)
+
