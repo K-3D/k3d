@@ -1111,7 +1111,7 @@ void insert_knot(curve_arrays& Curve, const k3d::double_t u, const k3d::uint_t r
 
 	if(s + r > Curve.order - 1)
 	{
-		k3d::log() << debug << "insert_knot: No knot inserted: target multiplicity " << s + r << " for knot " << u << " exceeds curve degree " << Curve.order-1 << std::endl;
+		k3d::log() << error << "insert_knot: No knot inserted: target multiplicity " << s + r << " for knot " << u << " exceeds curve degree " << Curve.order-1 << std::endl;
 		return;
 	}
 
@@ -1548,8 +1548,8 @@ void approximate(k3d::mesh::points_t& Points, k3d::mesh::weights_t& Weights, con
 	}
 	catch(std::exception& E)
 	{
-		k3d::log() << debug << "error solving system: " << E.what() << std::endl;
-		k3d::log() << debug << "matrix: " << A << std::endl;
+		k3d::log() << error << "error solving system: " << E.what() << std::endl;
+		k3d::log() << error << "matrix: " << A << std::endl;
 	}
 }
 

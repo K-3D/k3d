@@ -698,7 +698,6 @@ void split_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	{
 		split_curve(curves_mesh, *split_curves_prim, curves_mesh, *const_curves_prim, curve, u);
 	}
-	k3d::log() << debug << "curve attribs: " <<split_curves_prim->parameter_attributes << std::endl;
 
 	if(is_closed(*const_curves_prim, 0))
 	{
