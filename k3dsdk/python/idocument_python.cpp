@@ -76,17 +76,6 @@ static void redraw_all(idocument_wrapper& Self)
 	k3d::gl::redraw_all(Self.wrapped(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 }
 
-static const list nodes(idocument_wrapper& Self)
-{
-	list results;
-
-	const k3d::inode_collection::nodes_t nodes = Self.wrapped().nodes().collection();
-	for(k3d::inode_collection::nodes_t::const_iterator n = nodes.begin(); n != nodes.end(); ++n)
-		results.append(wrap_unknown(*n));
-
-	return results;
-}
-
 static const object new_node(idocument_wrapper& Self, const object& Type)
 {
 	extract<string_t> plugin_name(Type);
@@ -119,25 +108,6 @@ static const object get_node(idocument_wrapper& Self, const string_t& Name)
 		return boost::python::object();
 	
 	return wrap_unknown(nodes.back());
-}
-
-static const object get_node_by_metadata(idocument_wrapper& Self, const string_t& MetaName, const string_t& MetaValue)
-{
-	const std::vector<k3d::inode*> nodes = k3d::node::lookup<k3d::inode>(Self.wrapped(), MetaName, MetaValue);
-	
-	if(nodes.size() > 1)
-		throw std::runtime_error("multiple nodes exist with the given metadata");
-	
-	if(nodes.empty())
-		return boost::python::object();
-	
-	return wrap_unknown(nodes.back());
-}
-
-static const bool has_node(idocument_wrapper& Self, const string_t& Name)
-{
-	const std::vector<k3d::inode*> nodes = k3d::node::lookup(Self.wrapped(), Name);
-	return nodes.size() == 1;
 }
 
 static void delete_node(idocument_wrapper& Self, object& Node)
@@ -197,11 +167,8 @@ void define_class_idocument()
 		.def("cancel_change_set", &cancel_change_set)
 		.def("finish_change_set", &finish_change_set)
 		.def("redraw_all", &redraw_all)
-		.def("nodes", &nodes)
 		.def("new_node", &new_node)
 		.def("get_node", &get_node)
-		.def("get_node_by_metadata", &get_node_by_metadata)
-		.def("has_node", &has_node)
 		.def("delete_node", &delete_node)
 		.def("get_dependency", &get_dependency)
 		.def("set_dependency", &set_dependency);

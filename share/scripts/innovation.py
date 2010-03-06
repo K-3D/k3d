@@ -14,7 +14,7 @@ def innovate():
 	context.document.start_change_set()
 	try:
 		# Deliver "value" ...
-		for node in context.document.nodes():
+		for node in k3d.node.lookup(context.document):
 			node.name = "Microsoft " + node.name + " (TM)"
 
 		# Finish recording undos ...
