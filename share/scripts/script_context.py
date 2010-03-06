@@ -2,9 +2,9 @@
 
 import k3d
 
-if locals().has_key("Node"):
+if context.has_key("node"):
 	k3d.ui().message("This script is executing within a node context")
-elif locals().has_key("Document"):
+elif context.has_key("document"):
 	k3d.ui().message("This script is executing within a document context")
 else:
 	k3d.ui().message("This script is executing within the global context")
