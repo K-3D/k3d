@@ -8,7 +8,7 @@
 #
 # To start a K-3D "server", do the following at the shell:
 #
-# $ k3d --ui=none --script=simple_rpc.py
+# $ k3d --ui=none --script-file=/path/to/simple_rpc.py
 #
 # To communicate with the running K-3D "server" use netcat to send interactive
 # Python "commands":

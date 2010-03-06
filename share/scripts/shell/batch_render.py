@@ -1,9 +1,9 @@
 #python
 
-# This script uses Python to load a K-3D document, load a sample OBJ file into the
-# document, then render the results using RenderMan. It provides an example of a
-# "batch rendering" scenario where the user has prepared a document with the K-3D
-# graphical user interface, then uses a script to optionally modify and render the
+# This script uses Python to load an existing K-3D document, load a sample OBJ file
+# into the document, then render the results using RenderMan. It provides an example
+# of a "batch rendering" scenario where the user has prepared a document with the K-3D
+# graphical user interface, then uses a script to modify the document and render the
 # results to a file in the current working directory.
 # 
 # This scenario can be adapted to many different use-cases.  For example, this
@@ -13,7 +13,7 @@
 #
 # To run the script, do the following at the shell:
 #
-# $ k3d --ui=none --script=batch_render.py --batch --exit
+# $ k3d --ui=none --script-file=/path/to/batch_render.py --batch --exit
 #
 # The 
 
