@@ -1360,7 +1360,7 @@ bool control::on_redraw()
 			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin.get()))
 			{
 				k3d::iscript_engine::context context;
-				context["Command"] = k3d::string_t("ngui:opengl-start");
+				context["command"] = k3d::string_t("ngui:opengl-start");
 				scripted_action->execute(context);
 			}
 		}

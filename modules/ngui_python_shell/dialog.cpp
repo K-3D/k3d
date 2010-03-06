@@ -133,7 +133,7 @@ public:
 		if(document)
 		{
 			k3d::iscript_engine::context context;
-			context["Document"] = document;
+			context["document"] = document;
 			engine->execute(get_factory().name(), "", context);
 		}
 	}

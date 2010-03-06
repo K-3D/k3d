@@ -326,7 +326,7 @@ public:
 
 		k3d::iscript_engine::context context;
 		if(m_document)
-			context["Document"] = m_document;
+			context["document"] = m_document;
 
 		m_running = true;
 		update_title();

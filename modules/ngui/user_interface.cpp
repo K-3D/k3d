@@ -541,7 +541,7 @@ private:
 			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
 			{
 				k3d::iscript_engine::context context;
-				context["Command"] = k3d::string_t("startup");
+				context["command"] = k3d::string_t("startup");
 				scripted_action->execute(context);
 			}
 		}
@@ -554,7 +554,7 @@ private:
 			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(*plugin))
 			{
 				k3d::iscript_engine::context context;
-				context["Command"] = k3d::string_t("shutdown");
+				context["command"] = k3d::string_t("shutdown");
 				scripted_action->execute(context);
 			}
 		}

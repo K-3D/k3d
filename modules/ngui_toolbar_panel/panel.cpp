@@ -615,7 +615,7 @@ struct implementation
 		k3d::script::code script(Script);
 
 		k3d::iscript_engine::context context;
-		context["Document"] = &m_document_state.document();
+		context["document"] = &m_document_state.document();
 
 		execute_script(script, "Inline Script", context);
 	}
@@ -623,7 +623,7 @@ struct implementation
 	void on_run_external_script(const k3d::filesystem::path Script)
 	{
 		k3d::iscript_engine::context context;
-		context["Document"] = &m_document_state.document();
+		context["document"] = &m_document_state.document();
 
 		execute_script(Script, context);
 	}

@@ -88,10 +88,10 @@ public:
 		const k3d::filesystem::path archive_path = State.frame.add_file("renderman_script");
 
 		k3d::iscript_engine::context context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Archive"] = archive_path;
-		context["RenderState"] = &State;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["archive"] = archive_path;
+		context["render_state"] = &State;
 
 		return_if_fail(execute_script(context));
 

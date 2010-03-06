@@ -372,8 +372,8 @@ document_state::document_state(k3d::idocument& Document) :
 		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
 		{
 			k3d::iscript_engine::context context;
-			context["Command"] = k3d::string_t("startup");
-			context["Document"] = &Document;
+			context["command"] = k3d::string_t("startup");
+			context["document"] = &Document;
 			scripted_action->execute(context);
 		}
 	}
@@ -400,8 +400,8 @@ document_state::~document_state()
 		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(*plugin))
 		{
 			k3d::iscript_engine::context context;
-			context["Command"] = k3d::string_t("shutdown");
-			context["Document"] = &document();
+			context["command"] = k3d::string_t("shutdown");
+			context["document"] = &document();
 			scripted_action->execute(context);
 		}
 	}
