@@ -39,20 +39,211 @@ namespace module
 namespace nurbs
 {
 
+//////////////////////
+// patch_point_data
+
+patch_point_data::patch_point_data(const k3d::mesh& Mesh, const k3d::nurbs_patch::const_primitive& Primitive, const k3d::uint_t Patch)
+{
+	const k3d::uint_t points_begin = Primitive.patch_first_points[Patch];
+	const k3d::uint_t points_end = Primitive.patch_u_point_counts[Patch] * Primitive.patch_v_point_counts[Patch];
+	point_attributes = Mesh.point_attributes.clone_types();
+	vertex_attributes = Primitive.vertex_attributes.clone(points_begin, points_end);
+	k3d::table_copier point_attribute_copier(Mesh.point_attributes, point_attributes);
+	for(k3d::uint_t point_idx = points_begin; point_idx != points_end; ++point_idx)
+	{
+		points.push_back(Mesh.points->at(Primitive.patch_points[point_idx]));
+		point_attribute_copier.push_back(Primitive.patch_points[point_idx]);
+		weights.push_back(Primitive.patch_point_weights[point_idx]);
+	}
+}
+
+patch_point_data::patch_point_data(const k3d::uint_t Size) : points(Size), weights(Size)
+{
+	point_attributes.set_row_count(Size);
+	vertex_attributes.set_row_count(Size);
+}
+
+const k3d::bool_t patch_point_data::validate() const
+{
+	return_val_if_fail(points.size() == weights.size(), false);
+	return_val_if_fail(point_attributes.empty() || point_attributes.row_count() == points.size(), false);
+	return_val_if_fail(vertex_attributes.empty() || vertex_attributes.row_count() == points.size(), false);
+	return true;
+}
+
+////////////////////////////
+// point_data_copier
+
+point_data_copier::point_data_copier(const patch_point_data& Source, patch_point_data& Destination) : m_source(Source), m_destination(Destination)
+{
+	const k3d::uint_t destination_size = m_destination.points.size();
+	if(m_destination.point_attributes.empty())
+	{
+		m_destination.point_attributes = m_source.point_attributes.clone_types();
+		m_destination.point_attributes.set_row_count(destination_size);
+	}
+	m_point_attribute_copier.reset(new k3d::table_copier(m_source.point_attributes, m_destination.point_attributes));
+	if(m_destination.vertex_attributes.empty())
+	{
+		m_destination.vertex_attributes = m_source.vertex_attributes.clone_types();
+		m_destination.vertex_attributes.set_row_count(destination_size);
+	}
+	m_vertex_attribute_copier.reset(new k3d::table_copier(m_source.vertex_attributes, m_destination.vertex_attributes));
+}
+
+void point_data_copier::push_back(const k3d::uint_t Index)
+{
+	m_destination.points.push_back(m_source.points[Index]);
+	m_destination.weights.push_back(m_source.weights[Index]);
+	m_point_attribute_copier->push_back(Index);
+	m_vertex_attribute_copier->push_back(Index);
+}
+
+void point_data_copier::push_back(const k3d::uint_t Count, const k3d::uint_t* Indices, const k3d::double_t* Weights)
+{
+	k3d::point3 p(0,0,0);
+	k3d::double_t w = 0.0;
+	for(k3d::uint_t i = 0; i != Count; ++i)
+	{
+		p += k3d::to_vector(m_source.points[Indices[i]])*Weights[i];
+		w += m_source.weights[Indices[i]]*Weights[i];
+	}
+	m_destination.points.push_back(p);
+	m_destination.weights.push_back(w);
+	m_point_attribute_copier->push_back(Count, Indices, Weights);
+	m_vertex_attribute_copier->push_back(Count, Indices, Weights);
+}
+
+void point_data_copier::copy(const k3d::uint_t SourceIndex, const k3d::uint_t TargetIndex)
+{
+	m_destination.points[TargetIndex] = m_source.points[SourceIndex];
+	m_destination.weights[TargetIndex] = m_source.weights[SourceIndex];
+	m_point_attribute_copier->copy(SourceIndex, TargetIndex);
+	m_vertex_attribute_copier->copy(SourceIndex, TargetIndex);
+}
+
+void point_data_copier::copy(const k3d::uint_t Count, const k3d::uint_t* Indices, const k3d::double_t* Weights, const k3d::uint_t TargetIndex)
+{
+	k3d::point3 p(0,0,0);
+	k3d::double_t w = 0.0;
+	for(k3d::uint_t i = 0; i != Count; ++i)
+	{
+		p += k3d::to_vector(m_source.points[Indices[i]])*Weights[i];
+		w += m_source.weights[Indices[i]]*Weights[i];
+	}
+	m_destination.points[TargetIndex] = p;
+	m_destination.weights[TargetIndex] = w;
+	m_point_attribute_copier->copy(Count, Indices, Weights, TargetIndex);
+	m_vertex_attribute_copier->copy(Count, Indices, Weights, TargetIndex);
+}
+
+////////////////////////////
+// curve_point_data_copier
+
+curve_point_data_copier::curve_point_data_copier(const curve_arrays& Source, patch_point_data& Destination) : m_source(Source), m_destination(Destination)
+{
+	const k3d::uint_t destination_size = m_destination.points.size();
+	if(m_destination.point_attributes.empty())
+	{
+		m_destination.point_attributes = m_source.point_attributes.clone_types();
+		m_destination.point_attributes.set_row_count(destination_size);
+	}
+	m_point_attribute_copier.reset(new k3d::table_copier(m_source.point_attributes, m_destination.point_attributes));
+	if(m_destination.vertex_attributes.empty())
+	{
+		m_destination.vertex_attributes = m_source.vertex_attributes.clone_types();
+		m_destination.vertex_attributes.set_row_count(destination_size);
+	}
+	m_vertex_attribute_copier.reset(new k3d::table_copier(m_source.vertex_attributes, m_destination.vertex_attributes));
+}
+
+void curve_point_data_copier::push_back(const k3d::uint_t Index)
+{
+	m_destination.points.push_back(dehomogenize(m_source.points[Index]));
+	const k3d::double_t w = 1 / m_source.points[Index][3];
+	m_destination.weights.push_back(m_source.points[Index][3]);
+	m_point_attribute_copier->push_back(1, &Index, &w);
+	m_vertex_attribute_copier->push_back(1, &Index, &w);
+}
+
+void curve_point_data_copier::push_back(const k3d::uint_t Count, const k3d::uint_t* Indices, const k3d::double_t* Weights)
+{
+	k3d::point3 p(0,0,0);
+	k3d::double_t w = 0.0;
+	k3d::double_t* inverted_weights = new k3d::double_t[Count];
+	for(k3d::uint_t i = 0; i != Count; ++i)
+	{
+		p += k3d::to_vector(dehomogenize(m_source.points[Indices[i]]))*Weights[i];
+		w += m_source.points[Indices[i]][3]*Weights[i];
+		inverted_weights[i] = Weights[i]/m_source.points[Indices[i]][3]; // Make sure we 'unweight' the curve attributes
+	}
+
+	m_destination.points.push_back(p);
+	m_destination.weights.push_back(w);
+	m_point_attribute_copier->push_back(Count, Indices, inverted_weights);
+	m_vertex_attribute_copier->push_back(Count, Indices, inverted_weights);
+}
+
+void curve_point_data_copier::copy(const k3d::uint_t SourceIndex, const k3d::uint_t TargetIndex)
+{
+	m_destination.points[TargetIndex] = dehomogenize(m_source.points[SourceIndex]);
+	m_destination.weights[TargetIndex] = m_source.points[SourceIndex][3];
+	const k3d::double_t w = 1/m_source.points[SourceIndex][3];
+	m_point_attribute_copier->copy(1, &SourceIndex, &w, TargetIndex);
+	m_vertex_attribute_copier->copy(1, &SourceIndex, &w, TargetIndex);
+}
+
+void curve_point_data_copier::copy(const k3d::uint_t Count, const k3d::uint_t* Indices, const k3d::double_t* Weights, const k3d::uint_t TargetIndex)
+{
+	k3d::point3 p(0,0,0);
+	k3d::double_t w = 0.0;
+	k3d::double_t* inverted_weights = new k3d::double_t[Count];
+	for(k3d::uint_t i = 0; i != Count; ++i)
+	{
+		p += k3d::to_vector(dehomogenize(m_source.points[Indices[i]]))*Weights[i];
+		w += m_source.points[Indices[i]][3]*Weights[i];
+		inverted_weights[i] = Weights[i]/m_source.points[Indices[i]][3]; // Make sure we 'unweight' the curve attributes
+	}
+
+	m_destination.points[TargetIndex] = p;
+	m_destination.weights[TargetIndex] = w;
+	m_point_attribute_copier->copy(Count, Indices, inverted_weights, TargetIndex);
+	m_vertex_attribute_copier->copy(Count, Indices, inverted_weights, TargetIndex);
+}
+
+///////////////////////////
+// patch_attribute_tables
+
+patch_attribute_tables::patch_attribute_tables(const k3d::nurbs_patch::const_primitive& Primitive, const k3d::uint_t Patch)
+{
+	if(!Primitive.patch_attributes.empty())
+	{
+		patch_attributes = Primitive.patch_attributes.clone(Patch, Patch+1);
+	}
+	if(!Primitive.parameter_attributes.empty())
+	{
+		parameter_attributes = Primitive.parameter_attributes.clone(4*Patch, 4*Patch+4);
+	}
+}
+
+///////////////////////////
+
+
 void add_patch(k3d::mesh& Mesh,
 		k3d::nurbs_patch::primitive& NurbsPatches,
-		const k3d::mesh::points_t& ControlPoints,
-		const k3d::mesh::weights_t& Weights,
+		const patch_point_data& PointData,
 		const k3d::mesh::knots_t& UKnots,
 		const k3d::mesh::knots_t& VKnots,
 		const k3d::uint_t UOrder,
-		const k3d::uint_t VOrder)
+		const k3d::uint_t VOrder,
+		const k3d::table& PatchAttributes,
+		const k3d::table& ParameterAttributes)
 {
 	// Sanity checking ...
 	return_if_fail(Mesh.points);
 	return_if_fail(Mesh.point_selection);
 
-	return_if_fail(ControlPoints.size() == Weights.size());
+	return_if_fail(PointData.validate());
 
 	return_if_fail(UOrder >= 2);
 	return_if_fail(VOrder >= 2);
@@ -61,11 +252,28 @@ void add_patch(k3d::mesh& Mesh,
 	k3d::mesh::selection_t& point_selection = Mesh.point_selection.writable();
 
 	NurbsPatches.patch_first_points.push_back(NurbsPatches.patch_points.size());
+	const k3d::uint_t point_count = PointData.points.size();
 
-	for(k3d::uint_t i = 0; i != ControlPoints.size(); ++i)
+	if(Mesh.point_attributes.empty())
+	{
+		Mesh.point_attributes = PointData.point_attributes.clone_types();
+		Mesh.point_attributes.set_row_count(Mesh.points->size());
+	}
+	k3d::table_copier point_copier(PointData.point_attributes, Mesh.point_attributes);
+
+	if(NurbsPatches.vertex_attributes.empty())
+	{
+		NurbsPatches.vertex_attributes = PointData.vertex_attributes.clone_types();
+		NurbsPatches.vertex_attributes.set_row_count(NurbsPatches.patch_points.size());
+	}
+	k3d::table_copier vertex_copier(PointData.vertex_attributes, NurbsPatches.vertex_attributes);
+
+	for(k3d::uint_t i = 0; i != point_count; ++i)
 	{
 		NurbsPatches.patch_points.push_back(points.size());
-		points.push_back(ControlPoints[i]);
+		points.push_back(PointData.points[i]);
+		point_copier.push_back(i);
+		vertex_copier.push_back(i);
 	}
 	point_selection.resize(points.size(), 0.0);
 
@@ -78,34 +286,48 @@ void add_patch(k3d::mesh& Mesh,
 	NurbsPatches.patch_v_point_counts.push_back(VKnots.size() - VOrder);
 	NurbsPatches.patch_trim_loop_counts.push_back(0);
 	NurbsPatches.patch_first_trim_loops.push_back(0);
-	NurbsPatches.patch_point_weights.insert(NurbsPatches.patch_point_weights.end(), Weights.begin(), Weights.end());
+	NurbsPatches.patch_point_weights.insert(NurbsPatches.patch_point_weights.end(), PointData.weights.begin(), PointData.weights.end());
 	NurbsPatches.patch_u_knots.insert(NurbsPatches.patch_u_knots.end(), UKnots.begin(), UKnots.end());
 	NurbsPatches.patch_v_knots.insert(NurbsPatches.patch_v_knots.end(), VKnots.begin(), VKnots.end());
+
+	if(NurbsPatches.patch_attributes.empty())
+	{
+		NurbsPatches.patch_attributes = PatchAttributes.clone_types();
+		NurbsPatches.patch_attributes.set_row_count(NurbsPatches.patch_first_points.size()-1);
+	}
+	k3d::table_copier(PatchAttributes, NurbsPatches.patch_attributes).push_back(0);
+
+	if(NurbsPatches.parameter_attributes.empty())
+	{
+		NurbsPatches.parameter_attributes = ParameterAttributes.clone_types();
+		NurbsPatches.parameter_attributes.set_row_count(4*(NurbsPatches.patch_first_points.size()-1));
+	}
+	k3d::table_copier param_copier(ParameterAttributes, NurbsPatches.parameter_attributes);
+	param_copier.push_back(0);
+	param_copier.push_back(1);
+	param_copier.push_back(2);
+	param_copier.push_back(3);
 }
 
-void add_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch)
+void copy_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch)
 {
-	k3d::mesh::points_t points;
-	k3d::mesh::weights_t weights;
 	const k3d::uint_t u_order = InputPatches.patch_u_orders[Patch];
 	const k3d::uint_t v_order = InputPatches.patch_v_orders[Patch];
-	const k3d::uint_t points_begin = InputPatches.patch_first_points[Patch];
 	const k3d::uint_t u_point_count = InputPatches.patch_u_point_counts[Patch];
 	const k3d::uint_t v_point_count = InputPatches.patch_v_point_counts[Patch];
-	const k3d::uint_t points_end = points_begin + u_point_count*v_point_count;
-	for(k3d::uint_t i = points_begin; i != points_end; ++i)
-	{
-		points.push_back(InputMesh.points->at(InputPatches.patch_points[i]));
-		weights.push_back(InputPatches.patch_point_weights[i]);
-	}
+
+	patch_point_data point_data(InputMesh, InputPatches, Patch);
+	patch_attribute_tables attributes(InputPatches, Patch);
+
 	const k3d::uint_t u_knots_begin = InputPatches.patch_u_first_knots[Patch];
 	const k3d::uint_t u_knots_end = u_knots_begin + u_order + u_point_count;
 	k3d::mesh::knots_t u_knots(InputPatches.patch_u_knots.begin() + u_knots_begin, InputPatches.patch_u_knots.begin() + u_knots_end);
 	const k3d::uint_t v_knots_begin = InputPatches.patch_v_first_knots[Patch];
 	const k3d::uint_t v_knots_end = v_knots_begin + v_order + v_point_count;
 	k3d::mesh::knots_t v_knots(InputPatches.patch_v_knots.begin() + v_knots_begin, InputPatches.patch_v_knots.begin() + v_knots_end);
-	add_patch(OutputMesh, OutputPatches, points, weights, u_knots, v_knots, u_order, v_order);
+	add_patch(OutputMesh, OutputPatches, point_data, u_knots, v_knots, u_order, v_order, attributes.patch_attributes, attributes.parameter_attributes);
 	OutputPatches.patch_materials.push_back(InputPatches.patch_materials[Patch]);
+	OutputPatches.constant_attributes = InputPatches.constant_attributes.clone();
 }
 
 void add_trim_curve(k3d::nurbs_patch::primitive& OutputPatches, const k3d::uint_t Patch, const k3d::mesh::points_2d_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t UOffset, const k3d::double_t VOffset, const k3d::double_t UScale, const k3d::double_t VScale)
@@ -151,8 +373,6 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::uint_t SourcePrimI
 {
 	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> source_curves(k3d::nurbs_curve::validate(SourceCurves, *SourceCurves.primitives[SourcePrimIdx]));
 	return_if_fail(source_curves);
-	OutputPatches.patch_attributes = source_curves->curve_attributes.clone_types();
-	k3d::table_copier uniform_copier(source_curves->curve_attributes, OutputPatches.patch_attributes);
 
 	for(k3d::mesh::primitives_t::const_iterator trav_primitive = CurvesToTraverse.primitives.begin(); trav_primitive != CurvesToTraverse.primitives.end(); ++trav_primitive)
 	{
@@ -166,6 +386,9 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::uint_t SourcePrimI
 		{
 			if(!source_curves->curve_selections[source_curve])
 				continue;
+
+			curve_arrays source_curve_arrays(SourceCurves, *source_curves, source_curve);
+
 			const k3d::uint_t curves_to_traverse_begin = 0;
 			const k3d::uint_t curves_to_traverse_end = curves_to_traverse->curve_first_knots.size();
 			for(k3d::uint_t curve_to_traverse = curves_to_traverse_begin; curve_to_traverse != curves_to_traverse_end; ++curve_to_traverse)
@@ -173,21 +396,16 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::uint_t SourcePrimI
 				if(!curves_to_traverse->curve_selections[curve_to_traverse])
 					continue;
 
+				curve_arrays curve_to_traverse_arrays(CurvesToTraverse, *curves_to_traverse, curve_to_traverse);
+
 				//move the 1st curve along the 2nd
 				const k3d::uint_t curve_points_begin[2] = {source_curves->curve_first_points[source_curve], curves_to_traverse->curve_first_points[curve_to_traverse]};
 				const k3d::uint_t curve_points_end[2] = { curve_points_begin[0] + source_curves->curve_point_counts[source_curve], curve_points_begin[1] + curves_to_traverse->curve_point_counts[curve_to_traverse] };
 
-				const k3d::uint_t curve_knots_begin[2] = { source_curves->curve_first_knots[source_curve], curves_to_traverse->curve_first_knots[curve_to_traverse]};
-				const k3d::uint_t curve_knots_end[2] = { curve_knots_begin[0] + source_curves->curve_orders[source_curve] + source_curves->curve_point_counts[source_curve], curve_knots_begin[1] + curves_to_traverse->curve_orders[curve_to_traverse] + curves_to_traverse->curve_point_counts[curve_to_traverse]};
+				patch_point_data new_points;
 
-				k3d::mesh::points_t new_points;
-				k3d::mesh::weights_t new_weights;
-
-				k3d::mesh::knots_t u_knots;
-				u_knots.insert(u_knots.end(), source_curves->curve_knots.begin() + curve_knots_begin[0], source_curves->curve_knots.begin() + curve_knots_end[0]);
-
-				k3d::mesh::knots_t v_knots;
-				v_knots.insert(v_knots.end(), curves_to_traverse->curve_knots.begin() + curve_knots_begin[1], curves_to_traverse->curve_knots.begin() + curve_knots_end[1]);
+				k3d::mesh::knots_t u_knots(source_curve_arrays.knots.begin(), source_curve_arrays.knots.end());
+				k3d::mesh::knots_t v_knots(curve_to_traverse_arrays.knots.begin(), curve_to_traverse_arrays.knots.end());
 
 				k3d::uint_t u_order = source_curves->curve_orders[source_curve];
 				k3d::uint_t v_order = curves_to_traverse->curve_orders[curve_to_traverse];
@@ -196,26 +414,54 @@ void traverse_curve(const k3d::mesh& SourceCurves, const k3d::uint_t SourcePrimI
 				const k3d::mesh::points_t& source_mesh_points = *SourceCurves.points;
 				const k3d::mesh::points_t& traverse_mesh_points = *CurvesToTraverse.points;
 
+				patch_point_data tmp_points;
+				tmp_points.points.resize(2);
+				tmp_points.weights.resize(2);
+				curve_point_data_copier u_copier(curve_to_traverse_arrays, tmp_points);
+				curve_point_data_copier v_copier(source_curve_arrays, tmp_points);
+				point_data_copier new_copier(tmp_points, new_points);
+				k3d::double_t weights[] = {0.5, 0.5};
+				if(curve_to_traverse_arrays.point_attributes.empty())
+				{
+					weights[0] = 0.0;
+					weights[1] = 1.0;
+				}
+				else if(source_curve_arrays.point_attributes.empty())
+				{
+					weights[1] = 0.0;
+					weights[0] = 1.0;
+				}
+				const k3d::uint_t indices[] = {0,1};
 				for (int i = 0; i < curves_to_traverse->curve_point_counts[curve_to_traverse]; i++)
 				{
-					k3d::vector3 delta_u = traverse_mesh_points[curves_to_traverse->curve_points[curve_points_begin[1] + i]] - traverse_mesh_points[curves_to_traverse->curve_points[curve_points_begin[1]]];
-					double w_u = curves_to_traverse->curve_point_weights[curve_points_begin[1] + i];
+					k3d::vector3 delta_u = dehomogenize(curve_to_traverse_arrays.points[i]) - dehomogenize(curve_to_traverse_arrays.points.front());
+					const k3d::double_t w_u = curve_to_traverse_arrays.points[i][3];
+					u_copier.copy(i, 0);
 
 					for (int j = 0; j < point_count; j++)
 					{
-						k3d::point3 p_v = source_mesh_points[source_curves->curve_points[curve_points_begin[0] + j]];
-						double w_v = source_curves->curve_point_weights[curve_points_begin[0] + j];
+						v_copier.copy(j, 1);
+						new_copier.push_back(2, indices, weights);
 
-						new_points.push_back(p_v + delta_u);
-						new_weights.push_back(w_u * w_v);
+						new_points.points.back() = dehomogenize(source_curve_arrays.points[j]) + delta_u;
+						new_points.weights.back() = source_curve_arrays.points[j][3] * w_u;
 					}
 				}
-				add_patch(OutputMesh, OutputPatches, new_points, new_weights, u_knots, v_knots, source_curves->curve_orders[source_curve], curves_to_traverse->curve_orders[curve_to_traverse]);
-				uniform_copier.push_back(source_curve);
+				k3d::table patch_attributes = curve_to_traverse_arrays.curve_attributes.empty() ? source_curve_arrays.curve_attributes.clone() : curve_to_traverse_arrays.curve_attributes.clone();
+				k3d::table parameter_attributes = curve_to_traverse_arrays.parameter_attributes.clone();
+				if(parameter_attributes.empty())
+				{
+					parameter_attributes = source_curve_arrays.parameter_attributes.clone();
+				}
+				k3d::table_copier v_parameter_copier(source_curve_arrays.parameter_attributes, parameter_attributes);
+				v_parameter_copier.push_back(0);
+				v_parameter_copier.push_back(1);
+				add_patch(OutputMesh, OutputPatches, new_points, u_knots, v_knots, source_curves->curve_orders[source_curve], curves_to_traverse->curve_orders[curve_to_traverse], patch_attributes, parameter_attributes);
 				OutputPatches.patch_materials.push_back(source_curves->material[0]);
 			}
 		}
 	}
+	OutputPatches.constant_attributes = source_curves->constant_attributes.clone();
 }
 
 void traverse_curve(const k3d::mesh& SourceCurves, const k3d::mesh& CurvesToTraverse, k3d::mesh& OutputMesh)
@@ -237,26 +483,50 @@ void extract_patch_curve_by_number(k3d::mesh& OutputMesh, k3d::nurbs_curve::prim
 	const k3d::uint_t curve_point_count = UDirection ? InputPatches.patch_u_point_counts[Patch] : InputPatches.patch_v_point_counts[Patch];
 	return_if_fail(Curve < curve_count);
 
-	const k3d::uint_t point_step = UDirection ? 1 : curve_count;
-	const k3d::uint_t points_begin = InputPatches.patch_first_points[Patch] + Curve * (UDirection ? curve_point_count : 1);
-	const k3d::uint_t points_end = points_begin + point_step * curve_point_count;
+	curve_arrays output_curve;
+	output_curve.order = UDirection ? InputPatches.patch_u_orders[Patch] : InputPatches.patch_v_orders[Patch];
 
 	const k3d::mesh::knots_t& input_knots = UDirection ? InputPatches.patch_u_knots : InputPatches.patch_v_knots;
 	const k3d::uint_t order = UDirection ? InputPatches.patch_u_orders[Patch] : InputPatches.patch_v_orders[Patch];
 	const k3d::uint_t knot_count = curve_point_count + order;
 	const k3d::uint_t knots_begin = UDirection ? InputPatches.patch_u_first_knots[Patch] : InputPatches.patch_v_first_knots[Patch];
 	const k3d::uint_t knots_end = knots_begin + knot_count;
-	k3d::mesh::knots_t knots(input_knots.begin() + knots_begin, input_knots.begin() + knots_end);
-	k3d::mesh::points_t points;
-	k3d::mesh::weights_t weights;
+	output_curve.knots.insert(output_curve.knots.end(), input_knots.begin() + knots_begin, input_knots.begin() + knots_end);
 
+	const k3d::uint_t point_step = UDirection ? 1 : curve_count;
+	const k3d::uint_t points_begin = InputPatches.patch_first_points[Patch] + Curve * (UDirection ? curve_point_count : 1);
+	const k3d::uint_t points_end = points_begin + point_step * curve_point_count;
+	output_curve.vertex_attributes = InputPatches.vertex_attributes.clone_types();
+	k3d::table_copier vertex_copier(InputPatches.vertex_attributes, output_curve.vertex_attributes);
+	output_curve.point_attributes = InputMesh.point_attributes.clone_types();
+	k3d::table_copier point_copier(InputMesh.point_attributes, output_curve.point_attributes);
 	for (int i = points_begin; i < points_end; i += point_step)
 	{
-		points.push_back(InputMesh.points->at(InputPatches.patch_points[i]));
-		weights.push_back(InputPatches.patch_point_weights[i]);
+		const k3d::double_t w = InputPatches.patch_point_weights[i];
+		const k3d::point3& p = InputMesh.points->at(InputPatches.patch_points[i]);
+		output_curve.points.push_back(k3d::point4(p[0]*w, p[1]*w, p[2]*w, w));
+		const k3d::uint_t idx = static_cast<k3d::uint_t>(i);
+		vertex_copier.push_back(1, &idx, &w);
+		point_copier.push_back(1, &(InputPatches.patch_points[i]), &w);
 	}
 
-	k3d::nurbs_curve::add_curve(OutputMesh, OutputCurve, order, points, weights, knots);
+	// Calculate the value of the parameter attributes at the start and end of the curve
+	const k3d::uint_t start_indices[] = {Patch*4, UDirection ? Patch*4+2 : Patch*4+1};
+	const k3d::uint_t end_indices[] = {UDirection ? Patch*4+1 : Patch*4+2, Patch*4+3};
+	const k3d::mesh::knots_t& other_knots = UDirection ? InputPatches.patch_v_knots : InputPatches.patch_u_knots;
+	const k3d::uint_t other_order = UDirection ? InputPatches.patch_v_orders[Patch] : InputPatches.patch_u_orders[Patch];
+	const k3d::uint_t other_knots_begin = UDirection ? InputPatches.patch_v_first_knots[Patch] : InputPatches.patch_u_first_knots[Patch];
+	const k3d::double_t u = (other_knots[other_order-1 + Curve] - other_knots.front()) / (other_knots.back() - other_knots.front());
+	const k3d::double_t weights[] = {1.0-u, u};
+	output_curve.parameter_attributes = InputPatches.parameter_attributes.clone_types();
+	k3d::table_copier param_copier(InputPatches.parameter_attributes, output_curve.parameter_attributes);
+	param_copier.push_back(2, start_indices, weights);
+	param_copier.push_back(2, end_indices, weights);
+
+	output_curve.curve_attributes = InputPatches.patch_attributes.clone(Patch, Patch+1);
+
+	output_curve.add_curve(OutputMesh, OutputCurve);
+	OutputCurve.constant_attributes = InputPatches.constant_attributes.clone();
 }
 
 void extract_patch_curve_by_parameter(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch, const k3d::double_t U, const k3d::bool_t UDirection)
@@ -288,7 +558,7 @@ void extract_patch_curve_by_parameter(k3d::mesh& OutputMesh, k3d::nurbs_curve::p
 	}
 	else
 	{
-		add_patch(tmp_mesh, *tmp_patch, InputMesh, InputPatches, Patch);
+		copy_patch(tmp_mesh, *tmp_patch, InputMesh, InputPatches, Patch);
 	}
 	const k3d::mesh::knots_t& knots = !UDirection ? tmp_patch->patch_u_knots : tmp_patch->patch_v_knots;
 	k3d::mesh::knots_t normalized_knots2(knots.size());
@@ -328,23 +598,36 @@ void curves_to_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputP
 	}
 	else
 	{
-		k3d::mesh::points_t points;
-		k3d::mesh::weights_t weights;
+		patch_point_data output_point_data;
 		const k3d::uint_t point_count = InputCurves.curve_point_counts.front();
+		k3d::table patch_attributes;
+		k3d::table parameter_attributes;
 		for(k3d::uint_t i = 0; i != point_count; ++i)
 		{
 			for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
 			{
-				const k3d::uint_t point_idx = InputCurves.curve_first_points[curve] + i;
-				points.push_back(InputMesh.points->at(InputCurves.curve_points[point_idx]));
-				weights.push_back(InputCurves.curve_point_weights[point_idx]);
+				curve_arrays input_curve_arrays(InputMesh, InputCurves, curve);
+				curve_point_data_copier copier(input_curve_arrays, output_point_data);
+				copier.push_back(i);
+				if(!input_curve_arrays.curve_attributes.empty())
+					patch_attributes = input_curve_arrays.curve_attributes.clone();
+				if(i == 0 || i == (point_count-1))
+				{
+					if(curve == 0 || curve == (curve_count-1))
+					{
+						if(parameter_attributes.empty())
+							parameter_attributes = input_curve_arrays.parameter_attributes.clone_types();
+						k3d::table_copier parameter_copier(input_curve_arrays.parameter_attributes, parameter_attributes);
+						parameter_copier.push_back(i == 0 ? 0 : 1);
+					}
+				}
 			}
 		}
 		k3d::mesh::knots_t v_knots(InputCurves.curve_knots.begin(), InputCurves.curve_knots.begin() + InputCurves.curve_point_counts.front() + InputCurves.curve_orders.front());
 		const k3d::uint_t u_knots_begin = InputPatches.patch_u_first_knots[Patch];
 		const k3d::uint_t u_knots_end = u_knots_begin + curve_count + u_order;
 		k3d::mesh::knots_t u_knots(InputPatches.patch_u_knots.begin() + u_knots_begin, InputPatches.patch_u_knots.begin() + u_knots_end);
-		add_patch(OutputMesh, OutputPatches, points, weights, u_knots, v_knots, u_order, v_order);
+		add_patch(OutputMesh, OutputPatches, output_point_data, u_knots, v_knots, u_order, v_order, patch_attributes, parameter_attributes);
 		OutputPatches.patch_materials.push_back(InputPatches.patch_materials[Patch]);
 		OutputPatches.patch_selections.back() = InputPatches.patch_selections[Patch];
 	}
@@ -359,13 +642,12 @@ void elevate_patch_degree(const k3d::mesh& InputMesh, const k3d::nurbs_patch::co
 	extract_curves(curves_mesh, *curves_prim, InputMesh, InputPatches, Patch, UDirection);
 
 	// Elevate them
-	boost::scoped_ptr<k3d::nurbs_curve::const_primitive> const_curves_prim(k3d::nurbs_curve::validate(curves_mesh, *curves_mesh.primitives.front()));
 	boost::scoped_ptr<k3d::nurbs_curve::primitive> elevated_curves_prim(k3d::nurbs_curve::create(curves_mesh));
 	elevated_curves_prim->material.push_back(InputPatches.patch_materials[Patch]);
 	const k3d::uint_t curve_count = UDirection ? InputPatches.patch_v_point_counts[Patch] : InputPatches.patch_u_point_counts[Patch];
 	for(k3d::uint_t curve = 0; curve != curve_count; ++curve)
 	{
-		elevate_curve_degree(curves_mesh, *elevated_curves_prim, curves_mesh, *const_curves_prim, curve, Elevations);
+		elevate_curve_degree(curves_mesh, *elevated_curves_prim, curves_mesh, *curves_prim, curve, Elevations);
 	}
 
 	curves_to_patch(OutputMesh, OutputPatches, curves_mesh, *elevated_curves_prim, InputPatches, Patch, UDirection);
@@ -397,7 +679,7 @@ void split_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	// Can't split at end
 	if(u > 1 - 0.000001 || u < 0.000001)
 	{
-		add_patch(OutputMesh, OutputPatches, InputMesh, InputPatches, Patch);
+		copy_patch(OutputMesh, OutputPatches, InputMesh, InputPatches, Patch);
 		return;
 	}
 
@@ -416,6 +698,7 @@ void split_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	{
 		split_curve(curves_mesh, *split_curves_prim, curves_mesh, *const_curves_prim, curve, u);
 	}
+	k3d::log() << debug << "curve attribs: " <<split_curves_prim->parameter_attributes << std::endl;
 
 	if(is_closed(*const_curves_prim, 0))
 	{
@@ -469,15 +752,21 @@ void revolve_curve(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
 	}
 
 	// New patch arrays
-	k3d::mesh::points_t points;
-	k3d::mesh::weights_t weights;
+	patch_point_data output_points;
 
-	const k3d::uint_t curve_points_begin = InputCurves.curve_first_points[Curve];
-	const k3d::uint_t curve_points_end = InputCurves.curve_point_counts[Curve] + curve_points_begin;
+	curve_arrays input_curve_arrays(InputMesh, InputCurves, Curve);
+	output_points.point_attributes = input_curve_arrays.point_attributes.clone_types();
+	output_points.vertex_attributes = input_curve_arrays.vertex_attributes.clone_types();
+	k3d::table_copier point_copier(input_curve_arrays.point_attributes, output_points.point_attributes);
+	k3d::table_copier vertex_copier(input_curve_arrays.vertex_attributes, output_points.vertex_attributes);
+	const k3d::uint_t curve_points_begin = 0;
+	const k3d::uint_t curve_points_end = input_curve_arrays.points.size();
+
 	for (k3d::uint_t i = curve_points_begin; i != curve_points_end; ++i)
 	{
-		k3d::point3 p = InputMesh.points->at(InputCurves.curve_points[i]);
-		double w = InputCurves.curve_point_weights[i];
+		k3d::point3 p = dehomogenize(input_curve_arrays.points[i]);
+		const k3d::double_t w = input_curve_arrays.points[i][3];
+		const k3d::double_t inv_w = 1.0/w;
 		double distance = 1.0;
 		switch (Axis)
 		{
@@ -508,8 +797,10 @@ void revolve_curve(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
 				break;
 			}
 
-			points.push_back(p_u);
-			weights.push_back(w * u_weights[j]);
+			output_points.points.push_back(p_u);
+			output_points.weights.push_back(w * u_weights[j]);
+			point_copier.push_back(1, &i, &inv_w);
+			vertex_copier.push_back(1, &i, &inv_w);
 		}
 	}
 
@@ -518,7 +809,13 @@ void revolve_curve(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
 	const k3d::uint_t knots_end = knots_begin + v_order + InputCurves.curve_point_counts[Curve];
 	k3d::mesh::knots_t v_knots(InputCurves.curve_knots.begin() + knots_begin, InputCurves.curve_knots.begin() + knots_end);
 
-	add_patch(OutputMesh, OutputPatches, points, weights, u_knots, v_knots, 3, v_order);
+	k3d::table parameter_attributes = input_curve_arrays.parameter_attributes.clone();
+	k3d::table_copier parameter_copier(input_curve_arrays.parameter_attributes, parameter_attributes);
+	parameter_copier.push_back(0);
+	parameter_copier.push_back(1);
+	parameter_copier.push_back(1);
+
+	add_patch(OutputMesh, OutputPatches, output_points, u_knots, v_knots, 3, v_order, input_curve_arrays.curve_attributes, parameter_attributes);
 	OutputPatches.patch_materials.push_back(InputCurves.material.front());
 }
 
@@ -528,11 +825,22 @@ void ruled_surface(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
 	return_if_fail(InputCurves.curve_orders.front() == InputCurves.curve_orders.back());
 	return_if_fail(InputCurves.curve_point_counts.front() == InputCurves.curve_point_counts.back());
 
+	curve_arrays input1_arrays(InputMesh, InputCurves, 0);
+	curve_arrays input2_arrays(InputMesh, InputCurves, 1);
+
 	const k3d::uint_t v_point_count = InputCurves.curve_point_counts.front();
-	k3d::mesh::points_t points;
-	k3d::mesh::weights_t weights;
+	patch_point_data output_point_data;
+	patch_point_data point_mixer;
+	point_mixer.points.resize(2);
+	point_mixer.weights.resize(2);
+	curve_point_data_copier input1_copier(input1_arrays, point_mixer);
+	curve_point_data_copier input2_copier(input2_arrays, point_mixer);
+	point_data_copier output_copier(point_mixer, output_point_data);
+	const k3d::uint_t indices[] = {0,1};
 	for(k3d::uint_t i = 0; i != v_point_count; ++i)
 	{
+		input1_copier.copy(i, 0);
+		input2_copier.copy(i, 1);
 		const k3d::point3& p1 = InputMesh.points->at(InputCurves.curve_points[i]);
 		const k3d::double_t w1 = InputCurves.curve_point_weights[i];
 		const k3d::point3& p2 = InputMesh.points->at(InputCurves.curve_points[i + v_point_count]);
@@ -541,8 +849,9 @@ void ruled_surface(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
 		const k3d::vector3 delta = (p2 - p1) / Segments;
 		for (k3d::uint_t segment = 0; segment <= Segments; ++segment)
 		{
-			points.push_back(p1 + delta * segment);
-			weights.push_back(k3d::mix(w1, w2, static_cast<double>(segment)/static_cast<double>(Segments)));
+			const k3d::double_t w = static_cast<double>(segment)/static_cast<double>(Segments);
+			const k3d::double_t weights[] = {1.0-w, w};
+			output_copier.push_back(2, indices, weights);
 		}
 	}
 
@@ -550,7 +859,12 @@ void ruled_surface(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPat
 	k3d::nurbs_curve::add_open_uniform_knots(Order, Segments + 1, u_knots);
 	const k3d::uint_t v_order = InputCurves.curve_orders.front();
 	k3d::mesh::knots_t v_knots(InputCurves.curve_knots.begin(), InputCurves.curve_knots.begin() + v_point_count + v_order);
-	add_patch(OutputMesh, OutputPatches, points, weights, u_knots, v_knots, Order, v_order);
+
+	k3d::table parameter_attributes = input1_arrays.parameter_attributes.clone();
+	k3d::table_copier parameter_copier(input2_arrays.parameter_attributes, parameter_attributes);
+	parameter_copier.push_back(0);
+	parameter_copier.push_back(1);
+	add_patch(OutputMesh, OutputPatches, output_point_data, u_knots, v_knots, Order, v_order, input1_arrays.curve_attributes, parameter_attributes);
 	OutputPatches.patch_materials.push_back(InputCurves.material.back());
 }
 
@@ -599,44 +913,66 @@ void apply_knot_vectors(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& Outp
 
 void create_bilinear_patch(k3d::mesh& OutputMesh,
 		k3d::nurbs_patch::primitive& OutputPatches,
-		const k3d::point3& P1,
-		const k3d::point3& P2,
-		const k3d::point3& P3,
-		const k3d::point3& P4,
-		const k3d::double_t W1,
-		const k3d::double_t W2,
-		const k3d::double_t W3,
-		const k3d::double_t W4)
+		const patch_point_data& PointData,
+		const k3d::table& PatchAttributes,
+		const k3d::table& ParameterAttributes)
 {
-	k3d::mesh::points_t bilinear_points;
-	bilinear_points.push_back(P1);
-	bilinear_points.push_back(P2);
-	bilinear_points.push_back(P4);
-	bilinear_points.push_back(P3);
-	k3d::mesh::weights_t bilinear_weights;
-	bilinear_weights.push_back(W1);
-	bilinear_weights.push_back(W2);
-	bilinear_weights.push_back(W4);
-	bilinear_weights.push_back(W3);
 	k3d::mesh::knots_t bilinear_knots;
 	bilinear_knots.push_back(0);
 	bilinear_knots.push_back(0);
 	bilinear_knots.push_back(1);
 	bilinear_knots.push_back(1);
-	add_patch(OutputMesh, OutputPatches, bilinear_points, bilinear_weights, bilinear_knots, bilinear_knots, 2, 2);
+	add_patch(OutputMesh, OutputPatches, PointData, bilinear_knots, bilinear_knots, 2, 2, PatchAttributes, ParameterAttributes);
 }
 
 void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t U1, const k3d::uint_t V1, const k3d::uint_t U2, const k3d::uint_t V2)
 {
-	const k3d::point3& P1 = InputMesh.points->at(InputCurves.curve_points[InputCurves.curve_first_points[U1]]);
-	const k3d::point3& P2 = InputMesh.points->at(InputCurves.curve_points[InputCurves.curve_first_points[V1]]);
-	const k3d::point3& P3 = InputMesh.points->at(InputCurves.curve_points[InputCurves.curve_first_points[U2]]);
-	const k3d::point3& P4 = InputMesh.points->at(InputCurves.curve_points[InputCurves.curve_first_points[V2]]);
+	patch_point_data bilinear_point_data;
+	bilinear_point_data.points.push_back(InputMesh.points->at(InputCurves.curve_points[InputCurves.curve_first_points[U1]]));
+	bilinear_point_data.points.push_back(InputMesh.points->at(InputCurves.curve_points[InputCurves.curve_first_points[V1]]));
+	bilinear_point_data.points.push_back(InputMesh.points->at(InputCurves.curve_points[InputCurves.curve_first_points[V2]]));
+	bilinear_point_data.points.push_back(InputMesh.points->at(InputCurves.curve_points[InputCurves.curve_first_points[U2]]));
 
-	const k3d::double_t W1 = InputCurves.curve_point_weights[InputCurves.curve_first_points[U1]];
-	const k3d::double_t W2 = InputCurves.curve_point_weights[InputCurves.curve_first_points[V1]];
-	const k3d::double_t W3 = InputCurves.curve_point_weights[InputCurves.curve_first_points[U2]];
-	const k3d::double_t W4 = InputCurves.curve_point_weights[InputCurves.curve_first_points[V2]];
+	bilinear_point_data.weights.push_back(InputCurves.curve_point_weights[InputCurves.curve_first_points[U1]]);
+	bilinear_point_data.weights.push_back(InputCurves.curve_point_weights[InputCurves.curve_first_points[V1]]);
+	bilinear_point_data.weights.push_back(InputCurves.curve_point_weights[InputCurves.curve_first_points[V2]]);
+	bilinear_point_data.weights.push_back(InputCurves.curve_point_weights[InputCurves.curve_first_points[U2]]);
+
+	bilinear_point_data.vertex_attributes = InputCurves.vertex_attributes.clone_types();
+	bilinear_point_data.point_attributes = InputMesh.point_attributes.clone_types();
+	k3d::table_copier vertex_copier(InputCurves.vertex_attributes, bilinear_point_data.vertex_attributes);
+	k3d::table_copier point_copier(InputMesh.point_attributes, bilinear_point_data.point_attributes);
+
+	vertex_copier.push_back(InputCurves.curve_first_points[U1]);
+	vertex_copier.push_back(InputCurves.curve_first_points[V1]);
+	vertex_copier.push_back(InputCurves.curve_first_points[U2]);
+	vertex_copier.push_back(InputCurves.curve_first_points[V2]);
+
+	point_copier.push_back(InputCurves.curve_points[InputCurves.curve_first_points[U1]]);
+	point_copier.push_back(InputCurves.curve_points[InputCurves.curve_first_points[V1]]);
+	point_copier.push_back(InputCurves.curve_points[InputCurves.curve_first_points[U2]]);
+	point_copier.push_back(InputCurves.curve_points[InputCurves.curve_first_points[V2]]);
+
+	k3d::table patch_attributes = InputCurves.curve_attributes.clone_types();
+	k3d::table_copier patch_copier(InputCurves.curve_attributes, patch_attributes);
+	k3d::uint_t curve_indices[] = {U1, V1, U2, V2};
+	k3d::double_t curve_weights[] = {0.5, 0.5, 0.5, 0.5};
+	patch_copier.push_back(4, curve_indices, curve_weights);
+
+	k3d::table parameter_attributes = InputCurves.parameter_attributes.clone_types();
+	if(!parameter_attributes.empty())
+	{
+		k3d::table_copier parameter_copier(InputCurves.parameter_attributes, parameter_attributes);
+		k3d::uint_t param_idx0[] = {2*U1, 2*U2};
+		k3d::double_t param_weights[] = {0.5, 0.5};
+		parameter_copier.push_back(2, param_idx0, param_weights);
+		k3d::uint_t param_idx1[] = {2*U1+1, 2*U2+1};
+		parameter_copier.push_back(2, param_idx1, param_weights);
+		k3d::uint_t param_idx2[] = {2*V1, 2*V2};
+		parameter_copier.push_back(2, param_idx2, param_weights);
+		k3d::uint_t param_idx3[] = {2*V1+1, 2*V2+1};
+		parameter_copier.push_back(2, param_idx3, param_weights);
+	}
 
 	// Storage for temporary patches
 	k3d::mesh patch_mesh;
@@ -644,7 +980,7 @@ void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	patch_mesh.point_selection.create();
 
 	boost::scoped_ptr<k3d::nurbs_patch::primitive> bilinear_patch(k3d::nurbs_patch::create(patch_mesh));
-	create_bilinear_patch(patch_mesh, *bilinear_patch, P1, P2, P3, P4, W1, W2, W3, W4);
+	create_bilinear_patch(patch_mesh, *bilinear_patch, bilinear_point_data, patch_attributes, parameter_attributes);
 	bilinear_patch->patch_materials.push_back(InputCurves.material.back());
 
 	// Flip curve U2 and V2
@@ -709,10 +1045,23 @@ void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	apply_knot_vectors(patch_mesh, *v_ruled_compatible, patch_mesh, *const_v_ruled, 0, common_u_knots, common_v_knots, v_order, u_order);
 
 	// Compose the final patch
-	k3d::mesh::points_t points;
-	k3d::mesh::weights_t weights;
+	patch_point_data output_point_data;
+	patch_point_data mixer(3); // data from a single point of the 3 patches
+	mixer.point_attributes = patch_mesh.point_attributes.clone_types();
+	mixer.vertex_attributes = u_ruled_compatible->vertex_attributes.clone_types();
+	mixer.point_attributes.set_row_count(3);
+	mixer.vertex_attributes.set_row_count(3);
+	// copiers
+	k3d::table_copier patch_point_copier(patch_mesh.point_attributes, mixer.point_attributes);
+	k3d::table_copier u_vertex_copier(u_ruled_compatible->vertex_attributes, mixer.vertex_attributes);
+	k3d::table_copier v_vertex_copier(v_ruled_compatible->vertex_attributes, mixer.vertex_attributes);
+	k3d::table_copier bilinear_vertex_copier(bilinear_compatible->vertex_attributes, mixer.vertex_attributes);
 	const k3d::uint_t u_count = bilinear_compatible->patch_u_point_counts.back();
 	const k3d::uint_t v_count = bilinear_compatible->patch_v_point_counts.back();
+	// output copying
+	point_data_copier output_copier(mixer, output_point_data);
+	const k3d::uint_t indices[] = {0, 1, 2};
+	const k3d::double_t weights[] = {1.0, 1.0, -1.0};
 	for(k3d::uint_t v = 0; v != v_count; ++v)
 	{
 		const k3d::uint_t u_start = u_count * v;
@@ -720,11 +1069,27 @@ void coons_patch(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 		{
 			const k3d::uint_t idx = u_start + u;
 			const k3d::uint_t transposed_idx = v + u*v_count;
-			points.push_back(patch_mesh.points->at(u_ruled_compatible->patch_points[transposed_idx]) + (patch_mesh.points->at(v_ruled_compatible->patch_points[idx]) - patch_mesh.points->at(bilinear_compatible->patch_points[idx])));
-			weights.push_back(u_ruled_compatible->patch_point_weights[transposed_idx] + v_ruled_compatible->patch_point_weights[idx] - bilinear_compatible->patch_point_weights[idx]);
+
+			patch_point_copier.copy(u_ruled_compatible->patch_points[transposed_idx], 0);
+			patch_point_copier.copy(v_ruled_compatible->patch_points[idx], 1);
+			patch_point_copier.copy(bilinear_compatible->patch_points[idx], 2);
+
+			u_vertex_copier.copy(transposed_idx, 0);
+			v_vertex_copier.copy(idx, 1);
+			bilinear_vertex_copier.copy(idx, 2);
+
+			mixer.points[0] = patch_mesh.points->at(u_ruled_compatible->patch_points[transposed_idx]);
+			mixer.points[1] = patch_mesh.points->at(v_ruled_compatible->patch_points[idx]);
+			mixer.points[2] = patch_mesh.points->at(bilinear_compatible->patch_points[idx]);
+
+			mixer.weights[0] = u_ruled_compatible->patch_point_weights[transposed_idx];
+			mixer.weights[1] = v_ruled_compatible->patch_point_weights[idx];
+			mixer.weights[2] = bilinear_compatible->patch_point_weights[idx];
+
+			output_copier.push_back(3, indices, weights);
 		}
 	}
-	add_patch(OutputMesh, OutputPatches, points, weights, common_u_knots, common_v_knots, u_order, v_order);
+	add_patch(OutputMesh, OutputPatches, output_point_data, common_u_knots, common_v_knots, u_order, v_order, patch_attributes, parameter_attributes);
 	OutputPatches.patch_materials.push_back(InputCurves.material.back());
 }
 
@@ -785,10 +1150,24 @@ void skin_curves(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatch
 	const k3d::uint_t u_order = InputCurves.curve_orders.front();
 	const k3d::uint_t curve_count = InputCurves.curve_first_points.size();
 
+	patch_point_data output_point_data;
+
 	// Because of the way elevate_curve_degree (and ultimately add_curve) works, the points should be ordered correctly
-	k3d::mesh::points_t points(InputMesh.points->begin() + InputCurves.curve_points[InputCurves.curve_first_points.front()], InputMesh.points->end());
+	output_point_data.points.insert(output_point_data.points.end(), InputMesh.points->begin() + InputCurves.curve_points[InputCurves.curve_first_points.front()], InputMesh.points->end());
+	output_point_data.weights = InputCurves.curve_point_weights;
+	output_point_data.vertex_attributes = InputCurves.vertex_attributes.clone();
+	output_point_data.point_attributes = InputMesh.point_attributes.clone(InputCurves.curve_points[InputCurves.curve_first_points.front()], InputMesh.points->size());
 	k3d::mesh::knots_t u_knots(InputCurves.curve_knots.begin(), InputCurves.curve_knots.begin() + InputCurves.curve_point_counts.front() + InputCurves.curve_orders.front());
-	add_patch(OutputMesh, OutputPatches, points, InputCurves.curve_point_weights, u_knots, VKnots, u_order, VOrder);
+
+	k3d::table patch_attributes = InputCurves.curve_attributes.clone(0, 1);
+	k3d::table parameter_attributes = InputCurves.parameter_attributes.clone_types();
+	k3d::table_copier parameter_copier(InputCurves.parameter_attributes, parameter_attributes);
+	parameter_copier.push_back(0);
+	parameter_copier.push_back(1);
+	parameter_copier.push_back(2*InputCurves.curve_first_points.size()-2);
+	parameter_copier.push_back(2*InputCurves.curve_first_points.size()-1);
+
+	add_patch(OutputMesh, OutputPatches, output_point_data, u_knots, VKnots, u_order, VOrder, patch_attributes, parameter_attributes);
 	OutputPatches.patch_materials.push_back(InputCurves.material.back());
 	OutputPatches.patch_selections.back() = 1.0;
 }
@@ -799,21 +1178,17 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 	const k3d::uint_t swept_curves_count = SweptCurves.curve_first_points.size();
 	for(k3d::uint_t path = 0; path != paths_count; ++path)
 	{
-		k3d::mesh::points_t path_points;
-		k3d::mesh::weights_t path_weights;
-		k3d::mesh::knots_t path_knots;
-		k3d::table path_point_attributes;
-		//extract_curve_arrays(path_points, path_knots, path_weights, path_point_attributes, InputMesh, Paths, path, true);
-		const k3d::uint_t path_point_count = path_points.size();
-		const k3d::uint_t order = Paths.curve_orders[path];
+		curve_arrays path_arrays(InputMesh, Paths, path, true);
+		const k3d::uint_t path_point_count = path_arrays.points.size();
+		const k3d::uint_t order = path_arrays.order;
 
 		// Unique knot values
 		k3d::mesh::knots_t unique_knots;
-		for(k3d::uint_t i = 0; i < path_knots.size();)
+		for(k3d::uint_t i = 0; i < path_arrays.knots.size();)
 		{
-			const k3d::double_t u = path_knots[i];
+			const k3d::double_t u = path_arrays.knots[i];
 			unique_knots.push_back(u);
-			i += multiplicity(path_knots, u, i, path_knots.size());
+			i += multiplicity(path_arrays.knots, u, i, path_arrays.knots.size());
 		}
 
 		// Construct a local coordinate system around each sample point
@@ -821,15 +1196,16 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 		k3d::mesh::vectors_t x_vecs, y_vecs, z_vecs;
 		k3d::mesh::knots_t samples_u;
 		{
-			const k3d::point3 o = path_points.front();
-			const k3d::double_t w = path_weights.front();
-			origins.push_back(k3d::point4(o[0]*w, o[1]*w, o[2]*w, w));
-			const k3d::vector3 z = k3d::normalize(path_points[1] - path_points[0]);
-			const k3d::double_t step = (path_knots[order] - path_knots[0]) / static_cast<k3d::double_t>(Samples+1);
-			k3d::vector3 next_tangent = tangent(path_points, path_weights, path_knots, 0.5*step);
+			origins.push_back(path_arrays.points.front());
+			const k3d::point3 p0 = dehomogenize(path_arrays.points[0]);
+			const k3d::point3 p1 = dehomogenize(path_arrays.points[1]);
+			const k3d::point3 p2 = dehomogenize(path_arrays.points[2]);
+			const k3d::vector3 z = k3d::normalize(p1 - p0);
+			const k3d::double_t step = (path_arrays.knots[order] - path_arrays.knots[0]) / static_cast<k3d::double_t>(Samples+1);
+			k3d::vector3 next_tangent = path_arrays.tangent(0.5*step);
 			if(std::abs(z*next_tangent) > 0.999999)
 			{
-				next_tangent = path_point_count > 2 ? k3d::normalize(path_points[2] - path_points[1]) : z;
+				next_tangent = path_point_count > 2 ? k3d::normalize(p2 - p1) : z;
 				if(std::abs(z*next_tangent) > 0.999999) // Choose a random vector that is not parallel to z to make a cross product with
 				{
 					if(z[0] != 0)
@@ -854,9 +1230,9 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 			{
 				const k3d::double_t u = start_u + static_cast<k3d::double_t>(sample) * step;
 				samples_u.push_back(u);
-				const k3d::point4 origin = evaluate_position(path_points, path_weights, path_knots, u);
-				k3d::vector3 z = tangent(path_points, path_weights, path_knots, u, 0.5*step);
-				const k3d::uint_t mul = multiplicity(path_knots, u, 0, path_knots.size());
+				const k3d::point4 origin = path_arrays.evaluate(u).weighted_position;
+				k3d::vector3 z = path_arrays.tangent(u, 0.5*step);
+				const k3d::uint_t mul = multiplicity(path_arrays.knots, u, 0, path_arrays.knots.size());
 				k3d::double_t scaling = 1.0;
 				if(mul == order-1)
 				{
@@ -902,10 +1278,10 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 			z = z_vecs.front();
 			k3d::mesh::points_t swept_points;
 			k3d::mesh::weights_t swept_weights;
-			k3d::mesh::knots_t swept_knots;
-			k3d::table swept_point_attributes;
-			//extract_curve_arrays(swept_points, swept_knots, swept_weights, swept_point_attributes, InputMesh, SweptCurves, swept_curve, true);
-			const k3d::uint_t swept_point_count = swept_points.size();
+			curve_arrays swept_arrays(InputMesh, SweptCurves, swept_curve, true);
+			swept_arrays.points3(swept_points);
+			swept_arrays.weights(swept_weights);
+			const k3d::uint_t swept_point_count = swept_arrays.points.size();
 			if(AlignNormal)
 			{
 				k3d::point3 center(0,0,0);
@@ -966,14 +1342,14 @@ void sweep(k3d::mesh& OutputMesh, k3d::nurbs_patch::primitive& OutputPatches, co
 				}
 				k3d::mesh::points_t points_out;
 				k3d::mesh::weights_t weights_out;
-				approximate(points_out, weights_out, samples_u, samples, order, path_knots);
+				approximate(points_out, weights_out, samples_u, samples, order, path_arrays.knots);
 				const k3d::double_t swept_w = swept_weights[j];
 				for(k3d::uint_t i = 0; i != weights_out.size(); ++i)
 					weights_out[i] *= swept_w;
 				return_if_fail(points_out.size());
-				k3d::nurbs_curve::add_curve(curves_mesh, *curves_prim, order, points_out, weights_out, path_knots);
+				k3d::nurbs_curve::add_curve(curves_mesh, *curves_prim, order, points_out, weights_out, path_arrays.knots);
 			}
-			skin_curves(OutputMesh, OutputPatches, curves_mesh, *curves_prim, swept_knots, SweptCurves.curve_orders[swept_curve]);
+			skin_curves(OutputMesh, OutputPatches, curves_mesh, *curves_prim, swept_arrays.knots, SweptCurves.curve_orders[swept_curve]);
 		}
 	}
 }
@@ -1008,10 +1384,11 @@ void polygonize(k3d::mesh::points_t& Vertices, k3d::mesh::counts_t& VertexCounts
 		curve_mesh.point_selection.create();
 		boost::scoped_ptr<k3d::nurbs_curve::primitive> curve(k3d::nurbs_curve::create(curve_mesh));
 		extract_patch_curve_by_parameter(curve_mesh, *curve, InputMesh, InputPatches, Patch, v, true);
+		curve_arrays curve_arr(curve_mesh, *curve, 0);
 		for(k3d::uint_t i = 0; i != u_sample_count; ++i)
 		{
 			const k3d::double_t u = u_samples[i];
-			Vertices.push_back(dehomogenize(evaluate_position(*curve_mesh.points, curve->curve_point_weights, curve->curve_knots, u)));
+			Vertices.push_back(curve_arr.evaluate(u).position());
 		}
 	}
 	for(k3d::uint_t j = 0; j != v_sample_count-1; ++j)
@@ -1057,8 +1434,8 @@ const k3d::point4 evaluate_position(const k3d::mesh& Mesh, const k3d::nurbs_patc
 	k3d::mesh::weights_t curve_weights;
 	k3d::mesh::knots_t curve_knots;
 	k3d::table curve_point_attributes;
-	//extract_curve_arrays(curve_points, curve_knots, curve_weights, curve_point_attributes, curve_mesh, *curve_prim, 0, true);
-	return evaluate_position(curve_points, curve_weights, curve_knots, V);
+	curve_arrays curve(curve_mesh, *curve_prim, 0, true);
+	return curve.evaluate(V).weighted_position;
 }
 
 void trim_to_nurbs(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_patch::const_primitive& InputPatches, const k3d::uint_t Patch, const k3d::uint_t Samples)
@@ -1093,26 +1470,22 @@ void trim_to_nurbs(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCur
 			const k3d::uint_t max_order = std::max(u_order,v_order);
 			const k3d::uint_t elevations = order < max_order ? max_order - order : 0;
 			elevate_curve_degree(tmp_mesh, *elevated_curves, tmp_mesh, *tmp_curve, 0, elevations);
-			k3d::mesh::points_t el_trim_points;
-			k3d::mesh::weights_t el_trim_weights;
-			k3d::mesh::knots_t el_trim_knots;
-			k3d::table el_trim_point_attributes;
-			//extract_curve_arrays(el_trim_points, el_trim_knots, el_trim_weights, el_trim_point_attributes, tmp_mesh, *elevated_curves, 0, true);
+			curve_arrays el_curve(tmp_mesh, *elevated_curves, 0, true);
 			k3d::mesh::knots_t u_samples;
-			sample(u_samples, el_trim_knots, Samples);
+			sample(u_samples, el_curve.knots, Samples);
 			const k3d::uint_t samples_end = u_samples.size();
 			points4_t sample_points;
 			for(k3d::uint_t sample = 0; sample != samples_end; ++sample)
 			{
-				const k3d::point4 p_trim = evaluate_position(el_trim_points, el_trim_weights, el_trim_knots, u_samples[sample]);
-				const k3d::point3 p = dehomogenize(p_trim);
-				sample_points.push_back(p_trim[3] * evaluate_position(InputMesh, InputPatches, Patch, (p[0]-umin)/urange, (p[1]-vmin)/vrange));
+				curve_arrays::curve_value val = el_curve.evaluate(u_samples[sample]);
+				const k3d::point3 p = val.position();
+				sample_points.push_back(val.weight() * evaluate_position(InputMesh, InputPatches, Patch, (p[0]-umin)/urange, (p[1]-vmin)/vrange));
 			}
 			k3d::mesh::points_t curve_points;
 			k3d::mesh::weights_t curve_weights;
-			approximate(curve_points, curve_weights, u_samples, sample_points, max_order, el_trim_knots);
+			approximate(curve_points, curve_weights, u_samples, sample_points, max_order, el_curve.knots);
 			return_if_fail(curve_points.size());
-			k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, max_order, curve_points, curve_weights, el_trim_knots);
+			k3d::nurbs_curve::add_curve(OutputMesh, OutputCurves, max_order, curve_points, curve_weights, el_curve.knots);
 			if(OutputCurves.material.empty())
 				OutputCurves.material.push_back(InputPatches.patch_materials[Patch]);
 		}

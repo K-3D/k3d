@@ -90,9 +90,9 @@ public:
 			{
 				if(curves_prim->curve_selections[curve])
 				{
-					if(!patches_prim)
-						patches_prim.reset(k3d::nurbs_patch::create(Output));
+					patches_prim.reset(k3d::nurbs_patch::create(Output));
 					module::nurbs::revolve_curve(Output, *patches_prim, Input, *curves_prim, curve, m_around.pipeline_value(), m_angle.pipeline_value(), m_segments.pipeline_value());
+					patches_prim->constant_attributes = curves_prim->constant_attributes.clone();
 				}
 			}
 		}
