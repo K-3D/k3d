@@ -68,7 +68,6 @@ public:
 				continue;
 			
 			const k3d::mesh::points_t& points = *Mesh.points;
-			const k3d::mesh::table_t& vertex_attributes = Mesh.point_attributes;
 
 			k3d::ri::unsigned_integers ri_point_counts;
 
@@ -82,7 +81,7 @@ public:
 			ri_varying_attributes.add_arrays(linear_curve->parameter_attributes);
 
 			array_copier ri_vertex_attributes;
-			ri_vertex_attributes.add_arrays(vertex_attributes);
+			ri_vertex_attributes.add_arrays(linear_curve->vertex_attributes);
 			ri_vertex_attributes.add_array(k3d::ri::RI_P(), points);
 
 			const k3d::uint_t curves_begin = 0;
