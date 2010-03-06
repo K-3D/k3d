@@ -681,10 +681,6 @@ K3D_TEST(mesh.modifier.ConnectVertices
 	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
 	LABELS mesh modifier)
 
-K3D_TEST(mesh.modifier.CreateTrimCurve 
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CreateTrimCurve.py
-	REQUIRES K3D_BUILD_NURBS_MODULE
-	LABELS mesh modifier)
 
 K3D_TEST(mesh.modifier.CylindricalWavePoints 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CylindricalWavePoints.py
