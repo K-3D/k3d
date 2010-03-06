@@ -1,11 +1,11 @@
 #python
 
 import k3d
-k3d.check_node_environment(locals(), "MeshPainterScript")
+k3d.check_node_environment(context, "OpenGLPainterScript")
 
 from OpenGL.GL import *
 
-points = Mesh.points()
+points = context.mesh.points()
 if points:
 	glPushAttrib(GL_ALL_ATTRIB_BITS)
 	glDisable(GL_LIGHTING)
