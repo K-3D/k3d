@@ -23,6 +23,7 @@
 
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/plugins.h>
 #include <k3dsdk/properties.h>
 #include <k3dsdk/time_source.h>
 
@@ -31,7 +32,10 @@ namespace k3d
 
 inode* get_time_source(idocument& Document)
 {
-	const std::vector<inode*> nodes = node::lookup(Document, "TimeSource");
+	static iplugin_factory* const factory = plugin::factory::lookup("TimeSource");
+	return_val_if_fail(factory, 0);
+
+	const std::vector<inode*> nodes = node::lookup(Document, factory->factory_id());
 	return (1 == nodes.size()) ? nodes[0] : 0;
 }
 
