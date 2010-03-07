@@ -5,13 +5,13 @@ import testing
 
 document = k3d.new_document()
 
-source = document.new_node("PolyTorus")
+source = k3d.plugin.create("PolyTorus", document)
 
-triangles = document.new_node("TriangulateFaces")
+triangles = k3d.plugin.create("TriangulateFaces", document)
 triangles.mesh_selection = k3d.select_all()
 document.set_dependency(triangles.get_property("input_mesh"), source.get_property("output_mesh"))
 
-modifier = document.new_node("PGPRemesh")
+modifier = k3d.plugin.create("PGPRemesh", document)
 modifier.use_smooth = False
 modifier.steps = 0
 modifier.omega = 1

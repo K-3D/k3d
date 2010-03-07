@@ -5,7 +5,7 @@ import k3d
 context.document.start_change_set()
 try:
 	# Create a FrozenMesh node to act as a mesh source ...
-	frozen_mesh = context.document.new_node("FrozenMesh")
+	frozen_mesh = k3d.plugin.create("FrozenMesh", context.document)
 	frozen_mesh.name = "Simple Polyhedron"
 
 	# Create a mesh ...
@@ -19,7 +19,7 @@ try:
 	polyhedron = k3d.polyhedron.create(mesh, vertices, vertex_counts, vertex_indices, material)
 	
 	# Connect the FrozenMesh to a MeshInstance to place it in the scene ...
-	mesh_instance = context.document.new_node("MeshInstance")
+	mesh_instance = k3d.plugin.create("MeshInstance", context.document)
 	mesh_instance.name = "Simple Polyhedron Instance"
 	mesh_instance.gl_painter = context.document.get_node("GL Default Painter")
 	mesh_instance.ri_painter = context.document.get_node("RenderMan Default Painter")

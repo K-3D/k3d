@@ -5,11 +5,11 @@ import k3d
 
 document = k3d.new_document()
 
-patch = document.new_node("NurbsGrid")
-curve = document.new_node("NurbsCircle")
-merge_mesh = document.new_node("MergeMesh")
-modifier = document.new_node("NurbsAddTrimCurve")
-extract_trim = document.new_node("NurbsExtractTrimCurves")
+patch = k3d.plugin.create("NurbsGrid", document)
+curve = k3d.plugin.create("NurbsCircle", document)
+merge_mesh = k3d.plugin.create("MergeMesh", document)
+modifier = k3d.plugin.create("NurbsAddTrimCurve", document)
+extract_trim = k3d.plugin.create("NurbsExtractTrimCurves", document)
 
 merge_mesh.create_property("k3d::mesh*", "input_mesh1", "Input Mesh 1", "")
 merge_mesh.create_property("k3d::mesh*", "input_mesh2", "Input Mesh 2", "")

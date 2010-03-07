@@ -4,15 +4,15 @@ import testing, k3d, sys
 
 doc = k3d.new_document()
 
-source = doc.new_node("PolyGrid")
+source = k3d.plugin.create("PolyGrid", doc)
 
-k3d_to_cuda = doc.new_node("CUDAMeshK3dToCUDAConverter")
-cuda_to_k3d = doc.new_node("CUDAMeshCUDAToK3dConverter")
+k3d_to_cuda = k3d.plugin.create("CUDAMeshK3dToCUDAConverter", doc)
+cuda_to_k3d = k3d.plugin.create("CUDAMeshCUDAToK3dConverter", doc)
 
 doc.set_dependency(k3d_to_cuda.get_property("input_mesh"), source.get_property("output_mesh"))
 doc.set_dependency(cuda_to_k3d.get_property("device_input_mesh"), k3d_to_cuda.get_property("device_output_mesh"))
 
-difference = doc.new_node("MeshDiff")
+difference = k3d.plugin.create("MeshDiff", doc)
 difference.threshold = 1
 difference.create_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
 difference.create_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")

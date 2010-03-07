@@ -498,7 +498,7 @@ K3D_TEST(mesh.source.CUDAPolyGrid.benchmark
 
 K3D_TEST(mesh.source.PolyGrid.benchmark
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.PolyGrid.benchmark.py
-	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE
+	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE K3D_BUILD_CUDA_MODULE
 	LABELS mesh source)
 
 K3D_TEST(mesh.source.BenchmarkComparison

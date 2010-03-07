@@ -4,12 +4,12 @@ import k3d
 
 # Setup a simple pipeline ...
 doc = k3d.new_document()
-source = doc.new_node("PolyCube")
-modifier = doc.new_node("ScalePoints")
+source = k3d.plugin.create("PolyCube", doc)
+modifier = k3d.plugin.create("ScalePoints", doc)
 doc.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
 
 # Create a profiler ...
-profiler = doc.new_node("PipelineProfiler")
+profiler = k3d.plugin.create("PipelineProfiler", doc)
 
 # At this point the profiler should be empty ...
 if len(profiler.records) != 0:

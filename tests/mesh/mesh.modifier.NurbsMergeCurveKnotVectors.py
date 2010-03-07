@@ -6,11 +6,11 @@ import math
 
 document = k3d.new_document()
 
-curve1 = document.new_node("NurbsCircle")
-curve2 = document.new_node("NurbsCircle")
-transform = document.new_node("TranslatePoints")
-merge_mesh = document.new_node("MergeMesh")
-modifier = document.new_node("NurbsMergeCurveKnotVectors")
+curve1 = k3d.plugin.create("NurbsCircle", document)
+curve2 = k3d.plugin.create("NurbsCircle", document)
+transform = k3d.plugin.create("TranslatePoints", document)
+merge_mesh = k3d.plugin.create("MergeMesh", document)
+modifier = k3d.plugin.create("NurbsMergeCurveKnotVectors", document)
 
 curve2.thetamax = math.radians(180)
 curve2.u_segments = 6

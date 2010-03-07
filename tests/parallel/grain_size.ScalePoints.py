@@ -13,7 +13,7 @@ selection = k3d.geometry.selection.create(0)
 selection.points = k3d.geometry.point_selection.create(selection, 1)
 setup.modifier.mesh_selection = selection
 
-profiler = setup.document.new_node("PipelineProfiler")
+profiler = k3d.plugin.create("PipelineProfiler", setup.document)
 
 thread_count = 2
 

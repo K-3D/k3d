@@ -5,11 +5,11 @@ import testing
 
 document = k3d.new_document()
 
-time_source = document.new_node("TimeSource")
-instance = document.new_node("MeshInstance")
-transform = document.new_node("FrozenMatrix")
-track = document.new_node("AnimationTrackDoubleMatrix4")
-interpolator = document.new_node("InterpolatorDoubleMatrix4Linear")
+time_source = k3d.plugin.create("TimeSource", document)
+instance = k3d.plugin.create("MeshInstance", document)
+transform = k3d.plugin.create("FrozenMatrix", document)
+track = k3d.plugin.create("AnimationTrackDoubleMatrix4", document)
+interpolator = k3d.plugin.create("InterpolatorDoubleMatrix4Linear", document)
 track.interpolator = interpolator
 transform.matrix = k3d.translate3(3, 0, 0)
 

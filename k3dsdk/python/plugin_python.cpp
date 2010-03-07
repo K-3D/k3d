@@ -17,15 +17,14 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <k3dsdk/python/iunknown_python.h>
-#include <k3dsdk/python/plugin_python.h>
-
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/plugins.h>
+#include <k3dsdk/python/idocument_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/plugin_python.h>
 
 #include <boost/python.hpp>
-using namespace boost::python;
 
 namespace k3d
 {
@@ -36,9 +35,9 @@ namespace python
 class plugin
 {
 public:
-	static list wrap_factories(const k3d::plugin::factory::collection_t& Factories)
+	static boost::python::list wrap_factories(const k3d::plugin::factory::collection_t& Factories)
 	{
-		list python_factories;
+		boost::python::list python_factories;
 
 		for(k3d::plugin::factory::collection_t::const_iterator factory = Factories.begin(); factory != Factories.end(); ++factory)
 			python_factories.append(wrap_unknown(*factory));
@@ -46,45 +45,60 @@ public:
 		return python_factories;
 	}
 
-	static object create_by_uuid(const uuid& ID)
+	static boost::python::object create_by_uuid(const uuid& ID)
 	{
 		return wrap_unknown(k3d::plugin::create(ID));
 	}
 
-	static object create_by_name(const string_t& Type)
+	static boost::python::object create_by_name(const string_t& Type)
 	{
 		return wrap_unknown(k3d::plugin::create(Type));
 	}
 
-	static object create_by_factory(const iunknown_wrapper& Factory)
+	static boost::python::object create_by_factory(const iunknown_wrapper& Factory)
 	{
 		return wrap_unknown(k3d::plugin::create(dynamic_cast<k3d::iplugin_factory&>(Factory.wrapped())));
+	}
+
+	static boost::python::object document_create_by_uuid(const uuid& ID, const idocument_wrapper& Document)
+	{
+		return wrap_unknown(k3d::plugin::create(ID, Document.wrapped()));
+	}
+
+	static boost::python::object document_create_by_name(const string_t& Type, const idocument_wrapper& Document)
+	{
+		return wrap_unknown(k3d::plugin::create(Type, Document.wrapped()));
+	}
+
+	static boost::python::object document_create_by_factory(const iunknown_wrapper& Factory, const idocument_wrapper& Document)
+	{
+		return wrap_unknown(k3d::plugin::create(dynamic_cast<k3d::iplugin_factory&>(Factory.wrapped()), Document.wrapped()));
 	}
 
 	class factory
 	{
 	public:
-		static list lookup()
+		static boost::python::list lookup()
 		{
 			return wrap_factories(k3d::plugin::factory::lookup());
 		}
 
-		static object lookup_by_uuid(const uuid& ID)
+		static boost::python::object lookup_by_uuid(const uuid& ID)
 		{
 			return wrap_unknown(k3d::plugin::factory::lookup(ID));
 		}
 
-		static object lookup_by_name(const string_t& Name)
+		static boost::python::object lookup_by_name(const string_t& Name)
 		{
 			return wrap_unknown(k3d::plugin::factory::lookup(Name));
 		}
 
-		static list lookup_by_metadata(const string_t& MetadataName, const string_t& MetadataValue)
+		static boost::python::list lookup_by_metadata(const string_t& MetadataName, const string_t& MetadataValue)
 		{
 			return wrap_factories(k3d::plugin::factory::lookup(MetadataName, MetadataValue));
 		}
 
-		static list lookup_by_mime_type(const k3d::mime::type& Type)
+		static boost::python::list lookup_by_mime_type(const k3d::mime::type& Type)
 		{
 			return wrap_factories(k3d::plugin::factory::lookup(Type));
 		}
@@ -93,16 +107,22 @@ public:
 
 void define_namespace_plugin()
 {
-	scope outer = class_<plugin>("plugin", no_init)
+	boost::python::scope outer = boost::python::class_<plugin>("plugin", boost::python::no_init)
 		.def("create", plugin::create_by_name,
 			"Returns a new application plugin instance, or None.")
 		.def("create", plugin::create_by_uuid,
 			"Returns a new application plugin instance, or None.")
 		.def("create", plugin::create_by_factory,
 			"Returns a new application plugin instance, or None.")
+		.def("create", plugin::document_create_by_name,
+			"Returns a new document plugin instance, or None.")
+		.def("create", plugin::document_create_by_uuid,
+			"Returns a new document plugin instance, or None.")
+		.def("create", plugin::document_create_by_factory,
+			"Returns a new document plugin instance, or None.")
 		.staticmethod("create");
 
-	class_<plugin::factory>("factory", no_init)
+	boost::python::class_<plugin::factory>("factory", boost::python::no_init)
 		.def("lookup", plugin::factory::lookup,
 			"Returns a list containing all available plugin factories.")
 		.def("lookup", plugin::factory::lookup_by_uuid,

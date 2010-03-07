@@ -76,27 +76,6 @@ static void redraw_all(idocument_wrapper& Self)
 	k3d::gl::redraw_all(Self.wrapped(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 }
 
-static const object new_node(idocument_wrapper& Self, const object& Type)
-{
-	extract<string_t> plugin_name(Type);
-	if(plugin_name.check())
-	{
-		k3d::iplugin_factory* const plugin_factory = k3d::plugin::factory::lookup(plugin_name());
-		if(!plugin_factory)
-			throw std::runtime_error("no factory for plugin type " + plugin_name());
-
-		return wrap_unknown(k3d::plugin::create<k3d::iunknown>(*plugin_factory, Self.wrapped(), k3d::unique_name(Self.wrapped().nodes(), plugin_name())));
-	}
-
-	extract<iunknown_wrapper> plugin_factory(Type);
-	if(plugin_factory.check())
-	{
-		return wrap_unknown(k3d::plugin::create<k3d::iunknown>(dynamic_cast<k3d::iplugin_factory&>(plugin_factory().wrapped()), Self.wrapped()));
-	}
-
-	throw std::invalid_argument("can't create new node from given argument");
-}
-
 static const object get_node(idocument_wrapper& Self, const string_t& Name)
 {
 	const std::vector<k3d::inode*> nodes = k3d::node::lookup(Self.wrapped(), Name);
@@ -167,7 +146,6 @@ void define_class_idocument()
 		.def("cancel_change_set", &cancel_change_set)
 		.def("finish_change_set", &finish_change_set)
 		.def("redraw_all", &redraw_all)
-		.def("new_node", &new_node)
 		.def("get_node", &get_node)
 		.def("delete_node", &delete_node)
 		.def("get_dependency", &get_dependency)

@@ -4,8 +4,8 @@ import k3d
 
 doc = k3d.new_document()
 
-node1 = doc.new_node("TwistPoints")
-node2 = doc.new_node("TwistPoints")
+node1 = k3d.plugin.create("TwistPoints", doc)
+node2 = k3d.plugin.create("TwistPoints", doc)
 
 node1.axis = "x"
 node2.axis = "y"

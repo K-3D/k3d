@@ -5,13 +5,13 @@ import testing
 
 document = k3d.new_document()
 
-small_cube = document.new_node("PolyCube")
+small_cube = k3d.plugin.create("PolyCube", document)
 small_cube.width = 2.5
 small_cube.depth = 2.5
 small_cube.height = 7.5
-big_cube = document.new_node("PolyCube")
+big_cube = k3d.plugin.create("PolyCube", document)
 
-cgal_boolean = document.new_node("CGALBoolean")
+cgal_boolean = k3d.plugin.create("CGALBoolean", document)
 cgal_boolean.type = "difference"
 cgal_boolean.create_property("k3d::mesh*", "input_1", "Input 1", "")
 cgal_boolean.create_property("k3d::mesh*", "input_2", "Input 2", "")

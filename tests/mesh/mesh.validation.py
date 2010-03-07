@@ -5,7 +5,7 @@ import testing
 
 document = k3d.new_document()
 
-source = document.new_node("FrozenMesh")
+source = k3d.plugin.create("FrozenMesh", document)
 mesh = source.create_mesh()
 polyhedron = k3d.polyhedron.create(mesh)
 primitive = mesh.primitives()[0]

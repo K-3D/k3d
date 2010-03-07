@@ -18,8 +18,8 @@ def test_unequal(a, b, test):
 
 document = k3d.new_document()
 
-source_a = document.new_node("FrozenMesh")
-source_b = document.new_node("FrozenMesh")
+source_a = k3d.plugin.create("FrozenMesh", document)
+source_b = k3d.plugin.create("FrozenMesh", document)
 
 mesh_a = source_a.create_mesh()
 mesh_b = source_b.create_mesh()

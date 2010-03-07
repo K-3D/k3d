@@ -4,7 +4,7 @@ import k3d
 
 doc = k3d.new_document()
 
-axes = doc.new_node("Axes")
+axes = k3d.plugin.create("Axes", doc)
 axes.axes = True
 axes.xyplane = False
 

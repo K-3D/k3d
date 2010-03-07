@@ -20,7 +20,7 @@ class benchmarkMesh(object):
         self.initialize_mesh()
         
     def initialize_mesh(self):
-        self.__cube = self.__document.new_node("PolyCube")
+        self.__cube = k3d.plugin.create("PolyCube", self.__document)
         self.__cube.columns = 1;
         self.__cube.rows = 1;
         self.__cube.slices = 1;
@@ -28,12 +28,12 @@ class benchmarkMesh(object):
         self.__cube.height = 1;
         self.__cube.depth = 1;
         
-        self.__mesh_array_3D = self.__document.new_node("MeshArray3D")
+        self.__mesh_array_3D = k3d.plugin.create("MeshArray3D", self.__document)
         self.__mesh_array_3D.count1 = self.__counts[0]
         self.__mesh_array_3D.count2 = self.__counts[1]
         self.__mesh_array_3D.count3 = self.__counts[2]
     
-        self.__mesh_array_3D.layout = self.__document.new_node("TranslateArray3D")
+        self.__mesh_array_3D.layout = k3d.plugin.create("TranslateArray3D", self.__document)
     
         self.__document.set_dependency(self.__mesh_array_3D.get_property("input_mesh"), self.__cube.get_property("output_mesh"))
     
@@ -318,8 +318,8 @@ def mesh_source_benchmark(benchmarkPluginName, properties = {}):
 def run_mesh_source_benchmark(meshSourceNodeName, numberOfRuns = 1, properties = {}, appendToFile = False, firstInFile=False):
     document = k3d.new_document()
         
-    profiler = document.new_node("PipelineProfiler")
-    benchmarkNode = document.new_node(meshSourceNodeName)
+    profiler = k3d.plugin.create("PipelineProfiler", document)
+    benchmarkNode = k3d.plugin.create(meshSourceNodeName, document)
     
     sizeMetric = 1
     for (p, val) in properties.items():
@@ -427,7 +427,7 @@ def extract_data(benchmarkPluginName, ColumnTitle = "Total", operation = CALC_AV
 def run_mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRuns = 1, properties = {}, appendToFile = False, firstInFile=False):
     document = k3d.new_document()
         
-    profiler = document.new_node("PipelineProfiler")
+    profiler = k3d.plugin.create("PipelineProfiler", document)
     
     benchmarkMesh.set_document(document)
     
@@ -436,7 +436,7 @@ def run_mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRun
     selection = k3d.select_all()
     
 
-    benchmarkNode = document.new_node(meshModifierNodeName)
+    benchmarkNode = k3d.plugin.create(meshModifierNodeName, document)
     for (p, val) in properties.items():
         benchmarkNode.get_property(p).set_value(val)
     benchmarkNode.mesh_selection = selection

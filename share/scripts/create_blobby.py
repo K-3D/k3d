@@ -5,7 +5,7 @@ import k3d
 context.document.start_change_set()
 try:
 	# Create a FrozenMesh node to act as a mesh source ...
-	frozen_mesh = context.document.new_node("FrozenMesh")
+	frozen_mesh = k3d.plugin.create("FrozenMesh", context.document)
 	frozen_mesh.name = "Blobby"
 
 	# Create a mesh ...
@@ -42,7 +42,7 @@ try:
 	blobby.operands().assign([5, 0, 1, 2, 3]) # Operand count, followed by the index of each primitive to add
 
 	# Connect the FrozenMesh to a MeshInstance to place it in the scene ...
-	mesh_instance = context.document.new_node("MeshInstance")
+	mesh_instance = k3d.plugin.create("MeshInstance", context.document)
 	mesh_instance.name = "Blobby Instance"
 	mesh_instance.gl_painter = context.document.get_node("GL Default Painter")
 	mesh_instance.ri_painter = context.document.get_node("RenderMan Default Painter")

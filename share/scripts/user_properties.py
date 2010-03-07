@@ -1,8 +1,10 @@
 #python
 
+import k3d
+
 context.document.start_change_set()
 try:
-	node = context.document.new_node("Null")
+	node = k3d.plugin.create("Null", context.document)
 	node.name = "User Properties Test"
 
 	node.create_property("k3d::bool_t", "bool", "Boolean", "Boolean user property")

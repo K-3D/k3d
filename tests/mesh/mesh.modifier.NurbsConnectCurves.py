@@ -5,11 +5,11 @@ import k3d
 
 document = k3d.new_document()
 
-curve1 = document.new_node("NurbsCurve")
-curve2 = document.new_node("NurbsCurve")
-transform = document.new_node("TranslatePoints")
-merge_mesh = document.new_node("MergeMesh")
-modifier = document.new_node("NurbsConnectCurves")
+curve1 = k3d.plugin.create("NurbsCurve", document)
+curve2 = k3d.plugin.create("NurbsCurve", document)
+transform = k3d.plugin.create("TranslatePoints", document)
+merge_mesh = k3d.plugin.create("MergeMesh", document)
+modifier = k3d.plugin.create("NurbsConnectCurves", document)
 
 merge_mesh.create_property("k3d::mesh*", "input_mesh1", "Input Mesh 1", "")
 merge_mesh.create_property("k3d::mesh*", "input_mesh2", "Input Mesh 2", "")

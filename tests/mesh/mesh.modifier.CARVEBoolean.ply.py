@@ -5,16 +5,16 @@ import testing
 
 document = k3d.new_document()
 
-small_cylinder = document.new_node("PLYMeshReader")
+small_cylinder = k3d.plugin.create("PLYMeshReader", document)
 small_cylinder.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/mesh.modifier.CARVEBoolean.input.b.ply")
 small_cylinder.center = False
 small_cylinder.scale_to_size = False
-big_cylinder = document.new_node("PLYMeshReader")
+big_cylinder = k3d.plugin.create("PLYMeshReader", document)
 big_cylinder.file = k3d.filesystem.generic_path(testing.source_path() + "/meshes/mesh.modifier.CARVEBoolean.input.a.ply")
 big_cylinder.center = False
 big_cylinder.scale_to_size = False
 
-carve_boolean = document.new_node("CARVEBoolean")
+carve_boolean = k3d.plugin.create("CARVEBoolean", document)
 carve_boolean.type = "difference"
 carve_boolean.create_property("k3d::mesh*", "input_1", "Input 1", "")
 carve_boolean.create_property("k3d::mesh*", "input_2", "Input 2", "")

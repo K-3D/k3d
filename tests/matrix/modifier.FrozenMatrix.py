@@ -5,8 +5,8 @@ import testing
 
 document = k3d.new_document()
 
-instance = document.new_node("MeshInstance")
-transform = document.new_node("FrozenMatrix")
+instance = k3d.plugin.create("MeshInstance", document)
+transform = k3d.plugin.create("FrozenMatrix", document)
 
 transform.matrix = k3d.translate3(1, 0, 0)
 document.set_dependency(instance.get_property("input_matrix"), transform.get_property("output_matrix"))

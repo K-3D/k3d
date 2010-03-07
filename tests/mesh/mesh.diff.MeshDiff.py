@@ -4,10 +4,10 @@ import k3d
 
 doc = k3d.new_document()
 
-source_a = doc.new_node("PolyGrid")
-source_b = doc.new_node("PolyGrid")
+source_a = k3d.plugin.create("PolyGrid", doc)
+source_b = k3d.plugin.create("PolyGrid", doc)
 
-diff = doc.new_node("MeshDiff")
+diff = k3d.plugin.create("MeshDiff", doc)
 diff.create_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
 diff.create_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")
 

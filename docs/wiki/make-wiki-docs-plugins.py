@@ -143,7 +143,7 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 	article.write("|}\n")
 
 	if plugin.is_document_plugin():
-		node = doc.new_node(plugin.name())
+		node = k3d.plugin.create(plugin, doc)
 
 		if node:
 			article.write("== Properties == " + "\n")

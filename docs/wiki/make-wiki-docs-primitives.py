@@ -19,7 +19,7 @@ for i in range(len(primitive_types)):
 	primitive_name = primitive_names[i]
 
 	document = k3d.new_document()
-	source = document.new_node("FrozenMesh")
+	source = k3d.plugin.create("FrozenMesh", document)
 	mesh = source.create_mesh()
 	primitive_type.create(mesh)
 	primitive = mesh.primitives()[0]
@@ -54,7 +54,7 @@ for i in range(len(primitive_types)):
 	article.write("<graphviz>\n")
 
 	document = k3d.new_document()
-	source = document.new_node("FrozenMesh")
+	source = k3d.plugin.create("FrozenMesh", document)
 	mesh = source.create_mesh()
 	primitive_type.create(mesh)
 
@@ -71,7 +71,7 @@ for i in range(len(primitive_types)):
 		mesh.create_points()
 		mesh.create_point_selection()
 
-	writer = document.new_node("GraphVizMeshWriter")
+	writer = k3d.plugin.create("GraphVizMeshWriter", document)
 	document.set_dependency(writer.get_property("input_mesh"), source.get_property("output_mesh"))
 	article.write(writer.output_string)
 

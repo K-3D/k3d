@@ -5,10 +5,10 @@ import testing
 
 document = k3d.new_document()
 
-source1 = document.new_node("PolyCone")
-source2 = document.new_node("PolySphere")
-source3 = document.new_node("PolyCube")
-modifier = document.new_node("MorphPoints")
+source1 = k3d.plugin.create("PolyCone", document)
+source2 = k3d.plugin.create("PolySphere", document)
+source3 = k3d.plugin.create("PolyCube", document)
+modifier = k3d.plugin.create("MorphPoints", document)
 
 modifier.create_property("k3d::mesh*", "input1", "input1", "input1")
 modifier.create_property("k3d::mesh*", "input2", "input2", "input2")

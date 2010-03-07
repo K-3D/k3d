@@ -5,7 +5,7 @@ import k3d
 def setup_matrix_modifier_test(source_name, matrix):
 	doc = k3d.new_document()
 
-	source = doc.new_node(source_name)
+	source = k3d.plugin.create(source_name, doc)
 	source.input_matrix = matrix
 
 	class result_object:

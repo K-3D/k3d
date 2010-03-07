@@ -4,11 +4,11 @@ import k3d
 
 doc = k3d.new_document()
 
-node_selection = doc.new_node("NodeSelection")
+node_selection = k3d.plugin.create("NodeSelection", doc)
 
-node1 = doc.new_node("FrozenMesh")
-node2 = doc.new_node("FrozenMesh")
-node3 = doc.new_node("FrozenMesh")
+node1 = k3d.plugin.create("FrozenMesh", doc)
+node2 = k3d.plugin.create("FrozenMesh", doc)
+node3 = k3d.plugin.create("FrozenMesh", doc)
 
 node1.name="n1"
 node2.name="n2"

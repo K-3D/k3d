@@ -5,7 +5,7 @@ import testing
 
 setup = testing.setup_mesh_reader_test("PLYMeshReader", "mesh.modifier.PGPRemesh.torus.ply")
 
-modifier = setup.document.new_node("PGPRemesh")
+modifier = setup.k3d.plugin.create("PGPRemesh", document)
 modifier.use_smooth = True
 modifier.steps = 15
 modifier.h = 1000

@@ -9,7 +9,7 @@ try:
 	if k3d.ui().query_message("Choose one ...", ["Succeed", "Fail"]) == 2:
 		raise RuntimeError("Simulated error condition.")
 
-	null_node = context.document.new_node("Null")
+	null_node = k3d.plugin.create("Null", context.document)
 	null_node.name = "Test Node"
 
 	context.document.finish_change_set("Test Change Set")

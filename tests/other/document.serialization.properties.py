@@ -8,22 +8,22 @@ def create_property(node, type, value):
 	property.set_value(value)
 
 document = k3d.new_document()
-test_container = document.new_node("Null")
+test_container = k3d.plugin.create("Null", document)
 test_container.name = "test_container"
 
-test_material = document.new_node("MultiMaterial")
+test_material = k3d.plugin.create("MultiMaterial", document)
 test_material.name = "test_material"
 
-test_gl_mesh_painter = document.new_node("OpenGLPointPainter")
+test_gl_mesh_painter = k3d.plugin.create("OpenGLPointPainter", document)
 test_gl_mesh_painter.name = "test_gl_mesh_painter"
 
-test_ri_mesh_painter = document.new_node("RenderManLinearCurvePainter")
+test_ri_mesh_painter = k3d.plugin.create("RenderManLinearCurvePainter", document)
 test_ri_mesh_painter.name = "test_ri_mesh_painter"
 
-test_ri_texture = document.new_node("RenderManTextureMap")
+test_ri_texture = k3d.plugin.create("RenderManTextureMap", document)
 test_ri_texture.name = "test_ri_texture"
 
-test_node = document.new_node("Axes")
+test_node = k3d.plugin.create("Axes", document)
 test_node.name = "test_node"
 
 create_property(test_container, "k3d::bool_t", True)

@@ -4,7 +4,7 @@ import k3d
 import sys
 
 document = k3d.new_document()
-frozen_mesh = document.new_node("FrozenMesh")
+frozen_mesh = k3d.plugin.create("FrozenMesh", document)
 mesh = frozen_mesh.create_mesh()
 polyhedron = k3d.polyhedron.create(mesh)
 

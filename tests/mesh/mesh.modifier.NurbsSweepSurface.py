@@ -6,12 +6,12 @@ from math import pi
 
 document = k3d.new_document()
 
-path = document.new_node("NurbsCircle")
-to_sweep = document.new_node("NurbsCircle")
-rotate = document.new_node("RotatePoints")
-translate = document.new_node("TranslatePoints")
-merge_mesh = document.new_node("MergeMesh")
-modifier = document.new_node("NurbsSweepSurface")
+path = k3d.plugin.create("NurbsCircle", document)
+to_sweep = k3d.plugin.create("NurbsCircle", document)
+rotate = k3d.plugin.create("RotatePoints", document)
+translate = k3d.plugin.create("TranslatePoints", document)
+merge_mesh = k3d.plugin.create("MergeMesh", document)
+modifier = k3d.plugin.create("NurbsSweepSurface", document)
 
 merge_mesh.create_property("k3d::mesh*", "input_mesh1", "Input Mesh 1", "")
 merge_mesh.create_property("k3d::mesh*", "input_mesh2", "Input Mesh 2", "")

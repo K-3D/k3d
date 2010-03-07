@@ -5,7 +5,7 @@ import testing
 
 document = k3d.new_document()
 
-source = document.new_node("FrozenMesh")
+source = k3d.plugin.create("FrozenMesh", document)
 mesh = source.create_mesh()
 
 positions = [(-5, 5, 0), (5, 5, 0), (-5, -5, 0), (5, -5, 0)]
@@ -33,7 +33,7 @@ polyhedron.vertex_selections().assign([0, 0, 0, 0])
 Cs = polyhedron.edge_attributes().create("Cs", "k3d::color")
 Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color(1, 1, 1)])
 
-modifier = document.new_node("GTSMeshArea")
+modifier = k3d.plugin.create("GTSMeshArea", document)
 document.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
 
 testing.require_mesh_area(modifier.area, 50.0)

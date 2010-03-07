@@ -4,7 +4,7 @@ import k3d
 
 doc = k3d.new_document()
 
-axes = doc.new_node("Axes")
+axes = k3d.plugin.create("Axes", doc)
 doc.set_dependency(axes.get_property("xyplane"), axes.get_property("axes"));
 
 if doc.get_dependency(axes.get_property("xyplane")).name() != "axes":

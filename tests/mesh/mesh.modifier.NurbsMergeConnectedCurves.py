@@ -6,10 +6,10 @@ import testing
 document = k3d.new_document()
 
 selection = k3d.geometry.selection.create(1)
-circle = document.new_node("NurbsCircle")
-split1 = document.new_node("NurbsSplitCurve")
-split2 = document.new_node("NurbsSplitCurve")
-merge = document.new_node("NurbsMergeConnectedCurves")
+circle = k3d.plugin.create("NurbsCircle", document)
+split1 = k3d.plugin.create("NurbsSplitCurve", document)
+split2 = k3d.plugin.create("NurbsSplitCurve", document)
+merge = k3d.plugin.create("NurbsMergeConnectedCurves", document)
 
 split1.mesh_selection = selection
 split2.mesh_selection = selection

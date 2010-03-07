@@ -5,12 +5,12 @@ import testing
 
 document = k3d.new_document()
 
-grid = document.new_node("PolyGrid");
+grid = k3d.plugin.create("PolyGrid"), document;
 grid.columns = 1
 grid.rows = 1
 
-modifier = document.new_node("SubdivideEdges")
-cuda_modifier = document.new_node("CUDASubdivideEdges")
+modifier = k3d.plugin.create("SubdivideEdges", document)
+cuda_modifier = k3d.plugin.create("CUDASubdivideEdges", document)
 
 modifier.mesh_selection = k3d.geometry.selection.create(1)
 modifier.vertices = 1
