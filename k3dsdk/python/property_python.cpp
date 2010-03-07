@@ -65,7 +65,7 @@ void define_namespace_property()
 
 		.def("disconnect", property::disconnect,
 			"Breaks the pipeline connection (if any) to the given property.")
-		.staticmethod("connect")
+		.staticmethod("disconnect")
 		;
 }
 
