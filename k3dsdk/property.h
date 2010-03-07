@@ -38,7 +38,11 @@ namespace property
 {
 
 /// Makes a connection from one property to another.
-void connect(idocument& Document, iproperty* const From, iproperty* const To);
+void connect(idocument& Document, iproperty& From, iproperty& To);
+/// Returns the connection to a property (if any), or NULL.
+iproperty* connection(idocument& Document, iproperty& Property);
+/// Disconnects a property from its dependency (if any).
+void disconnect(idocument& Document, iproperty& Property);
 
 /// Returns a matching property by name, or NULL
 iproperty* get(iunknown& Object, const string_t& Name);

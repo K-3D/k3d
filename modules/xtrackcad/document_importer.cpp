@@ -79,8 +79,8 @@ public:
 
 			k3d::property::connect(
 				Document,
-				k3d::property::get(*track_source, "output_mesh"),
-				k3d::property::get(*track_instance, "input_mesh"));
+				*k3d::property::get(*track_source, "output_mesh"),
+				*k3d::property::get(*track_instance, "input_mesh"));
 
 			k3d::property::set_internal_value(*track_instance, "gl_painter", track_painter);
 
@@ -166,8 +166,8 @@ public:
 
 					k3d::property::connect(
 						Document,
-						k3d::property::get(*source, "output_mesh"),
-						k3d::property::get(*instance, "input_mesh"));
+						*k3d::property::get(*source, "output_mesh"),
+						*k3d::property::get(*instance, "input_mesh"));
 
 					k3d::property::set_internal_value(*instance, "gl_painter", painter);
 

@@ -895,14 +895,22 @@ private:
 
 } // namespace detail
 
-void connect(idocument& Document, iproperty* const From, iproperty* const To)
+void connect(idocument& Document, iproperty& From, iproperty& To)
 {
-	return_if_fail(From);
-	return_if_fail(To);
-
 	ipipeline::dependencies_t dependencies;
-	dependencies.insert(std::make_pair(To, From));
+	dependencies.insert(std::make_pair(&To, &From));
+	Document.pipeline().set_dependencies(dependencies);
+}
 
+iproperty* connection(idocument& Document, iproperty& Property)
+{
+	return Document.pipeline().dependency(Property);
+}
+
+void disconnect(idocument& Document, iproperty& Property)
+{
+	ipipeline::dependencies_t dependencies;
+	dependencies.insert(std::make_pair(&Property, static_cast<iproperty*>(0)));
 	Document.pipeline().set_dependencies(dependencies);
 }
 

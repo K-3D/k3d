@@ -151,6 +151,8 @@ ADD_LIBRARY(k3dsdk-python-b SHARED
 	parallel_python.cpp
 	plugin_python.cpp
 	plugin_python.h
+	property_python.cpp
+	property_python.h
 	resource_python.cpp
 	resource_python.h
 	ri_python.cpp

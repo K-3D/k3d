@@ -72,6 +72,7 @@
 #include <k3dsdk/python/point4_python.h>
 #include <k3dsdk/python/particle_python.h>
 #include <k3dsdk/python/polyhedron_python.h>
+#include <k3dsdk/python/property_python.h>
 #include <k3dsdk/python/resource_python.h>
 #include <k3dsdk/python/ri_python.h>
 #include <k3dsdk/python/script_python.h>
@@ -389,6 +390,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_plugin();
 	define_namespace_particle();
 	define_namespace_polyhedron();
+	define_namespace_property();
 	define_namespace_resource();
 	define_namespace_ri();
 	define_namespace_script();
