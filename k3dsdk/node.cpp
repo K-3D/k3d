@@ -154,6 +154,12 @@ const std::vector<inode*> node::lookup(idocument& Document, const string_t& Meta
 	return result;
 }
 
+inode* node::lookup_one(idocument& Document, const string_t& NodeName)
+{
+	std::vector<inode*> nodes = lookup(Document, NodeName);
+	return nodes.size() == 1 ? nodes[0] : 0;
+}
+
 void node::show(idocument& Document, inode& Node)
 {
 	show(Document, std::vector<inode*>(1, &Node));

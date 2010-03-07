@@ -24,7 +24,7 @@ import os
 document = k3d.open_document(k3d.share_path() / k3d.filesystem.generic_path("scripts/shell/batch_render.k3d"))
 
 # Load an external OBJ file into the document.
-obj_reader = document.get_node("OBJMeshReader")
+obj_reader = k3d.node.lookup_one(document, "OBJMeshReader")
 obj_reader.filepath = k3d.share_path() / k3d.filesystem.generic_path("geometry/knot.obj")
 
 # Figure-out where to put the rendered results.
@@ -32,7 +32,7 @@ output = k3d.filesystem.native_path(os.getcwd()) / k3d.filesystem.generic_path("
 print output
 
 # Render the document to the current directory.
-camera = document.get_node("Camera")
-render_engine = document.get_node("RenderMan Engine")
+camera = k3d.node.lookup_one(document, "Camera")
+render_engine = k3d.node.lookup_one(document, "RenderMan Engine")
 render_engine.render_camera_frame(camera, output, False)
 

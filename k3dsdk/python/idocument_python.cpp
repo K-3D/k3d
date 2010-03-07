@@ -76,19 +76,6 @@ static void redraw_all(idocument_wrapper& Self)
 	k3d::gl::redraw_all(Self.wrapped(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 }
 
-static const object get_node(idocument_wrapper& Self, const string_t& Name)
-{
-	const std::vector<k3d::inode*> nodes = k3d::node::lookup(Self.wrapped(), Name);
-	
-	if(nodes.size() > 1)
-		throw std::runtime_error("multiple nodes exist with the given name");
-	
-	if(nodes.empty())
-		return boost::python::object();
-	
-	return wrap_unknown(nodes.back());
-}
-
 static void delete_node(idocument_wrapper& Self, object& Node)
 {
 	extract<iunknown_wrapper> node(Node);
@@ -146,7 +133,6 @@ void define_class_idocument()
 		.def("cancel_change_set", &cancel_change_set)
 		.def("finish_change_set", &finish_change_set)
 		.def("redraw_all", &redraw_all)
-		.def("get_node", &get_node)
 		.def("delete_node", &delete_node)
 		.def("get_dependency", &get_dependency)
 		.def("set_dependency", &set_dependency);

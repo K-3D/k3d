@@ -24,7 +24,6 @@
 #include <k3dsdk/node.h>
 
 #include <boost/python.hpp>
-using namespace boost::python;
 
 namespace k3d
 {
@@ -35,9 +34,9 @@ namespace python
 class node
 {
 public:
-	static list wrap_nodes(const std::vector<inode*>& Nodes)
+	static boost::python::list wrap_nodes(const std::vector<inode*>& Nodes)
 	{
-		list python_nodes;
+		boost::python::list python_nodes;
 
 		for(uint_t i = 0; i != Nodes.size(); ++i)
 			python_nodes.append(wrap_unknown(*Nodes[i]));
@@ -45,24 +44,29 @@ public:
 		return python_nodes;
 	}
 
-	static list lookup_all(idocument_wrapper& Document)
+	static boost::python::list lookup_all(idocument_wrapper& Document)
 	{
 		return wrap_nodes(k3d::node::lookup(Document.wrapped()));
 	}
 
-	static list lookup_by_uuid(idocument_wrapper& Document, const uuid& ID)
+	static boost::python::list lookup_by_uuid(idocument_wrapper& Document, const uuid& ID)
 	{
 		return wrap_nodes(k3d::node::lookup(Document.wrapped(), ID));
 	}
 
-	static list lookup_by_name(idocument_wrapper& Document, const string_t& Name)
+	static boost::python::list lookup_by_name(idocument_wrapper& Document, const string_t& Name)
 	{
 		return wrap_nodes(k3d::node::lookup(Document.wrapped(), Name));
 	}
 
-	static list lookup_by_metadata(idocument_wrapper& Document, const string_t& MetadataName, const string_t& MetadataValue)
+	static boost::python::list lookup_by_metadata(idocument_wrapper& Document, const string_t& MetadataName, const string_t& MetadataValue)
 	{
 		return wrap_nodes(k3d::node::lookup(Document.wrapped(), MetadataName, MetadataValue));
+	}
+
+	static boost::python::object lookup_one_by_name(idocument_wrapper& Document, const string_t& Name)
+	{
+		return wrap_unknown(k3d::node::lookup_one(Document.wrapped(), Name));
 	}
 
 	static void show_one(idocument_wrapper& Document, iunknown_wrapper& Node)
@@ -78,7 +82,7 @@ public:
 
 void define_namespace_node()
 {
-	scope outer = class_<node>("node", no_init)
+	boost::python::scope outer = boost::python::class_<node>("node", boost::python::no_init)
 		.def("lookup", node::lookup_all,
 			"Returns the set of all nodes in the given document.")
 		.def("lookup", node::lookup_by_uuid,
@@ -88,6 +92,10 @@ void define_namespace_node()
 		.def("lookup", node::lookup_by_metadata,
 			"Returns the set of nodes in a document that match the given metadata name and value.")
 		.staticmethod("lookup")
+
+		.def("lookup_one", node::lookup_one_by_name,
+			"Returns the one-and-only-one node in a document that matches the given node name, or None.")
+		.staticmethod("lookup_one")
 
 		.def("show", node::show_one,
 			"Returns the set of all nodes in the given document.")

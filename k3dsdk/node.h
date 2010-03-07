@@ -120,6 +120,9 @@ public:
 		return result;
 	}
 
+	/// Returns the one node that matches the given name, or NULL.
+	static inode* lookup_one(idocument& Document, const string_t& NodeName);
+
 	/// Makes a node visible (adds it to visibility properties for all node collection sinks)
 	static void show(idocument& Document, inode& Node);
 	/// Makes a collection of nodes visible (adds them to visibility properties for all node collection sinks)

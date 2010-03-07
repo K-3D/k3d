@@ -287,7 +287,7 @@ def require_similar_mesh(document, input_mesh, base_mesh_name, threshold, platfo
 	reference = k3d.plugin.create("K3DMeshReader", document)
 	reference.center = False
 	reference.scale_to_size = False
-	reference.material = document.get_node("Material")
+	reference.material = k3d.node.lookup_one(document, "Material")
 	reference.file = reference_path
 
 	if not os.path.exists(str(reference_path)):

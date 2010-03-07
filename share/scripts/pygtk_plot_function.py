@@ -123,8 +123,8 @@ if not k3d.batch_mode():
 			# Connect the FrozenMesh to a MeshInstance to place it in the scene ...
 			mesh_instance = k3d.plugin.create("MeshInstance", context.document)
 			mesh_instance.name = function + " Instance"
-			mesh_instance.gl_painter = context.document.get_node("GL Default Painter")
-			mesh_instance.ri_painter = context.document.get_node("RenderMan Default Painter")
+			mesh_instance.gl_painter = k3d.node.lookup_one(context.document, "GL Default Painter")
+			mesh_instance.ri_painter = k3d.node.lookup_one(context.document, "RenderMan Default Painter")
 			context.document.set_dependency(mesh_instance.get_property("input_mesh"), frozen_mesh.get_property("output_mesh"))
 
 			# Make the MeshInstance visible to render engines ...
