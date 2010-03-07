@@ -26,7 +26,7 @@
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/persistent_property_collection.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/tokens.h>
 #include <k3dsdk/type_registry.h>

@@ -38,7 +38,7 @@
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/string_cast.h>
 
 #include <gtkmm/box.h>

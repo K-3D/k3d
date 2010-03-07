@@ -24,7 +24,7 @@
 #include <k3dsdk/ngui/custom_property_control.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/spin_button.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/type_registry.h>
 

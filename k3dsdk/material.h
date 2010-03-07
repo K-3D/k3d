@@ -28,7 +28,7 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/iproperty_collection.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 
 namespace k3d
 {

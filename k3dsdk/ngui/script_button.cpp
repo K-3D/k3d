@@ -34,7 +34,7 @@
 #include <k3dsdk/istate_recorder_sink.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/system.h>

@@ -35,7 +35,7 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_property_changed_signal.h>
 

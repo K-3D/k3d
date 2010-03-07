@@ -27,7 +27,7 @@
 
 #include <k3dsdk/gl.h>
 #include <k3dsdk/iproperty.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/subdivision_surface/catmull_clark.h>
 
 #include <boost/ptr_container/ptr_map.hpp>

@@ -38,7 +38,7 @@
 #include <k3dsdk/ngui/selection_input_model.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/system.h>

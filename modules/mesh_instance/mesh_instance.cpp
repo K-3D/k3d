@@ -39,7 +39,7 @@
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/parentable.h>
 #include <k3dsdk/pointer_demand_storage.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/selection.h>

@@ -38,7 +38,7 @@
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
@@ -53,7 +53,7 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options_policy.h>
 #include <k3dsdk/parallel/threads.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/register_application.h>
 #include <k3dsdk/register_plugin_factories.h>
 #include <k3dsdk/scripting.h>

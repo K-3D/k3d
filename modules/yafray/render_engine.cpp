@@ -52,7 +52,7 @@
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>

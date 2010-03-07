@@ -47,8 +47,8 @@
 #include <k3dsdk/ngui/transform.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/nodes.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>

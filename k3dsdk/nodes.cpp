@@ -29,7 +29,7 @@
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/nodes.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/string_modifiers.h>
 #include <k3dsdk/utility.h>

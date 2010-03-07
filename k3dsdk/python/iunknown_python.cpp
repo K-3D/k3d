@@ -44,7 +44,7 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/types.h>
 
 #include <boost/python.hpp>

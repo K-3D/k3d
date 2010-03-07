@@ -26,7 +26,7 @@
 #include <k3dsdk/ngui/enumeration_chooser.h>
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/node_window.h>
-#include <k3dsdk/ngui/properties.h>
+#include <k3dsdk/ngui/property.h>
 #include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
@@ -34,14 +34,14 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ipersistent_collection.h>
 #include <k3dsdk/iproperty_collection.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/property_types.h>
 #include <k3dsdk/property_types_ri.h>
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/tokens.h>
 #include <k3dsdk/type_registry.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/buttonbox.h>

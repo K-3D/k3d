@@ -61,7 +61,7 @@
 #include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/paraboloid.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/sphere.h>
 #include <k3dsdk/time_source.h>

@@ -22,7 +22,7 @@
 */
 
 #include <k3dsdk/application_detail.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/document.h>
 #include <k3dsdk/iapplication.h>
@@ -30,7 +30,7 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iscripted_action.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/signal_accumulators.h>
 #include <k3dsdk/state_change_set.h>

@@ -44,7 +44,7 @@
 #include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/imatrix_sink.h>
 
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 
 #include "int_elements.h"
 #include "integration.h"

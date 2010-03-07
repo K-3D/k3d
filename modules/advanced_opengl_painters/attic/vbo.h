@@ -32,7 +32,7 @@
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/subdivision_surface/catmull_clark.h>
 
 #include "cached_triangulation.h"

@@ -38,7 +38,7 @@
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/irenderable_gl.h>
@@ -50,7 +50,7 @@
 #include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/xml.h>

@@ -42,7 +42,7 @@
 #include <k3dsdk/ngui/scripting.h>
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 
 #include <gtkmm/action.h>

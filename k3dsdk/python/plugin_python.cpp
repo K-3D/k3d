@@ -19,7 +19,7 @@
 
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/mime_types.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/python/idocument_python.h>
 #include <k3dsdk/python/iunknown_python.h>
 #include <k3dsdk/python/plugin_python.h>

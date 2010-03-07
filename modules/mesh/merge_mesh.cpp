@@ -36,7 +36,7 @@
 #include <k3dsdk/parallel/parallel_for.h>
 #include <k3dsdk/parallel/threads.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
 #include <boost/scoped_ptr.hpp>

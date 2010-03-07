@@ -27,9 +27,9 @@
 #include <k3dsdk/itexture_ri.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/shader_ri.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 
 namespace k3d
 {

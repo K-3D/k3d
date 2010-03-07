@@ -43,7 +43,7 @@
 #include <k3dsdk/ngui/tool.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/state_change_set.h>
 

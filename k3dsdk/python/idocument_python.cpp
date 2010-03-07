@@ -27,7 +27,7 @@
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iplugin_factory_collection.h>

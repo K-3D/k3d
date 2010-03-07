@@ -45,9 +45,9 @@
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
 #include <k3dsdk/ngui/pipeline.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/string_cast.h>

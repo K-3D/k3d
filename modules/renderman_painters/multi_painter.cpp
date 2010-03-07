@@ -26,7 +26,7 @@
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 
 namespace module
 {

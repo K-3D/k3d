@@ -27,7 +27,7 @@
 #include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/mime_types.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/register_plugin_factories.h>
 #include <k3dsdk/utility.h>
 

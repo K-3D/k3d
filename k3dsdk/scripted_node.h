@@ -26,7 +26,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/data.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/user_property_changed_signal.h>
 

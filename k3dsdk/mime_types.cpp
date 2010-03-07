@@ -23,7 +23,7 @@
 
 #include <k3dsdk/imime_type_handler.h>
 #include <k3dsdk/mime_types.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 
 #include <map>
 

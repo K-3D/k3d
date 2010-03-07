@@ -29,7 +29,7 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/console.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/result.h>
 
 #include <gtkmm/texttag.h>

@@ -29,7 +29,7 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/string_source.h>
 
 // #include <iostream>

@@ -42,7 +42,7 @@
 #include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
 

@@ -23,8 +23,8 @@
 
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/time_source.h>
 
 namespace k3d

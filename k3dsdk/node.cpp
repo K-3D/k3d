@@ -25,7 +25,7 @@
 #include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 
 #include <algorithm>
 #include <iostream>

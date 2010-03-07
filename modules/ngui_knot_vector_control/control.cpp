@@ -25,7 +25,7 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/entry.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/type_registry.h>
 
 #include <gtkmm/box.h>

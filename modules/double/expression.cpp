@@ -28,7 +28,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/expression/parser.h>
 #include <k3dsdk/iuser_property.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_property_changed_signal.h>
 

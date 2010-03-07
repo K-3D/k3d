@@ -31,7 +31,7 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 
 #include <boost/scoped_ptr.hpp>
 

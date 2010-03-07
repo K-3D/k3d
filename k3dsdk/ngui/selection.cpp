@@ -46,9 +46,9 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/selection.h>
 

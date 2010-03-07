@@ -29,7 +29,7 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/serialization_xml.h>
 #include <k3dsdk/type_registry.h>

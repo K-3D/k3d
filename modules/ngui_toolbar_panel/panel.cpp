@@ -41,7 +41,7 @@
 #include <k3dsdk/ngui/transform.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/ngui/widget_manip.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/utility_gl.h>

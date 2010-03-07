@@ -43,7 +43,6 @@
 #include <k3dsdk/imulti_mesh_sink.h>
 #include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/ipipeline.h>
-#include <k3dsdk/ireset_properties.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
@@ -63,13 +62,13 @@
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 
 #include <iterator>
 #include <functional>

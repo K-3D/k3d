@@ -34,7 +34,7 @@
 #include <k3dsdk/imatrix_sink.h>
 #include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iwritable_property.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/transform.h>
 
 #include <algorithm>

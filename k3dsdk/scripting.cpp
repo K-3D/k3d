@@ -25,7 +25,7 @@
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/mime_types.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/uuid.h>

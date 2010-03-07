@@ -31,8 +31,8 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/types.h>
 
 #include <boost/algorithm/string.hpp>

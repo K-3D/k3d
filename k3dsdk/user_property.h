@@ -1,5 +1,5 @@
-#ifndef K3DSDK_USER_PROPERTIES_H
-#define K3DSDK_USER_PROPERTIES_H
+#ifndef K3DSDK_USER_PROPERTY_H
+#define K3DSDK_USER_PROPERTY_H
 
 // K-3D
 // Copyright (c) 1995-2008, Timothy M. Shead
@@ -60,5 +60,5 @@ private:
 
 } // namespace k3d
 
-#endif // !K3DSDK_USER_PROPERTIES_H
+#endif // !K3DSDK_USER_PROPERTY_H
 

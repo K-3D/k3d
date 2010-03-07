@@ -74,8 +74,8 @@
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/system.h>

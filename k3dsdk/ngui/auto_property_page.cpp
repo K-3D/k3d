@@ -52,10 +52,10 @@
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/iuser_property.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/type_registry.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 #include <k3dsdk/utility.h>
 
 // Not strictly required to compile, but this #include ensures that we have a std::typeinfo for k3d::mesh that matches the SDK (i.e. we don't break the ODR)

@@ -36,7 +36,7 @@
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/widget_manip.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/label.h>

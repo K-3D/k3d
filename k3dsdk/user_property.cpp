@@ -25,9 +25,9 @@
 #include <k3dsdk/ipersistent_collection.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/iuser_property.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 
 namespace k3d
 {

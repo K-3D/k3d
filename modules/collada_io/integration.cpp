@@ -31,14 +31,14 @@
 #include <dom/domNode.h>
 #include <dom/domCOLLADA.h>
 #include <k3dsdk/algebra.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/idocument_plugin_factory.h>
 
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/ipipeline.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/classes.h>
 

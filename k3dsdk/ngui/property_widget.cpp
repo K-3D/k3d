@@ -43,7 +43,7 @@
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/nodes.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 
 namespace k3d

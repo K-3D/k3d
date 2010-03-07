@@ -30,7 +30,7 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/iwritable_property.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/property_types.h>
 #include <k3dsdk/property_types_ri.h>
 #include <k3dsdk/type_registry.h>
@@ -108,7 +108,7 @@ void define_methods_iproperty_collection(iunknown& Interface, boost::python::obj
 		return;
 
 	utility::add_method(utility::make_function(&properties,
-		"Returns the set of all properties held within this collection.\n\n"
+		"Returns the set of all property.held within this collection.\n\n"
 		"@return: A list of L{iproperty} objects."), "properties", Instance);
 	utility::add_method(utility::make_function(&get_property,
 		"Returns a single property by name.\n\n"

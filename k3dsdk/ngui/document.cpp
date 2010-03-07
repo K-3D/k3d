@@ -38,11 +38,11 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/main_document_window.h>
 #include <k3dsdk/ngui/messages.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/transform.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 
 #include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>

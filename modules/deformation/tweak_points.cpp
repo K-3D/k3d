@@ -30,7 +30,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 
 namespace module
 {

@@ -82,8 +82,8 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/share.h>
@@ -91,7 +91,7 @@
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/transform.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 #include <k3dsdk/utility_gl.h>
 #include <k3dsdk/xml.h>
 #include <k3d-version-config.h>

@@ -22,7 +22,7 @@
 */
 
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/idocument.h>
@@ -31,7 +31,7 @@
 #include <k3dsdk/iparentable.h>
 #include <k3dsdk/imatrix_sink.h>
 #include <k3dsdk/imatrix_source.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/transform.h>
 

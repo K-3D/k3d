@@ -25,7 +25,7 @@
 #include <k3dsdk/ngui/button.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
-#include <k3dsdk/ngui/properties.h>
+#include <k3dsdk/ngui/property.h>
 #include <k3dsdk/ngui/render.h>
 #include <k3dsdk/ngui/toggle_button.h>
 #include <k3dsdk/ngui/toolbar.h>

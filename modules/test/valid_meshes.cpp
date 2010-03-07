@@ -41,7 +41,7 @@
 #include <k3dsdk/paraboloid.h>
 #include <k3dsdk/particle.h>
 #include <k3dsdk/primitive_validation.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/polyhedron.h>
 #include <k3dsdk/sphere.h>
 #include <k3dsdk/teapot.h>

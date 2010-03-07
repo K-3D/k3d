@@ -46,7 +46,7 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/enumeration_chooser.h>
 #include <k3dsdk/ngui/panel.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/selection_state_gl.h>

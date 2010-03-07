@@ -92,7 +92,7 @@
 #include <k3dsdk/classes.h>
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/geometric_operations.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument.h>

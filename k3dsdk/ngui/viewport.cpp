@@ -52,7 +52,7 @@
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/selection_state_gl.h>
 #include <k3dsdk/time_source.h>

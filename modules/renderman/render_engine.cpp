@@ -51,8 +51,8 @@
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/stream_ri.h>
 #include <k3dsdk/renderable_ri.h>
