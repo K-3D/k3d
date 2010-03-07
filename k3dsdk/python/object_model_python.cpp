@@ -313,6 +313,18 @@ dict module_difference_mesh(mesh_wrapper& A, mesh_wrapper& B)
 	return result;
 }
 
+dict module_difference_matrix(k3d::matrix4& A, k3d::matrix4& B)
+{
+	k3d::bool_t equal = true;
+	k3d::uint64_t ulps = 0;
+	k3d::difference(A, B, equal, ulps);
+
+	dict result;
+	result["equal"] = equal;
+	result["ulps"] = ulps;
+	return result;
+}
+
 const k3d::vector3 module_to_vector3(const k3d::point3& v)
 {
 	return k3d::to_vector(v);
@@ -414,6 +426,8 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns the difference between two meshes using fuzzy-comparisons for floating-point types.");
 	def("difference", module_difference_mesh,
 		"Returns the difference between two meshes using fuzzy-comparisons for floating-point types.");
+	def("difference", module_difference_matrix,
+		"Returns the difference between two matrices using fuzzy-comparisons for floating-point types.");
 	def("documents", module_documents,
 		"Returns a list containing all open documents.");
 	def("exit", module_exit,
