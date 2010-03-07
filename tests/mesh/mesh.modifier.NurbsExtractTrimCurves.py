@@ -26,6 +26,6 @@ document.set_dependency(merge_mesh.get_property("input_mesh2"), curve.get_proper
 document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
 document.set_dependency(extract_trim.get_property("input_mesh"), modifier.get_property("output_mesh"))
 
-
 testing.require_valid_mesh(document, extract_trim.get_property("output_mesh"))
-testing.require_similar_mesh(document, extract_trim.get_property("output_mesh"), "mesh.modifier.NurbsExtractTrimCurves", 1)
+testing.require_similar_mesh(document, extract_trim.get_property("output_mesh"), "mesh.modifier.NurbsExtractTrimCurves", 10)
+
