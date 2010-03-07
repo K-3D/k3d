@@ -96,6 +96,16 @@ public:
 	matrix4(const vector4& v0, const vector4& v1, const vector4& v2, const vector4& v3);
 	matrix4(const double d);
 	matrix4(euler_angles Angles);
+
+	/// Creates a new matrix4 from values in row-major order
+	template<typename IteratorT>
+	static matrix4 row_major(IteratorT Begin, IteratorT End)
+	{
+		matrix4 result;
+		std::copy(Begin, End, &result.v[0][0]);
+		return result;
+	}
+
 	/// Copy constructor
 	matrix4(const matrix4& m);
 	/// Assignment of an matrix4

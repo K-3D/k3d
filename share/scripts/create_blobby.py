@@ -27,7 +27,7 @@ try:
 		blobby.primitives().append(k3d.blobby.primitive_type.ELLIPSOID)
 		blobby.primitive_first_floats().append(len(blobby.floats()))
 		blobby.primitive_float_counts().append(16)
-		for i in (k3d.translate3(center) * k3d.scale3(1.7, 1, 1.7)).column_major_list():
+		for i in (k3d.translate3(center) * k3d.scale3(1.7, 1, 1.7)).column_major_values():
 			blobby.floats().append(i)
 
 	# Assign a color to each primitive ...
