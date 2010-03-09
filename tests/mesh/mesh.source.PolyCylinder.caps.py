@@ -9,5 +9,5 @@ setup.source.bottom_segments = 2
 
 
 testing.require_valid_mesh(setup.document, setup.source.get_property("output_mesh"))
-testing.require_similar_mesh(setup.document, setup.source.get_property("output_mesh"), "mesh.source.PolyCylinder.caps", 1, testing.platform_specific)
+testing.require_similar_mesh(setup.document, setup.source.get_property("output_mesh"), "mesh.source.PolyCylinder.caps", 1)
 

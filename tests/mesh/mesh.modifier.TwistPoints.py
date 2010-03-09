@@ -14,5 +14,5 @@ setup.modifier.angle = math.radians(20.0)
 
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TwistPoints", 1, testing.platform_specific)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.TwistPoints", 1)
 

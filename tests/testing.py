@@ -7,12 +7,6 @@ import platform
 import sys
 import time
 
-def platform_agnostic():
-	return ""
-
-def platform_specific():
-	return "." + str(platform.system()) + "-" + str(platform.machine())
-
 class timer:
 	def __init__(self):
 		if sys.platform == "win32":
@@ -273,8 +267,14 @@ def require_mesh_volume(calculated_volume, expected_volume):
 	if calculated_volume != expected_volume:
 		raise Exception("incorrect mesh volume")
 
-def require_similar_mesh(document, input_mesh, base_mesh_name, threshold, platform = platform_agnostic):
-	mesh_name = base_mesh_name + ".reference" + platform()
+def require_similar_mesh(document, input_mesh, base_mesh_name, threshold, custom_platforms = []):
+	mesh_name = base_mesh_name + ".reference"
+
+	platform_id = str(platform.system()) + "-" + str(platform.machine())
+	for custom_platform in custom_platforms:
+		if custom_platform == platform_id:
+			mesh_name = mesh_name + "." + platform_id
+			break
 
 	output_path = k3d.filesystem.generic_path(binary_path() + "/meshes/" + mesh_name + ".k3d")
 	reference_path = k3d.filesystem.generic_path(source_path() + "/meshes/" + mesh_name + ".k3d")
