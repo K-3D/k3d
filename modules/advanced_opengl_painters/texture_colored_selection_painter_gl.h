@@ -1,5 +1,5 @@
-#ifndef MODULES_ADVANCED_OPENGL_PAINTERS_VBO_COLORED_SELECTION_PAINTER_GL_H
-#define MODULES_ADVANCED_OPENGL_PAINTERS_VBO_COLORED_SELECTION_PAINTER_GL_H
+#ifndef MODULES_ADVANCED_OPENGL_PAINTERS_TEXTURE_COLORED_SELECTION_PAINTER_GL_H
+#define MODULES_ADVANCED_OPENGL_PAINTERS_TEXTURE_COLORED_SELECTION_PAINTER_GL_H
 
 // K-3D
 // Copyright (c) 1995-2009, Timothy M. Shead
@@ -33,8 +33,6 @@
 #include <k3dsdk/painter_selection_state_gl.h>
 #include <k3dsdk/utility_gl.h>
 
-#include "vbo.h"
-
 namespace module
 {
 
@@ -44,13 +42,13 @@ namespace opengl
 namespace painters
 {
 
-class vbo_colored_selection_painter :
+class texture_colored_selection_painter :
 	public k3d::node,
 	public k3d::gl::imesh_painter
 {
 	typedef k3d::node base;
 public:
-	vbo_colored_selection_painter(k3d::iplugin_factory& Factory,
+	texture_colored_selection_painter(k3d::iplugin_factory& Factory,
 			k3d::idocument& Document,
 			const k3d::color UnselectedMeshColor = k3d::color(0.0, 0.0, 0.0),
 			const k3d::color SelectedMeshColor = k3d::color(1.0, 1.0, 1.0),
@@ -63,18 +61,16 @@ public:
 		m_selected_mesh_color(init_owner(*this) + init_name("selected_mesh_color") + init_label(_("Selected Mesh Color")) + init_description(_("Color unselected components are drawn in when their mesh is selected")) + init_value(SelectedMeshColor)),
 		m_selected_component_color(init_owner(*this) + init_name("selected_component_color") + init_label(_("Selected Component Color")) + init_description(_("Color selected components are drawn in")) + init_value(SelectedComponentColor))
 	{
-		m_unselected_mesh_color.changed_signal().connect(sigc::mem_fun(*this, &vbo_colored_selection_painter::make_unselected_texture));
-		m_parent_selected_mesh_color.changed_signal().connect(sigc::mem_fun(*this, &vbo_colored_selection_painter::make_parent_selected_texture));
-		m_selected_mesh_color.changed_signal().connect(sigc::mem_fun(*this, &vbo_colored_selection_painter::make_selected_texture));
-		m_selected_component_color.changed_signal().connect(sigc::mem_fun(*this, &vbo_colored_selection_painter::make_component_texture));
+		m_unselected_mesh_color.changed_signal().connect(sigc::mem_fun(*this, &texture_colored_selection_painter::make_unselected_texture));
+		m_parent_selected_mesh_color.changed_signal().connect(sigc::mem_fun(*this, &texture_colored_selection_painter::make_parent_selected_texture));
+		m_selected_mesh_color.changed_signal().connect(sigc::mem_fun(*this, &texture_colored_selection_painter::make_selected_texture));
+		m_selected_component_color.changed_signal().connect(sigc::mem_fun(*this, &texture_colored_selection_painter::make_component_texture));
 	}
 	
 	void paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		if(!m_enabled.pipeline_value())
 			return;
-
-		clean_vbo_state();
 
 		if(!glIsTexture(m_unselected_name) || !glIsTexture(m_parent_selected_name) || !glIsTexture(m_selected_name) || !glIsTexture(m_component_name))
 			init_textures();
@@ -92,16 +88,13 @@ public:
 			bind_unselected_mesh_color(RenderState.parent_selection);
 
 		on_paint_mesh(Mesh, RenderState, ChangedSignal);
-		clean_vbo_state();
 	}
 
 	void select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		if(m_enabled.pipeline_value())
 		{
-			clean_vbo_state();
 			on_select_mesh(Mesh, RenderState, SelectionState, ChangedSignal);
-			clean_vbo_state();
 		}
 	}
 
@@ -109,7 +102,7 @@ protected:
 	/// Returns a slot that will schedule an asynchronous screen update when called
 	sigc::slot<void, k3d::ihint*> make_async_redraw_slot()
 	{
-		return sigc::mem_fun(*this, &vbo_colored_selection_painter::async_redraw);
+		return sigc::mem_fun(*this, &texture_colored_selection_painter::async_redraw);
 	}
 
 	/// Schedules an asynchronous screen update
@@ -254,7 +247,7 @@ private:
 	GLuint m_parent_selected_name;
 	GLuint m_selected_name;
 	GLuint m_component_name;
-}; // class vbo_colored_selection_painter
+}; // class texture_colored_selection_painter
 
 } // namespace opengl
 
@@ -262,5 +255,5 @@ private:
 
 } // namespace module
 
-#endif // !MODULES_ADVANCED_OPENGL_PAINTERS_VBO_COLORED_SELECTION_PAINTER_GL_H
+#endif // !MODULES_ADVANCED_OPENGL_PAINTERS_TEXTURE_COLORED_SELECTION_PAINTER_GL_H
 
