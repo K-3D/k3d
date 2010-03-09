@@ -74,8 +74,10 @@ protected:
 /// Specialization of difference that tests inode pointers for equality
 inline void difference(inode* const A, inode* const B, bool_t& Equal, uint64_t& ULPS)
 {
-	Equal = A == B;
-	ULPS = 0;
+	if(A == B)
+		return;
+
+	Equal = false;
 }
 
 } // namespace k3d

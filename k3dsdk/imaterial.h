@@ -44,8 +44,10 @@ protected:
 /// Specialization of difference that tests imaterial pointers for equality
 inline void difference(imaterial* const A, imaterial* const B, bool_t& Equal, uint64_t& ULPS)
 {
-	Equal = A == B;
-	ULPS = 0;
+	if(A == B)
+		return;
+
+	Equal = false;
 }
 
 } // namespace k3d

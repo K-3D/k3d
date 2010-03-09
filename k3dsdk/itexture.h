@@ -44,8 +44,10 @@ protected:
 /// Specialization of difference that tests itexture pointers for equality
 inline void difference(itexture* const A, itexture* const B, bool_t& Equal, uint64_t& ULPS)
 {
-	Equal = A == B;
-	ULPS = 0;
+	if(A == B)
+		return;
+
+	Equal = false;
 }
 
 } // namespace k3d
