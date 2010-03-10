@@ -22,6 +22,8 @@
 
 #include <k3d-platform-config.h>
 #include <k3dsdk/types.h>
+
+#include <boost/math/special_functions/next.hpp>
 #include <boost/static_assert.hpp>
 
 namespace k3d
@@ -119,19 +121,10 @@ inline void difference(const uint64_t& A, const uint64_t& B, bool_t& Equal, uint
 	Equal = false;
 };
 
-/// Convert a double_t to a lexicographically-ordered twos-complement integer
-inline int64_t ordered_integer(const double_t& Value)
-{
-	const int64_t value = *(int64_t*)&Value;
-	return value < 0 ? 0x8000000000000000LL - value : value;
-}
-
 /// Specialization of difference that tests double_t
 inline void difference(const double_t& A, const double_t& B, bool_t& Equal, uint64_t& ULPS)
 {
-	const int64_t a = ordered_integer(A);
-	const int64_t b = ordered_integer(B);
-	const int64_t ulps = a > b ? a - b : b - a;
+	const double_t ulps = std::fabs(boost::math::float_distance(A, B));
 	if(ulps <= ULPS)
 		return;
 
