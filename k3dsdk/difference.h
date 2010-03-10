@@ -124,7 +124,7 @@ inline void difference(const uint64_t& A, const uint64_t& B, bool_t& Equal, uint
 /// Specialization of difference that tests double_t
 inline void difference(const double_t& A, const double_t& B, bool_t& Equal, uint64_t& ULPS)
 {
-	const double_t ulps = std::fabs(boost::math::float_distance(A, B));
+	const double_t ulps = std::fabs(boost::math::float_distance(A < 1e-15 ? 0.0 : A, B < 1e-15 ? 0.0 : B));
 	if(ulps <= ULPS)
 		return;
 
