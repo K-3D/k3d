@@ -43,6 +43,7 @@
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/node.h>
 
 #include <k3dsdk/plugin.h>
 
@@ -170,9 +171,9 @@ void node_recursion(k3d::idocument& Document, std::vector<collada_obj> &collada_
 		k3d::inode *mesh_instance = k3d::plugin::create<k3d::inode>(*k3d::plugin::factory::lookup("MeshInstance"),Document,k3d::unique_name(Document.nodes(),instance_name.str()));
 
 		// Set painters
-		const k3d::nodes_t gl_nodes = k3d::find_nodes(Document.nodes(), "GL Default Painter");
+		const k3d::nodes_t gl_nodes = k3d::node::lookup(Document, "GL Default Painter");
 		k3d::inode* gl_painter = (1 == gl_nodes.size()) ? *gl_nodes.begin() : 0;
-		const k3d::nodes_t ri_nodes = k3d::find_nodes(Document.nodes(), "RenderMan Default Painter");
+		const k3d::nodes_t ri_nodes = k3d::node::lookup(Document, "RenderMan Default Painter");
 		k3d::inode* ri_painter = (1 == ri_nodes.size()) ? *ri_nodes.begin() : 0;
 		k3d::property::set_internal_value(*mesh_instance, "gl_painter", gl_painter);
 		k3d::property::set_internal_value(*mesh_instance, "ri_painter", ri_painter);
@@ -228,7 +229,7 @@ class document_importer :
 	public k3d::idocument_importer
 {
 public:
-	bool read_file(k3d::idocument& Document, const k3d::filesystem::path& FilePath)
+	k3d::bool_t read_file(const k3d::filesystem::path& FilePath, k3d::idocument& Document)
 	{
 		// Instantiate the reference implementation
 		DAE dae;
@@ -314,6 +315,11 @@ public:
 		freeConversionObjects<intCamera, domCamera>(dae);
 
 		return true;
+	}
+
+	k3d::imetadata::metadata_t get_file_metadata(const k3d::filesystem::path& File)
+	{
+		return k3d::imetadata::metadata_t();
 	}
 
 	static k3d::iplugin_factory& get_factory()

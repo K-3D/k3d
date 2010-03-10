@@ -87,37 +87,26 @@ namespace io
 		// Store polyhedra ...
 		std::vector<domUint> ind;
 		std::vector<domUint> vcou;
-		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(*mesh));
-		if(polyhedron)
+		for(k3d::uint_t prim_idx = 0; prim_idx != mesh->primitives.size(); ++prim_idx)
 		{
-			const k3d::mesh::indices_t& first_faces = *mesh->polyhedra->first_faces;
-			const k3d::mesh::counts_t& face_counts = *mesh->polyhedra->face_counts;
-			const k3d::mesh::polyhedra_t::types_t& types = *mesh->polyhedra->types;
-			const k3d::mesh::indices_t& face_first_loops = *mesh->polyhedra->face_first_loops;
-			const k3d::mesh::counts_t& face_loop_counts = *mesh->polyhedra->face_loop_counts;
-			const k3d::mesh::indices_t& loop_first_edges = *mesh->polyhedra->loop_first_edges;
-			const k3d::mesh::indices_t& edge_points = *mesh->polyhedra->edge_points;
-			const k3d::mesh::indices_t& clockwise_edges = *mesh->polyhedra->clockwise_edges;
-			const size_t polyhedron_begin = 0;
-			const size_t polyhedron_end = polyhedron_begin + first_faces.size();
-	
-			for(size_t polyhedron = polyhedron_begin; polyhedron != polyhedron_end; ++polyhedron)
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh, *mesh->primitives[prim_idx]));
+			if(polyhedron)
 			{
-				const size_t face_begin = first_faces[polyhedron];
-				const size_t face_end = face_begin + face_counts[polyhedron];
+				const size_t face_begin = 0;
+				const size_t face_end = polyhedron->face_first_loops.size();
 				for(size_t face = face_begin; face != face_end; ++face)
 				{
-					const size_t loop_begin = face_first_loops[face];
-					const size_t loop_end = loop_begin + face_loop_counts[face];
+					const size_t loop_begin = polyhedron->face_first_loops[face];
+					const size_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
 					for(size_t loop = loop_begin; loop != loop_end; ++loop)
 					{
-						const size_t first_edge = loop_first_edges[loop];
+						const size_t first_edge = polyhedron->loop_first_edges[loop];
 						size_t face_size = 0;
 						for(size_t edge = first_edge; ; )
 						{
-							ind.push_back(edge_points[edge]);
-	
-							edge = clockwise_edges[edge];
+							ind.push_back(polyhedron->vertex_points[edge]);
+
+							edge = polyhedron->clockwise_edges[edge];
 							face_size++;
 							if(edge == first_edge)
 							{
@@ -125,21 +114,21 @@ namespace io
 								break;
 							}
 						}
-	
+
 						/** \todo Support faces with holes */
 						break;
 					}
 				}
-	
+
 				domPolylist* polylist = daeSafeCast<domPolylist>(gmesh->add("polylist"));
 				polylist->setMaterial("mtl");
-				polylist->setCount(face_counts[polyhedron]);
+				polylist->setCount(face_end);
 				domPolylist::domVcount *vcount = daeSafeCast<domPolylist::domVcount>(polylist->add("vcount"));
-				
+
 				addInput(polylist, "VERTEX",   removeSpaces(name) + "-vertices", 0);
 				//addInput(polylist, "NORMAL",   geomID + "-normals",  1);
 				//addInput(polylist, "TEXCOORD", geomID + "-uv",       2);
-				
+
 				domP* p = daeSafeCast<domP>(polylist->add("p"));
 				domUint index[ind.size()];
 				for(int i=0; i<ind.size(); i++)
@@ -147,7 +136,7 @@ namespace io
 				domUint vcount_tmp[vcou.size()];
 				for(int i=0; i<vcou.size(); i++)
 					vcount_tmp[i] = vcou[i];
-				
+
 				p->getValue() = rawArrayToDaeArray(index, ind.size());
 				vcount->getValue() = rawArrayToDaeArray(vcount_tmp, vcou.size());
 			}
