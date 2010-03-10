@@ -33,6 +33,6 @@ document.set_dependency(merge_mesh.get_property("input_mesh1"), curve1.get_prope
 document.set_dependency(merge_mesh.get_property("input_mesh2"), transform.get_property("output_mesh"))
 document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
 
-
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
-testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsMergeCurveKnotVectors", 1)
+testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsMergeCurveKnotVectors", 2)
+
