@@ -20,7 +20,7 @@
 /** \file Paint points using a VBO
  */
 
-#include "vbo_colored_selection_painter_gl.h"
+#include "texture_colored_selection_painter_gl.h"
 #include "painter_cache.h"
 #include "sds_cache.h"
 
@@ -52,9 +52,9 @@ namespace painters
 // sds_face_painter
 
 class sds_face_painter :
-	public vbo_colored_selection_painter
+	public texture_colored_selection_painter
 {
-	typedef vbo_colored_selection_painter base;
+	typedef texture_colored_selection_painter base;
 
 public:
 	sds_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

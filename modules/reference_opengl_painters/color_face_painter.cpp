@@ -51,8 +51,8 @@ class color_face_painter :
 public:
 	color_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_color_array(init_owner(*this) + init_name("color_array") + init_label(_("Color Array")) + init_description(_("Specifies the array to be used for face colors")) + init_value(std::string("Cs"))),
-		m_array_type(init_owner(*this) + init_name("array_type") + init_label(_("Array Type")) + init_description(_("Type of array to use")) + init_value(FACE) + init_enumeration(array_type_values()))
+		m_color_array(init_owner(*this) + init_name("color_array") + init_label(_("Color Array")) + init_description(_("Specifies the array name to be used for face colors")) + init_value(std::string("Cs"))),
+		m_array_type(init_owner(*this) + init_name("array_type") + init_label(_("Array Type")) + init_description(_("Type of array to use")) + init_value(k3d::string_t("face")) + init_values(component_values()))
 	{
 		m_color_array.changed_signal().connect(make_async_redraw_slot());
 		m_array_type.changed_signal().connect(make_async_redraw_slot());
@@ -178,122 +178,68 @@ public:
 	}
 
 private:
-	typedef enum
+	const k3d::ilist_property<k3d::string_t>::values_t& component_values()
 	{
-		CONSTANT,
-		FACE,
-		VARYING,
-		VERTEX
-		
-	} array_t;
-
-	static const k3d::ienumeration_property::enumeration_values_t& array_type_values()
-	{
-		static k3d::ienumeration_property::enumeration_values_t values;
+		static k3d::ilist_property<k3d::string_t>::values_t values;
 		if(values.empty())
 		{
-			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Constant"), "constant", _("Use an array of constant data")));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Face"), "face", _("Use an array of face data")));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Varying"), "varying", _("Use an array of varying data")));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Vertex"), "vertex", _("Use an array of vertex data")));
+			values.push_back("constant");
+			values.push_back("edge");
+			values.push_back("face");
+			values.push_back("vertex");
+			values.push_back("point");
 		}
 
 		return values;
-	}
-
-	friend std::ostream& operator<<(std::ostream& Stream, const array_t& Value)
-	{
-		switch(Value)
-		{
-			case CONSTANT:
-				Stream << "constant";
-				break;
-			case FACE:
-				Stream << "face";
-				break;
-			case VARYING:
-				Stream << "varying";
-				break;
-			case VERTEX:
-				Stream << "vertex";
-				break;
-		}
-
-		return Stream;
-	}
-
-	friend std::istream& operator>>(std::istream& Stream, array_t& Value)
-	{
-		std::string text;
-		Stream >> text;
-
-		if(text == "constant")
-			Value = CONSTANT;
-		else if(text == "face")
-			Value = FACE;
-		else if(text == "varying")
-			Value = VARYING;
-		else if(text == "vertex")
-			Value = VERTEX;
-		else
-			k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]"<< std::endl;
-
-		return Stream;
 	}
 	
 	struct color_array_proxy
 	{
 		// Note: we assume the polyhedra are valid here
-		color_array_proxy(const array_t ArrayType,
+		color_array_proxy(const k3d::string_t ArrayType,
 				const k3d::string_t& ArrayName,
 				const k3d::polyhedron::const_primitive& Polyhedron,
-				const k3d::table& VertexData) :
+				const k3d::table& PointData) :
 					m_array_type(ArrayType),
-					m_edge_points(Polyhedron.vertex_points)
+					m_vertex_points(Polyhedron.vertex_points)
 		{
 			m_color_array = 0;
-			switch(m_array_type)
-			{
-			case CONSTANT:
+			if(m_array_type == "constant")
 				m_color_array = Polyhedron.constant_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
-				break;
-			case FACE:
+			else if(m_array_type == "face")
 				m_color_array = Polyhedron.face_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
-				break;
-			case VARYING:
+			else if(m_array_type == "edge")
 				m_color_array = Polyhedron.edge_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
-				break;
-			case VERTEX:
-				m_color_array = VertexData.lookup<k3d::mesh::colors_t>(ArrayName);
-			}
+			else if(m_array_type == "vertex")
+				m_color_array = Polyhedron.vertex_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
+			else if(m_array_type == "point")
+				m_color_array = PointData.lookup<k3d::mesh::colors_t>(ArrayName);
+			assert_not_reached();
 		}
 		
 		const k3d::color operator()(const k3d::uint_t Face, const k3d::uint_t Edge)
 		{
 			if(!m_color_array)
 				return k3d::color(0.9,0.9,0.9);
-			switch(m_array_type)
-			{
-			case CONSTANT:
+			if(m_array_type == "constant")
 				return m_color_array->at(0);
-			case FACE:
+			else if(m_array_type == "face")
 				return m_color_array->at(Face);
-			case VARYING:
+			else if(m_array_type == "edge" || m_array_type == "vertex")
 				return m_color_array->at(Edge);
-			case VERTEX:
-				return m_color_array->at(m_edge_points[Edge]);
-			}
+			else if(m_array_type == "point")
+				return m_color_array->at(m_vertex_points[Edge]);
 			assert_not_reached();
 		}
 		
 	private:
-		const array_t m_array_type;
+		const k3d::string_t m_array_type;
 		const k3d::mesh::colors_t* m_color_array;
-		const k3d::mesh::indices_t& m_edge_points;
+		const k3d::mesh::indices_t& m_vertex_points;
 	};
 	
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color_array;
-	k3d_data(array_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_array_type;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color_array;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_array_type;
 };
 
 /////////////////////////////////////////////////////////////////////////////
