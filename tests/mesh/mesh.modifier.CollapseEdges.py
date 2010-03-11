@@ -28,5 +28,5 @@ k3d.geometry.primitive_selection.append(primitive_selection, 82, 83, 1)
 setup.modifier.mesh_selection = selection
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.CollapseEdges", 1)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.CollapseEdges", 2)
 

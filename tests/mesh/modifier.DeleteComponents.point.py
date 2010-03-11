@@ -13,5 +13,5 @@ setup.modifier.mesh_selection = selection
 
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.DeleteComponents.point", 1)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.DeleteComponents.point", 2)
 

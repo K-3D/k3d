@@ -296,7 +296,8 @@ def require_similar_mesh(document, input_mesh, base_mesh_name, threshold, custom
 	difference = get_mesh_difference(document, input_mesh, reference.get_property("output_mesh"), threshold)
 
 	print """<DartMeasurement name="Mesh Equal" type="numeric/integer">""" + str(difference.equal) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Mesh Difference" type="numeric/integer">""" + str(difference.difference) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Mesh ULPS" type="numeric/integer">""" + str(difference.difference) + """</DartMeasurement>"""
+	print """<DartMeasurement name="Mesh ULPS Threshold" type="numeric/integer">""" + str(threshold) + """</DartMeasurement>"""
 
 	if not difference.get_property("input_a").pipeline_value() or not difference.get_property("input_b").pipeline_value():
 		raise Exception("missing mesh comparison input")
