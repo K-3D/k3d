@@ -9,7 +9,7 @@ axes.axes = True
 axes.xyplane = False
 
 # Confirm that setting a property dependency works ...
-doc.set_dependency(axes.get_property("xyplane"), axes.get_property("axes"));
+k3d.property.connect(doc, axes.get_property("axes"), axes.get_property("xyplane"));
 
 if axes.get_property("xyplane").internal_value() != False:
 	raise "incorrect internal value"
@@ -18,7 +18,7 @@ if axes.get_property("xyplane").pipeline_value() != True:
 	raise "incorrect pipeline value"
 
 # Confirm that removing a property dependency works ...
-doc.set_dependency(axes.get_property("xyplane"), None)
+k3d.property.disconnect(doc, axes.get_property("xyplane"))
 
 if axes.get_property("xyplane").pipeline_value() != False:
 	raise "incorrect pipeline value"

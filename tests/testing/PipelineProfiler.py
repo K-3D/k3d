@@ -6,7 +6,7 @@ import k3d
 doc = k3d.new_document()
 source = k3d.plugin.create("PolyCube", doc)
 modifier = k3d.plugin.create("ScalePoints", doc)
-doc.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
+k3d.property.connect(doc, source.get_property("output_mesh"), modifier.get_property("input_mesh"))
 
 # Create a profiler ...
 profiler = k3d.plugin.create("PipelineProfiler", doc)

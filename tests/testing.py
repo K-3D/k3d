@@ -44,7 +44,7 @@ def create_camera(document):
 	camera_view.up = k3d.translate3(k3d.vector3(0, 0, 20))
 	
 	camera = k3d.plugin.create("Camera", document)
-	document.set_dependency(camera.get_property("input_matrix"), camera_view.get_property("output_matrix"))
+	k3d.property.connect(document, camera_view.get_property("output_matrix"), camera.get_property("input_matrix"))
 
 	return camera
 
@@ -73,7 +73,7 @@ def setup_bitmap_test(nodes):
 	for node in nodes:
 		result.nodes.append(k3d.plugin.create(node, result.document))
 		if len(result.nodes) > 1:
-			result.document.set_dependency(result.nodes[-1].get_property("input_bitmap"), result.nodes[-2].get_property("output_bitmap"))
+			k3d.property.connect(result.document, result.nodes[-2].get_property("output_bitmap"), result.nodes[-1].get_property("input_bitmap"))
 
 	result.source = result.nodes[0]
 
@@ -123,16 +123,16 @@ def require_similar_bitmap(document, image_property, image_name, threshold):
 	difference.field_of_view = 10.0
 	difference.luminance = 100
 	difference_property = difference.get_property("output_bitmap")
-	document.set_dependency(difference.get_property("input_a"), image_property)
-	document.set_dependency(difference.get_property("input_b"), reference_property)
+	k3d.property.connect(document, image_property, difference.get_property("input_a"))
+	k3d.property.connect(document, reference_property, difference.get_property("input_b"))
 
 	image_writer = k3d.plugin.create("PNGBitmapWriter", document)
 	image_writer.file = output_file
-	document.set_dependency(image_writer.get_property("input_bitmap"), image_property)
+	k3d.property.connect(document, image_property, image_writer.get_property("input_bitmap"))
 
 	difference_writer = k3d.plugin.create("PNGBitmapWriter", document)
 	difference_writer.file= difference_file
-	document.set_dependency(difference_writer.get_property("input_bitmap"), difference_property)
+	k3d.property.connect(document, difference_property, difference_writer.get_property("input_bitmap"))
 
 	pixel_count = image_property.pipeline_value().width() * image_property.pipeline_value().height()
 	pixel_difference = difference.difference
@@ -176,7 +176,7 @@ def setup_mesh_test(nodes):
 	for node in nodes:
 		result.nodes.append(k3d.plugin.create(node, result.document))
 		if len(result.nodes) > 1:
-			result.document.set_dependency(result.nodes[-1].get_property("input_mesh"), result.nodes[-2].get_property("output_mesh"))
+			k3d.property.connect(result.document, result.nodes[-2].get_property("output_mesh"), result.nodes[-1].get_property("input_mesh"))
 
 	result.source = result.nodes[0]
 
@@ -209,8 +209,8 @@ def setup_mesh_modifier_test(source_name, modifier_name):
 	result.source = k3d.plugin.create(source_name, result.document)
 	result.add_index_attributes = k3d.plugin.create("AddIndexAttributes", result.document)
 	result.modifier = k3d.plugin.create(modifier_name, result.document)
-	result.document.set_dependency(result.modifier.get_property("input_mesh"), result.add_index_attributes.get_property("output_mesh"))
-	result.document.set_dependency(result.add_index_attributes.get_property("input_mesh"), result.source.get_property("output_mesh"))
+	k3d.property.connect(result.document, result.source.get_property("output_mesh"), result.add_index_attributes.get_property("input_mesh"))
+	k3d.property.connect(result.document, result.add_index_attributes.get_property("output_mesh"), result.modifier.get_property("input_mesh"))
 
 	return result
 
@@ -224,9 +224,9 @@ def setup_mesh_modifier_test2(source_name, modifier1_name, modifier2_name):
 	result.add_index_attributes = k3d.plugin.create("AddIndexAttributes", result.document)
 	result.modifier1 = k3d.plugin.create(modifier1_name, result.document)
 	result.modifier2 = k3d.plugin.create(modifier2_name, result.document)
-	result.document.set_dependency(result.modifier2.get_property("input_mesh"), result.modifier1.get_property("output_mesh"))
-	result.document.set_dependency(result.modifier1.get_property("input_mesh"), result.add_index_attributes.get_property("output_mesh"))
-	result.document.set_dependency(result.add_index_attributes.get_property("input_mesh"), result.source.get_property("output_mesh"))
+	k3d.property.connect(result.document, result.source.get_property("output_mesh"), result.add_index_attributes.get_property("input_mesh"))
+	k3d.property.connect(result.document, result.add_index_attributes.get_property("output_mesh"), result.modifier1.get_property("input_mesh"))
+	k3d.property.connect(result.document, result.modifier1.get_property("output_mesh"), result.modifier2.get_property("input_mesh"))
 
 	return result
 
@@ -247,7 +247,7 @@ def setup_mesh_writer_test(nodes, reader, target_file):
 def require_valid_mesh(document, input_mesh):
 	primitives = k3d.plugin.create("ValidMeshes", document)
 	primitives.create_property("k3d::mesh*", "input_mesh", "Input Mesh", "First input mesh")
-	document.set_dependency(primitives.get_property("input_mesh"), input_mesh)
+	k3d.property.connect(document, input_mesh, primitives.get_property("input_mesh"))
 	if not primitives.valid:
 		raise Exception("invalid or unknown primitive type in mesh")
 
@@ -282,7 +282,7 @@ def require_similar_mesh(document, input_mesh, base_mesh_name, ulps_threshold, c
 
 	output = k3d.plugin.create("K3DMeshWriter", document)
 	output.file = output_path
-	document.set_dependency(output.get_property("input_mesh"), input_mesh)
+	k3d.property.connect(document, input_mesh, output.get_property("input_mesh"))
 
 	reference = k3d.plugin.create("K3DMeshReader", document)
 	reference.center = False
@@ -336,8 +336,8 @@ def bitmap_perceptual_difference(document, input_image1, input_image2, threshold
 	difference = k3d.plugin.create("BitmapPerceptualDifference", document)
 	difference.field_of_view = 10.0
 	difference.luminance = 100
-	document.set_dependency(difference.get_property("input_a"), input_image1)
-	document.set_dependency(difference.get_property("input_b"), input_image2)
+	k3d.property.connect(document, input_image1, difference.get_property("input_a"))
+	k3d.property.connect(document, input_image2, difference.get_property("input_b"))
 	
 	pixel_count = input_image1.internal_value().width() * input_image1.internal_value().height()
 	pixel_difference = difference.difference
@@ -366,8 +366,8 @@ def bitmap_compare_plugin_outputs(referenceName, pluginToTest, pluginPropertyVal
 		testNode.get_property(property).set_value(value)
 	
 	# set the dependency to the input bitmap so that the errors can be measured
-	document.set_dependency(referenceNode.get_property("input_bitmap"), inputBitmap.reader.get_property("output_bitmap"))
-	document.set_dependency(testNode.get_property("input_bitmap"), inputBitmap.reader.get_property("output_bitmap"))
+	k3d.property.connect(document, inputBitmap.reader.get_property("output_bitmap"), referenceNode.get_property("input_bitmap"))
+	k3d.property.connect(document, inputBitmap.reader.get_property("output_bitmap"), testNode.get_property("input_bitmap"))
 	
 	print """<DartMeasurement name="Description" type="text/string"> Compare """ + pluginToTest + " to " + referenceName + """</DartMeasurement>"""
 	if len(pluginPropertyValues) > 0:
@@ -396,7 +396,7 @@ def bitmap_modifier_benchmark(BitmapModifier):
 
 			modifier = k3d.plugin.create(BitmapModifier, document)
 
-			document.set_dependency(modifier.get_property("input_bitmap"), image.get_property("output_bitmap"))
+			k3d.property.connect(document, image.get_property("output_bitmap"), modifier.get_property("input_bitmap"))
 			modifier.output_bitmap
 
 			if first_row:

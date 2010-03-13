@@ -15,7 +15,7 @@ torus.material = material
 
 mesh_instance = k3d.plugin.create("MeshInstance", doc)
 mesh_instance.gl_painter = k3d.plugin.create("OpenGLTorusPainter", doc)
-doc.set_dependency(mesh_instance.get_property("input_mesh"), torus.get_property("output_mesh"))
+k3d.property.connect(doc, torus.get_property("output_mesh"), mesh_instance.get_property("input_mesh"))
 
 camera = testing.create_camera(doc)
 render_engine = testing.create_opengl_engine(doc)
