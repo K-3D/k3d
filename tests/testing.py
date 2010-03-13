@@ -246,7 +246,7 @@ def setup_mesh_writer_test(nodes, reader, target_file):
 
 def require_valid_mesh(document, input_mesh):
 	primitives = k3d.plugin.create("ValidMeshes", document)
-	primitives.create_property("k3d::mesh*", "input_mesh", "Input Mesh", "First input mesh")
+	k3d.property.create(primitives, "k3d::mesh*", "input_mesh", "Input Mesh", "First input mesh")
 	k3d.property.connect(document, input_mesh, primitives.get_property("input_mesh"))
 	if not primitives.valid:
 		raise Exception("invalid or unknown primitive type in mesh")

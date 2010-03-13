@@ -4,7 +4,7 @@ import k3d
 import testing
 
 def create_property(node, type, value):
-	property = node.create_property(type, type, "", "")
+	property = k3d.property.create(node, type, type, "", "")
 	property.set_value(value)
 
 document = k3d.new_document()

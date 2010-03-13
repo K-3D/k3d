@@ -16,9 +16,9 @@ for position in positions:
 	points.append(k3d.point3(position[0], position[1], position[2]))
 	point_selection.append(0.0)
 
-setup.modifier.create_property("k3d::string_t","function_1", "Function 1", "Function 1")
-setup.modifier.create_property("k3d::string_t","function_2", "Function 2", "Function 2")
-setup.modifier.create_property("k3d::string_t","function_3", "Function 3", "Function 3")
+k3d.property.create(setup.modifier, "k3d::string_t","function_1", "Function 1", "Function 1")
+k3d.property.create(setup.modifier, "k3d::string_t","function_2", "Function 2", "Function 2")
+k3d.property.create(setup.modifier, "k3d::string_t","function_3", "Function 3", "Function 3")
 
 setup.modifier.function_1 = "u^2"
 setup.modifier.function_2 = "sin(v)"

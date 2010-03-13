@@ -10,8 +10,8 @@ sphere = k3d.plugin.create("PolySphere", document)
 torus = k3d.plugin.create("PolyTorus", document)
 
 cgal_boolean = k3d.plugin.create("CGALBoolean", document)
-cgal_boolean.create_property("k3d::mesh*", "input_1", "Input 1", "")
-cgal_boolean.create_property("k3d::mesh*", "input_2", "Input 2", "")
+k3d.property.create(cgal_boolean, "k3d::mesh*", "input_1", "Input 1", "")
+k3d.property.create(cgal_boolean, "k3d::mesh*", "input_2", "Input 2", "")
 
 k3d.property.connect(document, sphere.get_property("output_mesh"), cgal_boolean.get_property("input_1"))
 k3d.property.connect(document, torus.get_property("output_mesh"), cgal_boolean.get_property("input_2"))

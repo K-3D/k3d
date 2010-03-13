@@ -25,8 +25,8 @@ k3d.property.connect(document, source1.get_property("output_mesh"), modifier1.ge
 k3d.property.connect(document, source2.get_property("output_mesh"), modifier2.get_property("input_mesh"))
 
 merge_mesh = k3d.plugin.create("MergeMesh", document)
-merge_mesh.create_property("k3d::mesh*", "input_mesh1", "Input Mesh 1", "")
-merge_mesh.create_property("k3d::mesh*", "input_mesh2", "Input Mesh 2", "")
+k3d.property.create(merge_mesh, "k3d::mesh*", "input_mesh1", "Input Mesh 1", "")
+k3d.property.create(merge_mesh, "k3d::mesh*", "input_mesh2", "Input Mesh 2", "")
 
 k3d.property.connect(document, modifier1.get_property("output_mesh"), merge_mesh.get_property("input_mesh1"))
 k3d.property.connect(document, modifier2.get_property("output_mesh"), merge_mesh.get_property("input_mesh2"))

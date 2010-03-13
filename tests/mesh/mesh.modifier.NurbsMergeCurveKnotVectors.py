@@ -15,8 +15,8 @@ modifier = k3d.plugin.create("NurbsMergeCurveKnotVectors", document)
 curve2.thetamax = math.radians(180)
 curve2.u_segments = 6
 
-merge_mesh.create_property("k3d::mesh*", "input_mesh1", "Input Mesh 1", "")
-merge_mesh.create_property("k3d::mesh*", "input_mesh2", "Input Mesh 2", "")
+k3d.property.create(merge_mesh, "k3d::mesh*", "input_mesh1", "Input Mesh 1", "")
+k3d.property.create(merge_mesh, "k3d::mesh*", "input_mesh2", "Input Mesh 2", "")
 
 transform_selection = k3d.geometry.selection.create(0)
 k3d.geometry.point_selection.create(transform_selection, 1)

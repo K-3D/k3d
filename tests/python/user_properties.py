@@ -14,7 +14,7 @@ for type in types:
 	name = type
 	label = type
 	description = ""
-	node.create_property(type, name, label, description)
+	k3d.property.create(node, type, name, label, description)
 
 for type in types:
 	if type not in skip_values:

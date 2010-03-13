@@ -13,8 +13,8 @@ translate = k3d.plugin.create("TranslatePoints", document)
 merge_mesh = k3d.plugin.create("MergeMesh", document)
 modifier = k3d.plugin.create("NurbsSweepSurface", document)
 
-merge_mesh.create_property("k3d::mesh*", "input_mesh1", "Input Mesh 1", "")
-merge_mesh.create_property("k3d::mesh*", "input_mesh2", "Input Mesh 2", "")
+k3d.property.create(merge_mesh, "k3d::mesh*", "input_mesh1", "Input Mesh 1", "")
+k3d.property.create(merge_mesh, "k3d::mesh*", "input_mesh2", "Input Mesh 2", "")
 
 rotate.mesh_selection = k3d.geometry.selection.create(1)
 translate.mesh_selection = k3d.geometry.selection.create(1)

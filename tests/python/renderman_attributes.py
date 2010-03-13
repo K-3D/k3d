@@ -13,7 +13,7 @@ for type in types:
 	name = type
 	label = type
 	description = ""
-	node.create_renderman_attribute(type, attribute_name, name, label, description)
+	k3d.property.ri.create_attribute(node, type, attribute_name, name, label, description)
 
 for type in types:
 	name = type

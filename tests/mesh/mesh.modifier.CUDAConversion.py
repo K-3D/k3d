@@ -14,8 +14,8 @@ k3d.property.connect(doc, k3d_to_cuda.get_property("device_output_mesh"), cuda_t
 
 difference = k3d.plugin.create("MeshDiff", doc)
 difference.threshold = 1
-difference.create_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
-difference.create_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")
+k3d.property.create(difference, "k3d::mesh*", "input_a", "InputA", "First input mesh")
+k3d.property.create(difference, "k3d::mesh*", "input_b", "InputB", "Second input mesh")
 k3d.property.connect(doc, source.get_property("output_mesh"), difference.get_property("input_a"))
 k3d.property.connect(doc, cuda_to_k3d.get_property("output_mesh"), difference.get_property("input_b"))
 

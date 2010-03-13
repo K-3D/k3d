@@ -13,7 +13,7 @@ for type in types:
 	name = type
 	label = type
 	description = ""
-	node.create_renderman_option(type, option_name, name, label, description)
+	k3d.property.ri.create_option(node, type, option_name, name, label, description)
 
 for type in types:
 	name = type

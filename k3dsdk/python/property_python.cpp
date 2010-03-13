@@ -17,6 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <k3dsdk/inode.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/python/idocument_python.h>
 #include <k3dsdk/python/iunknown_python.h>
@@ -62,12 +63,54 @@ public:
 
 		k3d::property::disconnect(Document.wrapped(), *property);
 	}
+
+	static boost::python::object create(iunknown_wrapper& Self, const string_t& Type, const string_t& Name, const string_t& Label, const string_t& Description)
+	{
+		k3d::inode* const node = Self.wrapped_ptr<k3d::inode>();
+		if(!node)
+			throw std::runtime_error("missing node");
+
+		k3d::iproperty* const result = k3d::property::create(*node, Type, Name, Label, Description);
+		if(!result)
+			throw std::invalid_argument("unknown user property type: " + Type);
+
+		return wrap_unknown(result);
+	}
+
+	class ri
+	{
+	public:
+		static boost::python::object create_attribute(iunknown_wrapper& Self, const string_t& Type, const string_t& AttributeName, const string_t& Name, const string_t& Label, const string_t& Description)
+		{
+			k3d::inode* const node = Self.wrapped_ptr<k3d::inode>();
+			if(!node)
+				throw std::runtime_error("missing node");
+
+			k3d::iproperty* const result = k3d::property::ri::create_attribute(*node, Type, AttributeName, Name, Label, Description);
+			if(!result)
+				throw std::invalid_argument("unknown attribute type: " + Type);
+
+			return wrap_unknown(result);
+		}
+
+		static boost::python::object create_option(iunknown_wrapper& Self, const string_t& Type, const string_t& OptionName, const string_t& Name, const string_t& Label, const string_t& Description)
+		{
+			k3d::inode* const node = Self.wrapped_ptr<k3d::inode>();
+			if(!node)
+				throw std::runtime_error("missing node");
+
+			k3d::iproperty* const result = k3d::property::ri::create_option(*node, Type, OptionName, Name, Label, Description);
+			if(!result)
+				throw std::invalid_argument("unknown option type: " + Type);
+
+			return wrap_unknown(result);
+		}
+	};
 };
 
 void define_namespace_property()
 {
 	boost::python::scope outer = boost::python::class_<property>("property", boost::python::no_init)
-
 		.def("connect", property::connect,
 			"Makes a pipeline connection between two properties.")
 		.staticmethod("connect")
@@ -79,6 +122,20 @@ void define_namespace_property()
 		.def("disconnect", property::disconnect,
 			"Breaks the pipeline connection (if any) to the given property.")
 		.staticmethod("disconnect")
+
+		.def("create", property::create,
+			"Adds a new property to an existing node.")
+		.staticmethod("create")
+		;
+
+	boost::python::class_<property::ri>("ri", boost::python::no_init)
+		.def("create_attribute", property::ri::create_attribute,
+			"Adds a new RenderMan attribute property to an existing node.")
+		.staticmethod("create_attribute")
+
+		.def("create_option", property::ri::create_option,
+			"Adds a new RenderMan option property to an existing node.")
+		.staticmethod("create_option")
 		;
 }
 
