@@ -31,7 +31,9 @@ for i in range(len(array_types)):
 
 setup.source.set_mesh(mesh) # This is a bit of a hack, it forces the writer to send the current mesh to disk
 
-difference = testing.get_mesh_difference(setup.document, setup.source.get_property("output_mesh"), setup.reader.get_property("output_mesh"), 0)
-if not difference.equal:
+result = k3d.difference.test_result()
+k3d.difference.test(setup.source.output_mesh, setup.reader.output_mesh, result)
+
+if not result.equal and result.ulps == 0:
 	raise Exception("serialized mesh differs from reference")
 
