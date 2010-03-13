@@ -13,8 +13,8 @@ cgal_boolean = k3d.plugin.create("CGALBoolean", document)
 cgal_boolean.create_property("k3d::mesh*", "input_1", "Input 1", "")
 cgal_boolean.create_property("k3d::mesh*", "input_2", "Input 2", "")
 
-document.set_dependency(cgal_boolean.get_property("input_1"), sphere.get_property("output_mesh"))
-document.set_dependency(cgal_boolean.get_property("input_2"), torus.get_property("output_mesh"))
+k3d.property.connect(document, sphere.get_property("output_mesh"), cgal_boolean.get_property("input_1"))
+k3d.property.connect(document, torus.get_property("output_mesh"), cgal_boolean.get_property("input_2"))
 
 profiler = k3d.plugin.create("PipelineProfiler", document)
 

@@ -24,12 +24,12 @@ transform2.z = 3
 
 modifier.mesh_selection = k3d.geometry.selection.create(1)
 
-document.set_dependency(transform1.get_property("input_mesh"), curve2.get_property("output_mesh"))
-document.set_dependency(transform2.get_property("input_mesh"), curve3.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh1"), curve1.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh2"), transform1.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh3"), transform2.get_property("output_mesh"))
-document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
+k3d.property.connect(document, curve2.get_property("output_mesh"), transform1.get_property("input_mesh"))
+k3d.property.connect(document, curve3.get_property("output_mesh"), transform2.get_property("input_mesh"))
+k3d.property.connect(document, curve1.get_property("output_mesh"), merge_mesh.get_property("input_mesh1"))
+k3d.property.connect(document, transform1.get_property("output_mesh"), merge_mesh.get_property("input_mesh2"))
+k3d.property.connect(document, transform2.get_property("output_mesh"), merge_mesh.get_property("input_mesh3"))
+k3d.property.connect(document, merge_mesh.get_property("output_mesh"), modifier.get_property("input_mesh"))
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
 testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsSkinnedSurface", 1)

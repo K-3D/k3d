@@ -34,7 +34,7 @@ Cs = polyhedron.edge_attributes().create("Cs", "k3d::color")
 Cs.assign([k3d.color(1, 0, 0), k3d.color(0, 1, 0), k3d.color(0, 0, 1), k3d.color(1, 1, 1)])
 
 modifier = k3d.plugin.create("GTSMeshArea", document)
-document.set_dependency(modifier.get_property("input_mesh"), source.get_property("output_mesh"))
+k3d.property.connect(document, source.get_property("output_mesh"), modifier.get_property("input_mesh"))
 
 testing.require_mesh_area(modifier.area, 50.0)
 

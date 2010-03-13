@@ -22,10 +22,10 @@ transform.y = 0.5*pi
 
 modifier.mesh_selection = k3d.geometry.selection.create(1)
 
-document.set_dependency(transform.get_property("input_mesh"), curve2.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh1"), curve1.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh2"), transform.get_property("output_mesh"))
-document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
+k3d.property.connect(document, curve2.get_property("output_mesh"), transform.get_property("input_mesh"))
+k3d.property.connect(document, curve1.get_property("output_mesh"), merge_mesh.get_property("input_mesh1"))
+k3d.property.connect(document, transform.get_property("output_mesh"), merge_mesh.get_property("input_mesh2"))
+k3d.property.connect(document, merge_mesh.get_property("output_mesh"), modifier.get_property("input_mesh"))
 
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))

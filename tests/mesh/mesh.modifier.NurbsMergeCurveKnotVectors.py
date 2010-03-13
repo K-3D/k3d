@@ -28,10 +28,10 @@ curve_selection = k3d.geometry.primitive_selection.create(selection, k3d.selecti
 k3d.geometry.primitive_selection.append(curve_selection, 0, 10000, 1)
 modifier.mesh_selection = selection
 
-document.set_dependency(transform.get_property("input_mesh"), curve2.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh1"), curve1.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh2"), transform.get_property("output_mesh"))
-document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
+k3d.property.connect(document, curve2.get_property("output_mesh"), transform.get_property("input_mesh"))
+k3d.property.connect(document, curve1.get_property("output_mesh"), merge_mesh.get_property("input_mesh1"))
+k3d.property.connect(document, transform.get_property("output_mesh"), merge_mesh.get_property("input_mesh2"))
+k3d.property.connect(document, merge_mesh.get_property("output_mesh"), modifier.get_property("input_mesh"))
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
 testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsMergeCurveKnotVectors", 2)

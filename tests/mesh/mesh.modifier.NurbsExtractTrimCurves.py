@@ -21,10 +21,10 @@ modifier.delete_curve = True
 
 extract_trim.mesh_selection = k3d.geometry.selection.create(1)
 
-document.set_dependency(merge_mesh.get_property("input_mesh1"), patch.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh2"), curve.get_property("output_mesh"))
-document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
-document.set_dependency(extract_trim.get_property("input_mesh"), modifier.get_property("output_mesh"))
+k3d.property.connect(document, patch.get_property("output_mesh"), merge_mesh.get_property("input_mesh1"))
+k3d.property.connect(document, curve.get_property("output_mesh"), merge_mesh.get_property("input_mesh2"))
+k3d.property.connect(document, merge_mesh.get_property("output_mesh"), modifier.get_property("input_mesh"))
+k3d.property.connect(document, modifier.get_property("output_mesh"), extract_trim.get_property("input_mesh"))
 
 testing.require_valid_mesh(document, extract_trim.get_property("output_mesh"))
 testing.require_similar_mesh(document, extract_trim.get_property("output_mesh"), "mesh.modifier.NurbsExtractTrimCurves", 10)

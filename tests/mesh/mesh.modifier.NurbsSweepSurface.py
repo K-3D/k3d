@@ -27,11 +27,11 @@ modifier.align_normal = False
 path.thetamax = 0.6*pi
 to_sweep.radius = 1.
 
-document.set_dependency(rotate.get_property("input_mesh"), to_sweep.get_property("output_mesh"))
-document.set_dependency(translate.get_property("input_mesh"), rotate.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh1"), path.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh2"), translate.get_property("output_mesh"))
-document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
+k3d.property.connect(document, to_sweep.get_property("output_mesh"), rotate.get_property("input_mesh"))
+k3d.property.connect(document, rotate.get_property("output_mesh"), translate.get_property("input_mesh"))
+k3d.property.connect(document, path.get_property("output_mesh"), merge_mesh.get_property("input_mesh1"))
+k3d.property.connect(document, translate.get_property("output_mesh"), merge_mesh.get_property("input_mesh2"))
+k3d.property.connect(document, merge_mesh.get_property("output_mesh"), modifier.get_property("input_mesh"))
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
 testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsSweepSurface", 20)

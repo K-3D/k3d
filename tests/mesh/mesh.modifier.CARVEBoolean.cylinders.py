@@ -25,10 +25,10 @@ second_boolean.type = "reverse_difference"
 second_boolean.create_property("k3d::mesh*", "input_1", "Input 1", "")
 second_boolean.create_property("k3d::mesh*", "input_2", "Input 2", "")
 
-document.set_dependency(first_boolean.get_property("input_1"), big_cylinder.get_property("output_mesh"))
-document.set_dependency(first_boolean.get_property("input_2"), small_cylinder.get_property("output_mesh"))
-document.set_dependency(second_boolean.get_property("input_1"), torus.get_property("output_mesh"))
-document.set_dependency(second_boolean.get_property("input_2"), first_boolean.get_property("output_mesh"))
+k3d.property.connect(document, big_cylinder.get_property("output_mesh"), first_boolean.get_property("input_1"))
+k3d.property.connect(document, small_cylinder.get_property("output_mesh"), first_boolean.get_property("input_2"))
+k3d.property.connect(document, torus.get_property("output_mesh"), second_boolean.get_property("input_1"))
+k3d.property.connect(document, first_boolean.get_property("output_mesh"), second_boolean.get_property("input_2"))
 
 
 testing.require_valid_mesh(document, second_boolean.get_property("output_mesh"))

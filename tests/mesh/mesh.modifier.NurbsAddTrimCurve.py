@@ -17,9 +17,9 @@ modifier.mesh_selection = k3d.geometry.selection.create(1)
 modifier.offset_u = 0.5
 modifier.offset_v = 0.5
 
-document.set_dependency(merge_mesh.get_property("input_mesh1"), patch.get_property("output_mesh"))
-document.set_dependency(merge_mesh.get_property("input_mesh2"), curve.get_property("output_mesh"))
-document.set_dependency(modifier.get_property("input_mesh"), merge_mesh.get_property("output_mesh"))
+k3d.property.connect(document, patch.get_property("output_mesh"), merge_mesh.get_property("input_mesh1"))
+k3d.property.connect(document, curve.get_property("output_mesh"), merge_mesh.get_property("input_mesh2"))
+k3d.property.connect(document, merge_mesh.get_property("output_mesh"), modifier.get_property("input_mesh"))
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
 testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsAddTrimCurve", 1)

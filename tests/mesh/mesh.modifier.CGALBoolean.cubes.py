@@ -16,8 +16,8 @@ cgal_boolean.type = "difference"
 cgal_boolean.create_property("k3d::mesh*", "input_1", "Input 1", "")
 cgal_boolean.create_property("k3d::mesh*", "input_2", "Input 2", "")
 
-document.set_dependency(cgal_boolean.get_property("input_1"), big_cube.get_property("output_mesh"))
-document.set_dependency(cgal_boolean.get_property("input_2"), small_cube.get_property("output_mesh"))
+k3d.property.connect(document, big_cube.get_property("output_mesh"), cgal_boolean.get_property("input_1"))
+k3d.property.connect(document, small_cube.get_property("output_mesh"), cgal_boolean.get_property("input_2"))
 
 
 testing.require_valid_mesh(document, cgal_boolean.get_property("output_mesh"))

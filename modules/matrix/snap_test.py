@@ -14,7 +14,7 @@ try:
 	floor_instance.name = "Floor Instance"
 	floor_instance.gl_painter = k3d.node.lookup_one(context.document, "GL Default Painter")
 	floor_instance.ri_painter = k3d.node.lookup_one(context.document, "RenderMan Default Painter")
-	context.document.set_dependency(floor_instance.get_property("input_mesh"), floor.get_property("output_mesh"))
+	k3d.property.connect(context.document, floor.get_property("output_mesh"), floor_instance.get_property("input_mesh"))
 
 	k3d.dynamic_cast(floor_instance, "isnappable").add_snap_target("-x", k3d.point3(-5, 0, 0))
 	k3d.dynamic_cast(floor_instance, "isnappable").add_snap_target("+x", k3d.point3(5, 0, 0))
@@ -30,7 +30,7 @@ try:
 	chair_instance.name = "Chair Instance"
 	chair_instance.gl_painter = k3d.node.lookup_one(context.document, "GL Default Painter")
 	chair_instance.ri_painter = k3d.node.lookup_one(context.document, "RenderMan Default Painter")
-	context.document.set_dependency(chair_instance.get_property("input_mesh"), chair.get_property("output_mesh"))
+	k3d.property.connect(context.document, chair.get_property("output_mesh"), chair_instance.get_property("input_mesh"))
 
 	k3d.dynamic_cast(chair_instance, "isnappable").add_snap_source("bottom", k3d.point3(0, 0, -2.5))
 

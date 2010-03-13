@@ -15,9 +15,9 @@ modifier.create_property("k3d::mesh*", "input2", "input2", "input2")
 modifier.create_property("k3d::double_t", "amount1", "amount1", "amount1")
 modifier.create_property("k3d::double_t", "amount2", "amount2", "amount2")
 
-document.set_dependency(modifier.get_property("input_mesh"), source1.get_property("output_mesh"))
-document.set_dependency(modifier.get_property("input1"), source2.get_property("output_mesh"))
-document.set_dependency(modifier.get_property("input2"), source3.get_property("output_mesh"))
+k3d.property.connect(document, source1.get_property("output_mesh"), modifier.get_property("input_mesh"))
+k3d.property.connect(document, source2.get_property("output_mesh"), modifier.get_property("input1"))
+k3d.property.connect(document, source3.get_property("output_mesh"), modifier.get_property("input2"))
 
 selection = k3d.geometry.selection.create(0)
 point_selection = k3d.geometry.point_selection.create(selection, 1)

@@ -10,7 +10,7 @@ source1.color = k3d.color(1, 0, 0)
 
 modifier = k3d.plugin.create("BlobbyNegate", document)
 
-document.set_dependency(modifier.get_property("input_mesh"), source1.get_property("output_mesh"))
+k3d.property.connect(document, source1.get_property("output_mesh"), modifier.get_property("input_mesh"))
 
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))

@@ -12,7 +12,7 @@ modifier.h = 1000
 modifier.omega = 10
 modifier.div = 4
 modifier.triangulate = True
-document.set_dependency(modifier.get_property("input_mesh"), setup.source.get_property("output_mesh"))
+k3d.property.connect(document, setup.source.get_property(", modifier.get_property("input_mesh")output_mesh"))
 
 #print "source output: " + repr(source.output_mesh)
 #print "triangles output: " + repr(triangles.output_mesh)

@@ -45,6 +45,15 @@ public:
 		k3d::property::connect(Document.wrapped(), *from, *to);
 	}
 
+	static boost::python::object connection(idocument_wrapper& Document, iunknown_wrapper& Property)
+	{
+		k3d::iproperty* const property = Property.wrapped_ptr<k3d::iproperty>();
+		if(!property)
+			throw std::invalid_argument("Argument must be a valid property.");
+
+		return wrap_unknown(k3d::property::connection(Document.wrapped(), *property));
+	}
+
 	static void disconnect(idocument_wrapper& Document, iunknown_wrapper& Property)
 	{
 		k3d::iproperty* const property = Property.wrapped_ptr<k3d::iproperty>();
@@ -62,6 +71,10 @@ void define_namespace_property()
 		.def("connect", property::connect,
 			"Makes a pipeline connection between two properties.")
 		.staticmethod("connect")
+
+		.def("connection", property::connection,
+			"Returns the connection (if any) coming into the given property.")
+		.staticmethod("connection")
 
 		.def("disconnect", property::disconnect,
 			"Breaks the pipeline connection (if any) to the given property.")

@@ -18,8 +18,8 @@ modifier.vertices = 1
 cuda_modifier.mesh_selection = modifier.mesh_selection
 cuda_modifier.vertices = 1
 
-document.set_dependency(modifier.get_property("input_mesh"), grid.get_property("output_mesh"))
-document.set_dependency(cuda_modifier.get_property("input_mesh"), grid.get_property("output_mesh"))
+k3d.property.connect(document, grid.get_property("output_mesh"), modifier.get_property("input_mesh"))
+k3d.property.connect(document, grid.get_property("output_mesh"), cuda_modifier.get_property("input_mesh"))
 
 testing.output_mesh_difference(cuda_modifier.output_mesh, modifier.output_mesh, 1)
 
