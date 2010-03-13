@@ -178,11 +178,16 @@ inline bool operator!=(const point2& a, const point2& b)
 	return !(a == b);
 }
 
-/// Specialization of difference for point2 
-inline void difference(const point2& A, const point2& B, bool_t& Equal, uint64_t& ULPS)
+namespace difference
 {
-	range_difference(A.n, A.n + 2, B.n, Equal, ULPS);
+
+/// Specialization of difference::test for point2
+inline void test(const point2& A, const point2& B, test_result& Result)
+{
+	range_test(A.n, A.n + 2, B.n, B.n + 2, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

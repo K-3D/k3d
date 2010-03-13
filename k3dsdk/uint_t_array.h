@@ -118,38 +118,32 @@ public:
 		return base_type::empty();
 	}
 
-	void difference(const array& Other, bool_t& Equal, uint64_t& ULPS) const
+	void difference(const array& Other, difference::test_result& Result) const
 	{
 		const this_type* const other = dynamic_cast<const this_type*>(&Other);
-		if(!other)
-		{
-			Equal = false;
-			return;
-		}
+		Result.insert(other);
 
-		difference(*other, Equal, ULPS);
+		if(other)
+			difference(*other, Result);
 	}
 
-	void difference(const this_type& Other, bool_t& Equal, uint64_t& ULPS) const
+	void difference(const this_type& Other, difference::test_result& Result) const
 	{
-		if(metadata != Other.metadata)
-			Equal = false;
-
-		if(base_type::size() != Other.size())
-		{
-			Equal = false;
-			return;
-		}
-
-		range_difference(base_type::begin(), base_type::end(), Other.begin(), Equal, ULPS);
+		Result.insert(metadata == Other.metadata);
+		range_test(base_type::begin(), base_type::end(), Other.begin(), Other.end(), Result);
 	}
 };
 
-/// Specialization of difference for k3d::uint_t_array
-inline void difference(const uint_t_array& A, const uint_t_array& B, bool_t& Equal, uint64_t& ULPS)
+namespace difference
 {
-	A.difference(B, Equal, ULPS);
+
+/// Specialization of difference::test for k3d::uint_t_array
+inline void test(const uint_t_array& A, const uint_t_array& B, test_result& Result)
+{
+	A.difference(B, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

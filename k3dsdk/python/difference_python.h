@@ -1,8 +1,8 @@
-#ifndef K3DSDK_ITEXTURE_H
-#define K3DSDK_ITEXTURE_H
+#ifndef K3DSDK_PYTHON_DIFFERENCE_PYTHON_H
+#define K3DSDK_PYTHON_DIFFERENCE_PYTHON_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2008, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,38 +21,20 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Tim Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
-
-#include <k3dsdk/difference.h>
-#include <k3dsdk/iunknown.h>
 
 namespace k3d
 {
 
-/// Abstract interface implemented by objects that can act as geometric surface materials
-class itexture :
-	public virtual iunknown
-{
-protected:
-	itexture() {}
-	itexture(const itexture& Other) : iunknown(Other) {}
-	itexture& operator=(const itexture&) { return *this; }
-	virtual ~itexture() {}
-};
-
-/// Specialization of difference::test::test that tests itexture pointers for equality
-namespace difference
+namespace python
 {
 
-inline void test(itexture* const A, itexture* const B, test_result& Result)
-{
-	Result.insert(A == B);
-}
+void define_namespace_difference();
 
-} // namespace difference
+} // namespace python
 
 } // namespace k3d
 
-#endif // !K3DSDK_ITEXTURE_H
+#endif // !K3DSDK_PYTHON_DIFFERENCE_PYTHON_H
 

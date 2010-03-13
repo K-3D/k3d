@@ -267,7 +267,7 @@ def require_mesh_volume(calculated_volume, expected_volume):
 	if calculated_volume != expected_volume:
 		raise Exception("incorrect mesh volume")
 
-def require_similar_mesh(document, input_mesh, base_mesh_name, threshold, custom_platforms = []):
+def require_similar_mesh(document, input_mesh, base_mesh_name, ulps_threshold, custom_platforms = []):
 	mesh_name = base_mesh_name + ".reference"
 
 	platform_id = str(platform.system()) + "-" + str(platform.machine())
@@ -293,48 +293,22 @@ def require_similar_mesh(document, input_mesh, base_mesh_name, threshold, custom
 	if not os.path.exists(str(reference_path)):
 		raise Exception("missing reference file: " + str(reference_path))
 
-	difference = get_mesh_difference(document, input_mesh, reference.get_property("output_mesh"), threshold)
+	result = k3d.difference.test_result()
+	k3d.difference.test(input_mesh.internal_value(), reference.output_mesh, result)
 
-	print """<DartMeasurement name="Mesh Equal" type="numeric/integer">""" + str(difference.equal) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Mesh ULPS" type="numeric/integer">""" + str(difference.difference) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Mesh ULPS Threshold" type="numeric/integer">""" + str(threshold) + """</DartMeasurement>"""
+	print """<DartMeasurement name="difference.equal" type="numeric/integer">""" + str(result.equal) + """</DartMeasurement>"""
+	print """<DartMeasurement name="difference.ulps" type="numeric/integer">""" + str(result.ulps) + """</DartMeasurement>"""
+	print """<DartMeasurement name="difference.relative_error" type="numeric/float">""" + str(result.relative_error) + """</DartMeasurement>"""
+	print """<DartMeasurement name="ULPS Threshold" type="numeric/integer">""" + str(ulps_threshold) + """</DartMeasurement>"""
 
-	if not difference.get_property("input_a").pipeline_value() or not difference.get_property("input_b").pipeline_value():
-		raise Exception("missing mesh comparison input")
+	if result.ulps > ulps_threshold:
+		print """<DartMeasurement name="Geometry Difference" type="text/html"><![CDATA[\n"""
+		print difflib.HtmlDiff().make_file(str(input_mesh.internal_value()).splitlines(1), str(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
+		print """]]></DartMeasurement>\n"""
+		sys.stdout.flush()
 
-	if difference.equal:
-		return
+		raise Exception("output mesh differs from reference")
 	
-	# if there is a difference, output it
-	difference_file = open(str(difference_path), "w")
-	difference_file.write(difflib.HtmlDiff().make_file(str(input_mesh.pipeline_value()).splitlines(1), str(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry"))
-	difference_file.close()
-
-	output_mesh_difference(input_mesh.pipeline_value(), reference.output_mesh, threshold)
-	raise Exception("output mesh differs from reference")
-
-"""
-	setup a difference node between two meshes
-"""
-def get_mesh_difference(document, input_mesh, reference_mesh, threshold):
-	difference = k3d.plugin.create("MeshDiff", document)
-	difference.threshold = threshold
-	difference.create_property("k3d::mesh*", "input_a", "InputA", "First input mesh")
-	difference.create_property("k3d::mesh*", "input_b", "InputB", "Second input mesh")
-	document.set_dependency(difference.get_property("input_a"), input_mesh)
-	document.set_dependency(difference.get_property("input_b"), reference_mesh)
-	
-	return difference
-
-"""
-	Output the mesh difference to the dashboard
-"""
-def output_mesh_difference(input_mesh, reference_mesh, threshold, name = "Mesh Difference"):
-	print """<DartMeasurement name="Geometry Difference" type="text/html"><![CDATA[\n"""
-	print difflib.HtmlDiff().make_file(str(input_mesh).splitlines(1), str(reference_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
-	print """]]></DartMeasurement>\n"""
-	sys.stdout.flush()
-
 #####################################################################################33
 # Scalar-related testing
 

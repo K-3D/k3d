@@ -216,11 +216,16 @@ inline const vector2 perpendicular(const vector2& Vector)
 	return vector2(Vector[1], -Vector[0]);
 }
 
-/// Specialization of difference for vector2 
-inline void difference(const vector2& A, const vector2& B, bool_t& Equal, uint64_t& ULPS)
+namespace difference
 {
-	range_difference(A.n, A.n + 2, B.n, Equal, ULPS);
+
+/// Specialization of difference::test for vector2
+inline void test(const vector2& A, const vector2& B, test_result& Result)
+{
+	range_test(A.n, A.n + 2, B.n, B.n + 2, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

@@ -11,7 +11,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 #components that are always needed
-SET(K3D_BOOST_COMPONENTS date_time program_options regex)
+SET(K3D_BOOST_COMPONENTS date_time program_options regex unit_test_framework)
 
 # python lib
 IF(${K3D_BUILD_PYTHON_MODULE} STREQUAL "ON")
@@ -55,4 +55,7 @@ SET(K3D_BOOST_SYSTEM_LIBS
 	)
 SET(K3D_BOOST_THREAD_LIBS
 	${Boost_THREAD_LIBRARY}
+	)
+SET(K3D_BOOST_UNIT_TEST_FRAMEWORK_LIBS
+	${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
 	)

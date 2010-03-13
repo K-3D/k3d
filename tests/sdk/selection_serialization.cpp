@@ -71,18 +71,12 @@ int main(int argc, char* argv[])
 		k3d::uint64_t ulps;
 
 		k3d::selection::set b;
-		equal = true;
-		ulps = 0;
-		k3d::difference(b, a, equal, ulps);
-		test_expression(!equal);
+		test_expression(!k3d::difference::test(b, a).equal);
 
 		k3d::ipersistent::load_context load_context(root_path, lookup);
 		k3d::xml::load(b, xml, load_context);
 
-		equal = true;
-		ulps = 0;
-		k3d::difference(b, a, equal, ulps);
-		test_expression(equal);
+		test_expression(k3d::difference::test(b, a).equal);
 	}
 	catch(std::exception& e)
 	{

@@ -99,8 +99,8 @@ public:
 		/// Stores array data that defines the primitive's attributes.
 		named_tables_t attributes;
 
-		/// Returns the difference between two primitives using the fuzzy semantics of difference().
-		void difference(const primitive& Other, bool_t& Equal, uint64_t& ULPS) const;
+		/// Returns the difference between two primitives using the fuzzy semantics of difference::test().
+		void difference(const primitive& Other, difference::test_result& Result) const;
 	};
 
 	/// Defines storage for a collection of primitives.
@@ -121,8 +121,8 @@ public:
 	/// Stores mesh primitives.
 	primitives_t primitives;
 
-	/// Returns the difference between two meshes using the fuzzy semantics of difference().
-	void difference(const mesh& Other, bool_t& Equal, uint64_t& ULPS) const;
+	/// Returns the difference between two meshes using the fuzzy semantics of difference::test().
+	void difference(const mesh& Other, difference::test_result& Result) const;
 
 	/// Returns a bounding-box containing every point in the given mesh.
 	static const bounding_box3 bounds(const mesh& Mesh);
@@ -203,17 +203,22 @@ public:
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS);
 std::ostream& operator<<(std::ostream& Stream, const mesh::primitive& RHS);
 
-/// Specialization of difference for k3d::mesh
-inline void difference(const k3d::mesh& A, const k3d::mesh& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of difference::test for k3d::mesh
+namespace difference
 {
-	A.difference(B, Equal, ULPS);
+
+inline void test(const k3d::mesh& A, const k3d::mesh& B, test_result& Result)
+{
+	A.difference(B, Result);
 }
 
-/// Specialization of difference for k3d::mesh::primitive
-inline void difference(const k3d::mesh::primitive& A, const k3d::mesh::primitive& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of difference::test for k3d::mesh::primitive
+inline void test(const k3d::mesh::primitive& A, const k3d::mesh::primitive& B, test_result& Result)
 {
-	A.difference(B, Equal, ULPS);
+	A.difference(B, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

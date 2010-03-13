@@ -208,6 +208,8 @@ K3D_GENERATE_DEF_FILE(k3dsdk-python-primitives)
 TARGET_LINK_LIBRARIES(k3dsdk-python-primitives k3dsdk-python-b)
 
 ADD_LIBRARY(k3dsdk-python SHARED
+	difference_python.cpp
+	difference_python.h
 	instance_wrapper_python.h
 	file_signal_python.cpp
 	file_signal_python.h

@@ -38,20 +38,18 @@ table* named_tables::writable(const string_t& Name)
 	return result == end() ? static_cast<table*>(0) : &result->second;
 }
 
-void named_tables::difference(const named_tables& Other, bool_t& Equal, uint64_t& ULPS) const
+void named_tables::difference(const named_tables& Other, difference::test_result& Result) const
 {
 	// If we have differing numbers of tables, we definitely aren't equal
-	if(size() != Other.size())
-		Equal = false;
+	Result.insert(size() == Other.size());
 
 	for(named_tables::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
 		// Each pair of tables must have equal names
-		if(a->first != b->first)
-			Equal = false;
+		Result.insert(a->first == b->first);
 
 		// Perform element-wise comparisons of the tables 
-		a->second.difference(b->second, Equal, ULPS);
+		a->second.difference(b->second, Result);
 	}
 }
 

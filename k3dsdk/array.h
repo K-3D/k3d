@@ -58,9 +58,9 @@ public:
 	virtual uint_t size() const = 0;
 	/// Returns true iff this array is empty
 	virtual bool_t empty() const = 0;
-	/// Returns the difference between this array and another, using the imprecise semantics of difference()
+	/// Returns the difference between this array and another, using the imprecise semantics of difference::test()
 	/// \note: Returns false if given an array with a different concrete type.
-	virtual void difference(const array& Other, bool_t& Equal, uint64_t& ULPS) const = 0;
+	virtual void difference(const array& Other, difference::test_result& Result) const = 0;
 
 	/// Sets a new name-value pair, overwriting the value if the name already exists
 	void set_metadata_value(const string_t& Name, const string_t& Value);
@@ -81,11 +81,16 @@ protected:
 /// Serialization
 std::ostream& operator<<(std::ostream& Stream, const array& RHS);
 
-/// Specialization of difference for k3d::array
-inline void difference(const array& A, const array& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of difference::test for k3d::array
+namespace difference
 {
-	A.difference(B, Equal, ULPS);
+
+inline void test(const array& A, const array& B, test_result& Result)
+{
+	A.difference(B, Result);
 }
+
+} // namespace difference
 
 /// Specialization of pipeline_data_traits for use with k3d::array
 template<>

@@ -1281,11 +1281,17 @@ inline std::istream& operator>>(std::istream& Stream, euler_angles& Arg)
 	return Stream;
 }
 
-/// Specialization of difference for matrix4 
-inline void difference(const matrix4& A, const matrix4& B, bool_t& Equal, uint64_t& ULPS)
+namespace difference
 {
-	range_difference(A.v, A.v + 4, B.v, Equal, ULPS);
+
+/// Specialization of difference::test for matrix4 
+inline void test(const matrix4& A, const matrix4& B, test_result& Result)
+{
+	range_test(A.v, A.v + 4, B.v, B.v + 4, Result);
 }
+
+} // namespace difference
+
 } // namespace k3d
 
 #endif // !K3DSDK_ALGEBRA_H

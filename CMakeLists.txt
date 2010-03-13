@@ -305,7 +305,7 @@ K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_UNDO_TREE_PANEL_MODULE)
 K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_UV_EDITOR_PANEL_MODULE)
 
 INCLUDE(K3DFindBoost)
-K3D_CHECK_REQUIRED_DEPENDENCY(K3D_BOOST_FOUND "Boost" "http://www.boost.org" "Note: in addition to the main Boost libraries, K-3D requires Boost.Program_options, Boost.Python, and Boost.Regex, which may be distributed separately on some systems.")
+K3D_CHECK_REQUIRED_DEPENDENCY(K3D_BOOST_FOUND "Boost" "http://www.boost.org" "Note: in addition to the main Boost libraries, K-3D requires Boost.Program_options, Boost.Python, Boost.Regex, and Boost.UnitTest which may be distributed separately on some systems.")
 
 IF(K3D_BUILD_PYTHON_MODULE AND NOT K3D_ENABLE_PYTHON)
 	MESSAGE(SEND_ERROR "K3D_BUILD_PYTHON_MODULE requires K3D_ENABLE_PYTHON")
