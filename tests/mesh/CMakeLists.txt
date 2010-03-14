@@ -458,10 +458,10 @@ K3D_TEST(mesh.source.PolyTorus
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE
 	LABELS mesh source PolyTorus)
 
-K3D_TEST(mesh.source.Polyhedron
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.Polyhedron.py
+K3D_TEST(mesh.source.UniformPolyhedron
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/source.UniformPolyhedron.py
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE
-	LABELS mesh source Polyhedron)
+	LABELS mesh source polyhedron UniformPolyhedron)
 
 K3D_TEST(mesh.source.SurfacePlot
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.SurfacePlot.py
@@ -1030,7 +1030,7 @@ K3D_TEST(mesh.modifier.SelectCube
 K3D_TEST(mesh.modifier.SelectNSided 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SelectNSided.py
 	REQUIRES K3D_BUILD_SELECTION_MODULE
-	LABELS mesh modifier)
+	LABELS mesh modifier polyhedron UniformPolyhedron SelectNSided)
 
 K3D_TEST(mesh.modifier.ShearPoints 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.ShearPoints.py
