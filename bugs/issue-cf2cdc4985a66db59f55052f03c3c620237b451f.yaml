@@ -1,0 +1,19 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Program hang loading documents in OSX release build.
+desc: Like it says ... document.serialization.properties and sdk.xml-xpath display this behavior - the process is 'hung' with zero CPU, and can't be killed.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-03-14 04:38:33.032053 Z
+references: []
+
+id: cf2cdc4985a66db59f55052f03c3c620237b451f
+log_events: 
+- - 2010-03-14 04:38:34.423257 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 
