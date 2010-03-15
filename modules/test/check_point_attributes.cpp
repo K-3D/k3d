@@ -54,22 +54,17 @@ class check_point_attributes :
 public:
 	check_point_attributes(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_threshold(init_owner(*this) + init_name("threshold") + init_label(_("Threshold")) + init_description(_("Sets the maximum allowable difference between floating-point numbers.")) + init_value(0) + init_constraint(constraint::minimum<k3d::int32_t>(0))),
-		m_difference(init_owner(*this) + init_name("difference") + init_label(_("Difference")) + init_description(_("Difference in Units in the Last Place.")) + init_value(static_cast<k3d::uint64_t>(0))),
+		m_ulps(init_owner(*this) + init_name("difference") + init_label(_("Difference")) + init_description(_("Difference in Units in the Last Place.")) + init_value(static_cast<k3d::uint64_t>(0))),
 		m_equal(init_owner(*this) + init_name("equal") + init_label(_("Equal")) + init_description(_("True iff all input meshes are completely equivalent.")) + init_value(true)),
-				m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0))
+		m_relative_error(init_owner(*this) + init_name("relative_error") + init_label(_("Relative Error")) + init_description(_("Maximum relative error.")) + init_value(0.0)),
+		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0))
 	{
-		m_threshold.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_difference.make_slot()));
-		m_threshold.changed_signal().connect(k3d::hint::converter<
-			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_equal.make_slot()));
 		m_input_mesh.changed_signal().connect(k3d::hint::converter<
-				k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_difference.make_slot()));
-		m_input_mesh.changed_signal().connect(k3d::hint::converter<
-				k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(m_equal.make_slot()));
+				k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(sigc::mem_fun(*this, &check_point_attributes::update)));
 
-		m_difference.set_update_slot(sigc::mem_fun(*this, &check_point_attributes::execute_difference));
+		m_ulps.set_update_slot(sigc::mem_fun(*this, &check_point_attributes::execute_ulps));
 		m_equal.set_update_slot(sigc::mem_fun(*this, &check_point_attributes::execute_equal));
+		m_relative_error.set_update_slot(sigc::mem_fun(*this, &check_point_attributes::execute_relative_error));
 	}
 
 	k3d::iproperty& mesh_sink_input()
@@ -91,128 +86,140 @@ public:
 	}
 
 private:
-	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_threshold;
-	k3d_data(k3d::uint64_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_difference;
+	k3d_data(k3d::uint64_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_ulps;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_equal;
+	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_relative_error;
 	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input_mesh;
 
-	void difference(k3d::bool_t& Equal, k3d::uint64_t& ULPS)
+	boost::optional<k3d::difference::test_result> m_test_result;
+
+	void update(k3d::ihint*)
 	{
-		const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value();
-		if(!input_mesh)
-			return;
+		m_test_result = boost::none;
 
-		const k3d::string_t table_name = "points";
-
-		const k3d::mesh::points_t* point_attributes = input_mesh->point_attributes.lookup<k3d::mesh::points_t>(table_name);
-		if(point_attributes)
-			input_mesh->points->difference(*point_attributes, Equal, ULPS);
-
-		for(k3d::mesh::primitives_t::const_iterator p = input_mesh->primitives.begin(); p != input_mesh->primitives.end(); ++p)
-		{
-			const k3d::mesh::primitive& primitive = **p;
-
-			const k3d::mesh::indices_t* indices = 0;
-			for(k3d::mesh::named_tables_t::const_iterator structure = primitive.structure.begin(); structure != primitive.structure.end(); ++structure)
-			{
-				for(k3d::mesh::table_t::const_iterator array = structure->second.begin(); array != structure->second.end(); ++array)
-				{
-					if(array->second->get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::point_indices_domain())
-						indices = dynamic_cast<const k3d::mesh::indices_t*>(array->second.get());
-				}
-			}
-
-			if(!indices)
-				continue;
-
-			for(k3d::mesh::named_tables_t::const_iterator attribute = primitive.attributes.begin(); attribute != primitive.attributes.end(); ++attribute)
-			{
-				const k3d::string_t& attribute_name = attribute->first;
-				if(attribute_name != "vertex" && attribute_name != "edge")
-					continue;
-
-				const k3d::uint_t attribute_count = k3d::component_size(primitive, attribute_name);
-				if(0 == attribute_count)
-					continue;
-
-				const k3d::table& attribute_table = attribute->second;
-
-				k3d::mesh::points_t reference_points;
-
-				for(k3d::uint_t i = 0; i != attribute_count; ++i)
-					reference_points.push_back(input_mesh->points->at(indices->at(i)));
-
-				const k3d::mesh::points_t* array = attribute_table.lookup<k3d::mesh::points_t>(table_name);
-				if(array)
-					reference_points.difference(*array, Equal, ULPS);
-			}
-
-			// Specific cases for NURBS parameter attributes
-			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curve_prim(k3d::nurbs_curve::validate(*input_mesh, primitive));
-			if(curve_prim)
-			{
-				const k3d::uint_t curves_begin = 0;
-				const k3d::uint_t curves_end = curve_prim->curve_first_points.size();
-				k3d::mesh::points_t ref_points;
-				const k3d::mesh::points_t* array = curve_prim->parameter_attributes.lookup<k3d::mesh::points_t>(table_name);
-				if(!array)
-					continue;
-				for(k3d::uint_t curve = curves_begin; curve != curves_end; ++curve)
-				{
-					const k3d::uint_t first_point = curve_prim->curve_first_points[curve];
-					const k3d::uint_t last_point = curve_prim->curve_point_counts[curve] + first_point - 1;
-					ref_points.push_back(input_mesh->points->at(curve_prim->curve_points[first_point]));
-					ref_points.push_back(input_mesh->points->at(curve_prim->curve_points[last_point]));
-				}
-				ref_points.difference(*array, Equal, ULPS);
-				continue;
-			}
-
-			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> patch_prim(k3d::nurbs_patch::validate(*input_mesh, primitive));
-			if(patch_prim)
-			{
-				const k3d::uint_t patches_begin = 0;
-				const k3d::uint_t patches_end = patch_prim->patch_first_points.size();
-				k3d::mesh::points_t ref_points;
-				const k3d::mesh::points_t* array = patch_prim->parameter_attributes.lookup<k3d::mesh::points_t>(table_name);
-				if(!array)
-					continue;
-				for(k3d::uint_t patch = patches_begin; patch != patches_end; ++patch)
-				{
-					// Point indices of the patch corners
-					const k3d::uint_t u_count = patch_prim->patch_u_point_counts[patch];
-					const k3d::uint_t v_count = patch_prim->patch_v_point_counts[patch];
-					const k3d::uint_t c1 = patch_prim->patch_first_points[patch];
-					const k3d::uint_t c2 = c1 + u_count-1;
-					const k3d::uint_t c3 = c1 + u_count*(v_count-1);
-					const k3d::uint_t c4 = c3 + u_count - 1;
-					ref_points.push_back(input_mesh->points->at(c1));
-					ref_points.push_back(input_mesh->points->at(c2));
-					ref_points.push_back(input_mesh->points->at(c3));
-					ref_points.push_back(input_mesh->points->at(c4));
-				}
-				ref_points.difference(*array, Equal, ULPS);
-			}
-		}
+		m_equal.update();
+		m_ulps.update();
+		m_relative_error.update();
 	}
 
-	void execute_difference(const std::vector<k3d::ihint*>& Hints, k3d::uint64_t& Output)
+	k3d::difference::test_result test_result()
 	{
-		k3d::bool_t equal = true;
-		k3d::uint64_t ulps = 0;
-		difference(equal, ulps);
-		Output = ulps;
+		if(!m_test_result)
+		{
+			m_test_result = k3d::difference::test_result();
+			const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value();
+			if(input_mesh)
+			{
+				const k3d::string_t table_name = "points";
+
+				const k3d::mesh::points_t* point_attributes = input_mesh->point_attributes.lookup<k3d::mesh::points_t>(table_name);
+				if(point_attributes)
+					input_mesh->points->difference(*point_attributes, *m_test_result);
+
+				for(k3d::mesh::primitives_t::const_iterator p = input_mesh->primitives.begin(); p != input_mesh->primitives.end(); ++p)
+				{
+					const k3d::mesh::primitive& primitive = **p;
+
+					const k3d::mesh::indices_t* indices = 0;
+					for(k3d::mesh::named_tables_t::const_iterator structure = primitive.structure.begin(); structure != primitive.structure.end(); ++structure)
+					{
+						for(k3d::mesh::table_t::const_iterator array = structure->second.begin(); array != structure->second.end(); ++array)
+						{
+							if(array->second->get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::point_indices_domain())
+								indices = dynamic_cast<const k3d::mesh::indices_t*>(array->second.get());
+						}
+					}
+
+					if(!indices)
+						continue;
+
+					for(k3d::mesh::named_tables_t::const_iterator attribute = primitive.attributes.begin(); attribute != primitive.attributes.end(); ++attribute)
+					{
+						const k3d::string_t& attribute_name = attribute->first;
+						if(attribute_name != "vertex" && attribute_name != "edge")
+							continue;
+
+						const k3d::uint_t attribute_count = k3d::component_size(primitive, attribute_name);
+						if(0 == attribute_count)
+							continue;
+
+						const k3d::table& attribute_table = attribute->second;
+
+						k3d::mesh::points_t reference_points;
+
+						for(k3d::uint_t i = 0; i != attribute_count; ++i)
+							reference_points.push_back(input_mesh->points->at(indices->at(i)));
+
+						const k3d::mesh::points_t* array = attribute_table.lookup<k3d::mesh::points_t>(table_name);
+						if(array)
+							reference_points.difference(*array, *m_test_result);
+					}
+
+					// Specific cases for NURBS parameter attributes
+					boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curve_prim(k3d::nurbs_curve::validate(*input_mesh, primitive));
+					if(curve_prim)
+					{
+						const k3d::uint_t curves_begin = 0;
+						const k3d::uint_t curves_end = curve_prim->curve_first_points.size();
+						k3d::mesh::points_t ref_points;
+						const k3d::mesh::points_t* array = curve_prim->parameter_attributes.lookup<k3d::mesh::points_t>(table_name);
+						if(!array)
+							continue;
+						for(k3d::uint_t curve = curves_begin; curve != curves_end; ++curve)
+						{
+							const k3d::uint_t first_point = curve_prim->curve_first_points[curve];
+							const k3d::uint_t last_point = curve_prim->curve_point_counts[curve] + first_point - 1;
+							ref_points.push_back(input_mesh->points->at(curve_prim->curve_points[first_point]));
+							ref_points.push_back(input_mesh->points->at(curve_prim->curve_points[last_point]));
+						}
+						ref_points.difference(*array, *m_test_result);
+						continue;
+					}
+
+					boost::scoped_ptr<k3d::nurbs_patch::const_primitive> patch_prim(k3d::nurbs_patch::validate(*input_mesh, primitive));
+					if(patch_prim)
+					{
+						const k3d::uint_t patches_begin = 0;
+						const k3d::uint_t patches_end = patch_prim->patch_first_points.size();
+						k3d::mesh::points_t ref_points;
+						const k3d::mesh::points_t* array = patch_prim->parameter_attributes.lookup<k3d::mesh::points_t>(table_name);
+						if(!array)
+							continue;
+						for(k3d::uint_t patch = patches_begin; patch != patches_end; ++patch)
+						{
+							// Point indices of the patch corners
+							const k3d::uint_t u_count = patch_prim->patch_u_point_counts[patch];
+							const k3d::uint_t v_count = patch_prim->patch_v_point_counts[patch];
+							const k3d::uint_t c1 = patch_prim->patch_first_points[patch];
+							const k3d::uint_t c2 = c1 + u_count-1;
+							const k3d::uint_t c3 = c1 + u_count*(v_count-1);
+							const k3d::uint_t c4 = c3 + u_count - 1;
+							ref_points.push_back(input_mesh->points->at(c1));
+							ref_points.push_back(input_mesh->points->at(c2));
+							ref_points.push_back(input_mesh->points->at(c3));
+							ref_points.push_back(input_mesh->points->at(c4));
+						}
+						ref_points.difference(*array, *m_test_result);
+					}
+				}
+			}
+		}
+		return *m_test_result;
 	}
 
 	void execute_equal(const std::vector<k3d::ihint*>& Hints, k3d::bool_t& Output)
 	{
-		k3d::bool_t equal = true;
-		k3d::uint64_t ulps = 0;
-		difference(equal, ulps);
+		Output = test_result().equal;
+	}
 
-		Output = equal;
-		if(ulps > m_threshold.pipeline_value())
-			Output = false;
+	void execute_ulps(const std::vector<k3d::ihint*>& Hints, k3d::uint64_t& Output)
+	{
+		Output = test_result().ulps;
+	}
+
+	void execute_relative_error(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Output)
+	{
+		Output = test_result().relative_error;
 	}
 };
 
