@@ -33,7 +33,7 @@
 						<array name="shell_types" type="k3d::int32_t">0</array>
 					</table>
 					<table type="vertex">
-						<array name="vertex_points" type="k3d::uint_t">0 1 3 2 0 2 14 12 0 4 5 9 8 4 0 12 13 1 1 13 15 3 2 3 7 6 10 11 7 3 15 14 4 6 7 5 4 8 10 6 5 7 11 9 8 9 11 10 12 14 15 13
+						<array name="vertex_points" type="k3d::uint_t">0 1 3 2 0 2 14 12 0 4 5 9 8 4 0 12 13 1 1 13 15 3 2 6 10 11 7 6 2 3 15 14 4 6 7 5 4 8 10 6 5 7 11 9 8 9 11 10 12 14 15 13
 							<metadata>
 								<pair name="k3d:domain">k3d:point-indices</pair>
 							</metadata>
