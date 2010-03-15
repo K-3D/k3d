@@ -186,11 +186,16 @@ inline bool operator!=(const texture3& a, const texture3& b)
 	return !(a == b);
 }
 
-/// Specialization of difference for texture3 
-inline void difference(const texture3& A, const texture3& B, bool_t& Equal, uint64_t& ULPS)
+namespace difference
 {
-	range_difference(A.n, A.n + 3, B.n, Equal, ULPS);
+
+/// Specialization of difference::test for texture3
+inline void test(const texture3& A, const texture3& B, test_result& Result)
+{
+	range_test(A.n, A.n + 3, B.n, B.n + 3, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

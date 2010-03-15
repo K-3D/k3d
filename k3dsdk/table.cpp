@@ -71,24 +71,18 @@ table table::clone(const uint_t Begin, const uint_t End) const
 	return result;
 }
 
-void table::difference(const table& Other, bool_t& Equal, uint64_t& ULPS) const
+void table::difference(const table& Other, difference::test_result& Result) const
 {
 	// If we have differing numbers of arrays, we definitely aren't equal
-	if(column_count() != Other.column_count())
-		Equal = false;
+	Result.insert(column_count() == Other.column_count());
 
 	for(table::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
 		// Each pair of arrays must have equal names
-		if(a->first != b->first)
-			Equal = false;
-
-		// If both arrays point to the same memory, they're equal
-		if(a->second.get() == b->second.get())
-			continue;
+		Result.insert(a->first == b->first);
 
 		// Perform element-wise comparisons of the arrays
-		a->second->difference(*b->second, Equal, ULPS);
+		a->second->difference(*b->second, Result);
 	}
 }
 

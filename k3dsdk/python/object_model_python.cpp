@@ -42,6 +42,7 @@
 #include <k3dsdk/python/const_typed_array_python.h>
 #include <k3dsdk/python/cubic_curve_python.h>
 #include <k3dsdk/python/cylinder_python.h>
+#include <k3dsdk/python/difference_python.h>
 #include <k3dsdk/python/disk_python.h>
 #include <k3dsdk/python/euler_angles_python.h>
 #include <k3dsdk/python/euler_python.h>
@@ -289,42 +290,6 @@ object module_open_document(const k3d::filesystem::path& Path)
 	return wrap(document);
 }
 
-dict module_difference_const_mesh(const_mesh_wrapper& A, const_mesh_wrapper& B)
-{
-	k3d::bool_t equal = true;
-	k3d::uint64_t ulps = 0;
-	k3d::difference(A.wrapped(), B.wrapped(), equal, ulps);
-
-	dict result;
-	result["equal"] = equal;
-	result["ulps"] = ulps;
-	return result;
-}
-
-dict module_difference_mesh(mesh_wrapper& A, mesh_wrapper& B)
-{
-	k3d::bool_t equal = true;
-	k3d::uint64_t ulps = 0;
-	k3d::difference(A.wrapped(), B.wrapped(), equal, ulps);
-
-	dict result;
-	result["equal"] = equal;
-	result["ulps"] = ulps;
-	return result;
-}
-
-dict module_difference_matrix(k3d::matrix4& A, k3d::matrix4& B)
-{
-	k3d::bool_t equal = true;
-	k3d::uint64_t ulps = 0;
-	k3d::difference(A, B, equal, ulps);
-
-	dict result;
-	result["equal"] = equal;
-	result["ulps"] = ulps;
-	return result;
-}
-
 const k3d::vector3 module_to_vector3(const k3d::point3& v)
 {
 	return k3d::to_vector(v);
@@ -386,6 +351,7 @@ BOOST_PYTHON_MODULE(k3d)
 	define_namespace_cone();
 	define_namespace_cubic_curve();
 	define_namespace_cylinder();
+	define_namespace_difference();
 	define_namespace_disk();
 	define_namespace_euler();
 	define_namespace_filesystem();
@@ -422,12 +388,6 @@ BOOST_PYTHON_MODULE(k3d)
 		"Returns the root(s) of the command node hierarchy.");
 	def("create_plugin", module_create_plugin,
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
-	def("difference", module_difference_const_mesh,
-		"Returns the difference between two meshes using fuzzy-comparisons for floating-point types.");
-	def("difference", module_difference_mesh,
-		"Returns the difference between two meshes using fuzzy-comparisons for floating-point types.");
-	def("difference", module_difference_matrix,
-		"Returns the difference between two matrices using fuzzy-comparisons for floating-point types.");
 	def("documents", module_documents,
 		"Returns a list containing all open documents.");
 	def("exit", module_exit,

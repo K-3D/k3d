@@ -13,8 +13,8 @@ source2.color = k3d.color(1, 1, 0)
 
 modifier = k3d.plugin.create("BlobbySubtract", document)
 
-document.set_dependency(modifier.get_property("input_a"), source1.get_property("output_mesh"))
-document.set_dependency(modifier.get_property("input_b"), source2.get_property("output_mesh"))
+k3d.property.connect(document, source1.get_property("output_mesh"), modifier.get_property("input_a"))
+k3d.property.connect(document, source2.get_property("output_mesh"), modifier.get_property("input_b"))
 
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))

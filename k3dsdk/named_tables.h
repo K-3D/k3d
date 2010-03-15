@@ -35,18 +35,23 @@ public:
 	const table* lookup(const string_t& Name) const;
 	/// Return an attribute_array by name, or NULL
 	table* writable(const string_t& Name);
-	/// Returns the difference between two collections, using the imprecise semantics of difference().
-	void difference(const named_tables& Other, bool_t& Equal, uint64_t& ULPS) const;
+	/// Returns the difference between two collections, using the imprecise semantics of difference::test().
+	void difference(const named_tables& Other, difference::test_result& Result) const;
 };
 
 /// Serialization
 std::ostream& operator<<(std::ostream& Stream, const named_tables& RHS);
 
-/// Specialization of difference for k3d::named_tables
-inline void difference(const named_tables& A, const named_tables& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of difference::test for k3d::named_tables
+namespace difference
 {
-	A.difference(B, Equal, ULPS);
+
+inline void test(const named_tables& A, const named_tables& B, test_result& Result)
+{
+	A.difference(B, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

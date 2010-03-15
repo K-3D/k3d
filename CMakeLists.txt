@@ -211,6 +211,7 @@ OPTION(K3D_BUILD_SVG_IO_MODULE "Build the SVG file format module" ON)
 OPTION(K3D_BUILD_TEST_MODULE "Build the regression test plugin module" ON)
 OPTION(K3D_BUILD_TIFF_IO_MODULE "Build the TIFF file format module" ON)
 OPTION(K3D_BUILD_TIME_MODULE "Build the time source plugin module" ON)
+OPTION(K3D_BUILD_UNIFORM_POLYHEDRON_MODULE "Build the uniform polyhedron source plugin module" ON)
 OPTION(K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE "Build the virtual offscreen OpenGL rendering module" ${K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE_DEFAULT})
 OPTION(K3D_BUILD_VIRTUAL_OPENGL_PAINTERS_MODULE "Build virtual OpenGL painters modules" ON)
 OPTION(K3D_BUILD_WGL_MODULE "Build the Windows offscreen rendering module" ${WIN32})
@@ -305,7 +306,7 @@ K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_UNDO_TREE_PANEL_MODULE)
 K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_UV_EDITOR_PANEL_MODULE)
 
 INCLUDE(K3DFindBoost)
-K3D_CHECK_REQUIRED_DEPENDENCY(K3D_BOOST_FOUND "Boost" "http://www.boost.org" "Note: in addition to the main Boost libraries, K-3D requires Boost.Program_options, Boost.Python, and Boost.Regex, which may be distributed separately on some systems.")
+K3D_CHECK_REQUIRED_DEPENDENCY(K3D_BOOST_FOUND "Boost" "http://www.boost.org" "Note: in addition to the main Boost libraries, K-3D requires Boost.Program_options, Boost.Python, Boost.Regex, and Boost.UnitTest which may be distributed separately on some systems.")
 
 IF(K3D_BUILD_PYTHON_MODULE AND NOT K3D_ENABLE_PYTHON)
 	MESSAGE(SEND_ERROR "K3D_BUILD_PYTHON_MODULE requires K3D_ENABLE_PYTHON")
@@ -348,22 +349,24 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 # Setup a macro for compiling resources ...
-MACRO(K3D_COMPILE_RESOURCE OUTPUT INPUT_FILE RESOURCE_PATH)
+MACRO(K3D_COMPILE_RESOURCE OUTPUT INPUT RESOURCE_PATH)
 
-	SET(INPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${INPUT_FILE}")
-	SET(OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/resource_${INPUT_FILE}.cpp")
+	SET(INPUT_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${INPUT}")
+	SET(OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${INPUT}.cpp")
+	GET_FILENAME_COMPONENT(OUTPUT_PATH ${OUTPUT_FILE} PATH)
 
 	GET_TARGET_PROPERTY(K3D_RESOURCE_COMPILER k3d-resource-compiler LOCATION)
 
 	ADD_CUSTOM_COMMAND(
 		DEPENDS k3d-resource-compiler
-		DEPENDS ${INPUT_PATH}
-		COMMAND ${K3D_RESOURCE_COMPILER} --input ${INPUT_PATH} --path \"<path>${RESOURCE_PATH}</path>\" --output ${OUTPUT_PATH}
-		OUTPUT ${OUTPUT_PATH}
-		COMMENT "Compiling resource ${INPUT_PATH}"
+		DEPENDS ${INPUT_FILE}
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_PATH}
+		COMMAND ${K3D_RESOURCE_COMPILER} --input ${INPUT_FILE} --path \"<path>${RESOURCE_PATH}</path>\" --output ${OUTPUT_FILE}
+		OUTPUT ${OUTPUT_FILE}
+		COMMENT "Compiling resource ${INPUT_FILE}"
 		)
 
-	LIST(APPEND ${OUTPUT} ${OUTPUT_PATH})
+	LIST(APPEND ${OUTPUT} ${OUTPUT_FILE})
 
 ENDMACRO(K3D_COMPILE_RESOURCE)
 

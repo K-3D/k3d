@@ -81,7 +81,7 @@ public:
 	/// Returns an table containing copies of a half-open range of all the original arrays.
 	table clone(const uint_t Begin, const uint_t End) const;
 	/// Returns the difference between two tables, using the imprecise semantics of difference().
-	void difference(const table& Other, bool_t& Equal, uint64_t& ULPS) const;
+	void difference(const table& Other, difference::test_result& Result) const;
 
 	typedef std::vector<const table*> table_collection;
 	static table clone_types(const table_collection& AttributeArrays);
@@ -101,11 +101,16 @@ private:
 /// Serialization
 std::ostream& operator<<(std::ostream& Stream, const table& RHS);
 
-/// Specialization of difference for k3d::table
-inline void difference(const table& A, const table& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of difference::test for k3d::table
+namespace difference
 {
-	A.difference(B, Equal, ULPS);
+
+inline void test(const table& A, const table& B, test_result& Result)
+{
+	A.difference(B, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

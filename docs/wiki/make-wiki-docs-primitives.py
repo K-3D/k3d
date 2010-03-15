@@ -72,7 +72,7 @@ for i in range(len(primitive_types)):
 		mesh.create_point_selection()
 
 	writer = k3d.plugin.create("GraphVizMeshWriter", document)
-	document.set_dependency(writer.get_property("input_mesh"), source.get_property("output_mesh"))
+	k3d.property.connect(document, source.get_property("output_mesh"), writer.get_property("input_mesh"))
 	article.write(writer.output_string)
 
 	k3d.close_document(document)

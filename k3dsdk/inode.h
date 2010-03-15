@@ -71,14 +71,16 @@ protected:
 	inode& operator=(const inode&) { return *this; }
 };
 
-/// Specialization of difference that tests inode pointers for equality
-inline void difference(inode* const A, inode* const B, bool_t& Equal, uint64_t& ULPS)
+namespace difference
 {
-	if(A == B)
-		return;
 
-	Equal = false;
+/// Specialization of difference::test that tests inode pointers for equality
+inline void test(inode* const A, inode* const B, test_result& Result)
+{
+	Result.insert(A == B);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

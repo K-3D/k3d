@@ -224,11 +224,16 @@ inline const vector4 normalize(const vector4& Vector)
 	return Vector / length;
 }
 
-/// Specialization of difference for vector4 
-inline void difference(const vector4& A, const vector4& B, bool_t& Equal, uint64_t& ULPS)
+namespace difference
 {
-	range_difference(A.n, A.n + 4, B.n, Equal, ULPS);
+
+/// Specialization of difference::test for vector4
+inline void test(const vector4& A, const vector4& B, test_result& Result)
+{
+	range_test(A.n, A.n + 4, B.n, B.n + 4, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

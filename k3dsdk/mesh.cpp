@@ -35,81 +35,64 @@ namespace k3d
 {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// difference
+// difference::test
 
-/// Return the difference between two shared arrays (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+/// Return the difference between two shared arrays (handles "fuzzy" floating-point comparisons).
+namespace difference
+{
+
 template<typename T>
-void difference(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, bool_t& Equal, uint64_t& ULPS)
+void test(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, test_result& Result)
 {
-	if(A.get() == B.get())
-		return;
-
 	if(A && B)
-		A->difference(*B, Equal, ULPS);
+		A->difference(*B, Result);
+	else if(!A && !B)
+		Result.insert(true);
 	else
-		Equal = false;
+		Result.insert(false);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// difference
-
-/// Return the difference between two shared arrays (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
-void difference(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, bool_t& Equal, uint64_t& ULPS)
+/// Return the difference between two shared arrays (handles "fuzzy" floating-point comparisons).
+void test(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, test_result& Result)
 {
-	if(A.get() == B.get())
-		return;
-
 	if(A && B)
-		A->difference(*B, Equal, ULPS);
+		A->difference(*B, Result);
+	else if(!A && !B)
+		Result.insert(true);
 	else
-		Equal = false;
+		Result.insert(false);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// difference
-
-/// Return the difference between two shared objects (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+/// Return the difference between two shared objects (handles "fuzzy" floating-point comparisons).
 template<typename T>
-void difference(const pipeline_data<T>& A, const pipeline_data<T>& B, bool_t& Equal, uint64_t& ULPS)
+void test(const pipeline_data<T>& A, const pipeline_data<T>& B, test_result& Result)
 {
-	if(A.get() == B.get())
-		return;
-
 	if(A && B)
-		k3d::difference(*A, *B, Equal, ULPS);
+		k3d::difference::test(*A, *B, Result);
+	else if(!A && !B)
+		Result.insert(true);
 	else
-		Equal = false;
+		Result.insert(false);
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// difference
 
 /// Return the difference between two sets of primitives.
-
-void difference(const mesh::primitives_t& A, const mesh::primitives_t& B, bool_t& Equal, uint64_t& ULPS)
+void test(const mesh::primitives_t& A, const mesh::primitives_t& B, test_result& Result)
 {
 	// If they have differing numbers of primitives, they definitely aren't equal
-	if(A.size() != B.size())
-		Equal = false;
+	Result.insert(A.size() == B.size());
 
 	for(mesh::primitives_t::const_iterator a = A.begin(), b = B.begin(); a != A.end() && b != B.end(); ++a, ++b)
 	{
-		// If both primitives point to the same memory, they're equal
-		if(a->get() == b->get())
-			continue;
-
-		// Perform element-wise comparisons of the two primitives ...
 		if(a->get() && b->get())
-		{
-			(**a).difference((**b), Equal, ULPS);
-		}
-		// One array was NULL and the other wasn't
-		else if(a->get() || b->get())
-		{
-			Equal = false;
-		}
+			(**a).difference((**b), Result);
+		else if(!a->get() && !b->get())
+			Result.insert(true);
+		else
+			Result.insert(false);
 	}
 }
+
+} // namespace difference
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh
@@ -118,12 +101,12 @@ mesh::mesh()
 {
 }
 
-void mesh::difference(const mesh& Other, bool_t& Equal, uint64_t& ULPS) const
+void mesh::difference(const mesh& Other, difference::test_result& Result) const
 {
-	k3d::difference(points, Other.points, Equal, ULPS);
-	k3d::difference(point_selection, Other.point_selection, Equal, ULPS);
-	k3d::difference(point_attributes, Other.point_attributes, Equal, ULPS);
-	k3d::difference(primitives, Other.primitives, Equal, ULPS);
+	k3d::difference::test(points, Other.points, Result);
+	k3d::difference::test(point_selection, Other.point_selection, Result);
+	k3d::difference::test(point_attributes, Other.point_attributes, Result);
+	k3d::difference::test(primitives, Other.primitives, Result);
 }
 
 namespace detail
@@ -384,11 +367,11 @@ mesh::primitive::primitive(const string_t& Type) :
 {
 }
 
-void mesh::primitive::difference(const primitive& Other, bool_t& Equal, uint64_t& ULPS) const
+void mesh::primitive::difference(const primitive& Other, difference::test_result& Result) const
 {
-	k3d::difference(type, Other.type, Equal, ULPS);
-	k3d::difference(structure, Other.structure, Equal, ULPS);
-	k3d::difference(attributes, Other.attributes, Equal, ULPS);
+	k3d::difference::test(type, Other.type, Result);
+	k3d::difference::test(structure, Other.structure, Result);
+	k3d::difference::test(attributes, Other.attributes, Result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

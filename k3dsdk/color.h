@@ -817,13 +817,18 @@ public:
 /// Convenience typedef for our "standard" color type
 typedef basic_rgb<double_t> color;
 
-/// Specialization of difference for color 
-inline void difference(const color& A, const color& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of difference::test for color 
+namespace difference
 {
-	difference(A.red, B.red, Equal, ULPS);
-	difference(A.green, B.green, Equal, ULPS);
-	difference(A.blue, B.blue, Equal, ULPS);
+
+inline void test(const color& A, const color& B, test_result& Result)
+{
+	test(A.red, B.red, Result);
+	test(A.green, B.green, Result);
+	test(A.blue, B.blue, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

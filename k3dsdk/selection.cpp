@@ -362,10 +362,10 @@ storage::storage(const string_t& Type) :
 {
 }
 
-void storage::difference(const storage& Other, bool_t& Equal, uint64_t& ULPS) const
+void storage::difference(const storage& Other, difference::test_result& Result) const
 {
-	k3d::difference(type, Other.type, Equal, ULPS);
-	k3d::difference(structure, Other.structure, Equal, ULPS);
+	k3d::difference::test(type, Other.type, Result);
+	k3d::difference::test(structure, Other.structure, Result);
 }
 
 std::ostream& operator<<(std::ostream& Stream, const storage& RHS)
@@ -386,14 +386,14 @@ storage& set::create(const string_t& Type)
 	return back().create(new storage(Type));
 }
 
-void set::difference(const set& Other, bool_t& Equal, uint64_t& ULPS) const
+void set::difference(const set& Other, difference::test_result& Result) const
 {
-	if(size() != Other.size())
-		Equal = false;
-
 	const set& self = *this;
-	for(uint_t i = 0; i != self.size(); ++i)
-		k3d::difference(*self[i], *Other[i], Equal, ULPS);
+
+	Result.insert(self.size() == Other.size());
+
+	for(uint_t i = 0; i != self.size() && i != Other.size(); ++i)
+		k3d::difference::test(*self[i], *Other[i], Result);
 }
 
 void set::append(const set& Source, set& Target)

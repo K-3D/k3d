@@ -194,8 +194,8 @@ public:
 	/// Stores array data that defines the selection.
 	named_arrays structure;
 
-	/// Returns the difference between two selections using the fuzzy semantics of k3d::difference().
-	void difference(const storage& Other, bool_t& Equal, uint64_t& ULPS) const;
+	/// Returns the difference between two selections using the fuzzy semantics of k3d::difference::test().
+	void difference(const storage& Other, difference::test_result& Result) const;
 };
 
 /// Stream serialization
@@ -209,8 +209,8 @@ public:
 	/// Create a new selection, appending it to the collection.
 	storage& create(const string_t& Type);
 
-	/// Returns the difference between two selection sets using the fuzzy semantics of k3d::difference().
-	void difference(const set& Other, bool_t& Equal, uint64_t& ULPS) const;
+	/// Returns the difference between two selection sets using the fuzzy semantics of k3d::difference::test().
+	void difference(const set& Other, difference::test_result& Result) const;
 
 	/// Combines two selection sets by appending one to another.
 	static void append(const set& Source, set& Target);
@@ -221,17 +221,22 @@ std::ostream& operator<<(std::ostream& Stream, const set& RHS);
 
 } // namespace selection
 
-/// Specialization of difference for k3d::selection::storage
-inline void difference(const k3d::selection::storage& A, const k3d::selection::storage& B, bool_t& Equal, uint64_t& ULPS)
+namespace difference
 {
-	A.difference(B, Equal, ULPS);
+
+/// Specialization of difference::test for k3d::selection::storage
+inline void test(const k3d::selection::storage& A, const k3d::selection::storage& B, test_result& Result)
+{
+	A.difference(B, Result);
 }
 
-/// Specialization of difference for k3d::selection::set
-inline void difference(const k3d::selection::set& A, const k3d::selection::set& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of difference::test for k3d::selection::set
+inline void test(const k3d::selection::set& A, const k3d::selection::set& B, test_result& Result)
 {
-	A.difference(B, Equal, ULPS);
+	A.difference(B, Result);
 }
+
+} // namespace difference
 
 /////////////////////////////////////////////////////////////////////////////
 // selection_set_serialization

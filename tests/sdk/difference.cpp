@@ -14,14 +14,12 @@ void test_difference(const T& A, const T& B, const k3d::uint64_t Threshold)
 {
 	std::cout << std::setprecision(17) << k3d::demangle(typeid(T)) << ": " << A << " == " << B << std::endl;
 
-	k3d::bool_t equal = true;
-	k3d::uint64_t ulps = 0;
-	k3d::difference(A, B, equal, ulps);
+	const k3d::difference::test_result result = k3d::difference::test(A, B);
 
-	if(equal)
+	if(result.equal)
 		return;
 
-	if(ulps < Threshold)
+	if(result.ulps < Threshold)
 		return;
 
 	throw std::runtime_error("values not equal");

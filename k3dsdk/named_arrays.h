@@ -75,18 +75,23 @@ public:
 	named_arrays clone_types() const;
 	/// Returns an object containing deep copies of all the original arrays.
 	named_arrays clone() const;
-	/// Compares two collections using the imprecise semantics of difference().
-	void difference(const named_arrays& Other, bool_t& Equal, uint64_t& ULPS) const;
+	/// Compares two collections using the imprecise semantics of difference::test().
+	void difference(const named_arrays& Other, difference::test_result& Result) const;
 };
 
 /// Serialization
 std::ostream& operator<<(std::ostream& Stream, const named_arrays& RHS);
 
-/// Specialization of difference for named_arrays
-inline void difference(const named_arrays& A, const named_arrays& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of difference::test for named_arrays
+namespace difference
 {
-	A.difference(B, Equal, ULPS);
+
+inline void test(const named_arrays& A, const named_arrays& B, test_result& Result)
+{
+	A.difference(B, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

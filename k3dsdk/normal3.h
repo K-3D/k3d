@@ -208,11 +208,16 @@ inline const normal3 normalize(const normal3& Normal)
 	return Normal / length;
 }
 
-/// Specialization of difference for normal3 
-inline void difference(const normal3& A, const normal3& B, bool_t& Equal, uint64_t& ULPS)
+namespace difference
 {
-	range_difference(A.n, A.n + 3, B.n, Equal, ULPS);
+
+/// Specialization of difference::test for normal3
+inline void test(const normal3& A, const normal3& B, test_result& Result)
+{
+	range_test(A.n, A.n + 3, B.n, B.n + 3, Result);
 }
+
+} // difference
 
 } // namespace k3d
 

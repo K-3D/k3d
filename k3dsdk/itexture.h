@@ -41,14 +41,16 @@ protected:
 	virtual ~itexture() {}
 };
 
-/// Specialization of difference that tests itexture pointers for equality
-inline void difference(itexture* const A, itexture* const B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of difference::test::test that tests itexture pointers for equality
+namespace difference
 {
-	if(A == B)
-		return;
 
-	Equal = false;
+inline void test(itexture* const A, itexture* const B, test_result& Result)
+{
+	Result.insert(A == B);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

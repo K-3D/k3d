@@ -15,9 +15,9 @@ transform.matrix = k3d.translate3(3, 0, 0)
 
 time = k3d.get_time(document)
 
-document.set_dependency(instance.get_property("input_matrix"), track.get_property("output_value"))
-document.set_dependency(track.get_property("value_input"), transform.get_property("output_matrix"))
-document.set_dependency(track.get_property("time_input"), time_source.get_property("time"))
+k3d.property.connect(document, track.get_property("output_value"), instance.get_property("input_matrix"))
+k3d.property.connect(document, transform.get_property("output_matrix"), track.get_property("value_input"))
+k3d.property.connect(document, time_source.get_property("time"), track.get_property("time_input"))
 
 time.set_value(0.0)
 transform.matrix = k3d.translate3(0, 0, 0)

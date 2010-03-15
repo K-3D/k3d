@@ -41,14 +41,16 @@ protected:
 	virtual ~imaterial() {}
 };
 
-/// Specialization of difference that tests imaterial pointers for equality
-inline void difference(imaterial* const A, imaterial* const B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of difference::test that tests imaterial pointers for equality
+namespace difference
 {
-	if(A == B)
-		return;
 
-	Equal = false;
+inline void test(imaterial* const A, imaterial* const B, test_result& Result)
+{
+	Result.insert(A == B);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

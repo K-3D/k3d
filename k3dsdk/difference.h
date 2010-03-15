@@ -24,143 +24,155 @@
 #include <k3dsdk/types.h>
 
 #include <boost/math/special_functions/next.hpp>
+#include <boost/math/tools/test.hpp>
 #include <boost/static_assert.hpp>
 
 namespace k3d
 {
 
+namespace difference
+{
+
+/// Stores the results of the difference::test() function.
+class test_result
+{
+public:
+	test_result() :
+		count(0),
+		equal(true),
+		ulps(0),
+		relative_error(0)
+	{
+	}
+
+	void insert(const bool_t& Equal)
+	{
+		++count;
+
+		if(!Equal)
+			equal = false;
+	}
+
+	uint64_t count;
+	bool_t equal;
+	uint64_t ulps;
+	double_t relative_error;
+};
+
 /// Function that tests the difference between two objects, returning separate results for exact (integer and string) and inexact (floating-point) types.
 /// Specializations provide the actual implementations.  For exact types, the boolean value will be set to 'false' if the objects are not equal.
-/// For inexact types, their difference, specified as the maximum number of Units in the Last Place is returned - see
+/// For inexact types, their difference, specified as the maximum number of Units in the Last Place is returned, along with the maximum relative error - see
 /// "Comparing floating point numbers" by Bruce Dawson at http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
 template<typename T>
-void difference(const T& A, const T& B, bool_t& Equal, uint64_t& ULPS)
+const test_result test(const T& A, const T& B)
+{
+	test_result result;
+	test(A, B, result);
+	return result;
+};
+
+/// Function that tests the difference between two objects, returning separate results for exact (integer and string) and inexact (floating-point) types.
+/// Specializations provide the actual implementations.  For exact types, the boolean value will be set to 'false' if the objects are not equal.
+/// For inexact types, their difference, specified as the maximum number of Units in the Last Place is returned, along with the maximum relative error - see
+/// "Comparing floating point numbers" by Bruce Dawson at http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
+template<typename T>
+void test(const T& A, const T& B, test_result& Result)
 {
 	// This will be triggered if this template is ever instantiated
 	BOOST_STATIC_ASSERT(sizeof(T) == 0);
 };
 
-/// Specialization of difference() that tests bool_t
-inline void difference(const bool_t& A, const bool_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test() that tests bool_t
+inline void test(const bool_t& A, const bool_t& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
-/// Specialization of difference that tests int8_t
-inline void difference(const int8_t& A, const int8_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test that tests int8_t
+inline void test(const int8_t& A, const int8_t& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
-/// Specialization of difference that tests int16_t
-inline void difference(const int16_t& A, const int16_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test that tests int16_t
+inline void test(const int16_t& A, const int16_t& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
-/// Specialization of difference that tests int32_t
-inline void difference(const int32_t& A, const int32_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test that tests int32_t
+inline void test(const int32_t& A, const int32_t& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
-/// Specialization of difference that tests int64_t
-inline void difference(const int64_t& A, const int64_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test that tests int64_t
+inline void test(const int64_t& A, const int64_t& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
-/// Specialization of difference that tests uint8_t
-inline void difference(const uint8_t& A, const uint8_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test that tests uint8_t
+inline void test(const uint8_t& A, const uint8_t& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
-/// Specialization of difference that tests uint16_t
-inline void difference(const uint16_t& A, const uint16_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test that tests uint16_t
+inline void test(const uint16_t& A, const uint16_t& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
-/// Specialization of difference that tests uint32_t
-inline void difference(const uint32_t& A, const uint32_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test that tests uint32_t
+inline void test(const uint32_t& A, const uint32_t& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
-/// Specialization of difference that tests uint64_t
-inline void difference(const uint64_t& A, const uint64_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test that tests uint64_t
+inline void test(const uint64_t& A, const uint64_t& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
-/// Specialization of difference that tests double_t
-inline void difference(const double_t& A, const double_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test that tests double_t
+inline void test(const double_t& A, const double_t& B, test_result& Result)
 {
-	const double_t ulps = std::fabs(boost::math::float_distance(A < 1e-15 ? 0.0 : A, B < 1e-15 ? 0.0 : B));
-	if(ulps <= ULPS)
-		return;
-
-	ULPS = ulps;
+	++Result.count;
+	Result.ulps = std::max(Result.ulps, static_cast<uint64_t>(std::fabs(boost::math::float_distance(A, B))));
+	Result.relative_error = std::max(Result.relative_error, boost::math::tools::relative_error(A, B));
 };
 
-/// Specialization of difference that tests string_t
-inline void difference(const string_t& A, const string_t& B, bool_t& Equal, uint64_t& ULPS)
+/// Specialization of test that tests string_t
+inline void test(const string_t& A, const string_t& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
 #ifdef K3D_API_DARWIN
 
-/// Specialization of difference for use with unsigned long (required on OSX)
+/// Specialization of test for use with unsigned long (required on OSX)
 /// \deprecated New code must use the sized K-3D types instead of unsigned long
-inline void difference(const unsigned long& A, const unsigned long& B, bool_t& Equal, uint64_t& ULPS)
+inline void test(const unsigned long& A, const unsigned long& B, test_result& Result)
 {
-	if(A == B)
-		return;
-
-	Equal = false;
+	Result.insert(A == B);
 };
 
 #endif // K3D_API_DARWIN
 
-/// Given iterators designating to equal length sequences, calls the difference() function for each pair of values.
+/// Given iterators designating two sequences, calls the test() function for each pair of values,
+/// and confirms that both sequences are the same length.
 template<typename IteratorT>
-void range_difference(IteratorT A, IteratorT LastA, IteratorT B, bool_t& Equal, uint64_t& ULPS)
+void range_test(IteratorT A, IteratorT LastA, IteratorT B, IteratorT LastB, test_result& Result)
 {
-	for(; A != LastA; ++A, ++B)
-		difference(*A, *B, Equal, ULPS);
+	for(; A != LastA && B != LastB; ++A, ++B)
+		test(*A, *B, Result);
+
+	Result.insert(A == LastA && B == LastB);
 };
+
+} // namespace difference
 
 } // namespace k3d
 

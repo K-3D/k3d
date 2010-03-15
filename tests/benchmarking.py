@@ -35,7 +35,7 @@ class benchmarkMesh(object):
     
         self.__mesh_array_3D.layout = k3d.plugin.create("TranslateArray3D", self.__document)
     
-        self.__document.set_dependency(self.__mesh_array_3D.get_property("input_mesh"), self.__cube.get_property("output_mesh"))
+        k3d.property.connect(self.__document, self.__cube.get_property("output_mesh"), self.__mesh_array_3D.get_property("input_mesh"))
     
     def set_counts(self, counts):
         # counts is a tuple of values
@@ -443,7 +443,7 @@ def run_mesh_modifier_benchmark(meshModifierNodeName, benchmarkMesh, numberOfRun
         
     profilingResults = k3dProfilingProcessor()
     for n in range(numberOfRuns):
-        document.set_dependency(benchmarkNode.get_property("input_mesh"), inputNode.get_property("output_mesh"))
+        k3d.property.connect(document, inputNode.get_property("output_mesh"), benchmarkNode.get_property("input_mesh"))
         benchmarkNode.output_mesh
         profilingResults.add_profiler_results_for_node(meshModifierNodeName, profiler.records)
     

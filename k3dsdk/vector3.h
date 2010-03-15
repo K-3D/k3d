@@ -240,11 +240,16 @@ inline const vector3 spherical(const vector3& Vector)
 */
 }
 
-/// Specialization of difference for vector3 
-inline void difference(const vector3& A, const vector3& B, bool_t& Equal, uint64_t& ULPS)
+namespace difference
 {
-	range_difference(A.n, A.n + 3, B.n, Equal, ULPS);
+
+/// Specialization of difference::test for vector3
+inline void test(const vector3& A, const vector3& B, test_result& Result)
+{
+	range_test(A.n, A.n + 3, B.n, B.n + 3, Result);
 }
+
+} // namespace difference
 
 } // namespace k3d
 

@@ -15,7 +15,7 @@ modifier = k3d.plugin.create("CatmullClark", document)
 
 modifier.level = 2
 
-document.set_dependency(modifier.get_property("input_mesh"), reader.get_property("output_mesh"))
+k3d.property.connect(document, reader.get_property("output_mesh"), modifier.get_property("input_mesh"))
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
 testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.CatmullClark.complex", 2)

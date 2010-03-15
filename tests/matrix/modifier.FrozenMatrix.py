@@ -9,7 +9,7 @@ instance = k3d.plugin.create("MeshInstance", document)
 transform = k3d.plugin.create("FrozenMatrix", document)
 
 transform.matrix = k3d.translate3(1, 0, 0)
-document.set_dependency(instance.get_property("input_matrix"), transform.get_property("output_matrix"))
+k3d.property.connect(document, transform.get_property("output_matrix"), instance.get_property("input_matrix"))
 
 position = k3d.world_position(instance)
 reference = k3d.point3(1, 0, 0)

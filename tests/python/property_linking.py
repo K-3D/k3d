@@ -10,7 +10,7 @@ node2 = k3d.plugin.create("TwistPoints", doc)
 node1.axis = "x"
 node2.axis = "y"
 
-doc.set_dependency(node2.get_property("axis"), node1.get_property("axis"));
+k3d.property.connect(doc, node1.get_property("axis"), node2.get_property("axis"));
 
 if node1.get_property("axis").internal_value() != "x":
 	raise "incorrect internal value"

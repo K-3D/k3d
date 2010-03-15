@@ -119,33 +119,19 @@ public:
 		return base_type::empty();
 	}
 
-	void difference(const array& Other, bool_t& Equal, uint64_t& ULPS) const
+	void difference(const array& Other, difference::test_result& Result) const
 	{
 		const this_type* const other = dynamic_cast<const this_type*>(&Other);
-		if(!other)
-		{
-			Equal = false;
-			return;
-		}
+		Result.insert(other);
 
-		difference(*other, Equal, ULPS);
+		if(other)
+			difference(*other, Result);
 	}
 
-	void difference(const this_type& Other, bool_t& Equal, uint64_t& ULPS) const
+	void difference(const this_type& Other, difference::test_result& Result) const
 	{
-		if(base_type::size() != Other.size())
-		{
-			Equal = false;
-			return;
-		}
-
-		if(metadata != Other.metadata)
-		{
-			Equal = false;
-			return;
-		}
-
-		range_difference(base_type::begin(), base_type::end(), Other.begin(), Equal, ULPS);
+		Result.insert(metadata == Other.metadata);
+		range_test(base_type::begin(), base_type::end(), Other.begin(), Other.end(), Result);
 	}
 };
 

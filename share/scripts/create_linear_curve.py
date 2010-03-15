@@ -54,7 +54,7 @@ try:
 	mesh_instance.gl_painter = k3d.node.lookup_one(context.document, "GL Default Painter")
 	mesh_instance.ri_painter = k3d.node.lookup_one(context.document, "RenderMan Default Painter")
 
-	context.document.set_dependency(mesh_instance.get_property("input_mesh"), frozen_mesh.get_property("output_mesh"))
+	k3d.property.connect(context.document, frozen_mesh.get_property("output_mesh"), mesh_instance.get_property("input_mesh"))
 
 	# Make the MeshInstance visible to render engines ...
 	k3d.node.show(context.document, mesh_instance)

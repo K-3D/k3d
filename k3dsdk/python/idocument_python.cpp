@@ -85,46 +85,6 @@ static void delete_node(idocument_wrapper& Self, object& Node)
 	k3d::delete_nodes(Self.wrapped(), k3d::make_collection<k3d::nodes_t>(node().wrapped_ptr<k3d::inode>()));
 }
 
-static object get_dependency(idocument_wrapper& Self, iunknown_wrapper& Property)
-{
-	if(!Property.wrapped_ptr<k3d::iproperty>())
-		throw std::invalid_argument("not a property");
-
-	return wrap_unknown(Self.wrapped().pipeline().dependency(dynamic_cast<k3d::iproperty&>(Property.wrapped())));
-}
-
-static void set_dependency(idocument_wrapper& Self, iunknown_wrapper& From, boost::python::object& To)
-{
-	k3d::iproperty* const from = From.wrapped_ptr<k3d::iproperty>();
-	if(!from)
-		throw std::invalid_argument("first argument must be a valid property object");
-
-	k3d::iproperty* to = 0;
-
-	extract<iunknown_wrapper> to_value(To);
-	if(to_value.check())
-	{
-		to = to_value().wrapped_ptr<k3d::iproperty>();
-		if(!to)
-			throw std::invalid_argument("second argument must be a valid property instance or None");
-	}
-	else if(To.ptr() == boost::python::object().ptr())
-	{
-		to = 0;
-	}
-	else
-	{
-		throw std::invalid_argument("second argument must be a valid property instance or None");
-	}
-
-	if(from && to && from->property_type() != to->property_type())
-		throw std::invalid_argument("property types do not match");
-
-	k3d::ipipeline::dependencies_t dependencies;
-	dependencies[from] = to;
-	Self.wrapped().pipeline().set_dependencies(dependencies);
-}
-
 void define_class_idocument()
 {
 	class_<idocument_wrapper>("idocument")
@@ -134,8 +94,7 @@ void define_class_idocument()
 		.def("finish_change_set", &finish_change_set)
 		.def("redraw_all", &redraw_all)
 		.def("delete_node", &delete_node)
-		.def("get_dependency", &get_dependency)
-		.def("set_dependency", &set_dependency);
+		;
 }
 
 } // namespace python
