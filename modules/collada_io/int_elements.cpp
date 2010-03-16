@@ -326,6 +326,8 @@ namespace io
 				polyhedron->face_shells.push_back(polyhedron->shell_types.size()-1);
 			}
 		}
+		Mesh.point_selection.create(new k3d::mesh::selection_t(Mesh.points->size(), 0.0));
+		polyhedron->vertex_selections.resize(polyhedron->vertex_points.size(), 0.0);
 	}
 
 	intLight::intLight(domLight& Light, const k3d::matrix4& ccst)
