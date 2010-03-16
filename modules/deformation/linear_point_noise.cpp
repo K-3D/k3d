@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,12 +18,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Timothy M. Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <k3d-i18n-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3d-i18n-config.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
 #include <k3dsdk/noise.h>
@@ -81,43 +81,44 @@ public:
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const bool use_x = m_use_x.pipeline_value();
-		const bool use_y = m_use_y.pipeline_value();
-		const bool use_z = m_use_z.pipeline_value();
+		const k3d::bool_t use_x = m_use_x.pipeline_value();
+		const k3d::bool_t use_y = m_use_y.pipeline_value();
+		const k3d::bool_t use_z = m_use_z.pipeline_value();
 
-		const bool move_x = m_move_x.pipeline_value();
-		const bool move_y = m_move_y.pipeline_value();
-		const bool move_z = m_move_z.pipeline_value();
+		const k3d::bool_t move_x = m_move_x.pipeline_value();
+		const k3d::bool_t move_y = m_move_y.pipeline_value();
+		const k3d::bool_t move_z = m_move_z.pipeline_value();
 
-		const double frequency_x = m_frequency_x.pipeline_value();
-		const double frequency_y = m_frequency_y.pipeline_value();
-		const double frequency_z = m_frequency_z.pipeline_value();
+		const k3d::double_t frequency_x = m_frequency_x.pipeline_value();
+		const k3d::double_t frequency_y = m_frequency_y.pipeline_value();
+		const k3d::double_t frequency_z = m_frequency_z.pipeline_value();
 
-		const double offset_x = m_offset_x.pipeline_value();
-		const double offset_y = m_offset_y.pipeline_value();
-		const double offset_z = m_offset_z.pipeline_value();
+		const k3d::double_t offset_x = m_offset_x.pipeline_value();
+		const k3d::double_t offset_y = m_offset_y.pipeline_value();
+		const k3d::double_t offset_z = m_offset_z.pipeline_value();
 
-		const double amplitude_x = m_amplitude_x.pipeline_value();
-		const double amplitude_y = m_amplitude_y.pipeline_value();
-		const double amplitude_z = m_amplitude_z.pipeline_value();
+		const k3d::double_t amplitude_x = m_amplitude_x.pipeline_value();
+		const k3d::double_t amplitude_y = m_amplitude_y.pipeline_value();
+		const k3d::double_t amplitude_z = m_amplitude_z.pipeline_value();
 
-		const size_t point_begin = 0;
-		const size_t point_end = point_begin + OutputPoints.size();
-		for(size_t point = point_begin; point != point_end; ++point)
+		k3d::noise noise;
+
+		const k3d::uint_t point_begin = 0;
+		const k3d::uint_t point_end = point_begin + OutputPoints.size();
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			const k3d::point3 position = InputPoints[point];
+			const k3d::point3 perturb = noise.value<k3d::point3>(
+				use_x ? offset_x + frequency_x * InputPoints[point][0] : 0.0,
+				use_y ? offset_y + frequency_y * InputPoints[point][1] : 0.0,
+				use_z ? offset_z + frequency_z * InputPoints[point][2] : 0.0
+				);
 
-			const k3d::point3 noise = k3d::noise<k3d::point3>(
-				k3d::point3(
-					use_x ? offset_x + frequency_x * position[0] : 0.0,
-					use_y ? offset_y + frequency_y * position[1] : 0.0,
-					use_z ? offset_z + frequency_z * position[2] : 0.0));
-
-			const k3d::point3 offset =
-				k3d::point3(
-					move_x ? amplitude_x * 2.0 * (noise[0] - 0.5) : 0.0,
-					move_y ? amplitude_y * 2.0 * (noise[1] - 0.5) : 0.0,
-					move_z ? amplitude_z * 2.0 * (noise[2] - 0.5) : 0.0);
+			const k3d::vector3 offset =
+				k3d::vector3(
+					move_x ? amplitude_x * 2.0 * (perturb[0] - 0.5) : 0.0,
+					move_y ? amplitude_y * 2.0 * (perturb[1] - 0.5) : 0.0,
+					move_z ? amplitude_z * 2.0 * (perturb[2] - 0.5) : 0.0
+					);
 
 			OutputPoints[point] = k3d::mix(InputPoints[point], InputPoints[point] + offset, PointSelection[point]);
 		}
@@ -138,25 +139,25 @@ public:
 	}
 
 private:
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_use_x;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_use_y;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_use_z;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_use_x;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_use_y;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_use_z;
 
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_move_x;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_move_y;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_move_z;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_move_x;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_move_y;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_move_z;
 
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_frequency_x;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_frequency_y;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_frequency_z;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_frequency_x;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_frequency_y;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_frequency_z;
 
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_offset_x;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_offset_y;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_offset_z;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_offset_x;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_offset_y;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_offset_z;
 
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_amplitude_x;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_amplitude_y;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_amplitude_z;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_amplitude_x;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_amplitude_y;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_amplitude_z;
 };
 
 /////////////////////////////////////////////////////////////////////////////
