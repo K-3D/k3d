@@ -895,7 +895,7 @@ public static double noise(double x, double y, double z) {
 
 inline int32_t fastfloor(double_t x)
 {
-	return x > 0 ? static_cast<uint_t>(x) : static_cast<uint_t>(x - 1);
+	return x > 0 ? static_cast<int32_t>(x) : static_cast<int32_t>(x - 1);
 }
 
 inline double_t dot(int32_t g[], double_t x, double_t y, double_t z)
