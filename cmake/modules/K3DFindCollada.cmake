@@ -2,15 +2,11 @@ SET(K3D_COLLADA_FOUND FALSE)
 
 #Unix configuration
 IF(UNIX AND NOT APPLE)
-	FIND_PATH(K3D_COLLADA_DAE_INCLUDE_PATH dae.h
-		/usr/local/include/colladadom
-		/usr/include/colladadom
+	FIND_PATH(K3D_COLLADA_DAE_INCLUDE_PATH colladadom/dae.h
 		DOC "Directory where the ColladaDOM dae.h file is located"
 		)
 
-	FIND_PATH(K3D_COLLADA_DOM_INCLUDE_PATH /dom
-		/usr/local/include/colladadom/1.4
-		/usr/include/colladadom/1.4
+	FIND_PATH(K3D_COLLADA_DOM_INCLUDE_PATH colladadom/1.4/dom
 		DOC "Directory where the ColladaDOM 1.4 header files are located"
 		)
 	
@@ -69,7 +65,7 @@ MARK_AS_ADVANCED(K3D_COLLADA_DAE_INCLUDE_PATH)
 MARK_AS_ADVANCED(K3D_COLLADA_DOM_INCLUDE_PATH)	
 MARK_AS_ADVANCED(K3D_COLLADA_LIBRARY)
 
-SET(K3D_COLLADA_INCLUDE_DIRS ${K3D_COLLADA_DAE_INCLUDE_PATH} ${K3D_COLLADA_DOM_INCLUDE_PATH})
+SET(K3D_COLLADA_INCLUDE_DIRS ${K3D_COLLADA_DAE_INCLUDE_PATH}/colladadom ${K3D_COLLADA_DOM_INCLUDE_PATH}/colladadom/1.4)
 SET(K3D_COLLADA_LIBS ${K3D_COLLADA_LIBRARY})
 
 IF(WIN32)
