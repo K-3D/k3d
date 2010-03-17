@@ -301,7 +301,7 @@ def require_similar_mesh(document, input_mesh, base_mesh_name, ulps_threshold, c
 	print """<DartMeasurement name="difference.relative_error" type="numeric/float">""" + str(result.relative_error) + """</DartMeasurement>"""
 	print """<DartMeasurement name="ULPS Threshold" type="numeric/integer">""" + str(ulps_threshold) + """</DartMeasurement>"""
 
-	if result.ulps > ulps_threshold:
+	if not result.equal or result.ulps > ulps_threshold:
 		print """<DartMeasurement name="Geometry Difference" type="text/html"><![CDATA[\n"""
 		print difflib.HtmlDiff().make_file(str(input_mesh.internal_value()).splitlines(1), str(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
 		print """]]></DartMeasurement>\n"""

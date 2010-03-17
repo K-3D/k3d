@@ -39,7 +39,7 @@ extern k3d::iplugin_factory& collapse_faces_factory();
 extern k3d::iplugin_factory& collapse_points_factory();
 extern k3d::iplugin_factory& connect_vertices_factory();
 extern k3d::iplugin_factory& delete_components_factory();
-extern k3d::iplugin_factory& dissolve_components_factory();
+extern k3d::iplugin_factory& dissolve_faces_factory();
 extern k3d::iplugin_factory& extrude_faces_factory();
 //extern k3d::iplugin_factory& fillet_edges_factory();
 extern k3d::iplugin_factory& flip_orientation_factory();
@@ -69,7 +69,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::polyhedron::collapse_points_factory());
 	Registry.register_factory(module::polyhedron::connect_vertices_factory());
 	Registry.register_factory(module::polyhedron::delete_components_factory());
-	Registry.register_factory(module::polyhedron::dissolve_components_factory());
+	Registry.register_factory(module::polyhedron::dissolve_faces_factory());
 	Registry.register_factory(module::polyhedron::extrude_faces_factory());
 //	Registry.register_factory(module::polyhedron::fillet_edges_factory());
 	Registry.register_factory(module::polyhedron::flip_orientation_factory());

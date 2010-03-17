@@ -681,7 +681,6 @@ K3D_TEST(mesh.modifier.ConnectVertices
 	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
 	LABELS mesh modifier)
 
-
 K3D_TEST(mesh.modifier.CylindricalWavePoints 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CylindricalWavePoints.py
 	REQUIRES K3D_BUILD_DEFORMATION_MODULE
@@ -711,6 +710,11 @@ K3D_TEST(mesh.modifier.DeleteComponents.complex
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.DeleteComponents.complex.py
 	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
 	LABELS mesh modifier DeleteComponents)
+
+K3D_TEST(mesh.modifier.DissolveFaces 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/modifier.DissolveFaces.py
+	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
+	LABELS mesh modifier polyhedron PolyGrid DissolveFaces)
 
 K3D_TEST(mesh.modifier.EdgesToBlobby 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.EdgesToBlobby.py
