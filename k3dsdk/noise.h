@@ -32,64 +32,16 @@
 namespace k3d
 {
 
-/*
-template<typename T>
-const T noise(const double U);
-template<typename T>
-const T noise(const double U, const double V);
-template<typename T>
-const T noise(const point3& Pt);
-
-const double noise(const double U);
-const double noise(const double U, const double V);
-const double noise(const point3& Pt);
-
-template<>
-inline const point3 noise(const double U)
+namespace noise
 {
-	return point3(noise(U + 0.34), noise(U + 0.011), noise(U + 0.34));
-}
 
-template<>
-inline const point3 noise(const double U, const double V)
-{
-	return point3(noise(U + 0.34, V + 0.66), noise(U + 0.011, V + 0.845), noise(U + 0.34, V + 0.12));
-}
-
-template<>
-inline const color noise(const double U)
-{
-	return color(noise(U + 0.34), noise(U + 0.011), noise(U + 0.34));
-}
-
-template<>
-inline const color noise(const double U, const double V)
-{
-	return color(noise(U + 0.34, V + 0.66), noise(U + 0.011, V + 0.845), noise(U + 0.34, V + 0.12));
-}
-
-template<>
-inline const color noise(const point3& Pt)
-{
-	return color(
-		noise(point3(Pt[0] + 0.34, Pt[1] + 0.66, Pt[2] + 0.237)),
-		noise(point3(Pt[0] + 0.011, Pt[1] + 0.845, Pt[2] + 0.037)),
-		noise(point3(Pt[0] + 0.34, Pt[1] + 0.12, Pt[2] + 0.9)));
-}
-*/
-
-class noise
+/// Noise generator that returns "classic" Perlin 3D noise in the range (-1, 1).
+class classic3
 {
 public:
-	noise();
+	classic3();
 
-	template<typename ValueT>
-	const ValueT value(double_t, double_t, double_t) const
-	{
-		// This will be triggered if this template is ever instantiated
-		BOOST_STATIC_ASSERT(sizeof(ValueT) == 0);
-	}
-
+	/// Returns a noise value in the range (-1, 1) for the given point in 3-space.
 	double_t operator()(double_t X, double_t Y, double_t Z) const;
 
 private:
@@ -98,15 +50,18 @@ private:
 	static int32_t perm[512];
 };
 
-template<>
-const point3 noise::value<point3>(double_t X, double_t Y, double_t Z) const
+/// Helper function that maps 3D noise to 3D objects including point3, vector3, normal3, and texture3.
+template<typename ValueT, typename GeneratorT>
+const ValueT map3(const GeneratorT& Generator, double_t X, double_t Y, double_t Z)
 {
-	return point3(
-		(*this)(X + 0.34, Y + 0.66, Z + 0.237),
-		(*this)(X + 0.011, Y + 0.845, Z + 0.037),
-		(*this)(X + 0.34, Y + 0.12, Z + 0.9)
+	return ValueT(
+		Generator(X + 0.34, Y + 0.66, Z + 0.237),
+		Generator(X + 0.011, Y + 0.845, Z + 0.037),
+		Generator(X + 0.34, Y + 0.12, Z + 0.9)
 		);
 }
+
+} // namespace noise
 
 } // namespace k3d
 

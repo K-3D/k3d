@@ -48,12 +48,12 @@ public:
 		m_use_x(init_owner(*this) + init_name("use_x") + init_label(_("Use X")) + init_description(_("Add noise on X components")) + init_value(true)),
 		m_use_y(init_owner(*this) + init_name("use_y") + init_label(_("Use Y")) + init_description(_("Add noise on Y components")) + init_value(true)),
 		m_use_z(init_owner(*this) + init_name("use_z") + init_label(_("Use Z")) + init_description(_("Add noise on Z components")) + init_value(true)),
-		m_move_x(init_owner(*this) + init_name("move_x") + init_label(_("Move X")) + init_description(_("Apply offset on X component")) + init_value(true)),
-		m_move_y(init_owner(*this) + init_name("move_y") + init_label(_("Move Y")) + init_description(_("Apply offset on Y component")) + init_value(true)),
+		m_move_x(init_owner(*this) + init_name("move_x") + init_label(_("Move X")) + init_description(_("Apply offset on X component")) + init_value(false)),
+		m_move_y(init_owner(*this) + init_name("move_y") + init_label(_("Move Y")) + init_description(_("Apply offset on Y component")) + init_value(false)),
 		m_move_z(init_owner(*this) + init_name("move_z") + init_label(_("Move Z")) + init_description(_("Apply offset on Z component")) + init_value(true)),
-		m_frequency_x(init_owner(*this) + init_name("frequency_x") + init_label(_("X frequency")) + init_description(_("X Frequency")) + init_value(1.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_frequency_y(init_owner(*this) + init_name("frequency_y") + init_label(_("Y frequency")) + init_description(_("Y Frequency")) + init_value(1.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
-		m_frequency_z(init_owner(*this) + init_name("frequency_z") + init_label(_("Z frequency")) + init_description(_("Z Frequency")) + init_value(1.0) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
+		m_frequency_x(init_owner(*this) + init_name("frequency_x") + init_label(_("X frequency")) + init_description(_("X Frequency")) + init_value(0.1) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
+		m_frequency_y(init_owner(*this) + init_name("frequency_y") + init_label(_("Y frequency")) + init_description(_("Y Frequency")) + init_value(0.1) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
+		m_frequency_z(init_owner(*this) + init_name("frequency_z") + init_label(_("Z frequency")) + init_description(_("Z Frequency")) + init_value(0.1) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar))),
 		m_offset_x(init_owner(*this) + init_name("offset_x") + init_label(_("X offset")) + init_description(_("X Offset")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_offset_y(init_owner(*this) + init_name("offset_y") + init_label(_("Y offset")) + init_description(_("Y Offset")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
 		m_offset_z(init_owner(*this) + init_name("offset_z") + init_label(_("Z offset")) + init_description(_("Z Offset")) + init_value(0.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance))),
@@ -101,26 +101,27 @@ public:
 		const k3d::double_t amplitude_y = m_amplitude_y.pipeline_value();
 		const k3d::double_t amplitude_z = m_amplitude_z.pipeline_value();
 
-		k3d::noise noise;
+		k3d::noise::classic3 noise;
 
 		const k3d::uint_t point_begin = 0;
 		const k3d::uint_t point_end = point_begin + OutputPoints.size();
 		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			const k3d::point3 perturb = noise.value<k3d::point3>(
-				use_x ? offset_x + frequency_x * InputPoints[point][0] : 0.0,
-				use_y ? offset_y + frequency_y * InputPoints[point][1] : 0.0,
-				use_z ? offset_z + frequency_z * InputPoints[point][2] : 0.0
-				);
+			const k3d::point3 start = InputPoints[point];
+
+			const k3d::vector3 perturb = k3d::noise::map3<k3d::vector3>(
+				noise,
+				use_x ? offset_x + frequency_x * start[0] : 0.0,
+				use_y ? offset_y + frequency_y * start[1] : 0.0,
+				use_z ? offset_z + frequency_z * start[2] : 0.0);
 
 			const k3d::vector3 offset =
 				k3d::vector3(
-					move_x ? amplitude_x * 2.0 * (perturb[0] - 0.5) : 0.0,
-					move_y ? amplitude_y * 2.0 * (perturb[1] - 0.5) : 0.0,
-					move_z ? amplitude_z * 2.0 * (perturb[2] - 0.5) : 0.0
-					);
+					move_x ? amplitude_x * perturb[0] : 0.0,
+					move_y ? amplitude_y * perturb[1] : 0.0,
+					move_z ? amplitude_z * perturb[2] : 0.0);
 
-			OutputPoints[point] = k3d::mix(InputPoints[point], InputPoints[point] + offset, PointSelection[point]);
+			OutputPoints[point] = k3d::mix(start, start + offset, PointSelection[point]);
 		}
 	}
 
