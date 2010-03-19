@@ -12,3 +12,4 @@ K3D_TEST(platform.float TARGET test-platform-floating-point LABELS platform)
 
 ADD_EXECUTABLE(test-platform-normalized platform_normalized.cpp)
 
+ADD_EXECUTABLE(test-platform-statistics platform_statistics.cpp)
