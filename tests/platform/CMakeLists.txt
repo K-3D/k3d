@@ -7,6 +7,8 @@ INCLUDE_DIRECTORIES(${K3D_BOOST_INCLUDE_DIRS})
 ADD_EXECUTABLE(test-platform-types platform_types.cpp)
 K3D_TEST(platform.types TARGET test-platform-types LABELS platform)
 
-ADD_EXECUTABLE(test-floating-point platform_floating_point.cpp)
-K3D_TEST(platform.float TARGET test-floating-point LABELS platform)
+ADD_EXECUTABLE(test-platform-floating-point platform_floating_point.cpp)
+K3D_TEST(platform.float TARGET test-platform-floating-point LABELS platform)
+
+ADD_EXECUTABLE(test-platform-normalized platform_normalized.cpp)
 
