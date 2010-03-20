@@ -75,9 +75,9 @@ namespace difference
 {
 
 /// Specialization of difference::test that tests inode pointers for equality
-inline void test(inode* const A, inode* const B, test_result& Result)
+inline void test(inode* const A, inode* const B, accumulator& Result)
 {
-	Result.insert(A == B);
+	Result.exact(A == B);
 }
 
 } // namespace difference

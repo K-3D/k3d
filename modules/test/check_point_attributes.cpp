@@ -56,7 +56,6 @@ public:
 		base(Factory, Document),
 		m_ulps(init_owner(*this) + init_name("difference") + init_label(_("Difference")) + init_description(_("Difference in Units in the Last Place.")) + init_value(static_cast<k3d::uint64_t>(0))),
 		m_equal(init_owner(*this) + init_name("equal") + init_label(_("Equal")) + init_description(_("True iff all input meshes are completely equivalent.")) + init_value(true)),
-		m_relative_error(init_owner(*this) + init_name("relative_error") + init_label(_("Relative Error")) + init_description(_("Maximum relative error.")) + init_value(0.0)),
 		m_input_mesh(init_owner(*this) + init_name("input_mesh") + init_label(_("Input Mesh")) + init_description(_("Input mesh")) + init_value<k3d::mesh*>(0))
 	{
 		m_input_mesh.changed_signal().connect(k3d::hint::converter<
@@ -64,7 +63,6 @@ public:
 
 		m_ulps.set_update_slot(sigc::mem_fun(*this, &check_point_attributes::execute_ulps));
 		m_equal.set_update_slot(sigc::mem_fun(*this, &check_point_attributes::execute_equal));
-		m_relative_error.set_update_slot(sigc::mem_fun(*this, &check_point_attributes::execute_relative_error));
 	}
 
 	k3d::iproperty& mesh_sink_input()
@@ -88,25 +86,23 @@ public:
 private:
 	k3d_data(k3d::uint64_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_ulps;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_equal;
-	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_relative_error;
 	k3d_data(k3d::mesh*, k3d::data::immutable_name, k3d::data::change_signal, k3d::data::no_undo, k3d::data::local_storage, k3d::data::no_constraint, k3d::data::read_only_property, k3d::data::no_serialization) m_input_mesh;
 
-	boost::optional<k3d::difference::test_result> m_test_result;
+	boost::optional<k3d::difference::accumulator> m_accumulator;
 
 	void update(k3d::ihint*)
 	{
-		m_test_result = boost::none;
+		m_accumulator = boost::none;
 
 		m_equal.update();
 		m_ulps.update();
-		m_relative_error.update();
 	}
 
-	k3d::difference::test_result test_result()
+	k3d::difference::accumulator accumulator()
 	{
-		if(!m_test_result)
+		if(!m_accumulator)
 		{
-			m_test_result = k3d::difference::test_result();
+			m_accumulator = k3d::difference::accumulator();
 			const k3d::mesh* const input_mesh = m_input_mesh.pipeline_value();
 			if(input_mesh)
 			{
@@ -114,7 +110,7 @@ private:
 
 				const k3d::mesh::points_t* point_attributes = input_mesh->point_attributes.lookup<k3d::mesh::points_t>(table_name);
 				if(point_attributes)
-					input_mesh->points->difference(*point_attributes, *m_test_result);
+					input_mesh->points->difference(*point_attributes, *m_accumulator);
 
 				for(k3d::mesh::primitives_t::const_iterator p = input_mesh->primitives.begin(); p != input_mesh->primitives.end(); ++p)
 				{
@@ -152,7 +148,7 @@ private:
 
 						const k3d::mesh::points_t* array = attribute_table.lookup<k3d::mesh::points_t>(table_name);
 						if(array)
-							reference_points.difference(*array, *m_test_result);
+							reference_points.difference(*array, *m_accumulator);
 					}
 
 					// Specific cases for NURBS parameter attributes
@@ -172,7 +168,7 @@ private:
 							ref_points.push_back(input_mesh->points->at(curve_prim->curve_points[first_point]));
 							ref_points.push_back(input_mesh->points->at(curve_prim->curve_points[last_point]));
 						}
-						ref_points.difference(*array, *m_test_result);
+						ref_points.difference(*array, *m_accumulator);
 						continue;
 					}
 
@@ -199,27 +195,22 @@ private:
 							ref_points.push_back(input_mesh->points->at(c3));
 							ref_points.push_back(input_mesh->points->at(c4));
 						}
-						ref_points.difference(*array, *m_test_result);
+						ref_points.difference(*array, *m_accumulator);
 					}
 				}
 			}
 		}
-		return *m_test_result;
+		return *m_accumulator;
 	}
 
 	void execute_equal(const std::vector<k3d::ihint*>& Hints, k3d::bool_t& Output)
 	{
-		Output = test_result().equal;
+		Output = boost::accumulators::min(accumulator().exact);
 	}
 
 	void execute_ulps(const std::vector<k3d::ihint*>& Hints, k3d::uint64_t& Output)
 	{
-		Output = test_result().ulps;
-	}
-
-	void execute_relative_error(const std::vector<k3d::ihint*>& Hints, k3d::double_t& Output)
-	{
-		Output = test_result().relative_error;
+		Output = boost::accumulators::max(accumulator().ulps);
 	}
 };
 

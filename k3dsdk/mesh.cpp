@@ -42,53 +42,53 @@ namespace difference
 {
 
 template<typename T>
-void test(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, test_result& Result)
+void test(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, accumulator& Result)
 {
 	if(A && B)
 		A->difference(*B, Result);
 	else if(!A && !B)
-		Result.insert(true);
+		Result.exact(true);
 	else
-		Result.insert(false);
+		Result.exact(false);
 }
 
 /// Return the difference between two shared arrays (handles "fuzzy" floating-point comparisons).
-void test(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, test_result& Result)
+void test(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, accumulator& Result)
 {
 	if(A && B)
 		A->difference(*B, Result);
 	else if(!A && !B)
-		Result.insert(true);
+		Result.exact(true);
 	else
-		Result.insert(false);
+		Result.exact(false);
 }
 
 /// Return the difference between two shared objects (handles "fuzzy" floating-point comparisons).
 template<typename T>
-void test(const pipeline_data<T>& A, const pipeline_data<T>& B, test_result& Result)
+void test(const pipeline_data<T>& A, const pipeline_data<T>& B, accumulator& Result)
 {
 	if(A && B)
 		k3d::difference::test(*A, *B, Result);
 	else if(!A && !B)
-		Result.insert(true);
+		Result.exact(true);
 	else
-		Result.insert(false);
+		Result.exact(false);
 }
 
 /// Return the difference between two sets of primitives.
-void test(const mesh::primitives_t& A, const mesh::primitives_t& B, test_result& Result)
+void test(const mesh::primitives_t& A, const mesh::primitives_t& B, accumulator& Result)
 {
 	// If they have differing numbers of primitives, they definitely aren't equal
-	Result.insert(A.size() == B.size());
+	Result.exact(A.size() == B.size());
 
 	for(mesh::primitives_t::const_iterator a = A.begin(), b = B.begin(); a != A.end() && b != B.end(); ++a, ++b)
 	{
 		if(a->get() && b->get())
 			(**a).difference((**b), Result);
 		else if(!a->get() && !b->get())
-			Result.insert(true);
+			Result.exact(true);
 		else
-			Result.insert(false);
+			Result.exact(false);
 	}
 }
 
@@ -101,7 +101,7 @@ mesh::mesh()
 {
 }
 
-void mesh::difference(const mesh& Other, difference::test_result& Result) const
+void mesh::difference(const mesh& Other, difference::accumulator& Result) const
 {
 	k3d::difference::test(points, Other.points, Result);
 	k3d::difference::test(point_selection, Other.point_selection, Result);
@@ -367,7 +367,7 @@ mesh::primitive::primitive(const string_t& Type) :
 {
 }
 
-void mesh::primitive::difference(const primitive& Other, difference::test_result& Result) const
+void mesh::primitive::difference(const primitive& Other, difference::accumulator& Result) const
 {
 	k3d::difference::test(type, Other.type, Result);
 	k3d::difference::test(structure, Other.structure, Result);

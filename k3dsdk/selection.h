@@ -195,7 +195,7 @@ public:
 	named_arrays structure;
 
 	/// Returns the difference between two selections using the fuzzy semantics of k3d::difference::test().
-	void difference(const storage& Other, difference::test_result& Result) const;
+	void difference(const storage& Other, difference::accumulator& Result) const;
 };
 
 /// Stream serialization
@@ -210,7 +210,7 @@ public:
 	storage& create(const string_t& Type);
 
 	/// Returns the difference between two selection sets using the fuzzy semantics of k3d::difference::test().
-	void difference(const set& Other, difference::test_result& Result) const;
+	void difference(const set& Other, difference::accumulator& Result) const;
 
 	/// Combines two selection sets by appending one to another.
 	static void append(const set& Source, set& Target);
@@ -225,13 +225,13 @@ namespace difference
 {
 
 /// Specialization of difference::test for k3d::selection::storage
-inline void test(const k3d::selection::storage& A, const k3d::selection::storage& B, test_result& Result)
+inline void test(const k3d::selection::storage& A, const k3d::selection::storage& B, accumulator& Result)
 {
 	A.difference(B, Result);
 }
 
 /// Specialization of difference::test for k3d::selection::set
-inline void test(const k3d::selection::set& A, const k3d::selection::set& B, test_result& Result)
+inline void test(const k3d::selection::set& A, const k3d::selection::set& B, accumulator& Result)
 {
 	A.difference(B, Result);
 }

@@ -15,10 +15,10 @@ int main(int argc, char* argv[])
 {
 	try
 	{
-		accumulator_set<double, stats<tag::min, tag::mean, tag::max, tag::median, tag::lazy_variance> > model;
+		accumulator_set<bool, stats<tag::min, tag::mean, tag::max, tag::median, tag::lazy_variance> > model;
 		for(int i = 1; i < argc; ++i)
 		{
-			model(boost::lexical_cast<double>(argv[i]));
+			model(boost::lexical_cast<bool>(argv[i]));
 		}
 
 		std::cerr << "count: " << count(model) << std::endl;

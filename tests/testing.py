@@ -56,6 +56,23 @@ def create_opengl_engine(document):
 
 	return render_engine
 
+def dart_measurement(name, value):
+	if type(value).__name__ == "str":
+		value_type = "text/string"
+	elif type(value).__name__ == "bool":
+		value_type = "text/string"
+	elif type(value).__name__ == "int":
+		value_type = "numeric/integer"
+	elif type(value).__name__ == "long":
+		value_type = "numeric/integer"
+	elif type(value).__name__ == "float":
+		value_type = "numeric/float"
+	else:
+		raise Exception("Unknown type: " + repr(value))
+
+	print "<DartMeasurement name=\"" + name + "\" type=\"" + value_type + "\">" + str(value) + "</DartMeasurement>"
+	sys.stdout.flush()
+
 #####################################################################################33
 # Bitmap-related testing
 
@@ -101,11 +118,10 @@ def setup_bitmap_modifier_test(source_name, modifier_name):
 	return result
 
 def require_bitmap_size(bitmap, width, height):
-	print """<DartMeasurement name="Bitmap Width" type="numeric/float">""" + str(bitmap.width()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Bitmap Height" type="numeric/float">""" + str(bitmap.height()) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Target Width" type="numeric/float">""" + str(width) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Target Height" type="numeric/float">""" + str(height) + """</DartMeasurement>"""
-	sys.stdout.flush()
+	dart_measurement("bitmap_width", bitmap.width())
+	dart_measurement("bitmap_height", bitmap.height())
+	dart_measurement("expected_width", width)
+	dart_measurement("expected_height", height)
 	
 	if bitmap.width() != width or bitmap.height() != height:
 		raise "bitmap dimensions incorrect"
@@ -252,17 +268,15 @@ def require_valid_mesh(document, input_mesh):
 		raise Exception("invalid or unknown primitive type in mesh")
 
 def require_mesh_area(calculated_area, expected_area):
-	print """<DartMeasurement name="Calculated Area" type="numeric/float">""" + str(calculated_area) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Expected Area" type="numeric/float">""" + str(expected_area) + """</DartMeasurement>"""
-	sys.stdout.flush()
+	dart_measurement("calculated_area", calculated_area)
+	dart_measurement("expected_area", expected_area)
 
 	if calculated_area != expected_area:
 		raise Exception("incorrect mesh area")
 
 def require_mesh_volume(calculated_volume, expected_volume):
-	print """<DartMeasurement name="Calculated Volume" type="numeric/float">""" + str(calculated_volume) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Expected Volume" type="numeric/float">""" + str(expected_volume) + """</DartMeasurement>"""
-	sys.stdout.flush()
+	dart_measurement("calculated_volume", calculated_volume)
+	dart_measurement("expected_volume", expected_volume)
 
 	if calculated_volume != expected_volume:
 		raise Exception("incorrect mesh volume")
@@ -293,16 +307,25 @@ def require_similar_mesh(document, input_mesh, base_mesh_name, ulps_threshold, c
 	if not os.path.exists(str(reference_path)):
 		raise Exception("missing reference file: " + str(reference_path))
 
-	result = k3d.difference.test_result()
+	result = k3d.difference.accumulator()
 	k3d.difference.test(input_mesh.internal_value(), reference.output_mesh, result)
 
-	print """<DartMeasurement name="difference.equal" type="numeric/integer">""" + str(result.equal) + """</DartMeasurement>"""
-	print """<DartMeasurement name="difference.ulps" type="numeric/integer">""" + str(result.ulps) + """</DartMeasurement>"""
-	print """<DartMeasurement name="difference.relative_error" type="numeric/float">""" + str(result.relative_error) + """</DartMeasurement>"""
-	print """<DartMeasurement name="ULPS Threshold" type="numeric/integer">""" + str(ulps_threshold) + """</DartMeasurement>"""
+	dart_measurement("exact_count", result.exact_count())
+	dart_measurement("exact_min", result.exact_min())
+	dart_measurement("exact_max", result.exact_max())
 
-	if not result.equal or result.ulps > ulps_threshold:
-		print """<DartMeasurement name="Geometry Difference" type="text/html"><![CDATA[\n"""
+	dart_measurement("ulps_count", result.ulps_count())
+	dart_measurement("ulps_min", result.ulps_min())
+	dart_measurement("ulps_max", result.ulps_max())
+	dart_measurement("ulps_mean", result.ulps_mean())
+	dart_measurement("ulps_median", result.ulps_median())
+	dart_measurement("ulps_standard_deviation", result.ulps_standard_deviation())
+	dart_measurement("ulps_variance", result.ulps_variance())
+
+	dart_measurement("ulps_threshold", ulps_threshold)
+
+	if (result.exact_count() and result.exact_min() == 0) or result.ulps_max() > ulps_threshold:
+		print """<DartMeasurement name="geometry_difference" type="text/html"><![CDATA[\n"""
 		print difflib.HtmlDiff().make_file(str(input_mesh.internal_value()).splitlines(1), str(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
 		print """]]></DartMeasurement>\n"""
 		sys.stdout.flush()
@@ -323,8 +346,8 @@ def setup_scalar_source_test(source_name):
 	return result
 
 def require_scalar_value(value, expected_value):
-	print """<DartMeasurement name="Value" type="numeric/float">""" + str(value) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Expected Value" type="numeric/float">""" + str(expected_value) + """</DartMeasurement>"""
+	dart_measurement("value", value);
+	dart_measurement("expected_value", expected_value);
 	if value != expected_value:
 		raise Exception("value does not match expected value")
 
@@ -342,13 +365,12 @@ def bitmap_perceptual_difference(document, input_image1, input_image2, threshold
 	pixel_count = input_image1.internal_value().width() * input_image1.internal_value().height()
 	pixel_difference = difference.difference
 	difference_measurement = float(pixel_difference) / float(pixel_count)
-	
-	print """<DartMeasurement name="Pixel Difference" type="numeric/float">""" + str(pixel_difference) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Pixel Count" type="numeric/float">""" + str(pixel_count) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Difference" type="numeric/float">""" + str(difference_measurement) + """</DartMeasurement>"""
-	print """<DartMeasurement name="Threshold" type="numeric/float">""" + str(threshold) + """</DartMeasurement>"""
-	sys.stdout.flush()
 
+	dart_measurement("pixel_difference", pixel_difference)
+	dart_measurement("pixel_count", pixel_count)
+	dart_measurement("difference", difference_measurement)
+	dart_measurement("threshold", threshold)
+	
 	if difference_measurement > threshold:
 		raise "pixel difference exceeds threshold"
    

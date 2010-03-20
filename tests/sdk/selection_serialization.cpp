@@ -71,12 +71,12 @@ int main(int argc, char* argv[])
 		k3d::uint64_t ulps;
 
 		k3d::selection::set b;
-		test_expression(!k3d::difference::test(b, a).equal);
+		test_expression(boost::accumulators::max(k3d::difference::test(b, a).exact) != true);
 
 		k3d::ipersistent::load_context load_context(root_path, lookup);
 		k3d::xml::load(b, xml, load_context);
 
-		test_expression(k3d::difference::test(b, a).equal);
+		test_expression(boost::accumulators::min(k3d::difference::test(b, a).exact) != false);
 	}
 	catch(std::exception& e)
 	{

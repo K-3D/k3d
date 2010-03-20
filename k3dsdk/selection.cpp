@@ -362,7 +362,7 @@ storage::storage(const string_t& Type) :
 {
 }
 
-void storage::difference(const storage& Other, difference::test_result& Result) const
+void storage::difference(const storage& Other, difference::accumulator& Result) const
 {
 	k3d::difference::test(type, Other.type, Result);
 	k3d::difference::test(structure, Other.structure, Result);
@@ -386,11 +386,11 @@ storage& set::create(const string_t& Type)
 	return back().create(new storage(Type));
 }
 
-void set::difference(const set& Other, difference::test_result& Result) const
+void set::difference(const set& Other, difference::accumulator& Result) const
 {
 	const set& self = *this;
 
-	Result.insert(self.size() == Other.size());
+	Result.exact(self.size() == Other.size());
 
 	for(uint_t i = 0; i != self.size() && i != Other.size(); ++i)
 		k3d::difference::test(*self[i], *Other[i], Result);

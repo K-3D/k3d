@@ -1285,7 +1285,7 @@ namespace difference
 {
 
 /// Specialization of difference::test for matrix4 
-inline void test(const matrix4& A, const matrix4& B, test_result& Result)
+inline void test(const matrix4& A, const matrix4& B, accumulator& Result)
 {
 	range_test(A.v, A.v + 4, B.v, B.v + 4, Result);
 }

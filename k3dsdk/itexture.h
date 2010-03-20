@@ -41,13 +41,13 @@ protected:
 	virtual ~itexture() {}
 };
 
-/// Specialization of difference::test::test that tests itexture pointers for equality
+/// Specialization of difference::test that tests itexture pointers for equality
 namespace difference
 {
 
-inline void test(itexture* const A, itexture* const B, test_result& Result)
+inline void test(itexture* const A, itexture* const B, accumulator& Result)
 {
-	Result.insert(A == B);
+	Result.exact(A == B);
 }
 
 } // namespace difference

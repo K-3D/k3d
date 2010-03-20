@@ -38,15 +38,15 @@ table* named_tables::writable(const string_t& Name)
 	return result == end() ? static_cast<table*>(0) : &result->second;
 }
 
-void named_tables::difference(const named_tables& Other, difference::test_result& Result) const
+void named_tables::difference(const named_tables& Other, difference::accumulator& Result) const
 {
 	// If we have differing numbers of tables, we definitely aren't equal
-	Result.insert(size() == Other.size());
+	Result.exact(size() == Other.size());
 
 	for(named_tables::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
 		// Each pair of tables must have equal names
-		Result.insert(a->first == b->first);
+		Result.exact(a->first == b->first);
 
 		// Perform element-wise comparisons of the tables 
 		a->second.difference(b->second, Result);

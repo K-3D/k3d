@@ -118,18 +118,18 @@ public:
 		return base_type::empty();
 	}
 
-	void difference(const array& Other, difference::test_result& Result) const
+	void difference(const array& Other, difference::accumulator& Result) const
 	{
 		const this_type* const other = dynamic_cast<const this_type*>(&Other);
-		Result.insert(other);
+		Result.exact(other ? true : false);
 
 		if(other)
 			difference(*other, Result);
 	}
 
-	void difference(const this_type& Other, difference::test_result& Result) const
+	void difference(const this_type& Other, difference::accumulator& Result) const
 	{
-		Result.insert(metadata == Other.metadata);
+		Result.exact(metadata == Other.metadata);
 		range_test(base_type::begin(), base_type::end(), Other.begin(), Other.end(), Result);
 	}
 };
@@ -138,7 +138,7 @@ namespace difference
 {
 
 /// Specialization of difference::test for k3d::uint_t_array
-inline void test(const uint_t_array& A, const uint_t_array& B, test_result& Result)
+inline void test(const uint_t_array& A, const uint_t_array& B, accumulator& Result)
 {
 	A.difference(B, Result);
 }

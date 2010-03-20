@@ -36,7 +36,7 @@ public:
 	/// Return an attribute_array by name, or NULL
 	table* writable(const string_t& Name);
 	/// Returns the difference between two collections, using the imprecise semantics of difference::test().
-	void difference(const named_tables& Other, difference::test_result& Result) const;
+	void difference(const named_tables& Other, difference::accumulator& Result) const;
 };
 
 /// Serialization
@@ -46,7 +46,7 @@ std::ostream& operator<<(std::ostream& Stream, const named_tables& RHS);
 namespace difference
 {
 
-inline void test(const named_tables& A, const named_tables& B, test_result& Result)
+inline void test(const named_tables& A, const named_tables& B, accumulator& Result)
 {
 	A.difference(B, Result);
 }

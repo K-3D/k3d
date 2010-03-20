@@ -3,17 +3,17 @@
 import k3d
 
 def test_equal(a, b, test):
-	result = k3d.difference.test_result()
+	result = k3d.difference.accumulator()
 	k3d.difference.test(a, b, result)
-	if result.equal != True or result.ulps > 0:
+	if result.exact_min() != True or result.ulps_max() > 0:
 		print repr(a)
 		print repr(b)
 		raise Exception(test + " should test equal")
 
 def test_unequal(a, b, test):
-	result = k3d.difference.test_result()
+	result = k3d.difference.accumulator()
 	k3d.difference.test(a, b, result)
-	if result.equal == True and result.ulps == 0:
+	if result.exact_min() == True and result.ulps_max() == 0:
 		print repr(a)
 		print repr(b)
 		raise Exception(test + " should test unequal")

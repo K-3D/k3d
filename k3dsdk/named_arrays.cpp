@@ -61,15 +61,15 @@ named_arrays named_arrays::clone() const
 	return result;
 }
 
-void named_arrays::difference(const named_arrays& Other, difference::test_result& Result) const
+void named_arrays::difference(const named_arrays& Other, difference::accumulator& Result) const
 {
 	// If we have differing numbers of arrays, we definitely aren't equal
-	Result.insert(size() == Other.size());
+	Result.exact(size() == Other.size());
 
 	for(named_arrays::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
 		// Each pair of arrays must have equal names
-		Result.insert(a->first == b->first);
+		Result.exact(a->first == b->first);
 
 		// Perform element-wise comparisons of the arrays 
 		a->second->difference(*b->second, Result);

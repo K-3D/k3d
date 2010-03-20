@@ -220,7 +220,7 @@ namespace difference
 {
 
 /// Specialization of difference::test for vector2
-inline void test(const vector2& A, const vector2& B, test_result& Result)
+inline void test(const vector2& A, const vector2& B, accumulator& Result)
 {
 	range_test(A.n, A.n + 2, B.n, B.n + 2, Result);
 }

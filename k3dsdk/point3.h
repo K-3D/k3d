@@ -191,7 +191,7 @@ namespace difference
 {
 
 /// Specialization of difference::test for point3
-inline void test(const point3& A, const point3& B, test_result& Result)
+inline void test(const point3& A, const point3& B, accumulator& Result)
 {
 	range_test(A.n, A.n + 3, B.n, B.n + 3, Result);
 }

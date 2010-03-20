@@ -821,7 +821,7 @@ typedef basic_rgb<double_t> color;
 namespace difference
 {
 
-inline void test(const color& A, const color& B, test_result& Result)
+inline void test(const color& A, const color& B, accumulator& Result)
 {
 	test(A.red, B.red, Result);
 	test(A.green, B.green, Result);

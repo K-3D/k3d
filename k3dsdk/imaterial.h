@@ -45,9 +45,9 @@ protected:
 namespace difference
 {
 
-inline void test(imaterial* const A, imaterial* const B, test_result& Result)
+inline void test(imaterial* const A, imaterial* const B, accumulator& Result)
 {
-	Result.insert(A == B);
+	Result.exact(A == B);
 }
 
 } // namespace difference

@@ -53,16 +53,16 @@ int main(int argc, char* argv[])
 
 		// Verify that metadata is handled correctly when testing for equality ...
 		k3d::uint_t_array e = a;
-		test_expression(k3d::difference::test(e, a).equal);
+		test_expression(boost::accumulators::min(k3d::difference::test(e, a).exact) != false);
 		
 		e.set_metadata_value("foo", "bar");
-		test_expression(!k3d::difference::test(e, a).equal);
+		test_expression(boost::accumulators::min(k3d::difference::test(e, a).exact) != true);
 
 		e.erase_metadata_value("foo");
-		test_expression(k3d::difference::test(e, a).equal);
+		test_expression(boost::accumulators::min(k3d::difference::test(e, a).exact) != false);
 
 		e.set_metadata_value(k3d::metadata::key::domain(), "../array[@name=\"clockwise_edges\"]/indices()");
-		test_expression(!k3d::difference::test(e, a).equal);
+		test_expression(boost::accumulators::min(k3d::difference::test(e, a).exact) != true);
 	}
 	catch(std::exception& e)
 	{

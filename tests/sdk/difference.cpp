@@ -14,15 +14,13 @@ void test_difference(const T& A, const T& B, const k3d::uint64_t Threshold)
 {
 	std::cout << std::setprecision(17) << k3d::demangle(typeid(T)) << ": " << A << " == " << B << std::endl;
 
-	const k3d::difference::test_result result = k3d::difference::test(A, B);
+	const k3d::difference::accumulator result = k3d::difference::test(A, B);
 
-	if(result.equal)
-		return;
+	if(boost::accumulators::count(result.exact) && boost::accumulators::min(result.exact) == false)
+		throw std::runtime_error("exact value mismatch");
 
-	if(result.ulps < Threshold)
-		return;
-
-	throw std::runtime_error("values not equal");
+	if(boost::accumulators::count(result.ulps) && boost::accumulators::max(result.ulps) > Threshold)
+		throw std::runtime_error("ulps exceed threshold");
 }
 
 int main(int argc, char* argv[])

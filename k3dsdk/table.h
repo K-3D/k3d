@@ -81,7 +81,7 @@ public:
 	/// Returns an table containing copies of a half-open range of all the original arrays.
 	table clone(const uint_t Begin, const uint_t End) const;
 	/// Returns the difference between two tables, using the imprecise semantics of difference().
-	void difference(const table& Other, difference::test_result& Result) const;
+	void difference(const table& Other, difference::accumulator& Result) const;
 
 	typedef std::vector<const table*> table_collection;
 	static table clone_types(const table_collection& AttributeArrays);
@@ -105,7 +105,7 @@ std::ostream& operator<<(std::ostream& Stream, const table& RHS);
 namespace difference
 {
 
-inline void test(const table& A, const table& B, test_result& Result)
+inline void test(const table& A, const table& B, accumulator& Result)
 {
 	A.difference(B, Result);
 }

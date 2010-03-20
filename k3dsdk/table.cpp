@@ -71,15 +71,15 @@ table table::clone(const uint_t Begin, const uint_t End) const
 	return result;
 }
 
-void table::difference(const table& Other, difference::test_result& Result) const
+void table::difference(const table& Other, difference::accumulator& Result) const
 {
 	// If we have differing numbers of arrays, we definitely aren't equal
-	Result.insert(column_count() == Other.column_count());
+	Result.exact(column_count() == Other.column_count());
 
 	for(table::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
 		// Each pair of arrays must have equal names
-		Result.insert(a->first == b->first);
+		Result.exact(a->first == b->first);
 
 		// Perform element-wise comparisons of the arrays
 		a->second->difference(*b->second, Result);

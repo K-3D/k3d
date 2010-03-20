@@ -212,7 +212,7 @@ namespace difference
 {
 
 /// Specialization of difference::test for normal3
-inline void test(const normal3& A, const normal3& B, test_result& Result)
+inline void test(const normal3& A, const normal3& B, accumulator& Result)
 {
 	range_test(A.n, A.n + 3, B.n, B.n + 3, Result);
 }

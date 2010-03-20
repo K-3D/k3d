@@ -60,7 +60,7 @@ public:
 	virtual bool_t empty() const = 0;
 	/// Returns the difference between this array and another, using the imprecise semantics of difference::test()
 	/// \note: Returns false if given an array with a different concrete type.
-	virtual void difference(const array& Other, difference::test_result& Result) const = 0;
+	virtual void difference(const array& Other, difference::accumulator& Result) const = 0;
 
 	/// Sets a new name-value pair, overwriting the value if the name already exists
 	void set_metadata_value(const string_t& Name, const string_t& Value);
@@ -85,7 +85,7 @@ std::ostream& operator<<(std::ostream& Stream, const array& RHS);
 namespace difference
 {
 
-inline void test(const array& A, const array& B, test_result& Result)
+inline void test(const array& A, const array& B, accumulator& Result)
 {
 	A.difference(B, Result);
 }

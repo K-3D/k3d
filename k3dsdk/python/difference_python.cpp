@@ -33,46 +33,57 @@ namespace python
 class difference
 {
 public:
-	static void const_mesh(const_mesh_wrapper& A, const_mesh_wrapper& B, k3d::difference::test_result& Result)
+	static void const_mesh(const_mesh_wrapper& A, const_mesh_wrapper& B, k3d::difference::accumulator& Result)
 	{
 		k3d::difference::test(A.wrapped(), B.wrapped(), Result);
 	}
 
-	static void mesh(mesh_wrapper& A, mesh_wrapper& B, k3d::difference::test_result& Result)
+	static void mesh(mesh_wrapper& A, mesh_wrapper& B, k3d::difference::accumulator& Result)
 	{
 		k3d::difference::test(A.wrapped(), B.wrapped(), Result);
 	}
 
-	static void matrix4(k3d::matrix4& A, k3d::matrix4& B, k3d::difference::test_result& Result)
-	{
-		k3d::difference::test(A, B, Result);
-	}
-
-	static void double_t(k3d::double_t& A, k3d::double_t& B, k3d::difference::test_result& Result)
+	static void matrix4(k3d::matrix4& A, k3d::matrix4& B, k3d::difference::accumulator& Result)
 	{
 		k3d::difference::test(A, B, Result);
 	}
 };
 
+static std::size_t exact_count(k3d::difference::accumulator& Self) { return boost::accumulators::count(Self.exact); }
+static k3d::bool_t exact_min(k3d::difference::accumulator& Self) { return boost::accumulators::min(Self.exact); }
+static k3d::bool_t exact_max(k3d::difference::accumulator& Self) { return boost::accumulators::max(Self.exact); }
+static std::size_t ulps_count(k3d::difference::accumulator& Self) { return boost::accumulators::count(Self.ulps); }
+static k3d::double_t ulps_min(k3d::difference::accumulator& Self) { return boost::accumulators::min(Self.ulps); }
+static k3d::double_t ulps_max(k3d::difference::accumulator& Self) { return boost::accumulators::max(Self.ulps); }
+static k3d::double_t ulps_mean(k3d::difference::accumulator& Self) { return boost::accumulators::mean(Self.ulps); }
+static k3d::double_t ulps_median(k3d::difference::accumulator& Self) { return boost::accumulators::median(Self.ulps); }
+static k3d::double_t ulps_variance(k3d::difference::accumulator& Self) { return boost::accumulators::variance(Self.ulps); }
+static k3d::double_t ulps_standard_deviation(k3d::difference::accumulator& Self) { return std::sqrt(boost::accumulators::variance(Self.ulps)); }
+
 void define_namespace_difference()
 {
 	boost::python::scope outer = boost::python::class_<difference>("difference", boost::python::no_init)
 		.def("test", &difference::const_mesh,
-			"Returns the difference between two meshes using fuzzy-comparisons for floating-point types.")
+			"Computes the difference between two meshes using fuzzy-comparisons for floating-point types.")
 		.def("test", &difference::mesh,
-			"Returns the difference between two meshes using fuzzy-comparisons for floating-point types.")
+			"Computes the difference between two meshes using fuzzy-comparisons for floating-point types.")
 		.def("test", &difference::matrix4,
-			"Returns the difference between two matrices using fuzzy-comparisons for floating-point types.")
-		.def("test", &difference::double_t,
-			"Returns the difference between two doubles using fuzzy-comparisons for floating-point types.")
+			"Computes the difference between two matrices using fuzzy-comparisons for floating-point types.")
 		.staticmethod("test")
 		;
 
-	boost::python::class_<k3d::difference::test_result>("test_result")
-		.def_readonly("count", &k3d::difference::test_result::count)
-		.def_readonly("equal", &k3d::difference::test_result::equal)
-		.def_readonly("ulps", &k3d::difference::test_result::ulps)
-		.def_readonly("relative_error", &k3d::difference::test_result::relative_error)
+	boost::python::class_<k3d::difference::accumulator>("accumulator")
+		.def("exact_count", &exact_count)
+		.def("exact_min", &exact_min)
+		.def("exact_max", &exact_max)
+
+		.def("ulps_count", &ulps_count)
+		.def("ulps_min", &ulps_min)
+		.def("ulps_max", &ulps_max)
+		.def("ulps_mean", &ulps_mean)
+		.def("ulps_median", &ulps_median)
+		.def("ulps_variance", &ulps_variance)
+		.def("ulps_standard_deviation", &ulps_standard_deviation)
 		;
 }
 

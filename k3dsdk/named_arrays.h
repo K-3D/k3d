@@ -76,7 +76,7 @@ public:
 	/// Returns an object containing deep copies of all the original arrays.
 	named_arrays clone() const;
 	/// Compares two collections using the imprecise semantics of difference::test().
-	void difference(const named_arrays& Other, difference::test_result& Result) const;
+	void difference(const named_arrays& Other, difference::accumulator& Result) const;
 };
 
 /// Serialization
@@ -86,7 +86,7 @@ std::ostream& operator<<(std::ostream& Stream, const named_arrays& RHS);
 namespace difference
 {
 
-inline void test(const named_arrays& A, const named_arrays& B, test_result& Result)
+inline void test(const named_arrays& A, const named_arrays& B, accumulator& Result)
 {
 	A.difference(B, Result);
 }

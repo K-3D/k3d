@@ -100,7 +100,7 @@ public:
 		named_tables_t attributes;
 
 		/// Returns the difference between two primitives using the fuzzy semantics of difference::test().
-		void difference(const primitive& Other, difference::test_result& Result) const;
+		void difference(const primitive& Other, difference::accumulator& Result) const;
 	};
 
 	/// Defines storage for a collection of primitives.
@@ -122,7 +122,7 @@ public:
 	primitives_t primitives;
 
 	/// Returns the difference between two meshes using the fuzzy semantics of difference::test().
-	void difference(const mesh& Other, difference::test_result& Result) const;
+	void difference(const mesh& Other, difference::accumulator& Result) const;
 
 	/// Returns a bounding-box containing every point in the given mesh.
 	static const bounding_box3 bounds(const mesh& Mesh);
@@ -207,13 +207,13 @@ std::ostream& operator<<(std::ostream& Stream, const mesh::primitive& RHS);
 namespace difference
 {
 
-inline void test(const k3d::mesh& A, const k3d::mesh& B, test_result& Result)
+inline void test(const k3d::mesh& A, const k3d::mesh& B, accumulator& Result)
 {
 	A.difference(B, Result);
 }
 
 /// Specialization of difference::test for k3d::mesh::primitive
-inline void test(const k3d::mesh::primitive& A, const k3d::mesh::primitive& B, test_result& Result)
+inline void test(const k3d::mesh::primitive& A, const k3d::mesh::primitive& B, accumulator& Result)
 {
 	A.difference(B, Result);
 }
