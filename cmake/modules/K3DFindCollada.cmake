@@ -1,14 +1,15 @@
 SET(K3D_COLLADA_FOUND FALSE)
 
-#Unix configuration
-IF(UNIX AND NOT APPLE)
-	FIND_PATH(K3D_COLLADA_DAE_INCLUDE_PATH colladadom/dae.h
-		DOC "Directory where the ColladaDOM dae.h file is located"
+IF(NOT APPLE)
+	FIND_PATH(K3D_COLLADA_BASE_INCLUDE_PATH colladadom
+		DOC "Directory where the colladadom base directory is located"
 		)
-
-	FIND_PATH(K3D_COLLADA_DOM_INCLUDE_PATH colladadom/1.4/dom
-		DOC "Directory where the ColladaDOM 1.4 header files are located"
-		)
+		
+    SET(K3D_COLLADA_DAE_INCLUDE_PATH ${K3D_COLLADA_BASE_INCLUDE_PATH}/colladadom CACHE PATH
+	"Directoy containing the Collada dae.h include file")
+	
+	SET(K3D_COLLADA_DOM_INCLUDE_PATH ${K3D_COLLADA_BASE_INCLUDE_PATH}/colladadom/1.4 CACHE PATH
+	"Directoy containing the Collada dom includes")
 	
 	FIND_LIBRARY(K3D_COLLADA_LIBRARY
 		NAMES collada14dom
@@ -16,9 +17,8 @@ IF(UNIX AND NOT APPLE)
 		/usr/local/lib
 		/usr/lib
 		DOC "The ColladaDOM 1.4 library"
-		)
-	
-ENDIF(UNIX AND NOT APPLE)
+		)	
+ENDIF(NOT APPLE)
 	
 #Apple configuration
 IF(UNIX AND APPLE)
@@ -41,31 +41,12 @@ IF(UNIX AND APPLE)
 
 ENDIF(UNIX AND APPLE)
 
-#Windows configuration
-IF(WIN32)
-	FIND_PATH(K3D_COLLADA_DAE_INCLUDE_PATH dae.h
-		C:/Program Files/domcollada/include
-		DOC "Directory where the ColladaDOM dae.h file is located"
-		)
-
-	FIND_PATH(K3D_COLLADA_DOM_INCLUDE_PATH dom/
-		C:/Program Files/domcollada/include/1.4
-		DOC "Directory where the ColladaDOM 1.4 header files are located"
-		)
-	
-	FIND_LIBRARY(K3D_COLLADA_LIBRARY
-		NAMES Collada14Dom
-		PATHS
-		C:/Program Files/domcollada/build/vc8-1.4
-		DOC "The ColladaDOM 1.4 library"
-		)
-ENDIF(WIN32)
-
+MARK_AS_ADVANCED(K3D_COLLADA_BASE_INCLUDE_PATH)
 MARK_AS_ADVANCED(K3D_COLLADA_DAE_INCLUDE_PATH)
 MARK_AS_ADVANCED(K3D_COLLADA_DOM_INCLUDE_PATH)	
 MARK_AS_ADVANCED(K3D_COLLADA_LIBRARY)
 
-SET(K3D_COLLADA_INCLUDE_DIRS ${K3D_COLLADA_DAE_INCLUDE_PATH}/colladadom ${K3D_COLLADA_DOM_INCLUDE_PATH}/colladadom/1.4)
+SET(K3D_COLLADA_INCLUDE_DIRS ${K3D_COLLADA_DAE_INCLUDE_PATH} ${K3D_COLLADA_DOM_INCLUDE_PATH})
 SET(K3D_COLLADA_LIBS ${K3D_COLLADA_LIBRARY})
 
 IF(WIN32)
