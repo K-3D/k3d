@@ -10,11 +10,6 @@ K3D_TEST(mesh.diff
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.diff.py
 	LABELS mesh)
 
-K3D_TEST(mesh.diff.MeshDiff 
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.diff.MeshDiff.py
-	REQUIRES K3D_BUILD_TEST_MODULE
-	LABELS mesh modifier)
-
 K3D_TEST(mesh.solid
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.solid.py
 	LABELS mesh)
