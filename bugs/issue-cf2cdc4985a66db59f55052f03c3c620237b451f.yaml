@@ -5,8 +5,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2010-03-14 04:38:33.032053 Z
 references: []
 
@@ -16,4 +16,11 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - created
   - ""
+- - 2010-03-21 17:06:48.779232 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - |-
+    This issue manifests during k3d::xml::xpath parsing as a program hang when doing XPath matching with an attribute-value test.
+    For example, line 101 of k3d/tests/sdk/xml_xpath.cpp when doing a match on /k3d/nodes/node/properties/property[@user_property][@type='double']
+    Upgrading from Apple gcc 4.0.1 to XCode 3.1.4 and 686-apple-darwin9-gcc-4.2.1 (GCC) 4.2.1 (Apple Inc. build 5577) fixes the problem.
 claimer: 
