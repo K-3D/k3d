@@ -28,5 +28,6 @@ setup.modifier.mesh_selection = selection
 setup.modifier.subdivision_type = "centermidpoints"
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
+testing.require_valid_point_attributes(setup.document, setup.modifier.get_property("output_mesh"))
 testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.SubdivideFaces.CenterMidpoints", 1)
 

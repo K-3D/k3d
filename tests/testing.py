@@ -246,6 +246,11 @@ def setup_mesh_modifier_test2(source_name, modifier1_name, modifier2_name):
 
 	return result
 
+def add_point_attributes_test(setup):
+	setup.add_point_attributes = k3d.plugin.create("AddPointAttributes", setup.document)
+	k3d.property.connect(setup.document, setup.add_index_attributes.get_property("output_mesh"), setup.add_point_attributes.get_property("input_mesh"))
+	k3d.property.connect(setup.document, setup.add_point_attributes.get_property("output_mesh"), setup.modifier.get_property("input_mesh"))
+
 def setup_mesh_writer_test(nodes, reader, target_file):
 	if len(nodes) < 2:
 		raise Exception("Mesh writer test requires at least two nodes.")
@@ -332,6 +337,14 @@ def require_similar_mesh(document, input_mesh, base_mesh_name, ulps_threshold, c
 
 		raise Exception("output mesh differs from reference")
 	
+def require_valid_point_attributes(document, input_mesh):
+	difference = k3d.plugin.create("CheckPointAttributes", document)
+	k3d.property.connect(document, input_mesh, difference.get_property("input_mesh"))
+	print """<DartMeasurement name="point_attribute_difference.equal" type="numeric/integer">""" + str(difference.equal) + """</DartMeasurement>"""
+	print """<DartMeasurement name="point_attribute_difference.ulps" type="numeric/integer">""" + str(difference.difference) + """</DartMeasurement>"""
+	print """<DartMeasurement name="point_attribute_difference.relative_error" type="numeric/float">""" + str(difference.relative_error) + """</DartMeasurement>"""
+	if not difference.equal:
+		raise Exception("Point attributes don't match points array")
 #####################################################################################33
 # Scalar-related testing
 
