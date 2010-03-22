@@ -342,8 +342,13 @@ def require_valid_point_attributes(document, input_mesh):
 	k3d.property.connect(document, input_mesh, difference.get_property("input_mesh"))
 	print """<DartMeasurement name="point_attribute_difference.equal" type="numeric/integer">""" + str(difference.equal) + """</DartMeasurement>"""
 	print """<DartMeasurement name="point_attribute_difference.ulps" type="numeric/integer">""" + str(difference.difference) + """</DartMeasurement>"""
-	print """<DartMeasurement name="point_attribute_difference.relative_error" type="numeric/float">""" + str(difference.relative_error) + """</DartMeasurement>"""
-	if not difference.equal:
+	if difference.difference > 100:
+		ref_attribs = k3d.plugin.create("AddPointAttributes", document)
+		k3d.property.connect(document, input_mesh, ref_attribs.get_property("input_mesh"))
+		print """<DartMeasurement name="point_attribute_difference" type="text/html"><![CDATA[\n"""
+		print difflib.HtmlDiff().make_file(str(input_mesh.internal_value()).splitlines(1), str(ref_attribs.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
+		print """]]></DartMeasurement>\n"""
+		sys.stdout.flush()
 		raise Exception("Point attributes don't match points array")
 #####################################################################################33
 # Scalar-related testing
