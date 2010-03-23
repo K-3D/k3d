@@ -1228,13 +1228,13 @@ void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 		first_curve.order = input_curve.order;
 		curve_copier first_copier(input_curve, first_curve);
 
+		k3d::log() << debug << "copying from curve with parameter attributes: " << input_curve.parameter_attributes << std::endl;
+
 		first_curve.knots.insert(first_curve.knots.begin(), input_curve.knots.begin(), split_knot);
 		first_curve.knots.push_back(first_curve.knots.back()); // Clamp knot vector by increasing the multiplicity to become equal to the order
 		const k3d::uint_t points_end = first_curve.knots.size() - order;
 		for(k3d::uint_t i = 0; i != points_end; ++i)
 			first_copier.push_back(i);
-
-
 
 		// Second curve: start with order times the u-knot, then take all remaining knots
 		curve_arrays second_curve;
@@ -1327,36 +1327,6 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 		points.push_back(Start + delta * i);
 	}
 	add_curve(OutputMesh, NurbsCurves, Order, points);
-}
-
-void evaluate_attribute(k3d::table& PointAttributes, const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U)
-{
-	k3d::table_copier point_attribute_copier(PointAttributes);
-	if(U <= Knots.front())
-	{
-		point_attribute_copier.push_back(0);
-		return;
-	}
-	const k3d::uint_t point_count = Points.size();
-	if(U >= Knots.back())
-	{
-		point_attribute_copier.push_back(point_count - 1);
-		return;
-	}
-
-	k3d::mesh::knots_t bases;
-	const k3d::uint_t order = Knots.size() - Points.size();
-	basis_functions(bases, Knots, order, U);
-	const k3d::uint_t knot_idx = std::find_if(Knots.begin(), Knots.end(), find_first_knot_after(U)) - Knots.begin();
-	const k3d::uint_t first_point = knot_idx != Knots.size() ? knot_idx - order : knot_idx - (2*order);
-	std::vector<k3d::double_t> weights;
-	std::vector<k3d::uint_t> indices;
-	for(k3d::uint_t i = 0; i != order; ++i)
-	{
-		indices.push_back(first_point+i);
-		weights.push_back(bases[i]);
-	}
-	point_attribute_copier.push_back(indices.size(), &indices[0], &weights[0]);
 }
 
 const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU)
