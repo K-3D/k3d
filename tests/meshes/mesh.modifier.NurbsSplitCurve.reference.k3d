@@ -5,6 +5,7 @@
 		<point_selection>0 0 0 0 0 0</point_selection>
 		<point_attributes>
 			<array name="index" type="k3d::uint_t">0 1 1 1 2 3</array>
+			<array name="points" type="k3d::point3">0 0 0 1 0 0 1.5 0 0 1.5 0 0 2 0 0 3 0 0</array>
 		</point_attributes>
 		<primitives>
 			<primitive type="nurbs_curve">
@@ -41,10 +42,12 @@
 						<array name="index" type="k3d::uint_t">0 0</array>
 					</table>
 					<table type="parameter">
-						<array name="index" type="k3d::uint_t">0 1 0 1</array>
+						<array name="index" type="k3d::uint_t">0 0 0 1</array>
+						<array name="points" type="k3d::point3">0 0 0 1.5 0 0 1.5 0 0 3 0 0</array>
 					</table>
 					<table type="vertex">
 						<array name="index" type="k3d::uint_t">0 1 1 1 2 3</array>
+						<array name="points" type="k3d::point3">0 0 0 1 0 0 1.5 0 0 1.5 0 0 2 0 0 3 0 0</array>
 					</table>
 				</attributes>
 			</primitive>

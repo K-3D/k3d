@@ -1228,8 +1228,6 @@ void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 		first_curve.order = input_curve.order;
 		curve_copier first_copier(input_curve, first_curve);
 
-		k3d::log() << debug << "copying from curve with parameter attributes: " << input_curve.parameter_attributes << std::endl;
-
 		first_curve.knots.insert(first_curve.knots.begin(), input_curve.knots.begin(), split_knot);
 		first_curve.knots.push_back(first_curve.knots.back()); // Clamp knot vector by increasing the multiplicity to become equal to the order
 		const k3d::uint_t points_end = first_curve.knots.size() - order;
@@ -1246,6 +1244,18 @@ void split_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 		const k3d::uint_t points_begin = first_curve.knots.size() - order - 1;
 		for(k3d::uint_t i = points_begin; i != input_curve.points.size(); ++i)
 			second_copier.push_back(i);
+
+		// Parameter attributes need tweaking
+		const k3d::double_t param_weights[] = {u, 1.0-u};
+		const k3d::uint_t param_indices[] = {0, 1};
+		first_curve.parameter_attributes = input_curve.parameter_attributes.clone_types();
+		k3d::table_copier first_param_copier(input_curve.parameter_attributes, first_curve.parameter_attributes);
+		first_param_copier.push_back(0);
+		first_param_copier.push_back(2, param_indices, param_weights);
+		second_curve.parameter_attributes = input_curve.parameter_attributes.clone_types();
+		k3d::table_copier second_param_copier(input_curve.parameter_attributes, second_curve.parameter_attributes);
+		second_param_copier.push_back(2, param_indices, param_weights);
+		second_param_copier.push_back(1);
 
 		first_curve.add_curve(OutputMesh, OutputCurves);
 		second_curve.add_curve(OutputMesh, OutputCurves);
@@ -1327,11 +1337,6 @@ void straight_line(const k3d::point3& Start, const k3d::point3 End, const k3d::u
 		points.push_back(Start + delta * i);
 	}
 	add_curve(OutputMesh, NurbsCurves, Order, points);
-}
-
-const k3d::vector3 tangent(const k3d::mesh::points_t& Points, const k3d::mesh::weights_t& Weights, const k3d::mesh::knots_t& Knots, const k3d::double_t U, const k3d::double_t DeltaU)
-{
-
 }
 
 void basis_functions(k3d::mesh::knots_t& BasisFunctions, const k3d::mesh::knots_t& Knots, const k3d::uint_t Order, const k3d::double_t U)
