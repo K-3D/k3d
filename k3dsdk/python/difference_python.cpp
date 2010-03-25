@@ -21,6 +21,7 @@
 #include <k3dsdk/difference.h>
 #include <k3dsdk/python/difference_python.h>
 #include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/typed_array_python.h>
 
 #include <boost/python.hpp>
 
@@ -47,6 +48,11 @@ public:
 	{
 		k3d::difference::test(A, B, Result);
 	}
+
+	static void points(instance_wrapper<k3d::mesh::points_t>& A, instance_wrapper<k3d::mesh::points_t>& B, k3d::difference::accumulator& Result)
+	{
+		A.wrapped().difference(B.wrapped(), Result);
+	}
 };
 
 static std::size_t exact_count(k3d::difference::accumulator& Self) { return boost::accumulators::count(Self.exact); }
@@ -69,6 +75,8 @@ void define_namespace_difference()
 			"Computes the difference between two meshes using fuzzy-comparisons for floating-point types.")
 		.def("test", &difference::matrix4,
 			"Computes the difference between two matrices using fuzzy-comparisons for floating-point types.")
+		.def("test", &difference::points,
+			"Computes the difference between two point arrays using fuzzy-comparisons for floating-point types.")
 		.staticmethod("test")
 		;
 
