@@ -60,6 +60,14 @@ static string_t get_metadata_value(const self_t& Self, const string_t& Name)
 }
 
 template<typename self_t>
+static const string_t array_str(const self_t& Self)
+{
+	std::ostringstream buffer;
+	buffer << Self.wrapped();
+	return buffer.str();
+}
+
+template<typename self_t>
 static boost::python::dict get_metadata(const self_t& Self)
 {
 	boost::python::dict result;
@@ -82,6 +90,7 @@ static void define_class_const_typed_array(const char* const ClassName, const ch
 	boost::python::class_<wrapper_type>(ClassName, DocString, boost::python::no_init)
 		.def("__len__", &utility::wrapped_len<wrapper_type>)
 		.def("__getitem__", &utility::wrapped_get_item<wrapper_type, typename array_type::value_type>)
+		.def("__str__", &array_str<wrapper_type>)
 		.def("get_metadata_value", &get_metadata_value<wrapper_type>)
 		.def("get_metadata", &get_metadata<wrapper_type>)
 		;
