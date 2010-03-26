@@ -22,8 +22,11 @@
 #include <k3dsdk/python/difference_python.h>
 #include <k3dsdk/python/mesh_python.h>
 #include <k3dsdk/python/typed_array_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <boost/python.hpp>
+#include <boost/python/detail/api_placeholder.hpp>
+using namespace boost::python;
 
 namespace k3d
 {
@@ -49,9 +52,28 @@ public:
 		k3d::difference::test(A, B, Result);
 	}
 
+	static void const_points(instance_wrapper<const k3d::mesh::points_t>& A, instance_wrapper<const k3d::mesh::points_t>& B, k3d::difference::accumulator& Result)
+	{
+		A.wrapped().difference(B.wrapped(), Result);
+	}
+
 	static void points(instance_wrapper<k3d::mesh::points_t>& A, instance_wrapper<k3d::mesh::points_t>& B, k3d::difference::accumulator& Result)
 	{
 		A.wrapped().difference(B.wrapped(), Result);
+	}
+
+	static void points_list(instance_wrapper<k3d::mesh::points_t>& A, list B, k3d::difference::accumulator& Result)
+	{
+		k3d::mesh::points_t b;
+		utility::copy(B, b);
+		A.wrapped().difference(b, Result);
+	}
+
+	static void const_points_list(instance_wrapper<const k3d::mesh::points_t>& A, list B, k3d::difference::accumulator& Result)
+	{
+		k3d::mesh::points_t b;
+		utility::copy(B, b);
+		A.wrapped().difference(b, Result);
 	}
 };
 
@@ -77,6 +99,12 @@ void define_namespace_difference()
 			"Computes the difference between two matrices using fuzzy-comparisons for floating-point types.")
 		.def("test", &difference::points,
 			"Computes the difference between two point arrays using fuzzy-comparisons for floating-point types.")
+		.def("test", &difference::const_points,
+			"Computes the difference between two point arrays using fuzzy-comparisons for floating-point types.")
+		.def("test", &difference::points_list,
+			"Computes the difference between a point array and a list using fuzzy-comparisons for floating-point types.")
+		.def("test", &difference::const_points_list,
+			"Computes the difference between a point array and a list using fuzzy-comparisons for floating-point types.")
 		.staticmethod("test")
 		;
 
