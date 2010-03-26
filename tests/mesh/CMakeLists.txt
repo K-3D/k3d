@@ -615,6 +615,11 @@ K3D_TEST(mesh.modifier.CatmullClark.complex
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CatmullClark.complex.py
 	REQUIRES K3D_BUILD_SUBDIVISION_SURFACE_MODULE
 	LABELS mesh modifier)
+	
+K3D_TEST(mesh.modifier.CatmullClark.cube 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CatmullClark.cube.py
+	REQUIRES K3D_BUILD_SUBDIVISION_SURFACE_MODULE
+	LABELS mesh modifier)
 
 K3D_TEST(mesh.modifier.CenterPoints 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.CenterPoints.py

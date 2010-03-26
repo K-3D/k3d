@@ -246,8 +246,11 @@ def setup_mesh_modifier_test2(source_name, modifier1_name, modifier2_name):
 
 	return result
 
-def add_point_attributes_test(setup):
+def add_point_attributes_test(setup, points, vertices, parameters):
 	setup.add_point_attributes = k3d.plugin.create("AddPointAttributes", setup.document)
+	setup.add_point_attributes.add_point_attributes = points
+	setup.add_point_attributes.add_vertex_attributes = vertices
+	setup.add_point_attributes.add_parameter_attributes = parameters
 	k3d.property.connect(setup.document, setup.add_index_attributes.get_property("output_mesh"), setup.add_point_attributes.get_property("input_mesh"))
 	k3d.property.connect(setup.document, setup.add_point_attributes.get_property("output_mesh"), setup.modifier.get_property("input_mesh"))
 
@@ -336,20 +339,116 @@ def require_similar_mesh(document, input_mesh, base_mesh_name, ulps_threshold, c
 		sys.stdout.flush()
 
 		raise Exception("output mesh differs from reference")
+
+def points_to_string(points):
+	result = ''
+	for point in points:
+		result += str(point) + '\n'
+	return result
+
+def print_difference(accumulator, prefix=""):
+	dart_measurement(prefix+"exact_count", accumulator.exact_count())
+	dart_measurement(prefix+"exact_min", accumulator.exact_min())
+	dart_measurement(prefix+"exact_max", accumulator.exact_max())
+
+	dart_measurement(prefix+"ulps_count", accumulator.ulps_count())
+	dart_measurement(prefix+"ulps_min", accumulator.ulps_min())
+	dart_measurement(prefix+"ulps_max", accumulator.ulps_max())
+	dart_measurement(prefix+"ulps_mean", accumulator.ulps_mean())
+	dart_measurement(prefix+"ulps_median", accumulator.ulps_median())
+	dart_measurement(prefix+"ulps_standard_deviation", accumulator.ulps_standard_deviation())
+	dart_measurement(prefix+"ulps_variance", accumulator.ulps_variance())
+
+
+def require_valid_point_attributes(document, input_mesh, ulps_threshold = 10):
+	point_attributes = input_mesh.point_attributes()["points"]
 	
-def require_valid_point_attributes(document, input_mesh):
-	difference = k3d.plugin.create("CheckPointAttributes", document)
-	k3d.property.connect(document, input_mesh, difference.get_property("input_mesh"))
-	print """<DartMeasurement name="point_attribute_difference.equal" type="numeric/integer">""" + str(difference.equal) + """</DartMeasurement>"""
-	print """<DartMeasurement name="point_attribute_difference.ulps" type="numeric/integer">""" + str(difference.difference) + """</DartMeasurement>"""
-	if difference.difference > 100:
-		ref_attribs = k3d.plugin.create("AddPointAttributes", document)
-		k3d.property.connect(document, input_mesh, ref_attribs.get_property("input_mesh"))
-		print """<DartMeasurement name="point_attribute_difference" type="text/html"><![CDATA[\n"""
-		print difflib.HtmlDiff().make_file(str(input_mesh.internal_value()).splitlines(1), str(ref_attribs.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
+	result = k3d.difference.accumulator()
+	k3d.difference.test(input_mesh.points(), point_attributes, result)
+
+	print_difference(result, "point_attributes_")
+
+	if (result.exact_count() and result.exact_min() == 0) or result.ulps_max() > ulps_threshold:
+		print """<DartMeasurement name="geometry_difference" type="text/html"><![CDATA[\n"""
+		print difflib.HtmlDiff().make_file(points_to_string(point_attributes).splitlines(1), points_to_string(input_mesh.points()).splitlines(1), "Test Points", "Reference Points")
 		print """]]></DartMeasurement>\n"""
 		sys.stdout.flush()
 		raise Exception("Point attributes don't match points array")
+
+def require_valid_vertex_attributes(document, input_mesh, ulps_threshold = 10):
+	points = input_mesh.points()
+	for (i, prim) in zip(range(len(input_mesh.primitives())), input_mesh.primitives()):
+		struc = prim.structure()
+		refpoints = []
+		if struc.keys().count('vertex'):
+			vertex_table = struc['vertex']
+			for array in vertex_table:
+				if array.get_metadata_value('k3d:domain') == 'k3d:point-indices':
+					for idx in array:
+						refpoints.append(points[idx])
+		if len(refpoints):
+			attribs = prim.attributes()
+			if attribs.keys().count('vertex'):
+				vertex_attribs = attribs['vertex']
+				if vertex_attribs.keys().count('points'):
+					vertex_point_attribs = vertex_attribs['points']
+					result = k3d.difference.accumulator()
+					k3d.difference.test(vertex_point_attribs, refpoints, result)
+					print_difference(result, "vertex_attributes_")
+					if (result.exact_count() and result.exact_min() == 0) or result.ulps_max() > ulps_threshold:
+						print """<DartMeasurement name="geometry_difference" type="text/html"><![CDATA[\n"""
+						print difflib.HtmlDiff().make_file(points_to_string(vertex_point_attribs).splitlines(1), points_to_string(refpoints).splitlines(1), "Test Points", "Reference Points")
+						print """]]></DartMeasurement>\n"""
+						sys.stdout.flush()
+						raise Exception("Vertex point attributes don't match points array for primitive {0}".format(i))
+
+def require_valid_parameter_attributes(document, input_mesh, ulps_threshold = 10):
+	points = input_mesh.points()
+	for (i, prim) in zip(range(len(input_mesh.primitives())), input_mesh.primitives()):
+		curve_prim = k3d.nurbs_curve.validate(input_mesh, prim)
+		if curve_prim:
+			refpoints = []
+			for (first_point, point_count) in zip(curve_prim.curve_first_points(), curve_prim.curve_point_counts()):
+				last_point = first_point + point_count - 1
+				refpoints.append(points[first_point])
+				refpoints.append(points[last_point])
+			if len(refpoints):
+				if curve_prim.parameter_attributes().keys().count('points'):
+					testpoints = curve_prim.parameter_attributes()['points']
+					result = k3d.difference.accumulator()
+					k3d.difference.test(testpoints, refpoints, result)
+					print_difference(result, "parameter_attributes_")
+					if (result.exact_count() and result.exact_min() == 0) or result.ulps_max() > ulps_threshold:
+						print """<DartMeasurement name="geometry_difference" type="text/html"><![CDATA[\n"""
+						print difflib.HtmlDiff().make_file(points_to_string(testpoints).splitlines(1), points_to_string(refpoints).splitlines(1), "Test Points", "Reference Points")
+						print """]]></DartMeasurement>\n"""
+						sys.stdout.flush()
+						raise Exception("Parameter point attributes don't match points array for primitive {0}".format(i))
+
+		patch_prim = k3d.nurbs_patch.validate(input_mesh, prim)
+		if patch_prim:
+			refpoints = []
+			for (c1, u_count, v_count) in zip(patch_prim.patch_first_points(), patch_prim.patch_u_point_counts(), patch_prim.patch_v_point_counts()):
+				c2 = c1 + u_count-1;
+				c3 = c1 + u_count*(v_count-1);
+				c4 = c3 + u_count - 1;
+				refpoints.append(points[c1]);
+				refpoints.append(points[c2]);
+				refpoints.append(points[c3]);
+				refpoints.append(points[c4]);
+			if len(refpoints):
+				if patch_prim.parameter_attributes().keys().count('points'):
+					testpoints = patch_prim.parameter_attributes()['points']
+					result = k3d.difference.accumulator()
+					k3d.difference.test(testpoints, refpoints, result)
+					print_difference(result, "parameter_attributes_")
+					if (result.exact_count() and result.exact_min() == 0) or result.ulps_max() > ulps_threshold:
+						print """<DartMeasurement name="geometry_difference" type="text/html"><![CDATA[\n"""
+						print difflib.HtmlDiff().make_file(points_to_string(testpoints).splitlines(1), points_to_string(refpoints).splitlines(1), "Test Points", "Reference Points")
+						print """]]></DartMeasurement>\n"""
+						sys.stdout.flush()
+						raise Exception("Parameter point attributes don't match points array for primitive {0}".format(i))
+
 #####################################################################################33
 # Scalar-related testing
 

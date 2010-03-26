@@ -26,6 +26,7 @@
 #include <k3dsdk/component.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
+#include <k3dsdk/hints.h>
 #include <k3dsdk/mesh_modifier.h>
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/node.h>
@@ -50,8 +51,17 @@ class add_point_attributes :
 
 public:
 	add_point_attributes(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document)
+		base(Factory, Document),
+		m_add_point_attributes(init_owner(*this) + init_name("add_point_attributes") + init_label(_("Add point attributes")) + init_description(_("Add point data to the points attribute array")) + init_value(true)),
+		m_add_vertex_attributes(init_owner(*this) + init_name("add_vertex_attributes") + init_label(_("Add vertex attributes")) + init_description(_("Add point data to the vertex attribute arrays")) + init_value(false)),
+		m_add_parameter_attributes(init_owner(*this) + init_name("add_parameter_attributes") + init_label(_("Add parameter attributes")) + init_description(_("Add point data to the parameter attribute arrays")) + init_value(false))
 	{
+		m_add_point_attributes.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reset_mesh_slot()));
+		m_add_vertex_attributes.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reset_mesh_slot()));
+		m_add_parameter_attributes.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reset_mesh_slot()));
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -65,81 +75,92 @@ public:
 		const k3d::string_t table_name = "points";
 
 
-		const k3d::uint_t attribute_count = Output.points ? Output.points->size() : 0;
-		k3d::mesh::points_t& array = Output.point_attributes.create(table_name, new k3d::mesh::points_t(attribute_count));
-		for(k3d::uint_t i = 0; i != attribute_count; ++i)
-			array[i] = Output.points->at(i);
+		if(m_add_point_attributes.pipeline_value())
+		{
+			const k3d::uint_t attribute_count = Output.points ? Output.points->size() : 0;
+			k3d::mesh::points_t& array = Output.point_attributes.create(table_name, new k3d::mesh::points_t(attribute_count));
+			for(k3d::uint_t i = 0; i != attribute_count; ++i)
+				array[i] = Output.points->at(i);
+		}
 
+		const k3d::bool_t add_vertex_attributes = m_add_vertex_attributes.pipeline_value();
+		const k3d::bool_t add_parameter_attributes = m_add_parameter_attributes.pipeline_value();
 		for(k3d::mesh::primitives_t::iterator p = Output.primitives.begin(); p != Output.primitives.end(); ++p)
 		{
-			k3d::mesh::primitive& primitive = p->writable();
-
-			const k3d::mesh::indices_t* indices = 0;
-			for(k3d::mesh::named_tables_t::const_iterator structure = primitive.structure.begin(); structure != primitive.structure.end(); ++structure)
+			if(add_vertex_attributes)
 			{
-				for(k3d::mesh::table_t::const_iterator array = structure->second.begin(); array != structure->second.end(); ++array)
+				k3d::mesh::primitive& primitive = p->writable();
+
+				const k3d::mesh::indices_t* indices = 0;
+				for(k3d::mesh::named_tables_t::const_iterator structure = primitive.structure.begin(); structure != primitive.structure.end(); ++structure)
 				{
-					if(array->second->get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::point_indices_domain())
-						indices = dynamic_cast<const k3d::mesh::indices_t*>(array->second.get());
+					for(k3d::mesh::table_t::const_iterator array = structure->second.begin(); array != structure->second.end(); ++array)
+					{
+						if(array->second->get_metadata_value(k3d::metadata::key::domain()) == k3d::metadata::value::point_indices_domain())
+							indices = dynamic_cast<const k3d::mesh::indices_t*>(array->second.get());
+					}
+				}
+
+				if(!indices)
+					continue;
+
+				for(k3d::mesh::named_tables_t::iterator attribute = primitive.attributes.begin(); attribute != primitive.attributes.end(); ++attribute)
+				{
+					const k3d::string_t& attribute_name = attribute->first;
+					if(attribute_name != "vertex")
+						continue;
+
+					const k3d::uint_t attribute_count = k3d::component_size(primitive, attribute_name);
+					if(0 == attribute_count)
+						continue;
+
+					k3d::table& attribute_table = attribute->second;
+
+					k3d::mesh::points_t& array = attribute_table.create(table_name, new k3d::mesh::points_t(attribute_count));
+					for(k3d::uint_t i = 0; i != attribute_count; ++i)
+						array[i] = Output.points->at(indices->at(i));
 				}
 			}
 
-			if(!indices)
-				continue;
-
-			for(k3d::mesh::named_tables_t::iterator attribute = primitive.attributes.begin(); attribute != primitive.attributes.end(); ++attribute)
+			if(add_parameter_attributes)
 			{
-				const k3d::string_t& attribute_name = attribute->first;
-				if(attribute_name != "vertex" && attribute_name != "edge")
-					continue;
-
-				const k3d::uint_t attribute_count = k3d::component_size(primitive, attribute_name);
-				if(0 == attribute_count)
-					continue;
-
-				k3d::table& attribute_table = attribute->second;
-
-				k3d::mesh::points_t& array = attribute_table.create(table_name, new k3d::mesh::points_t(attribute_count));
-				for(k3d::uint_t i = 0; i != attribute_count; ++i)
-					array[i] = Output.points->at(indices->at(i));
-			}
-
-			// Specific cases for NURBS parameter attributes
-			boost::scoped_ptr<k3d::nurbs_curve::primitive> curve_prim(k3d::nurbs_curve::validate(Output, *p));
-			if(curve_prim)
-			{
-				const k3d::uint_t curves_begin = 0;
-				const k3d::uint_t curves_end = curve_prim->curve_first_points.size();
-				k3d::mesh::points_t& array = curve_prim->parameter_attributes.create(table_name, new k3d::mesh::points_t());
-				for(k3d::uint_t curve = curves_begin; curve != curves_end; ++curve)
+				// Specific cases for NURBS parameter attributes
+				boost::scoped_ptr<k3d::nurbs_curve::primitive> curve_prim(k3d::nurbs_curve::validate(Output, *p));
+				if(curve_prim)
 				{
-					const k3d::uint_t first_point = curve_prim->curve_first_points[curve];
-					const k3d::uint_t last_point = curve_prim->curve_point_counts[curve] + first_point - 1;
-					array.push_back(Output.points->at(curve_prim->curve_points[first_point]));
-					array.push_back(Output.points->at(curve_prim->curve_points[last_point]));
+					const k3d::uint_t curves_begin = 0;
+					const k3d::uint_t curves_end = curve_prim->curve_first_points.size();
+					k3d::mesh::points_t& array = curve_prim->parameter_attributes.create(table_name, new k3d::mesh::points_t());
+					for(k3d::uint_t curve = curves_begin; curve != curves_end; ++curve)
+					{
+						const k3d::uint_t first_point = curve_prim->curve_first_points[curve];
+						const k3d::uint_t last_point = curve_prim->curve_point_counts[curve] + first_point - 1;
+						array.push_back(Output.points->at(curve_prim->curve_points[first_point]));
+						array.push_back(Output.points->at(curve_prim->curve_points[last_point]));
+					}
+					continue;
 				}
-				continue;
-			}
 
-			boost::scoped_ptr<k3d::nurbs_patch::primitive> patch_prim(k3d::nurbs_patch::validate(Output, *p));
-			if(patch_prim)
-			{
-				const k3d::uint_t patches_begin = 0;
-				const k3d::uint_t patches_end = patch_prim->patch_first_points.size();
-				k3d::mesh::points_t& array = patch_prim->parameter_attributes.create(table_name, new k3d::mesh::points_t());
-				for(k3d::uint_t patch = patches_begin; patch != patches_end; ++patch)
+				boost::scoped_ptr<k3d::nurbs_patch::primitive> patch_prim(k3d::nurbs_patch::validate(Output, *p));
+				if(patch_prim)
 				{
-					// Point indices of the patch corners
-					const k3d::uint_t u_count = patch_prim->patch_u_point_counts[patch];
-					const k3d::uint_t v_count = patch_prim->patch_v_point_counts[patch];
-					const k3d::uint_t c1 = patch_prim->patch_first_points[patch];
-					const k3d::uint_t c2 = c1 + u_count-1;
-					const k3d::uint_t c3 = c1 + u_count*(v_count-1);
-					const k3d::uint_t c4 = c3 + u_count - 1;
-					array.push_back(Output.points->at(c1));
-					array.push_back(Output.points->at(c2));
-					array.push_back(Output.points->at(c3));
-					array.push_back(Output.points->at(c4));
+					const k3d::uint_t patches_begin = 0;
+					const k3d::uint_t patches_end = patch_prim->patch_first_points.size();
+					k3d::mesh::points_t& array = patch_prim->parameter_attributes.create(table_name, new k3d::mesh::points_t());
+					for(k3d::uint_t patch = patches_begin; patch != patches_end; ++patch)
+					{
+						// Point indices of the patch corners
+						const k3d::uint_t u_count = patch_prim->patch_u_point_counts[patch];
+						const k3d::uint_t v_count = patch_prim->patch_v_point_counts[patch];
+						const k3d::uint_t c1 = patch_prim->patch_first_points[patch];
+						const k3d::uint_t c2 = c1 + u_count-1;
+						const k3d::uint_t c3 = c1 + u_count*(v_count-1);
+						const k3d::uint_t c4 = c3 + u_count - 1;
+						array.push_back(Output.points->at(c1));
+						array.push_back(Output.points->at(c2));
+						array.push_back(Output.points->at(c3));
+						array.push_back(Output.points->at(c4));
+					}
 				}
 			}
 		}
@@ -158,6 +179,10 @@ public:
 
 		return factory;
 	}
+private:
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_add_point_attributes;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_add_vertex_attributes;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_add_parameter_attributes;
 };
 
 /////////////////////////////////////////////////////////////////////////////
