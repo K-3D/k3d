@@ -24,6 +24,7 @@ ADD_CUSTOM_TARGET(www-html
 	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/www" mako-render "donations.html" > "${www_OUTPUT_DIR}/donations.html"
 	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/www" mako-render "downloads.html" > "${www_OUTPUT_DIR}/downloads.html"
 	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/www" mako-render "index.html" > "${www_OUTPUT_DIR}/index.html"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/www" mako-render "video.html" > "${www_OUTPUT_DIR}/video.html"
 	)
 
 ADD_CUSTOM_TARGET(planet-html
