@@ -771,7 +771,8 @@ public:
 	void operator()(const k3d::uint_t Point)
 	{
 		// Set initial position
-		k3d::point3& output_position = m_output_points[m_corner_points[Point]];
+		const k3d::uint_t output_idx = m_corner_points[Point];
+		k3d::point3& output_position = m_output_points[output_idx];
 		output_position = m_input_points[Point];
 		
 		// Get the number of outbound affected and boundary edges
@@ -812,14 +813,14 @@ public:
 			}
 			sum *= neighbour_weight;
 			output_position += sum;
-			k3d::mesh::weights_t corner_weights(corner_indices.size()+1, neighbour_weight);
+			k3d::mesh::weights_t corner_weights(corner_indices.size(), neighbour_weight);
 			corner_indices.back() = Point; // Append the current point and its weight
 			corner_weights.back() = own_weight;
-			m_point_attributes_copier.copy(corner_indices.size(), &corner_indices[0], &corner_weights[0], m_corner_points[Point]); // Contribution of Point and its neighbor corners
-			k3d::mesh::weights_t face_weights(face_indices.size()+1, neighbour_weight);
-			face_indices.back() = m_corner_points[Point];
+			m_point_attributes_copier.copy(corner_indices.size(), &corner_indices[0], &corner_weights[0], output_idx); // Contribution of Point and its neighbor corners
+			k3d::mesh::weights_t face_weights(face_indices.size(), neighbour_weight);
+			face_indices.back() = output_idx;
 			face_weights.back() = 1.0;
-			m_point_attributes_mixer.copy(face_indices.size(), &face_indices[0], &face_weights[0], m_corner_points[Point]); // Contribution of the face vertices
+			m_point_attributes_mixer.copy(face_indices.size(), &face_indices[0], &face_weights[0], output_idx); // Contribution of the face vertices
 		}
 		else if(affected_edge_count != 0) // Boundary of the subdivided surface
 		{
