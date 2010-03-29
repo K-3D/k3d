@@ -9,6 +9,8 @@ SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 INCLUDE(K3DOutOfSourceBuild) # Disallow in-source builds
 INCLUDE(K3DGenerateDEF) # Convenience macro for linking Win32 DLLs using MSVC
 INCLUDE(K3DDependencies)
+INCLUDE(K3DWordSize) # Detect 32/64 bit platform
+INCLUDE(K3DCompiler) # Detect problematic compilers
 
 # Set the K-3D version
 SET(K3D_MAJOR_VERSION 0)
@@ -22,25 +24,6 @@ SET(K3D_HOST ${CMAKE_SYSTEM} ${CMAKE_SYSTEM_PROCESSOR})
 SET(K3D_COPYRIGHT "Copyright (c) 1995-2009, Timothy M. Shead.  All Rights Reserved.")
 SET(K3D_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
 SET(K3D_LIBDIR lib${LIB_SUFFIX})
-
-# Detect 32/64 bit platform type
-MESSAGE(STATUS "checking the width of std::vector<>::size_type for this platform")
-
-TRY_RUN(
-	K3D_PLATFORM_SIZE_TYPE
-	K3D_PLATFORM_SIZE_TYPE_COMPILE
-	${CMAKE_CURRENT_BINARY_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}/configuration/size_type.cpp)
-
-MESSAGE(STATUS "  std::vector<>::size_type is ${K3D_PLATFORM_SIZE_TYPE} bits")
-
-IF(K3D_PLATFORM_SIZE_TYPE EQUAL 32)
-	SET(K3D_UINT_T_32_BITS 1)
-ELSEIF(K3D_PLATFORM_SIZE_TYPE EQUAL 64)
-	SET(K3D_UINT_T_64_BITS 1)
-ELSE(K3D_PLATFORM_SIZE_TYPE EQUAL 32)
-	MESSAGE(SEND_ERROR "Error detecting platform word-size.")
-ENDIF(K3D_PLATFORM_SIZE_TYPE EQUAL 32)
 
 # Setup high-level build options
 IF(WIN32 AND MSVC)
