@@ -53,7 +53,7 @@ keywords = { ":unstarted":"Unstarted", ":closed":"Closed", ":bugfix":"Bugfix", "
 			<table>
 				<tbody>
 				% for event in issue["log_events"]:
-					<tr><td>${event[0].strftime("%Y-%m-%d %H:%M UTC") | h}</td><td>${event[1] | h}</td><td>${event[2] | h}</td></tr>
+					<tr><td>${event[0].strftime("%Y-%m-%d %H:%M UTC") | h}</td><td>${event[1] | h}</td><td>${event[2] | h}</td><td>${event[3] | h}</td></tr>
 				% endfor
 				</tbody>
 			</table>
