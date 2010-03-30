@@ -60,6 +60,6 @@ ADD_CUSTOM_TARGET(tracker-html
 	COMMAND "${CMAKE_COMMAND}" -E make_directory "${developer_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E make_directory "${tracker_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/developer/tracker/tracker.css" "${tracker_OUTPUT_DIR}"
-	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer/tracker" "${CMAKE_CURRENT_SOURCE_DIR}/developer/tracker/tracker" --project "${ditz_SOURCE_DIR}" --templates "${CMAKE_CURRENT_SOURCE_DIR}/developer/tracker" --output "${tracker_OUTPUT_DIR}"
+	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer/tracker" ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/developer/tracker/tracker" --project "${ditz_SOURCE_DIR}" --templates "${CMAKE_CURRENT_SOURCE_DIR}/developer/tracker" --output "${tracker_OUTPUT_DIR}"
 	)
 
