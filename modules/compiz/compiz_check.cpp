@@ -62,7 +62,7 @@ public:
 					if(compiz_running)
 					{
 						k3d::user_interface().nag_message(
-							"CompizCheck.1",
+							"CompizCheck/1",
 							k3d::ustring::from_utf8(_("Found running Compiz window manager.")),
 							k3d::ustring::from_utf8(_("Depending on your system hardware, Compiz may interfere with rendering in K-3D and other OpenGL applications.  If you have problems (black viewport, problems with viewport updates, etc), try disabling Compiz and re-running K-3D.")));
 					}

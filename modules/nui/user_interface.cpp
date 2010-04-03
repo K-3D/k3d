@@ -100,6 +100,7 @@ public:
 
 	void nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
 	{
+		std::cout << "MESSAGE: " << Message.raw() << " " << SecondaryMessage.raw() << std::endl;
 	}
 
 	k3d::bool_t get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)

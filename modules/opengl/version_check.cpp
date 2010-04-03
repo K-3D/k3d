@@ -81,7 +81,7 @@ public:
 						if(major < min_major || (major == min_major && minor < min_minor) || (major == min_major && minor == min_minor && (version_tokens.size() == 2 || boost::lexical_cast<k3d::uint_t>(version_tokens[2]) < min_patch)))
 						{
 							k3d::user_interface().nag_message(
-								"MesaVersionCheck.1",
+								"MesaVersionCheck/1",
 								k3d::ustring::from_utf8(k3d::string_cast(boost::format(_("Your OpenGL version is %1%.")) % version)),
 								k3d::ustring::from_utf8(_("On your platform, Mesa versions earlier than 7.5.1 are known to cause problems with face selection. If you experience this, please upgrade your Mesa library. See http://bugs.freedesktop.org/show_bug.cgi?id=16866 for detailed information.")));
 						}

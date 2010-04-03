@@ -231,7 +231,7 @@ public:
 				"BridgeFaces",
 				"Creates new polygons forming a bridge between two selected polygons",
 				"Polyhedron",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

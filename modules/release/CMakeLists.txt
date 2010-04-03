@@ -1,0 +1,3 @@
+K3D_BUILD_MODULE(k3d-release)
+K3D_CREATE_MODULE_PROXY(k3d-release)
+
