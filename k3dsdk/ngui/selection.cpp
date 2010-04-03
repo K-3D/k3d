@@ -54,8 +54,9 @@
 
 #include <boost/scoped_ptr.hpp>
 
-#include <map>
 #include <iostream>
+#include <map>
+#include <set>
 
 namespace k3d
 {

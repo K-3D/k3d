@@ -27,7 +27,7 @@
 #include <k3dsdk/plugins_detail.h>
 #include <k3dsdk/types.h>
 
-#include <set>
+#include <vector>
 #include <typeinfo>
 
 
@@ -46,7 +46,7 @@ namespace factory
 {
 
 /// Defines storage for a collection of plugin factories
-typedef std::set<iplugin_factory*> collection_t;
+typedef std::vector<iplugin_factory*> collection_t;
 
 /// Returns the set of all available plugin factories.
 const collection_t lookup();

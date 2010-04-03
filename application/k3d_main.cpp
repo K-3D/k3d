@@ -594,7 +594,7 @@ typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
 void create_auto_start_plugins(auto_start_plugins_t& Plugins)
 {
 	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
-	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
 		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
 
