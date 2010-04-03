@@ -36,7 +36,6 @@ k3d.property.connect(document, source7.get_property("output_mesh"), modifier.get
 k3d.property.connect(document, source8.get_property("output_mesh"), modifier.get_property("input_mesh8"))
 k3d.property.connect(document, source9.get_property("output_mesh"), modifier.get_property("input_mesh9"))
 
-
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
-testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.MergeMesh", 32)
+testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.MergeMesh", 32, ["Darwin-i386"])
 

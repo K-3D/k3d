@@ -14,7 +14,6 @@ setup.modifier.mesh_selection = selection
 setup.modifier.angle = math.radians(90)
 setup.modifier.around = "y"
 
-
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.BendPoints", 512)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.BendPoints", 512, ["Darwin-i386"])
 

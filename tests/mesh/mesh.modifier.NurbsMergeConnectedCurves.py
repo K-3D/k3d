@@ -20,5 +20,5 @@ k3d.property.connect(document, split1.get_property("output_mesh"), split2.get_pr
 k3d.property.connect(document, split2.get_property("output_mesh"), merge.get_property("input_mesh"))
 
 testing.require_valid_mesh(document, merge.get_property("output_mesh"))
-testing.require_similar_mesh(document, merge.get_property("output_mesh"), "mesh.modifier.NurbsMergeConnectedCurves", 1)
+testing.require_similar_mesh(document, merge.get_property("output_mesh"), "mesh.modifier.NurbsMergeConnectedCurves", 1, ["Darwin-i386"])
 

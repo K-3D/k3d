@@ -25,5 +25,5 @@ setup.modifier.function_2 = "sin(v)"
 setup.modifier.function_3 = "u*v"
 
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.source.LeastSquaresPlot", 2048)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.source.LeastSquaresPlot", 4096)
 

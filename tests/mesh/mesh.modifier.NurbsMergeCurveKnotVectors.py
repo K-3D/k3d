@@ -34,5 +34,5 @@ k3d.property.connect(document, transform.get_property("output_mesh"), merge_mesh
 k3d.property.connect(document, merge_mesh.get_property("output_mesh"), modifier.get_property("input_mesh"))
 
 testing.require_valid_mesh(document, modifier.get_property("output_mesh"))
-testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsMergeCurveKnotVectors", 2)
+testing.require_similar_mesh(document, modifier.get_property("output_mesh"), "mesh.modifier.NurbsMergeCurveKnotVectors", 2, ["Darwin-i386"])
 

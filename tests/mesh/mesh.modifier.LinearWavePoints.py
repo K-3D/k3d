@@ -15,7 +15,6 @@ setup.modifier.mesh_selection = selection
 setup.modifier.axis = "x"
 setup.modifier.along = "z"
 
-
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.LinearWavePoints", 1)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.LinearWavePoints", 1, ["Darwin-i386"])
 

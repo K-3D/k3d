@@ -14,7 +14,6 @@ setup.source.v_segments = 16
 setup.modifier.mesh_selection = selection
 setup.modifier.amplitude = 1
 
-
 testing.require_valid_mesh(setup.document, setup.modifier.get_property("output_mesh"))
-testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.CylindricalWavePoints", 1)
+testing.require_similar_mesh(setup.document, setup.modifier.get_property("output_mesh"), "mesh.modifier.CylindricalWavePoints", 1, ["Darwin-i386"])
 
