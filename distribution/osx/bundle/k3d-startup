@@ -4,33 +4,31 @@
 # Inkscape Modifications: Michael Wybrow <mjwybrow@users.sourceforge.net>
 # K-3D Modifications: Timothy M. Shead <tshead@k-3d.com>
 
+echo "INFO: Starting $0"
+
 K3D_BUNDLE="`echo "$0" | sed -e 's/\/Contents\/MacOS\/K-3D//'`"
 K3D_RESOURCES="$K3D_BUNDLE/Contents/Resources"
 K3D_TEMP="/tmp/k3d/$UID"
 K3D_ETC="$K3D_TEMP/etc"
 K3D_PANGO_RC_FILE="$K3D_ETC/pango/pangorc"
 
-echo "K-3D: Starting $0"
-echo "K-3D: K3D_BUNDLE: $K3D_BUNDLE"
-
-# Setup temporary runtime files
 rm -rf "$K3D_TEMP"
-
-# Because the bundle could be located anywhere at runtime, we have to
-# create temporary copies of the Pango configuration files that
-# reflect our current location
 mkdir -p "$K3D_ETC/pango"
+
 sed -e 's|/opt/local/etc|'"$K3D_ETC|g" "$K3D_RESOURCES/etc/pango/pangorc" > "$K3D_ETC/pango/pangorc"
 sed -e 's|/opt/local|\"'"$K3D_RESOURCES|g" -e "s/\.so/.so\"/g" "$K3D_RESOURCES/etc/pango/pango.modules" > "$K3D_ETC/pango/pango.modules"
+sed -e 's|/opt/local|'"$K3D_RESOURCES|g" -e "s/\.so/.so\"/g" "$K3D_RESOURCES/etc/gtk-2.0/gdk-pixbuf.loaders" > "$K3D_ETC/gdk-pixbuf.loaders"
 cp -f "$K3D_RESOURCES/etc/pango/pangox.aliases" "$K3D_ETC/pango/pangox.aliases"
 
 export "DYLD_LIBRARY_PATH=$K3D_RESOURCES/lib"
 export "FONTCONFIG_PATH=$K3D_RESOURCES/etc/fonts"
+export "GDK_PIXBUF_MODULE_FILE=$K3D_ETC/gdk-pixbuf.loaders"
+export "GTK_PATH=$K3D_RESOURCES/lib/gtk-2.0"
 export "PANGO_RC_FILE=$K3D_PANGO_RC_FILE"
 export "PATH=$K3D_RESOURCES/bin:$PATH"
 
-#export
+export
 exec "$K3D_RESOURCES/bin/k3d" "--log-level=debug" "--plugins=$K3D_RESOURCES/lib/k3d/plugins" "--share=$K3D_RESOURCES/share/k3d" "--ui=$K3D_RESOURCES/lib/k3d/plugins/k3d-ngui.module"
 
-echo "K-3D: Finishing $0"
+echo "INFO: Finishing $0"
 
