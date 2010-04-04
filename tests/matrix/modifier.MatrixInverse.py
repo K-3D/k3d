@@ -6,7 +6,7 @@ document = k3d.new_document()
 modifier = k3d.plugin.create("MatrixInverse", document)
 modifier.input_matrix = k3d.matrix4.row_major((1, 5, 2, 4, 2, 2, 2, 3, 3, 7, 2, 2, 4, 8, 4, 1))
 
-reference_matrix = k3d.matrix4.row_major((-0.525, 0.45, 0.475, -0.2, .125, -0.25, 0.125, 0.0, 0.25, 0.0, -0.75, 0.5, 0.1, 0.2, 0.1, -0.2))
+reference_matrix = k3d.matrix4.row_major((-0.525, 0.45, 0.47500000000000003, -0.2, .125, -0.25, 0.125, 1.3877787807814457e-17, 0.25, 0.0, -0.75, 0.5, 0.1, 0.2, 0.1, -0.2))
 
 result = k3d.difference.accumulator()
 k3d.difference.test(modifier.output_matrix, reference_matrix, result)

@@ -4,7 +4,7 @@ import k3d
 import testing
 
 setup = testing.setup_mesh_modifier_test("NurbsCurve","NurbsSplitCurve")
-#testing.add_point_attributes_test(setup, True, True, True)
+testing.add_point_attributes_test(setup, True, True, True)
 
 selection = k3d.geometry.selection.create(0)
 curve_selection = k3d.geometry.primitive_selection.create(selection, k3d.selection.type.CURVE)
