@@ -331,7 +331,7 @@ public:
 				"BevelPoints",
 				"Bevels a surface at each selected point",
 				"Polyhedron",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}

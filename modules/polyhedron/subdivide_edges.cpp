@@ -160,7 +160,7 @@ public:
 				"SubdivideEdges",
 				"Subdivides selected edges by adding points.",
 				"Polyhedron",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
