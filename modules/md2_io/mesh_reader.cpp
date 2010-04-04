@@ -132,7 +132,7 @@ public:
 				"MD2MeshReader",
 				_("Reader that loads external MD2 (.md2) files into the document by reference"),
 				"MeshReader",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
