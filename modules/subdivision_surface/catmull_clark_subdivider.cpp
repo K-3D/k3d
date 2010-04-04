@@ -108,7 +108,7 @@ public:
 				"CatmullClark",
 				_("Generates a Catmull-Clark subdivision mesh"),
 				"Subdivision",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}
