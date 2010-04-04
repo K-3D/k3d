@@ -109,21 +109,19 @@ private:
 
 	static boost::optional<uint_t> get_index(const uint_t Index)
 	{
-		boost::optional<uint_t> result = Index;
-
 		while(factories.size() > Index)
 		{
 			if(!handlers[Index])
 				handlers[Index] = plugin::create<imime_type_handler>(*factories[Index]);
 
 			if(handlers[Index])
-				break;
+				return boost::optional<uint_t>(Index);
 
 			factories.erase(factories.begin() + Index);
 			handlers.erase(handlers.begin() + Index);
 		}
 
-		return result;
+		return boost::optional<uint_t>();
 	}
 
 	static std::vector<iplugin_factory*> factories;
