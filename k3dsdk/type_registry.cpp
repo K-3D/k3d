@@ -23,6 +23,7 @@
 
 #include <k3dsdk/bitmap.h>
 #include <k3dsdk/color.h>
+#include <k3dsdk/context_gl.h>
 #include <k3dsdk/i3d_2d_mapping.h>
 #include <k3dsdk/ibitmap_exporter.h>
 #include <k3dsdk/ibitmap_importer.h>
@@ -30,6 +31,7 @@
 #include <k3dsdk/ibitmap_source.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icolor_source.h>
+#include <k3dsdk/icontext_factory_gl.h>
 #include <k3dsdk/idisplacement_shader_ri.h>
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/idocument_importer.h>
@@ -46,6 +48,8 @@
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/imaterial_ri.h>
 #include <k3dsdk/imaterial_yafray.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/imesh_selection_algorithm.h>
@@ -72,8 +76,6 @@
 #include <k3dsdk/itransform_array_1d.h>
 #include <k3dsdk/itransform_array_2d.h>
 #include <k3dsdk/itransform_array_3d.h>
-#include <k3dsdk/imatrix_sink.h>
-#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iuri_handler.h>
 #include <k3dsdk/ivector3_source.h>
 #include <k3dsdk/ivolume_shader_ri.h>
@@ -167,6 +169,8 @@ void initialize_types()
 	register_type(typeid(k3d::double_t), "k3d::double_t");
 	register_type(typeid(k3d::filesystem::path), "k3d::filesystem::path");
 	register_type(typeid(k3d::float_t), "k3d::float_t");
+	register_type(typeid(k3d::gl::context), "k3d::gl::context");
+	register_type(typeid(k3d::gl::icontext_factory), "k3d::gl::icontext_factory");
 	register_type(typeid(k3d::gl::ilight), "k3d::gl::ilight");
 	register_type(typeid(k3d::gl::imesh_painter), "k3d::gl::imesh_painter");
 	register_type(typeid(k3d::gl::imesh_painter*), "k3d::gl::imesh_painter*");

@@ -60,6 +60,7 @@ TARGET_LINK_LIBRARIES(k3dsdk
 	${K3D_OPENGL_GL_LIBRARY}
 	${K3D_OPENGL_GLU_LIBRARY}
 	k3dsdk-half
+	k3dsdk-opengl
 	k3dsdk-sgi-tesselator
 	k3dsdk-glew
 	k3dsdk-parallel
@@ -87,6 +88,7 @@ ENDIF(WIN32)
 ADD_SUBDIRECTORY(Half)
 ADD_SUBDIRECTORY(expression)
 ADD_SUBDIRECTORY(ftgl)
+ADD_SUBDIRECTORY(opengl)
 ADD_SUBDIRECTORY(glew)
 ADD_SUBDIRECTORY(parallel)
 ADD_SUBDIRECTORY(resource)
