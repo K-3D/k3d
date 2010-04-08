@@ -78,6 +78,16 @@ public:
 		return api;
 	}
 
+	const k3d::uint8_t* buffer_begin()
+	{
+		return &buffer[0];
+	}
+
+	const k3d::uint8_t* buffer_end()
+	{
+		return &buffer[0] + buffer.size();
+	}
+
 	OSMesaContext osmesa_context;
 	OSMesaMakeCurrent osmesa_make_current;
 	OSMesaDestroyContext osmesa_destroy_context;
@@ -144,20 +154,6 @@ public:
 				throw std::runtime_error("Error creating OSMesa context.");
 
 			context* const result = new context(osmesa_context, osmesa_make_current.get(), osmesa_destroy_context.get(), api.get(), Width, Height);
-
-k3d::log() << debug;
-std::copy(result->buffer.begin(), result->buffer.end(), std::ostream_iterator<int>(k3d::log(), " "));
-k3d::log() << std::endl;
-
-			result->make_current();
-			result->draw().glClearColor(1.0, 0.5, 0.25, 0.125);
-			result->draw().glClear(GL_COLOR_BUFFER_BIT);
-			result->draw().glFlush();
-
-k3d::log() << debug;
-std::copy(result->buffer.begin(), result->buffer.end(), std::ostream_iterator<int>(k3d::log(), " "));
-k3d::log() << std::endl;
-
 			return result;
 		}
 		catch(std::exception& e)
@@ -189,11 +185,15 @@ private:
 	boost::optional<k3d::gl::api> api;
 };
 
+/////////////////////////////////////////////////////////////////////////////
+// context_factory_factory
+
+k3d::iplugin_factory& context_factory_factory()
+{
+	return context_factory::get_factory();
+}
+
 } // namespace osmesa
 
 } // namespace module
-
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::osmesa::context_factory::get_factory());
-K3D_MODULE_END
 

@@ -40,6 +40,8 @@ class icontext_factory :
 	public virtual iunknown
 {
 public:
+	virtual ~icontext_factory() {}
+
 	/// Creates a new OpenGL render context with the given width and height in pixels.
 	/// The caller is responsible for the lifetime of the returned object.
 	virtual context* create(const uint_t Width, const uint_t Height) = 0;
@@ -48,7 +50,6 @@ protected:
 	icontext_factory() {}
 	icontext_factory(const icontext_factory&) {}
 	icontext_factory& operator=(const icontext_factory&) { return *this; }
-	virtual ~icontext_factory() {}
 };
 } // namespace gl
 

@@ -1,6 +1,3 @@
-#ifndef K3DSDK_CONTEXT_GL_H
-#define K3DSDK_CONTEXT_GL_H
-
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -21,43 +18,26 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-	\author Tim Shead (tshead@k-3d.com)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/iunknown.h>
+#include <k3dsdk/module.h>
 
-namespace k3d
+namespace module
 {
 
-namespace gl
+namespace osmesa
 {
 
-class api;
+extern k3d::iplugin_factory& context_factory_factory();
+extern k3d::iplugin_factory& test_dialog_factory();
 
-/// Abstract interface implemented by OpenGL context objects
-class context :
-	public virtual iunknown
-{
-public:
-	virtual ~context() {}
+} // namespace osmesa
 
-	/// Activates this context for drawing in the calling thread.	
-	virtual void make_current() = 0;
+} // namespace module
 
-	/// Returns an OpenGL drawing API object for rendering using this context.
-	virtual const api& draw() = 0;
-
-	virtual const uint8_t* buffer_begin() = 0;
-	virtual const uint8_t* buffer_end() = 0;
-
-protected:
-	context() {}
-	context(const context&) {}
-	context& operator=(const context&) { return *this; }
-};
-} // namespace gl
-
-} // namespace k3d
-
-#endif // !K3DSDK_CONTEXT_GL_H
+K3D_MODULE_START(Registry)
+	Registry.register_factory(module::osmesa::context_factory_factory());
+	Registry.register_factory(module::osmesa::test_dialog_factory());
+K3D_MODULE_END
 
