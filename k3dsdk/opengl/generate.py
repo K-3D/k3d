@@ -148,10 +148,17 @@ public:
 	typedef uint64_t GLuint64;
 	typedef struct __GLsync *GLsync;
 
-
 	api();
 
+	template<typename FunctorT>
+	void load(const FunctorT& Functor)
+	{
 """)
+
+for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])):
+	stream.write("\t\tFunctor(\"gl" + function["name"] + "\", gl" + function["name"] + ");\n")
+
+stream.write("""\t}\n\n""")
 
 for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])):
 
@@ -173,8 +180,7 @@ for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])
 
 	stream.write(");\n")
 
-stream.write("""
-};
+stream.write("""};
 
 } // namespace gl
 

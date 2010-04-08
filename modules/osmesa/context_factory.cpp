@@ -29,6 +29,8 @@
 #include <k3dsdk/opengl/api.h>
 #include <k3dsdk/result.h>
 
+#include <boost/optional.hpp>
+
 #include <iterator>
 #include <stdexcept>
 
@@ -85,6 +87,23 @@ public:
 	std::vector<GLubyte> buffer;
 };
 
+struct api_loader
+{
+	api_loader(void* Module) :
+		module(Module)
+	{
+	}
+
+	template<typename FunctionT>
+	void operator()(const char* Name, FunctionT& Function) const
+	{
+		if(void* function = dlsym(module, Name))
+			Function = FunctionT(function);
+	}
+
+	void* const module;
+};
+
 class context_factory :
 	public k3d::gl::icontext_factory
 {
@@ -97,35 +116,34 @@ public:
 	{
 		try
 		{
-			void* const module = dlopen("libOSMesa.so", RTLD_LAZY | RTLD_LOCAL);
 			if(!module)
-				throw std::runtime_error(dlerror());
-		
-			OSMesaCreateContext osmesa_create_context = OSMesaCreateContext(dlsym(module, "OSMesaCreateContext"));
-			if(!osmesa_create_context)
+			{
+				module = dlopen("libOSMesa.so", RTLD_LAZY | RTLD_LOCAL);
+				if(!module.get())
+					throw std::runtime_error(dlerror());
+
+				osmesa_create_context = OSMesaCreateContext(dlsym(module.get(), "OSMesaCreateContext"));
+				osmesa_make_current = OSMesaMakeCurrent(dlsym(module.get(), "OSMesaMakeCurrent"));
+				osmesa_destroy_context = OSMesaDestroyContext(dlsym(module.get(), "OSMesaDestroyContext"));
+
+				api = k3d::gl::api();
+				api.get().load(api_loader(module.get()));
+			}
+
+			if(!module.get())
+				throw std::runtime_error("Failed to open OSMesa library.");
+			if(!osmesa_create_context.get())
 				throw std::runtime_error("Missing OSMesaCreateContext function.");
-
-			OSMesaMakeCurrent osmesa_make_current = OSMesaMakeCurrent(dlsym(module, "OSMesaMakeCurrent"));
-			if(!osmesa_make_current)
+			if(!osmesa_make_current.get())
 				throw std::runtime_error("Missing OSMesaMakeCurrent function.");
-
-			OSMesaDestroyContext osmesa_destroy_context = OSMesaDestroyContext(dlsym(module, "OSMesaDestroyContext"));
-			if(!osmesa_destroy_context)
+			if(!osmesa_destroy_context.get())
 				throw std::runtime_error("Missing OSMesaDestroyContext function.");
-
-			const OSMesaContext osmesa_context = osmesa_create_context(OSMESA_RGBA, NULL);
+		
+			const OSMesaContext osmesa_context = osmesa_create_context.get()(OSMESA_RGBA, NULL);
 			if(!osmesa_context)
 				throw std::runtime_error("Error creating OSMesa context.");
 
-			api.glClearColor = (void(*)(GLclampf, GLclampf, GLclampf, GLclampf))dlsym(module, "glClearColor");
-			if(!api.glClearColor)
-				throw std::runtime_error("Missing glClearColor function.");
-
-			api.glClear = (void(*)(GLbitfield))dlsym(module, "glClear");
-			if(!api.glClear)
-				throw std::runtime_error("Missing glClear function.");
-
-			context* const result = new context(osmesa_context, osmesa_make_current, osmesa_destroy_context, api, Width, Height);
+			context* const result = new context(osmesa_context, osmesa_make_current.get(), osmesa_destroy_context.get(), api.get(), Width, Height);
 
 k3d::log() << debug;
 std::copy(result->buffer.begin(), result->buffer.end(), std::ostream_iterator<int>(k3d::log(), " "));
@@ -164,7 +182,11 @@ k3d::log() << std::endl;
 	}
 
 private:
-	k3d::gl::api api;
+	boost::optional<void*> module;
+	boost::optional<OSMesaCreateContext> osmesa_create_context;
+	boost::optional<OSMesaMakeCurrent> osmesa_make_current;
+	boost::optional<OSMesaDestroyContext> osmesa_destroy_context;
+	boost::optional<k3d::gl::api> api;
 };
 
 } // namespace osmesa
