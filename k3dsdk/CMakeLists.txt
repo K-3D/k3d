@@ -60,7 +60,6 @@ TARGET_LINK_LIBRARIES(k3dsdk
 	${K3D_OPENGL_GL_LIBRARY}
 	${K3D_OPENGL_GLU_LIBRARY}
 	k3dsdk-half
-	k3dsdk-opengl
 	k3dsdk-sgi-tesselator
 	k3dsdk-glew
 	k3dsdk-parallel

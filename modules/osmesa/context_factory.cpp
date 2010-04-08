@@ -134,6 +134,7 @@ k3d::log() << std::endl;
 			result->make_current();
 			result->draw().glClearColor(1.0, 0.5, 0.25, 0.125);
 			result->draw().glClear(GL_COLOR_BUFFER_BIT);
+			result->draw().glFlush();
 
 k3d::log() << debug;
 std::copy(result->buffer.begin(), result->buffer.end(), std::ostream_iterator<int>(k3d::log(), " "));
