@@ -74,10 +74,6 @@ public:
 		return api;
 	}
 
-	void swap_buffers()
-	{
-	}
-
 	void end()
 	{
 	}

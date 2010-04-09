@@ -42,6 +42,10 @@
 #include <boost/scoped_ptr.hpp>
 
 #include <gdk/gdkx.h>
+#include <GL/glx.h>
+#include <X11/Xlib.h>
+
+//#include <gtkgl-2.0/gtkgl/gdkgl.h>
 
 namespace module
 {
@@ -65,9 +69,25 @@ public:
 		offscreen_button->signal_clicked().connect(sigc::mem_fun(*this, &test_dialog::on_render_offscreen));
 		box->pack_start(*Gtk::manage(offscreen_button), Gtk::PACK_SHRINK);
 
+		Display* const x_display = GDK_DISPLAY();
+		int x_config[] = {GLX_RGBA, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_DEPTH_SIZE, 1, GLX_DOUBLEBUFFER, None};
+		XVisualInfo* const x_visual = glXChooseVisual(x_display, DefaultScreen(x_display), x_config);
+
+		GdkVisual* const visual = gdkx_visual_get(x_visual->visualid);
+		XFree(x_visual);
+
+k3d::log() << debug << "x visual: " << x_visual << " " << x_visual->visualid << std::endl;
+k3d::log() << debug << "gdk_visual: " << visual << std::endl;
+
+		gtk_widget_push_colormap(gdk_colormap_new(visual, TRUE));
+		gtk_widget_push_visual(visual);
+
 		Gtk::DrawingArea* const drawing_area = new Gtk::DrawingArea();
 		drawing_area->signal_expose_event().connect(sigc::bind<0>(sigc::mem_fun(*this, &test_dialog::on_expose_event), drawing_area));
 		box->pack_start(*Gtk::manage(drawing_area), Gtk::PACK_EXPAND_WIDGET);
+
+		gtk_widget_pop_visual();
+		gtk_widget_pop_colormap();
 
 		set_border_width(10);
 
@@ -98,7 +118,6 @@ public:
 			gl.glClearColor(1.0, 0.5, 0.25, 0.125);
 			gl.glClear(GL_COLOR_BUFFER_BIT);
 			gl.glFlush();
-			context->swap_buffers();
 			context->end();
 			
 			k3d::log() << debug;
@@ -143,7 +162,6 @@ public:
 			gl.glClearColor(1.0, 0.5, 0.25, 0.125);
 			gl.glClear(GL_COLOR_BUFFER_BIT);
 			gl.glFlush();
-			context->swap_buffers();
 			context->end();
 		}
 		catch(std::exception& e)

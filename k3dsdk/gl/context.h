@@ -46,9 +46,6 @@ public:
 	virtual const api& begin() = 0;
 
 	/// If the context is double-buffered, swaps the front and back buffers.  Otherwise, a no-op.
-	virtual void swap_buffers() = 0;
-
-	/// Deactivates this context for drawing in the calling thread.
 	virtual void end() = 0;
 
 protected:

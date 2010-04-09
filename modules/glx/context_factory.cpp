@@ -60,14 +60,15 @@ public:
 	~context()
 	{
 		glXDestroyContext(x_display, x_context);
+//		glXDestroyWindow(x_display, x_drawable);
 	}
 
 	const k3d::gl::api& begin()
 	{
 		try
 		{
-			if(!glXMakeContextCurrent(x_display, x_drawable, x_drawable, x_context))
-				throw std::runtime_error("Error making GLX context current.");
+//			if(!glXMakeCurrent(x_display, x_drawable, x_context))
+//				throw std::runtime_error("Error making GLX context current.");
 		}
 		catch(std::exception& e)
 		{
@@ -76,13 +77,10 @@ public:
 		return api;
 	}
 
-	void swap_buffers()
-	{
-		glXSwapBuffers(x_display, x_drawable);
-	}
-
 	void end()
 	{
+		
+		glXSwapBuffers(x_display, x_drawable);
 	}
 
 	Display* const x_display;
@@ -141,18 +139,39 @@ public:
 			if(!glXQueryExtension(x_display, &dummy, &dummy))
 				throw std::runtime_error("X display doesn't support GLX.");
 
-			int x_config[] = {GLX_RGBA, GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8, GLX_DEPTH_SIZE, 8, None};
+			int x_config[] = {GLX_RGBA, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_DEPTH_SIZE, 1, GLX_DOUBLEBUFFER, None};
 			XVisualInfo* const x_visual = glXChooseVisual(x_display, DefaultScreen(x_display), x_config);
+
+k3d::log() << debug << "context visual: " << x_visual << " " << x_visual->visualid << std::endl;
+
 			if(!x_visual)
 				throw std::runtime_error("Error choosing X visual.");
 		
-			const GLXContext x_context = glXCreateContext(x_display, x_visual, 0, false);
+			const GLXContext x_context = glXCreateContext(x_display, x_visual, 0, False);
 			if(!x_context)
 				throw std::runtime_error("Error creating X context.");
 
-			const GLXDrawable x_drawable = GLXDrawable(Drawable);
+			return new context(x_display, x_context, GLXDrawable(Drawable), api.get());
+
+/*
+			const int x_attributes[] = { GLX_RENDER_TYPE, GLX_RGBA_BIT, GLX_DOUBLEBUFFER, True, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, None };
+			int x_config_count = 0;
+			const GLXFBConfig* const x_configs = glXChooseFBConfig(x_display, DefaultScreen(x_display), x_attributes, &x_config_count);
+			if(!x_configs)
+				throw std::runtime_error("Error choosing GLXFBConfig.");
+			if(!x_config_count)
+				throw std::runtime_error("No compatible GLXFBConfig.");
+
+			const GLXContext x_context = glXCreateNewContext(x_display, x_configs[0], GLX_RGBA_TYPE, NULL, True);
+			if(!x_context)
+				throw std::runtime_error("Error creating GLXContext.");
+
+			const GLXDrawable x_drawable = glXCreateWindow(x_display, x_configs[0], XID(Drawable), NULL);
+			if(!x_drawable)
+				throw std::runtime_error("Error creating GLXDrawable.");
 
 			return new context(x_display, x_context, x_drawable, api.get());
+*/
 		}
 		catch(std::exception& e)
 		{
