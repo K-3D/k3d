@@ -94,11 +94,12 @@ public:
 			std::copy(context->buffer_begin(), context->buffer_end(), std::ostream_iterator<int>(k3d::log(), " "));
 			k3d::log() << std::endl;
 
-			context->make_current();
-			context->draw().glClearColor(1.0, 0.5, 0.25, 0.125);
-			context->draw().glClear(GL_COLOR_BUFFER_BIT);
-			context->draw().glFlush();
+			const k3d::gl::api& gl = context->begin();
+			gl.glClearColor(1.0, 0.5, 0.25, 0.125);
+			gl.glClear(GL_COLOR_BUFFER_BIT);
+			gl.glFlush();
 			context->swap_buffers();
+			context->end();
 			
 			k3d::log() << debug;
 			std::copy(context->buffer_begin(), context->buffer_end(), std::ostream_iterator<int>(k3d::log(), " "));
@@ -127,7 +128,7 @@ public:
 				if(!factory)
 					throw std::runtime_error("Error creating context factory");
 
-				context.reset(factory->create(reinterpret_cast<void*>(GDK_DRAWABLE_XID(window->gobj()))));
+				context.reset(factory->create(GDK_DRAWABLE_XID(window->gobj())));
 			}
 
 			if(!context)
@@ -137,12 +138,13 @@ public:
 			const int width = allocation.get_width();
 			const int height = allocation.get_height();
 
-			context->make_current();
-			context->draw().glViewport(0, 0, width, height);
-			context->draw().glClearColor(1.0, 0.5, 0.25, 0.125);
-			context->draw().glClear(GL_COLOR_BUFFER_BIT);
-			context->draw().glFlush();
+			const k3d::gl::api& gl = context->begin();
+			gl.glViewport(0, 0, width, height);
+			gl.glClearColor(1.0, 0.5, 0.25, 0.125);
+			gl.glClear(GL_COLOR_BUFFER_BIT);
+			gl.glFlush();
 			context->swap_buffers();
+			context->end();
 		}
 		catch(std::exception& e)
 		{

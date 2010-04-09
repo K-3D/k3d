@@ -43,9 +43,9 @@ public:
 	virtual ~context_factory() {}
 
 	/// Creates a new OpenGL render context for use with the given drawable.  Note that
-	/// the drawable could be an X drawable, a Windows HWND, etc.  The caller is responsible
+	/// the drawable could be an X11 XID, a Windows HWND, etc.  The caller is responsible
 	/// for the lifetime of the returned object.
-	virtual context* create(void* Drawable) = 0;
+	virtual context* create(uint64_t Drawable) = 0;
 
 protected:
 	context_factory() {}

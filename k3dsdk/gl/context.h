@@ -41,14 +41,15 @@ class context :
 public:
 	virtual ~context() {}
 
-	/// Activates this context for drawing in the calling thread.	
-	virtual void make_current() = 0;
+	/// Activates this context for drawing in the calling thread, returning an
+	/// OpenGL drawing api for rendering using this context.
+	virtual const api& begin() = 0;
 
 	/// If the context is double-buffered, swaps the front and back buffers.  Otherwise, a no-op.
 	virtual void swap_buffers() = 0;
 
-	/// Returns an OpenGL drawing API object for rendering using this context.
-	virtual const api& draw() = 0;
+	/// Deactivates this context for drawing in the calling thread.
+	virtual void end() = 0;
 
 protected:
 	context() {}

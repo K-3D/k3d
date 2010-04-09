@@ -62,7 +62,7 @@ public:
 		glXDestroyContext(x_display, x_context);
 	}
 
-	void make_current()
+	const k3d::gl::api& begin()
 	{
 		try
 		{
@@ -73,6 +73,7 @@ public:
 		{
 			k3d::log() << error << e.what() << std::endl;
 		}
+		return api;
 	}
 
 	void swap_buffers()
@@ -80,9 +81,8 @@ public:
 		glXSwapBuffers(x_display, x_drawable);
 	}
 
-	const k3d::gl::api& draw()
+	void end()
 	{
-		return api;
 	}
 
 	Display* const x_display;
@@ -116,7 +116,7 @@ public:
 	{
 	}
 
-	k3d::gl::context* create(void* Drawable)
+	k3d::gl::context* create(k3d::uint64_t Drawable)
 	{
 		try
 		{
@@ -150,7 +150,7 @@ public:
 			if(!x_context)
 				throw std::runtime_error("Error creating X context.");
 
-			const GLXDrawable x_drawable = reinterpret_cast<GLXDrawable>(Drawable);
+			const GLXDrawable x_drawable = GLXDrawable(Drawable);
 
 			return new context(x_display, x_context, x_drawable, api.get());
 		}

@@ -68,18 +68,18 @@ public:
 		osmesa_destroy_context(osmesa_context);
 	}
 
-	void make_current()
+	const k3d::gl::api& begin()
 	{
 		osmesa_make_current(osmesa_context, &buffer[0], GL_UNSIGNED_BYTE, width, height);
+		return api;
 	}
 
 	void swap_buffers()
 	{
 	}
 
-	const k3d::gl::api& draw()
+	void end()
 	{
-		return api;
 	}
 
 	const k3d::uint8_t* buffer_begin()
