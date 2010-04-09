@@ -24,7 +24,7 @@
 #include <k3dsdk/python/icontext_factory_gl_python.h>
 #include <k3dsdk/python/iunknown_python.h>
 #include <k3dsdk/python/utility_python.h>
-#include <k3dsdk/context_gl.h>
+#include <k3dsdk/opengl/offscreen_context.h>
 #include <k3dsdk/icontext_factory_gl.h>
 
 #include <boost/python.hpp>

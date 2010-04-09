@@ -30,13 +30,13 @@ namespace module
 namespace glx
 {
 
-extern k3d::iplugin_factory& camera_to_bitmap_factory();
+extern k3d::iplugin_factory& context_factory_factory();
 
 } // namespace glx
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::glx::camera_to_bitmap_factory());
+	Registry.register_factory(module::glx::context_factory_factory());
 K3D_MODULE_END
 

@@ -1,5 +1,5 @@
-#ifndef K3DSDK_CONTEXT_GL_H
-#define K3DSDK_CONTEXT_GL_H
+#ifndef K3DSDK_OPENGL_CONTEXT_H
+#define K3DSDK_OPENGL_CONTEXT_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -44,20 +44,21 @@ public:
 	/// Activates this context for drawing in the calling thread.	
 	virtual void make_current() = 0;
 
+	/// If the context is double-buffered, swaps the front and back buffers.  Otherwise, a no-op.
+	virtual void swap_buffers() = 0;
+
 	/// Returns an OpenGL drawing API object for rendering using this context.
 	virtual const api& draw() = 0;
-
-	virtual const uint8_t* buffer_begin() = 0;
-	virtual const uint8_t* buffer_end() = 0;
 
 protected:
 	context() {}
 	context(const context&) {}
 	context& operator=(const context&) { return *this; }
 };
+
 } // namespace gl
 
 } // namespace k3d
 
-#endif // !K3DSDK_CONTEXT_GL_H
+#endif // !K3DSDK_OPENGL_CONTEXT_H
 

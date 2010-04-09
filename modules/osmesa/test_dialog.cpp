@@ -23,21 +23,24 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/context_gl.h>
-#include <k3dsdk/opengl/api.h>
+#include <k3dsdk/gl.h>
 #include <k3dsdk/icontext_factory_gl.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
-#include <k3dsdk/gl.h>
+#include <k3dsdk/opengl/api.h>
+#include <k3dsdk/opengl/offscreen_context.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/result.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
+#include <gtkmm/drawingarea.h>
 #include <gtkmm/label.h>
 
 #include <boost/assign/list_of.hpp>
 #include <boost/scoped_ptr.hpp>
+
+#include <gdk/gdkx.h>
 
 namespace module
 {
@@ -57,16 +60,20 @@ public:
 		Gtk::VBox* const box = new Gtk::VBox();
 		add(*Gtk::manage(box));
 
-		Gtk::Label* const label = new Gtk::Label(_("OpenGL context / offscreen render testing."));
-		box->pack_start(*Gtk::manage(label));
+		Gtk::Button* const offscreen_button = new Gtk::Button(_("Render offscreen"));
+		offscreen_button->signal_clicked().connect(sigc::mem_fun(*this, &test_dialog::on_render_offscreen));
+		box->pack_start(*Gtk::manage(offscreen_button), Gtk::PACK_SHRINK);
 
-		Gtk::Button* const button = new Gtk::Button(_("Render offscreen"));
-		button->signal_clicked().connect(sigc::mem_fun(*this, &test_dialog::on_render_offscreen));
-		box->pack_start(*Gtk::manage(button));
+		Gtk::DrawingArea* const drawing_area = new Gtk::DrawingArea();
+		drawing_area->signal_expose_event().connect(sigc::bind<0>(sigc::mem_fun(*this, &test_dialog::on_expose_event), drawing_area));
+		box->pack_start(*Gtk::manage(drawing_area), Gtk::PACK_EXPAND_WIDGET);
 
 		set_border_width(10);
 
 		set_role("osmesa");
+		set_title(_("OpenGL context / offscreen render testing"));
+		resize(200, 200);
+
 		show_all();
 	}
 
@@ -78,7 +85,7 @@ public:
 			if(!factory)
 				throw std::runtime_error("Error creating context factory");
 
-			const boost::scoped_ptr<k3d::gl::context> context(factory->create(5, 5));
+			const boost::scoped_ptr<k3d::gl::offscreen_context> context(factory->create(5, 5));
 			if(!context)
 				throw std::runtime_error("Error creating context");
 			
@@ -90,6 +97,7 @@ public:
 			context->draw().glClearColor(1.0, 0.5, 0.25, 0.125);
 			context->draw().glClear(GL_COLOR_BUFFER_BIT);
 			context->draw().glFlush();
+			context->swap_buffers();
 			
 			k3d::log() << debug;
 			std::copy(context->buffer_begin(), context->buffer_end(), std::ostream_iterator<int>(k3d::log(), " "));
@@ -100,6 +108,50 @@ public:
 			k3d::log() << error << e.what() << std::endl;
 		}
 	}
+
+	bool on_expose_event(Gtk::DrawingArea* self, GdkEventExpose* event)
+	{
+		try
+		{
+			if(!context)
+			{
+				Glib::RefPtr<Gdk::Window> window = self->get_window();
+				if(!window)
+					throw std::runtime_error("Missing window");
+
+				if(!window->ensure_native())
+					throw std::runtime_error("Not a native window");
+
+				const boost::scoped_ptr<k3d::gl::icontext_factory> factory(k3d::plugin::create<k3d::gl::icontext_factory>("GLXContextFactory"));
+				if(!factory)
+					throw std::runtime_error("Error creating context factory");
+
+				context.reset(factory->create(reinterpret_cast<void*>(GDK_DRAWABLE_XID(window->gobj()))));
+			}
+
+			if(!context)
+				throw std::runtime_error("Error creating context");
+			
+			Gtk::Allocation allocation = self->get_allocation();
+			const int width = allocation.get_width();
+			const int height = allocation.get_height();
+
+			context->make_current();
+			context->draw().glViewport(0, 0, width, height);
+			context->draw().glClearColor(1.0, 0.5, 0.25, 0.125);
+			context->draw().glClear(GL_COLOR_BUFFER_BIT);
+			context->draw().glFlush();
+			context->swap_buffers();
+		}
+		catch(std::exception& e)
+		{
+			k3d::log() << error << e.what() << std::endl;
+		}
+
+		return true;
+	}
+
+	boost::scoped_ptr<k3d::gl::context> context;
 
 	static k3d::iplugin_factory& get_factory()
 	{
