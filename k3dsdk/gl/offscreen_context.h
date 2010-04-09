@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/opengl/context.h>
+#include <k3dsdk/gl/context.h>
 
 namespace k3d
 {

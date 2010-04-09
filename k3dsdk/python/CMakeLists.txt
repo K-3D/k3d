@@ -86,8 +86,8 @@ ADD_LIBRARY(k3dsdk-python-interfaces SHARED
 	any_python.h
 	icommand_node_python.cpp
 	icommand_node_python.h
-	icontext_factory_gl_python.cpp
-	icontext_factory_gl_python.h
+	offscreen_context_factory_gl_python.cpp
+	offscreen_context_factory_gl_python.h
 	idocument_exporter_python.cpp
 	idocument_exporter_python.h
 	idocument_importer_python.cpp

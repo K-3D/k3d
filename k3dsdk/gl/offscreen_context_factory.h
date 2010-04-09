@@ -1,5 +1,5 @@
-#ifndef K3DSDK_ICONTEXT_FACTORY_GL_H
-#define K3DSDK_ICONTEXT_FACTORY_GL_H
+#ifndef K3DSDK_GL_OFFSCREEN_CONTEXT_FACTORY_H
+#define K3DSDK_GL_OFFSCREEN_CONTEXT_FACTORY_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -33,30 +33,27 @@ namespace k3d
 namespace gl
 {
 
-class context;
 class offscreen_context;
 	
 /// Abstract interface implemented by objects that can create OpenGL render context objects,
-class icontext_factory :
+class offscreen_context_factory :
 	public virtual iunknown
 {
 public:
-	virtual ~icontext_factory() {}
+	virtual ~offscreen_context_factory() {}
 
-	/// Creates a new OpenGL render context for use with the given display and drawable.
-	virtual context* create(void* Drawable) = 0;
 	/// Creates a new offscreen OpenGL render context with the given width and height in pixels.
 	/// The caller is responsible for the lifetime of the returned object.
 	virtual offscreen_context* create(const uint_t Width, const uint_t Height) = 0;
 
 protected:
-	icontext_factory() {}
-	icontext_factory(const icontext_factory&) {}
-	icontext_factory& operator=(const icontext_factory&) { return *this; }
+	offscreen_context_factory() {}
+	offscreen_context_factory(const offscreen_context_factory&) {}
+	offscreen_context_factory& operator=(const offscreen_context_factory&) { return *this; }
 };
 } // namespace gl
 
 } // namespace k3d
 
-#endif // !K3DSDK_ICONTEXT_FACTORY_GL_H
+#endif // !K3DSDK_GL_OFFSCREEN_CONTEXT_FACTORY_H
 

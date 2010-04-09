@@ -23,12 +23,13 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/gl/api.h>
+#include <k3dsdk/gl/context_factory.h>
 #include <k3dsdk/gl.h>
-#include <k3dsdk/icontext_factory_gl.h>
+#include <k3dsdk/gl/offscreen_context_factory.h>
+#include <k3dsdk/gl/offscreen_context.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/ngui/application_window.h>
-#include <k3dsdk/opengl/api.h>
-#include <k3dsdk/opengl/offscreen_context.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/result.h>
 
@@ -81,7 +82,7 @@ public:
 	{
 		try
 		{
-			const boost::scoped_ptr<k3d::gl::icontext_factory> factory(k3d::plugin::create<k3d::gl::icontext_factory>("OSMesaContextFactory"));
+			const boost::scoped_ptr<k3d::gl::offscreen_context_factory> factory(k3d::plugin::create<k3d::gl::offscreen_context_factory>("OSMesaContextFactory"));
 			if(!factory)
 				throw std::runtime_error("Error creating context factory");
 
@@ -122,7 +123,7 @@ public:
 				if(!window->ensure_native())
 					throw std::runtime_error("Not a native window");
 
-				const boost::scoped_ptr<k3d::gl::icontext_factory> factory(k3d::plugin::create<k3d::gl::icontext_factory>("GLXContextFactory"));
+				const boost::scoped_ptr<k3d::gl::context_factory> factory(k3d::plugin::create<k3d::gl::context_factory>("GLXContextFactory"));
 				if(!factory)
 					throw std::runtime_error("Error creating context factory");
 

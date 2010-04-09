@@ -23,8 +23,10 @@
 
 #include <k3dsdk/bitmap.h>
 #include <k3dsdk/color.h>
-#include <k3dsdk/opengl/context.h>
-#include <k3dsdk/opengl/offscreen_context.h>
+#include <k3dsdk/gl/context.h>
+#include <k3dsdk/gl/context_factory.h>
+#include <k3dsdk/gl/offscreen_context.h>
+#include <k3dsdk/gl/offscreen_context_factory.h>
 #include <k3dsdk/i3d_2d_mapping.h>
 #include <k3dsdk/ibitmap_exporter.h>
 #include <k3dsdk/ibitmap_importer.h>
@@ -32,7 +34,6 @@
 #include <k3dsdk/ibitmap_source.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/icolor_source.h>
-#include <k3dsdk/icontext_factory_gl.h>
 #include <k3dsdk/idisplacement_shader_ri.h>
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/idocument_importer.h>
@@ -171,8 +172,9 @@ void initialize_types()
 	register_type(typeid(k3d::filesystem::path), "k3d::filesystem::path");
 	register_type(typeid(k3d::float_t), "k3d::float_t");
 	register_type(typeid(k3d::gl::context), "k3d::gl::context");
+	register_type(typeid(k3d::gl::context_factory), "k3d::gl::context_factory");
 	register_type(typeid(k3d::gl::offscreen_context), "k3d::gl::offscreen_context");
-	register_type(typeid(k3d::gl::icontext_factory), "k3d::gl::icontext_factory");
+	register_type(typeid(k3d::gl::offscreen_context_factory), "k3d::gl::offscreen_context_factory");
 	register_type(typeid(k3d::gl::ilight), "k3d::gl::ilight");
 	register_type(typeid(k3d::gl::imesh_painter), "k3d::gl::imesh_painter");
 	register_type(typeid(k3d::gl::imesh_painter*), "k3d::gl::imesh_painter*");

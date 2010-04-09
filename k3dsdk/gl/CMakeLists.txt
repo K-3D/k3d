@@ -1,4 +1,10 @@
-ADD_LIBRARY(k3dsdk-opengl SHARED api.h api.cpp)
+FILE(GLOB HEADERS *.h)
+FILE(GLOB SOURCES *.cpp)
+
+LIST(SORT HEADERS)
+LIST(SORT SOURCES)
+
+ADD_LIBRARY(k3dsdk-opengl SHARED ${HEADERS} ${SOURCES})
 K3D_GENERATE_DEF_FILE(K3dsdk-opengl)
 
 ADD_CUSTOM_TARGET(generate-opengl-api

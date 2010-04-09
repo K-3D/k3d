@@ -23,7 +23,7 @@
 
 #include <k3dsdk/python/any_python.h>
 #include <k3dsdk/python/icommand_node_python.h>
-#include <k3dsdk/python/icontext_factory_gl_python.h>
+#include <k3dsdk/python/offscreen_context_factory_gl_python.h>
 #include <k3dsdk/python/idocument_exporter_python.h>
 #include <k3dsdk/python/idocument_importer_python.h>
 #include <k3dsdk/python/ifile_change_notifier_python.h>
@@ -67,7 +67,7 @@ object wrap_unknown(iunknown& Unknown)
 	object result = object(iunknown_wrapper(Unknown));
 
 	define_methods_icommand_node(Unknown, result);
-	define_methods_icontext_factory_gl(Unknown, result);
+	define_methods_offscreen_context_factory_gl(Unknown, result);
 	define_methods_idocument_exporter(Unknown, result);
 	define_methods_idocument_importer(Unknown, result);
 	define_methods_ifile_change_notifier(Unknown, result);

@@ -5,7 +5,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include <k3dsdk/log.h>
-#include <k3dsdk/opengl/api.h>
+#include <k3dsdk/gl/api.h>
 
 namespace k3d
 {

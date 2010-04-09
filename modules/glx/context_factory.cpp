@@ -23,10 +23,10 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/icontext_factory_gl.h>
+#include <k3dsdk/gl/api.h>
+#include <k3dsdk/gl/context_factory.h>
+#include <k3dsdk/gl/context.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/opengl/api.h>
-#include <k3dsdk/opengl/offscreen_context.h>
 #include <k3dsdk/result.h>
 
 #include <boost/optional.hpp>
@@ -109,7 +109,7 @@ struct api_loader
 };
 
 class context_factory :
-	public k3d::gl::icontext_factory
+	public k3d::gl::context_factory
 {
 public:
 	context_factory()
@@ -161,15 +161,10 @@ public:
 		}
 	}
 
-	k3d::gl::offscreen_context* create(const k3d::uint_t Width, const k3d::uint_t Height)
-	{
-		return 0;
-	}
-
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<context_factory,
-			k3d::interface_list<k3d::gl::icontext_factory> > factory(
+			k3d::interface_list<k3d::gl::context_factory> > factory(
 				k3d::uuid(0x3a6869e9, 0x9a4ed128, 0x0f06b4bc, 0x672b53e1),
 				"GLXContextFactory",
 				_("Creates GLX graphics contexts."),
