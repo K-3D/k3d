@@ -4,5 +4,5 @@ K3D_BUILD_NGUI_MODULE(k3d-osmesa)
 K3D_CREATE_MODULE_PROXY(k3d-osmesa)
 
 TARGET_LINK_LIBRARIES(k3d-osmesa k3dsdk-opengl)
-TARGET_LINK_LIBRARIES(k3d-osmesa /usr/lib/libgtkgl-2.0.so)
+#TARGET_LINK_LIBRARIES(k3d-osmesa /usr/lib/libgtkgl-2.0.so)
 

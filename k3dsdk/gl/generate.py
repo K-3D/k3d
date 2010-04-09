@@ -45,6 +45,67 @@ def full_parameter_type(parameter):
 		result += "*"
 	return result
 
+# Parse OpenGL enumerations
+enums = {} 
+
+skip_enums = [
+	"1PASS_EXT",
+	"1PASS_SGIS",
+	"2D",
+	"2PASS_0_EXT",
+	"2PASS_0_SGIS",
+	"2PASS_1_EXT",
+	"2PASS_1_SGIS",
+	"2X_BIT_ATI",
+	"2_BYTES",
+	"3D",
+	"3DC_XY_AMD",
+	"3DC_X_AMD",
+	"3D_COLOR",
+	"3D_COLOR_TEXTURE",
+	"3_BYTES",
+	"422_AVERAGE_EXT",
+	"422_EXT",
+	"422_REV_AVERAGE_EXT",
+	"422_REV_EXT",
+	"4D_COLOR_TEXTURE",
+	"4PASS_0_EXT",
+	"4PASS_0_SGIS",
+	"4PASS_1_EXT",
+	"4PASS_1_SGIS",
+	"4PASS_2_EXT",
+	"4PASS_2_SGIS",
+	"4PASS_3_EXT",
+	"4PASS_3_SGIS",
+	"4X_BIT_ATI",
+	"4_BYTES",
+	"8X_BIT_ATI",
+	"OFFSET_TEXTURE_2D_BIAS_NV",
+	"OFFSET_TEXTURE_2D_MATRIX_NV",
+	"OFFSET_TEXTURE_2D_SCALE_NV"
+	]
+
+for line in fileinput.input("enum.spec"):
+	if line[0:1] == "#":
+		continue
+
+	if line.strip == "":
+		continue
+
+	if line.count(":"):
+		continue
+
+	enum = re.search("^\t([^\s]+)\s*=\s*([^\s]+)", line)
+	if enum:
+		name = enum.group(1)
+		value = enum.group(2)
+
+		if name in skip_enums:
+			continue
+
+		enums[name] = value
+		continue
+
 # Parse OpenGL function signatures
 functions = []
 function = None
@@ -150,13 +211,23 @@ public:
 
 	api();
 
+	enum constants
+	{
+""")
+
+for name in sorted(enums.keys()):
+	stream.write("\t\t" + name + " = " + enums[name] + ",\n")
+
+stream.write("""
+	};
+
 	template<typename FunctorT>
 	void load(const FunctorT& Functor)
 	{
 """)
 
 for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])):
-	stream.write("\t\tFunctor(\"gl" + function["name"] + "\", gl" + function["name"] + ");\n")
+	stream.write("\t\tFunctor(\"gl" + function["name"] + "\", " + function["name"] + ");\n")
 
 stream.write("""\t}\n\n""")
 
@@ -164,7 +235,7 @@ for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])
 
 	stream.write("\t")
 	stream.write(return_type(function))
-	stream.write(" (*gl" + function["name"] + ")")
+	stream.write(" (*" + function["name"] + ")")
 	stream.write("(")
 
 	for p in range(len(function["parameters"])):
@@ -204,7 +275,7 @@ stream.write("""////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
 
 #include <k3dsdk/log.h>
-#include <k3dsdk/opengl/api.h>
+#include <k3dsdk/gl/api.h>
 
 namespace k3d
 {
@@ -234,7 +305,7 @@ for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])
 
 	stream.write(")\n")
 	stream.write("{\n")
-	stream.write("\tlog() << warning << \"gl" + function["name"] + " not available.\" << std::endl;\n")
+	stream.write("\tlog() << warning << \"" + function["name"] + " not available.\" << std::endl;\n")
 	stream.write("}\n\n")
 
 stream.write("""api::api() :""")
@@ -248,7 +319,7 @@ for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])
 		stream.write("\n\t")
 		index = True
 
-	stream.write("gl" + function["name"] + "(fallback" + function["name"] + ")")
+	stream.write("" + function["name"] + "(fallback" + function["name"] + ")")
 
 stream.write("""
 {

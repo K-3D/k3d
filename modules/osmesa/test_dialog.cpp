@@ -45,8 +45,6 @@
 #include <GL/glx.h>
 #include <X11/Xlib.h>
 
-//#include <gtkgl-2.0/gtkgl/gdkgl.h>
-
 namespace module
 {
 
@@ -115,9 +113,9 @@ k3d::log() << debug << "gdk_visual: " << visual << std::endl;
 			k3d::log() << std::endl;
 
 			const k3d::gl::api& gl = context->begin();
-			gl.glClearColor(1.0, 0.5, 0.25, 0.125);
-			gl.glClear(GL_COLOR_BUFFER_BIT);
-			gl.glFlush();
+			gl.ClearColor(1.0, 0.5, 0.25, 0.125);
+			gl.Clear(gl.COLOR_BUFFER_BIT);
+			gl.Flush();
 			context->end();
 			
 			k3d::log() << debug;
@@ -158,10 +156,10 @@ k3d::log() << debug << "gdk_visual: " << visual << std::endl;
 			const int height = allocation.get_height();
 
 			const k3d::gl::api& gl = context->begin();
-			gl.glViewport(0, 0, width, height);
-			gl.glClearColor(1.0, 0.5, 0.25, 0.125);
-			gl.glClear(GL_COLOR_BUFFER_BIT);
-			gl.glFlush();
+			gl.Viewport(0, 0, width, height);
+			gl.ClearColor(1.0, 0.5, 0.25, 0.125);
+			gl.Clear(gl.COLOR_BUFFER_BIT);
+			gl.Flush();
 			context->end();
 		}
 		catch(std::exception& e)
