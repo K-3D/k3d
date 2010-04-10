@@ -74,14 +74,12 @@ public:
 		GdkVisual* const visual = gdkx_visual_get(x_visual->visualid);
 		XFree(x_visual);
 
-k3d::log() << debug << "x visual: " << x_visual << " " << x_visual->visualid << std::endl;
-k3d::log() << debug << "gdk_visual: " << visual << std::endl;
-
 		gtk_widget_push_colormap(gdk_colormap_new(visual, TRUE));
 		gtk_widget_push_visual(visual);
 
 		Gtk::DrawingArea* const drawing_area = new Gtk::DrawingArea();
 		drawing_area->signal_expose_event().connect(sigc::bind<0>(sigc::mem_fun(*this, &test_dialog::on_expose_event), drawing_area));
+		drawing_area->set_double_buffered(false);
 		box->pack_start(*Gtk::manage(drawing_area), Gtk::PACK_EXPAND_WIDGET);
 
 		gtk_widget_pop_visual();
@@ -134,6 +132,8 @@ k3d::log() << debug << "gdk_visual: " << visual << std::endl;
 		{
 			if(!context)
 			{
+				XSynchronize(GDK_DISPLAY(), True);
+
 				Glib::RefPtr<Gdk::Window> window = self->get_window();
 				if(!window)
 					throw std::runtime_error("Missing window");
@@ -146,6 +146,8 @@ k3d::log() << debug << "gdk_visual: " << visual << std::endl;
 					throw std::runtime_error("Error creating context factory");
 
 				context.reset(factory->create(GDK_DRAWABLE_XID(window->gobj())));
+
+				XSynchronize(GDK_DISPLAY(), False);
 			}
 
 			if(!context)

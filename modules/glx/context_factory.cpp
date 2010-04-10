@@ -67,8 +67,8 @@ public:
 	{
 		try
 		{
-//			if(!glXMakeCurrent(x_display, x_drawable, x_context))
-//				throw std::runtime_error("Error making GLX context current.");
+			if(!glXMakeCurrent(x_display, x_drawable, x_context))
+				throw std::runtime_error("Error making GLX context current.");
 		}
 		catch(std::exception& e)
 		{
@@ -79,7 +79,6 @@ public:
 
 	void end()
 	{
-		
 		glXSwapBuffers(x_display, x_drawable);
 	}
 
@@ -141,8 +140,6 @@ public:
 
 			int x_config[] = {GLX_RGBA, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_DEPTH_SIZE, 1, GLX_DOUBLEBUFFER, None};
 			XVisualInfo* const x_visual = glXChooseVisual(x_display, DefaultScreen(x_display), x_config);
-
-k3d::log() << debug << "context visual: " << x_visual << " " << x_visual->visualid << std::endl;
 
 			if(!x_visual)
 				throw std::runtime_error("Error choosing X visual.");
