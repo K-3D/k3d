@@ -38,7 +38,8 @@ namespace module
 namespace qtui
 {
 
-class canvas;
+class viewport_scene;
+class viewport_view;
 
 //////////////////////////////////////////////////////////////////////////
 // main_window
@@ -64,7 +65,8 @@ private:
 	k3d::idocument* m_document;
 	QComboBox* m_camera_combo;
 	QComboBox* m_render_engine_combo;
-	canvas* m_canvas;
+	viewport_scene* m_viewport_scene;
+	viewport_view* m_viewport_view;
 	std::vector<k3d::icamera*> m_cameras;
 	std::vector<k3d::gl::irender_viewport*> m_render_engines;
 };

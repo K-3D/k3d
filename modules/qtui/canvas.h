@@ -28,7 +28,10 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/irender_viewport_gl.h>
 
-#include <QGLWidget>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+
+class QGraphicsTextItem;
 
 namespace module
 {
@@ -37,36 +40,47 @@ namespace qtui
 {
 
 //////////////////////////////////////////////////////////////////////////
-// canvas
+// viewport_scene
 
-class canvas :
-	public QGLWidget
+class viewport_scene :
+	public QGraphicsScene
 {
 	Q_OBJECT
 
 public:
-	canvas(QWidget* parent = 0);
+	viewport_scene();
+ 
+	virtual void drawBackground(QPainter *painter, const QRectF &rect);
 
 private Q_SLOTS:
 	void on_camera_changed(k3d::icamera* const Camera);
 	void on_render_engine_changed(k3d::gl::irender_viewport* const Engine);
 	
 private:
-	void initializeGL();
-	void paintGL();
-
 	/// Stores the document camera for drawing
 	k3d_data(k3d::icamera*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_camera;
 	/// Stores the document OpenGL render engine for drawing
 	k3d_data(k3d::gl::irender_viewport*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_gl_engine;
-	/// Stores the current set of OpenGL font glyphs
-	unsigned long m_font_begin;
-	/// Stores the current set of OpenGL font glyphs
-	unsigned long m_font_end;
 	// Buffers parameters from the most-recent render
 	GLdouble m_gl_view_matrix[16];
 	GLdouble m_gl_projection_matrix[16];
 	GLint m_gl_viewport[4];
+	QGraphicsTextItem* m_fps;
+};
+
+//////////////////////////////////////////////////////////////////////////
+// viewport_view
+
+class viewport_view :
+	public QGraphicsView
+{
+	Q_OBJECT
+
+public:
+	viewport_view(QWidget* parent = 0);
+
+protected:
+	void resizeEvent(QResizeEvent *event);
 };
 
 } // namespace qtui

@@ -86,11 +86,14 @@ main_window::main_window(QApplication& Application) :
 	m_render_engine_combo->setEnabled(false);
 	connect(m_render_engine_combo, SIGNAL(activated(int)), this, SLOT(on_render_engine_changed(int)));
 
-	m_canvas = new canvas(this);
-	connect(this, SIGNAL(camera_changed(k3d::icamera* const)), m_canvas, SLOT(on_camera_changed(k3d::icamera* const)));
-	connect(this, SIGNAL(render_engine_changed(k3d::gl::irender_viewport* const)), m_canvas, SLOT(on_render_engine_changed(k3d::gl::irender_viewport* const)));
+	m_viewport_scene = new viewport_scene();
+	m_viewport_view = new viewport_view(this);
+	m_viewport_view->setScene(m_viewport_scene);
 
-	setCentralWidget(m_canvas);
+	connect(this, SIGNAL(camera_changed(k3d::icamera* const)), m_viewport_scene, SLOT(on_camera_changed(k3d::icamera* const)));
+	connect(this, SIGNAL(render_engine_changed(k3d::gl::irender_viewport* const)), m_viewport_scene, SLOT(on_render_engine_changed(k3d::gl::irender_viewport* const)));
+
+	setCentralWidget(m_viewport_view);
 }
 
 void main_window::on_file_open()
@@ -141,22 +144,18 @@ void main_window::on_file_open()
 		m_render_engine_combo->addItem(dynamic_cast<k3d::inode*>(*render_engine)->name().c_str());
 	m_render_engine_combo->adjustSize();
 	
-	Q_EMIT camera_changed(m_cameras.size() ? dynamic_cast<k3d::icamera*>(*m_cameras.begin()) : 0);
-	Q_EMIT render_engine_changed(m_render_engines.size() ? dynamic_cast<k3d::gl::irender_viewport*>(*m_render_engines.begin()) : 0);
+	Q_EMIT camera_changed(m_cameras.size() ? m_cameras[0] : 0);
+	Q_EMIT render_engine_changed(m_render_engines.size() ? m_render_engines[0] : 0);
 }
 
 void main_window::on_camera_changed(int Index)
 {
-	std::vector<k3d::icamera*>::iterator it = m_cameras.begin();
-	std::advance(it, Index);
-	Q_EMIT camera_changed(dynamic_cast<k3d::icamera*>(*it));
+	Q_EMIT camera_changed(m_cameras[Index]);
 }
 
 void main_window::on_render_engine_changed(int Index)
 {
-	std::vector<k3d::gl::irender_viewport*>::iterator it = m_render_engines.begin();
-	std::advance(it, Index);
-	Q_EMIT render_engine_changed(dynamic_cast<k3d::gl::irender_viewport*>(*it));
+	Q_EMIT render_engine_changed(m_render_engines[Index]);
 }
 	
 

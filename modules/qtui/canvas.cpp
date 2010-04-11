@@ -22,6 +22,7 @@
 */
 
 #include "canvas.h"
+#include <ui_extrude_faces.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
@@ -35,14 +36,13 @@
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/share.h>
 
-#include <QAction>
-#include <QApplication>
-#include <QComboBox>
-#include <QFileDialog>
-#include <QMenuBar>
-#include <QMessageBox>
-#include <QStatusBar>
-#include <QToolBar>
+#include <QCheckBox>
+#include <QGLWidget>
+#include <QGraphicsProxyWidget>
+#include <QGroupBox>
+#include <QPushButton>
+#include <QResizeEvent>
+#include <QVBoxLayout>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -55,85 +55,98 @@ namespace qtui
 {
 
 //////////////////////////////////////////////////////////////////////////
-// canvas
+// viewport_scene
 
-canvas::canvas(QWidget* parent) :
-	QGLWidget(parent),
+viewport_scene::viewport_scene() :
 	m_camera(init_value<k3d::icamera*>(0)),
 	m_gl_engine(init_value<k3d::gl::irender_viewport*>(0)),
-	m_font_end(0)
+	m_fps(0)
 {
-	setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
+	QGraphicsProxyWidget* const button = addWidget(new QPushButton("Hello, World!"));
+	button->setPos(100, 10);
+
+	m_fps = new QGraphicsTextItem();
+	m_fps->setPos(5, 5);
+	addItem(m_fps);
+
+	QGraphicsProxyWidget* const extrude_faces_widget = addWidget(new QWidget());
+	Ui::ExtrudeFaces* const extrude_faces = new Ui::ExtrudeFaces();
+	extrude_faces->setupUi(extrude_faces_widget->widget());
+
+/*
+	QGroupBox* const group_box = new QGroupBox("ExtrudeFaces");
+	QVBoxLayout* const vbox = new QVBoxLayout();
+	vbox->addWidget(new QCheckBox("Option A"));
+	vbox->addWidget(new QCheckBox("Option B"));
+	vbox->addWidget(new QCheckBox("Option C"));
+	group_box->setLayout(vbox);
+	QGraphicsProxyWidget* const group_box_proxy = addWidget(group_box);
+*/
+	extrude_faces_widget->setPos(10, 200);
+	extrude_faces_widget->setOpacity(0.8);
 }
 
-void canvas::on_camera_changed(k3d::icamera* const Camera)
+void viewport_scene::drawBackground(QPainter *painter, const QRectF &rect)
 {
-	m_camera.set_value(Camera);
-	update();
-}
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
 
-void canvas::on_render_engine_changed(k3d::gl::irender_viewport* const Engine)
-{
-	m_gl_engine.set_value(Engine);
-	update();
-}
-
-void canvas::initializeGL()
-{
-}
-
-void canvas::paintGL()
-{
-	glViewport(0, 0, width(), height());
 	if(m_gl_engine.internal_value() && m_camera.internal_value())
 	{
 		k3d::timer timer;
 
 		m_gl_engine.internal_value()->render_viewport(*m_camera.internal_value(), width(), height(), m_gl_view_matrix, m_gl_projection_matrix, m_gl_viewport);
 
-		const double elapsed = timer.elapsed();
+		const k3d::double_t elapsed = timer.elapsed();
+		std::stringstream buffer;
 		if(elapsed)
-		{
-			std::stringstream buffer;
 			buffer << std::fixed << std::setprecision(1) << 1.0 / elapsed << "fps";
-
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			glOrtho(-1, 1, -1, 1, -1, 1);
-
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-
-			glDisable(GL_LIGHTING);
-			glDisable(GL_TEXTURE_1D);
-			glDisable(GL_TEXTURE_2D);
-			glDisable(GL_BLEND);
-
-			glColor3d(0, 0, 0);
-			renderText(-0.95, -0.95, 0.0, buffer.str().c_str());
-		}
+//		m_fps->setPlainText(buffer.str().c_str());
 	}
 	else
 	{
 		glClearColor(0.6f, 0.6f, 0.6f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(-1, 1, -1, 1, -1, 1);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-
-		glDisable(GL_LIGHTING);
-		glDisable(GL_TEXTURE_1D);
-		glDisable(GL_TEXTURE_2D);
-		glDisable(GL_BLEND);
-
-		glColor3d(0, 0, 0);
-		renderText(-0.95, 0.0, 0.0, _("Use File > Open to load a document"));
 	}
-	glFlush();
+
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+	glPopAttrib();
+}
+
+void viewport_scene::on_camera_changed(k3d::icamera* const Camera)
+{
+	m_camera.set_value(Camera);
+	update();
+}
+
+void viewport_scene::on_render_engine_changed(k3d::gl::irender_viewport* const Engine)
+{
+	m_gl_engine.set_value(Engine);
+	update();
+}
+
+//////////////////////////////////////////////////////////////////////////
+// viewport_view
+
+viewport_view::viewport_view(QWidget* parent) :
+	QGraphicsView(parent)
+{
+//	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+	setViewport(new QGLWidget(QGLFormat()));
+	setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+}
+
+void viewport_view::resizeEvent(QResizeEvent *event)
+{
+	if(scene())
+		scene()->setSceneRect(QRect(QPoint(0, 0), event->size()));
+	QGraphicsView::resizeEvent(event);
 }
 
 } // namespace qtui
