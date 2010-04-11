@@ -37,11 +37,14 @@
 #include <k3dsdk/share.h>
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QGLWidget>
 #include <QGraphicsProxyWidget>
 #include <QGroupBox>
+#include <QMenu>
 #include <QPushButton>
 #include <QResizeEvent>
+#include <QToolButton>
 #include <QVBoxLayout>
 
 #include <boost/scoped_ptr.hpp>
@@ -60,10 +63,23 @@ namespace qtui
 viewport_scene::viewport_scene() :
 	m_camera(init_value<k3d::icamera*>(0)),
 	m_gl_engine(init_value<k3d::gl::irender_viewport*>(0)),
-	m_fps(0)
+	m_fps(0),
+	m_camera_combo(0),
+	m_engine_combo(0)
 {
-	QGraphicsProxyWidget* const button = addWidget(new QPushButton("Hello, World!"));
-	button->setPos(100, 10);
+	QToolButton* const file_menu_button = new QToolButton();
+	file_menu_button->setText("Stuff");
+	file_menu_button->setPopupMode(QToolButton::MenuButtonPopup);
+
+	QMenu* const file_menu = new QMenu(file_menu_button);
+	file_menu->addAction("Stampede");
+	file_menu->addAction("Framulize");
+	file_menu->addAction("Transmogrify");
+
+	file_menu_button->setMenu(file_menu);
+
+	QGraphicsProxyWidget* const button_proxy = addWidget(file_menu_button);
+	button_proxy->setPos(10, 10);
 
 	m_fps = new QGraphicsTextItem();
 	m_fps->setPos(5, 5);
@@ -84,6 +100,16 @@ viewport_scene::viewport_scene() :
 */
 	extrude_faces_widget->setPos(10, 200);
 	extrude_faces_widget->setOpacity(0.8);
+
+	m_camera_combo = new QComboBox();
+	connect(m_camera_combo, SIGNAL(activated(int)), this, SLOT(on_camera_changed(int)));
+	QGraphicsProxyWidget* const camera_combo_proxy = addWidget(m_camera_combo);
+	camera_combo_proxy->setPos(100, 10);
+
+	m_engine_combo = new QComboBox();
+	connect(m_engine_combo, SIGNAL(activated(int)), this, SLOT(on_render_engine_changed(int)));
+	QGraphicsProxyWidget* const engine_combo_proxy = addWidget(m_engine_combo);
+	engine_combo_proxy->setPos(200, 10);
 }
 
 void viewport_scene::drawBackground(QPainter *painter, const QRectF &rect)
@@ -119,15 +145,37 @@ void viewport_scene::drawBackground(QPainter *painter, const QRectF &rect)
 	glPopAttrib();
 }
 
-void viewport_scene::on_camera_changed(k3d::icamera* const Camera)
+void viewport_scene::on_document_changed(k3d::idocument& Document)
 {
-	m_camera.set_value(Camera);
+	m_cameras = k3d::node::lookup<k3d::icamera>(Document);
+	m_render_engines = k3d::node::lookup<k3d::gl::irender_viewport>(Document);
+
+	m_camera_combo->clear();
+	m_camera_combo->setEnabled(m_cameras.size());
+	for(std::vector<k3d::icamera*>::iterator camera = m_cameras.begin(); camera != m_cameras.end(); ++camera)
+		m_camera_combo->addItem(dynamic_cast<k3d::inode*>(*camera)->name().c_str());
+	m_camera_combo->adjustSize();
+
+	m_engine_combo->clear();
+	m_engine_combo->setEnabled(m_render_engines.size());
+	for(std::vector<k3d::gl::irender_viewport*>::iterator render_engine = m_render_engines.begin(); render_engine != m_render_engines.end(); ++render_engine)
+		m_engine_combo->addItem(dynamic_cast<k3d::inode*>(*render_engine)->name().c_str());
+	m_engine_combo->adjustSize();
+
+	m_camera.set_value(m_cameras.size() ? m_cameras[0] : 0);
+	m_gl_engine.set_value(m_render_engines.size() ? m_render_engines[0] : 0);	
 	update();
 }
 
-void viewport_scene::on_render_engine_changed(k3d::gl::irender_viewport* const Engine)
+void viewport_scene::on_camera_changed(int Index)
 {
-	m_gl_engine.set_value(Engine);
+	m_camera.set_value(m_cameras[Index]);
+	update();
+}
+
+void viewport_scene::on_render_engine_changed(int Index)
+{
+	m_gl_engine.set_value(m_render_engines[Index]);
 	update();
 }
 

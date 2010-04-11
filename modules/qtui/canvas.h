@@ -31,6 +31,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 
+class QComboBox;
 class QGraphicsTextItem;
 
 namespace module
@@ -53,8 +54,9 @@ public:
 	virtual void drawBackground(QPainter *painter, const QRectF &rect);
 
 private Q_SLOTS:
-	void on_camera_changed(k3d::icamera* const Camera);
-	void on_render_engine_changed(k3d::gl::irender_viewport* const Engine);
+	void on_document_changed(k3d::idocument&);
+	void on_camera_changed(int Index);
+	void on_render_engine_changed(int Index);
 	
 private:
 	/// Stores the document camera for drawing
@@ -66,6 +68,10 @@ private:
 	GLdouble m_gl_projection_matrix[16];
 	GLint m_gl_viewport[4];
 	QGraphicsTextItem* m_fps;
+	QComboBox* m_camera_combo;
+	QComboBox* m_engine_combo;
+	std::vector<k3d::icamera*> m_cameras;
+	std::vector<k3d::gl::irender_viewport*> m_render_engines;
 };
 
 //////////////////////////////////////////////////////////////////////////

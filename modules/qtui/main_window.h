@@ -53,13 +53,10 @@ public:
 	main_window(QApplication& Application);
 
 Q_SIGNALS:
-	void camera_changed(k3d::icamera* const);
-	void render_engine_changed(k3d::gl::irender_viewport* const);
+	void document_changed(k3d::idocument&);
 	
 private Q_SLOTS:
 	void on_file_open();
-	void on_camera_changed(int Index);
-	void on_render_engine_changed(int Index);
 
 private:
 	k3d::idocument* m_document;
@@ -67,8 +64,6 @@ private:
 	QComboBox* m_render_engine_combo;
 	viewport_scene* m_viewport_scene;
 	viewport_view* m_viewport_view;
-	std::vector<k3d::icamera*> m_cameras;
-	std::vector<k3d::gl::irender_viewport*> m_render_engines;
 };
 	
 } // namespace qtui
