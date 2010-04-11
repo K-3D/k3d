@@ -25,12 +25,9 @@
 */
 
 #include <QMainWindow>
+#include <ui_main_window.h>
 
-class QComboBox;
-
-namespace k3d { class icamera; }
 namespace k3d { class idocument; }
-namespace k3d { namespace gl { class irender_viewport; } }
 
 namespace module
 {
@@ -59,11 +56,10 @@ private Q_SLOTS:
 	void on_file_open();
 
 private:
-	k3d::idocument* m_document;
-	QComboBox* m_camera_combo;
-	QComboBox* m_render_engine_combo;
-	viewport_scene* m_viewport_scene;
+	Ui::main_window ui;
 	viewport_view* m_viewport_view;
+	viewport_scene* m_viewport_scene;
+	k3d::idocument* m_document;
 };
 	
 } // namespace qtui

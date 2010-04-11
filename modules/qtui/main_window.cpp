@@ -57,31 +57,22 @@ namespace qtui
 // main_window
 	
 main_window::main_window(QApplication& Application) :
+	m_viewport_view(0),
+	m_viewport_scene(0),
 	m_document(0)
 {
-	setWindowTitle("K-3D Sample Qt User Interface");
-
-	QMenu* const fileMenu = this->menuBar()->addMenu(tr("&File"));
-
-	QAction* const fileOpenAction = fileMenu->addAction(
-		QPixmap((k3d::share_path() / k3d::filesystem::generic_path("qtui/stock_open.png")).native_filesystem_string().c_str()),
-		"&Open...");
-	connect(fileOpenAction, SIGNAL(activated()), this, SLOT(on_file_open()));
-
-	QAction* const fileQuitAction = fileMenu->addAction(
-		QPixmap((k3d::share_path() / k3d::filesystem::generic_path("qtui/stock_exit.png")).native_filesystem_string().c_str()),
-		"&Quit");
-	connect(fileQuitAction, SIGNAL(activated()), &Application, SLOT(quit()));
+	ui.setupUi(this);
 
 	m_viewport_scene = new viewport_scene();
 	m_viewport_view = new viewport_view(this);
 	m_viewport_view->setScene(m_viewport_scene);
 
-	connect(this, SIGNAL(document_changed(k3d::idocument&)), m_viewport_scene, SLOT(on_document_changed(k3d::idocument&)));
-
 	setCentralWidget(m_viewport_view);
+	statusBar()->setVisible(false);
 
-	showMaximized();
+	connect(ui.actionOpen, SIGNAL(activated()), this, SLOT(on_file_open()));
+	connect(ui.actionQuit, SIGNAL(activated()), &Application, SLOT(quit()));
+	connect(this, SIGNAL(document_changed(k3d::idocument&)), m_viewport_scene, SLOT(on_document_changed(k3d::idocument&)));
 }
 
 void main_window::on_file_open()
