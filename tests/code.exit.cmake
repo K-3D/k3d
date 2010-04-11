@@ -18,6 +18,7 @@ SET(SKIP_FILES
 	"^modules/ngui_python_shell/dialog.cpp$"
 	"^modules/obj_io/obj_specification.txt$"
 	"^modules/qslim/MxStdModel.cpp$"
+	"^modules/qtui/user_interface.cpp$"
 	"^renderframe/main.cpp$"
 	"^renderjob/main.cpp$"
 	"^resource-compiler/main.cpp$"
