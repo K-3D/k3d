@@ -21,6 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "main_window.h"
 #include "user_interface.h"
 
 #include <k3d-i18n-config.h>
@@ -54,209 +55,6 @@ namespace module
 namespace qtui
 {
 
-/////////////////////////////////////////////////////////////////////////
-// timer_helper
-
-timer_helper::timer_helper(const unsigned int Interval) :
-	timer(new QTimer())
-{
-	connect(timer.get(), SIGNAL(timeout()), this, SLOT(on_timer()));
-	timer->start(Interval);
-}
-
-void timer_helper::on_timer()
-{
-	m_signal();
-}
-	
-//////////////////////////////////////////////////////////////////////////
-// viewport
-
-viewport::viewport(QWidget* parent) :
-	QGLWidget(parent),
-	m_camera(init_value<k3d::icamera*>(0)),
-	m_gl_engine(init_value<k3d::gl::irender_viewport*>(0)),
-	m_font_end(0)
-{
-	setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
-}
-
-void viewport::on_camera_changed(k3d::icamera* const Camera)
-{
-	m_camera.set_value(Camera);
-	update();
-}
-
-void viewport::on_render_engine_changed(k3d::gl::irender_viewport* const Engine)
-{
-	m_gl_engine.set_value(Engine);
-	update();
-}
-
-void viewport::initializeGL()
-{
-}
-
-void viewport::paintGL()
-{
-	glViewport(0, 0, width(), height());
-	if(m_gl_engine.internal_value() && m_camera.internal_value())
-	{
-		k3d::timer timer;
-
-		m_gl_engine.internal_value()->render_viewport(*m_camera.internal_value(), width(), height(), m_gl_view_matrix, m_gl_projection_matrix, m_gl_viewport);
-
-		const double elapsed = timer.elapsed();
-		if(elapsed)
-		{
-			std::stringstream buffer;
-			buffer << std::fixed << std::setprecision(1) << 1.0 / elapsed << "fps";
-
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			glOrtho(-1, 1, -1, 1, -1, 1);
-
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-
-			glDisable(GL_LIGHTING);
-			glDisable(GL_TEXTURE_1D);
-			glDisable(GL_TEXTURE_2D);
-			glDisable(GL_BLEND);
-
-			glColor3d(0, 0, 0);
-			renderText(-0.95, -0.95, 0.0, buffer.str().c_str());
-		}
-	}
-	else
-	{
-		glClearColor(0.6f, 0.6f, 0.6f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(-1, 1, -1, 1, -1, 1);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-
-		glDisable(GL_LIGHTING);
-		glDisable(GL_TEXTURE_1D);
-		glDisable(GL_TEXTURE_2D);
-		glDisable(GL_BLEND);
-
-		glColor3d(0, 0, 0);
-		renderText(-0.95, 0.0, 0.0, _("Use File > Open to load a document"));
-	}
-	glFlush();
-}
-	
-//////////////////////////////////////////////////////////////////////////
-// main_window
-	
-main_window::main_window(QApplication& Application) :
-	m_document(0)
-{
-	setWindowTitle("K-3D Sample Qt User Interface");
-
-	QMenu* const fileMenu = this->menuBar()->addMenu(tr("&File"));
-
-	QAction* const fileOpenAction = fileMenu->addAction(
-		QPixmap((k3d::share_path() / k3d::filesystem::generic_path("qtui/stock_open.png")).native_filesystem_string().c_str()),
-		"&Open...");
-	connect(fileOpenAction, SIGNAL(activated()), this, SLOT(on_file_open()));
-
-	QAction* const fileQuitAction = fileMenu->addAction(
-		QPixmap((k3d::share_path() / k3d::filesystem::generic_path("qtui/stock_exit.png")).native_filesystem_string().c_str()),
-		"&Quit");
-	connect(fileQuitAction, SIGNAL(activated()), &Application, SLOT(quit()));
-
-	QToolBar* const viewTools = new QToolBar("View Operations", this);
-	addToolBar(Qt::TopToolBarArea, viewTools);
-
-	m_camera_combo = new QComboBox(viewTools);
-	viewTools->addWidget(m_camera_combo);
-	m_camera_combo->setEnabled(false);
-	connect(m_camera_combo, SIGNAL(activated(int)), this, SLOT(on_camera_changed(int)));
-
-	m_render_engine_combo = new QComboBox(viewTools);
-	viewTools->addWidget(m_render_engine_combo);
-	m_render_engine_combo->setEnabled(false);
-	connect(m_render_engine_combo, SIGNAL(activated(int)), this, SLOT(on_render_engine_changed(int)));
-
-	m_viewport = new viewport(this);
-	connect(this, SIGNAL(camera_changed(k3d::icamera* const)), m_viewport, SLOT(on_camera_changed(k3d::icamera* const)));
-	connect(this, SIGNAL(render_engine_changed(k3d::gl::irender_viewport* const)), m_viewport, SLOT(on_render_engine_changed(k3d::gl::irender_viewport* const)));
-
-	setCentralWidget(m_viewport);
-}
-
-void main_window::on_file_open()
-{
-	boost::scoped_ptr<k3d::idocument_importer> importer(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
-	if(!importer.get())
-	{
-		QMessageBox::warning(this, _("Open K-3D Document:"), _("Document reader plugin not installed."), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
-		return;
-	}
-
-	const QString filepath = QFileDialog::getOpenFileName(this, _("Choose a file to open:"), "/home", _("K-3D Documents (*.k3d)"));
-	if(filepath.isEmpty())
-		return;
-
-	const k3d::filesystem::path document_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(filepath.toAscii().data()));
-	
-	if(m_document)
-	{
-		k3d::application().close_document(*m_document);
-		m_document = 0;
-	}
-	
-	m_document = k3d::application().create_document();
-	return_if_fail(m_document);
-
-	if(!importer->read_file(document_path, *m_document))
-	{
-		QMessageBox::warning(this, _("Open K-3D Document:"), _("Error reading document."), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
-		return;
-	}
-
-	setWindowTitle(("K-3D Sample Qt User Interface - " + document_path.leaf().raw()).c_str());
-	statusBar()->showMessage(("Loaded document " + document_path.leaf().raw()).c_str(), 0);
-
-	m_cameras = k3d::node::lookup<k3d::icamera>(*m_document);
-	m_render_engines = k3d::node::lookup<k3d::gl::irender_viewport>(*m_document);
-
-	m_camera_combo->clear();
-	m_camera_combo->setEnabled(m_cameras.size());
-	for(std::vector<k3d::icamera*>::iterator camera = m_cameras.begin(); camera != m_cameras.end(); ++camera)
-		m_camera_combo->addItem(dynamic_cast<k3d::inode*>(*camera)->name().c_str());
-	m_camera_combo->adjustSize();
-
-	m_render_engine_combo->clear();
-	m_render_engine_combo->setEnabled(m_render_engines.size());
-	for(std::vector<k3d::gl::irender_viewport*>::iterator render_engine = m_render_engines.begin(); render_engine != m_render_engines.end(); ++render_engine)
-		m_render_engine_combo->addItem(dynamic_cast<k3d::inode*>(*render_engine)->name().c_str());
-	m_render_engine_combo->adjustSize();
-	
-	emit camera_changed(m_cameras.size() ? dynamic_cast<k3d::icamera*>(*m_cameras.begin()) : 0);
-	emit render_engine_changed(m_render_engines.size() ? dynamic_cast<k3d::gl::irender_viewport*>(*m_render_engines.begin()) : 0);
-}
-
-void main_window::on_camera_changed(int Index)
-{
-	std::vector<k3d::icamera*>::iterator it = m_cameras.begin();
-	std::advance(it, Index);
-	emit camera_changed(dynamic_cast<k3d::icamera*>(*it));
-}
-
-void main_window::on_render_engine_changed(int Index)
-{
-	std::vector<k3d::gl::irender_viewport*>::iterator it = m_render_engines.begin();
-	std::advance(it, Index);
-	emit render_engine_changed(dynamic_cast<k3d::gl::irender_viewport*>(*it));
-}
-	
 /////////////////////////////////////////////////////////////////////////////
 // user_interface
 
@@ -336,6 +134,7 @@ void user_interface::stop_event_loop()
 
 void user_interface::open_uri(const k3d::string_t& URI)
 {
+	assert_not_reached();
 }
 
 void user_interface::message(const k3d::string_t& Message)
@@ -353,23 +152,26 @@ void user_interface::error_message(const k3d::string_t& Message)
 	QMessageBox::critical(0, _("Error"), Message.c_str());
 }
 
-void user_interface::nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
-{
-//	QMessageBox::information(0, _("Information"), Message.c_str());
-}
-
 unsigned int user_interface::query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
 {
+	assert_not_implemented();
 	return 0;
+}
+
+void user_interface::nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
+{
+	assert_not_implemented();
 }
 
 bool user_interface::get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
 {
+	assert_not_implemented();
 	return false;
 }
 
 bool user_interface::show(iunknown& Object)
 {
+	assert_not_implemented();
 	return false;
 }
 
@@ -380,25 +182,19 @@ void user_interface::synchronize()
 
 sigc::connection user_interface::get_timer(const double FrameRate, sigc::slot<void> Slot)
 {
-	return_val_if_fail(FrameRate != 0.0, sigc::connection());
-	const unsigned int interval = static_cast<unsigned int>(1000.0 / FrameRate);
-
-	timer_helper* const helper = new timer_helper(interval);
-	return helper->m_signal.connect(Slot);
+	assert_not_implemented();
+	return sigc::connection();
 }
 
 k3d::uint_t user_interface::watch_path(const k3d::filesystem::path& Path, const sigc::slot<void>& Slot)
 {
+	assert_not_implemented();
 	return 0;
 }
 
 void user_interface::unwatch_path(const k3d::uint_t WatchID)
 {
-}
-
-k3d::iplugin_factory& user_interface::factory()
-{
-	return get_factory();
+	assert_not_implemented();
 }
 
 k3d::iplugin_factory& user_interface::get_factory()
