@@ -32,7 +32,7 @@
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/xml.h>
 

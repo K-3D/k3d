@@ -26,16 +26,16 @@
 namespace module
 {
 
-namespace mesh
+namespace subdivision_surface
 {
 
 extern k3d::iplugin_factory& catmull_clark_subdivision_factory();
 
-} // namespace mesh
+} // namespace subdivision_surface
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::mesh::catmull_clark_subdivision_factory());
+	Registry.register_factory(module::subdivision_surface::catmull_clark_subdivision_factory());
 K3D_MODULE_END
 

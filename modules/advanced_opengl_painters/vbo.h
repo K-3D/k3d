@@ -24,23 +24,13 @@
  * 	\author Bart Janssens (bart.janssens@lid.kviv.be)
  */
 
-#include <list>
-#include <map>
-#include <set>
-
 #include <k3dsdk/gl.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/properties.h>
-#include <k3dsdk/subdivision_surface/catmull_clark.h>
+#include <k3dsdk/property.h>
 
-#include "cached_triangulation.h"
 #include "painter_cache.h"
-#include "sds_cache.h"
-#include "selection_cache.h"
-
-#include <boost/ptr_container/ptr_map.hpp>
 
 #include <stdexcept>
 
@@ -53,16 +43,12 @@ namespace opengl
 namespace painters
 {
 
-typedef std::map<size_t, size_t> indexmap_t;
-typedef std::multimap<size_t, size_t> indexmultimap_t;
-typedef std::list<size_t> indexlist_t;
-
 /// Exception for VBO-related errors
 class vbo_exception : public std::runtime_error
 {
 	typedef std::runtime_error base;
 public:
-	vbo_exception(const std::string& Message) : base("VBO error: " + Message) {} 
+	vbo_exception(const std::string& Message) : base("VBO error: " + Message) {}
 };
 
 /// Convenience wrapper for OpenGL vertex buffer objects
@@ -80,274 +66,37 @@ private:
 	GLuint m_name;
 };
 
-typedef boost::ptr_map<const k3d::mesh::primitive*, vbo> vbos_t;
+/// Bind a vertex buffer VBO, and enable the required OpenGL state
+void bind_vertex_buffer(const vbo& VBO);
 
-/// Keep track of point position data in a VBO
-class point_vbo : public scheduler
-{
-public:
-	point_vbo(const k3d::mesh* const Mesh) : m_vbo(0) {}
-	/// Bind the internal VBO for usage by the array drawing commands
-	void bind();
-protected:
-	/// Implements the scheduling phase of a point position update
-	void on_schedule(k3d::inode* Painter);
-	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter);
-	
-	/// Executes the point position update
-	virtual void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
-private:
-	/// Stores the data itself
-	vbo* m_vbo;
-	
-	/// Stores the modified point indices provided by the hint
-	k3d::mesh::indices_t m_indices;
-};
+/// Bind a texture coordinate VBO, and enable the required OpenGL state
+void bind_texture_buffer(const vbo& VBO);
 
-/// Keep track of edge indices in a VBO
-class edge_vbo : public scheduler
-{
-public:
-	edge_vbo(const k3d::mesh* const Mesh) {}
-	/// Bind the internal VBO for usage by the array drawing commands
-	void bind(const k3d::mesh::primitive* Primitive);
-protected:
-	void on_schedule(k3d::inode* Painter);
-	/// Creates the edge vbo
-	virtual void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
-private:
-	/// Stores the data itself
-	vbos_t m_vbos;
-};
-
-/// VBOs used to paint a triangulated mesh
-class triangle_vbo : public scheduler
-{
-public:
-	triangle_vbo(const k3d::mesh* const Mesh) : m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0), m_mesh(Mesh) {}
-	~triangle_vbo()
-	{
-		delete m_point_vbo;
-		delete m_normal_vbo;
-		delete m_index_vbo;
-	}
-	
-	/// Bind the buffers for drawing
-	void bind();
-	
-	/// Draw faces with original mesh indices Start to End
-	void draw_range(k3d::uint_t Start, k3d::uint_t End, k3d::inode* Painter);
-protected:
-	void on_schedule(k3d::inode* Painter);
-	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter);
-	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter);
-private:
-	vbo* m_point_vbo;
-	vbo* m_index_vbo;
-	vbo* m_normal_vbo;
-	k3d::mesh::indices_t m_indices;
-	// For each triangle corner, store the face it belongs to (used for flat normal calculation)
-	k3d::mesh::indices_t m_corner_to_face;
-	const k3d::mesh* const m_mesh;
-};
-
-/// Keep track of the SDS VBOs per level
-template<class component_t> class sds_vbo : public scheduler
-{
-public:
-	sds_vbo(const k3d::mesh* const Mesh) : m_mesh(Mesh) {}
-	
-	~sds_vbo()
-	{
-		for (typename connections_t::iterator connection = m_changed_connections.begin(); connection != m_changed_connections.end(); ++connection)
-		{
-			connection->second.disconnect();
-			m_deleted_connections[connection->first].disconnect();
-		}
-		m_changed_connections.clear();
-		m_deleted_connections.clear();
-	}
-	
-	/// Binds the vbo's at the given level
-	void bind(k3d::uint_t Level, k3d::inode* Painter, const k3d::mesh::primitive* Primitive)
-	{
-		cache(Level, Painter, Primitive).bind();
-	}
-	
-	/// Get the cache at the requested level
-	component_t& cache(k3d::uint_t Level, k3d::inode* Painter, const k3d::mesh::primitive* Primitive)
-	{
-		caches_per_level_t& caches = m_caches[Primitive];
-		std::pair<typename caches_per_level_t::iterator, bool> result = caches.insert(std::make_pair(Level, component_t()));
-		if (result.second)
-			result.first->second.update(Primitive, Level, get_data<sds_cache>(m_mesh, Painter));
-		return caches[Level];
-	}
-	
-protected:
-	
-	void on_execute(const k3d::mesh& Mesh, k3d::inode* Painter)
-	{
-		return_if_fail(Painter);
-		k3d::int32_t level = k3d::property::pipeline_value<k3d::int32_t>(*Painter, "levels");
-		sds_cache& cache = get_data<sds_cache>(&Mesh, Painter);
-		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
-		{
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **primitive));
-			if(!polyhedron.get() || !k3d::polyhedron::is_sds(*polyhedron))
-				continue;
-			caches_per_level_t& caches = m_caches[primitive->get()];
-			caches.insert(std::make_pair(level, component_t())).first->second.update(primitive->get(), level, cache);
-		}
-	}
-	
-	void on_schedule(k3d::inode* Painter) 
-	{
-		clear();
-		register_painter(Painter);
-		schedule_data<sds_cache>(m_mesh, 0, Painter);
-	}
-	void on_schedule(k3d::hint::mesh_geometry_changed* Hint, k3d::inode* Painter)
-	{
-		register_painter(Painter);
-		schedule_data<sds_cache>(m_mesh, Hint, Painter);
-	}
-	void on_schedule(k3d::hint::selection_changed* Hint, k3d::inode* Painter)
-	{
-		register_painter(Painter);
-		schedule_data<sds_cache>(m_mesh, Hint, Painter);
-	}
-private:
-	void clear(k3d::ihint* Hint = 0)
-	{
-		m_caches.clear();
-	}
-	
-	void register_painter(k3d::inode* Painter)
-	{
-		k3d::iproperty* property = k3d::property::get(*Painter, "levels");
-		if (property)
-		{
-			if (m_changed_connections.find(Painter) == m_changed_connections.end())
-				m_changed_connections[Painter] = property->property_changed_signal().connect(sigc::mem_fun(*this, &sds_vbo::clear));
-			if (m_deleted_connections.find(Painter) == m_deleted_connections.end())
-				m_deleted_connections[Painter] = Painter->deleted_signal().connect(sigc::bind(sigc::mem_fun(*this, &sds_vbo::remove_painter), Painter));
-		}
-		else
-		{
-			k3d::log() << error << "sds_cache: failed to register property \"levels\"" << std::endl;
-		}
-	}
-	
-	void remove_painter(k3d::inode* Painter)
-	{
-		m_changed_connections[Painter].disconnect();
-		m_deleted_connections[Painter].disconnect();
-		m_changed_connections.erase(Painter);
-		m_deleted_connections.erase(Painter);
-		clear();
-	}
-	
-	// store connections for safe deletion of cache
-	typedef std::map<k3d::inode*, sigc::connection> connections_t;
-	connections_t m_changed_connections; // connections to changed_signals
-	connections_t m_deleted_connections; // connections to deleted_signals
-	typedef std::map<k3d::uint_t, component_t> caches_per_level_t;
-	typedef std::map<const k3d::mesh::primitive*, caches_per_level_t> caches_t;
-	caches_t m_caches; // stores an sds_vbo cache per level
-	const k3d::mesh* const m_mesh;
-};
-
-/// Cache SDS face VBOs
-class sds_face_vbo
-{
-public:
-	sds_face_vbo() : m_point_vbo(0), m_index_vbo(0), m_normal_vbo(0) {}
-	~sds_face_vbo()
-	{
-		delete m_point_vbo;
-		delete m_normal_vbo;
-		delete m_index_vbo;
-	}
-	
-	/// Update the cache using the supplied sds cache
-	void update(const k3d::mesh::primitive* Primitive, const k3d::uint_t Level, sds_cache& Cache);
-	
-	/// Bind the VBOs
-	void bind();
-	
-	/// Start indices for the faces
-	k3d::mesh::indices_t face_starts;
-	
-	/// Length of the index buffer
-	k3d::uint_t index_size;
-	
-	/// Indicates if a face is on the boundary
-	k3d::mesh::bools_t boundary_faces;
-	
-private:
-	vbo* m_point_vbo;
-	vbo* m_index_vbo;
-	vbo* m_normal_vbo;
-	k3d::mesh::indices_t m_companions;
-	k3d::mesh::bools_t m_boundary_edges;
-};
-
-/// Cache SDS edge VBOs
-class sds_edge_vbo
-{
-public:
-	sds_edge_vbo() : m_point_vbo(0) {}
-	~sds_edge_vbo()
-	{
-		delete m_point_vbo;
-	}
-	
-	/// Update the cache using the supplied sds cache
-	void update(const k3d::mesh::primitive* Primitive, const k3d::uint_t Level, sds_cache& Cache);
-	
-	/// Bind the VBOs
-	void bind();
-	
-	/// Start indices for the edges
-	k3d::mesh::indices_t edge_starts;
-	
-	/// Length of the index buffer
-	k3d::uint_t index_size;
-	
-private:
-	vbo* m_point_vbo;
-};
-
-/// Cache SDS point VBOs
-class sds_point_vbo
-{
-public:
-	sds_point_vbo() : m_point_vbo(0) {}
-	~sds_point_vbo()
-	{
-		delete m_point_vbo;
-	}
-	
-	/// Update the cache using the supplied sds cache
-	void update(const k3d::mesh::primitive* Primitive, const k3d::uint_t Level, sds_cache& Cache);
-	
-	/// Bind the VBOs
-	void bind();
-	
-	/// Length of the index buffer
-	k3d::uint_t index_size;
-	
-private:
-	vbo* m_point_vbo;
-};
-
-//////////////
-// Convenience functions  and types for functionality used by several mesh painters
-/////////////
-
-/// Clean VBO state. Call before and after VBO command sequence to ensure OpenGL state consistancy across painters
+/// Disable all VBOs
 void clean_vbo_state();
+
+//////////////////////////////////////////
+// point_vbo
+//////////////////////////////////////////
+
+struct point_data
+{
+	vbo points;
+	vbo selection;
+};
+
+/// Cached object for point data stored in VBOs
+class point_vbo : public cached_polyhedron_data<const k3d::mesh::points_t* const, point_data>
+{
+	typedef const k3d::mesh::points_t* const key_t;
+	typedef cached_polyhedron_data<key_t, point_data> base;
+public:
+	point_vbo(const key_t Key, k3d::iproperty::changed_signal_t& ChangedSignal) : base(Key, ChangedSignal) {}
+private:
+	void on_topology_changed(point_data& Output, const k3d::mesh& InputMesh);
+	void on_selection_changed(point_data& Output, const k3d::mesh& InputMesh);
+	void on_geometry_changed(point_data& Output, const k3d::mesh& InputMesh, const k3d::mesh::indices_t& ChangedPoints);
+};
 
 } // namespace painters
 

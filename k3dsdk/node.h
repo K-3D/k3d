@@ -24,15 +24,15 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "idocument.h"
-#include "inode.h"
-#include "inode_collection.h"
-#include "ipersistent.h"
-#include "metadata.h"
-#include "persistent_property_collection.h"
-#include "property_collection.h"
-#include "result.h"
+#include <k3dsdk/data.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/ipersistent.h>
+#include <k3dsdk/metadata.h>
+#include <k3dsdk/persistent_property_collection.h>
+#include <k3dsdk/property_collection.h>
+#include <k3dsdk/result.h>
 
 namespace k3d
 {
@@ -63,20 +63,75 @@ public:
 	void save(xml::element& Element, const ipersistent::save_context& Context);
 	void load(xml::element& Element, const ipersistent::load_context& Context);
 
+	/// Returns the set of all nodes for the given document
+	static const std::vector<inode*> lookup(idocument& Document);
+
+	/// Returns the set of nodes that match a specific factory ID (could return empty set!)
+	static const std::vector<inode*> lookup(idocument& Document, const uuid FactoryID);
+
+	/// Returns the set of nodes that match the given name (be prepared to handle zero, one, or many results)
+	static const std::vector<inode*> lookup(idocument& Document, const string_t& NodeName);
+
+	/// Returns the set of nodes that match the given metadata name and value
+	static const std::vector<inode*> lookup(idocument& Document, const string_t& MetaName, const string_t& MetaValue);
+
 	/// Returns the set of nodes that implement the requested interface type (could return an empty set).
 	template<typename interface_t>
 	static const std::vector<interface_t*> lookup(idocument& Document)
 	{
 		std::vector<interface_t*> result;
-		const inode_collection::nodes_t::const_iterator end(Document.nodes().collection().end());
-		for(inode_collection::nodes_t::const_iterator node = Document.nodes().collection().begin(); node != end; ++node)
+		const std::vector<inode*> nodes = lookup(Document);
+		const std::vector<inode*>::const_iterator end(nodes.end());
+		for(std::vector<inode*>::const_iterator node = nodes.begin(); node != end; ++node)
 		{
 			if(interface_t* const requested = dynamic_cast<interface_t*>(*node))
 				result.push_back(requested);
 		}
 		return result;
 	}
-	
+
+	/// Returns the set of nodes that implement the requested interface type and match the given factory ID.
+	template<typename interface_t>
+	static const std::vector<interface_t*> lookup(idocument& Document, const uuid FactoryID)
+	{
+		std::vector<interface_t*> result;
+		const std::vector<inode*> nodes = lookup(Document, FactoryID);
+		const std::vector<inode*>::const_iterator end(nodes.end());
+		for(std::vector<inode*>::const_iterator node = nodes.begin(); node != end; ++node)
+		{
+			if(interface_t* const requested = dynamic_cast<interface_t*>(*node))
+				result.push_back(requested);
+		}
+		return result;
+	}
+
+	/// Returns the set of nodes that implement the requested interface type and match the given metadata name and value.	
+	template<typename interface_t>
+	static const std::vector<interface_t*> lookup(idocument& Document, const string_t& MetaName, const string_t& MetaValue)
+	{
+		std::vector<interface_t*> result;
+		const std::vector<inode*> nodes = lookup(Document, MetaName, MetaValue);
+		const std::vector<inode*>::const_iterator end(nodes.end());
+		for(std::vector<inode*>::const_iterator node = nodes.begin(); node != end; ++node)
+		{
+			if(interface_t* const requested = dynamic_cast<interface_t*>(*node))
+				result.push_back(requested);
+		}
+		return result;
+	}
+
+	/// Returns the one node that matches the given name, or NULL.
+	static inode* lookup_one(idocument& Document, const string_t& NodeName);
+
+	/// Makes a node visible (adds it to visibility properties for all node collection sinks)
+	static void show(idocument& Document, inode& Node);
+	/// Makes a collection of nodes visible (adds them to visibility properties for all node collection sinks)
+	static void show(idocument& Document, const std::vector<inode*>& Node);
+	/// Makes a node invisible (removes it from visibility properties for all node collection sinks)
+	static void hide(idocument& Document, inode& Node);
+	/// Makes a collection of nodes invisible (removes them from visibility properties for all node collection sinks)
+	static void hide(idocument& Document, const std::vector<inode*>& Node);
+
 private:
 	void on_deleted();
 

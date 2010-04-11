@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Planet K-3D</title>
+		<link rel="icon" type="image/png" href="k3d.png" />
+		<link rel="stylesheet" type="text/css" href="k3d.css" />
+		<link rel="stylesheet" type="text/css" href="planet.css" />
+<!--
+<link rel="alternate" href="<TMPL_VAR feed ESCAPE="HTML">" title="<TMPL_VAR channel_title_plain ESCAPE="HTML">" type="application/<TMPL_VAR feedtype>+xml">
+-->
+	</head>
+
+<%
+import datetime
+import time
+
+def entry_date(entry):
+	return datetime.date(entry.updated_parsed.tm_year, entry.updated_parsed.tm_mon, entry.updated_parsed.tm_mday)
+%>
+
+<%def name="generate_feeds(entries)">
+	<%
+	last_date = None
+	last_source = None
+	%>
+	% for i in range(len(entries)):
+	<%
+	entry = entries[i]
+	date = entry_date(entry)
+	source = entry.source
+	%>
+
+	% if date != last_date:
+	<div class="date">
+		<h2>${date.strftime("%B %d, %Y") | h}</h2>
+	% endif
+
+	% if source != last_source or date != last_date:
+		<div class="channel ${source["feed_type"]}_channel">
+			<h3>
+				<a class="feed_link" href="${source.href | h}"><span>Feed:</span></a>
+				<a class="feed_title" href="${source.feed.link | h}"><span>${source["custom_title"]}</span></a>
+			</h3>
+	% endif
+
+			<div class="entry">
+				<h4><a href="${entry.link | h}">${entry.title | h}</a></h4>
+				% if source["feed_type"] not in ["wiki", "commit"]:
+				<div class="content">
+					<p>${entry.content[0].value if entry.has_key("content") else entry.summary}</p>
+				</div>
+				% endif
+			</div> <!-- entry -->
+
+	<%
+	last_source = source
+	last_date = date
+
+	next_entry = entries[i+1] if i+1 < len(entries) else None
+	next_date = entry_date(next_entry) if next_entry else None
+	next_source = next_entry.source if next_entry else None
+	%>
+
+	% if source != next_source or date != next_date:
+		</div> <!-- channel -->
+	% endif
+
+	% if date != next_date:
+	</div> <!-- date -->
+	% endif
+
+	% endfor
+</%def>
+
+	<body>
+		<div id="nav">
+			<a id="logo" href="."><h1>Planet K-3D</h1></a>
+
+			<ul>
+				<li><a href="http://www.k-3d.org/downloads">Downloads</a></li>
+				<li><a href="http://www.cafepress.com/shopk3d">Store</a></li>
+				<li><a href="http://www.k-3d.org/donations">Donations</a></li>
+				<li><a href="http://www.k-3d.org/wiki">Wiki</a></li>
+				<li><a href="http://www.k-3d.org/forums">Forums</a></li>
+				<li><a href="http://www.k-3d.org/blogs">Blogs</a></li>
+				<li><a href="http://developer.k-3d.org">Developer</a></li>
+				<li><a href="http://www.k-3d.org">User</a></li>
+			</ul>
+		</div>
+
+		<div id="main">
+			<div id="left" class="feeds">
+				${generate_feeds(filter(lambda entry: entry["source"]["feed_type"] != "commit", entries))}
+			</div>
+			<div id="right" class="feeds">
+				${generate_feeds(filter(lambda entry: entry["source"]["feed_type"] == "commit", entries))}
+			</div>
+		</div>
+		<div id="footer">
+			<p class="generated">${datetime.datetime.utcnow().strftime("Updated %B %d, %Y %H:%M UTC") | h}</p>
+		</div>
+
+		<script type="text/javascript" src="http://www.google-analytics.com/ga.js"/>
+		<script type="text/javascript">
+			try { var pageTracker = _gat._getTracker("UA-3773195-4"); pageTracker._trackPageview(); } catch(err) { }
+		</script>
+	</body>
+</html>
+

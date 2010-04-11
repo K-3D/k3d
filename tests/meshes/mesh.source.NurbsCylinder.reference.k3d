@@ -1,0 +1,74 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>5 0 -5 5 5.0000000000255174 -5 -2.5517059846396142e-11 5 -5 -5.0000000000510338 4.9999999999744817 -5 -5 -5.1034119692792285e-11 -5 -4.9999999999489662 -5.0000000000765512 -5 7.6551179539188427e-11 -5 -5 5.0000000001020686 -4.9999999999234488 -5 5 1.0206823938558457e-10 -5 5 0 0 5 5.0000000000255174 0 -2.5517059846396142e-11 5 0 -5.0000000000510338 4.9999999999744817 0 -5 -5.1034119692792285e-11 0 -4.9999999999489662 -5.0000000000765512 0 7.6551179539188427e-11 -5 0 5.0000000001020686 -4.9999999999234488 0 5 1.0206823938558457e-10 0 5 0 5 5 5.0000000000255174 5 -2.5517059846396142e-11 5 5 -5.0000000000510338 4.9999999999744817 5 -5 -5.1034119692792285e-11 5 -4.9999999999489662 -5.0000000000765512 5 7.6551179539188427e-11 -5 5 5.0000000001020686 -4.9999999999234488 5 5 1.0206823938558457e-10 5</points>
+		<point_selection>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</point_selection>
+		<point_attributes/>
+		<primitives>
+			<primitive type="nurbs_patch">
+				<structure>
+					<table type="patch">
+						<array name="patch_first_points" type="k3d::uint_t">0</array>
+						<array name="patch_first_trim_loops" type="k3d::uint_t">0</array>
+						<array name="patch_materials" type="k3d::imaterial*">0</array>
+						<array name="patch_selections" type="k3d::double_t">0
+							<metadata>
+								<pair name="k3d:role">k3d:selection</pair>
+							</metadata>
+						</array>
+						<array name="patch_trim_loop_counts" type="k3d::uint_t">0</array>
+						<array name="patch_u_first_knots" type="k3d::uint_t">0</array>
+						<array name="patch_u_orders" type="k3d::uint_t">3</array>
+						<array name="patch_u_point_counts" type="k3d::uint_t">9</array>
+						<array name="patch_v_first_knots" type="k3d::uint_t">0</array>
+						<array name="patch_v_orders" type="k3d::uint_t">2</array>
+						<array name="patch_v_point_counts" type="k3d::uint_t">3</array>
+					</table>
+					<table type="trim_knot">
+						<array name="curve_knots" type="k3d::double_t"/>
+					</table>
+					<table type="trim_loop">
+						<array name="trim_loop_curve_counts" type="k3d::uint_t"/>
+						<array name="trim_loop_first_curves" type="k3d::uint_t"/>
+						<array name="trim_loop_selections" type="k3d::double_t"/>
+					</table>
+					<table type="trim_point">
+						<array name="point_selections" type="k3d::double_t"/>
+						<array name="points" type="k3d::point2"/>
+					</table>
+					<table type="trim_uniform">
+						<array name="curve_first_knots" type="k3d::uint_t"/>
+						<array name="curve_first_points" type="k3d::uint_t"/>
+						<array name="curve_orders" type="k3d::uint_t"/>
+						<array name="curve_point_counts" type="k3d::uint_t"/>
+						<array name="curve_selections" type="k3d::double_t"/>
+					</table>
+					<table type="trim_vertex">
+						<array name="curve_point_weights" type="k3d::double_t"/>
+						<array name="curve_points" type="k3d::uint_t"/>
+					</table>
+					<table type="u_knot">
+						<array name="patch_u_knots" type="k3d::double_t">0 0 0 1 1 2 2 3 3 4 4 4</array>
+					</table>
+					<table type="v_knot">
+						<array name="patch_v_knots" type="k3d::double_t">0 0 1 2 2</array>
+					</table>
+					<table type="vertex">
+						<array name="patch_point_weights" type="k3d::double_t">1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1 0.70710678118474324 1</array>
+						<array name="patch_points" type="k3d::uint_t">0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+							<metadata>
+								<pair name="k3d:domain">k3d:point-indices</pair>
+							</metadata>
+						</array>
+					</table>
+				</structure>
+				<attributes>
+					<table type="constant"/>
+					<table type="parameter"/>
+					<table type="patch"/>
+					<table type="vertex"/>
+				</attributes>
+			</primitive>
+		</primitives>
+	</mesh_arrays>
+</k3dml>

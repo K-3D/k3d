@@ -29,13 +29,13 @@ namespace module
 namespace bilinear_patch
 {
 
-extern k3d::iplugin_factory& make_bilinear_patches_factory();
+extern k3d::iplugin_factory& poly_to_bilinear_factory();
 
 } // namespace bilinear_patch
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::bilinear_patch::make_bilinear_patches_factory());
+	Registry.register_factory(module::bilinear_patch::poly_to_bilinear_factory());
 K3D_MODULE_END
 

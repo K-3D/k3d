@@ -127,8 +127,8 @@ public:
 		static k3d::document_plugin_factory<cuda_deformation_transform_points,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > > > factory(
 				k3d::uuid(0x3bb9fc2b, 0x65483516, 0xd7c69198, 0x30375235),
 				"CUDATransformPoints",
 				_("Transform mesh points using input matrix"),
@@ -234,8 +234,8 @@ public:
 		static k3d::document_plugin_factory<cuda_deformation_transform_points_asynchronous,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > > > factory(
 				k3d::uuid(0x1cf04dc1, 0x7b443a52, 0x384baca7, 0xc84071a3),
 				"CUDATransformPointsAsynchronous",
 				_("Transform mesh points using input matrix"),
@@ -332,8 +332,8 @@ public:
 		static k3d::document_plugin_factory<cuda_deformation_transform_points_device_mesh,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > > > factory(
 				k3d::uuid(0x2ef86b2e, 0x2449d8a8, 0xbac438a5, 0xffeb92c8),
 				"CUDATransformPointsDeviceMesh",
 				_("Transform mesh points using input matrix using a device mesh"),

@@ -21,10 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "file_chooser_dialog.h"
-#include "script_button.h"
-#include "utility.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/script_button.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/classes.h>
@@ -34,7 +34,7 @@
 #include <k3dsdk/istate_recorder_sink.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/scripting.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/system.h>

@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "signal_system.h"
+#include <k3dsdk/signal_system.h>
 #include <vector>
 
 namespace k3d

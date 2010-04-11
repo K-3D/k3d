@@ -21,11 +21,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "fstream.h"
-#include "log.h"
-#include "resolutions.h"
-#include "share.h"
-#include "xml.h"
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/resolutions.h>
+#include <k3dsdk/share.h>
+#include <k3dsdk/xml.h>
 
 namespace k3d
 {

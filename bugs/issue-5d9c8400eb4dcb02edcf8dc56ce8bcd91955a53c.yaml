@@ -1,0 +1,26 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: MakeCreases has no implementation.
+desc: Like it says ... we either need to provide an implementation or remove it.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :wontfix
+creation_time: 2009-12-01 06:34:31.520276 Z
+references: []
+
+id: 5d9c8400eb4dcb02edcf8dc56ce8bcd91955a53c
+log_events: 
+- - 2009-12-01 06:34:32.432220 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-01-11 16:42:28.958175 Z
+  - Bart Janssens <bart.janssens@lid.kviv.be>
+  - commented
+  - Implementation should be postponed until we have a complete set of EUler operations. The last implementation dates back to the legacy mesh structure and was quite complex, but Euler operations would greatly simplify things.
+- - 2010-01-12 06:16:55.565269 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition wontfix
+  - We are going to postpone work on this.

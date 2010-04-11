@@ -25,9 +25,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "almost_equal.h"
-#include "iunknown.h"
-#include "signal_system.h"
+#include <k3dsdk/difference.h>
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/signal_system.h>
 
 #include <string>
 
@@ -71,14 +71,16 @@ protected:
 	inode& operator=(const inode&) { return *this; }
 };
 
-/// Specialization of almost_equal that tests inode pointers for equality
-template<>
-class almost_equal<inode*>
+namespace difference
 {
-public:
-	almost_equal(const boost::uint64_t) { } 
-	inline bool_t operator()(inode* const A, inode* const B) const { return A == B; }
-};
+
+/// Specialization of difference::test that tests inode pointers for equality
+inline void test(inode* const A, inode* const B, accumulator& Result)
+{
+	Result.exact(A == B);
+}
+
+} // namespace difference
 
 } // namespace k3d
 

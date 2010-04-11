@@ -21,9 +21,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "angle_axis.h"
-#include "spin_button.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/angle_axis.h>
+#include <k3dsdk/ngui/spin_button.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/iproperty.h>

@@ -24,8 +24,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "bounding_box3.h"
-#include "iunknown.h"
+#include <k3dsdk/bounding_box3.h>
+#include <k3dsdk/iunknown.h>
 
 namespace k3d
 {

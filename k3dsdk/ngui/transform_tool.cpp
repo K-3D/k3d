@@ -27,18 +27,18 @@
 
 #include <k3d-i18n-config.h>
 
-#include "document_state.h"
-#include "modifiers.h"
-#include "icons.h"
-#include "interactive.h"
-#include "keyboard.h"
-#include "transform_tool.h"
-#include "utility.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/interactive.h>
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/transform_tool.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3dsdk/classes.h>
 #include <k3dsdk/color.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/irenderable_gl.h>
@@ -46,17 +46,19 @@
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iprojection.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/ngui/selection.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/xml.h>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/scoped_ptr.hpp>
 
-#include <set>
+//#include <set>
 
 namespace k3d
 {
@@ -105,21 +107,51 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 	
 	const k3d::mesh::points_t& points = *Mesh.points;
 	const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
-	const size_t point_count = points.size();
 
-	// Get selected points
-	for (size_t point = 0; point != point_count; ++point)
+	// Flag points that are explicitly selected by the user ...
+	k3d::mesh::bools_t selected_point(point_selection.begin(), point_selection.end());
+
+	// Flag points that are implicitly selected by edges or faces ...
+	for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 	{
-		if (point_selection[point])
-		{
-			PointList.push_back(point);
+		boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **primitive));
+		if(!polyhedron)
+			continue;
 
-			component_center += to_vector(points[point]);
+		const k3d::uint_t face_begin = 0;
+		const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
+		for(k3d::uint_t face = face_begin; face != face_end; ++face)
+		{
+			const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+			const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+			for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+			{
+				const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+				for(k3d::uint_t edge = first_edge; ;)
+				{
+					if(polyhedron->face_selections[face])
+					{
+						selected_point[polyhedron->vertex_points[edge]] = true;
+					}
+					else if(polyhedron->edge_selections[edge])
+					{
+						selected_point[polyhedron->vertex_points[edge]] = true;
+						selected_point[polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]] = true;
+					}
+					else if(polyhedron->vertex_selections[edge])
+					{
+						selected_point[polyhedron->vertex_points[edge]] = true;
+					}
+
+					edge = polyhedron->clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
+				}
+			}
 		}
 	}
 
-  assert_not_implemented();
-  /*	
+/*
 	if(Mesh.polyhedra)
 	{
 		// Get selected lines
@@ -131,9 +163,9 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 		const k3d::mesh::indices_t& edge_points = *polyhedra.edge_points;
 		const k3d::mesh::selection_t& edge_selection = *polyhedra.edge_selection;
 		
-		const size_t edge_count = edge_points.size();
-		std::set<size_t> pointset; //ensure each point gets added only once
-		for (size_t edge = 0; edge < edge_count; ++edge)
+		const k3d::uint_t edge_count = edge_points.size();
+		std::set<k3d::uint_t> pointset; //ensure each point gets added only once
+		for (k3d::uint_t edge = 0; edge < edge_count; ++edge)
 		{
 			if (edge_selection[edge])
 			{
@@ -151,13 +183,13 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 		const k3d::mesh::indices_t& loop_first_edges = *polyhedra.loop_first_edges;
 		const k3d::mesh::selection_t& face_selection = *polyhedra.face_selection;
 	
-		const size_t face_count = face_first_loops.size();
-		for(size_t face = 0; face != face_count; ++face)
+		const k3d::uint_t face_count = face_first_loops.size();
+		for(k3d::uint_t face = 0; face != face_count; ++face)
 		{
 			if (face_selection[face])
 			{
-				const size_t first_edge = loop_first_edges[face_first_loops[face]];
-				for(size_t edge = first_edge; ; )
+				const k3d::uint_t first_edge = loop_first_edges[face_first_loops[face]];
+				for(k3d::uint_t edge = first_edge; ; )
 				{
 					pointset.insert(edge_points[edge]);
 					edge = clockwise_edges[edge];
@@ -167,18 +199,33 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 			}
 		}
 		
-		for (std::set<size_t>::const_iterator point = pointset.begin(); point != pointset.end(); ++ point)
+		for (std::set<k3d::uint_t>::const_iterator point = pointset.begin(); point != pointset.end(); ++ point)
 		{
 			PointList.push_back(*point);
 			component_center += to_vector(points[*point]);
 		}
 	}
 */
-	
-	// Compute average position
-	const double point_number = static_cast<double>(PointList.size());
-	if(point_number)
-		component_center /= point_number;
+
+	// Create the list of selected point indices ...
+	const k3d::uint_t point_begin = 0;
+	const k3d::uint_t point_end = point_begin + points.size();
+	for(k3d::uint_t point = point_begin; point != point_end; ++point)
+	{
+		if(selected_point[point])
+			PointList.push_back(point);
+	}
+
+	// Return the average position of the selected points ...
+	for(k3d::uint_t point = point_begin; point != point_end; ++point)
+	{
+		if(selected_point[point])
+			component_center += k3d::to_vector(points[point]);
+	}
+
+	const k3d::double_t point_count = static_cast<double>(PointList.size());
+	if(point_count)
+		component_center /= point_count;
 
 	return component_center;
 }
@@ -268,7 +315,7 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 
 	void transform_tool::transform_target::start_move()
 	{
-		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Move "))
+		if(create_transform_modifier(k3d::classes::FrozenMatrix(), "Move "))
 			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3()));
 
 		// Setup matrices
@@ -288,7 +335,7 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 
 	void transform_tool::transform_target::start_rotation()
 	{
-		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Rotate "))
+		if(create_transform_modifier(k3d::classes::FrozenMatrix(), "Rotate "))
 			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3()));
 
 		// Setup matrices
@@ -310,7 +357,7 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 
 	void transform_tool::transform_target::start_scaling()
 	{
-		if(create_transform_modifier(k3d::classes::FrozenTransformation(), "Scale "))
+		if(create_transform_modifier(k3d::classes::FrozenMatrix(), "Scale "))
 			assert_warning(k3d::property::set_internal_value(*modifier, "matrix", k3d::identity3()));
 
 		// Setup matrices
@@ -344,9 +391,9 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 		// Check for an existing transform modifier
 		k3d::inode* upstream_node = 0;
 		
-		k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(node);
+		k3d::imatrix_sink* const downstream_sink = dynamic_cast<k3d::imatrix_sink*>(node);
 		return_val_if_fail(downstream_sink, false);
-		k3d::iproperty& downstream_input = downstream_sink->transform_sink_input();
+		k3d::iproperty& downstream_input = downstream_sink->matrix_sink_input();
 		k3d::iproperty* upstream_output = node->document().pipeline().dependency(downstream_input);
 
 		// Check upstream object
@@ -378,8 +425,8 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 				return_val_if_fail(modifier, false);
 			
 				k3d::ipipeline::dependencies_t dependencies;
-				dependencies.insert(std::make_pair(&dynamic_cast<k3d::itransform_sink*>(modifier)->transform_sink_input(), upstream_output));
-				dependencies.insert(std::make_pair(&downstream_input2, &dynamic_cast<k3d::itransform_source*>(modifier)->transform_source_output()));
+				dependencies.insert(std::make_pair(&dynamic_cast<k3d::imatrix_sink*>(modifier)->matrix_sink_input(), upstream_output));
+				dependencies.insert(std::make_pair(&downstream_input2, &dynamic_cast<k3d::imatrix_source*>(modifier)->matrix_source_output()));
 				node->document().pipeline().set_dependencies(dependencies);
 			
 				return true;
@@ -438,11 +485,13 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 		if(m_drag_mutex)
 			return;
 		
-		k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_internal_value());
+		const k3d::mesh* const mesh = k3d::property::pipeline_value<k3d::mesh*>(mesh_source_property);
 		return_if_fail(mesh);
 
-		// Get selection and save initial position
+		// Get selection
 		component_center = detail::get_selected_points(selection::state(m_document_state.document()).current_mode(), *mesh, selected_points);
+		// Set initial positions (needs to be a copy, since the given property is the output mesh)
+		initial_positions = *mesh->points;
 
 		m_mesh_changed = false;
 	}
@@ -458,10 +507,16 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 		modifier = 0;
 	}
 
+	void transform_tool::mesh_target::init_transformation()
+	{
+		set_coordinate_system_change_matrices();
+	}
+
 	void transform_tool::mesh_target::start_move()
 	{
 		create_mesh_modifier("Move ");
-		assert_warning(k3d::property::set_internal_value(*modifier, "center", k3d::point3(0.0,0.0,0.0))); // center not needed for translation
+		init_transformation();
+		m_origin = component_center;
 	}
 
 	void transform_tool::mesh_target::move(const k3d::vector3& Move)
@@ -471,16 +526,19 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 
 		m_drag_mutex = true;
 		
-		const k3d::matrix4 translation = k3d::translate3(m_system_matrix * Move);
-		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * translation));
+		for(k3d::uint_t i = 0; i != selected_points.size(); ++i)
+			point_positions.push_back(m_system_matrix * Move + initial_positions[selected_points[i]]);
 
 		// Update manipulators position
 		component_center = m_system_matrix * Move + m_origin;
+
+		update_mesh_modifier();
 	}
 
 	void transform_tool::mesh_target::start_rotation()
 	{
 		create_mesh_modifier("Rotate ");
+		init_transformation();
 	}
 
 	void transform_tool::mesh_target::rotate(const k3d::matrix4& RotationMatrix, const k3d::point3& WorldCenter)
@@ -491,13 +549,18 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 		m_drag_mutex = true;
 		
 		const k3d::matrix4 current_coordinate_system_rotation = m_system_matrix * RotationMatrix * m_system_matrix_inverse;
-		assert_warning(k3d::property::set_internal_value(*modifier, "center", k3d::inverse(k3d::node_to_world_matrix(*node)) * WorldCenter)); // set center first, so we can ride on the change signal of the matrix
-		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_rotation));
+		const k3d::point3 center = k3d::inverse(k3d::node_to_world_matrix(*node)) * WorldCenter;
+
+		for(k3d::uint_t i = 0; i != selected_points.size(); ++i)
+			point_positions.push_back(current_coordinate_system_rotation * (initial_positions[selected_points[i]] - center) + center);
+
+		update_mesh_modifier();
 	}
 
 	void transform_tool::mesh_target::start_scaling()
 	{
 		create_mesh_modifier("Scale ");
+		init_transformation();
 	}
 
 	void transform_tool::mesh_target::scale(const k3d::point3& Scaling, const k3d::point3& WorldCenter)
@@ -508,8 +571,12 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 		m_drag_mutex = true;
 
 		const k3d::matrix4 current_coordinate_system_scaling = m_system_matrix * k3d::scale3(Scaling[0], Scaling[1], Scaling[2]) * m_system_matrix_inverse;
-		assert_warning(k3d::property::set_internal_value(*modifier, "center", k3d::inverse(k3d::node_to_world_matrix(*node))*WorldCenter)); // set center first, so we can ride on the change signal of the matrix
-		assert_warning(k3d::property::set_internal_value(*modifier, "matrix", m_original_matrix * current_coordinate_system_scaling));
+		const k3d::point3 center = k3d::inverse(k3d::node_to_world_matrix(*node)) * WorldCenter;
+
+		for(k3d::uint_t i = 0; i != selected_points.size(); ++i)
+			point_positions.push_back(current_coordinate_system_scaling * (initial_positions[selected_points[i]] - center) + center);
+
+		update_mesh_modifier();
 	}
 
 	void transform_tool::mesh_target::end_drag_motion()
@@ -523,34 +590,27 @@ k3d::point3 get_selected_points(selection::mode SelectionMode, const k3d::mesh& 
 		{
 			return_if_fail(node);
 
-			// Get mesh to tweak
-			k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_internal_value());
-			return_if_fail(mesh);
-
-			// Modify with TransformPoints
-			const k3d::uuid transform_points(0xb9c5bae2, 0x01df44d4, 0x86c395e9, 0x34a11c31);
+			// Modify with TweakPoints
+			const k3d::uuid tweak_points(0xed302b87, 0x49bf4fe6, 0x99064963, 0x17ec12d9);
 
 			// Check for an existing mesh modifier
 			k3d::inode* upstream_node = upstream_mesh_modifier(*node);
-			if(upstream_node && (transform_points == upstream_node->factory().factory_id()))
+			if(upstream_node && (tweak_points == upstream_node->factory().factory_id()))
 			{
 				set_transform_modifier(upstream_node);
 			}
 			else
 			{
 				const std::string modifier_name = Name + node->name() + " components";
-				set_transform_modifier(insert_mesh_modifier(*node, transform_points, modifier_name));
+				set_transform_modifier(insert_mesh_modifier(*node, tweak_points, modifier_name));
 			}
 		}
+	}
 
-		// Update modifier's selected point list
-		assert_warning(k3d::property::set_internal_value(*modifier, "selected_points", selected_points));
-		
-		m_origin = component_center;
-		
-		// Setup matrices
-		m_original_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(*modifier, "matrix"));
-		set_coordinate_system_change_matrices();
+	void transform_tool::mesh_target::update_mesh_modifier()
+	{
+		assert_warning(k3d::property::set_internal_value(*modifier, "tweaks", std::make_pair(selected_points, point_positions)));
+		point_positions.clear();
 	}
 
 
@@ -615,7 +675,7 @@ void transform_tool::lbutton_down(viewport::control& Viewport, const k3d::point2
 	// If a node was hit ...
 	if(k3d::selection::get_node(m_mouse_down_selection))
 	{
-		if(m_document_state.is_selected(m_mouse_down_selection))
+		if(selection::state(m_document_state.document()).is_selected(m_mouse_down_selection))
 			lmb_down_selected();
 		else
 			lmb_down_deselected();
@@ -995,7 +1055,7 @@ k3d::point3 transform_tool::world_position()
 {
 	if(target_number())
 	{
-		if(selection::NODES == selection::state(m_document_state.document()).current_mode())
+		if(selection::NODE == selection::state(m_document_state.document()).current_mode())
 		{
 			m_current_target = m_current_target % m_targets.size();
 			itarget* t = m_targets[m_current_target];
@@ -1144,14 +1204,14 @@ void transform_tool::get_current_selection()
 
 	const k3d::nodes_t nodes = selection::state(m_document_state.document()).selected_nodes();
 
-	if(selection::NODES == selection::state(m_document_state.document()).current_mode())
+	if(selection::NODE == selection::state(m_document_state.document()).current_mode())
 	{
 		// Save transformable nodes as targets
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			if(!dynamic_cast<k3d::gl::irenderable*>(*node))
 				continue;
-			if(!dynamic_cast<k3d::itransform_sink*>(*node))
+			if(!dynamic_cast<k3d::imatrix_sink*>(*node))
 				continue;
 
 			m_targets.push_back(new transform_target(*node));

@@ -33,8 +33,8 @@
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/gprim_factory.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 
 #include <boost/assign/list_of.hpp>
 

@@ -24,8 +24,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "inode_collection.h"
-#include "inode_name_map.h"
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/inode_name_map.h>
 
 namespace k3d
 {

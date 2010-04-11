@@ -1,4 +1,4 @@
 #python
 
-Output = "K-3D"
+context.output = "K-3D"
 

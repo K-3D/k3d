@@ -51,7 +51,7 @@ public:
 	curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_order(init_owner(*this) + init_name("order") + init_label(_("Order")) + init_description(_("Order of the curve (2-linear - 4-cubic)")) + init_value(3) + init_constraint(constraint::minimum(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
-		m_point_count(init_owner(*this) + init_name("point_count") + init_label(_("Point Count")) + init_description(_("Number of control points")) + init_value(4) + init_constraint(constraint::minimum(4)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_point_count(init_owner(*this) + init_name("point_count") + init_label(_("Point Count")) + init_description(_("Number of control points")) + init_value(4) + init_constraint(constraint::minimum(2)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_point_spacing(init_owner(*this) + init_name("point_spacing") + init_label(_("Point Spacing")) + init_description(_("Space between points")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::distance)))
 	{
 		m_order.changed_signal().connect(k3d::hint::converter<

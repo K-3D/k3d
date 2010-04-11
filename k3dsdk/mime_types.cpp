@@ -21,10 +21,11 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "imime_type_handler.h"
-#include "mime_types.h"
-#include "plugins.h"
+#include <k3dsdk/imime_type_handler.h>
+#include <k3dsdk/mime_types.h>
+#include <k3dsdk/plugin.h>
 
+#include <boost/optional.hpp>
 #include <map>
 
 namespace k3d
@@ -33,69 +34,102 @@ namespace k3d
 namespace mime
 {
 
-namespace detail
-{
+//////////////////////////////////////////////////////////////////////////
+// handler_iterator
 
-/// Storage for an application plugin that gets created on-demand
-template<typename interface_t>
-class on_demand_instance
+class handler_iterator
 {
 public:
-	on_demand_instance(iplugin_factory& Factory) :
-		m_factory(&Factory),
-		m_instance(0)
+	static handler_iterator begin()
 	{
+		static bool_t initialized = false;
+		if(!initialized)
+		{
+			initialized = true;
+
+			// Get the set of MIME-type handler factories ...
+			factories = plugin::factory::lookup<imime_type_handler>();
+
+			// Remove any factories that are missing load-order information ...
+			for(plugin::factory::collection_t::iterator factory = factories.begin(); factory != factories.end(); ++factory)
+			{
+				if(!(**factory).metadata().count("k3d:load-order"))
+				{
+					k3d::log() << error << "MIME Type Handler [" << (**factory).name() << "] without k3d:load-order metadata will not be used" << std::endl;
+					*factory = 0;
+					continue;
+				}
+			}
+			factories.erase(std::remove(factories.begin(), factories.end(), static_cast<iplugin_factory*>(0)), factories.end());
+			handlers.assign(factories.size(), static_cast<imime_type_handler*>(0));
+
+			// Sort factories by load-order ...
+			std::sort(factories.begin(), factories.end(), load_order);
+		}
+
+		// Return a new iterator ...
+		handler_iterator result;
+		result.index = get_index(0);
+		return result;
 	}
 
-	interface_t* operator->() const
-//	interface_t* instance() const
+	static handler_iterator end()
 	{
-		if(!m_instance)
-			m_instance = plugin::create<interface_t>(*m_factory);
+		handler_iterator result;
+		return result;
+	}
 
-		return m_instance;
+	bool_t operator!=(const handler_iterator& other) const
+	{
+		return index != other.index;
+	}
+
+	handler_iterator& operator++()
+	{
+		if(!index)
+			return *this;
+
+		index = get_index(*index + 1);
+		return *this;
+	}
+
+	imime_type_handler* operator->() const
+	{
+		return handlers[*index];
 	}
 
 private:
-	iplugin_factory* m_factory;
-	mutable interface_t* m_instance;
-};
+	boost::optional<uint_t> index;
 
-typedef on_demand_instance<imime_type_handler> handler_t;
-/// Storage for an ordered collection of MIME-type handlers
-typedef std::multimap<k3d::uint32_t, handler_t> handlers_t;
-
-const handlers_t& get_handlers()
-{
-	// Cache a collection of MIME-type handlers ...
-	static handlers_t handlers;
-	static bool_t initialized = false;
-
-	if(!initialized)
+	static bool_t load_order(iplugin_factory* a, iplugin_factory* b)
 	{
-		initialized = true;
-
-		const plugin::factory::collection_t factories = plugin::factory::lookup<imime_type_handler>();
-		for(plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
-		{
-			iplugin_factory::metadata_t metadata = (**factory).metadata();
-			
-			if(!metadata.count("k3d:load-order"))
-			{
-				k3d::log() << error << "MIME Type Handler [" << (**factory).name() << "] without k3d:load-order metadata will not be used" << std::endl;
-				continue;
-			}
-
-			const k3d::uint32_t load_order = k3d::from_string<k3d::uint32_t>(metadata["k3d:load-order"], 255);
-
-			handlers.insert(std::make_pair(load_order, handler_t(**factory)));
-		}
+		return from_string<uint32_t>(a->metadata()["k3d:load-order"], 255)
+			< from_string<uint32_t>(b->metadata()["k3d:load-order"], 255);
 	}
 
-	return handlers;
-}
+	static boost::optional<uint_t> get_index(const uint_t Index)
+	{
+		while(factories.size() > Index)
+		{
+			if(!handlers[Index])
+				handlers[Index] = plugin::create<imime_type_handler>(*factories[Index]);
 
-} // namespace detail
+			if(handlers[Index])
+				return boost::optional<uint_t>(Index);
+
+			factories.erase(factories.begin() + Index);
+			handlers.erase(handlers.begin() + Index);
+		}
+
+		return boost::optional<uint_t>();
+	}
+
+	static std::vector<iplugin_factory*> factories;
+	static std::vector<imime_type_handler*> handlers;
+};
+
+std::vector<iplugin_factory*> handler_iterator::factories;
+std::vector<imime_type_handler*> handler_iterator::handlers;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // type
@@ -106,28 +140,28 @@ type::type()
 
 const type type::lookup(const filesystem::path& File)
 {
-	static const detail::handlers_t& handlers = detail::get_handlers();
+	type return_type;
 
-	type file_type;
-	for(detail::handlers_t::const_iterator handler = handlers.begin(); handler != handlers.end(); ++handler)
+	handler_iterator end = handler_iterator::end();
+	for(handler_iterator handler = handler_iterator::begin(); handler != end; ++handler)
 	{
-		if(handler->second->identify_mime_type(File, file_type.value))
+		if(handler->identify_mime_type(File, return_type.value))
 			break;
 	}
-	return file_type;
+	return return_type;
 }
 
 const type type::lookup(const string_t& Data)
 {
-	static const detail::handlers_t& handlers = detail::get_handlers();
+	type return_type;
 
-	type data_type;
-	for(detail::handlers_t::const_iterator handler = handlers.begin(); handler != handlers.end(); ++handler)
+	handler_iterator end = handler_iterator::end();
+	for(handler_iterator handler = handler_iterator::begin(); handler != end; ++handler)
 	{
-		if(handler->second->identify_mime_type(Data, data_type.value))
+		if(handler->identify_mime_type(Data, return_type.value))
 			break;
 	}
-	return data_type;
+	return return_type;
 }
 
 bool_t type::operator==(const string_t& RHS) const

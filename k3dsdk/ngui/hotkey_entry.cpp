@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "hotkey_entry.h"
+#include <k3dsdk/ngui/hotkey_entry.h>
 #include <gtkmm/window.h>
 
 namespace k3d

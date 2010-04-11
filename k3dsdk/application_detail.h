@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "signal_accumulators.h"
-#include "signal_system.h"
+#include <k3dsdk/signal_accumulators.h>
+#include <k3dsdk/signal_system.h>
 
 namespace k3d
 {

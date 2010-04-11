@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ipersistent_lookup.h"
+#include <k3dsdk/ipersistent_lookup.h>
 #include <map>
 
 namespace k3d

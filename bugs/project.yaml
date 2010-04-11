@@ -23,3 +23,16 @@ releases:
     - Timothy M. Shead <tshead@k-3d.com>
     - created
     - ""
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: 0.7.11.0
+  status: :released
+  release_time: 2009-03-19 04:17:40.762513 Z
+  log_events: 
+  - - 2009-03-19 04:17:30.288207 Z
+    - Timothy M. Shead <tshead@k-3d.com>
+    - created
+    - ""
+  - - 2009-03-19 04:17:40.762532 Z
+    - Timothy M. Shead <tshead@k-3d.com>
+    - released
+    - ""

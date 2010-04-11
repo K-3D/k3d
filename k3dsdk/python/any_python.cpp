@@ -21,13 +21,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "any_python.h"
-#include "bitmap_python.h"
-#include "const_bitmap_python.h"
-#include "idocument_python.h"
-#include "iunknown_python.h"
-#include "mesh_python.h"
-#include "ri_python.h"
+#include <k3dsdk/python/any_python.h>
+#include <k3dsdk/python/bitmap_python.h>
+#include <k3dsdk/python/const_bitmap_python.h>
+#include <k3dsdk/python/idocument_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/ri_python.h>
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/bitmap.h>
@@ -143,10 +143,7 @@ const object any_to_python(const boost::any& Value)
 		return wrap(boost::any_cast<const k3d::bitmap*>(Value));
 
 	if(type == typeid(k3d::inode*))
-	{
-		k3d::inode* const value = boost::any_cast<k3d::inode*>(Value);
-		return wrap_unknown(value);
-	}
+		return wrap_unknown(boost::any_cast<k3d::inode*>(Value));
 
 	if(type == typeid(k3d::idocument*))
 	{
@@ -165,7 +162,7 @@ const object any_to_python(const boost::any& Value)
 
 		boost::python::list results;
 		for(k3d::uint_t i = 0; i != nodes.size(); ++i)
-			results.append(wrap(nodes[i]));
+			results.append(wrap_unknown(nodes[i]));
 
 		return results;
 	}
@@ -206,26 +203,64 @@ const object any_to_python(const boost::any& Value)
 	throw std::invalid_argument("can't convert unrecognized type [" + demangle(type) + "] to boost::python::object");
 }
 
+#define safe_extract(type, value) { extract<type> extractor(value); if(extractor.check()) return extractor(); }
+
 const boost::any python_to_any(const object& Value)
 {
 	PyObject* const value = Value.ptr();
+
+	if(PyBool_Check(value))
+		return extract<bool_t>(Value)();
+
+	if(PyInt_Check(value))
+		return extract<int32_t>(Value)();
+
+	if(PyFloat_Check(value))
+		return extract<double_t>(Value)();
+
+	if(PyString_Check(value))
+		return extract<string_t>(Value)();
+
+	safe_extract(k3d::filesystem::path, Value);
+	safe_extract(k3d::angle_axis, Value);
+	safe_extract(k3d::color, Value);
+	safe_extract(k3d::point2, Value);
+	safe_extract(k3d::point3, Value);
+	safe_extract(k3d::normal3, Value);
+	safe_extract(k3d::texture3, Value);
+	safe_extract(k3d::vector3, Value);
+	safe_extract(k3d::point4, Value);
+	safe_extract(k3d::matrix4, Value);
+	safe_extract(k3d::euler_angles, Value);
+	safe_extract(k3d::selection::set, Value);
+	safe_extract(k3d::bounding_box3, Value);
+
 	{
 		extract<idocument_wrapper> value(Value);
 		if(value.check())
-		{
 			return boost::any(value().wrapped_ptr());
-		}
 	}
 
 	{
 		extract<iunknown_wrapper> value(Value);
 		if(value.check())
-		{
 			return boost::any(value().wrapped_ptr());
-		}
 	}
 
 	throw std::invalid_argument("can't convert unrecognized python value");
+}
+
+template<typename DestinationT, typename ValueT, int Size>
+static DestinationT from_sequence(const object& Value)
+{
+	const k3d::uint_t size = boost::python::len(Value);
+	if(size != Size)
+		throw std::invalid_argument("Sequence must be of length " + k3d::string_cast(Size));
+
+	DestinationT destination;
+	for(k3d::uint_t i = 0; i != size; ++i)
+		destination[i] = boost::python::extract<ValueT>(Value[i]);
+	return destination;
 }
 
 const boost::any python_to_any(const object& Value, const std::type_info& TargetType)
@@ -285,19 +320,19 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		return boost::any(extract<k3d::color>(Value)());
 
 	if(TargetType == typeid(k3d::point3))
-		return boost::any(extract<k3d::point3>(Value)());
+		return boost::any(from_sequence<k3d::point3, k3d::double_t, 3>(Value));
 
 	if(TargetType == typeid(k3d::point4))
-		return boost::any(extract<k3d::point4>(Value)());
+		return boost::any(from_sequence<k3d::point4, k3d::double_t, 4>(Value));
 
 	if(TargetType == typeid(k3d::normal3))
-		return boost::any(extract<k3d::normal3>(Value)());
+		return boost::any(from_sequence<k3d::normal3, k3d::double_t, 3>(Value));
 
 	if(TargetType == typeid(k3d::vector3))
-		return boost::any(extract<k3d::vector3>(Value)());
-
+		return boost::any(from_sequence<k3d::vector3, k3d::double_t, 3>(Value));
+	
 	if(TargetType == typeid(k3d::texture3))
-		return boost::any(extract<k3d::texture3>(Value)());
+		return boost::any(from_sequence<k3d::texture3, k3d::double_t, 3>(Value));
 
 	if(TargetType == typeid(k3d::matrix4))
 		return boost::any(extract<k3d::matrix4>(Value)());
@@ -354,7 +389,21 @@ const boost::any python_to_any(const object& Value, const std::type_info& Target
 		return boost::any(results);
 	}
 
-	throw std::invalid_argument("can't convert python value to unrecognized type [" + demangle(TargetType) + "]");
+	throw std::invalid_argument("Can't convert Python value to unrecognized type [" + demangle(TargetType) + "]");
+}
+
+const ustring python_to_ustring(const boost::python::object& Value)
+{
+	if(PyString_Check(Value.ptr()))
+	{
+		return ustring::from_utf8(PyString_AsString(Value.ptr()));
+	}
+	else if(PyUnicode_Check(Value.ptr()))
+	{
+		return ustring::from_utf8(PyString_AsString(Value.attr("encode")("UTF-8").ptr()));
+	}
+
+	throw std::invalid_argument("Can't convert Python value to a Unicode string.");
 }
 
 } // namespace python

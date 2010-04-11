@@ -3,11 +3,22 @@
 	<application>
 		<examples>
 			<example title="K-3D Logo" path="logo.k3d">
-				<description>This example contains the K-3D logo, created using quadric primitives.</description>
+				<description>This example contains the K-3D logo, created using quadric primitives.  You can see it rendered as "concrete" using a RenderMan engine such as Aqsis, or rendered as shiny copper using LuxRender.</description>
 			</example>
+			<example title="Digital Clock" path="animation/digital_clock.k3d">
+				<description>This example uses the realtime source to create a live, 3D digital clock.</description>
+			</example>
+			<example title="Arc Length" path="animation/arc_length.k3d">
+				<description>This example uses Python to animate two objects along a path, comparing the results with-and-without arc-length paramaterization.</description>
+			</example>
+			<example title="Euler Angles" path="animation/euler_angles.k3d">
+				<description>This example uses Python to rotate two objects using different Euler angles, yet producing identical results!</description>
+			</example>
+<!--
 			<example title="Old SDP Logo" path="old_logo.k3d">
 				<description>This example reproduces the old Shead Data Processing logo, implemented using a displacement map on a textured concrete cube.  Render it using a RenderMan engine such as Aqsis or Pixie to see the results.</description>
 			</example>
+-->
 		</examples>
 	</application>
 </k3dml>

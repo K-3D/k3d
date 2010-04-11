@@ -23,7 +23,7 @@
 
 #include <k3dsdk/inode.h>
 #include <k3dsdk/ngui/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 
 namespace k3d
 {

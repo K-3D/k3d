@@ -1,10 +1,10 @@
 #python
 
-# Load this script into a K-3D RenderManScript object to create
+# Load this script into a RenderManScript node to create
 # what is either a Tribble or a really bad-hair-day ...
 
 import k3d
-k3d.check_node_environment(locals(), "RenderManScript")
+k3d.check_node_environment(context, "RenderManScript")
 
 import sys
 import ri
@@ -18,15 +18,12 @@ message = """You're probably trying to run this script manually, which won't wor
 
 Use the Create > RenderMan > RenderManScript menu item to create the node, then load this file into its Script property."""
 
-try:
-      Archive
-except:
+if not context.has_key("archive"):
       k3d.ui.error_message(message)
       raise
 
-
 # Redirect output to our RIB archive
-ri._ribout = open(Archive, "w")
+ri._ribout = open(str(context.archive), "w")
 
 body_size = 5
 lumpyness = 1
@@ -69,4 +66,6 @@ RiSurface("k3d_hair")
 RiCurves(RI_CUBIC, control_point_counts, RI_NONPERIODIC, "P", control_points, "width", widths)
 
 ri._ribout.flush()
+
+context.render_state.use_shader(k3d.share_path() / k3d.filesystem.generic_path("shaders/surface/k3d_hair.sl"))
 

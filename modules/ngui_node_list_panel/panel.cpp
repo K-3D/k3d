@@ -47,6 +47,7 @@
 #include <k3dsdk/ngui/interactive.h>
 #include <k3dsdk/ngui/keyboard.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
@@ -128,7 +129,6 @@ public:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -203,7 +203,7 @@ public:
 			"NGUINodeListPanel",
 			_("Displays the document nodes as a flat list"),
 			"NGUI Panel",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Node List"));
 
 		return factory;
@@ -328,10 +328,7 @@ private:
 		}
 
 		if(selected_nodes.size() == 1)
-		{
-			m_document_state->view_node_properties_signal().emit(selected_nodes[0]);
-			m_document_state->view_node_history_signal().emit(selected_nodes[0]);
-		}
+			k3d::ngui::panel::mediator(m_document_state->document()).set_focus(*selected_nodes[0], *this);
 
 		m_selection_paths.clear();
 

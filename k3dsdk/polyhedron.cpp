@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,20 +17,21 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file Declares structures to add extra "convenience" data to a mesh
+/** \file
+	\author Timothy M. Shead (tshead@k-3d.com)
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "table_copier.h"
-#include "metadata_keys.h"
-#include "parallel/blocked_range.h"
-#include "parallel/parallel_for.h"
-#include "parallel/threads.h"
-#include "polyhedron.h"
-#include "primitive_validation.h"
-#include "selection.h"
-#include "string_cast.h"
-#include "triangulator.h"
+#include <k3dsdk/table_copier.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/parallel/blocked_range.h>
+#include <k3dsdk/parallel/parallel_for.h>
+#include <k3dsdk/parallel/threads.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/primitive_validation.h>
+#include <k3dsdk/selection.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/triangulator.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -50,55 +51,55 @@ namespace polyhedron
 // const_primitive
 
 const_primitive::const_primitive(
-	const mesh::indices_t& ShellFirstFaces,
-	const mesh::counts_t& ShellFaceCounts,
 	const typed_array<int32_t>& ShellTypes,
+	const mesh::indices_t& FaceShells,
 	const mesh::indices_t& FaceFirstLoops,
 	const mesh::counts_t& FaceLoopCounts,
 	const mesh::selection_t& FaceSelections,
 	const mesh::materials_t& FaceMaterials,
 	const mesh::indices_t& LoopFirstEdges,
-	const mesh::indices_t& EdgePoints,
 	const mesh::indices_t& ClockwiseEdges,
 	const mesh::selection_t& EdgeSelections,
+	const mesh::indices_t& VertexPoints,
+	const mesh::selection_t& VertexSelections,
 	const mesh::table_t& ConstantAttributes,
-	const mesh::table_t& UniformAttributes,
-	const mesh::table_t& FaceVaryingAttributes,
+	const mesh::table_t& FaceAttributes,
+	const mesh::table_t& EdgeAttributes,
 	const mesh::table_t& VertexAttributes
 		) :
-	shell_first_faces(ShellFirstFaces),
-	shell_face_counts(ShellFaceCounts),
 	shell_types(ShellTypes),
+	face_shells(FaceShells),
 	face_first_loops(FaceFirstLoops),
 	face_loop_counts(FaceLoopCounts),
 	face_selections(FaceSelections),
 	face_materials(FaceMaterials),
 	loop_first_edges(LoopFirstEdges),
-	edge_points(EdgePoints),
 	clockwise_edges(ClockwiseEdges),
 	edge_selections(EdgeSelections),
+	vertex_points(VertexPoints),
+	vertex_selections(VertexSelections),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes),
-	face_varying_attributes(FaceVaryingAttributes),
+	face_attributes(FaceAttributes),
+	edge_attributes(EdgeAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
 
 const_primitive::const_primitive(const primitive& Primitive) :
-	shell_first_faces(Primitive.shell_first_faces),
-	shell_face_counts(Primitive.shell_face_counts),
 	shell_types(Primitive.shell_types),
+	face_shells(Primitive.face_shells),
 	face_first_loops(Primitive.face_first_loops),
 	face_loop_counts(Primitive.face_loop_counts),
 	face_selections(Primitive.face_selections),
 	face_materials(Primitive.face_materials),
 	loop_first_edges(Primitive.loop_first_edges),
-	edge_points(Primitive.edge_points),
 	clockwise_edges(Primitive.clockwise_edges),
 	edge_selections(Primitive.edge_selections),
+	vertex_points(Primitive.vertex_points),
+	vertex_selections(Primitive.vertex_selections),
 	constant_attributes(Primitive.constant_attributes),
-	uniform_attributes(Primitive.uniform_attributes),
-	face_varying_attributes(Primitive.face_varying_attributes),
+	face_attributes(Primitive.face_attributes),
+	edge_attributes(Primitive.edge_attributes),
 	vertex_attributes(Primitive.vertex_attributes)
 {
 }
@@ -107,36 +108,36 @@ const_primitive::const_primitive(const primitive& Primitive) :
 // primitive
 
 primitive::primitive(
-	mesh::indices_t& ShellFirstFaces,
-	mesh::counts_t& ShellFaceCounts,
 	typed_array<int32_t>& ShellTypes,
+	mesh::indices_t& FaceShells,
 	mesh::indices_t& FaceFirstLoops,
 	mesh::counts_t& FaceLoopCounts,
 	mesh::selection_t& FaceSelections,
 	mesh::materials_t& FaceMaterials,
 	mesh::indices_t& LoopFirstEdges,
-	mesh::indices_t& EdgePoints,
 	mesh::indices_t& ClockwiseEdges,
 	mesh::selection_t& EdgeSelections,
+	mesh::indices_t& VertexPoints,
+	mesh::selection_t& VertexSelections,
 	mesh::table_t& ConstantAttributes,
-	mesh::table_t& UniformAttributes,
-	mesh::table_t& FaceVaryingAttributes,
+	mesh::table_t& FaceAttributes,
+	mesh::table_t& EdgeAttributes,
 	mesh::table_t& VertexAttributes
 		) :
-	shell_first_faces(ShellFirstFaces),
-	shell_face_counts(ShellFaceCounts),
 	shell_types(ShellTypes),
+	face_shells(FaceShells),
 	face_first_loops(FaceFirstLoops),
 	face_loop_counts(FaceLoopCounts),
 	face_selections(FaceSelections),
 	face_materials(FaceMaterials),
 	loop_first_edges(LoopFirstEdges),
-	edge_points(EdgePoints),
 	clockwise_edges(ClockwiseEdges),
 	edge_selections(EdgeSelections),
+	vertex_points(VertexPoints),
+	vertex_selections(VertexSelections),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes),
-	face_varying_attributes(FaceVaryingAttributes),
+	face_attributes(FaceAttributes),
+	edge_attributes(EdgeAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -151,26 +152,27 @@ primitive* create(mesh::primitive& GenericPrimitive)
 	GenericPrimitive.attributes.clear();
 
 	primitive* const result = new primitive(
-		GenericPrimitive.structure["shell"].create<mesh::indices_t>("shell_first_faces"),
-		GenericPrimitive.structure["shell"].create<mesh::counts_t>("shell_face_counts"),
 		GenericPrimitive.structure["shell"].create<typed_array<int32_t> >("shell_types"),
-		GenericPrimitive.structure["uniform"].create<mesh::indices_t>("face_first_loops"),
-		GenericPrimitive.structure["uniform"].create<mesh::counts_t>("face_loop_counts"),
-		GenericPrimitive.structure["uniform"].create<mesh::selection_t>("face_selections"),
-		GenericPrimitive.structure["uniform"].create<mesh::materials_t>("face_materials"),
+		GenericPrimitive.structure["face"].create<mesh::indices_t>("face_shells"),
+		GenericPrimitive.structure["face"].create<mesh::indices_t>("face_first_loops"),
+		GenericPrimitive.structure["face"].create<mesh::counts_t>("face_loop_counts"),
+		GenericPrimitive.structure["face"].create<mesh::selection_t>("face_selections"),
+		GenericPrimitive.structure["face"].create<mesh::materials_t>("face_materials"),
 		GenericPrimitive.structure["loop"].create<mesh::indices_t>("loop_first_edges"),
-		GenericPrimitive.structure["face_varying"].create<mesh::indices_t>("edge_points"),
-		GenericPrimitive.structure["face_varying"].create<mesh::indices_t>("clockwise_edges"),
-		GenericPrimitive.structure["face_varying"].create<mesh::selection_t>("edge_selections"),
+		GenericPrimitive.structure["edge"].create<mesh::indices_t>("clockwise_edges"),
+		GenericPrimitive.structure["edge"].create<mesh::selection_t>("edge_selections"),
+		GenericPrimitive.structure["vertex"].create<mesh::indices_t>("vertex_points"),
+		GenericPrimitive.structure["vertex"].create<mesh::selection_t>("vertex_selections"),
 		GenericPrimitive.attributes["constant"],
-		GenericPrimitive.attributes["uniform"],
-		GenericPrimitive.attributes["face_varying"],
+		GenericPrimitive.attributes["face"],
+		GenericPrimitive.attributes["edge"],
 		GenericPrimitive.attributes["vertex"]
 		);
 
 	result->face_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
-	result->edge_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 	result->edge_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
+	result->vertex_points.set_metadata_value(metadata::key::domain(), metadata::value::point_indices_domain());
+	result->vertex_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
 
 	return result;
 }
@@ -217,8 +219,6 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 
 		// Append a new polyhedron to the mesh ...
 		primitive* const polyhedron = create(Mesh);
-		polyhedron->shell_first_faces.push_back(0);
-		polyhedron->shell_face_counts.push_back(VertexCounts.size());
 		polyhedron->shell_types.push_back(POLYGONS);
 
 		uint_t face_vertex = 0;
@@ -226,178 +226,24 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 		const uint_t face_end = face_begin + VertexCounts.size();
 		for(uint_t face = face_begin; face != face_end; ++face)
 		{
+			polyhedron->face_shells.push_back(0);
 			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(0.0);
 			polyhedron->face_materials.push_back(Material);
-			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
+			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
 			const uint_t vertex_begin = 0;
 			const uint_t vertex_end = vertex_begin + VertexCounts[face];
-			const uint_t loop_begin = polyhedron->edge_points.size();
+			const uint_t loop_begin = polyhedron->clockwise_edges.size();
 			for(uint_t vertex = vertex_begin; vertex != vertex_end; ++vertex, ++face_vertex)
 			{
-				polyhedron->edge_points.push_back(point_offset + VertexIndices[face_vertex]);
-				polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+				polyhedron->vertex_points.push_back(point_offset + VertexIndices[face_vertex]);
+				polyhedron->vertex_selections.push_back(0.0);
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 				polyhedron->edge_selections.push_back(0.0);
 			}
 			polyhedron->clockwise_edges.back() = loop_begin;
-		}
-
-		return polyhedron;
-	}
-	catch(std::exception& e)
-	{
-		log() << error << e.what() << std::endl;
-	}
-
-	return 0;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// create_grid
-
-primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material)
-{
-	try
-	{
-		if(!Rows)
-			throw std::runtime_error("Cannot create grid with zero rows.");
-
-		if(!Columns)
-			throw std::runtime_error("Cannot create grid with zero columns.");
-
-		const uint_t rows = Rows;
-		const uint_t columns = Columns;
-		const uint_t point_rows = rows + 1;
-		const uint_t point_columns = columns + 1;
-
-		// Append points to the mesh (create the arrays if they don't already exist) ...
-		mesh::points_t& points = Mesh.points ? Mesh.points.writable() : Mesh.points.create();
-		mesh::selection_t& point_selection = Mesh.point_selection ? Mesh.point_selection.writable() : Mesh.point_selection.create();
-
-		const uint_t point_offset = points.size();
-		points.insert(points.end(), point_rows * point_columns, point3());
-		point_selection.insert(point_selection.end(), point_rows * point_columns, 0.0);
-		Mesh.point_attributes.set_row_count(point_offset + (point_rows * point_columns));
-
-		// Append a new polyhedron to the mesh ...
-		primitive* const polyhedron = create(Mesh);
-
-		polyhedron->shell_first_faces.assign(1, 0);
-		polyhedron->shell_face_counts.assign(1, rows * columns);
-		polyhedron->shell_types.assign(1, POLYGONS);
-		polyhedron->face_first_loops.resize(rows * columns);
-		polyhedron->face_loop_counts.assign(rows * columns, 1);
-		polyhedron->face_selections.assign(rows * columns, 0.0);
-		polyhedron->face_materials.assign(rows * columns, Material);
-		polyhedron->loop_first_edges.resize(rows * columns);
-		polyhedron->edge_points.resize(4 * rows * columns);
-		polyhedron->clockwise_edges.resize(4 * rows * columns);
-		polyhedron->edge_selections.assign(4 * rows * columns, 0.0);
-
-		mesh::indices_t::iterator face_first_loop = polyhedron->face_first_loops.begin();
-		mesh::indices_t::iterator loop_first_edge = polyhedron->loop_first_edges.begin();
-		mesh::indices_t::iterator edge_point = polyhedron->edge_points.begin();
-		mesh::indices_t::iterator clockwise_edge = polyhedron->clockwise_edges.begin();
-
-		uint_t face_number = 0;
-		for(uint_t row = 0; row != rows; ++row)
-		{
-			for(uint_t column = 0; column != columns; ++column, ++face_number)
-			{
-				*face_first_loop++ = face_number;
-
-				*loop_first_edge++ = 4 * face_number;
-
-				*edge_point++ = point_offset + (column + (row * point_columns));
-				*edge_point++ = point_offset + (column + (row * point_columns) + 1);
-				*edge_point++ = point_offset + (column + ((row + 1) * point_columns) + 1);
-				*edge_point++ = point_offset + (column + ((row + 1) * point_columns));
-
-				*clockwise_edge++ = (4 * face_number) + 1;
-				*clockwise_edge++ = (4 * face_number) + 2;
-				*clockwise_edge++ = (4 * face_number) + 3;
-				*clockwise_edge++ = (4 * face_number);
-			}
-		}
-
-		return polyhedron;
-	}
-	catch(std::exception& e)
-	{
-		log() << error << e.what() << std::endl;
-	}
-
-	return 0;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// create_cylinder
-
-primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material)
-{
-	try
-	{
-		if(!Rows)
-			throw std::runtime_error("Cannot create cylinder with zero rows.");
-
-		if(Columns < 2)
-			throw std::runtime_error("Cannot create cylinder with <2 columns.");
-
-		const uint_t rows = Rows;
-		const uint_t columns = Columns;
-		const uint_t point_rows = rows + 1;
-		const uint_t point_columns = columns;
-
-		// Append points to the mesh (create the arrays if they don't already exist) ...
-		mesh::points_t& points = Mesh.points ? Mesh.points.writable() : Mesh.points.create();
-		mesh::selection_t& point_selection = Mesh.point_selection ? Mesh.point_selection.writable() : Mesh.point_selection.create();
-
-		const uint_t point_offset = points.size();
-		points.insert(points.end(), point_rows * point_columns, point3());
-		point_selection.insert(point_selection.end(), point_rows * point_columns, 0);
-		Mesh.point_attributes.set_row_count(point_offset + (point_rows * point_columns));
-
-		// Append a new polyhedron to the mesh ...
-		primitive* const polyhedron = create(Mesh);
-
-		polyhedron->shell_first_faces.assign(1, 0);
-		polyhedron->shell_face_counts.assign(1, rows * columns);
-		polyhedron->shell_types.assign(1, POLYGONS);
-		polyhedron->face_first_loops.resize(rows * columns);
-		polyhedron->face_loop_counts.assign(rows * columns, 1);
-		polyhedron->face_selections.assign(rows * columns, 0);
-		polyhedron->face_materials.assign(rows * columns, Material);
-		polyhedron->loop_first_edges.resize(rows * columns);
-		polyhedron->edge_points.resize(4 * rows * columns);
-		polyhedron->clockwise_edges.resize(4 * rows * columns);
-		polyhedron->edge_selections.assign(4 * rows * columns, 0);
-		
-		mesh::indices_t::iterator face_first_loop = polyhedron->face_first_loops.begin();
-		mesh::indices_t::iterator loop_first_edge = polyhedron->loop_first_edges.begin();
-		mesh::indices_t::iterator edge_point = polyhedron->edge_points.begin();
-		mesh::indices_t::iterator clockwise_edge = polyhedron->clockwise_edges.begin();
-
-		uint_t face_number = 0;
-		for(uint_t row = 0; row != rows; ++row)
-		{
-			for(uint_t column = 0; column != columns; ++column, ++face_number)
-			{
-				*face_first_loop++ = face_number;
-
-				*loop_first_edge++ = 4 * face_number;
-
-				*edge_point++ = point_offset + (row * point_columns) + (column);
-				*edge_point++ = point_offset + (row * point_columns) + ((column + 1) % point_columns);
-				*edge_point++ = point_offset + ((row + 1) * point_columns) + ((column + 1) % point_columns);
-				*edge_point++ = point_offset + ((row + 1) * point_columns) + (column);
-
-				*clockwise_edge++ = (4 * face_number) + 1;
-				*clockwise_edge++ = (4 * face_number) + 2;
-				*clockwise_edge++ = (4 * face_number) + 3;
-				*clockwise_edge++ = (4 * face_number);
-			}
 		}
 
 		return polyhedron;
@@ -423,50 +269,82 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		require_valid_primitive(Mesh, Primitive);
 
 		const mesh::table_t& shell_structure = require_structure(Primitive, "shell");
-		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		const mesh::table_t& face_structure = require_structure(Primitive, "face");
 		const mesh::table_t& loop_structure = require_structure(Primitive, "loop");
-		const mesh::table_t& face_varying_structure = require_structure(Primitive, "face_varying");
+		const mesh::table_t& edge_structure = require_structure(Primitive, "edge");
+		const mesh::table_t& vertex_structure = require_structure(Primitive, "vertex");
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
-		const mesh::table_t& face_varying_attributes = require_attributes(Primitive, "face_varying");
+		const mesh::table_t& face_attributes = require_attributes(Primitive, "face");
+		const mesh::table_t& edge_attributes = require_attributes(Primitive, "edge");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		const mesh::indices_t& shell_first_faces = require_array<mesh::indices_t>(Primitive, shell_structure, "shell_first_faces");
-		const mesh::counts_t& shell_face_counts = require_array<mesh::counts_t>(Primitive, shell_structure, "shell_face_counts");
 		const typed_array<int32_t>& shell_types = require_array<typed_array<int32_t> >(Primitive, shell_structure, "shell_types");
-		const mesh::indices_t& face_first_loops = require_array<mesh::indices_t>(Primitive, uniform_structure, "face_first_loops");
-		const mesh::counts_t& face_loop_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "face_loop_counts");
-		const mesh::selection_t& face_selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "face_selections");
-		const mesh::materials_t& face_materials = require_array<mesh::materials_t>(Primitive, uniform_structure, "face_materials");
+		const mesh::indices_t& face_shells = require_array<mesh::indices_t>(Primitive, face_structure, "face_shells");
+		const mesh::indices_t& face_first_loops = require_array<mesh::indices_t>(Primitive, face_structure, "face_first_loops");
+		const mesh::counts_t& face_loop_counts = require_array<mesh::counts_t>(Primitive, face_structure, "face_loop_counts");
+		const mesh::selection_t& face_selections = require_array<mesh::selection_t>(Primitive, face_structure, "face_selections");
+		const mesh::materials_t& face_materials = require_array<mesh::materials_t>(Primitive, face_structure, "face_materials");
 		const mesh::indices_t& loop_first_edges = require_array<mesh::indices_t>(Primitive, loop_structure, "loop_first_edges");
-		const mesh::indices_t& edge_points = require_array<mesh::indices_t>(Primitive, face_varying_structure, "edge_points");
-		const mesh::indices_t& clockwise_edges = require_array<mesh::indices_t>(Primitive, face_varying_structure, "clockwise_edges");
-		const mesh::selection_t& edge_selections = require_array<mesh::selection_t>(Primitive, face_varying_structure, "edge_selections");
+		const mesh::indices_t& clockwise_edges = require_array<mesh::indices_t>(Primitive, edge_structure, "clockwise_edges");
+		const mesh::selection_t& edge_selections = require_array<mesh::selection_t>(Primitive, edge_structure, "edge_selections");
+		const mesh::indices_t& vertex_points = require_array<mesh::indices_t>(Primitive, vertex_structure, "vertex_points");
+		const mesh::selection_t& vertex_selections = require_array<mesh::selection_t>(Primitive, vertex_structure, "vertex_selections");
 
 		require_metadata(Primitive, face_selections, "face_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, edge_points, "edge_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::role(), metadata::value::selection_role());
+		require_metadata(Primitive, vertex_points, "vertex_points", metadata::key::domain(), metadata::value::point_indices_domain());
+		require_metadata(Primitive, vertex_selections, "vertex_selections", metadata::key::role(), metadata::value::selection_role());
 
-		require_table_row_count(Primitive, uniform_structure, "uniform", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
 		require_table_row_count(Primitive, loop_structure, "loop", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
+		require_table_row_count(Primitive, vertex_structure, "vertex", edge_structure.row_count());
 
-		/** \todo Calculate vertex attributes size here */
-		//require_table_row_count(Primitive, point_attributes, "vertex", );
+		// Check for out-of-bound shell indices ...
+		const uint_t face_begin = 0;
+		const uint_t face_end = face_begin + face_shells.size();
+		for(uint_t face = face_begin; face != face_end; ++face)
+		{
+			if(face_shells[face] >= shell_types.size())
+			{
+				log() << error << "face shell out-of-bounds for face " << face << std::endl;
+				return 0;
+			}	
+		}
 
-		// Check for infinite loops in our edge lists ...
+		// Check for out-of-bound indices and infinite loops in our edge lists ...
 		const uint_t loop_begin = 0;
 		const uint_t loop_end = loop_begin + loop_first_edges.size();
+
+		const uint_t edge_begin = 0;
+		const uint_t edge_end = edge_begin + clockwise_edges.size();
+
 		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 		{
 			const uint_t first_edge = loop_first_edges[loop];
+			if(first_edge >= edge_end)
+			{
+				log() << error << "loop first edge index out-of-bounds for loop " << loop << std::endl;
+				return 0;
+			}
+
 			uint_t edge_slow = first_edge;
 			uint_t edge_fast = first_edge;
 			uint_t cycle_count = 0;
 			while(true)
 			{
 				edge_slow = clockwise_edges[edge_slow];
+				if(edge_slow >= edge_end)
+				{
+					log() << error << "clockwise edge index out-of-bounds for edge " << edge_slow << std::endl;
+					return 0;
+				}
+
 				edge_fast = clockwise_edges[clockwise_edges[edge_fast]];
+				if(edge_fast >= edge_end)
+				{
+					log() << error << "clockwise edge index out-of-bounds for edge " << edge_fast << std::endl;
+					return 0;
+				}
 
 				if(edge_slow == edge_fast)
 					++cycle_count;
@@ -482,7 +360,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 			}
 		}
 
-		return new const_primitive(shell_first_faces, shell_face_counts, shell_types, face_first_loops, face_loop_counts, face_selections, face_materials, loop_first_edges, edge_points, clockwise_edges, edge_selections, constant_attributes, uniform_attributes, face_varying_attributes, vertex_attributes);
+		return new const_primitive(shell_types, face_shells, face_first_loops, face_loop_counts, face_selections, face_materials, loop_first_edges, clockwise_edges, edge_selections, vertex_points, vertex_selections, constant_attributes, face_attributes, edge_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -502,50 +380,82 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		require_valid_primitive(Mesh, Primitive);
 
 		mesh::table_t& shell_structure = require_structure(Primitive, "shell");
-		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		mesh::table_t& face_structure = require_structure(Primitive, "face");
 		mesh::table_t& loop_structure = require_structure(Primitive, "loop");
-		mesh::table_t& face_varying_structure = require_structure(Primitive, "face_varying");
+		mesh::table_t& edge_structure = require_structure(Primitive, "edge");
+		mesh::table_t& vertex_structure = require_structure(Primitive, "vertex");
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
-		mesh::table_t& face_varying_attributes = require_attributes(Primitive, "face_varying");
+		mesh::table_t& face_attributes = require_attributes(Primitive, "face");
+		mesh::table_t& edge_attributes = require_attributes(Primitive, "edge");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		mesh::indices_t& shell_first_faces = require_array<mesh::indices_t>(Primitive, shell_structure, "shell_first_faces");
-		mesh::counts_t& shell_face_counts = require_array<mesh::counts_t>(Primitive, shell_structure, "shell_face_counts");
 		typed_array<int32_t>& shell_types = require_array<typed_array<int32_t> >(Primitive, shell_structure, "shell_types");
-		mesh::indices_t& face_first_loops = require_array<mesh::indices_t>(Primitive, uniform_structure, "face_first_loops");
-		mesh::counts_t& face_loop_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "face_loop_counts");
-		mesh::selection_t& face_selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "face_selections");
-		mesh::materials_t& face_materials = require_array<mesh::materials_t>(Primitive, uniform_structure, "face_materials");
+		mesh::indices_t& face_shells = require_array<mesh::indices_t>(Primitive, face_structure, "face_shells");
+		mesh::indices_t& face_first_loops = require_array<mesh::indices_t>(Primitive, face_structure, "face_first_loops");
+		mesh::counts_t& face_loop_counts = require_array<mesh::counts_t>(Primitive, face_structure, "face_loop_counts");
+		mesh::selection_t& face_selections = require_array<mesh::selection_t>(Primitive, face_structure, "face_selections");
+		mesh::materials_t& face_materials = require_array<mesh::materials_t>(Primitive, face_structure, "face_materials");
 		mesh::indices_t& loop_first_edges = require_array<mesh::indices_t>(Primitive, loop_structure, "loop_first_edges");
-		mesh::indices_t& edge_points = require_array<mesh::indices_t>(Primitive, face_varying_structure, "edge_points");
-		mesh::indices_t& clockwise_edges = require_array<mesh::indices_t>(Primitive, face_varying_structure, "clockwise_edges");
-		mesh::selection_t& edge_selections = require_array<mesh::selection_t>(Primitive, face_varying_structure, "edge_selections");
+		mesh::indices_t& clockwise_edges = require_array<mesh::indices_t>(Primitive, edge_structure, "clockwise_edges");
+		mesh::selection_t& edge_selections = require_array<mesh::selection_t>(Primitive, edge_structure, "edge_selections");
+		mesh::indices_t& vertex_points = require_array<mesh::indices_t>(Primitive, vertex_structure, "vertex_points");
+		mesh::selection_t& vertex_selections = require_array<mesh::selection_t>(Primitive, vertex_structure, "vertex_selections");
 
 		require_metadata(Primitive, face_selections, "face_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, edge_points, "edge_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
 		require_metadata(Primitive, edge_selections, "edge_selections", metadata::key::role(), metadata::value::selection_role());
+		require_metadata(Primitive, vertex_points, "vertex_points", metadata::key::domain(), metadata::value::point_indices_domain());
+		require_metadata(Primitive, vertex_selections, "vertex_selections", metadata::key::role(), metadata::value::selection_role());
 
-		require_table_row_count(Primitive, uniform_structure, "uniform", std::accumulate(shell_face_counts.begin(), shell_face_counts.end(), 0));
 		require_table_row_count(Primitive, loop_structure, "loop", std::accumulate(face_loop_counts.begin(), face_loop_counts.end(), 0));
+		require_table_row_count(Primitive, vertex_structure, "vertex", edge_structure.row_count());
 
-		/** \todo Calculate vertex attributes size here */
-		//require_table_row_count(Primitive, vertex_attributes, "vertex", );
+		// Check for out-of-bound shell indices ...
+		const uint_t face_begin = 0;
+		const uint_t face_end = face_begin + face_shells.size();
+		for(uint_t face = face_begin; face != face_end; ++face)
+		{
+			if(face_shells[face] >= shell_types.size())
+			{
+				log() << error << "face shell out-of-bounds for face " << face << std::endl;
+				return 0;
+			}	
+		}
 
-		// Check for infinite loops in our edge lists ...
+		// Check for out-of-bound indices and infinite loops in our edge lists ...
 		const uint_t loop_begin = 0;
 		const uint_t loop_end = loop_begin + loop_first_edges.size();
+
+		const uint_t edge_begin = 0;
+		const uint_t edge_end = edge_begin + clockwise_edges.size();
+
 		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 		{
 			const uint_t first_edge = loop_first_edges[loop];
+			if(first_edge >= edge_end)
+			{
+				log() << error << "loop first edge index out-of-bounds for loop " << loop << std::endl;
+				return 0;
+			}
+
 			uint_t edge_slow = first_edge;
 			uint_t edge_fast = first_edge;
 			uint_t cycle_count = 0;
 			while(true)
 			{
 				edge_slow = clockwise_edges[edge_slow];
+				if(edge_slow >= edge_end)
+				{
+					log() << error << "clockwise edge index out-of-bounds for edge " << edge_slow << std::endl;
+					return 0;
+				}
+
 				edge_fast = clockwise_edges[clockwise_edges[edge_fast]];
+				if(edge_fast >= edge_end)
+				{
+					log() << error << "clockwise edge index out-of-bounds for edge " << edge_fast << std::endl;
+					return 0;
+				}
 
 				if(edge_slow == edge_fast)
 					++cycle_count;
@@ -561,7 +471,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 			}
 		}
 
-		return new primitive(shell_first_faces, shell_face_counts, shell_types, face_first_loops, face_loop_counts, face_selections, face_materials, loop_first_edges, edge_points, clockwise_edges, edge_selections, constant_attributes, uniform_attributes, face_varying_attributes, vertex_attributes);
+		return new primitive(shell_types, face_shells, face_first_loops, face_loop_counts, face_selections, face_materials, loop_first_edges, clockwise_edges, edge_selections, vertex_points, vertex_selections, constant_attributes, face_attributes, edge_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -583,21 +493,87 @@ primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& Primitive)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// add_face
+// add_triangle
 
-void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, imaterial* const Material)
+void add_triangle(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t V1, const uint_t V2, const uint_t V3, imaterial* const Material)
 {
-	add_face(Mesh, Polyhedron, Vertices, std::vector<mesh::points_t>(), Material);
+	return_if_fail(Shell < Polyhedron.shell_types.size());
+
+	Polyhedron.face_shells.push_back(Shell);
+	Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
+	Polyhedron.face_loop_counts.push_back(1);
+	Polyhedron.face_selections.push_back(0);
+	Polyhedron.face_materials.push_back(Material);
+
+	Polyhedron.loop_first_edges.push_back(Polyhedron.clockwise_edges.size());
+
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() - 2);
+
+	Polyhedron.edge_selections.push_back(0);
+	Polyhedron.edge_selections.push_back(0);
+	Polyhedron.edge_selections.push_back(0);
+
+	Polyhedron.vertex_points.push_back(V1);
+	Polyhedron.vertex_points.push_back(V2);
+	Polyhedron.vertex_points.push_back(V3);
+
+	Polyhedron.vertex_selections.push_back(0);
+	Polyhedron.vertex_selections.push_back(0);
+	Polyhedron.vertex_selections.push_back(0);
 }
 
-void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material)
+/////////////////////////////////////////////////////////////////////////////////////////////
+// add_quadrilateral
+
+void add_quadrilateral(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t V1, const uint_t V2, const uint_t V3, const uint_t V4, imaterial* const Material)
+{
+	return_if_fail(Shell < Polyhedron.shell_types.size());
+
+	Polyhedron.face_shells.push_back(Shell);
+	Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
+	Polyhedron.face_loop_counts.push_back(1);
+	Polyhedron.face_selections.push_back(0);
+	Polyhedron.face_materials.push_back(Material);
+
+	Polyhedron.loop_first_edges.push_back(Polyhedron.clockwise_edges.size());
+
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+	Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() - 3);
+
+	Polyhedron.edge_selections.push_back(0);
+	Polyhedron.edge_selections.push_back(0);
+	Polyhedron.edge_selections.push_back(0);
+	Polyhedron.edge_selections.push_back(0);
+
+	Polyhedron.vertex_points.push_back(V1);
+	Polyhedron.vertex_points.push_back(V2);
+	Polyhedron.vertex_points.push_back(V3);
+	Polyhedron.vertex_points.push_back(V4);
+
+	Polyhedron.vertex_selections.push_back(0);
+	Polyhedron.vertex_selections.push_back(0);
+	Polyhedron.vertex_selections.push_back(0);
+	Polyhedron.vertex_selections.push_back(0);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// add_face
+
+void add_face(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const mesh::points_t& Vertices, imaterial* const Material)
+{
+	add_face(Mesh, Polyhedron, Shell, Vertices, std::vector<mesh::points_t>(), Material);
+}
+
+void add_face(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material)
 {
 	return_if_fail(Mesh.points);
 	return_if_fail(Mesh.point_selection);
 
-	return_if_fail(Polyhedron.shell_first_faces.size() == 1);
-	return_if_fail(Polyhedron.shell_face_counts.size() == 1);
-	return_if_fail(Polyhedron.shell_types.size() == 1);
+	return_if_fail(Shell < Polyhedron.shell_types.size());
 
 	return_if_fail(Vertices.size() > 1);
 	for(uint_t hole = 0; hole != Holes.size(); ++hole)
@@ -606,16 +582,18 @@ void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices,
 	mesh::points_t& points = Mesh.points.writable();
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
 
+	Polyhedron.face_shells.push_back(Shell);
 	Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
 	Polyhedron.face_loop_counts.push_back(Holes.size() + 1);
 	Polyhedron.face_selections.push_back(0);
 	Polyhedron.face_materials.push_back(Material);
 
-	Polyhedron.loop_first_edges.push_back(Polyhedron.edge_points.size());
+	Polyhedron.loop_first_edges.push_back(Polyhedron.clockwise_edges.size());
 	for(mesh::points_t::const_iterator point = Vertices.begin(); point != Vertices.end(); ++point)
 	{
-		Polyhedron.edge_points.push_back(points.size());
-		Polyhedron.clockwise_edges.push_back(Polyhedron.edge_points.size());
+		Polyhedron.vertex_points.push_back(points.size());
+		Polyhedron.vertex_selections.push_back(0);
+		Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
 		Polyhedron.edge_selections.push_back(0);
 		
 		points.push_back(*point);
@@ -625,11 +603,12 @@ void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices,
 
 	for(uint_t hole = 0; hole != Holes.size(); ++hole)
 	{
-		Polyhedron.loop_first_edges.push_back(Polyhedron.edge_points.size());
+		Polyhedron.loop_first_edges.push_back(Polyhedron.clockwise_edges.size());
 		for(mesh::points_t::const_iterator point = Holes[hole].begin(); point != Holes[hole].end(); ++point)
 		{
-			Polyhedron.edge_points.push_back(points.size());
-			Polyhedron.clockwise_edges.push_back(Polyhedron.edge_points.size());
+			Polyhedron.vertex_points.push_back(points.size());
+			Polyhedron.vertex_selections.push_back(0);
+			Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
 			Polyhedron.edge_selections.push_back(0);
 			
 			points.push_back(*point);
@@ -637,9 +616,201 @@ void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices,
 		}
 		Polyhedron.clockwise_edges.back() = Polyhedron.loop_first_edges.back();
 	}
+}
 
-	Polyhedron.shell_first_faces[0] = 0;
-	Polyhedron.shell_face_counts[0] = Polyhedron.face_first_loops.size();
+/////////////////////////////////////////////////////////////////////////////////////////////
+// add_grid
+
+void add_grid(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t Rows, const uint_t Columns, imaterial* const Material)
+{
+	try
+	{
+		if(!Rows)
+			throw std::runtime_error("Cannot create grid with zero rows.");
+
+		if(!Columns)
+			throw std::runtime_error("Cannot create grid with zero columns.");
+
+		if(Shell >= Polyhedron.shell_types.size())
+			throw std::runtime_error("Invalid shell.");
+
+		const uint_t rows = Rows;
+		const uint_t columns = Columns;
+		const uint_t point_rows = rows + 1;
+		const uint_t point_columns = columns + 1;
+
+		// Append points to the mesh (create the arrays if they don't already exist) ...
+		mesh::points_t& points = Mesh.points ? Mesh.points.writable() : Mesh.points.create();
+		mesh::selection_t& point_selection = Mesh.point_selection ? Mesh.point_selection.writable() : Mesh.point_selection.create();
+
+		const uint_t point_offset = points.size();
+		points.insert(points.end(), point_rows * point_columns, point3());
+		point_selection.insert(point_selection.end(), point_rows * point_columns, 0);
+		Mesh.point_attributes.set_row_count(points.size());
+
+		// Append faces to the polyhedron ...
+		for(uint_t row = 0; row != rows; ++row)
+		{
+			for(uint_t column = 0; column != columns; ++column)
+			{
+				Polyhedron.face_shells.push_back(Shell);
+				Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
+				Polyhedron.face_loop_counts.push_back(1);
+				Polyhedron.face_selections.push_back(0);
+				Polyhedron.face_materials.push_back(Material);
+
+				Polyhedron.loop_first_edges.push_back(Polyhedron.clockwise_edges.size());
+
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() - 3);
+
+				Polyhedron.edge_selections.insert(Polyhedron.edge_selections.end(), 4, 0);
+
+				Polyhedron.vertex_points.push_back(point_offset + ((row + 0) * point_columns) + column + 0);
+				Polyhedron.vertex_points.push_back(point_offset + ((row + 0) * point_columns) + column + 1);
+				Polyhedron.vertex_points.push_back(point_offset + ((row + 1) * point_columns) + column + 1);
+				Polyhedron.vertex_points.push_back(point_offset + ((row + 1) * point_columns) + column + 0);
+
+				Polyhedron.vertex_selections.insert(Polyhedron.vertex_selections.end(), 4, 0);
+			}
+		}
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// add_cylinder
+
+void add_cylinder(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t Rows, const uint_t Columns, imaterial* const Material)
+{
+	try
+	{
+		if(!Rows)
+			throw std::runtime_error("Cannot create cylinder with zero rows.");
+
+		if(Columns < 2)
+			throw std::runtime_error("Cannot create cylinder with <2 columns.");
+
+		if(Shell >= Polyhedron.shell_types.size())
+			throw std::runtime_error("Invalid shell.");
+
+		const uint_t rows = Rows;
+		const uint_t columns = Columns;
+		const uint_t point_rows = rows + 1;
+		const uint_t point_columns = columns;
+
+		// Append points to the mesh (create the arrays if they don't already exist) ...
+		mesh::points_t& points = Mesh.points ? Mesh.points.writable() : Mesh.points.create();
+		mesh::selection_t& point_selection = Mesh.point_selection ? Mesh.point_selection.writable() : Mesh.point_selection.create();
+
+		const uint_t point_offset = points.size();
+		points.insert(points.end(), point_rows * point_columns, point3());
+		point_selection.insert(point_selection.end(), point_rows * point_columns, 0);
+		Mesh.point_attributes.set_row_count(points.size());
+
+		// Append faces to the polyhedron ...
+		for(uint_t row = 0; row != rows; ++row)
+		{
+			for(uint_t column = 0; column != columns; ++column)
+			{
+				Polyhedron.face_shells.push_back(Shell);
+				Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
+				Polyhedron.face_loop_counts.push_back(1);
+				Polyhedron.face_selections.push_back(0);
+				Polyhedron.face_materials.push_back(Material);
+
+				Polyhedron.loop_first_edges.push_back(Polyhedron.clockwise_edges.size());
+
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() - 3);
+
+				Polyhedron.edge_selections.insert(Polyhedron.edge_selections.end(), 4, 0);
+
+				Polyhedron.vertex_points.push_back(point_offset + ((row + 0) * point_columns) + (column + 0) % point_columns);
+				Polyhedron.vertex_points.push_back(point_offset + ((row + 0) * point_columns) + (column + 1) % point_columns);
+				Polyhedron.vertex_points.push_back(point_offset + ((row + 1) * point_columns) + (column + 1) % point_columns);
+				Polyhedron.vertex_points.push_back(point_offset + ((row + 1) * point_columns) + (column + 0) % point_columns);
+
+				Polyhedron.vertex_selections.insert(Polyhedron.vertex_selections.end(), 4, 0);
+			}
+		}
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// add_torus
+
+void add_torus(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t Rows, const uint_t Columns, imaterial* const Material)
+{
+	try
+	{
+		if(Rows < 2)
+			throw std::runtime_error("Cannot create torus with <2 rows.");
+
+		if(Columns < 2)
+			throw std::runtime_error("Cannot create torus with <2 columns.");
+
+		if(Shell >= Polyhedron.shell_types.size())
+			throw std::runtime_error("Invalid shell.");
+
+		const uint_t rows = Rows;
+		const uint_t columns = Columns;
+		const uint_t point_rows = rows;
+		const uint_t point_columns = columns;
+
+		// Append points to the mesh (create the arrays if they don't already exist) ...
+		mesh::points_t& points = Mesh.points ? Mesh.points.writable() : Mesh.points.create();
+		mesh::selection_t& point_selection = Mesh.point_selection ? Mesh.point_selection.writable() : Mesh.point_selection.create();
+
+		const uint_t point_offset = points.size();
+		points.insert(points.end(), point_rows * point_columns, point3());
+		point_selection.insert(point_selection.end(), point_rows * point_columns, 0);
+		Mesh.point_attributes.set_row_count(points.size());
+
+		// Append faces to the polyhedron ...
+		for(uint_t row = 0; row != rows; ++row)
+		{
+			for(uint_t column = 0; column != columns; ++column)
+			{
+				Polyhedron.face_shells.push_back(Shell);
+				Polyhedron.face_first_loops.push_back(Polyhedron.loop_first_edges.size());
+				Polyhedron.face_loop_counts.push_back(1);
+				Polyhedron.face_selections.push_back(0);
+				Polyhedron.face_materials.push_back(Material);
+
+				Polyhedron.loop_first_edges.push_back(Polyhedron.clockwise_edges.size());
+
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() + 1);
+				Polyhedron.clockwise_edges.push_back(Polyhedron.clockwise_edges.size() - 3);
+
+				Polyhedron.edge_selections.insert(Polyhedron.edge_selections.end(), 4, 0);
+
+				Polyhedron.vertex_points.push_back(point_offset + (((row + 0) % point_rows) * point_columns) + (column + 0) % point_columns);
+				Polyhedron.vertex_points.push_back(point_offset + (((row + 0) % point_rows) * point_columns) + (column + 1) % point_columns);
+				Polyhedron.vertex_points.push_back(point_offset + (((row + 1) % point_rows) * point_columns) + (column + 1) % point_columns);
+				Polyhedron.vertex_points.push_back(point_offset + (((row + 1) % point_rows) * point_columns) + (column + 0) % point_columns);
+
+				Polyhedron.vertex_selections.insert(Polyhedron.vertex_selections.end(), 4, 0);
+			}
+		}
+	}
+	catch(std::exception& e)
+	{
+		log() << error << e.what() << std::endl;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -681,7 +852,7 @@ bool_t is_solid(const const_primitive& Polyhedron)
 
 	mesh::bools_t boundary_edges;
 	mesh::indices_t adjacent_edges;
-	create_edge_adjacency_lookup(Polyhedron.edge_points, Polyhedron.clockwise_edges, boundary_edges, adjacent_edges);
+	create_edge_adjacency_lookup(Polyhedron.vertex_points, Polyhedron.clockwise_edges, boundary_edges, adjacent_edges);
 	return std::find(boundary_edges.begin(), boundary_edges.end(), true) == boundary_edges.end();
 }
 
@@ -694,16 +865,29 @@ bool_t is_sds(const const_primitive& Polyhedron)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// create_counterclockwise_edge_lookup
+
+void create_counterclockwise_edge_lookup(const const_primitive& Polyhedron, mesh::indices_t& CounterclockwiseEdges)
+{
+	CounterclockwiseEdges.resize(Polyhedron.clockwise_edges.size());
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + Polyhedron.clockwise_edges.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+		CounterclockwiseEdges[Polyhedron.clockwise_edges[edge]] = edge;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // center
 
-const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
+const point3 center(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
 {
 	point3 result(0, 0, 0);
 
 	uint_t count = 0;
 	for(uint_t edge = EdgeIndex; ; )
 	{
-		result += to_vector(Points[EdgePoints[edge]]);
+		result += to_vector(Points[VertexPoints[edge]]);
 		++count;
 
 		edge = ClockwiseEdges[edge];
@@ -720,15 +904,15 @@ const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& Cl
 //////////////////////////////////////////////////////////////////////////////
 // normal
 
-const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
+const normal3 normal(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex)
 {
 	// Calculates the normal for an edge loop using the summation method, which is more robust than the three-point methods (handles zero-length edges)
 	normal3 result(0, 0, 0);
 
 	for(uint_t edge = EdgeIndex; ; )
 	{
-		const point3& i = Points[EdgePoints[edge]];
-		const point3& j = Points[EdgePoints[ClockwiseEdges[edge]]];
+		const point3& i = Points[VertexPoints[edge]];
+		const point3& j = Points[VertexPoints[ClockwiseEdges[edge]]];
 
 		result[0] += (i[1] + j[1]) * (j[2] - i[2]);
 		result[1] += (i[2] + j[2]) * (j[0] - i[0]);
@@ -742,6 +926,52 @@ const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& C
 	return 0.5 * result;
 }
 
+const normal3 normal(const point3& i, const point3& j, const point3& k)
+{
+	normal3 result(0, 0, 0);
+
+	result[0] += (i[1] + j[1]) * (j[2] - i[2]);
+	result[1] += (i[2] + j[2]) * (j[0] - i[0]);
+	result[2] += (i[0] + j[0]) * (j[1] - i[1]);
+
+	result[0] += (j[1] + k[1]) * (k[2] - j[2]);
+	result[1] += (j[2] + k[2]) * (k[0] - j[0]);
+	result[2] += (j[0] + k[0]) * (k[1] - j[1]);
+
+	result[0] += (k[1] + i[1]) * (i[2] - k[2]);
+	result[1] += (k[2] + i[2]) * (i[0] - k[0]);
+	result[2] += (k[0] + i[0]) * (i[1] - k[1]);
+
+	return 0.5 * result;
+}
+
+void create_face_normal_lookup(const mesh& Mesh, const const_primitive& Polyhedron, mesh::normals_t& Normals)
+{
+	Normals.resize(Polyhedron.face_first_loops.size(), normal3(0, 0, 0));
+
+	return_if_fail(Mesh.points);
+	const mesh::points_t& points = *Mesh.points;
+
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
+        for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		for(uint_t edge = Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]; ; )
+		{
+			const point3& i = points[Polyhedron.vertex_points[edge]];
+			const point3& j = points[Polyhedron.vertex_points[Polyhedron.clockwise_edges[edge]]];
+
+			Normals[face][0] += 0.5 * (i[1] + j[1]) * (j[2] - i[2]);
+			Normals[face][1] += 0.5 * (i[2] + j[2]) * (j[0] - i[0]);
+			Normals[face][2] += 0.5 * (i[0] + j[0]) * (j[1] - i[1]);
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]])
+				break;
+		}
+	}
+}
+
 namespace detail
 {
 
@@ -752,38 +982,35 @@ class find_companion_worker
 {
 public:
 	find_companion_worker(
-		const mesh::indices_t& EdgePoints,
+		const mesh::indices_t& VertexPoints,
 		const mesh::indices_t& ClockwiseEdges,
-		const mesh::counts_t& Valences,
-		const mesh::indices_t& FirstEdges,
-		const mesh::indices_t& PointEdges,
+		const std::vector<mesh::indices_t>& PointEdges,
 		mesh::bools_t& BoundaryEdges,
 		mesh::indices_t& AdjacentEdges) :
-			m_edge_points(EdgePoints),
+			m_edge_points(VertexPoints),
 			m_clockwise_edges(ClockwiseEdges),
-			m_valences(Valences),
-			m_first_edges(FirstEdges),
 			m_point_edges(PointEdges),
 			m_boundary_edges(BoundaryEdges),
 			m_adjacent_edges(AdjacentEdges)
 		{
 		}
 	
-	void operator()(const k3d::parallel::blocked_range<k3d::uint_t>& range) const
+	void operator()(const k3d::parallel::blocked_range<uint_t>& range) const
 	{
-		const k3d::uint_t edge_begin = range.begin();
-		const k3d::uint_t edge_end = range.end();
-		for(size_t edge = edge_begin; edge != edge_end; ++edge)
+		const uint_t edge_begin = range.begin();
+		const uint_t edge_end = range.end();
+		for(uint_t edge = edge_begin; edge != edge_end; ++edge)
 		{
 			const uint_t vertex1 = m_edge_points[edge];
 			const uint_t vertex2 = m_edge_points[m_clockwise_edges[edge]];
 
-			const uint_t first_index = m_first_edges[vertex2];
-			const uint_t last_index = first_index + m_valences[vertex2];
+			const mesh::indices_t& point_edges = m_point_edges[vertex2];
+			const uint_t first_index = 0;
+			const uint_t last_index = point_edges.size();
 			m_adjacent_edges[edge] = edge;
 			for(uint_t i = first_index; i != last_index; ++i)
 			{
-				const uint_t companion = m_point_edges[i];
+				const uint_t companion = point_edges[i];
 				if(m_edge_points[m_clockwise_edges[companion]] == vertex1)
 				{
 					m_boundary_edges[edge] = false;
@@ -797,9 +1024,7 @@ public:
 private:
 	const mesh::indices_t& m_edge_points;
 	const mesh::indices_t& m_clockwise_edges;
-	const mesh::counts_t& m_valences;
-	const mesh::indices_t& m_first_edges;
-	const mesh::indices_t& m_point_edges;
+	const std::vector<mesh::indices_t>& m_point_edges;
 	mesh::bools_t& m_boundary_edges;
 	mesh::indices_t& m_adjacent_edges;
 };
@@ -843,11 +1068,14 @@ public:
 		// Setup copying of attribute arrays ...
 		output_polyhedron->constant_attributes = input_polyhedron->constant_attributes;
 
-		output_polyhedron->uniform_attributes = input_polyhedron->uniform_attributes.clone_types();
-		uniform_attributes_copier.reset(new table_copier(input_polyhedron->uniform_attributes, output_polyhedron->uniform_attributes));
+		output_polyhedron->face_attributes = input_polyhedron->face_attributes.clone_types();
+		face_attributes_copier.reset(new table_copier(input_polyhedron->face_attributes, output_polyhedron->face_attributes));
 
-		output_polyhedron->face_varying_attributes = input_polyhedron->face_varying_attributes.clone_types();
-		face_varying_attributes_copier.reset(new table_copier(input_polyhedron->face_varying_attributes, output_polyhedron->face_varying_attributes));
+		output_polyhedron->edge_attributes = input_polyhedron->edge_attributes.clone_types();
+		edge_attributes_copier.reset(new table_copier(input_polyhedron->edge_attributes, output_polyhedron->edge_attributes));
+
+		output_polyhedron->vertex_attributes = input_polyhedron->vertex_attributes.clone_types();
+		vertex_attributes_copier.reset(new table_copier(input_polyhedron->vertex_attributes, output_polyhedron->vertex_attributes));
 
 		Output.point_attributes = Input.point_attributes.clone();
 		point_attributes_copier.reset(new table_copier(Input.point_attributes, Output.point_attributes));
@@ -864,7 +1092,7 @@ public:
 					Polyhedron.face_first_loops,
 					Polyhedron.face_loop_counts,
 					Polyhedron.loop_first_edges,
-					Polyhedron.edge_points,
+					Polyhedron.vertex_points,
 					Polyhedron.clockwise_edges,
 					face);
 			}
@@ -874,8 +1102,6 @@ public:
 			}
 		}
 
-		output_polyhedron->shell_first_faces.push_back(0);
-		output_polyhedron->shell_face_counts.push_back(output_polyhedron->face_first_loops.size());
 		output_polyhedron->shell_types.push_back(POLYGONS);
 
 		return result;
@@ -896,61 +1122,74 @@ private:
 
 		point_attributes_copier->push_back(4, Vertices, Weights);
 
-		new_face_varying_attributes[NewVertex] = new_face_varying_record(Edges, Weights);
+		new_edge_attributes[NewVertex] = new_edge_record(Edges, Weights);
 	}
 
 	void add_triangle(uint_t Vertices[3], uint_t Edges[3])
 	{
+		output_polyhedron->face_shells.push_back(input_polyhedron->face_shells[current_face]);
 		output_polyhedron->face_first_loops.push_back(output_polyhedron->loop_first_edges.size());
 		output_polyhedron->face_loop_counts.push_back(1);
 		output_polyhedron->face_selections.push_back(1.0);
 		output_polyhedron->face_materials.push_back(input_polyhedron->face_materials[current_face]);
 
-		uniform_attributes_copier->push_back(current_face);
+		face_attributes_copier->push_back(current_face);
 
-		output_polyhedron->loop_first_edges.push_back(output_polyhedron->edge_points.size());
-		output_polyhedron->edge_points.push_back(Vertices[0]);
-		output_polyhedron->edge_points.push_back(Vertices[1]);
-		output_polyhedron->edge_points.push_back(Vertices[2]);
-		output_polyhedron->clockwise_edges.push_back(output_polyhedron->edge_points.size() - 2);
-		output_polyhedron->clockwise_edges.push_back(output_polyhedron->edge_points.size() - 1);
-		output_polyhedron->clockwise_edges.push_back(output_polyhedron->edge_points.size() - 3);
+		output_polyhedron->loop_first_edges.push_back(output_polyhedron->clockwise_edges.size());
+		output_polyhedron->vertex_points.push_back(Vertices[0]);
+		output_polyhedron->vertex_points.push_back(Vertices[1]);
+		output_polyhedron->vertex_points.push_back(Vertices[2]);
+		output_polyhedron->vertex_selections.push_back(0.0);
+		output_polyhedron->vertex_selections.push_back(0.0);
+		output_polyhedron->vertex_selections.push_back(0.0);
+		output_polyhedron->clockwise_edges.push_back(output_polyhedron->vertex_points.size() - 2);
+		output_polyhedron->clockwise_edges.push_back(output_polyhedron->vertex_points.size() - 1);
+		output_polyhedron->clockwise_edges.push_back(output_polyhedron->vertex_points.size() - 3);
 		output_polyhedron->edge_selections.push_back(0.0);
 		output_polyhedron->edge_selections.push_back(0.0);
 		output_polyhedron->edge_selections.push_back(0.0);
 
 		for(uint_t i = 0; i != 3; ++i)
 		{
-			if(new_face_varying_attributes.count(Vertices[i]))
-				face_varying_attributes_copier->push_back(4, new_face_varying_attributes[Vertices[i]].edges, new_face_varying_attributes[Vertices[i]].weights);
+			if(new_edge_attributes.count(Vertices[i]))
+			{
+				edge_attributes_copier->push_back(4, new_edge_attributes[Vertices[i]].edges, new_edge_attributes[Vertices[i]].weights);
+				vertex_attributes_copier->push_back(4, new_edge_attributes[Vertices[i]].edges, new_edge_attributes[Vertices[i]].weights);
+			}
 			else
-				face_varying_attributes_copier->push_back(Edges[i]);
+			{
+				edge_attributes_copier->push_back(Edges[i]);
+				vertex_attributes_copier->push_back(Edges[i]);
+			}
 		}
 	}
 
 	void add_existing_face(const uint_t Face)
 	{
+		output_polyhedron->face_shells.push_back(input_polyhedron->face_shells[Face]);
 		output_polyhedron->face_first_loops.push_back(output_polyhedron->loop_first_edges.size());
 		output_polyhedron->face_loop_counts.push_back(input_polyhedron->face_loop_counts[Face]);
 		output_polyhedron->face_selections.push_back(0.0);
 		output_polyhedron->face_materials.push_back(input_polyhedron->face_materials[Face]);
 
-		uniform_attributes_copier->push_back(Face);
+		face_attributes_copier->push_back(Face);
 
 		const uint_t loop_begin = input_polyhedron->face_first_loops[Face];
 		const uint_t loop_end = loop_begin + input_polyhedron->face_loop_counts[Face];
 		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 		{
-			output_polyhedron->loop_first_edges.push_back(output_polyhedron->edge_points.size());
+			output_polyhedron->loop_first_edges.push_back(output_polyhedron->vertex_points.size());
 
 			const uint_t first_edge = input_polyhedron->loop_first_edges[loop];
-			const uint_t edge_offset = output_polyhedron->edge_points.size() - first_edge;
+			const uint_t edge_offset = output_polyhedron->vertex_points.size() - first_edge;
 			for(uint_t edge = first_edge; ;)
 			{
-				output_polyhedron->edge_points.push_back(input_polyhedron->edge_points[edge]);
+				output_polyhedron->vertex_points.push_back(input_polyhedron->vertex_points[edge]);
+				output_polyhedron->vertex_selections.push_back(0.0);
 				output_polyhedron->clockwise_edges.push_back(input_polyhedron->clockwise_edges[edge] + edge_offset);
 				output_polyhedron->edge_selections.push_back(0.0);
-				face_varying_attributes_copier->push_back(edge);
+				edge_attributes_copier->push_back(edge);
+				vertex_attributes_copier->push_back(edge);
 
 				edge = input_polyhedron->clockwise_edges[edge];
 				if(edge == first_edge)
@@ -965,19 +1204,20 @@ private:
 	mesh::selection_t* output_point_selection;
 	boost::scoped_ptr<primitive> output_polyhedron;
 
-	boost::shared_ptr<table_copier> uniform_attributes_copier;
-	boost::shared_ptr<table_copier> face_varying_attributes_copier;
+	boost::shared_ptr<table_copier> face_attributes_copier;
+	boost::shared_ptr<table_copier> edge_attributes_copier;
+	boost::shared_ptr<table_copier> vertex_attributes_copier;
 	boost::shared_ptr<table_copier> point_attributes_copier;
 
 	uint_t current_face;
 
-	struct new_face_varying_record
+	struct new_edge_record
 	{
-		new_face_varying_record()
+		new_edge_record()
 		{
 		}
 
-		new_face_varying_record(uint_t Edges[4], double_t Weights[4])
+		new_edge_record(uint_t Edges[4], double_t Weights[4])
 		{
 			std::copy(Edges, Edges + 4, edges);
 			std::copy(Weights, Weights + 4, weights);
@@ -987,7 +1227,7 @@ private:
 		double_t weights[4];
 	};
 
-	std::map<uint_t, new_face_varying_record> new_face_varying_attributes;
+	std::map<uint_t, new_edge_record> new_edge_attributes;
 };
 
 } // namespace detail
@@ -995,58 +1235,57 @@ private:
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create_edge_adjacency_lookup
 
-void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges)
+void create_point_out_edge_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, std::vector<mesh::indices_t>& AdjacencyList)
 {
-	mesh::counts_t valences;
-	create_vertex_valence_lookup(0, EdgePoints, valences);
-	mesh::counts_t found_edges(valences.size(), 0);
-	mesh::indices_t first_edges(valences.size(), 0); // first edge in point_edges for each point
-	mesh::indices_t point_edges(EdgePoints.size(), 0);
-	uint_t count = 0;
-	for(uint_t point = 0; point != valences.size(); ++point)
-	{
-		first_edges[point] = count;
-		count += valences[point];
-	}
-	BoundaryEdges.assign(EdgePoints.size(), true);
-	AdjacentEdges.assign(EdgePoints.size(), 0);
-
 	const uint_t edge_begin = 0;
-	const uint_t edge_end = edge_begin + EdgePoints.size();
+	const uint_t edge_end = edge_begin + ClockwiseEdges.size();
 	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
 	{
-		const uint_t point = EdgePoints[edge];
-		point_edges[first_edges[point] + found_edges[point]] = edge;
-		++found_edges[point];
+		AdjacencyList[VertexPoints[edge]].push_back(edge);
 	}
+}
+
+void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges)
+{
+	const k3d::uint_t count = VertexPoints.empty() ? 0 : *std::max_element(VertexPoints.begin(), VertexPoints.end()) + 1;
+	if(!count)
+		return;
+	std::vector<mesh::indices_t> point_edges(count);
+	create_point_out_edge_lookup(VertexPoints, ClockwiseEdges, point_edges);
+
+	BoundaryEdges.assign(VertexPoints.size(), true);
+	AdjacentEdges.assign(VertexPoints.size(), 0);
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + VertexPoints.size();
 	
 	// Making this parallel decreases running time by 20 % on a Pentium D. 
 	k3d::parallel::parallel_for(
-				k3d::parallel::blocked_range<k3d::uint_t>(edge_begin, edge_end, k3d::parallel::grain_size()),
-				detail::find_companion_worker(EdgePoints, ClockwiseEdges, valences, first_edges, point_edges, BoundaryEdges, AdjacentEdges));
+				k3d::parallel::blocked_range<uint_t>(edge_begin, edge_end, k3d::parallel::grain_size()),
+				detail::find_companion_worker(VertexPoints, ClockwiseEdges, point_edges, BoundaryEdges, AdjacentEdges));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // create_edge_face_lookup
 
-void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::indices_t& EdgeFaces)
+void create_edge_face_lookup(const const_primitive& Polyhedron, mesh::indices_t& EdgeFaces)
 {
-	EdgeFaces.assign(ClockwiseEdges.size(), 0);
+	EdgeFaces.assign(Polyhedron.clockwise_edges.size(), 0);
 
-	const size_t face_begin = 0;
-	const size_t face_end = face_begin + FaceFirstLoops.size();
-	for(size_t face = face_begin; face != face_end; ++face)
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + Polyhedron.face_first_loops.size();
+	for(uint_t face = face_begin; face != face_end; ++face)
 	{
-		const size_t loop_begin = FaceFirstLoops[face];
-		const size_t loop_end = loop_begin + FaceLoopCounts[face];
-		for(size_t loop = loop_begin; loop != loop_end; ++loop)
+		const uint_t loop_begin = Polyhedron.face_first_loops[face];
+		const uint_t loop_end = loop_begin + Polyhedron.face_loop_counts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 		{
-			const size_t first_edge = LoopFirstEdges[loop];
-			for(size_t edge = first_edge; ;)
+			const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+			for(uint_t edge = first_edge; ;)
 			{
 				EdgeFaces[edge] = face;
 
-				edge = ClockwiseEdges[edge];
+				edge = Polyhedron.clockwise_edges[edge];
 				if(edge == first_edge)
 					break;
 			}
@@ -1054,25 +1293,47 @@ void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-// create_vertex_face_lookup
-
-void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces)
+void create_loop_edge_count_lookup(const const_primitive& Polyhedron, mesh::counts_t& LoopEdgeCounts)
 {
-	std::vector<std::vector<size_t> > adjacency_list(Points.size());
+	LoopEdgeCounts.assign(Polyhedron.loop_first_edges.size(), 0);
 
-	const size_t face_begin = 0;
-	const size_t face_end = face_begin + FaceFirstLoops.size();
-	for(size_t face = face_begin; face != face_end; ++face)
+	const uint_t loop_begin = 0;
+	const uint_t loop_end = loop_begin + Polyhedron.loop_first_edges.size();
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 	{
-		const size_t loop_begin = FaceFirstLoops[face];
-		const size_t loop_end = loop_begin + FaceLoopCounts[face];
-		for(size_t loop = loop_begin; loop != loop_end; ++loop)
+		const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+		for(uint_t edge = first_edge; ;)
 		{
-			const size_t first_edge = LoopFirstEdges[loop];
-			for(size_t edge = first_edge; ;)
+			++LoopEdgeCounts[loop];
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_point_face_lookup
+
+void create_point_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces)
+{
+	log() << warning << k3d_file_reference << " is deprecated" << std::endl;
+
+	std::vector<std::vector<uint_t> > adjacency_list(Points.size());
+
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + FaceFirstLoops.size();
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		const uint_t loop_begin = FaceFirstLoops[face];
+		const uint_t loop_end = loop_begin + FaceLoopCounts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			const uint_t first_edge = LoopFirstEdges[loop];
+			for(uint_t edge = first_edge; ;)
 			{
-				adjacency_list[EdgePoints[edge]].push_back(face);
+				adjacency_list[VertexPoints[edge]].push_back(face);
 
 				edge = ClockwiseEdges[edge];
 				if(edge == first_edge)
@@ -1085,9 +1346,9 @@ void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh
 	PointFaceCounts.assign(Points.size(), 0);
 	PointFaces.clear();
 
-	const size_t point_begin = 0;
-	const size_t point_end = point_begin + Points.size();
-	for(size_t point = point_begin; point != point_end; ++point)
+	const uint_t point_begin = 0;
+	const uint_t point_end = point_begin + Points.size();
+	for(uint_t point = point_begin; point != point_end; ++point)
 	{
 		PointFirstFaces[point] = PointFaces.size();
 		PointFaceCounts[point] = adjacency_list[point].size();
@@ -1095,18 +1356,115 @@ void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-// create_vertex_valence_lookup
-
-void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& EdgePoints, mesh::counts_t& Valences)
+void create_point_face_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList)
 {
+	AdjacencyList.resize(Mesh.points->size());
+
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + Polyhedron.face_shells.size();
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		const uint_t loop_begin = Polyhedron.face_first_loops[face];
+		const uint_t loop_end = loop_begin + Polyhedron.face_loop_counts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+			for(uint_t edge = first_edge; ;)
+			{
+				AdjacencyList[Polyhedron.vertex_points[edge]].push_back(face);
+
+				edge = Polyhedron.clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_point_out_edge_lookup
+
+void create_point_out_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList)
+{
+	AdjacencyList.resize(Mesh.points->size());
+	create_point_out_edge_lookup(Polyhedron.vertex_points, Polyhedron.clockwise_edges, AdjacencyList);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_point_in_edge_lookup
+
+void create_point_in_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList)
+{
+	AdjacencyList.resize(Mesh.points->size());
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + Polyhedron.clockwise_edges.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		AdjacencyList[Polyhedron.vertex_points[Polyhedron.clockwise_edges[edge]]].push_back(edge);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_point_edge_lookup
+
+void create_point_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList)
+{
+	AdjacencyList.resize(Mesh.points->size());
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + Polyhedron.clockwise_edges.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		AdjacencyList[Polyhedron.vertex_points[edge]].push_back(edge);
+		AdjacencyList[Polyhedron.vertex_points[Polyhedron.clockwise_edges[edge]]].push_back(edge);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_point_edge_lookup
+
+void create_point_edge_lookup(const mesh::indices_t& VertexPoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts)
+{
+	log() << warning << k3d_file_reference << " is deprecated" << std::endl;
+
+	if(PointEdgeCounts.empty())
+		create_point_valence_lookup(0, VertexPoints, PointEdgeCounts);
+	const uint_t point_count = PointEdgeCounts.size();
+	mesh::counts_t found_edges(point_count, 0);
+	PointFirstEdges.assign(point_count, 0); // first edge in point_edges for each point
+	PointEdges.assign(VertexPoints.size(), 0);
+	uint_t count = 0;
+	for(uint_t point = 0; point != point_count; ++point)
+	{
+		PointFirstEdges[point] = count;
+		count += PointEdgeCounts[point];
+	}
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + VertexPoints.size();
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		const uint_t point = VertexPoints[edge];
+		PointEdges[PointFirstEdges[point] + found_edges[point]] = edge;
+		++found_edges[point];
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// create_point_valence_lookup
+
+void create_point_valence_lookup(const uint_t PointCount, const mesh::indices_t& VertexPoints, mesh::counts_t& Valences)
+{
+	log() << warning << k3d_file_reference << " is deprecated" << std::endl;
+
 	Valences.assign(PointCount, 0);
 	
 	// Add 1 for each edge that starts at a point
-	uint_t edge_count = EdgePoints.size();
+	uint_t edge_count = VertexPoints.size();
 	for (uint_t edge = 0; edge != edge_count; ++edge)
 	{
-		const uint_t edge_point = EdgePoints[edge];
+		const uint_t edge_point = VertexPoints[edge];
 		if(edge_point >= Valences.size()) // In case PointCount was not known to the caller
 			Valences.resize(edge_point + 1, 0);
 		++Valences[edge_point];
@@ -1121,16 +1479,16 @@ void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const me
 	BoundaryFaces.clear();
 	BoundaryFaces.resize(FaceFirstLoops.size());
 	
-	const size_t face_begin = 0;
-	const size_t face_end = face_begin + FaceFirstLoops.size();
-	for(size_t face = face_begin; face != face_end; ++face)
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + FaceFirstLoops.size();
+	for(uint_t face = face_begin; face != face_end; ++face)
 	{
-		const size_t loop_begin = FaceFirstLoops[face];
-		const size_t loop_end = loop_begin + FaceLoopCounts[face];
-		for(size_t loop = loop_begin; loop != loop_end; ++loop)
+		const uint_t loop_begin = FaceFirstLoops[face];
+		const uint_t loop_end = loop_begin + FaceLoopCounts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
 		{
-			const size_t first_edge = LoopFirstEdges[loop];
-			for(size_t edge = first_edge; ;)
+			const uint_t first_edge = LoopFirstEdges[loop];
+			for(uint_t edge = first_edge; ;)
 			{
 				if (BoundaryEdges[edge])
 				{
@@ -1149,16 +1507,16 @@ void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const me
 /////////////////////////////////////////////////////////////////////////////////////////////
 // mark_collinear_edges
 
-void mark_collinear_edges(mesh::indices_t& RedundantEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold)
+void mark_collinear_edges(mesh::indices_t& RedundantEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold)
 {
-	for(uint_t edge = 0; edge != EdgePoints.size(); ++edge)
+	for(uint_t edge = 0; edge != VertexPoints.size(); ++edge)
 	{
 		if(!EdgeSelection[edge])
 			continue;
 		const uint_t clockwise = ClockwiseEdges[edge];
-		const uint_t p1_index = EdgePoints[edge];
-		const uint_t p2_index = EdgePoints[clockwise];
-		const uint_t p3_index = EdgePoints[ClockwiseEdges[clockwise]];
+		const uint_t p1_index = VertexPoints[edge];
+		const uint_t p2_index = VertexPoints[clockwise];
+		const uint_t p3_index = VertexPoints[ClockwiseEdges[clockwise]];
 		// valence must be 2 for internal edges or 1 for boundary edges
 		if(!((!BoundaryEdges[clockwise] && VertexValences[p2_index] == 2) || (BoundaryEdges[clockwise] && VertexValences[p2_index] == 1)))
 			continue;
@@ -1202,11 +1560,234 @@ void mark_coplanar_edges(const mesh::indices_t& Companions,
 }
 
 ////////////////////////////////////////////
-// Triangulate
+// triangulate
 
 mesh::primitive* triangulate(const mesh& Input, const const_primitive& Polyhedron, mesh& Output)
 {
 	return detail::create_triangles().process(Input, Polyhedron, Output);
+}
+
+////////////////////////////////////////////
+// delete_components
+
+void delete_components(const mesh& Mesh, primitive& Polyhedron, const mesh::bools_t& RemovePoints, mesh::bools_t& RemoveEdges, mesh::bools_t& RemoveLoops, mesh::bools_t& RemoveFaces)
+{
+	// Sanity checks ...
+	return_if_fail(RemovePoints.size() == Mesh.points->size());
+	return_if_fail(RemoveEdges.size() == Polyhedron.clockwise_edges.size());
+	return_if_fail(RemoveLoops.size() == Polyhedron.loop_first_edges.size());
+	return_if_fail(RemoveFaces.size() == Polyhedron.face_shells.size());
+
+	// Cache some useful stuff up-front ...
+	const uint_t face_begin = 0;
+	const uint_t face_end = face_begin + Polyhedron.face_shells.size();
+
+	const uint_t edge_begin = 0;
+	const uint_t edge_end = edge_begin + Polyhedron.clockwise_edges.size();
+
+	const uint_t loop_begin = 0;
+	const uint_t loop_end = loop_begin + Polyhedron.loop_first_edges.size();
+
+	// Mark edges to be implicitly removed because their points are going away ...
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		if(!RemovePoints[Polyhedron.vertex_points[edge]])
+			continue;
+
+		RemoveEdges[edge] = true;
+	}
+
+	// Mark loops to be implicitly removed because they have fewer than three edges remaining ...
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+	{
+		const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+
+		uint_t remaining_edge_count = 0;
+		for(uint_t edge = first_edge; ;)
+		{
+			if(!RemoveEdges[edge])
+				++remaining_edge_count;
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
+		}
+
+		if(remaining_edge_count < 3)
+			RemoveLoops[loop] = true;
+	}
+
+	// Mark faces to be implicitly removed because their first loop is going away ...
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		if(RemoveFaces[face])
+			continue;
+
+		if(RemoveLoops[Polyhedron.face_first_loops[face]])
+			RemoveFaces[face] = true;
+	}
+
+	// Mark loops and edges to be implicitly removed because their face is going away ...
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		if(!RemoveFaces[face])
+			continue;
+
+		const uint_t loop_begin = Polyhedron.face_first_loops[face];
+		const uint_t loop_end = loop_begin + Polyhedron.face_loop_counts[face];
+		for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+		{
+			RemoveLoops[loop] = true;
+
+			const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+			for(uint_t edge = first_edge; ;)
+			{
+				RemoveEdges[edge] = true;
+
+				edge = Polyhedron.clockwise_edges[edge];
+				if(edge == first_edge)
+					break;
+			}
+		}
+	}
+
+	// Compute new first edges for loops ...
+	mesh::indices_t new_first_edge(Polyhedron.loop_first_edges.size());
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+	{
+		if(RemoveLoops[loop])
+			continue;
+
+		const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+		for(uint_t edge = first_edge; ;)
+		{
+			if(!RemoveEdges[edge])
+			{
+				new_first_edge[loop] = edge;
+				break;
+			}
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
+		}
+	}
+
+	// Compute new clockwise_edges ...
+	mesh::indices_t new_clockwise_edge(Polyhedron.clockwise_edges.size());
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+	{
+		if(RemoveLoops[loop])
+			continue;
+
+		const uint_t first_edge = Polyhedron.loop_first_edges[loop];
+
+		mesh::indices_t remaining_edges;
+		for(uint_t edge = first_edge; ;)
+		{
+			if(!RemoveEdges[edge])
+				remaining_edges.push_back(edge);
+
+			edge = Polyhedron.clockwise_edges[edge];
+			if(edge == first_edge)
+				break;
+		}
+
+		for(uint_t e = 0; e != remaining_edges.size(); ++e)
+		{
+			new_clockwise_edge[remaining_edges[e]] = remaining_edges[(e+1)%remaining_edges.size()];
+		}
+	}
+
+	// Compute maps and remaining component counts ...
+	mesh::indices_t face_map;
+	mesh::create_index_removal_map(RemoveFaces, face_map);
+	const uint_t remaining_faces = std::count(RemoveFaces.begin(), RemoveFaces.end(), false);
+
+	mesh::indices_t loop_map;
+	mesh::create_index_removal_map(RemoveLoops, loop_map);
+	const uint_t remaining_loops = std::count(RemoveLoops.begin(), RemoveLoops.end(), false);
+
+	mesh::indices_t edge_map;
+	mesh::create_index_removal_map(RemoveEdges, edge_map);
+	const uint_t remaining_edges = std::count(RemoveEdges.begin(), RemoveEdges.end(), false);
+
+	// Delete faces, updating loop indices as we go ...
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		if(RemoveFaces[face])
+			continue;
+
+		Polyhedron.face_shells[face_map[face]] = Polyhedron.face_shells[face];
+		Polyhedron.face_first_loops[face_map[face]] = loop_map[Polyhedron.face_first_loops[face]];
+		Polyhedron.face_loop_counts[face_map[face]] = Polyhedron.face_loop_counts[face];
+		Polyhedron.face_selections[face_map[face]] = Polyhedron.face_selections[face];
+		Polyhedron.face_materials[face_map[face]] = Polyhedron.face_materials[face];
+	}
+	Polyhedron.face_shells.resize(remaining_faces);
+	Polyhedron.face_first_loops.resize(remaining_faces);
+	Polyhedron.face_loop_counts.resize(remaining_faces);
+	Polyhedron.face_selections.resize(remaining_faces);
+	Polyhedron.face_materials.resize(remaining_faces);
+
+	// Delete face attributes ...
+	table_copier face_attribute_copier(Polyhedron.face_attributes);
+	for(uint_t face = face_begin; face != face_end; ++face)
+	{
+		if(RemoveFaces[face])
+			continue;
+
+		face_attribute_copier.copy(face, face_map[face]);
+	}
+	Polyhedron.face_attributes.set_row_count(remaining_faces);
+
+	// Delete loops, updating edge indices as we go ...
+	for(uint_t loop = loop_begin; loop != loop_end; ++loop)
+	{
+		if(RemoveLoops[loop])
+			continue;
+
+		Polyhedron.loop_first_edges[loop_map[loop]] = edge_map[new_first_edge[loop]];
+	}
+	Polyhedron.loop_first_edges.resize(remaining_loops);
+
+	// Delete edges, updating edge indices as we go ...
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		if(RemoveEdges[edge])
+			continue;
+
+		Polyhedron.clockwise_edges[edge_map[edge]] = edge_map[new_clockwise_edge[edge]];
+		Polyhedron.edge_selections[edge_map[edge]] = Polyhedron.edge_selections[edge];
+		Polyhedron.vertex_points[edge_map[edge]] = Polyhedron.vertex_points[edge];
+		Polyhedron.vertex_selections[edge_map[edge]] = Polyhedron.vertex_selections[edge];
+	}
+	Polyhedron.clockwise_edges.resize(remaining_edges);
+	Polyhedron.edge_selections.resize(remaining_edges);
+	Polyhedron.vertex_points.resize(remaining_edges);
+	Polyhedron.vertex_selections.resize(remaining_edges);
+
+	// Delete edge attributes ...
+	table_copier edge_attribute_copier(Polyhedron.edge_attributes);
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		if(RemoveEdges[edge])
+			continue;
+
+		edge_attribute_copier.copy(edge, edge_map[edge]);
+	}
+	Polyhedron.edge_attributes.set_row_count(remaining_edges);
+
+	// Delete vertex attributes ...
+	table_copier vertex_attribute_copier(Polyhedron.vertex_attributes);
+	for(uint_t edge = edge_begin; edge != edge_end; ++edge)
+	{
+		if(RemoveEdges[edge])
+			continue;
+
+		vertex_attribute_copier.copy(edge, edge_map[edge]);
+	}
+	Polyhedron.vertex_attributes.set_row_count(remaining_edges);
 }
 
 } // namespace polyhedron

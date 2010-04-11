@@ -87,11 +87,11 @@ public:
 		// Get a path where we can store the scripted RIB output ...
 		const k3d::filesystem::path archive_path = State.frame.add_file("renderman_script");
 
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Archive"] = archive_path;
-		context["RenderState"] = &State;
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["archive"] = archive_path;
+		context["render_state"] = &State;
 
 		return_if_fail(execute_script(context));
 
@@ -101,8 +101,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<renderman_script,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 			k3d::uuid(0xded017f6, 0xa08849fd, 0xa9d8dd63, 0xe3cd6f1d),
 			"RenderManScript",
 			_("Creates RenderMan output under script control"),

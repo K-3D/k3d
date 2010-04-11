@@ -24,7 +24,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/ibitmap_source.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/virtual_document_plugin_factory.h>
 

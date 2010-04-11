@@ -81,20 +81,20 @@ public:
 				ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
 
 				array_copier ri_uniform_attributes;
-				ri_uniform_attributes.add_arrays(sphere->uniform_attributes);
+				ri_uniform_attributes.add_arrays(sphere->surface_attributes);
 				ri_uniform_attributes.push_back(i);
 				ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
 
 				array_copier ri_varying_attributes;
-				ri_varying_attributes.add_arrays(sphere->varying_attributes);
+				ri_varying_attributes.add_arrays(sphere->parameter_attributes);
 				for(k3d::uint_t j = 0; j != 4; ++j)
 					ri_varying_attributes.push_back((i * 4) + j);
 				ri_varying_attributes.copy_to(k3d::ri::VARYING, ri_parameters);
 				
 				RenderState.stream.RiSphereV(
 					sphere->radii[i],
-					sphere->radii[i] * sphere->z_min[i],
-					sphere->radii[i] * sphere->z_max[i],
+					std::max(-sphere->radii[i], sphere->radii[i] * sphere->z_min[i]),
+					std::min(sphere->radii[i], sphere->radii[i] * sphere->z_max[i]),
 					k3d::degrees(sphere->sweep_angles[i]),
 					ri_parameters);
 
@@ -114,7 +114,7 @@ public:
 			"RenderManSpherePainter",
 			_("Renders sphere primitives"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

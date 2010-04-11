@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "render_state_gl.h"
+#include <k3dsdk/render_state_gl.h>
 
 namespace k3d
 {

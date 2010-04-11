@@ -25,7 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include <k3dsdk/iunknown.h>
 
 namespace k3d
 {
@@ -33,7 +33,7 @@ namespace k3d
 class icrop_window;
 class iprojection;
 class iproperty;
-class itransform_source;
+class imatrix_source;
 
 /// Abstract interface for objects that can host (provide position and projection information to) a viewport
 class icamera :
@@ -41,13 +41,13 @@ class icamera :
 {
 public:
 	/// Returns the required position data for this camera
-	virtual itransform_source& transformation() = 0;
+	virtual imatrix_source& transformation() = 0;
 	/// Returns the required viewing projection for this camera
 	virtual iprojection& projection() = 0;
 	/// Returns the required crop-window for this camera
 	virtual icrop_window& crop_window() = 0;
 	/// Returns the transformable object that should be altered during interactive user navigation
-	virtual itransform_source& navigation_target() = 0;
+	virtual imatrix_source& navigation_target() = 0;
 	/// Retuns the camera's world target, a point (in world coordinates) around which the viewport orbits
 	virtual iproperty& world_target() = 0;
 

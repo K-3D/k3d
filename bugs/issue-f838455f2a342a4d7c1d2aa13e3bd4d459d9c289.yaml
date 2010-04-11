@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Support grouped inset in ExtrudeFaces
+desc: Currently, the inset property is ignored when grouping is enabled in ExtrudeFaces.  Make it work again.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-02-23 04:02:01.458926 Z
+references: []
+
+id: f838455f2a342a4d7c1d2aa13e3bd4d459d9c289
+log_events: 
+- - 2010-02-23 04:02:02.026851 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-02-27 06:35:42.570878 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""
+claimer: 

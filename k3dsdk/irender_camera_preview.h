@@ -2,7 +2,7 @@
 #define K3DSDK_IRENDER_CAMERA_PREVIEW_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include <k3dsdk/iunknown.h>
 
 namespace k3d
 {
@@ -36,7 +36,7 @@ class irender_camera_preview :
 	public virtual iunknown
 {
 public:
-	virtual bool render_camera_preview(icamera& Camera) = 0;
+	virtual bool_t render_camera_preview(icamera& Camera) = 0;
 
 protected:
 	irender_camera_preview() {}

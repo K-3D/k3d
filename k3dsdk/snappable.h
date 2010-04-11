@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "snappable_detail.h"
+#include <k3dsdk/snappable_detail.h>
 
 namespace k3d
 {

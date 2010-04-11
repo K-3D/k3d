@@ -21,10 +21,10 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "imesh_storage_python.h"
-#include "mesh_python.h"
-#include "iunknown_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/imesh_storage_python.h>
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/mesh.h>

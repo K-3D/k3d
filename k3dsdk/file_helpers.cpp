@@ -21,7 +21,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "file_helpers.h"
+#include <k3dsdk/file_helpers.h>
 
 namespace
 {

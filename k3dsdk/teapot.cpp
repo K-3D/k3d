@@ -17,11 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "metadata_keys.h"
-#include "primitive_validation.h"
-#include "selection.h"
-#include "string_cast.h"
-#include "teapot.h"
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/primitive_validation.h>
+#include <k3dsdk/selection.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/teapot.h>
 
 namespace k3d
 {
@@ -37,13 +37,13 @@ const_primitive::const_primitive(
 	const mesh::materials_t& Materials,
 	const mesh::selection_t& Selections,
 	const mesh::table_t& ConstantAttributes,
-	const mesh::table_t& UniformAttributes
+	const mesh::table_t& SurfaceAttributes
 		) :
 	matrices(Matrices),
 	materials(Materials),
 	selections(Selections),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes)
+	surface_attributes(SurfaceAttributes)
 {
 }
 
@@ -55,13 +55,13 @@ primitive::primitive(
 	mesh::materials_t& Materials,
 	mesh::selection_t& Selections,
 	mesh::table_t& ConstantAttributes,
-	mesh::table_t& UniformAttributes
+	mesh::table_t& SurfaceAttributes
 		) :
 	matrices(Matrices),
 	materials(Materials),
 	selections(Selections),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes)
+	surface_attributes(SurfaceAttributes)
 {
 }
 
@@ -73,11 +73,11 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("teapot");
 
 	primitive* const result = new primitive(
-		generic_primitive.structure["uniform"].create<mesh::matrices_t >("matrices"),
-		generic_primitive.structure["uniform"].create<mesh::materials_t >("materials"),
-		generic_primitive.structure["uniform"].create<mesh::selection_t>("selections"),
+		generic_primitive.structure["surface"].create<mesh::matrices_t >("matrices"),
+		generic_primitive.structure["surface"].create<mesh::materials_t >("materials"),
+		generic_primitive.structure["surface"].create<mesh::selection_t>("selections"),
 		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["uniform"]
+		generic_primitive.attributes["surface"]
 		);
 
 	result->selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
@@ -97,18 +97,18 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Mesh, Primitive);
 
-		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		const mesh::table_t& surface_structure = require_structure(Primitive, "surface");
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		const mesh::table_t& surface_attributes = require_attributes(Primitive, "surface");
 
-		const mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, uniform_structure, "matrices");
-		const mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "materials");
-		const mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
+		const mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, surface_structure, "matrices");
+		const mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, surface_structure, "materials");
+		const mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, surface_structure, "selections");
 
 		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
-		return new const_primitive(matrices, materials, selections, constant_attributes, uniform_attributes);
+		return new const_primitive(matrices, materials, selections, constant_attributes, surface_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -127,18 +127,18 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Mesh, Primitive);
 
-		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		mesh::table_t& surface_structure = require_structure(Primitive, "surface");
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
+		mesh::table_t& surface_attributes = require_attributes(Primitive, "surface");
 
-		mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, uniform_structure, "matrices");
-		mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "materials");
-		mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, uniform_structure, "selections");
+		mesh::matrices_t& matrices = require_array<mesh::matrices_t >(Primitive, surface_structure, "matrices");
+		mesh::materials_t& materials = require_array<mesh::materials_t >(Primitive, surface_structure, "materials");
+		mesh::selection_t& selections = require_array<mesh::selection_t>(Primitive, surface_structure, "selections");
 
 		require_metadata(Primitive, selections, "selections", metadata::key::role(), metadata::value::selection_role());
 
-		return new primitive(matrices, materials, selections, constant_attributes, uniform_attributes);
+		return new primitive(matrices, materials, selections, constant_attributes, surface_attributes);
 	}
 	catch(std::exception& e)
 	{

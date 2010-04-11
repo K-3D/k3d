@@ -17,11 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "iunknown_python.h"
-#include "mesh_python.h"
-#include "owned_instance_wrapper_python.h"
-#include "polyhedron_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/owned_instance_wrapper_python.h>
+#include <k3dsdk/python/polyhedron_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/polyhedron.h>
@@ -45,20 +45,21 @@ public:
 	public:
 		typedef owned_instance_wrapper<k3d::polyhedron::const_primitive> wrapper;
 
-		static object shell_first_faces(wrapper& Self) { return wrap(Self.wrapped().shell_first_faces); }
-		static object shell_face_counts(wrapper& Self) { return wrap(Self.wrapped().shell_face_counts); }
 		static object shell_types(wrapper& Self) { return wrap(Self.wrapped().shell_types); }
+		static object face_shells(wrapper& Self) { return wrap(Self.wrapped().face_shells); }
 		static object face_first_loops(wrapper& Self) { return wrap(Self.wrapped().face_first_loops); }
 		static object face_loop_counts(wrapper& Self) { return wrap(Self.wrapped().face_loop_counts); }
 		static object face_selections(wrapper& Self) { return wrap(Self.wrapped().face_selections); }
 		static object face_materials(wrapper& Self) { return wrap(Self.wrapped().face_materials); }
 		static object loop_first_edges(wrapper& Self) { return wrap(Self.wrapped().loop_first_edges); }
-		static object edge_points(wrapper& Self) { return wrap(Self.wrapped().edge_points); }
 		static object clockwise_edges(wrapper& Self) { return wrap(Self.wrapped().clockwise_edges); }
 		static object edge_selections(wrapper& Self) { return wrap(Self.wrapped().edge_selections); }
+		static object vertex_points(wrapper& Self) { return wrap(Self.wrapped().vertex_points); }
+		static object vertex_selections(wrapper& Self) { return wrap(Self.wrapped().vertex_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
-		static object face_varying_attributes(wrapper& Self) { return wrap(Self.wrapped().face_varying_attributes); }
+		static object face_attributes(wrapper& Self) { return wrap(Self.wrapped().face_attributes); }
+		static object edge_attributes(wrapper& Self) { return wrap(Self.wrapped().edge_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 	class primitive
@@ -66,20 +67,21 @@ public:
 	public:
 		typedef owned_instance_wrapper<k3d::polyhedron::primitive> wrapper;
 
-		static object shell_first_faces(wrapper& Self) { return wrap(Self.wrapped().shell_first_faces); }
-		static object shell_face_counts(wrapper& Self) { return wrap(Self.wrapped().shell_face_counts); }
 		static object shell_types(wrapper& Self) { return wrap(Self.wrapped().shell_types); }
+		static object face_shells(wrapper& Self) { return wrap(Self.wrapped().face_shells); }
 		static object face_first_loops(wrapper& Self) { return wrap(Self.wrapped().face_first_loops); }
 		static object face_loop_counts(wrapper& Self) { return wrap(Self.wrapped().face_loop_counts); }
 		static object face_selections(wrapper& Self) { return wrap(Self.wrapped().face_selections); }
 		static object face_materials(wrapper& Self) { return wrap(Self.wrapped().face_materials); }
 		static object loop_first_edges(wrapper& Self) { return wrap(Self.wrapped().loop_first_edges); }
-		static object edge_points(wrapper& Self) { return wrap(Self.wrapped().edge_points); }
 		static object clockwise_edges(wrapper& Self) { return wrap(Self.wrapped().clockwise_edges); }
 		static object edge_selections(wrapper& Self) { return wrap(Self.wrapped().edge_selections); }
+		static object vertex_points(wrapper& Self) { return wrap(Self.wrapped().vertex_points); }
+		static object vertex_selections(wrapper& Self) { return wrap(Self.wrapped().vertex_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
-		static object face_varying_attributes(wrapper& Self) { return wrap(Self.wrapped().face_varying_attributes); }
+		static object face_attributes(wrapper& Self) { return wrap(Self.wrapped().face_attributes); }
+		static object edge_attributes(wrapper& Self) { return wrap(Self.wrapped().edge_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 
@@ -159,37 +161,39 @@ void define_namespace_polyhedron()
 		.attr("__module__") = "k3d";
 
 	class_<polyhedron::const_primitive::wrapper>("const_primitive", no_init)
-		.def("shell_first_faces", &polyhedron::const_primitive::shell_first_faces)
-		.def("shell_face_counts", &polyhedron::const_primitive::shell_face_counts)
 		.def("shell_types", &polyhedron::const_primitive::shell_types)
+		.def("face_shells", &polyhedron::const_primitive::face_shells)
 		.def("face_first_loops", &polyhedron::const_primitive::face_first_loops)
 		.def("face_loop_counts", &polyhedron::const_primitive::face_loop_counts)
 		.def("face_selections", &polyhedron::const_primitive::face_selections)
 		.def("face_materials", &polyhedron::const_primitive::face_materials)
 		.def("loop_first_edges", &polyhedron::const_primitive::loop_first_edges)
-		.def("edge_points", &polyhedron::const_primitive::edge_points)
 		.def("clockwise_edges", &polyhedron::const_primitive::clockwise_edges)
 		.def("edge_selections", &polyhedron::const_primitive::edge_selections)
+		.def("vertex_points", &polyhedron::const_primitive::vertex_points)
+		.def("vertex_selections", &polyhedron::const_primitive::vertex_selections)
 		.def("constant_attributes", &polyhedron::const_primitive::constant_attributes)
-		.def("uniform_attributes", &polyhedron::const_primitive::uniform_attributes)
-		.def("face_varying_attributes", &polyhedron::const_primitive::face_varying_attributes)
+		.def("face_attributes", &polyhedron::const_primitive::face_attributes)
+		.def("edge_attributes", &polyhedron::const_primitive::edge_attributes)
+		.def("vertex_attributes", &polyhedron::const_primitive::vertex_attributes)
 		;
 
 	class_<polyhedron::primitive::wrapper>("primitive", no_init)
-		.def("shell_first_faces", &polyhedron::primitive::shell_first_faces)
-		.def("shell_face_counts", &polyhedron::primitive::shell_face_counts)
 		.def("shell_types", &polyhedron::primitive::shell_types)
+		.def("face_shells", &polyhedron::primitive::face_shells)
 		.def("face_first_loops", &polyhedron::primitive::face_first_loops)
 		.def("face_loop_counts", &polyhedron::primitive::face_loop_counts)
 		.def("face_selections", &polyhedron::primitive::face_selections)
 		.def("face_materials", &polyhedron::primitive::face_materials)
 		.def("loop_first_edges", &polyhedron::primitive::loop_first_edges)
-		.def("edge_points", &polyhedron::primitive::edge_points)
 		.def("clockwise_edges", &polyhedron::primitive::clockwise_edges)
 		.def("edge_selections", &polyhedron::primitive::edge_selections)
+		.def("vertex_points", &polyhedron::primitive::vertex_points)
+		.def("vertex_selections", &polyhedron::primitive::vertex_selections)
 		.def("constant_attributes", &polyhedron::primitive::constant_attributes)
-		.def("uniform_attributes", &polyhedron::primitive::uniform_attributes)
-		.def("face_varying_attributes", &polyhedron::primitive::face_varying_attributes)
+		.def("face_attributes", &polyhedron::primitive::face_attributes)
+		.def("edge_attributes", &polyhedron::primitive::edge_attributes)
+		.def("vertex_attributes", &polyhedron::primitive::vertex_attributes)
 		;
 }
 

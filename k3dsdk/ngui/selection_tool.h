@@ -25,7 +25,7 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "tool.h"
+#include <k3dsdk/ngui/tool.h>
 
 namespace k3d
 {
@@ -50,12 +50,6 @@ public:
 
 	const k3d::string_t tool_type() { return "selection_tool"; }
 
-	/// True if the selection is converted when switching modes
-	bool convert_selection();
-	
-	/// True if the selection is kept when switching modes
-	bool keep_selection();
-	
 	/// True if backfacing components are to be picked
 	bool pick_backfacing();
 	

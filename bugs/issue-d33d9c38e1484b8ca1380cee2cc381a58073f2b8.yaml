@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Confirm that all sample documents are working.
+desc: ""
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2009-08-15 16:21:29.338826 Z
+references: []
+
+id: d33d9c38e1484b8ca1380cee2cc381a58073f2b8
+log_events: 
+- - 2009-08-15 16:21:30.330763 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-02-06 08:01:53.951609 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""
+claimer: 

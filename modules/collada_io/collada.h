@@ -30,8 +30,8 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imesh_storage.h>
 #include <k3dsdk/imesh_source.h>
-#include <k3dsdk/properties.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/property.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/ustring.h>
 #include <dae.h>
 #include <dae/daeUtils.h>

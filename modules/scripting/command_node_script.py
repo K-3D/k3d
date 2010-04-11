@@ -1,5 +1,5 @@
 #python
 
-print "command: " + Command
-print "arguments: " + Arguments
+print "command: " + context.command
+print "arguments: " + context.arguments
 

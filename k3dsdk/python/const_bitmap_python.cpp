@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "const_bitmap_python.h"
+#include <k3dsdk/python/const_bitmap_python.h>
 
 #include <boost/python.hpp>
 #include <boost/python/tuple.hpp>

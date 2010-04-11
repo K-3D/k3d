@@ -66,7 +66,7 @@ public:
 			k3d::uuid(0xed110740, 0x7c2e4215, 0xbc8a4c1a, 0x3c1736ba),
 			"DoubleSourceScript",
 			_("Data source that uses a script to create a k3d::double_t output value"),
-			"Script Scalar",
+			"Script Double",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -75,16 +75,16 @@ public:
 private:
 	void on_update_double(k3d::double_t& Output)
 	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = 0.0;
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["output"] = 0.0;
 
 		execute_script(context);
 
-		if(context["Output"].type() == typeid(k3d::double_t))
+		if(context["output"].type() == typeid(k3d::double_t))
 		{
-			Output = boost::any_cast<k3d::double_t>(context["Output"]);
+			Output = boost::any_cast<k3d::double_t>(context["output"]);
 			return;
 		}
 

@@ -79,32 +79,34 @@ public:
 		const k3d::uint_t triangle_count = 20;
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 
-		polyhedron->shell_first_faces.push_back(polyhedron->face_first_loops.size());
-		polyhedron->shell_face_counts.push_back(triangle_count);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
+		polyhedron->face_shells.reserve(triangle_count);
 		polyhedron->face_first_loops.reserve(triangle_count);
 		polyhedron->face_loop_counts.reserve(triangle_count);
 		polyhedron->face_selections.reserve(triangle_count);
 		polyhedron->face_materials.reserve(triangle_count);
 		polyhedron->loop_first_edges.reserve(triangle_count);
-		polyhedron->edge_points.reserve(3 * triangle_count);
 		polyhedron->clockwise_edges.reserve(3 * triangle_count);
 		polyhedron->edge_selections.reserve(3 * triangle_count);
+		polyhedron->vertex_points.reserve(3 * triangle_count);
+		polyhedron->vertex_selections.reserve(3 * triangle_count);
 		
 		for(k3d::uint_t i = 0; i != triangle_count; ++i)
 		{
+			polyhedron->face_shells.push_back(0);
 			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(0.0);
 			polyhedron->face_materials.push_back(material);
-			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
+			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 			
 			for(k3d::uint_t j = 0; j != 3; ++j)
 			{
-				polyhedron->edge_points.push_back(tindices[i][j]);
-				polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 				polyhedron->edge_selections.push_back(0.0);
+				polyhedron->vertex_points.push_back(tindices[i][j]);
+				polyhedron->vertex_selections.push_back(0.0);
 			}
 
 			if(polyhedron->loop_first_edges.size() && polyhedron->clockwise_edges.size())
@@ -122,8 +124,8 @@ public:
 			k3d::uuid(0x100dff7b, 0x94410b60, 0x4989f4a9, 0x75f6c1bf),
 			"PolyIcosahedron",
 			_("Generates a polygonal sphere by recursive subdivision of an isocahedron"),
-			"Polygon",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			"Polyhedron",
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

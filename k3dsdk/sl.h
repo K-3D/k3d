@@ -25,7 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "path.h"
+#include <k3dsdk/path.h>
 
 #include <iosfwd>
 #include <string>

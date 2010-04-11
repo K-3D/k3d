@@ -21,18 +21,12 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <gtkmm/widget.h>
-
-#include "document_state.h"
-#include "viewport_input_model.h"
-#include "modifiers.h"
-#include "tool.h"
-#include "utility.h"
-#include "viewport.h"
-
 #include <k3d-i18n-config.h>
 #include <k3dsdk/basic_math.h>
+#include <k3dsdk/bicubic_patch.h>
+#include <k3dsdk/bilinear_patch.h>
 #include <k3dsdk/classes.h>
+#include <k3dsdk/cubic_curve.h>
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
@@ -41,19 +35,31 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iprojection.h>
+#include <k3dsdk/iscript_engine.h>
+#include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
+#include <k3dsdk/linear_curve.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/modifiers.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/tool.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/ngui/viewport_input_model.h>
+#include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/selection_state_gl.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/utility_gl.h>
 
+#include <gtkmm/widget.h>
 #include <gtk/gtkgl.h>
 #include <gtk/gtkmain.h>
 
@@ -85,10 +91,12 @@ const k3d::gl::selection_state select_nodes()
 	k3d::gl::selection_state result;
 
 	result.select_backfacing = true;
-	result.select_component.insert(k3d::selection::POINT);
-	result.select_component.insert(k3d::selection::SPLIT_EDGE);
-	result.select_component.insert(k3d::selection::UNIFORM);
 	result.select_component.insert(k3d::selection::CURVE);
+	result.select_component.insert(k3d::selection::FACE);
+	result.select_component.insert(k3d::selection::PATCH);
+	result.select_component.insert(k3d::selection::POINT);
+	result.select_component.insert(k3d::selection::EDGE);
+	result.select_component.insert(k3d::selection::SURFACE);
 
 	return result;
 }
@@ -226,10 +234,10 @@ private:
 };
 
 /// Convenience function used to choose whichever point is closest to the given window coordinates
-void select_nearest_point(const k3d::mesh::points_t& Points, const k3d::selection::id Point, const k3d::point2& Coordinates, const double ScreenHeight, const GLdouble ModelViewMatrix[16], const GLdouble ProjectionMatrix[16], const GLint Viewport[4], k3d::selection::id& OutputPoint, double& OutputDistance)
+void select_nearest_point(const k3d::mesh::points_t& Points, const k3d::selection::id Point, const k3d::point2& Coordinates, const k3d::double_t ScreenHeight, const GLdouble ModelViewMatrix[16], const GLdouble ProjectionMatrix[16], const GLint Viewport[4], k3d::selection::id& OutputPoint, k3d::double_t& OutputDistance)
 {
 	k3d::point2 coords;
-	double unused;
+	k3d::double_t unused;
 	gluProject(
 		Points[Point][0],
 		Points[Point][1],
@@ -242,7 +250,7 @@ void select_nearest_point(const k3d::mesh::points_t& Points, const k3d::selectio
 		&unused);
 	coords[1] = ScreenHeight - coords[1];
 
-	const double distance = (coords - Coordinates).length2();
+	const k3d::double_t distance = (coords - Coordinates).length2();
 	if(distance < OutputDistance)
 	{
 		OutputPoint = Point;
@@ -251,10 +259,10 @@ void select_nearest_point(const k3d::mesh::points_t& Points, const k3d::selectio
 }
 
 /// Convenience function used to choose whichever edge is closest to the given window coordinates
-void select_nearest_edge(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::points_t& Points, const k3d::selection::id Edge, const k3d::point2& Coordinates, const double ScreenHeight, const GLdouble ModelViewMatrix[16], const GLdouble ProjectionMatrix[16], const GLint Viewport[4], k3d::selection::id& OutputEdge, double& OutputDistance)
+void select_nearest_edge(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::points_t& Points, const k3d::selection::id Edge, const k3d::point2& Coordinates, const k3d::double_t ScreenHeight, const GLdouble ModelViewMatrix[16], const GLdouble ProjectionMatrix[16], const GLint Viewport[4], k3d::selection::id& OutputEdge, k3d::double_t& OutputDistance)
 {
-	double x1, y1, x2, y2;
-	double unused;
+	k3d::double_t x1, y1, x2, y2;
+	k3d::double_t unused;
 
 	// First edge end : S1
 	gluProject(
@@ -285,22 +293,22 @@ void select_nearest_edge(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh
 	const k3d::point2 S2(x2, ScreenHeight - y2);
 
 	// Coordinates to segment distance
-	double distance = 0;
+	k3d::double_t distance = 0;
 
 	const k3d::vector2 edge = S2 - S1;
 	const k3d::vector2 w = Coordinates - S1;
 
-	const double c1 = w * edge;
+	const k3d::double_t c1 = w * edge;
 	if(c1 <= 0)
 		distance = k3d::distance(Coordinates, S1);
 	else
 	{
-		const double c2 = edge * edge;
+		const k3d::double_t c2 = edge * edge;
 		if(c2 <= c1)
 			distance = k3d::distance(Coordinates, S2);
 		else
 		{
-			const double b = c1 / c2;
+			const k3d::double_t b = c1 / c2;
 			const k3d::point2 middlepoint = S1 + b * edge;
 			distance = k3d::distance(Coordinates, middlepoint);
 		}
@@ -714,20 +722,26 @@ k3d::selection::records control::get_object_selectables(const k3d::rectangle& Se
 {
 	switch(selection::state(m_implementation->m_document_state.document()).current_mode())
 	{
-		case selection::NODES:
+		case selection::CURVE:
+			return get_component_selectables(k3d::selection::CURVE, SelectionRegion, Backfacing);
+			break;
+		case selection::FACE:
+			return get_component_selectables(k3d::selection::FACE, SelectionRegion, Backfacing);
+			break;
+		case selection::NODE:
 			return get_node_selectables(SelectionRegion);
 			break;
-		case selection::POINTS:
+		case selection::PATCH:
+			return get_component_selectables(k3d::selection::PATCH, SelectionRegion, Backfacing);
+			break;
+		case selection::POINT:
 			return get_component_selectables(k3d::selection::POINT, SelectionRegion, Backfacing);
 			break;
-		case selection::SPLIT_EDGES:
-			return get_component_selectables(k3d::selection::SPLIT_EDGE, SelectionRegion, Backfacing);
+		case selection::EDGE:
+			return get_component_selectables(k3d::selection::EDGE, SelectionRegion, Backfacing);
 			break;
-		case selection::UNIFORM:
-			return get_component_selectables(k3d::selection::UNIFORM, SelectionRegion, Backfacing);
-			break;
-		case selection::CURVES:
-			return get_component_selectables(k3d::selection::CURVE, SelectionRegion, Backfacing);
+		case selection::SURFACE:
+			return get_component_selectables(k3d::selection::SURFACE, SelectionRegion, Backfacing);
 			break;
 	}
 
@@ -747,10 +761,10 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, bool 
 	return pick_point(Coordinates, records, Backfacing);
 }
 
-k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, bool Backfacing)
+k3d::selection::record control::pick_edge(const k3d::point2& Coordinates, bool Backfacing)
 {
 	k3d::selection::records records;
-	return pick_split_edge(Coordinates, records, Backfacing);
+	return pick_edge(Coordinates, records, Backfacing);
 }
 
 k3d::selection::record control::pick_component(const k3d::selection::type Component, const k3d::point2& Coordinates, bool Backfacing)
@@ -787,17 +801,19 @@ k3d::selection::record control::pick_node(const k3d::point2& Coordinates, k3d::s
 	return k3d::selection::record::empty_record();
 }
 
-k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
+k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::selection::records& Records, k3d::bool_t Backfacing)
 {
-	// Draw everything (will find nearest point if another component is picked)
+	// Draw everything (will find nearest point if some other component is picked)
 	k3d::gl::selection_state selection_state;
 	selection_state.exclude_unselected_nodes = true;
 	selection_state.select_backfacing = Backfacing;
 	selection_state.select_component.insert(k3d::selection::POINT);
-	selection_state.select_component.insert(k3d::selection::SPLIT_EDGE);
-	selection_state.select_component.insert(k3d::selection::UNIFORM);
+	selection_state.select_component.insert(k3d::selection::EDGE);
+	selection_state.select_component.insert(k3d::selection::FACE);
+	selection_state.select_component.insert(k3d::selection::PATCH);
+	selection_state.select_component.insert(k3d::selection::CURVE);
 
-	const double sensitivity = 5;
+	const k3d::double_t sensitivity = 5;
 	const k3d::rectangle selection_region(
 		Coordinates[0] - sensitivity,
 		Coordinates[0] + sensitivity,
@@ -810,261 +826,281 @@ k3d::selection::record control::pick_point(const k3d::point2& Coordinates, k3d::
 
 	Records = get_selection(selection_state, selection_region, view_matrix, projection_matrix, viewport);
 	std::sort(Records.begin(), Records.end(), detail::sort_by_zmin());
+
 	if(Records.empty())
 		return k3d::selection::record::empty_record();
 
 	const k3d::selection::record& record = Records.front();
 
-	k3d::inode* const node = k3d::selection::get_node(record);
-	if(!node)
-		return k3d::selection::record::empty_record();
-
-	k3d::mesh* const mesh = k3d::selection::get_mesh(record);
-	if(!mesh)
-		return k3d::selection::record::empty_record();
-	if(!mesh->points)
-		return k3d::selection::record::empty_record();
-
+	k3d::selection::id node_id = k3d::selection::null_id();
+	k3d::inode* node = 0;
 	GLdouble model_view_matrix[16];
-	k3d::transpose(k3d::gl::matrix(view_matrix) * k3d::node_to_world_matrix(*node)).CopyArray(model_view_matrix);
-
-	std::map<k3d::selection::type, k3d::selection::id> tokens;
+	k3d::selection::id mesh_id = k3d::selection::null_id();
+	k3d::mesh* mesh = 0;
+	k3d::selection::id primitive_id = k3d::selection::null_id();
+	const k3d::mesh::primitive* primitive = 0;
+	k3d::selection::id point_id = k3d::selection::null_id();
+	k3d::double_t point_distance = std::numeric_limits<k3d::double_t>::max();
 	for(k3d::selection::record::tokens_t::const_iterator token = record.tokens.begin(); token != record.tokens.end(); ++token)
-		tokens.insert(std::make_pair(token->type, token->id));
-
-	if(tokens.count(k3d::selection::POINT))
 	{
-		return record;
-	}
-
-	double distance = std::numeric_limits<double>::max();
-	k3d::selection::id selected_point;
-
-  assert_not_implemented();
-/*
-	if(tokens.count(k3d::selection::ABSOLUTE_SPLIT_EDGE))
-	{
-		if(mesh->polyhedra && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
+		switch(token->type)
 		{
-			const k3d::selection::id edge = tokens[k3d::selection::ABSOLUTE_SPLIT_EDGE];
-
-			detail::select_nearest_point(
-				*mesh->points,
-				(*mesh->polyhedra->edge_points)[edge],
-				Coordinates,
-				get_height(),
-				model_view_matrix,
-				projection_matrix,
-				viewport,
-				selected_point,
-				distance);
-
-			detail::select_nearest_point(
-				*mesh->points,
-				(*mesh->polyhedra->edge_points)[(*mesh->polyhedra->clockwise_edges)[edge]],
-				Coordinates,
-				get_height(),
-				model_view_matrix,
-				projection_matrix,
-				viewport,
-				selected_point,
-				distance);
-		}
-	}
-	else if(tokens.count(k3d::selection::ABSOLUTE_FACE))
-	{
-		if(mesh->polyhedra && mesh->polyhedra->face_first_loops && mesh->polyhedra->face_loop_counts && mesh->polyhedra->loop_first_edges && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
-		{
-			const k3d::selection::id face = tokens[k3d::selection::ABSOLUTE_FACE];
-
-			const size_t face_loop_begin = (*mesh->polyhedra->face_first_loops)[face];
-			const size_t face_loop_end = face_loop_begin + (*mesh->polyhedra->face_loop_counts)[face];
-			for(size_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
+			case k3d::selection::NODE:
 			{
-				const size_t first_edge = (*mesh->polyhedra->loop_first_edges)[face_loop];
-				for(size_t edge = first_edge; ; )
-				{
-					detail::select_nearest_point(
-						*mesh->points,
-						(*mesh->polyhedra->edge_points)[edge],
-						Coordinates,
-						get_height(),
-						model_view_matrix,
-						projection_matrix,
-						viewport,
-						selected_point,
-						distance);
+				node_id = token->id;
+				node = k3d::selection::get_node(record);
+				return_val_if_fail(node, k3d::selection::record::empty_record());
 
-					edge = (*mesh->polyhedra->clockwise_edges)[edge];
-					if(edge == first_edge)
-						break;
+				k3d::transpose(k3d::gl::matrix(view_matrix) * k3d::node_to_world_matrix(*node)).CopyArray(model_view_matrix);
+				break;
+			}
+			case k3d::selection::MESH:
+			{
+				mesh_id = token->id;
+				mesh = selection::get_mesh(node, mesh_id);
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(mesh->points, k3d::selection::record::empty_record());
+				break;
+			}
+			case k3d::selection::POINT:
+			{
+				return record;
+			}
+			case k3d::selection::PRIMITIVE:
+			{
+				primitive_id = token->id;
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(primitive_id < mesh->primitives.size(), k3d::selection::record::empty_record());
+				primitive = mesh->primitives[primitive_id].get();
+				break;
+			}
+			case k3d::selection::EDGE:
+			{
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(primitive, k3d::selection::record::empty_record());
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh, *primitive));
+				return_val_if_fail(polyhedron, k3d::selection::record::empty_record());
+
+				const k3d::selection::id edge = token->id;
+
+				detail::select_nearest_point(
+					*mesh->points,
+					polyhedron->vertex_points[edge],
+					Coordinates,
+					get_height(),
+					model_view_matrix,
+					projection_matrix,
+					viewport,
+					point_id,
+					point_distance);
+
+				detail::select_nearest_point(
+					*mesh->points,
+					polyhedron->vertex_points[polyhedron->clockwise_edges[edge]],
+					Coordinates,
+					get_height(),
+					model_view_matrix,
+					projection_matrix,
+					viewport,
+					point_id,
+					point_distance);
+				break;
+			}
+			case k3d::selection::FACE:
+			{
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(primitive, k3d::selection::record::empty_record());
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh, *primitive));
+				return_val_if_fail(polyhedron, k3d::selection::record::empty_record());
+
+				const k3d::selection::id face = token->id;
+				const k3d::uint_t face_loop_begin = polyhedron->face_first_loops[face];
+				const k3d::uint_t face_loop_end = face_loop_begin + polyhedron->face_loop_counts[face];
+				for(k3d::uint_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
+				{
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[face_loop];
+					for(k3d::uint_t edge = first_edge; ; )
+					{
+						detail::select_nearest_point(
+							*mesh->points,
+							polyhedron->vertex_points[edge],
+							Coordinates,
+							get_height(),
+							model_view_matrix,
+							projection_matrix,
+							viewport,
+							point_id,
+							point_distance);
+
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
+				}
+				break;
+			}
+			case k3d::selection::PATCH:
+			{
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(primitive, k3d::selection::record::empty_record());
+
+				const k3d::selection::id patch = token->id;
+
+				boost::scoped_ptr<k3d::bilinear_patch::const_primitive> bilinear_patch(k3d::bilinear_patch::validate(*mesh, *primitive));
+				if(bilinear_patch)
+				{
+					const k3d::uint_t point_begin = patch * 4;
+					const k3d::uint_t point_end = point_begin + 4;
+					for(k3d::uint_t patch_point = point_begin; patch_point != point_end; ++patch_point)
+					{
+						detail::select_nearest_point(
+							*mesh->points,
+							bilinear_patch->patch_points[patch_point],
+							Coordinates,
+							get_height(),
+							model_view_matrix,
+							projection_matrix,
+							viewport,
+							point_id,
+							point_distance);
+					}
+					break;
+				}
+
+				boost::scoped_ptr<k3d::bicubic_patch::const_primitive> bicubic_patch(k3d::bicubic_patch::validate(*mesh, *primitive));
+				if(bicubic_patch)
+				{
+					k3d::uint_t point_begin = patch * 16;
+					k3d::uint_t point_end = point_begin + 16;
+					for(k3d::uint_t patch_point = point_begin; patch_point != point_end; ++patch_point)
+					{
+						detail::select_nearest_point(
+							*mesh->points,
+							bicubic_patch->patch_points[patch_point],
+							Coordinates,
+							get_height(),
+							model_view_matrix,
+							projection_matrix,
+							viewport,
+							point_id,
+							point_distance);
+					}
+					break;
+				}
+
+				boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs_patch(k3d::nurbs_patch::validate(*mesh, *primitive));
+				if(nurbs_patch)
+				{
+					k3d::uint_t point_begin = nurbs_patch->patch_first_points.at(patch);
+					k3d::uint_t point_end = point_begin + (nurbs_patch->patch_u_point_counts[patch] * nurbs_patch->patch_v_point_counts[patch]);
+					for(k3d::uint_t patch_point = point_begin; patch_point != point_end; ++patch_point)
+					{
+						detail::select_nearest_point(
+							*mesh->points,
+							nurbs_patch->patch_points[patch_point],
+							Coordinates,
+							get_height(),
+							model_view_matrix,
+							projection_matrix,
+							viewport,
+							point_id,
+							point_distance);
+					}
+					break;
+				}
+			}
+			case k3d::selection::CURVE:
+			{
+				const k3d::selection::id curve = token->id;
+
+				boost::scoped_ptr<k3d::linear_curve::const_primitive> linear_curve(k3d::linear_curve::validate(*mesh, *primitive));
+				if(linear_curve)
+				{
+					const k3d::uint_t curve_points_begin = linear_curve->curve_first_points[curve];
+					const k3d::uint_t curve_points_end = curve_points_begin + linear_curve->curve_point_counts[curve];
+					for(k3d::uint_t curve_point = curve_points_begin; curve_point != curve_points_end; ++curve_point)
+					{
+						detail::select_nearest_point(
+							*mesh->points,
+							linear_curve->curve_points[curve_point],
+							Coordinates,
+							get_height(),
+							model_view_matrix,
+							projection_matrix,
+							viewport,
+							point_id,
+							point_distance);
+					}
+					break;
+				}
+
+				boost::scoped_ptr<k3d::cubic_curve::const_primitive> cubic_curve(k3d::cubic_curve::validate(*mesh, *primitive));
+				if(cubic_curve)
+				{
+					const k3d::uint_t curve_points_begin = cubic_curve->curve_first_points[curve];
+					const k3d::uint_t curve_points_end = curve_points_begin + cubic_curve->curve_point_counts[curve];
+					for(k3d::uint_t curve_point = curve_points_begin; curve_point != curve_points_end; ++curve_point)
+					{
+						detail::select_nearest_point(
+							*mesh->points,
+							cubic_curve->curve_points[curve_point],
+							Coordinates,
+							get_height(),
+							model_view_matrix,
+							projection_matrix,
+							viewport,
+							point_id,
+							point_distance);
+					}
+					break;
+				}
+
+				boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(*mesh, *primitive));
+				if(nurbs_curve)
+				{
+					const k3d::uint_t curve_points_begin = nurbs_curve->curve_first_points[curve];
+					const k3d::uint_t curve_points_end = curve_points_begin + nurbs_curve->curve_point_counts[curve];
+					for(k3d::uint_t curve_point = curve_points_begin; curve_point != curve_points_end; ++curve_point)
+					{
+						detail::select_nearest_point(
+							*mesh->points,
+							nurbs_curve->curve_points[curve_point],
+							Coordinates,
+							get_height(),
+							model_view_matrix,
+							projection_matrix,
+							viewport,
+							point_id,
+							point_distance);
+					}
+					break;
 				}
 			}
 		}
 	}
-	else if(tokens.count(k3d::selection::ABSOLUTE_LINEAR_CURVE))
-	{
-		assert_not_implemented();
-		if(mesh->linear_curve_groups && mesh->linear_curve_groups->curve_first_points && mesh->linear_curve_groups->curve_point_counts && mesh->linear_curve_groups->curve_points)
-		{
-			const k3d::selection::id curve = tokens[k3d::selection::ABSOLUTE_LINEAR_CURVE];
 
-			const size_t curve_points_begin = (*mesh->linear_curve_groups->curve_first_points)[curve];
-			const size_t curve_points_end = curve_points_begin + (*mesh->linear_curve_groups->curve_point_counts)[curve];
-			for(size_t curve_point = curve_points_begin; curve_point != curve_points_end; ++curve_point)
-			{
-				detail::select_nearest_point(
-					*mesh->points,
-					(*mesh->linear_curve_groups->curve_points)[curve_point],
-					Coordinates,
-					get_height(),
-					model_view_matrix,
-					projection_matrix,
-					viewport,
-					selected_point,
-					distance);
-			}
-		}
-	}
-	else if(tokens.count(k3d::selection::ABSOLUTE_CUBIC_CURVE))
-	{
-		assert_not_implemented();
-		if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->curve_first_points && mesh->cubic_curve_groups->curve_point_counts && mesh->cubic_curve_groups->curve_points)
-		{
-			const k3d::selection::id curve = tokens[k3d::selection::ABSOLUTE_CUBIC_CURVE];
-
-			const size_t curve_points_begin = (*mesh->cubic_curve_groups->curve_first_points)[curve];
-			const size_t curve_points_end = curve_points_begin + (*mesh->cubic_curve_groups->curve_point_counts)[curve];
-			for(size_t curve_point = curve_points_begin; curve_point != curve_points_end; ++curve_point)
-			{
-				detail::select_nearest_point(
-					*mesh->points,
-					(*mesh->cubic_curve_groups->curve_points)[curve_point],
-					Coordinates,
-					get_height(),
-					model_view_matrix,
-					projection_matrix,
-					viewport,
-					selected_point,
-					distance);
-			}
-		}
-	}
-	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_CURVE))
-	{
-		if(mesh->nurbs_curve_groups && mesh->nurbs_curve_groups->curve_first_points && mesh->nurbs_curve_groups->curve_point_counts && mesh->nurbs_curve_groups->curve_points)
-		{
-			const k3d::selection::id curve = tokens[k3d::selection::ABSOLUTE_NURBS_CURVE];
-
-			const size_t curve_points_begin = (*mesh->nurbs_curve_groups->curve_first_points)[curve];
-			const size_t curve_points_end = curve_points_begin + (*mesh->nurbs_curve_groups->curve_point_counts)[curve];
-			for(size_t curve_point = curve_points_begin; curve_point != curve_points_end; ++curve_point)
-			{
-				detail::select_nearest_point(
-					*mesh->points,
-					(*mesh->nurbs_curve_groups->curve_points)[curve_point],
-					Coordinates,
-					get_height(),
-					model_view_matrix,
-					projection_matrix,
-					viewport,
-					selected_point,
-					distance);
-			}
-		}
-	}
-	else if(tokens.count(k3d::selection::ABSOLUTE_BILINEAR_PATCH))
-	{
-		assert_not_implemented();
-		if(k3d::validate_bilinear_patches(*mesh))
-		{
-			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_BILINEAR_PATCH];
-			k3d::uint_t patch_begin = patch * 4;
-			k3d::uint_t patch_end = patch_begin + 4;
-			for(k3d::uint_t patch_point = patch_begin; patch_point != patch_end; ++patch_point)
-			{
-				detail::select_nearest_point(
-					*mesh->points,
-					(*mesh->bilinear_patches->patch_points)[patch_point],
-					Coordinates,
-					get_height(),
-					model_view_matrix,
-					projection_matrix,
-					viewport,
-					selected_point,
-					distance);
-			}
-		}
-	}
-	else if(tokens.count(k3d::selection::ABSOLUTE_BICUBIC_PATCH))
-	{
-		assert_not_implemented();
-		if(k3d::validate_bicubic_patches(*mesh))
-		{
-			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_BICUBIC_PATCH];
-			k3d::uint_t patch_begin = patch * 4;
-			k3d::uint_t patch_end = patch_begin + 4;
-			for(k3d::uint_t patch_point = patch_begin; patch_point != patch_end; ++patch_point)
-			{
-				detail::select_nearest_point(
-					*mesh->points,
-					(*mesh->bicubic_patches->patch_points)[patch_point],
-					Coordinates,
-					get_height(),
-					model_view_matrix,
-					projection_matrix,
-					viewport,
-					selected_point,
-					distance);
-			}
-		}
-	}
-	else if(tokens.count(k3d::selection::ABSOLUTE_NURBS_PATCH))
-	{
-		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs_patch(k3d::nurbs_patch::validate(*mesh));
-		if(nurbs_patch)
-		{
-			const k3d::selection::id patch = tokens[k3d::selection::ABSOLUTE_NURBS_PATCH];
-			k3d::uint_t patch_begin = nurbs_patch->patch_first_points.at(patch);
-			k3d::uint_t patch_end = patch_begin + (nurbs_patch->patch_u_point_counts.at(patch) * nurbs_patch->patch_v_point_counts.at(patch));
-			for(k3d::uint_t patch_point = patch_begin; patch_point != patch_end; ++patch_point)
-			{
-				detail::select_nearest_point(
-					*mesh->points,
-					nurbs_patch->patch_points[patch_point],
-					Coordinates,
-					get_height(),
-					model_view_matrix,
-					projection_matrix,
-					viewport,
-					selected_point,
-					distance);
-			}
-		}
-	}
-*/
-
-	if(distance < std::numeric_limits<double>::max())
+	if(point_distance < std::numeric_limits<double>::max())
 	{
 		k3d::selection::record record = k3d::selection::record::empty_record();
-		record.tokens.push_back(k3d::selection::token(NODE, tokens[NODE]));
-		record.tokens.push_back(k3d::selection::token(MESH, tokens[MESH]));
-		record.tokens.push_back(k3d::selection::token(POINT, selected_point));
+		record.tokens.push_back(k3d::selection::token(NODE, node_id));
+		record.tokens.push_back(k3d::selection::token(MESH, mesh_id));
+		record.tokens.push_back(k3d::selection::token(k3d::selection::POINT, point_id));
 		return record;
 	}
 
 	return k3d::selection::record::empty_record();
 }
 
-k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
+k3d::selection::record control::pick_edge(const k3d::point2& Coordinates, k3d::selection::records& Records, bool Backfacing)
 {
 	// Draw everything (will find nearest line if some other component type is picked)
 	k3d::gl::selection_state selection_state;
 	selection_state.exclude_unselected_nodes = true;
 	selection_state.select_backfacing = Backfacing;
-	selection_state.select_component.insert(k3d::selection::SPLIT_EDGE);
+	selection_state.select_component.insert(k3d::selection::EDGE);
+	selection_state.select_component.insert(k3d::selection::FACE);
 
-	const double sensitivity = 5;
+	const k3d::double_t sensitivity = 5;
 	const k3d::rectangle selection_region(
 		Coordinates[0] - sensitivity,
 		Coordinates[0] + sensitivity,
@@ -1077,80 +1113,105 @@ k3d::selection::record control::pick_split_edge(const k3d::point2& Coordinates, 
 
 	Records = get_selection(selection_state, selection_region, view_matrix, projection_matrix, viewport);
 	std::sort(Records.begin(), Records.end(), detail::sort_by_zmin());
+
 	if(Records.empty())
 		return k3d::selection::record::empty_record();
 
 	const k3d::selection::record& record = Records.front();
 
-	k3d::inode* const node = k3d::selection::get_node(record);
-	if(!node)
-		return k3d::selection::record::empty_record();
-
-	k3d::mesh* const mesh = k3d::selection::get_mesh(record);
-	if(!mesh)
-		return k3d::selection::record::empty_record();
-
+	k3d::selection::id node_id = k3d::selection::null_id();
+	k3d::inode* node = 0;
 	GLdouble model_view_matrix[16];
-	k3d::transpose(k3d::gl::matrix(view_matrix) * k3d::node_to_world_matrix(*node)).CopyArray(model_view_matrix);
+	k3d::selection::id mesh_id = k3d::selection::null_id();
+	k3d::mesh* mesh = 0;
+	k3d::selection::id primitive_id = k3d::selection::null_id();
+	const k3d::mesh::primitive* primitive = 0;
+	k3d::selection::id edge_id = k3d::selection::null_id();
+	k3d::double_t edge_distance = std::numeric_limits<k3d::double_t>::max();
 
-	std::map<k3d::selection::type, k3d::selection::id> tokens;
 	for(k3d::selection::record::tokens_t::const_iterator token = record.tokens.begin(); token != record.tokens.end(); ++token)
-		tokens.insert(std::make_pair(token->type, token->id));
-
-  assert_not_implemented();
-/*
-	if(tokens.count(k3d::selection::ABSOLUTE_SPLIT_EDGE))
 	{
-		return record;
-	}
-
-	double distance = std::numeric_limits<double>::max();
-	k3d::selection::id selected_edge;
-
-	if(tokens.count(k3d::selection::ABSOLUTE_FACE))
-	{
-		if(mesh->polyhedra && mesh->polyhedra->face_first_loops && mesh->polyhedra->face_loop_counts && mesh->polyhedra->loop_first_edges && mesh->polyhedra->edge_points && mesh->polyhedra->clockwise_edges)
+		switch(token->type)
 		{
-			const k3d::selection::id face = tokens[k3d::selection::ABSOLUTE_FACE];
-
-			const size_t face_loop_begin = (*mesh->polyhedra->face_first_loops)[face];
-			const size_t face_loop_end = face_loop_begin + (*mesh->polyhedra->face_loop_counts)[face];
-			for(size_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
+			case k3d::selection::NODE:
 			{
-				const size_t first_edge = (*mesh->polyhedra->loop_first_edges)[face_loop];
-				for(size_t edge = first_edge; ; )
-				{
-					detail::select_nearest_edge(
-						*mesh->polyhedra->edge_points,
-					*mesh->polyhedra->clockwise_edges,
-						*mesh->points,
-						edge,
-						Coordinates,
-						get_height(),
-						model_view_matrix,
-						projection_matrix,
-						viewport,
-						selected_edge,
-						distance);
+				node_id = token->id;
+				node = k3d::selection::get_node(record);
+				return_val_if_fail(node, k3d::selection::record::empty_record());
 
-					edge = (*mesh->polyhedra->clockwise_edges)[edge];
-					if(edge == first_edge)
-						break;
+				k3d::transpose(k3d::gl::matrix(view_matrix) * k3d::node_to_world_matrix(*node)).CopyArray(model_view_matrix);
+				break;
+			}
+			case k3d::selection::MESH:
+			{
+				mesh_id = token->id;
+				mesh = selection::get_mesh(node, mesh_id);
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(mesh->points, k3d::selection::record::empty_record());
+				break;
+			}
+			case k3d::selection::PRIMITIVE:
+			{
+				primitive_id = token->id;
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(primitive_id < mesh->primitives.size(), k3d::selection::record::empty_record());
+				primitive = mesh->primitives[primitive_id].get();
+				break;
+			}
+			case k3d::selection::EDGE:
+			{
+				return record;
+			}
+			case k3d::selection::FACE:
+			{
+				return_val_if_fail(mesh, k3d::selection::record::empty_record());
+				return_val_if_fail(primitive, k3d::selection::record::empty_record());
+				boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(*mesh, *primitive));
+				return_val_if_fail(polyhedron, k3d::selection::record::empty_record());
+
+				const k3d::selection::id face = token->id;
+
+				const k3d::uint_t face_loop_begin = polyhedron->face_first_loops[face];
+				const k3d::uint_t face_loop_end = face_loop_begin + polyhedron->face_loop_counts[face];
+				for(k3d::uint_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
+				{
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[face_loop];
+					for(k3d::uint_t edge = first_edge; ; )
+					{
+						detail::select_nearest_edge(
+							polyhedron->vertex_points,
+							polyhedron->clockwise_edges,
+							*mesh->points,
+							edge,
+							Coordinates,
+							get_height(),
+							model_view_matrix,
+							projection_matrix,
+							viewport,
+							edge_id,
+							edge_distance);
+
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
 				}
+				break;
 			}
 		}
 	}
 
-	if(distance < std::numeric_limits<double>::max())
+	if(edge_distance < std::numeric_limits<double>::max())
 	{
 		k3d::selection::record record = k3d::selection::record::empty_record();
-		record.tokens.push_back(k3d::selection::token(k3d::selection::NODE, tokens[k3d::selection::NODE]));
-		record.tokens.push_back(k3d::selection::token(k3d::selection::MESH, tokens[k3d::selection::MESH]));
-		record.tokens.push_back(k3d::selection::token(k3d::selection::ABSOLUTE_SPLIT_EDGE, selected_edge));
+		record.tokens.push_back(k3d::selection::token(k3d::selection::NODE, node_id));
+		record.tokens.push_back(k3d::selection::token(k3d::selection::MESH, mesh_id));
+		record.tokens.push_back(k3d::selection::token(k3d::selection::PRIMITIVE, primitive_id));
+		record.tokens.push_back(k3d::selection::token(k3d::selection::EDGE, edge_id));
+
 		return record;
 	}
 
-*/
 	return k3d::selection::record::empty_record();
 }
 
@@ -1187,20 +1248,26 @@ k3d::selection::record control::pick_object(const k3d::point2& Coordinates, k3d:
 {
 	switch(selection::state(m_implementation->m_document_state.document()).current_mode())
 	{
-		case selection::NODES:
+		case selection::CURVE:
+			return pick_component(k3d::selection::CURVE, Coordinates, Records, Backfacing);
+			break;
+		case selection::FACE:
+			return pick_component(k3d::selection::FACE, Coordinates, Records, Backfacing);
+			break;
+		case selection::NODE:
 			return pick_node(Coordinates, Records);
 			break;
-		case selection::POINTS:
+		case selection::PATCH:
+			return pick_component(k3d::selection::PATCH, Coordinates, Records, Backfacing);
+			break;
+		case selection::POINT:
 			return pick_point(Coordinates, Records, Backfacing);
 			break;
-		case selection::SPLIT_EDGES:
-			return pick_split_edge(Coordinates, Records, Backfacing);
+		case selection::EDGE:
+			return pick_edge(Coordinates, Records, Backfacing);
 			break;
-		case selection::UNIFORM:
-			return pick_component(k3d::selection::UNIFORM, Coordinates, Records, Backfacing);
-			break;
-		case selection::CURVES:
-			return pick_component(k3d::selection::CURVE, Coordinates, Records, Backfacing);
+		case selection::SURFACE:
+			return pick_component(k3d::selection::SURFACE, Coordinates, Records, Backfacing);
 			break;
 	}
 
@@ -1270,6 +1337,32 @@ bool control::on_redraw()
 		{
 			k3d::log() << error << "GLEW init failed: " << glewGetErrorString(err) << std::endl;
 			assert_not_reached();
+		}
+
+		// Create opengl-start plugins ...
+		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
+		for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+		{
+			k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
+
+			if(!metadata.count("ngui:opengl-start"))
+				continue;
+
+			k3d::log() << info << "Creating plugin [" << (**factory).name() << "] via ngui:opengl-start" << std::endl;
+
+			boost::scoped_ptr<k3d::iunknown> plugin(k3d::plugin::create(**factory));
+			if(!plugin)
+			{
+				k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via ngui:opengl-start" << std::endl;
+				continue;
+			}
+
+			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin.get()))
+			{
+				k3d::iscript_engine::context context;
+				context["command"] = k3d::string_t("ngui:opengl-start");
+				scripted_action->execute(context);
+			}
 		}
 	}
 
@@ -1391,7 +1484,7 @@ const GLint control::select(const k3d::gl::selection_state& SelectState, const k
 		glInitNames();
 
 		GLdouble projection_matrix[16];
-		m_implementation->m_gl_engine.internal_value()->render_viewport_selection(SelectState, *m_implementation->m_camera.internal_value(), width, height, k3d::normalize(SelectionRegion), m_implementation->m_gl_view_matrix, projection_matrix, m_implementation->m_gl_viewport);
+		m_implementation->m_gl_engine.internal_value()->render_viewport_selection(SelectState, *m_implementation->m_camera.internal_value(), width, height, k3d::rectangle::normalize(SelectionRegion), m_implementation->m_gl_view_matrix, projection_matrix, m_implementation->m_gl_viewport);
 		std::copy(m_implementation->m_gl_view_matrix, m_implementation->m_gl_view_matrix + 16, ViewMatrix);
 		std::copy(projection_matrix, projection_matrix + 16, ProjectionMatrix);
 		std::copy(m_implementation->m_gl_viewport, m_implementation->m_gl_viewport + 4, Viewport);
@@ -1432,11 +1525,11 @@ const k3d::point2 widget_to_ndc(viewport::control& Viewport, const k3d::point2& 
 	k3d::rectangle window_rect(0, 0, 0, 0);
 	Viewport.gl_engine()->get_ndc(*Viewport.camera(), width, height, host_rect, window_rect);
 
-	const double window_x = k3d::mix(window_rect.left, window_rect.right, WidgetCoords[0] / width);
-	const double window_y = k3d::mix(window_rect.top, window_rect.bottom, WidgetCoords[1] / height);
+	const double window_x = k3d::mix(window_rect.x1, window_rect.x2, WidgetCoords[0] / width);
+	const double window_y = k3d::mix(window_rect.y1, window_rect.y2, WidgetCoords[1] / height);
 
-	const double x = (window_x - host_rect.left) / (host_rect.right - host_rect.left);
-	const double y = (window_y - host_rect.top) / (host_rect.bottom - host_rect.top);
+	const double x = (window_x - host_rect.x1) / (host_rect.x2 - host_rect.x1);
+	const double y = (window_y - host_rect.y1) / (host_rect.y2 - host_rect.y1);
 
 	return k3d::point2(x, y);
 }
@@ -1455,11 +1548,11 @@ const k3d::point2 ndc_to_widget(viewport::control& Viewport, const k3d::point2& 
 	k3d::rectangle window_rect(0, 0, 0, 0);
 	Viewport.gl_engine()->get_ndc(*Viewport.camera(), width, height, host_rect, window_rect);
 
-	const double host_x = k3d::mix(host_rect.left, host_rect.right, NDC[0]);
-	const double host_y = k3d::mix(host_rect.top, host_rect.bottom, NDC[1]);
+	const double host_x = k3d::mix(host_rect.x1, host_rect.x2, NDC[0]);
+	const double host_y = k3d::mix(host_rect.y1, host_rect.y2, NDC[1]);
 
-	const double x = (host_x - window_rect.left) / (window_rect.right - window_rect.left);
-	const double y = (host_y - window_rect.top) / (window_rect.bottom - window_rect.top);
+	const double x = (host_x - window_rect.x1) / (window_rect.x2 - window_rect.x1);
+	const double y = (host_y - window_rect.y1) / (window_rect.y2 - window_rect.y1);
 
 	return k3d::point2(width * x, height * y);
 }

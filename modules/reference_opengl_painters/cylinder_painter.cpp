@@ -57,7 +57,7 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		const k3d::color color = RenderState.node_selection ? k3d::color(1, 1, 1) : k3d::color(0.8, 0.8, 0.8);
 		const k3d::color selected_color = RenderState.show_component_selection ? k3d::color(1, 0, 0) : color;
@@ -85,9 +85,9 @@ public:
 		}
 	}
 
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
-		if(!SelectionState.select_component.count(k3d::selection::UNIFORM))
+		if(!SelectionState.select_component.count(k3d::selection::SURFACE))
 			return;
 
 		k3d::uint_t primitive_index = 0;
@@ -104,22 +104,18 @@ public:
 			glMatrixMode(GL_MODELVIEW);
 			for(k3d::uint_t i = 0; i != cylinder->matrices.size(); ++i)
 			{
-				k3d::gl::push_selection_token(k3d::selection::UNIFORM, i);
+				k3d::gl::push_selection_token(k3d::selection::SURFACE, i);
 
 				glPushMatrix();
 				k3d::gl::push_matrix(cylinder->matrices[i]);
 				draw_solid(RenderState, cylinder->radii[i], cylinder->z_min[i], cylinder->z_max[i], cylinder->sweep_angles[i]);
 				glPopMatrix();
 
-				k3d::gl::pop_selection_token(); // UNIFORM
+				k3d::gl::pop_selection_token(); // SURFACE
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE
 		}
-	}
-
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
-	{
 	}
 
 	void draw_solid(const k3d::gl::render_state& State, const k3d::double_t Radius, const k3d::double_t ZMin, const k3d::double_t ZMax, const k3d::double_t SweepAngle)
@@ -176,7 +172,7 @@ public:
 			"OpenGLCylinderPainter",
 			_("Renders cylinder primitives using OpoenGL"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

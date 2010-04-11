@@ -81,8 +81,6 @@ public:
 		if(!file)
 			return;
 
-		k3d::log() << info << "Loading GNU Triangulated Surface file: " << Path.native_console_string() << std::endl;
-
 		// Read point, edge, and triangle counts ...
 		std::string buffer;
 		gts_line(file, buffer);
@@ -146,18 +144,18 @@ public:
 		// Read faces ...
 		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 
-		polyhedron->shell_first_faces.push_back(polyhedron->face_first_loops.size());
-		polyhedron->shell_face_counts.push_back(triangle_count);
 		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
+		polyhedron->face_shells.reserve(triangle_count);
 		polyhedron->face_first_loops.reserve(triangle_count);
 		polyhedron->face_loop_counts.reserve(triangle_count);
 		polyhedron->face_selections.reserve(triangle_count);
 		polyhedron->face_materials.reserve(triangle_count);
 		polyhedron->loop_first_edges.reserve(triangle_count);
-		polyhedron->edge_points.reserve(3 * triangle_count);
 		polyhedron->clockwise_edges.reserve(3 * triangle_count);
 		polyhedron->edge_selections.reserve(3 * triangle_count);
+		polyhedron->vertex_points.reserve(3 * triangle_count);
+		polyhedron->vertex_selections.reserve(3 * triangle_count);
 
 		for(k3d::uint_t i = 0; i != triangle_count; ++i)
 		{
@@ -211,23 +209,27 @@ public:
 				point3 = edge2_from;
 			}
 
+			polyhedron->face_shells.push_back(0);
 			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(0.0);
 			polyhedron->face_materials.push_back(0);
-			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
+			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 			
-			polyhedron->edge_points.push_back(point1);
-			polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+			polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 			polyhedron->edge_selections.push_back(0.0);
+			polyhedron->vertex_points.push_back(point1);
+			polyhedron->vertex_selections.push_back(0.0);
 
-			polyhedron->edge_points.push_back(point2);
-			polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+			polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 			polyhedron->edge_selections.push_back(0.0);
+			polyhedron->vertex_points.push_back(point2);
+			polyhedron->vertex_selections.push_back(0.0);
 
-			polyhedron->edge_points.push_back(point3);
-			polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size() - 3);
+			polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() - 2);
 			polyhedron->edge_selections.push_back(0.0);
+			polyhedron->vertex_points.push_back(point3);
+			polyhedron->vertex_selections.push_back(0.0);
 		}
 	}
 

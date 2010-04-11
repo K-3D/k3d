@@ -21,9 +21,10 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "iuser_interface_python.h"
-#include "iunknown_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/any_python.h>
+#include <k3dsdk/python/iuser_interface_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/path.h>
@@ -64,6 +65,11 @@ static unsigned long query_message(iunknown_wrapper& Self, const string_t& Messa
 	for(long i = 0; i != len(Buttons); ++i)
 		buttons.push_back(extract<string_t>(Buttons[i]));
 	return Self.wrapped<k3d::iuser_interface>().query_message(Message, 0, buttons);
+}
+
+static void nag_message(iunknown_wrapper& Self, const string_t& Type, const boost::python::object& Message, const boost::python::object& SecondaryMessage)
+{
+	Self.wrapped<k3d::iuser_interface>().nag_message(Type, python_to_ustring(Message), python_to_ustring(SecondaryMessage));
 }
 
 static const filesystem::path get_file_path(iunknown_wrapper& Self, const string_t& Direction, const string_t& Type, const string_t& Message, const string_t& StartPath)
@@ -118,6 +124,10 @@ void define_methods_iuser_interface(k3d::iunknown& Interface, boost::python::obj
 		"the user cancelled the query.\n" 
 		"@note: Depending on the user interface plugin, this might print a message "
 		"to the console, display a dialog box, or do nothing."), "query_message", Instance);
+	utility::add_method(utility::make_function(&nag_message,
+		"Display a message to the user that can be suppressed.\n"
+		"@note: Depending on the user interface plugin, this might print a message "
+		"to the console, display a dialog box, or do nothing."), "nag_message", Instance);
 	utility::add_method(utility::make_function(&get_file_path,
 		"Query the user to choose a filesystem path.\n"
 		"@param direction: Either \"read\" or \"write\".\n"

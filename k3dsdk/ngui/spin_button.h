@@ -31,11 +31,13 @@
 
 #include <gtkmm/table.h>
 
-namespace k3d { class iproperty; }
-namespace k3d { class istate_recorder; }
+namespace Gtk { class Button; }
 
 namespace k3d
 {
+
+class iproperty;
+class istate_recorder;
 
 namespace ngui
 {

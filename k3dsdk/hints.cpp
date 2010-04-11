@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "hints.h"
-#include "result.h"
+#include <k3dsdk/hints.h>
+#include <k3dsdk/result.h>
 
 #include <ostream>
 
@@ -162,6 +162,44 @@ void file_changed::print(std::ostream& Stream)
 file_changed* file_changed::instance()
 {
 	static file_changed hint;
+	return &hint;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// graph_topology_changed
+
+ihint* graph_topology_changed::clone()
+{
+	return new graph_topology_changed(*this);
+}
+
+void graph_topology_changed::print(std::ostream& Stream)
+{
+	Stream << "graph_topology_changed";
+}
+
+graph_topology_changed* graph_topology_changed::instance()
+{
+	static graph_topology_changed hint;
+	return &hint;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// graph_attributes_changed
+
+ihint* graph_attributes_changed::clone()
+{
+	return new graph_attributes_changed(*this);
+}
+
+void graph_attributes_changed::print(std::ostream& Stream)
+{
+	Stream << "graph_topology_changed";
+}
+
+graph_attributes_changed* graph_attributes_changed::instance()
+{
+	static graph_attributes_changed hint;
 	return &hint;
 }
 

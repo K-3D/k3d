@@ -46,13 +46,13 @@
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/mime_types.h>
 #include <k3dsdk/ngui/application_state.h>
 #include <k3dsdk/ngui/check_menu_item.h>
-#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/ngui/document.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
@@ -65,6 +65,7 @@
 #include <k3dsdk/ngui/modifiers.h>
 #include <k3dsdk/ngui/node.h>
 #include <k3dsdk/ngui/panel_frame.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/render.h>
 #include <k3dsdk/ngui/savable_document_window.h>
 #include <k3dsdk/ngui/scripting.h>
@@ -77,11 +78,12 @@
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/ngui/widget_manip.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/share.h>
@@ -89,7 +91,7 @@
 #include <k3dsdk/string_cast.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/transform.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 #include <k3dsdk/utility_gl.h>
 #include <k3dsdk/xml.h>
 #include <k3d-version-config.h>
@@ -362,11 +364,11 @@ public:
 		// Viewport on node list's right
 		panel_frame::control* const panel_frame4 = split_panel(*panel_frame2, *Gtk::manage(new Gtk::HPaned), 200);
 
-		const k3d::nodes_t gl_engines = k3d::find_nodes<k3d::gl::irender_viewport>(document().nodes());
-		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() > 0 ? dynamic_cast<k3d::gl::irender_viewport*>(*(gl_engines.begin())) : 0;
+		const std::vector<k3d::gl::irender_viewport*> gl_engines = k3d::node::lookup<k3d::gl::irender_viewport>(document());
+		k3d::gl::irender_viewport* const glengine1 = gl_engines.size() ? gl_engines[0] : 0;
 
-		const k3d::nodes_t cameras = k3d::find_nodes<k3d::icamera>(document().nodes());
-		k3d::icamera* const camera1 = cameras.size() > 0 ? dynamic_cast<k3d::icamera*>(*(cameras.begin())) : 0;
+		const std::vector<k3d::icamera*> cameras = k3d::node::lookup<k3d::icamera>(document());
+		k3d::icamera* const camera1 = cameras.size() ? cameras[0] : 0;
 
 		if(glengine1 && camera1)
 		{
@@ -539,14 +541,6 @@ private:
 				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIRenderRegionTool", get_accel_group())));
 		}
 
-		if(k3d::plugin::factory::lookup("NGUIKnifeTool"))
-		{
-			menu->items().push_back(*Gtk::manage(
-				new Gtk::MenuItem(_("_Knife Tool"), true)
-				<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_knife_tool))
-				<< set_accelerator_path("<k3d-document>/actions/edit/tools/NGUIKnifeTool", get_accel_group())));
-		}
-
 		if(k3d::plugin::factory::lookup("NGUISnapTool"))
 		{
 			menu->items().push_back(*Gtk::manage(
@@ -685,13 +679,28 @@ private:
 
 		menu->items().push_back(*Gtk::manage(
 			new Gtk::MenuItem(_("_Edges"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_edges))
-			<< set_accelerator_path("<k3d-document>/actions/select/select_lines", get_accel_group())));
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_split_edges))
+			<< set_accelerator_path("<k3d-document>/actions/select/select_split_edges", get_accel_group())));
+
+		menu->items().push_back(*Gtk::manage(
+			new Gtk::MenuItem(_("Faces"), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_faces))
+			<< set_accelerator_path("<k3d-document>/actions/select/select_faces", get_accel_group())));
+
+		menu->items().push_back(*Gtk::manage(
+			new Gtk::MenuItem(_("Curves"), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_curves))
+			<< set_accelerator_path("<k3d-document>/actions/select/select_curves", get_accel_group())));
+
+		menu->items().push_back(*Gtk::manage(
+			new Gtk::MenuItem(_("Patches"), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_patches))
+			<< set_accelerator_path("<k3d-document>/actions/select/select_patches", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
 			new Gtk::MenuItem(_("_Uniform"), true)
 			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_select_uniform))
-			<< set_accelerator_path("<k3d-document>/actions/select/select_faces", get_accel_group())));
+			<< set_accelerator_path("<k3d-document>/actions/select/select_uniform", get_accel_group())));
 		
 		menu->items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 		
@@ -1290,7 +1299,7 @@ private:
 		k3d::idocument* const reverted_document = k3d::application().create_document();
 		return_if_fail(reverted_document);
 
-		if(!importer->read_file(*reverted_document, document_path))
+		if(!importer->read_file(document_path, *reverted_document))
 		{
 			error_message(_("Error reading document.  The document could not be reverted."));
 			return;
@@ -1411,7 +1420,7 @@ private:
 
 		// Make this an undoable operation ...
 		k3d::record_state_change_set change_set(document(), k3d::string_cast(boost::format(_("Import %1%")) % filepath.native_utf8_string().raw()), K3D_CHANGE_SET_CONTEXT);
-		if(!importer->read_file(document(), filepath))
+		if(!importer->read_file(filepath, document()))
 		{
 			error_message(
 				"Error importing file.  If you chose \"Automatic\" as the filter type,\n"
@@ -1574,14 +1583,6 @@ private:
 		m_document_state.set_active_tool(*parent_tool);
 	}
 
-	void on_knife_tool()
-	{
-		tool* const knife_tool = m_document_state.get_tool("NGUIKnifeTool");
-		return_if_fail(knife_tool);
-
-		m_document_state.set_active_tool(*knife_tool);
-	}
-
 	void on_snap_tool()
 	{
 		tool* const snap_tool = m_document_state.get_tool("NGUISnapTool");
@@ -1592,12 +1593,12 @@ private:
 
 	void on_instantiate()
 	{
-		instantiate_selected_nodes(m_document_state);
+		pipeline::instantiate_selected_nodes(m_document_state.document());
 	}
 
 	void on_duplicate()
 	{
-		duplicate_selected_nodes(m_document_state);
+		pipeline::duplicate_selected_nodes(m_document_state.document());
 	}
 
 	void on_delete()
@@ -1747,28 +1748,46 @@ private:
 		std::for_each(siblings.begin(), siblings.end(), detail::select(m_document_state.document()));
 	}
 
+	void on_select_curves()
+	{
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Curves"), K3D_CHANGE_SET_CONTEXT);
+		selection::state(m_document_state.document()).set_current_mode(selection::CURVE);
+	}
+
+	void on_select_patches()
+	{
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Patches"), K3D_CHANGE_SET_CONTEXT);
+		selection::state(m_document_state.document()).set_current_mode(selection::PATCH);
+	}
+
+	void on_select_faces()
+	{
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Polygon Faces"), K3D_CHANGE_SET_CONTEXT);
+		selection::state(m_document_state.document()).set_current_mode(selection::FACE);
+	}
+
 	void on_select_nodes()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Nodes"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::NODES);
+		selection::state(m_document_state.document()).set_current_mode(selection::NODE);
 	}
 
 	void on_select_vertices()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Points"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::POINTS);
+		selection::state(m_document_state.document()).set_current_mode(selection::POINT);
 	}
 
-	void on_select_edges()
+	void on_select_split_edges()
 	{
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Polygon Edges"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::SPLIT_EDGES);
+		selection::state(m_document_state.document()).set_current_mode(selection::EDGE);
 	}
 
 	void on_select_uniform()
 	{
-		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Uniform"), K3D_CHANGE_SET_CONTEXT);
-		selection::state(m_document_state.document()).set_current_mode(selection::UNIFORM);
+		k3d::record_state_change_set change_set(m_document_state.document(), _("Select Surface"), K3D_CHANGE_SET_CONTEXT);
+		selection::state(m_document_state.document()).set_current_mode(selection::SURFACE);
 	}
 
 	void on_layout_maximize_panel()
@@ -2136,7 +2155,7 @@ private:
 		return_if_fail(viewport_control);
 		k3d::icamera* camera = viewport_control->camera();
 
-		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().transform_source_output()));
+		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().matrix_source_output()));
 		const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 		const k3d::point3 world_target = boost::any_cast<k3d::point3>(camera->world_target().property_internal_value());
 		const double distance = k3d::distance(world_position, world_target);
@@ -2191,29 +2210,26 @@ private:
 
 	void on_create_node(k3d::iplugin_factory* const Factory)
 	{
-		m_document_state.create_node(Factory);
+		if(cancel_plugin(*Factory))
+			return;
+
+		pipeline::create_node(m_document_state.document(), *Factory);
 	}
 
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)
 	{
-		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
+		if(cancel_plugin(*Modifier))
+			return;
 
-		k3d::inode* new_modifier;
-		for(k3d::nodes_t::iterator selected_node = selected_nodes.begin(); selected_node != selected_nodes.end(); ++selected_node)
-		{
-			new_modifier = modify_mesh(m_document_state, **selected_node, Modifier);
-			assert_warning(new_modifier);
-		}
-
-		// Show the new modifier properties if only one was processed
-		if(selected_nodes.size() == 1)
-			m_document_state.view_node_properties_signal().emit(new_modifier);
-
+		modify_selected_meshes(m_document_state, Modifier);
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
 
 	void on_modify_transformations(k3d::iplugin_factory* Modifier)
 	{
+		if(cancel_plugin(*Modifier))
+			return;
+
 		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 
 		k3d::inode* new_modifier;
@@ -2225,7 +2241,7 @@ private:
 
 		// Show the new modifier properties if only one was processed
 		if(selected_nodes.size() == 1)
-			m_document_state.view_node_properties_signal().emit(new_modifier);
+			panel::mediator(m_document_state.document()).set_focus(*new_modifier);
 
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
@@ -2244,8 +2260,8 @@ private:
 
 		k3d::filesystem::igzstream file(filepath);
 
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
 
 		execute_script(file, filepath.native_utf8_string().raw(), context);
 	}
@@ -2283,9 +2299,9 @@ private:
 
 		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin.get()))
 		{
-			k3d::iscript_engine::context_t context;
-			context["Command"] = k3d::string_t("action");
-			context["Document"] = &document();
+			k3d::iscript_engine::context context;
+			context["command"] = k3d::string_t("action");
+			context["document"] = &document();
 			scripted_action->execute(context);
 		}
 	}

@@ -24,8 +24,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "types.h"
-#include "ustring.h"
+#include <k3dsdk/types.h>
+#include <k3dsdk/ustring.h>
 #include <boost/iterator/iterator_facade.hpp>
 #include <vector>
 

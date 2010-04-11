@@ -91,7 +91,7 @@ public:
 	}
 
 	template<typename FunctorT>
-	static void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::typed_array<k3d::point3>& Centers, const k3d::typed_array<k3d::normal3>& Normals, const k3d::color& Color, const double Offset, const FunctorT& FaceTest, FTFont& Font)
+	static void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::typed_array<k3d::point3>& Centers, const k3d::typed_array<k3d::normal3>& Normals, const k3d::color& Color, const double Offset, FunctorT FaceTest, FTFont& Font)
 	{
 		k3d::gl::color3d(Color);
 
@@ -108,7 +108,7 @@ public:
 		}
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		const k3d::bool_t draw_selected = m_draw_selected.pipeline_value();
 		const k3d::bool_t draw_unselected = m_draw_unselected.pipeline_value();
@@ -145,8 +145,8 @@ public:
 			k3d::typed_array<k3d::normal3> normals(face_count);
 			for(k3d::uint_t face = 0; face != face_count; ++face)
 			{
-				centers[face] = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
-				normals[face] = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+				centers[face] = k3d::polyhedron::center(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+				normals[face] = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 			}
 	
 			k3d::gl::store_attributes attributes;
@@ -167,7 +167,7 @@ public:
 			"OpenGLFaceNumberingPainter",
 			_("Numbers polyhedron faces"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

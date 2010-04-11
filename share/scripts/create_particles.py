@@ -3,50 +3,59 @@
 import k3d
 from random import uniform
 
-doc = Document
-doc.start_change_set()
+context.document.start_change_set()
 try:
-	frozen_mesh = doc.new_node("FrozenMesh")
-	frozen_mesh.name = "Point Group"
+	# Create a FrozenMesh node to act as a mesh source ...
+	frozen_mesh = k3d.plugin.create("FrozenMesh", context.document)
+	frozen_mesh.name = "Particles"
 
-	mesh = k3d.dynamic_cast(frozen_mesh, "imesh_storage").reset_mesh()
+	# Create a mesh ...
+	mesh = frozen_mesh.create_mesh()
 
-	count = 100
+	particle_count = 100
 	size = 10
 
+	# Add geometric points to the mesh ...
 	points = mesh.create_points()
-	Cs = mesh.writable_vertex_data().create_array("Cs", "k3d::color")
 	point_selection = mesh.create_point_selection()
-	point_groups = mesh.create_point_groups()
-	first_points = point_groups.create_first_points()
-	point_counts = point_groups.create_point_counts()
-	materials = point_groups.create_materials()
-	constantwidth = point_groups.writable_constant_data().create_array("constantwidth", "k3d::double_t")
-	group_points = point_groups.create_points()
-
-	for i in range(count):
+	for i in range(particle_count):
 		points.append(k3d.point3(uniform(-size, size), uniform(-size, size), uniform(-size, size)))
 		point_selection.append(0.0)
+
+	# Create a particle primitive ...
+	particles = k3d.particle.create(mesh)
+
+	# Create a custom attribute array to control the widths of particles ...
+	constantwidth = particles.constant_attributes().create("constantwidth", "k3d::double_t")
+
+	# Create a custom attribute array to store color values for each particle ...
+	Cs = particles.vertex_attributes().create("Cs", "k3d::color")
+
+	# Add particles to the primitive ...
+	particles.material().append(None)
+	for i in range(particle_count):
+		particles.points().append(i)
+	
+	constantwidth.append(0.5)
+
+	# Assign a random color to each particle ...
+	for i in range(particle_count):
 		Cs.append(k3d.color(uniform(0, 1), uniform(0, 1), uniform(0, 1)))
 
-	first_points.append(len(group_points))
-	point_counts.append(len(points))
-	materials.append(None)
-	constantwidth.append(0.2)
+	# Connect the FrozenMesh to a MeshInstance to place it in the scene ...
+	mesh_instance = k3d.plugin.create("MeshInstance", context.document)
+	mesh_instance.name = "Particle Instance"
+	mesh_instance.gl_painter = k3d.node.lookup_one(context.document, "GL Default Painter")
+	mesh_instance.ri_painter = k3d.node.lookup_one(context.document, "RenderMan Default Painter")
 
-	for i in range(len(points)):
-		group_points.append(i)
+	k3d.property.connect(context.document, frozen_mesh.get_property("output_mesh"), mesh_instance.get_property("input_mesh"))
 
-	
-	mesh_instance = doc.new_node("MeshInstance")
-	mesh_instance.name = "Point Group Instance"
-	mesh_instance.gl_painter = doc.get_node("GL Default Painter")
-	mesh_instance.ri_painter = doc.get_node("RenderMan Default Painter")
-	doc.set_dependency(mesh_instance.get_property("input_mesh"), frozen_mesh.get_property("output_mesh"))
+	# Make the MeshInstance visible to render engines ...
+	k3d.node.show(context.document, mesh_instance)
 
-	doc.finish_change_set("Create Point Group")
+	context.document.finish_change_set("Create Point Group")
 
 except:
-	doc.cancel_change_set()
+	context.document.cancel_change_set()
 	raise
 

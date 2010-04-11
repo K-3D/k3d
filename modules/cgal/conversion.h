@@ -58,10 +58,8 @@ class nef_visitor
 	typedef typename nef_t::SHalfedge_around_facet_const_circulator SHalfedge_around_facet_const_circulator;
 public:
 	nef_visitor(k3d::polyhedron::primitive& Polyhedron, const CGAL::Object_index<Vertex_const_iterator>& VertexIndices)
-	: m_polyhedron(Polyhedron), m_vertex_indices(VertexIndices), m_edge(0)
+	: m_polyhedron(Polyhedron), m_vertex_indices(VertexIndices), m_edge(0), m_shell(Polyhedron.shell_types.size())
 	{
-		m_polyhedron.shell_first_faces.push_back(0);
-		m_polyhedron.shell_face_counts.push_back(0);
 		m_polyhedron.shell_types.push_back(k3d::polyhedron::POLYGONS);
 	}
 	
@@ -79,12 +77,13 @@ public:
 		return_if_fail(se!=0);
 		SHalfedge_around_facet_const_circulator hc_start(se);
 		SHalfedge_around_facet_const_circulator hc_end(hc_start);
-		const k3d::uint_t face_first_edge = m_polyhedron.edge_points.size();
+		const k3d::uint_t face_first_edge = m_polyhedron.vertex_points.size();
 		CGAL_For_all(hc_start,hc_end)
 		{
-			m_polyhedron.edge_points.push_back(m_vertex_indices[hc_start->source()->center_vertex()]);
-			m_polyhedron.clockwise_edges.push_back(m_polyhedron.edge_points.size());
+			m_polyhedron.vertex_points.push_back(m_vertex_indices[hc_start->source()->center_vertex()]);
+			m_polyhedron.clockwise_edges.push_back(m_polyhedron.vertex_points.size());
 			m_polyhedron.edge_selections.push_back(0.0);
+			m_polyhedron.vertex_selections.push_back(0.0);
 		}
 		m_polyhedron.clockwise_edges.back() = face_first_edge;
 		m_polyhedron.face_first_loops.push_back(m_polyhedron.loop_first_edges.size());
@@ -92,7 +91,7 @@ public:
 		m_polyhedron.face_loop_counts.push_back(1);
 		m_polyhedron.face_materials.push_back(static_cast<k3d::imaterial*>(0));
 		m_polyhedron.face_selections.push_back(0.0);
-		++m_polyhedron.shell_face_counts.back();
+		m_polyhedron.face_shells.push_back(m_shell);
 		++fc;
 		CGAL_For_all(fc, f->facet_cycles_end())
 		{
@@ -100,12 +99,13 @@ public:
 			return_if_fail(se!=0);
 			SHalfedge_around_facet_const_circulator hole_start(se);
 			SHalfedge_around_facet_const_circulator hole_end(hole_start);
-			const k3d::uint_t hole_first_edge = m_polyhedron.edge_points.size();
+			const k3d::uint_t hole_first_edge = m_polyhedron.vertex_points.size();
 			CGAL_For_all(hole_start,hole_end)
 			{
-				m_polyhedron.edge_points.push_back(m_vertex_indices[hole_start->source()->center_vertex()]);
-				m_polyhedron.clockwise_edges.push_back(m_polyhedron.edge_points.size());
+				m_polyhedron.vertex_points.push_back(m_vertex_indices[hole_start->source()->center_vertex()]);
+				m_polyhedron.clockwise_edges.push_back(m_polyhedron.vertex_points.size());
 				m_polyhedron.edge_selections.push_back(0.0);
+				m_polyhedron.vertex_selections.push_back(0.0);
 			}
 			m_polyhedron.clockwise_edges.back() = hole_first_edge;
 			m_polyhedron.loop_first_edges.push_back(hole_first_edge);
@@ -123,6 +123,7 @@ private:
 	k3d::polyhedron::primitive& m_polyhedron;
 	const CGAL::Object_index<Vertex_const_iterator>& m_vertex_indices;
 	k3d::uint_t m_edge;
+	const k3d::uint_t m_shell;
 };
 
 /// Converts a Nef_polyhedron to a k3d mesh
@@ -139,10 +140,6 @@ void to_mesh(nef_t& NefPolyhedron, k3d::mesh& Mesh, k3d::imaterial* const Materi
 	k3d::mesh::selection_t& point_selection = Mesh.point_selection.create();
 	
 	k3d::int32_t skip_volumes = nef_t::Infi_box::extended_kernel() ? 2 : 1;
-	
-	//k3d::log() << debug << "--------------- BEGIN OUTPUT NEF ----------------" << std::endl;
-	//k3d::log() << NefPolyhedron << std::endl;
-	//k3d::log() << debug << "---------------- END OUTPUT NEF -----------------" << std::endl;
 	
 	Vertex_const_iterator v;
 	CGAL::Object_index<Vertex_const_iterator> vertex_indices; 
@@ -190,9 +187,6 @@ boost::shared_ptr<nef_t> to_nef(const k3d::mesh::points_t Points, const k3d::pol
 	boost::shared_ptr<nef_t> nef(new nef_t(snc));
 	nef->build_external_structure();
 	nef->simplify();
-	//k3d::log() << debug << "--------------- BEGIN INPUT NEF ----------------" << std::endl;
-	//k3d::log() << *nef << std::endl;
-	//k3d::log() << debug << "---------------- END INPUT NEF -----------------" << std::endl;
 	return nef;
 }
 

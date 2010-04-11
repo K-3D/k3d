@@ -2,7 +2,7 @@
 #define K3DSDK_MESH_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -20,22 +20,20 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "bounding_box3.h"
-#include "named_arrays.h"
-#include "named_array_types.h"
-#include "named_tables.h"
-#include "pipeline_data.h"
-#include "table.h"
-#include "typed_array.h"
-#include "uint_t_array.h"
+#include <k3dsdk/bounding_box3.h>
+#include <k3dsdk/named_arrays.h>
+#include <k3dsdk/named_array_types.h>
+#include <k3dsdk/named_tables.h>
+#include <k3dsdk/pipeline_data.h>
+#include <k3dsdk/table.h>
+#include <k3dsdk/typed_array.h>
+#include <k3dsdk/uint_t_array.h>
 
 namespace k3d
 {
 
 class imaterial;
 class mesh_selection;
-
-namespace legacy { class mesh; }
 
 ////////////////////////////////////////////////////////////////////////////////
 // mesh
@@ -101,8 +99,8 @@ public:
 		/// Stores array data that defines the primitive's attributes.
 		named_tables_t attributes;
 
-		/// Compares two primitives for equality using the fuzzy semantics of almost_equal.
-		bool_t almost_equal(const primitive& Other, const uint64_t Threshold) const;
+		/// Returns the difference between two primitives using the fuzzy semantics of difference::test().
+		void difference(const primitive& Other, difference::accumulator& Result) const;
 	};
 
 	/// Defines storage for a collection of primitives.
@@ -123,20 +121,26 @@ public:
 	/// Stores mesh primitives.
 	primitives_t primitives;
 
-	/// Compares two meshes for equality using the fuzzy semantics of almost_equal.
-	bool_t almost_equal(const mesh& Other, const uint64_t Threshold) const;
-
-	/// Conversion from a legacy mesh to a new mesh.
-	mesh& operator=(const k3d::legacy::mesh& RHS);
+	/// Returns the difference between two meshes using the fuzzy semantics of difference::test().
+	void difference(const mesh& Other, difference::accumulator& Result) const;
 
 	/// Returns a bounding-box containing every point in the given mesh.
 	static const bounding_box3 bounds(const mesh& Mesh);
 	/// Returns a bounding-box containing every point in the given array.
 	static const bounding_box3 bounds(const points_t& Points);
+
+	/// Converts a bitmap marking indices to be removed from a contiguous set into a map.
+	static void create_index_removal_map(const mesh::bools_t& KeepIndices, mesh::indices_t& IndexMap);
+	/// Converts a bitmap marking indices in a range to a set of selected indices.
+	static void create_index_list(const mesh::bools_t& SelectedIndices, mesh::indices_t& IndexSet);
 	/// Initialize an array to mark unused mesh points (points not used by any primitive).
 	static void lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints);
-	/// Remove unused points from a mesh, adjusting point indices in all remaining primitives.
-	static void delete_unused_points(mesh& Mesh);
+	/// Remaps point indices in every primitive in a mesh.
+	static void remap_points(mesh& Mesh, const mesh::indices_t& PointMap);
+	/// Remove points from a mesh, adjusting point indices in all remaining primitives.
+	static void delete_points(mesh& Mesh, const mesh::bools_t& Points);
+	/// Remove points from a mesh, adjusting point indices in all remaining primitives, returning an array that maps original point indices to new point indices.
+	static void delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_t& PointMap);
 	/// Performs a deep-copy from one mesh to another (the new mesh doesn't share any memory with the old).
 	static void deep_copy(const mesh& From, mesh& To);
 
@@ -189,51 +193,32 @@ public:
 		for(mesh::primitives_t::iterator p = Mesh.primitives.begin(); p != Mesh.primitives.end(); ++p)
 			visit_arrays(p->writable(), Functor);
 	}
+
+	/// Combines two meshes by appending every point / primitive from one to the other.  Primitive point indices are automatically
+	/// offset to reflect the new position(s) of points in the combined mesh.  Returns the range of point and primitive indices that were appended.
+	static void append(const mesh& Source, mesh& Target, uint_t* const PointBegin = 0, uint_t* const PointEnd = 0, uint_t* const PrimitiveBegin = 0, uint_t* const PrimitiveEnd = 0);
 };
 
 /// Stream serialization
 std::ostream& operator<<(std::ostream& Stream, const mesh& RHS);
 std::ostream& operator<<(std::ostream& Stream, const mesh::primitive& RHS);
 
-/// Specialization of almost_equal that tests k3d::mesh for equality
-template<>
-class almost_equal<mesh>
+/// Specialization of difference::test for k3d::mesh
+namespace difference
 {
-	typedef mesh T;
 
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
-
-/// Specialization of almost_equal that tests k3d::mesh::primitive for equality
-template<>
-class almost_equal<mesh::primitive>
+inline void test(const k3d::mesh& A, const k3d::mesh& B, accumulator& Result)
 {
-	typedef mesh::primitive T;
+	A.difference(B, Result);
+}
 
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
+/// Specialization of difference::test for k3d::mesh::primitive
+inline void test(const k3d::mesh::primitive& A, const k3d::mesh::primitive& B, accumulator& Result)
+{
+	A.difference(B, Result);
+}
 
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
+} // namespace difference
 
 } // namespace k3d
 

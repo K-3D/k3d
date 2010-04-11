@@ -22,15 +22,9 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "document.h"
-#include "document_state.h"
-#include "main_document_window.h"
-#include "messages.h"
-
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_importer.h>
@@ -39,10 +33,16 @@
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/imetadata.h>
 #include <k3dsdk/irender_engine_ri.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/ngui/document.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/main_document_window.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/transform.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 
 #include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -108,7 +108,7 @@ void setup_renderman_document(k3d::idocument& Document)
 	return_if_fail(k3d::plugin::factory::lookup("RenderManMaterial"));
 	return_if_fail(k3d::plugin::factory::lookup("RenderManMultiPainter"));
 	return_if_fail(k3d::plugin::factory::lookup("RenderManNURBSPatchPainter"));
-	return_if_fail(k3d::plugin::factory::lookup("RenderManPointGroupPainter"));
+	return_if_fail(k3d::plugin::factory::lookup("RenderManParticlePainter"));
 	return_if_fail(k3d::plugin::factory::lookup("RenderManPolyhedronPainter"));
 	return_if_fail(k3d::plugin::factory::lookup("RenderManSubdivisionSurfacePainter"));
 	return_if_fail(k3d::plugin::factory::lookup("RenderManSurfaceShader"));
@@ -117,7 +117,7 @@ void setup_renderman_document(k3d::idocument& Document)
 	k3d::inode* const multi_painter = k3d::plugin::create<k3d::inode>("RenderManMultiPainter", Document, "RenderMan Default Painter");
 	return_if_fail(multi_painter);
 
-	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "point_groups", "Point Groups", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManPointGroupPainter", Document, "RenderMan Point Group Painter"));
+	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "particles", "Particles", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManParticlePainter", Document, "RenderMan Particle Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "polyhedra", "Polyhedra", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManPolyhedronPainter", Document, "RenderMan Polyhedron Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "subdivision_surfaces", "Subdivision Surfaces", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManSubdivisionSurfacePainter", Document, "RenderMan Subdivision Surface Painter"));
 	k3d::property::create<k3d::ri::imesh_painter*>(*multi_painter, "linear_curves", "Linear Curves", "", k3d::plugin::create<k3d::ri::imesh_painter>("RenderManLinearCurvePainter", Document, "RenderMan Linear Curve Painter"));
@@ -290,7 +290,24 @@ void open_document(const k3d::filesystem::path& Path)
 	k3d::idocument* const document = k3d::application().create_document();
 	return_if_fail(document);
 
-	if(!importer->read_file(*document, Path))
+	// Nag users about the file version ...
+	k3d::imetadata::metadata_t file_metadata = importer->get_file_metadata(Path);
+	std::stringstream version(file_metadata[k3d::metadata::key::version()]);
+	k3d::uint32_t major_version = 0;
+	k3d::uint32_t minor_version = 0;
+	k3d::uint32_t revision = 0;
+	k3d::uint32_t build = 0;
+	char point;
+	version >> major_version >> point >> minor_version >> point >> revision >> point >> build;
+
+	if(major_version == 0 && minor_version < 8)
+	{
+		warning_message(
+			_("Documents prior to K-3D 0.8 are unsupported."),
+			_("Due to significant changes to K-3D internals, documents from versions prior to 0.8 are unsupported and may not function correctly."));
+	}
+
+	if(!importer->read_file(Path, *document))
 	{
 		error_message(k3d::string_cast(boost::format(_("Error reading document %1%")) % Path.native_filesystem_string()));
 		return;

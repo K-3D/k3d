@@ -31,7 +31,6 @@ namespace development
 {
 
 extern k3d::iplugin_factory& glsl_painter_factory();
-extern k3d::iplugin_factory& tweak_points_factory();
 
 } // namespace development
 
@@ -39,6 +38,5 @@ extern k3d::iplugin_factory& tweak_points_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::development::glsl_painter_factory());
-	Registry.register_factory(module::development::tweak_points_factory());
 K3D_MODULE_END
 

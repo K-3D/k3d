@@ -23,9 +23,9 @@
 
 #include <gtkmm/widget.h>
 
-#include "document_state.h"
-#include "tool.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/tool.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/result.h>

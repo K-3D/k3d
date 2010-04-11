@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "icommand_node.h"
+#include <k3dsdk/icommand_node.h>
 
 namespace k3d
 {

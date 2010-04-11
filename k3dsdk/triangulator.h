@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh.h"
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {
@@ -45,7 +45,7 @@ public:
 		const mesh::indices_t& FaceFirstLoops,
 		const mesh::counts_t& FaceLoopCounts,
 		const mesh::indices_t& LoopFirstEdges,
-		const mesh::indices_t& EdgePoints,
+		const mesh::indices_t& VertexPoints,
 		const mesh::indices_t& ClockwiseEdges,
 		const uint_t Face);
 

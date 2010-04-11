@@ -42,8 +42,8 @@
 
 // Modified by Tim Shead for use with K-3D, January 1998
 
-#include "almost_equal.h"
-#include "result.h"
+#include <k3dsdk/difference.h>
+#include <k3dsdk/result.h>
 
 #include <boost/io/ios_state.hpp>
 #include <iomanip>
@@ -178,21 +178,16 @@ inline bool operator!=(const point2& a, const point2& b)
 	return !(a == b);
 }
 
-/// Specialization of almost_equal that tests two point2 objects for near-equality
-template<>
-class almost_equal<point2>
+namespace difference
 {
-	typedef point2 T;
-public:
-	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
-	inline bool operator()(const T& A, const T& B) const
-	{
-		return std::equal(A.n, A.n + 2, B.n, almost_equal<double>(threshold));
-	}
 
-private:
-	const boost::uint64_t threshold;
-};
+/// Specialization of difference::test for point2
+inline void test(const point2& A, const point2& B, accumulator& Result)
+{
+	range_test(A.n, A.n + 2, B.n, B.n + 2, Result);
+}
+
+} // namespace difference
 
 } // namespace k3d
 

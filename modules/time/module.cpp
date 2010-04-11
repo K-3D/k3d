@@ -31,7 +31,7 @@ namespace module
 namespace time
 {
 
-extern k3d::iplugin_factory& format_factory();
+extern k3d::iplugin_factory& time_to_string_factory();
 extern k3d::iplugin_factory& manual_time_source_factory();
 extern k3d::iplugin_factory& real_time_source_factory();
 extern k3d::iplugin_factory& time_source_factory();
@@ -41,7 +41,7 @@ extern k3d::iplugin_factory& time_source_factory();
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::time::format_factory());
+	Registry.register_factory(module::time::time_to_string_factory());
 	Registry.register_factory(module::time::manual_time_source_factory());
 	Registry.register_factory(module::time::real_time_source_factory());
 	Registry.register_factory(module::time::time_source_factory());

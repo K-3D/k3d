@@ -25,7 +25,7 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "iproperty.h"
+#include <k3dsdk/iproperty.h>
 
 namespace k3d
 {

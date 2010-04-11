@@ -21,28 +21,30 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "any_python.h"
-#include "icommand_node_python.h"
-#include "idocument_exporter_python.h"
-#include "idocument_importer_python.h"
-#include "ifile_change_notifier_python.h"
-#include "ikeyframer_python.h"
-#include "imesh_storage_python.h"
-#include "imetadata_python.h"
-#include "inode_python.h"
-#include "inode_selection_python.h"
-#include "iplugin_factory_python.h"
-#include "iproperty_python.h"
-#include "iproperty_collection_python.h"
-#include "isnappable_python.h"
-#include "iunknown_python.h"
-#include "iuser_interface_python.h"
+#include <k3dsdk/python/any_python.h>
+#include <k3dsdk/python/icommand_node_python.h>
+#include <k3dsdk/python/idocument_exporter_python.h>
+#include <k3dsdk/python/idocument_importer_python.h>
+#include <k3dsdk/python/ifile_change_notifier_python.h>
+#include <k3dsdk/python/ikeyframer_python.h>
+#include <k3dsdk/python/imesh_storage_python.h>
+#include <k3dsdk/python/imetadata_python.h>
+#include <k3dsdk/python/inode_python.h>
+#include <k3dsdk/python/inode_selection_python.h>
+#include <k3dsdk/python/iplugin_factory_python.h>
+#include <k3dsdk/python/iproperty_python.h>
+#include <k3dsdk/python/iproperty_collection_python.h>
+#include <k3dsdk/python/irender_camera_frame_python.h>
+#include <k3dsdk/python/irender_camera_preview_python.h>
+#include <k3dsdk/python/isnappable_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/iuser_interface_python.h>
 
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/log.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/types.h>
 
 #include <boost/python.hpp>
@@ -75,6 +77,8 @@ object wrap_unknown(iunknown& Unknown)
 	define_methods_iplugin_factory(Unknown, result);
 	define_methods_iproperty(Unknown, result);
 	define_methods_iproperty_collection(Unknown, result);
+	define_methods_irender_camera_frame(Unknown, result);
+	define_methods_irender_camera_preview(Unknown, result);
 	define_methods_isnappable(Unknown, result);
 	define_methods_iuser_interface(Unknown, result);
 	
@@ -124,6 +128,28 @@ static void setattr(object& Self, const string_t& Name, const object& Value)
 	Self.attr("__dict__")[Name] = Value;
 }
 
+static bool eq(const object& Self, const object& Other)
+{
+	if(Other == boost::python::object())
+		return false;
+
+	extract<iunknown_wrapper> self(Self);
+	extract<iunknown_wrapper> other(Other);
+
+	return self == other;
+}
+
+static bool ne(const object& Self, const object& Other)
+{
+	if(Other == boost::python::object())
+		return false;
+
+	extract<iunknown_wrapper> self(Self);
+	extract<iunknown_wrapper> other(Other);
+
+	return !(self == other);
+}
+
 void define_class_iunknown()
 {
 	class_<iunknown_wrapper>("iunknown", 
@@ -132,6 +158,8 @@ void define_class_iunknown()
 		no_init)
 		.def("__getattr__", getattr)
 		.def("__setattr__", setattr)
+		.def("__eq__", eq)
+		.def("__ne__", ne)
 		;
 }
 

@@ -42,8 +42,8 @@ namespace detail
 
 void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const k3d::blobby::operator_type Operator, const k3d::bool_t VariableArguments, k3d::mesh& Output)
 {
-	// Collect all of the varying and vertex arrays to be merged ...
-	k3d::mesh::table_t::table_collection source_varying_attributes;
+	// Collect all of the parameter and vertex arrays to be merged ...
+	k3d::mesh::table_t::table_collection source_parameter_attributes;
 	k3d::mesh::table_t::table_collection source_vertex_attributes;
 	for(mesh_collection::const_iterator mesh = Inputs.begin(); mesh != Inputs.end(); ++mesh)
 	{
@@ -53,7 +53,7 @@ void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const 
 			if(!source_blobby)
 				continue;
 
-			source_varying_attributes.push_back(&source_blobby->varying_attributes);
+			source_parameter_attributes.push_back(&source_blobby->parameter_attributes);
 			source_vertex_attributes.push_back(&source_blobby->vertex_attributes);
 		}
 	}
@@ -61,7 +61,7 @@ void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const 
 	// Setup the initial state of the output mesh ...
 	boost::scoped_ptr<k3d::blobby::primitive> target_blobby(k3d::blobby::create(Output));
 
-	target_blobby->varying_attributes = k3d::table::clone_types(source_varying_attributes);
+	target_blobby->parameter_attributes = k3d::table::clone_types(source_parameter_attributes);
 	target_blobby->vertex_attributes = k3d::table::clone_types(source_vertex_attributes);
 
 	target_blobby->first_primitives.push_back(0);
@@ -81,7 +81,7 @@ void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const 
 			if(!source_blobby)
 				continue;
 
-			k3d::table_copier varying_copier(source_blobby->varying_attributes, target_blobby->varying_attributes, k3d::table_copier::copy_subset());
+			k3d::table_copier parameter_copier(source_blobby->parameter_attributes, target_blobby->parameter_attributes, k3d::table_copier::copy_subset());
 			k3d::table_copier vertex_copier(source_blobby->vertex_attributes, target_blobby->vertex_attributes, k3d::table_copier::copy_subset());
 
 			const k3d::uint_t blobby_begin = 0;
@@ -98,7 +98,7 @@ void merge(const mesh_collection& Inputs, k3d::imaterial* const Material, const 
 					target_blobby->primitives.push_back(source_blobby->primitives[source_primitive]);
 					target_blobby->primitive_first_floats.push_back(target_blobby->floats.size());
 					target_blobby->primitive_float_counts.push_back(source_blobby->primitive_float_counts[source_primitive]);
-					varying_copier.push_back(source_primitive);
+					parameter_copier.push_back(source_primitive);
 					vertex_copier.push_back(source_primitive);
 
 					const k3d::uint_t source_floats_begin = source_blobby->primitive_first_floats[source_primitive];

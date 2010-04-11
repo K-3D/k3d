@@ -93,7 +93,7 @@ public:
 	}
 
 	template<typename FunctorT>
-	static void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::mesh::points_t& Points, const k3d::mesh::normals_t& FaceNormals, const k3d::color& Color, const k3d::double_t EdgeOffset, const k3d::double_t FaceOffset, const FunctorT& EdgeTest, FTFont& Font)
+	static void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::mesh::points_t& Points, const k3d::mesh::normals_t& FaceNormals, const k3d::color& Color, const k3d::double_t EdgeOffset, const k3d::double_t FaceOffset, FunctorT EdgeTest, FTFont& Font)
 	{
 		k3d::gl::color3d(Color);
 
@@ -110,8 +110,8 @@ public:
 				{
 					if(EdgeTest(Polyhedron.edge_selections, edge))
 					{
-						const k3d::point3 vertex1 = Points[Polyhedron.edge_points[edge]];
-						const k3d::point3 vertex2 = Points[Polyhedron.edge_points[Polyhedron.clockwise_edges[edge]]];
+						const k3d::point3 vertex1 = Points[Polyhedron.vertex_points[edge]];
+						const k3d::point3 vertex2 = Points[Polyhedron.vertex_points[Polyhedron.clockwise_edges[edge]]];
 						const k3d::vector3 edge_vector = vertex2 - vertex1;
 
 						const k3d::point3 position = vertex1 + (0.5 * edge_vector) + (EdgeOffset * k3d::normalize(FaceNormals[face] ^ edge_vector)) + (FaceOffset * k3d::to_vector(k3d::normalize(FaceNormals[face])));
@@ -128,8 +128,10 @@ public:
 		}
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
+		if(!Mesh.points)
+			return;
 		const k3d::bool_t draw_selected = m_draw_selected.pipeline_value();
 		const k3d::bool_t draw_unselected = m_draw_unselected.pipeline_value();
 		if(!draw_selected && !draw_unselected)
@@ -167,7 +169,7 @@ public:
 			// Calculate face normals ...
 			k3d::typed_array<k3d::normal3> normals(face_count);
 			for(k3d::uint_t face = 0; face != face_count; ++face)
-				normals[face] = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+				normals[face] = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 	
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);
@@ -187,7 +189,7 @@ public:
 			"OpenGLEdgeNumberingPainter",
 			_("Numbers polyhedron edges"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

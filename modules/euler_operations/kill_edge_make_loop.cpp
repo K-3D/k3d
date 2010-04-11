@@ -86,20 +86,22 @@ public:
       
       k3d::mesh::bools_t boundary_edges;
       k3d::mesh::indices_t companions;
-      k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->edge_points, polyhedron->clockwise_edges, boundary_edges, companions);
+      k3d::polyhedron::create_edge_adjacency_lookup(polyhedron->vertex_points, polyhedron->clockwise_edges, boundary_edges, companions);
       
       k3d::mesh::normals_t face_normals(polyhedron->face_first_loops.size());
       const k3d::uint_t face_begin = 0;
       const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
       for(k3d::uint_t face = face_begin; face != face_end; ++face)
       {
-        face_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
+        face_normals[face] = k3d::normalize(k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]));
       }
       
       k3d::euler::kill_edge_make_loop(*polyhedron, edge_list, boundary_edges, companions, points, face_normals);
     }
 
-		k3d::mesh::delete_unused_points(Output);
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)

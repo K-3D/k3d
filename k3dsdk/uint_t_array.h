@@ -20,8 +20,8 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "almost_equal.h"
-#include "array.h"
+#include <k3dsdk/difference.h>
+#include <k3dsdk/array.h>
 
 #include <algorithm>
 #include <vector>
@@ -118,26 +118,32 @@ public:
 		return base_type::empty();
 	}
 
-	bool_t almost_equal(const array& Other, const uint64_t Threshold) const
+	void difference(const array& Other, difference::accumulator& Result) const
 	{
 		const this_type* const other = dynamic_cast<const this_type*>(&Other);
-		if(!other)
-			return false;
+		Result.exact(other ? true : false);
 
-		return almost_equal(*other, Threshold);
+		if(other)
+			difference(*other, Result);
 	}
 
-	bool_t almost_equal(const this_type& Other, const uint64_t Threshold) const
+	void difference(const this_type& Other, difference::accumulator& Result) const
 	{
-		if(base_type::size() != Other.size())
-			return false;
-
-		if(metadata != Other.metadata)
-			return false;
-
-		return std::equal(base_type::begin(), base_type::end(), Other.begin(), k3d::almost_equal<uint_t>(Threshold));
+		Result.exact(metadata == Other.metadata);
+		range_test(base_type::begin(), base_type::end(), Other.begin(), Other.end(), Result);
 	}
 };
+
+namespace difference
+{
+
+/// Specialization of difference::test for k3d::uint_t_array
+inline void test(const uint_t_array& A, const uint_t_array& B, accumulator& Result)
+{
+	A.difference(B, Result);
+}
+
+} // namespace difference
 
 } // namespace k3d
 

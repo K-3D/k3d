@@ -92,10 +92,10 @@ public:
 	{
 		static k3d::document_plugin_factory<sphere > factory(
 			k3d::uuid(0xcaf583f9, 0xdb4579fe, 0xf5be1084, 0x1e5ebc61),
-			"Sphere",
+			"QuadricSphere",
 			"Creates a sphere primitive",
 			"Quadric",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

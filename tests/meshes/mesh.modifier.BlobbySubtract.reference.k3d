@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<point_attributes/>
+		<primitives>
+			<primitive type="blobby">
+				<structure>
+					<table type="float">
+						<array name="floats" type="k3d::double_t">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 3 0 0 1 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</array>
+					</table>
+					<table type="operand">
+						<array name="operands" type="k3d::uint_t">0 1</array>
+					</table>
+					<table type="operator">
+						<array name="operator_first_operands" type="k3d::uint_t">0</array>
+						<array name="operator_operand_counts" type="k3d::uint_t">2</array>
+						<array name="operators" type="k3d::int32_t">4</array>
+					</table>
+					<table type="surface">
+						<array name="first_operators" type="k3d::uint_t">0</array>
+						<array name="first_primitives" type="k3d::uint_t">0</array>
+						<array name="materials" type="k3d::imaterial*">0</array>
+						<array name="operator_counts" type="k3d::uint_t">1</array>
+						<array name="primitive_counts" type="k3d::uint_t">2</array>
+					</table>
+					<table type="vertex">
+						<array name="primitive_first_floats" type="k3d::uint_t">0 16</array>
+						<array name="primitive_float_counts" type="k3d::uint_t">16 23</array>
+						<array name="primitives" type="k3d::int32_t">1001 1002</array>
+					</table>
+				</structure>
+				<attributes>
+					<table type="constant"/>
+					<table type="parameter">
+						<array name="Cs" type="k3d::color">1 0 0 1 1 0</array>
+					</table>
+					<table type="surface"/>
+					<table type="vertex"/>
+				</attributes>
+			</primitive>
+		</primitives>
+	</mesh_arrays>
+</k3dml>

@@ -10,7 +10,7 @@ desc: |-
   Tested in SVN from 2007 Nov 27th on Ubuntu Gnu/Linux 7.10 Gutsy.
 type: :bugfix
 component: K-3D
-release: 0.8.0.0
+release: 1.0.0.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -26,4 +26,8 @@ log_events:
 - - 2009-08-02 22:53:20.367034 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 0.8.0.0 from unassigned
+  - ""
+- - 2009-08-20 06:32:53.313466 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
   - ""

@@ -20,10 +20,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "table.h"
-#include "named_array_types.h"
-#include "typed_array.h"
-#include "uint_t_array.h"
+#include <k3dsdk/table.h>
+#include <k3dsdk/named_array_types.h>
+#include <k3dsdk/typed_array.h>
+#include <k3dsdk/uint_t_array.h>
 
 #include <boost/graph/adjacency_list.hpp>
 

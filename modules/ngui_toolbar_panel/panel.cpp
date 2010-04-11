@@ -32,6 +32,7 @@
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/image_toggle_button.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/ngui/render.h>
 #include <k3dsdk/ngui/scripting.h>
 #include <k3dsdk/ngui/selection.h>
@@ -40,7 +41,7 @@
 #include <k3dsdk/ngui/transform.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/ngui/widget_manip.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/utility_gl.h>
@@ -66,44 +67,6 @@ namespace toolbar
 
 namespace detail
 {
-
-/// Provides an implementation of k3d::toggle_button::imodel for visualizing the current selection mode
-class selection_mode_model :
-	public toggle_button::imodel
-{
-public:
-	selection_mode_model(k3d::idocument& Document, const selection::mode Mode, const Glib::ustring& Label) :
-		m_document(Document),
-		m_mode(Mode),
-		m_label(Label)
-	{
-	}
-
-	const Glib::ustring label()
-	{
-		return m_label;
-	}
-
-	const k3d::bool_t value()
-	{
-		return selection::state(m_document).current_mode() == m_mode;
-	}
-
-	void set_value(const k3d::bool_t Value)
-	{
-		selection::state(m_document).set_current_mode(m_mode);
-	}
-
-	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
-	{
-		return selection::state(m_document).connect_current_mode_changed_signal(sigc::hide(Slot));
-	}
-
-private:
-	k3d::idocument& m_document;
-	const selection::mode m_mode;
-	const Glib::ustring m_label;
-};
 
 /// \deprecated Provides an implementation of k3d::toggle_button::imodel for visualizing the active tool
 class builtin_tool_model :
@@ -178,6 +141,112 @@ public:
 private:
 	document_state& m_document_state;
 	const k3d::string_t m_tool;
+};
+
+/// Provides an implementation of k3d::toggle_button::imodel for visualizing the current selection mode
+class selection_mode_model :
+	public toggle_button::imodel
+{
+public:
+	selection_mode_model(k3d::idocument& Document, const selection::mode Mode, const Glib::ustring& Label) :
+		m_document(Document),
+		m_mode(Mode),
+		m_label(Label)
+	{
+	}
+
+	const Glib::ustring label()
+	{
+		return m_label;
+	}
+
+	const k3d::bool_t value()
+	{
+		return selection::state(m_document).current_mode() == m_mode;
+	}
+
+	void set_value(const k3d::bool_t Value)
+	{
+		selection::state(m_document).set_current_mode(m_mode);
+	}
+
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
+	{
+		return selection::state(m_document).connect_current_mode_changed_signal(sigc::hide(Slot));
+	}
+
+private:
+	k3d::idocument& m_document;
+	const selection::mode m_mode;
+	const Glib::ustring m_label;
+};
+
+/// Provides an implementation of k3d::toggle_button::imodel for visualizing the current keep selection mode
+class keep_selection_model :
+	public toggle_button::imodel
+{
+public:
+	keep_selection_model(k3d::idocument& Document) :
+		m_document(Document)
+	{
+	}
+
+	const Glib::ustring label()
+	{
+		return _("Keep Selection");
+	}
+
+	const k3d::bool_t value()
+	{
+		return selection::state(m_document).keep_selection();
+	}
+
+	void set_value(const k3d::bool_t Value)
+	{
+		selection::state(m_document).set_keep_selection(Value);
+	}
+
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
+	{
+		return selection::state(m_document).connect_keep_selection_changed_signal(sigc::hide(Slot));
+	}
+
+private:
+	k3d::idocument& m_document;
+};
+
+/// Provides an implementation of k3d::toggle_button::imodel for visualizing the current convert selection mode
+class convert_selection_model :
+	public toggle_button::imodel
+{
+public:
+	convert_selection_model(k3d::idocument& Document) :
+		m_document(Document)
+	{
+	}
+
+	const Glib::ustring label()
+	{
+		return _("Convert Selection");
+	}
+
+	const k3d::bool_t value()
+	{
+		return selection::state(m_document).convert_selection();
+	}
+
+	void set_value(const k3d::bool_t Value)
+	{
+		selection::state(m_document).set_convert_selection(Value);
+	}
+
+	sigc::connection connect_changed_signal(const sigc::slot<void>& Slot)
+	{
+		return selection::state(m_document).connect_convert_selection_changed_signal(sigc::hide(Slot));
+	}
+
+private:
+	k3d::idocument& m_document;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -273,34 +342,43 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				new detail::selection_mode_model(m_document_state.document(), selection::NODES, _("Select Nodes mode")),
+				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::NODE, _("Select Nodes")),
 				&m_document_state.document().state_recorder(),
-				load_icon("node", Gtk::ICON_SIZE_SMALL_TOOLBAR))
-			<< set_tooltip(_("Select Objects"))
+				load_icon("select_node", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+			<< set_tooltip(_("Select Nodes"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				new detail::selection_mode_model(m_document_state.document(), selection::POINTS, _("Select Points mode")),
+				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::POINT, _("Select Points")),
 				&m_document_state.document().state_recorder(),
-				load_icon("vertex", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+				load_icon("select_vertex", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Points"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				new detail::selection_mode_model(m_document_state.document(), selection::SPLIT_EDGES, _("Select Polygon Edges")),
+				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::EDGE, _("Select Polygon Edges")),
 				&m_document_state.document().state_recorder(),
-				load_icon("edge", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+				load_icon("select_split_edge", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Polygon Edges"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				new detail::selection_mode_model(m_document_state.document(), selection::CURVES, _("Select Curves")),
+				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::FACE, _("Select Polygons")),
+				&m_document_state.document().state_recorder(),
+				load_icon("select_face", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+			<< set_tooltip(_("Select Polygons"))
+			<< make_toolbar_button()
+			), Gtk::PACK_SHRINK);
+
+		main_toolbar->row(1).pack_start(*Gtk::manage(
+			new image_toggle_button::control(
+				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::CURVE, _("Select Curves")),
 				&m_document_state.document().state_recorder(),
 				load_icon("select_curve", Gtk::ICON_SIZE_SMALL_TOOLBAR))
 			<< set_tooltip(_("Select Curves"))
@@ -309,10 +387,37 @@ struct implementation
 
 		main_toolbar->row(1).pack_start(*Gtk::manage(
 			new image_toggle_button::control(
-				new detail::selection_mode_model(m_document_state.document(), selection::UNIFORM, _("Select Uniform")),
+				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::PATCH, _("Select Patches")),
 				&m_document_state.document().state_recorder(),
-				load_icon("face", Gtk::ICON_SIZE_SMALL_TOOLBAR))
-			<< set_tooltip(_("Select Uniform"))
+				load_icon("select_patch", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+			<< set_tooltip(_("Select Patches"))
+			<< make_toolbar_button()
+			), Gtk::PACK_SHRINK);
+
+		main_toolbar->row(1).pack_start(*Gtk::manage(
+			new image_toggle_button::control(
+				new detail::selection_mode_model(m_document_state.document(), k3d::ngui::selection::SURFACE, _("Select Surface")),
+				&m_document_state.document().state_recorder(),
+				load_icon("select_uniform", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+			<< set_tooltip(_("Select Surface"))
+			<< make_toolbar_button()
+			), Gtk::PACK_SHRINK);
+
+		main_toolbar->row(1).pack_start(*Gtk::manage(
+			new image_toggle_button::control(
+				new detail::keep_selection_model(m_document_state.document()),
+				0,
+				load_icon("keep_selection", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+			<< set_tooltip(_("Keep Selection"))
+			<< make_toolbar_button()
+			), Gtk::PACK_SHRINK);
+
+		main_toolbar->row(1).pack_start(*Gtk::manage(
+			new image_toggle_button::control(
+				new detail::convert_selection_model(m_document_state.document()),
+				0,
+				load_icon("convert_selection", Gtk::ICON_SIZE_SMALL_TOOLBAR))
+			<< set_tooltip(_("Convert Selection"))
 			<< make_toolbar_button()
 			), Gtk::PACK_SHRINK);
 
@@ -462,7 +567,8 @@ struct implementation
 
 	void on_create_node(k3d::iplugin_factory* const Factory)
 	{
-		m_document_state.create_node(Factory);
+		return_if_fail(Factory);
+		k3d::ngui::pipeline::create_node(m_document_state.document(), *Factory);
 	}
 
 	/// Unparents all selected nodes
@@ -508,16 +614,16 @@ struct implementation
 	{
 		k3d::script::code script(Script);
 
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &m_document_state.document();
+		k3d::iscript_engine::context context;
+		context["document"] = &m_document_state.document();
 
 		execute_script(script, "Inline Script", context);
 	}
 
 	void on_run_external_script(const k3d::filesystem::path Script)
 	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &m_document_state.document();
+		k3d::iscript_engine::context context;
+		context["document"] = &m_document_state.document();
 
 		execute_script(Script, context);
 	}
@@ -535,8 +641,7 @@ struct implementation
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
-        public Gtk::VBox
+  public Gtk::VBox
 {
 	typedef Gtk::VBox base;
 
@@ -578,7 +683,7 @@ public:
 			"NGUIToolbarPanel",
 			_("Provides the standard toolbar"),
 			"NGUI Panel",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Toolbar"));
 
 		return factory;

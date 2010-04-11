@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -48,6 +48,7 @@
 #include <k3dsdk/imaterial_yafray.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/imesh_painter_ri.h>
+#include <k3dsdk/imesh_selection_algorithm.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imesh_storage.h>
@@ -71,14 +72,14 @@
 #include <k3dsdk/itransform_array_1d.h>
 #include <k3dsdk/itransform_array_2d.h>
 #include <k3dsdk/itransform_array_3d.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iuri_handler.h>
 #include <k3dsdk/ivector3_source.h>
 #include <k3dsdk/ivolume_shader_ri.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/rectangle.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/texture3.h>
 #include <k3dsdk/type_registry.h>
@@ -186,6 +187,7 @@ void initialize_types()
 	register_type(typeid(k3d::ikeyframer), "k3d::ikeyframer");
 	register_type(typeid(k3d::imaterial), "k3d::imaterial");
 	register_type(typeid(k3d::imaterial*), "k3d::imaterial*");
+	register_type(typeid(k3d::imesh_selection_algorithm), "k3d::imesh_selection_algorithm");
 	register_type(typeid(k3d::imesh_sink), "k3d::imesh_sink");
 	register_type(typeid(k3d::imesh_source), "k3d::imesh_source");
 	register_type(typeid(k3d::imesh_storage), "k3d::imesh_storage");
@@ -213,14 +215,12 @@ void initialize_types()
 	register_type(typeid(k3d::itransform_array_1d), "k3d::itransform_array_1d");
 	register_type(typeid(k3d::itransform_array_2d), "k3d::itransform_array_2d");
 	register_type(typeid(k3d::itransform_array_3d), "k3d::itransform_array_3d");
-	register_type(typeid(k3d::itransform_sink), "k3d::itransform_sink");
-	register_type(typeid(k3d::itransform_source), "k3d::itransform_source");
+	register_type(typeid(k3d::imatrix_sink), "k3d::imatrix_sink");
+	register_type(typeid(k3d::imatrix_source), "k3d::imatrix_source");
 	register_type(typeid(k3d::iunknown), "k3d::iunknown");
 	register_type(typeid(k3d::iunknown*), "k3d::iunknown*");
 	register_type(typeid(k3d::iuri_handler), "k3d::iuri_handler");
 	register_type(typeid(k3d::ivector3_source), "k3d::ivector3_source");
-	register_type(typeid(k3d::legacy::mesh), "k3d::legacy::mesh");
-	register_type(typeid(k3d::legacy::mesh*), "k3d::legacy::mesh*");
 	register_type(typeid(k3d::matrix4), "k3d::matrix4");
 	register_type(typeid(k3d::mesh), "k3d::mesh");
 	register_type(typeid(k3d::mesh*), "k3d::mesh*");
@@ -241,6 +241,7 @@ void initialize_types()
 	register_type(typeid(k3d::ri::itexture), "k3d::ri::itexture");
 	register_type(typeid(k3d::ri::itexture*), "k3d::ri::itexture*");
 	register_type(typeid(k3d::ri::ivolume_shader), "k3d::ri::ivolume_shader");
+	register_type(typeid(k3d::rectangle), "k3d::rectangle");
 	register_type(typeid(k3d::selection::set), "k3d::selection::set");
 	register_type(typeid(k3d::string_t), "k3d::string_t");
 	register_type(typeid(k3d::texture3), "k3d::texture3");

@@ -54,7 +54,7 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
@@ -111,9 +111,9 @@ public:
 		}
 	}
 	
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
-		if(!SelectionState.select_component.count(k3d::selection::UNIFORM))
+		if(!SelectionState.select_component.count(k3d::selection::PATCH))
 			return;
 
 		k3d::uint_t primitive_index = 0;
@@ -161,12 +161,12 @@ public:
 					*gl_patch_point++ = points[patch_points[point]][2];
 				}
 
-				k3d::gl::push_selection_token(k3d::selection::UNIFORM, patch);
+				k3d::gl::push_selection_token(k3d::selection::PATCH, patch);
 
 				glMap2d(GL_MAP2_VERTEX_3, 0, 1, u_stride, u_order, 0, 1, v_stride, v_order, &gl_patch_points[0]);
 				glEvalMesh2(GL_FILL, 0, u_count, 0, v_count);
 
-				k3d::gl::pop_selection_token(); // UNIFORM
+				k3d::gl::pop_selection_token(); // PATCH
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE
@@ -180,7 +180,7 @@ public:
 			"OpenGLBicubicPatchPainter",
 			_("Renders bicubic patches"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

@@ -25,10 +25,10 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "document_state.h"
-#include "selection.h"
-#include "utility.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3d-i18n-config.h>
 
@@ -36,8 +36,7 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/legacy_mesh.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/utility_gl.h>
@@ -119,13 +118,15 @@ protected:
 		{
 			switch(selection::state(m_document_state.document()).current_mode())
 			{
-				case selection::POINTS:
-				case selection::SPLIT_EDGES:
-				case selection::UNIFORM:
+				case selection::CURVE:
+				case selection::FACE:
+				case selection::POINT:
+				case selection::EDGE:
+				case selection::SURFACE:
 					if(!selection::state(m_document_state.document()).is_selected(*node))
 						m_mouse_down_selection = k3d::selection::record::empty_record();;
 					break;
-				case selection::NODES:
+				case selection::NODE:
 					break;
 				default:
 					assert_not_reached();
@@ -136,11 +137,7 @@ protected:
 
 	const k3d::rectangle normalize(const k3d::rectangle& Rectangle)
 	{
-		return k3d::rectangle(
-			std::min(Rectangle.left, Rectangle.right),
-			std::max(Rectangle.left, Rectangle.right),
-			std::min(Rectangle.top, Rectangle.bottom),
-			std::max(Rectangle.top, Rectangle.bottom));
+		return k3d::rectangle::normalize(Rectangle);
 	}
 
 	/// Stores a GC for drawing selections
@@ -169,14 +166,14 @@ protected:
 		Glib::RefPtr<Gdk::GC> GC = selection_gc(Viewport);
 
 		const k3d::rectangle rectangle = normalize(m_box_selection);
-		Drawable->draw_rectangle(GC, false, static_cast<int>(rectangle.left), static_cast<int>(rectangle.top), static_cast<int>(rectangle.width()), static_cast<int>(rectangle.height()));
+		Drawable->draw_rectangle(GC, false, static_cast<int>(rectangle.x1), static_cast<int>(rectangle.y1), static_cast<int>(rectangle.width()), static_cast<int>(rectangle.height()));
 	}
 
 	void on_box_select_motion(viewport::control& Viewport, const k3d::point2& Coordinates)
 	{
 		draw_rubber_band(Viewport);
-		m_box_selection.right = Coordinates[0];
-		m_box_selection.bottom = Coordinates[1];
+		m_box_selection.x2 = Coordinates[0];
+		m_box_selection.y2 = Coordinates[1];
 		draw_rubber_band(Viewport);
 	}
 

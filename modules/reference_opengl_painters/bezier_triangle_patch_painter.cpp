@@ -57,14 +57,14 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		extract_and_render_bezier_triangle(Mesh, RenderState, false);
 	}
 	
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
-		if(!SelectionState.select_component.count(k3d::selection::UNIFORM))
+		if(!SelectionState.select_component.count(k3d::selection::PATCH))
 			return;
 
 		extract_and_render_bezier_triangle(Mesh, RenderState, true);
@@ -77,7 +77,7 @@ public:
 			"OpenGLBezierTrianglePatchPainter",
 			_("Renders Bezier triangle patches"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
@@ -343,13 +343,13 @@ private:
 				}
 
 				if (select_mode) // Tokens are only for SELECTION MODE
-					k3d::gl::push_selection_token(k3d::selection::UNIFORM, patch);
+					k3d::gl::push_selection_token(k3d::selection::PATCH, patch);
 
 				// Tessellate/evaluate and render the patch.
 				bezier_triangle_patch_painter::gl_render_bezier_triangle(weighted_bezier_control_points, order, false);
 
 				if (select_mode) // Tokens are only for SELECTION MODE
-					k3d::gl::pop_selection_token(); // UNIFORM
+					k3d::gl::pop_selection_token(); // PATCH
 			}
 
 			if (select_mode) // Tokens are only for SELECTION MODE

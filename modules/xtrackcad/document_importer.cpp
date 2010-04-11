@@ -31,8 +31,8 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/types.h>
 
 #include <boost/algorithm/string.hpp>
@@ -54,11 +54,16 @@ class document_importer :
 	public k3d::idocument_importer
 {
 public:
-	k3d::bool_t read_file(k3d::idocument& Document, const k3d::filesystem::path& FilePath)
+	k3d::imetadata::metadata_t get_file_metadata(const k3d::filesystem::path& File)
+	{
+		return k3d::imetadata::metadata_t();
+	}
+
+	k3d::bool_t read_file(const k3d::filesystem::path& File, k3d::idocument& Document)
 	{
 		try
 		{
-			k3d::log() << info << "Reading " << FilePath.native_console_string() << " using " << get_factory().name() << std::endl;
+			k3d::log() << info << "Reading " << File.native_console_string() << " using " << get_factory().name() << std::endl;
 
 			k3d::imesh_storage* const track_source = k3d::plugin::create<k3d::imesh_storage>("FrozenMesh", Document, "Track");
 			if(!track_source)
@@ -74,8 +79,8 @@ public:
 
 			k3d::property::connect(
 				Document,
-				k3d::property::get(*track_source, "output_mesh"),
-				k3d::property::get(*track_instance, "input_mesh"));
+				*k3d::property::get(*track_source, "output_mesh"),
+				*k3d::property::get(*track_instance, "input_mesh"));
 
 			k3d::property::set_internal_value(*track_instance, "gl_painter", track_painter);
 
@@ -90,7 +95,7 @@ public:
 			std::stack<k3d::matrix4> transformation;
 			transformation.push(k3d::scale3(1, -1, 1) * k3d::identity3());
 
-			k3d::filesystem::ifstream stream(FilePath);
+			k3d::filesystem::ifstream stream(File);
 			while(true)
 			{
 				std::stringstream line;
@@ -161,8 +166,8 @@ public:
 
 					k3d::property::connect(
 						Document,
-						k3d::property::get(*source, "output_mesh"),
-						k3d::property::get(*instance, "input_mesh"));
+						*k3d::property::get(*source, "output_mesh"),
+						*k3d::property::get(*instance, "input_mesh"));
 
 					k3d::property::set_internal_value(*instance, "gl_painter", painter);
 

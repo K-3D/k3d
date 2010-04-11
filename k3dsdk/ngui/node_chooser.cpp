@@ -30,10 +30,6 @@
 
 #include <gtk/gtkmain.h>
 
-#include "document_state.h"
-#include "node_chooser.h"
-#include "utility.h"
-
 #include <k3d-i18n-config.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode.h>
@@ -41,8 +37,12 @@
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/istate_recorder.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/node_chooser.h>
+#include <k3dsdk/ngui/panel_mediator.h>
+#include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/string_cast.h>
 
@@ -247,7 +247,7 @@ void control::on_create_node(k3d::iplugin_factory* const Factory)
 		m_data->state_recorder->commit_change_set(m_data->state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), K3D_CHANGE_SET_CONTEXT);
 
 	if(node)
-		m_data->document().view_node_properties_signal().emit(node);
+		panel::mediator(m_data->document().document()).set_focus(*node);
 }
 
 void control::on_select_node(k3d::inode* const Object)
@@ -272,7 +272,7 @@ void control::on_edit()
 	if(!m_data->node())
 		return;
 
-	m_data->document().view_node_properties_signal().emit(m_data->node());
+	panel::mediator(m_data->document().document()).set_focus(*m_data->node());
 }
 
 std::auto_ptr<iselection_filter> filter(k3d::iproperty& Data)

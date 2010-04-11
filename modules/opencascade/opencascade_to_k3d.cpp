@@ -220,7 +220,7 @@ void on_trim_curve(const Handle(Geom2d_BSplineCurve)& Curve, const Handle(Geom_S
 			gp_Pnt2d pole_uv_nurbs = surface_analyser.ValueOfUV(pole_3d, Precision);
 			if (surface_analyser.Gap() > original_gap)
 			{
-				k3d::log() << debug << "Gap for projection: " << surface_analyser.Gap() << " while correcting original gap of " << original_gap << ". Using original." << std::endl;
+				k3d::log() << error << "Gap for projection: " << surface_analyser.Gap() << " while correcting original gap of " << original_gap << ". Using original." << std::endl;
 			}
 			else
 			{
@@ -322,7 +322,7 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 			}
 			else
 			{
-				k3d::log() << debug << "Closed cone could not be converted" << std::endl;
+				k3d::log() << error << "Closed cone could not be converted" << std::endl;
 			}
 		}
 		if(surface->IsKind(STANDARD_TYPE(Geom_CylindricalSurface)))
@@ -337,7 +337,7 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 			}
 			else
 			{
-				k3d::log() << debug << "Closed cylinder could not be converted" << std::endl;
+				k3d::log() << error << "Closed cylinder could not be converted" << std::endl;
 			}
 		}
 		if(surface->IsKind(STANDARD_TYPE(Geom_SphericalSurface)))
@@ -412,12 +412,12 @@ void process_face(const TopoDS_Face& Face, k3d::gprim_factory& Factory, const do
 		}
 		else
 		{
-			k3d::log() << debug << "Failed to find an elementary converter" << std::endl;
+			k3d::log() << error << "Failed to find an elementary converter" << std::endl;
 		}
 	}
 	if(nurbs_surface.IsNull())
 	{
-		k3d::log() << debug << "Failed to convert surface of type " << surface->DynamicType() << " to NURBS" << std::endl;
+		k3d::log() << error << "Failed to convert surface of type " << surface->DynamicType() << " to NURBS" << std::endl;
 		return;
 	}
 	if (!on_bspline_surface(nurbs_surface, Factory))
@@ -536,7 +536,7 @@ void process_surface(const TopoDS_Shape& Shape, k3d::gprim_factory& Factory)
 			// Split closed shapes
 //			ShapeUpgrade_ShapeDivideAngle angle_tool(k3d::pi()/2, revolution_shape);
 //			if (!angle_tool.Perform() && angle_tool.Status (ShapeExtend_FAIL)) {
-//			  k3d::log() << debug << "Splitting of angles failed" << std::endl;
+//			  k3d::log() << error << "Splitting of angles failed" << std::endl;
 //			  return;
 //			}
 
@@ -608,7 +608,7 @@ opencascade_document_processor::opencascade_document_processor(const k3d::filesy
 {
 	m_implementation = new detail::implementation;
 	std::string extension = k3d::filesystem::extension(FilePath).lowercase().raw();
-	k3d::log() << debug << "Loading file with extension " << extension << std::endl;
+	k3d::log() << info << "Loading file with extension " << extension << std::endl;
 	if (extension == ".stp" || extension == ".step")
 	{
 		detail::load_file<STEPCAFControl_Reader>(FilePath, "STEP", m_implementation);
@@ -626,7 +626,7 @@ opencascade_document_processor::opencascade_document_processor(const k3d::filesy
 		if(BRepTools::Read(shape, const_cast<char*>(FilePath.native_filesystem_string().c_str()), brep_builder))
 			TDataStd_Shape::Set(shaperoot.NewChild(), shape);
 		else
-			k3d::log() << debug << "failed to find any shapes in BREP file" << std::endl;
+			k3d::log() << error << "failed to find any shapes in BREP file" << std::endl;
 		m_implementation->shapes.push(TDF_ChildIterator(shaperoot));
 	}
 	else
@@ -699,7 +699,7 @@ void opencascade_document_processor::process_current(k3d::gprim_factory& Factory
 	}
 	else
 	{
-		k3d::log() << debug << "Found node that is not a shape" << std::endl;
+		k3d::log() << error << "Found node that is not a shape" << std::endl;
 	}
 }
 

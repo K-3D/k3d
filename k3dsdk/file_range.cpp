@@ -21,7 +21,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "file_range.h"
+#include <k3dsdk/file_range.h>
 
 #include <cmath>
 #include <iomanip>

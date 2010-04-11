@@ -21,9 +21,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "file_chooser_dialog.h"
-#include "hotkey_entry.h"
-#include "path_chooser.h"
+#include <k3dsdk/ngui/file_chooser_dialog.h>
+#include <k3dsdk/ngui/hotkey_entry.h>
+#include <k3dsdk/ngui/path_chooser.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/hints.h>
@@ -252,10 +252,8 @@ void control::on_watch_toggle()
 {
 	if(m_disable_set_value)
 		return;
-	k3d::log() << debug << "doing watch toggle" << std::endl;
 	return_if_fail(m_data.get());
 	m_data->watch(!m_data->is_watched());
-	k3d::log() << debug << "watch toggle finished" << std::endl;
 }
 
 void control::set_value()

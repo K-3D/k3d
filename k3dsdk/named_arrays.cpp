@@ -17,11 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "array.h"
-#include "iomanip.h"
-#include "log.h"
-#include "named_arrays.h"
-#include "type_registry.h"
+#include <k3dsdk/array.h>
+#include <k3dsdk/iomanip.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/named_arrays.h>
+#include <k3dsdk/type_registry.h>
 
 namespace k3d
 {
@@ -61,35 +61,19 @@ named_arrays named_arrays::clone() const
 	return result;
 }
 
-bool_t named_arrays::almost_equal(const named_arrays& Other, const uint64_t Threshold) const
+void named_arrays::difference(const named_arrays& Other, difference::accumulator& Result) const
 {
 	// If we have differing numbers of arrays, we definitely aren't equal
-	if(size() != Other.size())
-		return false;
+	Result.exact(size() == Other.size());
 
 	for(named_arrays::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
 		// Each pair of arrays must have equal names
-		if(a->first != b->first)
-			return false;
+		Result.exact(a->first == b->first);
 
-		// If both arrays point to the same memory, they're equal
-		if(a->second.get() == b->second.get())
-			continue;
-
-		// Perform element-wise comparisons of the two arrays
-		if(a->second && b->second)
-		{
-			// The array::almost_equal method correctly handles type-mismatches between arrays
-			if(a->second->almost_equal(*b->second, Threshold))
-				continue;
-		}
-
-		// Either the element-wise comparison failed or one array was NULL and the other wasn't
-		return false;
+		// Perform element-wise comparisons of the arrays 
+		a->second->difference(*b->second, Result);
 	}
-
-	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////

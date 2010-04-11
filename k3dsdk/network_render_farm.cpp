@@ -21,18 +21,18 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "fstream.h"
-#include "inetwork_render_frame.h"
-#include "inetwork_render_job.h"
-#include "network_render_farm.h"
-#include "network_render_farm_detail.h"
-#include "options.h"
-#include "result.h"
-#include "shader_cache.h"
-#include "share.h"
-#include "string_cast.h"
-#include "system.h"
-#include "xml.h"
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/inetwork_render_frame.h>
+#include <k3dsdk/inetwork_render_job.h>
+#include <k3dsdk/network_render_farm.h>
+#include <k3dsdk/network_render_farm_detail.h>
+#include <k3dsdk/options.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/shader_cache.h>
+#include <k3dsdk/share.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/system.h>
+#include <k3dsdk/xml.h>
 using namespace k3d::xml;
 
 #include <list>

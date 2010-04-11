@@ -21,16 +21,16 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "k3d-platform-config.h"
-#include "result.h"
-#include "socket.h"
-#include "string_cast.h"
+#include <k3d-platform-config.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/socket.h>
+#include <k3dsdk/string_cast.h>
 
 #include <cstring>
 
 #ifdef K3D_API_WIN32
 
-	#include "winsock2.h"
+	#include <winsock2.h>
 
 #else // K3D_API_WIN32
 

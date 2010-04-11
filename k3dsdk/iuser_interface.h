@@ -2,7 +2,7 @@
 #define K3DSDK_IUSER_INTERFACE_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,11 +24,12 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ipath_property.h"
-#include "iunknown.h"
-#include "keyboard.h"
-#include "signal_system.h"
-#include "types.h"
+#include <k3dsdk/ipath_property.h>
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/keyboard.h>
+#include <k3dsdk/signal_system.h>
+#include <k3dsdk/types.h>
+#include <k3dsdk/ustring.h>
 
 #include <vector>
 
@@ -42,13 +43,13 @@ class iuser_interface :
 	public virtual iunknown
 {
 public:
-	/// Displays a URI in the user's preferred application
+	/// Displays a URI in the user's preferred application.
 	virtual void open_uri(const string_t& URI) = 0;
-	/// Displays an informational message
+	/// Displays an informational message.
 	virtual void message(const string_t& Message) = 0;
-	/// Displays a warning message
+	/// Displays a warning message.
 	virtual void warning_message(const string_t& Message) = 0;
-	/// Displays an error message
+	/// Displays an error message.
 	virtual void error_message(const string_t& Message) = 0;
 	/**
 		 \brief Prompts the user to choose one of several options
@@ -56,14 +57,10 @@ public:
 		 \param DefaultOption one-based index of the option that is selected by default.  If DefaultOption is 0, no option is selected by default.
 		 \return one-based index of the option selected by the user, or "0" if a choice was not made (e.g. user clicked WM "close" button)
 	*/
-	virtual unsigned int query_message(const string_t& Message, const unsigned int DefaultOption, const std::vector<string_t>& Options) = 0;
+	virtual uint_t query_message(const string_t& Message, const uint_t DefaultOption, const std::vector<string_t>& Options) = 0;
 
-	/**
-		\brief Displays a message (for tutorial purposes) in a dialog box
-		\param Message the text to display in the dialog box
-		\return true iff the user wants to continue the tutorial, false to quit
-	*/
-	virtual bool tutorial_message(const string_t& Message) = 0;
+	/// Displays an informational "nag" message that users can choose to suppress.
+	virtual void nag_message(const string_t& Type, const ustring& Message, const ustring& SecondaryMessage = ustring()) = 0;
 
 	/**
 		\brief Prompts the user for a filepath, checking for old choices, and storing the current choice for reuse
@@ -72,16 +69,16 @@ public:
 		\param Result returns the chosen file path
 		\return true iff the user confirms the file path choice, false if they wish to cancel the pending operation
 	*/
-	virtual bool get_file_path(const ipath_property::mode_t Mode, const string_t& Type, const string_t& Prompt, const filesystem::path& OldPath, filesystem::path& Result) = 0;
+	virtual bool_t get_file_path(const ipath_property::mode_t Mode, const string_t& Type, const string_t& Prompt, const filesystem::path& OldPath, filesystem::path& Result) = 0;
 
 	/// Displays the given object using a graphical user interface
-	virtual bool show(iunknown& Object) = 0;
+	virtual bool_t show(iunknown& Object) = 0;
 
 	/// Runs the user interface loop (if any) until it is synchronized with the current document state
 	virtual void synchronize() = 0;
 
 	/// Returns a connection to a signal that will be emitted at the requested frame rate (could return an empty connection, if the UI doesn't support timers)
-	virtual sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot) = 0;
+	virtual sigc::connection get_timer(const double_t FrameRate, sigc::slot<void> Slot) = 0;
 	
 	/// Call a slot whenever given filesystem path is modified.  Note that we are watching the
 	/// path, not an inode, so it isn't an error to specify a path for a nonexistent file.

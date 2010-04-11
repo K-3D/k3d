@@ -80,10 +80,10 @@ public:
 				ri_constant_attributes.add_arrays(bicubic_patch->constant_attributes);
 
 				array_copier ri_uniform_attributes;
-				ri_uniform_attributes.add_arrays(bicubic_patch->uniform_attributes);
+				ri_uniform_attributes.add_arrays(bicubic_patch->patch_attributes);
 
 				array_copier ri_varying_attributes;
-				ri_varying_attributes.add_arrays(bicubic_patch->varying_attributes);
+				ri_varying_attributes.add_arrays(bicubic_patch->parameter_attributes);
 
 				array_copier ri_vertex_attributes;
 				ri_vertex_attributes.add_arrays(bicubic_patch->vertex_attributes);
@@ -124,7 +124,7 @@ public:
 			"RenderManBicubicPatchPainter",
 			_("Renders bicubic patches"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

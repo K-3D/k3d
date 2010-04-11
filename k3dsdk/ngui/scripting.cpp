@@ -21,10 +21,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "messages.h"
-#include "scripting.h"
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/scripting.h>
 
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3d-i18n-config.h>
 #include <k3dsdk/result.h>
@@ -71,7 +71,7 @@ int script_escape_handler(Gtk::Widget* Widget, GdkEventKey* Event)
 }
 
 /// Executes a script using the given plugin factory to create the script engine
-bool execute_script(const k3d::script::code& Script, const std::string& ScriptName, k3d::iscript_engine::context_t& Context, const k3d::script::language& Language)
+bool execute_script(const k3d::script::code& Script, const std::string& ScriptName, k3d::iscript_engine::context& Context, const k3d::script::language& Language)
 {
 	// Sanity checks ...
 	return_val_if_fail(ScriptName.size(), false);
@@ -80,8 +80,8 @@ bool execute_script(const k3d::script::code& Script, const std::string& ScriptNa
 	{
 		error_message(
 			_("Could not determine scripting language.  K-3D supports multiple scripting languages, but the language for this script was "
-			"not recognized. Most K-3D script engines use some type of \"magic token\" at the beginning of a script to recognize it, e.g. \"#k3dscript\" "
-			"in the first 12 characters of a script for K-3D's built-in K3DScript engine.  If you are writing a K-3D script, check the documentation "
+			"not recognized. Most K-3D script engines use some type of \"magic token\" at the beginning of a script to recognize it, e.g. \"#python\" "
+			"in the first 7 characters of a script for K-3D's Python engine.  If you are writing a K-3D script, check the documentation "
 			"for the scripting language you're writing in to see how to make it recognizable."));
 		return false;
 	}
@@ -117,17 +117,17 @@ bool execute_script(const k3d::script::code& Script, const std::string& ScriptNa
 
 } // namespace detail
 
-bool execute_script(const k3d::script::code& Script, const std::string& ScriptName, k3d::iscript_engine::context_t& Context, const k3d::script::language& Language)
+bool execute_script(const k3d::script::code& Script, const std::string& ScriptName, k3d::iscript_engine::context& Context, const k3d::script::language& Language)
 {
 	return detail::execute_script(Script, ScriptName, Context, Language);
 }
 
-bool execute_script(const k3d::script::code& Script, const std::string& ScriptName, k3d::iscript_engine::context_t& Context)
+bool execute_script(const k3d::script::code& Script, const std::string& ScriptName, k3d::iscript_engine::context& Context)
 {
 	return detail::execute_script(Script, ScriptName, Context, k3d::script::language(Script));
 }
 
-bool execute_script(const k3d::filesystem::path& Script, k3d::iscript_engine::context_t& Context)
+bool execute_script(const k3d::filesystem::path& Script, k3d::iscript_engine::context& Context)
 {
 	if(!k3d::filesystem::exists(Script))
 	{

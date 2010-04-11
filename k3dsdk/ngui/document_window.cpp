@@ -21,8 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "document_window.h"
-#include "document_state.h"
+#include <k3dsdk/ngui/document_window.h>
+#include <k3dsdk/ngui/document_state.h>
 
 #include <gdk/gdkkeysyms.h>
 

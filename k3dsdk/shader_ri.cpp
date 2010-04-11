@@ -21,15 +21,15 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "fstream.h"
-#include "k3d-i18n-config.h"
-#include "istate_container.h"
-#include "itexture_ri.h"
-#include "iuser_property.h"
-#include "options.h"
-#include "properties.h"
-#include "shader_ri.h"
-#include "user_properties.h"
+#include <k3dsdk/fstream.h>
+#include <k3d-i18n-config.h>
+#include <k3dsdk/istate_container.h>
+#include <k3dsdk/itexture_ri.h>
+#include <k3dsdk/iuser_property.h>
+#include <k3dsdk/options.h>
+#include <k3dsdk/property.h>
+#include <k3dsdk/shader_ri.h>
+#include <k3dsdk/user_property.h>
 
 namespace k3d
 {

@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "normal3_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/normal3_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/normal3.h>
 

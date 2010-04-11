@@ -20,6 +20,8 @@ if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 #include "LPyramid.h"
 #include <math.h>
 
+#include <cstdio>
+
 #ifndef M_PI
 #define M_PI 3.14159265f
 #endif

@@ -22,11 +22,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "file_chooser_dialog.h"
+#include <k3dsdk/ngui/file_chooser_dialog.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/data.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/idocument_plugin_factory.h>

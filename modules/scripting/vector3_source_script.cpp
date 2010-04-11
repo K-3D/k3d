@@ -75,16 +75,16 @@ public:
 private:
 	void on_update_vector3(k3d::vector3& Output)
 	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = k3d::vector3(0, 0, 0);
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["output"] = k3d::vector3(0, 0, 0);
 
 		execute_script(context);
 
-		if(context["Output"].type() == typeid(k3d::vector3))
+		if(context["output"].type() == typeid(k3d::vector3))
 		{
-			Output = boost::any_cast<k3d::vector3>(context["Output"]);
+			Output = boost::any_cast<k3d::vector3>(context["output"]);
 			return;
 		}
 

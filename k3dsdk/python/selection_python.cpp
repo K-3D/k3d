@@ -17,7 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "selection_python.h"
+#include <k3dsdk/python/selection_python.h>
 
 #include <k3dsdk/iomanip.h>
 
@@ -95,11 +95,13 @@ void define_namespace_selection()
 		.value("MESH", k3d::selection::MESH)
 		.value("PRIMITIVE", k3d::selection::PRIMITIVE)
 		.value("CONSTANT", k3d::selection::CONSTANT)
-		.value("UNIFORM", k3d::selection::UNIFORM)
-		.value("VARYING", k3d::selection::VARYING)
-		.value("FACE_VARYING", k3d::selection::FACE_VARYING)
-		.value("SPLIT_EDGE", k3d::selection::SPLIT_EDGE)
+		.value("SURFACE", k3d::selection::SURFACE)
+		.value("PARAMETER", k3d::selection::PARAMETER)
+		.value("EDGE", k3d::selection::EDGE)
 		.value("POINT", k3d::selection::POINT)
+		.value("CURVE", k3d::selection::CURVE)
+		.value("FACE", k3d::selection::FACE)
+		.value("PATCH", k3d::selection::PATCH)
 		.attr("__module__") = "k3d";
 
 	class_<selection_storage_wrapper>("storage", no_init)

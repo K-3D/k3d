@@ -22,7 +22,7 @@
 */
 
 #include <k3dsdk/application_detail.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/document.h>
 #include <k3dsdk/iapplication.h>
@@ -30,7 +30,7 @@
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/iscripted_action.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/signal_accumulators.h>
 #include <k3dsdk/state_change_set.h>
@@ -101,9 +101,9 @@ public:
 
 			if(iscripted_action* const scripted_action = dynamic_cast<iscripted_action*>(plugin))
 			{
-				iscript_engine::context_t context;
-				context["Command"] = string_t("startup");
-				context["Document"] = document;
+				iscript_engine::context context;
+				context["command"] = string_t("startup");
+				context["document"] = document;
 				scripted_action->execute(context);
 			}
 		}
@@ -123,9 +123,9 @@ public:
 		{
 			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin->second))
 			{
-				k3d::iscript_engine::context_t context;
-				context["Command"] = k3d::string_t("shutdown");
-				context["Document"] = &Document;
+				k3d::iscript_engine::context context;
+				context["command"] = k3d::string_t("shutdown");
+				context["document"] = &Document;
 				scripted_action->execute(context);
 			}
 		}

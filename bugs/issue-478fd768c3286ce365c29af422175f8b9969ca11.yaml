@@ -1,0 +1,19 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Revisit how to properly interpolate integer attributes.
+desc: Currently, interpolation of weighted integer primitive attributes produces wildly different results in some cases.  We need to figure-out how to get consistent results - perhaps we should simply pick the attribute with the largest weight, as we do with pointer attributes?
+type: :bugfix
+component: K-3D
+release: 1.0.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-04-04 05:05:15.345316 Z
+references: []
+
+id: 478fd768c3286ce365c29af422175f8b9969ca11
+log_events: 
+- - 2010-04-04 05:05:16.225256 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 

@@ -73,7 +73,7 @@ public:
       if(!polyhedron)
         continue;
 
-      k3d::mesh::strings_t& string_data = polyhedron->uniform_attributes.create(array_name, new k3d::mesh::strings_t(polyhedron->face_first_loops.size(), default_value));
+      k3d::mesh::strings_t& string_data = polyhedron->face_attributes.create(array_name, new k3d::mesh::strings_t(polyhedron->face_first_loops.size(), default_value));
 
       const k3d::uint_t face_begin = 0;
       const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
@@ -97,7 +97,7 @@ public:
 				k3d::uuid(0xf4d7f4d5, 0x3a40e51a, 0xfaf269bb, 0x1b68fdfe),
 				"NamedTextArray",
 				_("Creates or updates a named array with string data"),
-				"Named Arrays",
+				"MeshAttributes",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

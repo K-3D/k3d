@@ -47,14 +47,14 @@
 
 // Modified by Tim Shead for use with K-3D, January 1998
 
-#include "almost_equal.h"
-#include "normal3.h"
-#include "point2.h"
-#include "point3.h"
-#include "point4.h"
-#include "vector2.h"
-#include "vector3.h"
-#include "vector4.h"
+#include <k3dsdk/difference.h>
+#include <k3dsdk/normal3.h>
+#include <k3dsdk/point2.h>
+#include <k3dsdk/point3.h>
+#include <k3dsdk/point4.h>
+#include <k3dsdk/vector2.h>
+#include <k3dsdk/vector3.h>
+#include <k3dsdk/vector4.h>
 
 #include <algorithm>
 #include <cmath>
@@ -115,6 +115,18 @@ inline const point3 operator+(const point3& a, const vector3& b)
 
 /// Adds a vector and a point, returning the modified point
 inline const point3 operator+(const vector3& a, const point3& b)
+{
+	return point3(a.n[0] + b.n[0], a.n[1] + b.n[1], a.n[2] + b.n[2]);
+}
+
+/// Add a point and a normal, returning the modified point
+inline const point3 operator+(const point3& a, const normal3& b)
+{
+	return point3(a.n[0] + b.n[0], a.n[1] + b.n[1], a.n[2] + b.n[2]);
+}
+
+/// Adds a normal and a point, returning the modified point
+inline const point3 operator+(const normal3& a, const point3& b)
 {
 	return point3(a.n[0] + b.n[0], a.n[1] + b.n[1], a.n[2] + b.n[2]);
 }

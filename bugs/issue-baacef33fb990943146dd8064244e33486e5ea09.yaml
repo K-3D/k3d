@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Review plugin status
+desc: Before the release we need to review each plugin's stable / experimental / deprecated status.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-02-18 06:00:27.643930 Z
+references: []
+
+id: baacef33fb990943146dd8064244e33486e5ea09
+log_events: 
+- - 2010-02-18 06:00:28.315875 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-02-21 05:57:36.498845 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""
+claimer: 

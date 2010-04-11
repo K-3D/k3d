@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<k3dml>
+	<mesh_arrays>
+		<points>-3 -3 0 3 -3 0 3 3 0 -3 3 0</points>
+		<point_selection>0 0 0 0</point_selection>
+		<point_attributes/>
+		<primitives>
+			<primitive type="polyhedron">
+				<structure>
+					<table type="edge">
+						<array name="clockwise_edges" type="k3d::uint_t">1 2 0 4 5 3</array>
+						<array name="edge_selections" type="k3d::double_t">0 0 0 0 0 0
+							<metadata>
+								<pair name="k3d:role">k3d:selection</pair>
+							</metadata>
+						</array>
+					</table>
+					<table type="face">
+						<array name="face_first_loops" type="k3d::uint_t">0 1</array>
+						<array name="face_loop_counts" type="k3d::uint_t">1 1</array>
+						<array name="face_materials" type="k3d::imaterial*">0 0</array>
+						<array name="face_selections" type="k3d::double_t">0 0
+							<metadata>
+								<pair name="k3d:role">k3d:selection</pair>
+							</metadata>
+						</array>
+						<array name="face_shells" type="k3d::uint_t">0 0</array>
+					</table>
+					<table type="loop">
+						<array name="loop_first_edges" type="k3d::uint_t">0 3</array>
+					</table>
+					<table type="shell">
+						<array name="shell_types" type="k3d::int32_t">0</array>
+					</table>
+					<table type="vertex">
+						<array name="vertex_points" type="k3d::uint_t">0 1 3 1 2 3
+							<metadata>
+								<pair name="k3d:domain">k3d:point-indices</pair>
+							</metadata>
+						</array>
+						<array name="vertex_selections" type="k3d::double_t">0 0 0 0 0 0
+							<metadata>
+								<pair name="k3d:role">k3d:selection</pair>
+							</metadata>
+						</array>
+					</table>
+				</structure>
+				<attributes>
+					<table type="constant"/>
+					<table type="edge"/>
+					<table type="face"/>
+					<table type="vertex"/>
+				</attributes>
+			</primitive>
+		</primitives>
+	</mesh_arrays>
+</k3dml>

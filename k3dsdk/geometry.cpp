@@ -17,11 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "geometry.h"
-#include "metadata_keys.h"
-#include "selection_validation.h"
-#include "selection.h"
-#include "string_cast.h"
+#include <k3dsdk/geometry.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/selection_validation.h>
+#include <k3dsdk/selection.h>
+#include <k3dsdk/string_cast.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -500,11 +500,13 @@ k3d::selection::set create(const double_t Weight)
 
 	boost::scoped_ptr<primitive_selection::storage> primitive_selection_storage(primitive_selection::create(result));
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::CONSTANT, Weight);
-	primitive_selection::append(*primitive_selection_storage, k3d::selection::UNIFORM, Weight);
-	primitive_selection::append(*primitive_selection_storage, k3d::selection::VARYING, Weight);
-	primitive_selection::append(*primitive_selection_storage, k3d::selection::FACE_VARYING, Weight);
-	primitive_selection::append(*primitive_selection_storage, k3d::selection::SPLIT_EDGE, Weight);
 	primitive_selection::append(*primitive_selection_storage, k3d::selection::CURVE, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::EDGE, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::FACE, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::PARAMETER, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::PATCH, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::SURFACE, Weight);
+	primitive_selection::append(*primitive_selection_storage, k3d::selection::VERTEX, Weight);
 
 	return result;
 }
@@ -527,11 +529,6 @@ void merge(const k3d::selection::set& Set, mesh& Mesh)
 			continue;
 		}
 	}
-}
-
-void merge(const k3d::selection::set& Set, legacy::mesh& Mesh)
-{
-	assert_not_implemented();
 }
 
 } // namespace selection

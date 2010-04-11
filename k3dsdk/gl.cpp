@@ -21,7 +21,7 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "gl.h"
+#include <k3dsdk/gl.h>
 
 glew_context* glew_context::m_instance = 0;
 

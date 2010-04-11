@@ -22,8 +22,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iapplication.h"
-#include "register_application.h"
+#include <k3dsdk/iapplication.h>
+#include <k3dsdk/register_application.h>
 
 #include <cassert>
 

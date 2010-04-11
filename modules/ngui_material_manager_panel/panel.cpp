@@ -56,7 +56,7 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_engine_ri.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/log.h>
@@ -74,8 +74,8 @@
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/path.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/system.h>
@@ -1046,7 +1046,6 @@ void Implementation::propertySignalRender(k3d::iunknown* t)
      
 class Panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
   //baseContainer is the preview & ctrl container

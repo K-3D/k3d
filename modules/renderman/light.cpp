@@ -28,7 +28,7 @@
 #include <k3dsdk/ilight_ri.h>
 #include <k3dsdk/ilight_shader_ri.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/render_state_ri.h>
 #include <k3dsdk/renderable_gl.h>
 #include <k3dsdk/renderable_ri.h>
@@ -174,8 +174,8 @@ public:
 		static k3d::document_plugin_factory<light,
 			k3d::interface_list<k3d::gl::ilight,
 			k3d::interface_list<k3d::ri::ilight,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > > > factory(
 			k3d::classes::RenderManLight(),
 			"RenderManLight",
 			_("RenderMan light source"),

@@ -96,10 +96,10 @@ public:
 	{
 		static k3d::document_plugin_factory<torus > factory(
 			k3d::uuid(0xecc68314, 0x004e8d14, 0xd1571fb6, 0x247612b3),
-			"Torus",
+			"QuadricTorus",
 			"Creates a torus primitive",
 			"Quadric",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

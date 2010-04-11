@@ -24,14 +24,15 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
-#include "signal_system.h"
-#include "types.h"
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/signal_system.h>
+#include <k3dsdk/types.h>
 
 #include <boost/any.hpp>
 #include <iosfwd>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace k3d
 {
@@ -62,8 +63,12 @@ public:
 	*/
 	virtual const string_t language() = 0;
 
-	/// Defines a collection of named objects to pass to a script that define its context (its execution environment) - how they are used is implementation-dependent (note that the names are merely suggestions, and may be changed or ignored at the whim of the implementation)
-	typedef std::map<string_t, boost::any> context_t;
+	/// Defines a collection of name-value pairs passed to a script that define its context (its execution environment) - how they are used is implementation-dependent (note that the names are merely suggestions, and may be changed or ignored at the whim of the implementation)
+	class context :
+		public std::map<string_t, boost::any>
+	{
+	};
+
 	/// Defines a slot that can be called to redirect script output.
 	typedef sigc::slot<void, const string_t&> output_t;
 	/// Defines a list of possible command completions
@@ -77,31 +82,13 @@ public:
 		\param Stderr Optional slot that will be called with script output.
 		\return true, iff the script was successfully executed without errors (either syntax or runtime)
 	*/
-	virtual bool_t execute(const string_t& ScriptName, const string_t& Script, context_t& Context, output_t* Stdout = 0, output_t* Stderr = 0) = 0;
+	virtual bool_t execute(const string_t& ScriptName, const string_t& Script, context& Context, output_t* Stdout = 0, output_t* Stderr = 0) = 0;
 
 	/**	\brief Requests a cancellation of all running scripts.
 		\return true, iff script cancellation is supported by this engine.
 		\note Cancellation may be asynchronous, i.e. scripts may still be running when the call returns, and may continue to run for an indefinite period before shutting down, if at all.
 	*/
 	virtual bool_t halt() = 0;
-
-	/**	\brief Writes a token to a script stream so that it can be recognized by this engine
-	*/
-	virtual void bless_script(std::ostream& Script) = 0;
-
-	/**	\brief Appends the given text to a script as a comment that will be ignored by this engine
-		\param Comment A string to be appended to the script as a comment
-		\note The comment may be single- or multi-line, and can contain any text.  The engine is responsible for ensuring that the comment text does not introduce syntactically-incorrect code.
-	*/
-	virtual void append_comment(std::ostream& Script, const string_t& Comment) = 0;
-
-	/** Converts a command-node command into source code appropriate to this language and adds it to the given script
-		\param CommandNode The command node executing the command to be appended
-		\param Command The name of the command to be appended
-		\param Arguments The command arguments to be appended
-		\note The engine is responsible for ensuring that the appended command does not introduce syntactically-incorrect code, e.g. quoting issues or escaped characters with special meanings.
-	*/
-	virtual void append_command(std::ostream& Script, icommand_node& CommandNode, const string_t& Command, const string_t& Arguments) = 0;
 
 	/// Lists the possible completions for the given command
 	virtual const completions_t complete(const string_t& Command) = 0;

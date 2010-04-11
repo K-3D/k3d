@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iapplication_plugin_factory.h"
-#include "plugin_factory.h"
+#include <k3dsdk/iapplication_plugin_factory.h>
+#include <k3dsdk/plugin_factory.h>
 
 namespace k3d
 {

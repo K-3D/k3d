@@ -1,4 +1,3 @@
-FILE(GLOB PNG_FILES *.png)
-FILE(GLOB XPM_FILES *.xpm)
-INSTALL(FILES ${PNG_FILES} ${XPM_FILES} DESTINATION share/k3d/ngui/pixmap)
+INSTALL_GLOB(*.png share/k3d/ngui/pixmap)
+INSTALL_GLOB(*.xpm share/k3d/ngui/pixmap)
 

@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <cstdio>
 
 #include "inotify-cxx.h"
 

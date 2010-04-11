@@ -21,6 +21,7 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/dependencies.h>
 #include <k3dsdk/fstream.h>
+#include <k3dsdk/geometry.h>
 #include <k3dsdk/iomanip.h>
 #include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/module.h>
@@ -28,7 +29,7 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/serialization_xml.h>
 #include <k3dsdk/type_registry.h>
@@ -89,6 +90,14 @@ public:
 		save_selection->signal_activate().connect(sigc::bind(sigc::mem_fun(*this, &control::on_save_selection), selection));
 		m_menu->items().push_back(*manage(save_selection));
 
+		Gtk::MenuItem* const reset_selection = new Gtk::MenuItem(_("Reset Selection"));
+		reset_selection->signal_activate().connect(sigc::bind(sigc::mem_fun(*this, &control::on_reset_selection), Property));
+		m_menu->items().push_back(*manage(reset_selection));
+
+		Gtk::MenuItem* const select_all = new Gtk::MenuItem(_("Select All"));
+		select_all->signal_activate().connect(sigc::bind(sigc::mem_fun(*this, &control::on_select_all), Property));
+		m_menu->items().push_back(*manage(select_all));
+
 		m_menu->show_all();
 		m_menu->popup(1, gtk_get_current_event_time());
 	}
@@ -115,6 +124,16 @@ public:
 		stream << k3d::xml::declaration() << xml << std::endl;
 	}
 
+	void on_reset_selection(k3d::iproperty* const Property)
+	{
+		k3d::property::set_internal_value(*Property, k3d::selection::set());
+	}
+
+	void on_select_all(k3d::iproperty* const Property)
+	{
+		k3d::property::set_internal_value(*Property, k3d::geometry::selection::create(1.0));
+	}
+
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<control> factory(
@@ -122,7 +141,7 @@ public:
 			"NGUISelectionControl",
 			_("Provides a standard control for selection properties."),
 			"NGUI Control",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "property-control")("ngui:property-type", "k3d::selection::set"));
 
 		return factory;

@@ -17,9 +17,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh_python.h"
-#include "owned_instance_wrapper_python.h"
-#include "linear_curve_python.h"
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/owned_instance_wrapper_python.h>
+#include <k3dsdk/python/linear_curve_python.h>
 
 #include <k3dsdk/linear_curve.h>
 
@@ -50,7 +50,8 @@ public:
 		static object curve_points(wrapper& Self) { return wrap(Self.wrapped().curve_points); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object curve_attributes(wrapper& Self) { return wrap(Self.wrapped().curve_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 	class primitive
@@ -66,7 +67,8 @@ public:
 		static object curve_points(wrapper& Self) { return wrap(Self.wrapped().curve_points); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
 		static object curve_attributes(wrapper& Self) { return wrap(Self.wrapped().curve_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
+		static object vertex_attributes(wrapper& Self) { return wrap(Self.wrapped().vertex_attributes); }
 	};
 
 
@@ -105,7 +107,8 @@ void define_namespace_linear_curve()
 		.def("curve_points", &linear_curve::const_primitive::curve_points)
 		.def("constant_attributes", &linear_curve::const_primitive::constant_attributes)
 		.def("curve_attributes", &linear_curve::const_primitive::curve_attributes)
-		.def("varying_attributes", &linear_curve::const_primitive::varying_attributes)
+		.def("parameter_attributes", &linear_curve::const_primitive::parameter_attributes)
+		.def("vertex_attributes", &linear_curve::const_primitive::vertex_attributes)
 		;
 
 	class_<linear_curve::primitive::wrapper>("primitive", no_init)
@@ -117,7 +120,8 @@ void define_namespace_linear_curve()
 		.def("curve_points", &linear_curve::primitive::curve_points)
 		.def("constant_attributes", &linear_curve::primitive::constant_attributes)
 		.def("curve_attributes", &linear_curve::primitive::curve_attributes)
-		.def("varying_attributes", &linear_curve::primitive::varying_attributes)
+		.def("parameter_attributes", &linear_curve::primitive::parameter_attributes)
+		.def("vertex_attributes", &linear_curve::primitive::vertex_attributes)
 		;
 }
 

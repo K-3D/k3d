@@ -17,9 +17,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh_python.h"
-#include "owned_instance_wrapper_python.h"
-#include "cylinder_python.h"
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/owned_instance_wrapper_python.h>
+#include <k3dsdk/python/cylinder_python.h>
 
 #include <k3dsdk/cylinder.h>
 
@@ -50,8 +50,8 @@ public:
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 	class primitive
@@ -67,8 +67,8 @@ public:
 		static object sweep_angles(wrapper& Self) { return wrap(Self.wrapped().sweep_angles); }
 		static object selections(wrapper& Self) { return wrap(Self.wrapped().selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object surface_attributes(wrapper& Self) { return wrap(Self.wrapped().surface_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 
@@ -107,8 +107,8 @@ void define_namespace_cylinder()
 		.def("sweep_angles", &cylinder::const_primitive::sweep_angles)
 		.def("selections", &cylinder::const_primitive::selections)
 		.def("constant_attributes", &cylinder::const_primitive::constant_attributes)
-		.def("uniform_attributes", &cylinder::const_primitive::uniform_attributes)
-		.def("varying_attributes", &cylinder::const_primitive::varying_attributes)
+		.def("surface_attributes", &cylinder::const_primitive::surface_attributes)
+		.def("parameter_attributes", &cylinder::const_primitive::parameter_attributes)
 		;
 
 	class_<cylinder::primitive::wrapper>("primitive", no_init)
@@ -120,8 +120,8 @@ void define_namespace_cylinder()
 		.def("sweep_angles", &cylinder::primitive::sweep_angles)
 		.def("selections", &cylinder::primitive::selections)
 		.def("constant_attributes", &cylinder::primitive::constant_attributes)
-		.def("uniform_attributes", &cylinder::primitive::uniform_attributes)
-		.def("varying_attributes", &cylinder::primitive::varying_attributes)
+		.def("surface_attributes", &cylinder::primitive::surface_attributes)
+		.def("parameter_attributes", &cylinder::primitive::parameter_attributes)
 		;
 }
 

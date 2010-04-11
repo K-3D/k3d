@@ -134,9 +134,9 @@ public:
 	{
 		static k3d::document_plugin_factory<knot_curve > factory(
 			k3d::uuid(0xb39c53a3, 0xe2fe0e32, 0x21d09384, 0xc4ed13fe),
-				"KnotCurve",
+				"LinearKnot",
 				_("Generates a PQ-knot curve"),
-				"Curve",
+				"LinearCurve",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

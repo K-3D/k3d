@@ -1,14 +1,14 @@
 #python
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
 # Perform required one-time setup to store geometric points in the mesh ...
-points = Output.create_points()
-point_selection = Output.create_point_selection()
+points = context.output.create_points()
+point_selection = context.output.create_point_selection()
 
 # Perform required one-time setup to store cubic curves in the mesh ...
-curves = k3d.cubic_curve.create(Output)
+curves = k3d.cubic_curve.create(context.output)
 
 # Create an array to store constant curve widths ...
 constantwidth = curves.constant_attributes().create("constantwidth", "k3d::double_t")

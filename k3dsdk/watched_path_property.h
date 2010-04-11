@@ -25,13 +25,13 @@
 		\created Feb 6, 2009
 */
 
-#include "data.h"
-#include "hints.h"
-#include "ihint.h"
-#include "iuser_interface.h"
-#include "iwatched_path_property.h"
-#include "path.h"
-#include "types.h"
+#include <k3dsdk/data.h>
+#include <k3dsdk/hints.h>
+#include <k3dsdk/ihint.h>
+#include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/iwatched_path_property.h>
+#include <k3dsdk/path.h>
+#include <k3dsdk/types.h>
 
 namespace k3d
 {

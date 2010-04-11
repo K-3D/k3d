@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "inetwork_render_farm.h"
+#include <k3dsdk/inetwork_render_farm.h>
 
 namespace k3d
 {

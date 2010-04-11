@@ -1,0 +1,41 @@
+#!/usr/bin/python
+
+import feedparser
+import mako.template
+import optparse
+import sys
+
+parser = optparse.OptionParser()
+parser.add_option("--templates", help="Directory containing HTML template files.", dest="template_directory", default=".")
+parser.add_option("--output", help="HTML output directory.", dest="output_directory", default=".")
+parser.add_option("--html-index", help="HTML index filename.", dest="html_index", default="index.html")
+(options, args) = parser.parse_args()
+
+def define_feed(feed, type, title):
+	result = feedparser.parse(feed)
+	result["feed_type"] = type
+	result["custom_title"] = title
+	return result
+
+sources = []
+sources.append(define_feed("http://k-3d.org/blogs/feed", "blog", "K-3D Blogs"))
+sources.append(define_feed("http://k-3d.org/blogs/barche/feed", "blog", "Bart Janssens' Blog"))
+sources.append(define_feed("http://k-3d.org/blogs/dsmatthews/feed", "blog", "Dan Matthews' Blog"))
+sources.append(define_feed("http://k-3d.org/blogs/joetainment/feed", "blog", "Joe Crawford's Blog"))
+sources.append(define_feed("http://k-3d.org/blogs/tshead/feed", "blog", "Tim Shead's Blog"))
+sources.append(define_feed("http://www.k-3d.org/forums/rss/topics", "forum", "K-3D Forums"))
+sources.append(define_feed("http://www.k-3d.org/k3d_wiki/index.php?title=News&feed=atom", "wiki", "K-3D Wiki"))
+sources.append(define_feed("http://k3d.hg.sf.net/hgweb/k3d/k3d/rss-log", "commit", "K-3D Repository"))
+sources.append(define_feed("http://code.google.com/feeds/p/k3d-bart/hgchanges/basic", "commit", "Bart Janssens' Repository"))
+sources.append(define_feed("http://bitbucket.org/tshead/k3d-sandbox/rss/", "commit", "Tim Shead's Sandbox Repository"))
+
+entries = []
+for source in sources:
+	for entry in source.entries:
+		entry["source"] = source
+		entries.append(entry)
+entries.sort(lambda lhs, rhs: cmp(lhs.updated_parsed, rhs.updated_parsed), reverse=True)
+
+index_template = mako.template.Template(filename=options.template_directory + "/index.html", output_encoding='utf-8')
+file(options.output_directory + "/" + options.html_index, "w").write(index_template.render(sources=sources, entries=entries))
+

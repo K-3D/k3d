@@ -21,16 +21,16 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "auto_property_toolbar.h"
-#include "button.h"
-#include "document_state.h"
-#include "icons.h"
-#include "properties.h"
-#include "render.h"
-#include "toggle_button.h"
-#include "toolbar.h"
-#include "uri.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/auto_property_toolbar.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/property.h>
+#include <k3dsdk/ngui/render.h>
+#include <k3dsdk/ngui/toggle_button.h>
+#include <k3dsdk/ngui/toolbar.h>
+#include <k3dsdk/ngui/uri.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/icamera.h>

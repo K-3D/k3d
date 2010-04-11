@@ -10,18 +10,18 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
-#include "bicubic_patch.h"
-#include "metadata_keys.h"
-#include "primitive_validation.h"
-#include "selection.h"
-#include "string_cast.h"
+#include <k3dsdk/bicubic_patch.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/primitive_validation.h>
+#include <k3dsdk/selection.h>
+#include <k3dsdk/string_cast.h>
 
 #include <numeric>
 
@@ -39,16 +39,16 @@ const_primitive::const_primitive(
 	const mesh::materials_t& PatchMaterials,
 	const mesh::indices_t& PatchPoints,
 	const mesh::table_t& ConstantAttributes,
-	const mesh::table_t& UniformAttributes,
-	const mesh::table_t& VaryingAttributes,
+	const mesh::table_t& PatchAttributes,
+	const mesh::table_t& ParameterAttributes,
 	const mesh::table_t& VertexAttributes
 		) :
 	patch_selections(PatchSelections),
 	patch_materials(PatchMaterials),
 	patch_points(PatchPoints),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes),
-	varying_attributes(VaryingAttributes),
+	patch_attributes(PatchAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -61,16 +61,16 @@ primitive::primitive(
 	mesh::materials_t& PatchMaterials,
 	mesh::indices_t& PatchPoints,
 	mesh::table_t& ConstantAttributes,
-	mesh::table_t& UniformAttributes,
-	mesh::table_t& VaryingAttributes,
+	mesh::table_t& PatchAttributes,
+	mesh::table_t& ParameterAttributes,
 	mesh::table_t& VertexAttributes
 		) :
 	patch_selections(PatchSelections),
 	patch_materials(PatchMaterials),
 	patch_points(PatchPoints),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes),
-	varying_attributes(VaryingAttributes),
+	patch_attributes(PatchAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -83,17 +83,17 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("bicubic_patch");
 
 	primitive* const result = new primitive(
-		generic_primitive.structure["uniform"].create<mesh::selection_t >("patch_selections"),
-		generic_primitive.structure["uniform"].create<mesh::materials_t >("patch_materials"),
+		generic_primitive.structure["patch"].create<mesh::selection_t >("patch_selections"),
+		generic_primitive.structure["patch"].create<mesh::materials_t >("patch_materials"),
 		generic_primitive.structure["vertex"].create<mesh::indices_t >("patch_points"),
 		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["uniform"],
-		generic_primitive.attributes["varying"],
+		generic_primitive.attributes["patch"],
+		generic_primitive.attributes["parameter"],
 		generic_primitive.attributes["vertex"]
 		);
 
 	result->patch_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
-	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+	result->patch_points.set_metadata_value(metadata::key::domain(), metadata::value::point_indices_domain());
 
 	return result;
 }
@@ -110,25 +110,25 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Mesh, Primitive);
 
-		const table& uniform_structure = require_structure(Primitive, "uniform");
+		const table& patch_structure = require_structure(Primitive, "patch");
 		const table& vertex_structure = require_structure(Primitive, "vertex");
 
 		const table& constant_attributes = require_attributes(Primitive, "constant");
-		const table& uniform_attributes = require_attributes(Primitive, "uniform");
-		const table& varying_attributes = require_attributes(Primitive, "varying");
+		const table& patch_attributes = require_attributes(Primitive, "patch");
+		const table& parameter_attributes = require_attributes(Primitive, "parameter");
 		const table& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		const mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, uniform_structure, "patch_selections");
-		const mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "patch_materials");
+		const mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, patch_structure, "patch_selections");
+		const mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, patch_structure, "patch_materials");
 		const mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, vertex_structure, "patch_points");
 
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::point_indices_domain());
 
-		require_table_row_count(Primitive, vertex_structure, "vertex", uniform_structure.row_count() * 16);
-		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
+		require_table_row_count(Primitive, vertex_structure, "vertex", patch_structure.row_count() * 16);
+		require_table_row_count(Primitive, parameter_attributes, "parameter", patch_structure.row_count() * 4);
 
-		return new const_primitive(patch_selections, patch_materials, patch_points, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
+		return new const_primitive(patch_selections, patch_materials, patch_points, constant_attributes, patch_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -147,25 +147,25 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Mesh, Primitive);
 
-		table& uniform_structure = require_structure(Primitive, "uniform");
+		table& patch_structure = require_structure(Primitive, "patch");
 		table& vertex_structure = require_structure(Primitive, "vertex");
 
 		table& constant_attributes = require_attributes(Primitive, "constant");
-		table& uniform_attributes = require_attributes(Primitive, "uniform");
-		table& varying_attributes = require_attributes(Primitive, "varying");
+		table& patch_attributes = require_attributes(Primitive, "patch");
+		table& parameter_attributes = require_attributes(Primitive, "parameter");
 		table& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, uniform_structure, "patch_selections");
-		mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, uniform_structure, "patch_materials");
+		mesh::selection_t& patch_selections = require_array<mesh::selection_t >(Primitive, patch_structure, "patch_selections");
+		mesh::materials_t& patch_materials = require_array<mesh::materials_t >(Primitive, patch_structure, "patch_materials");
 		mesh::indices_t& patch_points = require_array<mesh::indices_t >(Primitive, vertex_structure, "patch_points");
 
 		require_metadata(Primitive, patch_selections, "patch_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, patch_points, "patch_points", metadata::key::domain(), metadata::value::point_indices_domain());
 
-		require_table_row_count(Primitive, vertex_structure, "vertex", uniform_structure.row_count() * 16);
-		require_table_row_count(Primitive, varying_attributes, "varying", uniform_structure.row_count() * 4);
+		require_table_row_count(Primitive, vertex_structure, "vertex", patch_structure.row_count() * 16);
+		require_table_row_count(Primitive, parameter_attributes, "parameter", patch_structure.row_count() * 4);
 
-		return new primitive(patch_selections, patch_materials, patch_points, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
+		return new primitive(patch_selections, patch_materials, patch_points, constant_attributes, patch_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -177,13 +177,13 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& Primitive)
 {
-  if(!Primitive.get())
-    return 0;
+	if(!Primitive.get())
+		return 0;
 
 	if(Primitive->type != "bicubic_patch")
 		return 0;
 
-  return validate(Mesh, Primitive.writable());
+	return validate(Mesh, Primitive.writable());
 }
 
 } // namespace bicubic_patch

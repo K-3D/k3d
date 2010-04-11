@@ -10,12 +10,12 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 /** \file
 	\author Tim Shead (tshead@k-3d.com)
@@ -43,7 +43,7 @@ namespace io
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// mesh_writerio
+// mesh_writer
 
 class mesh_writer :
 	public k3d::mesh_writer<k3d::node >
@@ -87,42 +87,37 @@ private:
 		// Store polyhedra ...
 		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
-      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input, **primitive));
-      if(!polyhedron)
-        continue;
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input, **primitive));
+			if(!polyhedron)
+				continue;
 
-      const k3d::uint_t shell_begin = 0;
-      const k3d::uint_t shell_end = shell_begin + polyhedron->shell_first_faces.size();
-      for(k3d::uint_t shell = shell_begin; shell != shell_end; ++shell)
-      {
-        const k3d::uint_t face_begin = polyhedron->shell_first_faces[shell];
-        const k3d::uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
-        for(k3d::uint_t face = face_begin; face != face_end; ++face)
-        {
-          Output << "f";
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
+			{
+				Output << "f";
 
-          const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-          const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-          for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-          {
-            const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-            for(k3d::uint_t edge = first_edge; ; )
-            {
-              Output << " " << polyhedron->edge_points[edge] + 1; //specs want indices starting with 1
+				const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+				const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+				{
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+					for(k3d::uint_t edge = first_edge; ; )
+					{
+						Output << " " << polyhedron->vertex_points[edge] + 1; //specs want indices starting with 1
 
-              edge = polyhedron->clockwise_edges[edge];
-              if(edge == first_edge)
-                break;
-            }
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
 
-            /** \todo Support faces with holes */
-            break;
-          }
+					/** \todo Support faces with holes */
+					break;
+				}
 
-          Output << "\n";
-        }
-      }
-    }
+				Output << "\n";
+			}
+		}
 	}
 };
 

@@ -24,7 +24,7 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "instance_wrapper_python.h"
+#include <k3dsdk/python/instance_wrapper_python.h>
 #include <k3dsdk/render_state_ri.h>
 
 namespace k3d

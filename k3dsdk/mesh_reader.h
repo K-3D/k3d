@@ -24,18 +24,18 @@
 	\author Tim Shead (tshead@k3d.com)
 */
 
-#include "data.h"
-#include "hints.h"
-#include "k3d-i18n-config.h"
-#include "ipipeline_profiler.h"
-#include "imesh_source.h"
-#include "imesh_storage.h"
-#include "measurement.h"
-#include "mesh.h"
-#include "node.h"
-#include "pointer_demand_storage.h"
-#include "user_interface.h"
-#include "watched_path_property.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/hints.h>
+#include <k3dsdk/ipipeline_profiler.h>
+#include <k3dsdk/imesh_source.h>
+#include <k3dsdk/imesh_storage.h>
+#include <k3dsdk/measurement.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/pointer_demand_storage.h>
+#include <k3dsdk/user_interface.h>
+#include <k3dsdk/watched_path_property.h>
 
 namespace k3d
 {

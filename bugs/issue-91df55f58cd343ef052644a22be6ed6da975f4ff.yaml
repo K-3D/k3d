@@ -1,12 +1,12 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: Review plugin categories, status.
-desc: Before the release we need to review plugin categories, and stable / experimental / deprecated status.
+title: Review plugin categories.
+desc: Before the release we need to review plugin categories.
 type: :task
 component: K-3D
 release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-08-03 15:34:22.468855 Z
 references: []
 
@@ -16,3 +16,12 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - created
   - ""
+- - 2010-02-18 05:59:46.467914 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - edited title, description
+  - ""
+- - 2010-02-18 06:00:45.930868 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""
+claimer: 

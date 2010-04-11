@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh.h"
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {
@@ -37,13 +37,13 @@ public:
 		const mesh::materials_t& Materials,
 		const mesh::selection_t& Selections,
 		const mesh::table_t& ConstantAttributes,
-		const mesh::table_t& UniformAttributes);
+		const mesh::table_t& SurfaceAttributes);
 
 	const mesh::matrices_t& matrices;
 	const mesh::materials_t& materials;
 	const mesh::selection_t& selections;
 	const mesh::table_t& constant_attributes;
-	const mesh::table_t& uniform_attributes;
+	const mesh::table_t& surface_attributes;
 };
 
 /// Gathers the member arrays of a teapot primitive into a convenient package
@@ -55,13 +55,13 @@ public:
 		mesh::materials_t& Materials,
 		mesh::selection_t& Selections,
 		mesh::table_t& ConstantAttributes,
-		mesh::table_t& UniformAttributes);
+		mesh::table_t& SurfaceAttributes);
 
 	mesh::matrices_t& matrices;
 	mesh::materials_t& materials;
 	mesh::selection_t& selections;
 	mesh::table_t& constant_attributes;
-	mesh::table_t& uniform_attributes;
+	mesh::table_t& surface_attributes;
 };
 
 /// Creates a new teapot mesh primitive, returning references to its member arrays.

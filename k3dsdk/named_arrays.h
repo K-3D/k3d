@@ -20,9 +20,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "almost_equal.h"
-#include "pipeline_data.h"
-#include "types.h"
+#include <k3dsdk/difference.h>
+#include <k3dsdk/pipeline_data.h>
+#include <k3dsdk/types.h>
 
 #include <map>
 
@@ -75,32 +75,23 @@ public:
 	named_arrays clone_types() const;
 	/// Returns an object containing deep copies of all the original arrays.
 	named_arrays clone() const;
-	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
-	bool_t almost_equal(const named_arrays& Other, const uint64_t Threshold) const;
+	/// Compares two collections using the imprecise semantics of difference::test().
+	void difference(const named_arrays& Other, difference::accumulator& Result) const;
 };
 
 /// Serialization
 std::ostream& operator<<(std::ostream& Stream, const named_arrays& RHS);
 
-/// Specialization of almost_equal that tests named_arrays for equality
-template<>
-class almost_equal<named_arrays>
+/// Specialization of difference::test for named_arrays
+namespace difference
 {
-	typedef named_arrays T;
 
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
+inline void test(const named_arrays& A, const named_arrays& B, accumulator& Result)
+{
+	A.difference(B, Result);
+}
 
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
+} // namespace difference
 
 } // namespace k3d
 

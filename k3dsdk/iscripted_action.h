@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iscript_engine.h"
-#include "types.h"
+#include <k3dsdk/iscript_engine.h>
+#include <k3dsdk/types.h>
 
 namespace k3d
 {
@@ -36,7 +36,7 @@ class iscripted_action :
 {
 public:
 	/// When called, the underlying object will execute a script using the given context
-	virtual bool_t execute(iscript_engine::context_t& Context) = 0;
+	virtual bool_t execute(iscript_engine::context& Context) = 0;
 
 protected:
 	iscripted_action() {}

@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "keyboard.h"
+#include <k3dsdk/ngui/keyboard.h>
 #include <gdk/gdk.h>
 
 namespace k3d

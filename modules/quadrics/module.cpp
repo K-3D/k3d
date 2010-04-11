@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -33,6 +33,7 @@ extern k3d::iplugin_factory& cone_factory();
 extern k3d::iplugin_factory& cylinder_factory();
 extern k3d::iplugin_factory& disk_factory();
 extern k3d::iplugin_factory& hyperboloid_factory();
+extern k3d::iplugin_factory& logo_factory();
 extern k3d::iplugin_factory& paraboloid_factory();
 extern k3d::iplugin_factory& sphere_factory();
 extern k3d::iplugin_factory& teapot_factory();
@@ -47,6 +48,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::quadrics::cylinder_factory());
 	Registry.register_factory(module::quadrics::disk_factory());
 	Registry.register_factory(module::quadrics::hyperboloid_factory());
+	Registry.register_factory(module::quadrics::logo_factory());
 	Registry.register_factory(module::quadrics::paraboloid_factory());
 	Registry.register_factory(module::quadrics::sphere_factory());
 	Registry.register_factory(module::quadrics::teapot_factory());

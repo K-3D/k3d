@@ -88,23 +88,26 @@ public:
 			
 			k3d::mesh::bools_t boundary_edges;
 			k3d::mesh::indices_t companions;
-			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, boundary_edges, companions);
+			k3d::polyhedron::create_edge_adjacency_lookup(input_polyhedron->vertex_points, input_polyhedron->clockwise_edges, boundary_edges, companions);
 			
 			// Calculate the face normals
 			k3d::mesh::normals_t face_normals(input_polyhedron->face_first_loops.size());
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				face_normals[face] = k3d::normalize(k3d::polyhedron::normal(input_polyhedron->edge_points, input_polyhedron->clockwise_edges, points, input_polyhedron->loop_first_edges[input_polyhedron->face_first_loops[face]]));
+				face_normals[face] = k3d::normalize(k3d::polyhedron::normal(input_polyhedron->vertex_points, input_polyhedron->clockwise_edges, points, input_polyhedron->loop_first_edges[input_polyhedron->face_first_loops[face]]));
 			}
 			
 			k3d::mesh::indices_t edge_faces;
-			k3d::polyhedron::create_edge_face_lookup(input_polyhedron->face_first_loops, input_polyhedron->face_loop_counts, input_polyhedron->loop_first_edges, input_polyhedron->clockwise_edges, edge_faces);
+			k3d::polyhedron::create_edge_face_lookup(*input_polyhedron, edge_faces);
 			k3d::mesh::indices_t redundant_edges;
 			k3d::polyhedron::mark_coplanar_edges(companions, boundary_edges, face_normals, edge_faces, input_face_selection, redundant_edges, m_threshold.pipeline_value());
 		
 			k3d::euler::kill_edge_make_loop(*output_polyhedron, redundant_edges, boundary_edges, companions, points, face_normals);
 		}
-		k3d::mesh::delete_unused_points(Output);
+
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -119,7 +122,7 @@ public:
 				k3d::uuid(0xba2b777f, 0xad4d6bbb, 0x04277595, 0x88105177),
 				"MergeCoplanarFaces",
 				_("Merges faces that are coplanar, up to a given threshold"),
-				"Mesh",
+				"Polyhedron",
 				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

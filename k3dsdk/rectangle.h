@@ -2,7 +2,7 @@
 #define K3DSDK_RECTANGLE_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,11 +21,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief 2D geometry routines
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "point2.h"
+#include <k3dsdk/point2.h>
 
 namespace k3d
 {
@@ -33,42 +32,42 @@ namespace k3d
 /////////////////////////////////////////////////////////////////////////////
 // rectangle
 
-/// A two-dimensional rectangle particularly suitable for use with window systems i.e. Y coordinates are reversed so that top <= bottom
+/// Provides storage for a two-dimensional rectangle.
 class rectangle
 {
 public:
-	rectangle(const double Left, const double Right, const double Top, const double Bottom);
-	rectangle(const point2& TopLeft, const point2& BottomRight);
-	rectangle(const point2& Center, const double Width, const double Height);
-	/// Returns the rectangle width
-	double width() const;
-	/// Returns the rectangle height
-	double height() const;
-	/// Returns the top-left corner of the rectangle
-	const point2 top_left() const;
-	/// Returns the bottom-right corner of the rectangle
-	const point2 bottom_right() const;
-	/// Returns the center of the rectangle
+	rectangle();
+	rectangle(const double_t X1, const double_t X2, const double_t Y1, const double_t Y2);
+	rectangle(const point2& Center, const double_t Width, const double_t Height);
+
+	/// Returns the rectangle width, which will always be >= 0.
+	double_t width() const;
+	/// Returns the rectangle height, which will always be >= 0.
+	double_t height() const;
+	/// Returns the center of the rectangle.
 	const point2 center() const;
 	/// Tests a point to see if it is contained within the rectangle
-	bool contains(const point2& Point) const;
-	/// Stores the rectangle's left edge
-	double left;
-	/// Stores the rectangle's right edge
-	double right;
-	/// Stores the rectangle's top edge
-	double top;
-	/// Stores the rectangle's bottom edge
-	double bottom;
+	bool_t contains(const point2& Point) const;
+	/// Stores the rectangle's first vertical edge.
+	double_t x1;
+	/// Stores the rectangle's second vertical edge.
+	double_t x2;
+	/// Stores the rectangle's first horizontal edge.
+	double_t y1;
+	/// Stores the rectangle's second horizontal edge.
+	double_t y2;
+
+	bool_t operator==(const rectangle& Other) const;
+	bool_t operator!=(const rectangle& Other) const;
+
+	/// Returns a rectangle where x1 <= x2 and y1 <= y2.
+	static const rectangle normalize(const rectangle& Rectangle);
 };
 
-/// Returns a rectangle where left <= right and top <= bottom
-const rectangle normalize(const rectangle& Rectangle);
-
-/// Output inserter
-std::ostream& operator<<(std::ostream& Stream, const rectangle& Arg);
-/// Input extractor
-std::istream& operator>>(std::istream& Stream, rectangle& Arg);
+/// Serialization
+std::ostream& operator<<(std::ostream& Stream, const rectangle& Value);
+/// Serialization
+std::istream& operator>>(std::istream& Stream, rectangle& Value);
 
 
 } // namespace k3d

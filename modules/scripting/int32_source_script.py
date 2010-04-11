@@ -1,4 +1,4 @@
 #python
 
-Output = 1
+context.output = 1
 

@@ -42,7 +42,7 @@
 #include <k3dsdk/command_node.h>
 #include <k3dsdk/command_tree.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/icommand_tree.h>
@@ -54,7 +54,7 @@
 #include <k3dsdk/ievent_loop.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/string_cast.h>
@@ -180,8 +180,7 @@ class user_interface :
 
 public:
 	user_interface() :
-		m_show_learning_menu(options::nag("show_learning_menu")),
-		m_record_tutorials(false)
+		m_show_learning_menu(options::nag("show_learning_menu"))
 	{
 		k3d::command_tree().add(*this, "ui", 0);
 
@@ -194,6 +193,7 @@ public:
 		g_log_set_handler("GLib-GObject", static_cast<GLogLevelFlags>(G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION), log_handler, 0);
 		g_log_set_handler("Gtk", static_cast<GLogLevelFlags>(G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION), log_handler, 0);
 		g_log_set_handler("Pango", static_cast<GLogLevelFlags>(G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION), log_handler, 0);
+		g_log_set_handler("atk-bridge", static_cast<GLogLevelFlags>(G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION), log_handler, 0);
 		g_log_set_handler("atkmm", static_cast<GLogLevelFlags>(G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION), log_handler, 0);
 		g_log_set_handler("gdkmm", static_cast<GLogLevelFlags>(G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION), log_handler, 0);
 		g_log_set_handler("glibmm", static_cast<GLogLevelFlags>(G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION), log_handler, 0);
@@ -249,9 +249,7 @@ public:
 			("no-custom-layouts", "Disable custom user interface layouts (useful when playing-back recorded tutorials).")
 			("no-splash", "Disables the startup splash screen.")
 			("open,o", boost::program_options::value<k3d::string_t>(), "Open an existing document.")
-			("record-tutorials", "Immediately opens the tutorial recorder following startup.")
-			("show-tutorials", "Immediately opens the tutorial menu following startup.")
-			("tutorials", boost::program_options::value<k3d::string_t>(), "Overrides the path for loading interactive tutorials.")
+			("show-learning-menu", "Display the learning menu after startup.")
 			;
 	}
 
@@ -332,23 +330,9 @@ public:
 			{
 				show_splash = false;
 			}
-			else if(argument->string_key == "tutorials")
-			{
-				if(argument->value.size() != 1 || argument->value[0].empty())
-				{
-					detail::handle_error("You must supply a single directory path with the --tutorials argument!", Quit, Error);
-					return arguments_t();
-				}
-
-				m_tutorials_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(argument->value[0]));
-			}
-			else if(argument->string_key == "show-tutorials")
+			else if(argument->string_key == "show-learning-menu")
 			{
 				m_show_learning_menu = true;
-			}
-			else if(argument->string_key == "record-tutorials")
-			{
-				m_record_tutorials = true;
 			}
 			else
 			{
@@ -380,14 +364,6 @@ public:
 
 		m_splash_box.reset();
 
-		const k3d::ustring message = k3d::ustring::from_utf8(k3d::string_cast(boost::format(_("Welcome to K-3D Version %1%")) % K3D_VERSION));
-		const k3d::ustring secondary_message = k3d::ustring::from_utf8(
-			"Note: this unstable preview release is not suitable for production use - "
-			"many features are incomplete or missing, existing documents may not load correctly, "
-			"and newly-saved documents may not be usable in the final release.");
-
-		nag_message("show_0_7_caveats", message, secondary_message);
-
 	        create_document();
 
 		if(m_show_learning_menu)
@@ -395,13 +371,6 @@ public:
 			Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUILearningDialog");
 			if(!window)
 				k3d::log() << error << "Error creating learning dialog at startup" << std::endl;
-		}
-
-		if(m_record_tutorials)
-		{
-			Gtk::Window* const window = k3d::plugin::create<Gtk::Window>("NGUITutorialRecorderDialog");
-			if(!window)
-				k3d::log() << error << "Error creating tutorial recorder dialog at startup" << std::endl;
 		}
 
 		create_auto_start_plugins();
@@ -474,23 +443,23 @@ public:
 		k3d::ngui::error_message(Message);
 	}
 
-	unsigned int query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
+	k3d::uint_t query_message(const k3d::string_t& Message, const k3d::uint_t DefaultOption, const std::vector<k3d::string_t>& Options)
 	{
 		return k3d::ngui::query_message(Message, DefaultOption, Options);
 	}
 
-	bool tutorial_message(const k3d::string_t& Message)
+	void nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
 	{
-		return false;
+		k3d::ngui::nag_message(Type, Message, SecondaryMessage);
 	}
 
-	bool get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
+	k3d::bool_t get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
 	{
 		file_chooser_dialog dialog(Prompt, Type, Mode);
 		return dialog.get_file_path(Result);
 	}
 
-	bool show(iunknown& Object)
+	k3d::bool_t show(iunknown& Object)
 	{
 		k3d::log() << error << k3d_file_reference << ": not implemented!" << std::endl;
 		return false;
@@ -501,7 +470,7 @@ public:
 		k3d::ngui::handle_pending_events();
 	}
 
-	sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot)
+	sigc::connection get_timer(const k3d::double_t FrameRate, sigc::slot<void> Slot)
 	{
 		return_val_if_fail(FrameRate != 0.0, sigc::connection());
 
@@ -520,9 +489,6 @@ public:
 
 	k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
 	{
-		if(Command == "tutorial_message")
-			return tutorial_message(Arguments) ? RESULT_CONTINUE : RESULT_STOP;
-
 		return base::execute_command(Command, Arguments);
 	}
 
@@ -566,8 +532,8 @@ private:
 
 			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
 			{
-				k3d::iscript_engine::context_t context;
-				context["Command"] = k3d::string_t("startup");
+				k3d::iscript_engine::context context;
+				context["command"] = k3d::string_t("startup");
 				scripted_action->execute(context);
 			}
 		}
@@ -579,8 +545,8 @@ private:
 		{
 			if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(*plugin))
 			{
-				k3d::iscript_engine::context_t context;
-				context["Command"] = k3d::string_t("shutdown");
+				k3d::iscript_engine::context context;
+				context["command"] = k3d::string_t("shutdown");
 				scripted_action->execute(context);
 			}
 		}
@@ -601,11 +567,7 @@ private:
 	}
 	
 	/// Set to true iff we should display the tutorial menu at startup
-	bool m_show_learning_menu;
-	/// Set to true iff we should begin recording a tutorial immediately at startup
-	bool m_record_tutorials;
-	/// Stores the path where tutorials should be displayed
-	k3d::filesystem::path m_tutorials_path;
+	k3d::bool_t m_show_learning_menu;
 	/// Stores the main loop
 	std::auto_ptr<Gtk::Main> m_main;
 	/// Stores the (optional) splash screen

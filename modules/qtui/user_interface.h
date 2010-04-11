@@ -121,8 +121,8 @@ private:
 	QComboBox* m_camera_combo;
 	QComboBox* m_render_engine_combo;
 	viewport* m_viewport;
-	k3d::nodes_t m_cameras;
-	k3d::nodes_t m_render_engines;
+	std::vector<k3d::icamera*> m_cameras;
+	std::vector<k3d::gl::irender_viewport*> m_render_engines;
 };
 	
 /////////////////////////////////////////////////////////////////////////////
@@ -147,7 +147,7 @@ public:
 	void warning_message(const k3d::string_t& Message);
 	void error_message(const k3d::string_t& Message);
 	unsigned int query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options);
-	bool tutorial_message(const k3d::string_t& Message);
+	void nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage);
 	bool get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result);
 	bool show(iunknown& Object);
 	void synchronize();

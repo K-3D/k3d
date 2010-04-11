@@ -1,26 +1,25 @@
 #python
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
 # Perform required one-time setup to store geometric points in the mesh ...
-points = Output.create_points()
-point_selection = Output.create_point_selection()
+points = context.output.create_points()
+point_selection = context.output.create_point_selection()
 
 # Create two polyhedra ...
 for i in range(2):
-	polyhedron = k3d.polyhedron.create(Output)
+	polyhedron = k3d.polyhedron.create(context.output)
 
-	# Create an (optional) array to store uniform (per-face) colors ...
-	Cs = polyhedron.uniform_attributes().create("Cs", "k3d::color")
+	# Create an (optional) array to store per-face colors ...
+	Cs = polyhedron.face_attributes().create("Cs", "k3d::color")
 
-	polyhedron.shell_first_faces().append(len(polyhedron.face_first_loops()))
-	polyhedron.shell_face_counts().append(3)
 	polyhedron.shell_types().append(k3d.polyhedron.shell_type.POLYGONS)
 
 	# Create three faces in each polyhedron ...
 	for j in range(3):
 		# Each face has a single loop (its exterior boundary) ...
+		polyhedron.face_shells().append(0)
 		polyhedron.face_first_loops().append(len(polyhedron.loop_first_edges()))
 		polyhedron.face_loop_counts().append(1)
 		polyhedron.face_materials().append(None)
@@ -28,24 +27,29 @@ for i in range(2):
 
 		Cs.append(k3d.color(1, j / 2.0, i / 1.0))
 
-		polyhedron.loop_first_edges().append(len(polyhedron.edge_points()))
+		polyhedron.loop_first_edges().append(len(polyhedron.clockwise_edges()))
 
 		# Each loop has four edges, each of which points to the next edge in clockwise-order ...
-		polyhedron.clockwise_edges().append(len(polyhedron.edge_points()) + 1)
-		polyhedron.clockwise_edges().append(len(polyhedron.edge_points()) + 2)
-		polyhedron.clockwise_edges().append(len(polyhedron.edge_points()) + 3)
-		polyhedron.clockwise_edges().append(len(polyhedron.edge_points()) + 0)
-
-		# Each edge refers to its starting-point ...
-		polyhedron.edge_points().append(len(points) + 0)
-		polyhedron.edge_points().append(len(points) + 1)
-		polyhedron.edge_points().append(len(points) + 2)
-		polyhedron.edge_points().append(len(points) + 3)
+		polyhedron.clockwise_edges().append(len(polyhedron.clockwise_edges()) + 1)
+		polyhedron.clockwise_edges().append(len(polyhedron.clockwise_edges()) + 1)
+		polyhedron.clockwise_edges().append(len(polyhedron.clockwise_edges()) + 1)
+		polyhedron.clockwise_edges().append(len(polyhedron.clockwise_edges()) - 3)
 
 		polyhedron.edge_selections().append(0.0)
 		polyhedron.edge_selections().append(0.0)
 		polyhedron.edge_selections().append(0.0)
 		polyhedron.edge_selections().append(0.0)
+
+		# Each edge has a vertex that references a mesh point ...
+		polyhedron.vertex_points().append(len(points) + 0)
+		polyhedron.vertex_points().append(len(points) + 1)
+		polyhedron.vertex_points().append(len(points) + 2)
+		polyhedron.vertex_points().append(len(points) + 3)
+
+		polyhedron.vertex_selections().append(0.0)
+		polyhedron.vertex_selections().append(0.0)
+		polyhedron.vertex_selections().append(0.0)
+		polyhedron.vertex_selections().append(0.0)
 
 		positions = [(-5, 0, 5), (5, 0, 5), (5, 0, -5), (-5, 0, -5)]
 

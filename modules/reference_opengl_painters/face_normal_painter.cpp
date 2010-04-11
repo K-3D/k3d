@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -20,8 +20,6 @@
 /** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
-
-#include "normal_cache.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -63,42 +61,44 @@ public:
 		m_unselected_color.changed_signal().connect(make_async_redraw_slot());
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
+		if(!Mesh.points)
+			return;
+
 		const k3d::bool_t draw_selected = m_draw_selected.pipeline_value() && RenderState.show_component_selection;
 		const k3d::bool_t draw_unselected = m_draw_unselected.pipeline_value();
 
 		if(!draw_selected && !draw_unselected)
 			return;
 
-		normal_cache& n_cache = get_data<normal_cache>(&Mesh, this);
-
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
-		k3d::uint_t face_offset = 0;
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **primitive));
 			if(!polyhedron.get())
 				continue;
-		
-			const k3d::mesh::points_t& points = *Mesh.points;		
-			const k3d::uint_t face_count = polyhedron->face_first_loops.size();
+	
+			const k3d::uint_t face_begin = 0;	
+			const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();
 			
 			if(draw_selected)
 			{
 				k3d::gl::color3d(m_selected_color.pipeline_value());
 	
 				glBegin(GL_LINES);
-				for(k3d::uint_t face = 0; face != face_count; ++face)
+				for(k3d::uint_t face = face_begin; face != face_end; ++face)
 				{
-					if(polyhedron->face_selections[face])
-					{
-						k3d::point3 center = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
-						k3d::gl::vertex3d(center);
-						k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face + face_offset)));
-					}
+					if(!polyhedron->face_selections[face])
+						continue;
+
+					k3d::point3 center = k3d::polyhedron::center(polyhedron->vertex_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+					k3d::normal3 normal = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+
+					k3d::gl::vertex3d(center);
+					k3d::gl::vertex3d(center + normal);
 				}
 				glEnd();
 			}
@@ -108,24 +108,20 @@ public:
 				k3d::gl::color3d(m_unselected_color.pipeline_value());
 	
 				glBegin(GL_LINES);
-				for(k3d::uint_t face = 0; face != face_count; ++face)
+				for(k3d::uint_t face = face_begin; face != face_end; ++face)
 				{
-					if(!polyhedron->face_selections[face])
-					{
-						k3d::point3 center = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
-						k3d::gl::vertex3d(center);
-						k3d::gl::vertex3d(center + k3d::to_point(n_cache.face_normals(this).at(face + face_offset)));
-					}
+					if(polyhedron->face_selections[face])
+						continue;
+
+					k3d::point3 center = k3d::polyhedron::center(polyhedron->vertex_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+					k3d::normal3 normal = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, *Mesh.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+
+					k3d::gl::vertex3d(center);
+					k3d::gl::vertex3d(center + normal);
 				}
 				glEnd();
 			}
-			face_offset += face_count;
 		}
-	}
-	
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
-	{		
-		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 	
 	static k3d::iplugin_factory& get_factory()

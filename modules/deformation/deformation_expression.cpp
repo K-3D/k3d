@@ -27,7 +27,7 @@
 #include <k3dsdk/expression/parser.h>
 #include <k3dsdk/iuser_property.h>
 #include <k3dsdk/mesh_simple_deformation_modifier.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
@@ -48,14 +48,12 @@ class deformation_expression :
 public:
 	deformation_expression(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_xyz_rename(init_owner(*this) + init_name("xyz_rename") + init_label(_("Rename local x y z")) + init_description(_("Renames the local x,y,z variables to suit the variables from your function. Could be u,v,w for example")) + init_value(k3d::string_t(_("x,y,z")))),
-		m_x_function(init_owner(*this) + init_name("x_function") + init_label(_("Local X component function")) + init_description(_("Function for the X component of the vector field.")) + init_value(k3d::string_t(_("x + x/sqrt(x^2+y^2+z^2) * exp(-(x^2+y^2+z^2))")))),
-		m_y_function(init_owner(*this) + init_name("y_function") + init_label(_("Local Y component function")) + init_description(_("Function for the Y component of the vector field.")) + init_value(k3d::string_t(_("y + y/sqrt(x^2+y^2+z^2) * exp(-(x^2+y^2+z^2))")))),
-		m_z_function(init_owner(*this) + init_name("z_function") + init_label(_("Local Z component function")) + init_description(_("Function for the Z component of the vector field.")) + init_value(k3d::string_t(_("z + z/sqrt(x^2+y^2+z^2) * exp(-(x^2+y^2+z^2))")))),
+		m_x_function(init_owner(*this) + init_name("x_function") + init_label(_("X Function")) + init_description(_("Output X coordinate function, in terms of x, y, z, and any user-defined scalars.")) + init_value(k3d::string_t(_("x")))),
+		m_y_function(init_owner(*this) + init_name("y_function") + init_label(_("Y Function")) + init_description(_("Output Y coordinate function, in terms of x, y, z, and any user-defined scalars.")) + init_value(k3d::string_t(_("y")))),
+		m_z_function(init_owner(*this) + init_name("z_function") + init_label(_("Z Function")) + init_description(_("Output Z coordinate function, in terms of x, y, z, and any user-defined scalars.")) + init_value(k3d::string_t(_("z + sin(x)")))),
 		m_user_property_changed_signal(*this)
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
-		m_xyz_rename.changed_signal().connect(make_update_mesh_slot());
 		m_x_function.changed_signal().connect(make_update_mesh_slot());
 		m_y_function.changed_signal().connect(make_update_mesh_slot());
 		m_z_function.changed_signal().connect(make_update_mesh_slot());
@@ -64,11 +62,13 @@ public:
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const std::string xyz_rename = m_xyz_rename.pipeline_value();
-		std::string variables(xyz_rename);
+		OutputPoints = InputPoints;
+
+		// Setup default variables for x, y, and z coordinates ...
+		std::string variables("x,y,z");
 		std::vector<k3d::double_t> values(3, 0.0);
-		
-		//Collect additional variables
+
+		// Collect additional, user-defined variables ...		
 		const k3d::iproperty_collection::properties_t& properties = k3d::node::properties();
 		for(k3d::iproperty_collection::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
 		{
@@ -85,47 +85,42 @@ public:
 			values.push_back(k3d::property::pipeline_value<double>(**property));
 		}
 			
-		const std::string x_function = m_x_function.pipeline_value();
-		const std::string y_function = m_y_function.pipeline_value();
-		const std::string z_function = m_z_function.pipeline_value();
-		
-		//Create all the three function parsers
 		k3d::expression::parser parser_x_component;
-		if(!parser_x_component.parse(x_function, variables))
+		if(!parser_x_component.parse(m_x_function.pipeline_value(), variables))
 		{
 			k3d::log() << error << factory().name() << ": function parsing for x component failed: " << parser_x_component.last_parse_error() << std::endl;
 			return;
 		}
 		k3d::expression::parser parser_y_component;
-		if(!parser_y_component.parse(y_function, variables))
+		if(!parser_y_component.parse(m_y_function.pipeline_value(), variables))
 		{
 			k3d::log() << error << factory().name() << ": function parsing for y component failed: " << parser_y_component.last_parse_error() << std::endl;
 			return;
 		}
 		k3d::expression::parser parser_z_component;
-		if(!parser_z_component.parse(z_function, variables))
+		if(!parser_z_component.parse(m_z_function.pipeline_value(), variables))
 		{
 			k3d::log() << error << factory().name() << ": function parsing for z component failed: " << parser_z_component.last_parse_error() << std::endl;
 			return;
 		}				
 		
-		OutputPoints = InputPoints;
 		//Evaluate functions on each point.
-		k3d::point3 output_point(0,0,0);
 		const k3d::uint_t point_begin = 0;
 		const k3d::uint_t point_end = point_begin + OutputPoints.size();
 		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			if(PointSelection[point])
-			{
-				values[0] = InputPoints[point].n[0];
-				values[1] = InputPoints[point].n[1];
-				values[2] = InputPoints[point].n[2];
-				output_point.n[0] = parser_x_component.evaluate(&values[0]);
-				output_point.n[1] = parser_y_component.evaluate(&values[0]);
-				output_point.n[2] = parser_z_component.evaluate(&values[0]);
-				OutputPoints[point] = output_point;
-			}
+			if(!PointSelection[point])
+				continue;
+
+			values[0] = InputPoints[point].n[0];
+			values[1] = InputPoints[point].n[1];
+			values[2] = InputPoints[point].n[2];
+
+			OutputPoints[point] = k3d::point3(
+				parser_x_component.evaluate(&values[0]),
+				parser_y_component.evaluate(&values[0]),
+				parser_z_component.evaluate(&values[0])
+				);
 		}
 	}
 
@@ -136,15 +131,14 @@ public:
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x82777f90, 0xb74d7201, 0xcc5bed8a, 0x35275e00),
 				"DeformationExpression",
-				_("Displace a mesh according a expression on x,y and z points components"),
+				_("Displace a mesh using functional expressions in x, y, and z."),
 				"Deformation",
-				k3d::iplugin_factory::EXPERIMENTAL);
+				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
 
 private:
-	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_xyz_rename;
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_x_function;
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_y_function;
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_z_function;

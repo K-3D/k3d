@@ -21,7 +21,8 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_curve_modifier.h"
+#include "nurbs_curves.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -58,13 +59,11 @@ public:
 	insert_knot(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_u_value(init_owner(*this) + init_name(_("u_value")) + init_label(_("u_value")) + init_description(_("Insert knot at [0,1]")) + init_step_increment(0.01) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum(0.0 , constraint::maximum(1.0))) + init_value(0.5)),
-		m_multiplicity(init_owner(*this) + init_name(_("multiplicity")) + init_label(_("multiplicity")) + init_description(_("Multiplicity")) + init_constraint(constraint::minimum(1 , constraint::maximum(3))) + init_value(1)),
-		m_normalize_all(init_owner(*this) + init_name(_("normalize_all")) + init_label(_("Share Degree and KnotVector?")) + init_description(_("Make all selected curves have same Degree and KnotVector?")) + init_value(false))
+		m_multiplicity(init_owner(*this) + init_name(_("multiplicity")) + init_label(_("multiplicity")) + init_description(_("Multiplicity")) + init_constraint(constraint::minimum(1 , constraint::maximum(3))) + init_value(1))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_u_value.changed_signal().connect(make_update_mesh_slot());
 		m_multiplicity.changed_signal().connect(make_update_mesh_slot());
-		m_normalize_all.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
@@ -75,37 +74,9 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+		modify_selected_curves(Input, Output, knot_inserter(m_u_value.pipeline_value(), m_multiplicity.pipeline_value()));
 
-		nurbs_curve_modifier mod(Output, *nurbs);
-
-		std::vector<k3d::uint_t> my_curves = mod.selected_curves();
-
-		if (my_curves.size() == 0)
-		{
-			k3d::log() << error << "You need to select at least one curve!" << std::endl;
-			return;
-		}
-
-		double u = m_u_value.pipeline_value();
-		int multiplicity = m_multiplicity.pipeline_value();
-
-		//call curve_knot_insertion
-		if (my_curves.size() > 1 && m_normalize_all.pipeline_value())
-		{
-			mod.knot_vector_adaption(my_curves);
-		}
-
-		for (int i = 0; i < my_curves.size(); i++)
-		{
-			mod.normalize_knot_vector(my_curves.at(i));
-			mod.curve_knot_insertion(my_curves.at(i), u, multiplicity);
-		}
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -120,9 +91,20 @@ public:
 		return factory;
 	}
 private:
+	struct knot_inserter
+	{
+		knot_inserter(const k3d::double_t U, const k3d::uint_t R) : u(U), r(R) {}
+		void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
+		{
+			curve_arrays curve(InputMesh, InputCurves, Curve);
+			module::nurbs::insert_knot(curve, u, r);
+			curve.add_curve(OutputMesh, OutputCurves);
+		}
+		const k3d::double_t u;
+		const k3d::uint_t r;
+	};
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_u_value;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_multiplicity;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_normalize_all;
 };
 
 k3d::iplugin_factory& insert_knot_factory()

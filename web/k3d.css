@@ -1,0 +1,237 @@
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td
+{
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+}
+
+html
+{
+  overflow-y: scroll;
+}
+
+body
+{
+  font-family: Georgia, Palatino, serif;
+  width: 900px;
+  margin: 0 auto;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1
+{
+  font-size: 170%;
+}
+
+h2
+{
+  font-size: 150%;
+  padding: 8px 0 8px 0;
+}
+
+h3
+{
+  font-size: 120%;
+}
+
+p
+{
+  margin-bottom: 12px;
+}
+
+caption
+{
+  background-color: darkred;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 110%;
+  font-weight: bold;
+  text-align: center;
+  padding: 3px;
+}
+
+table
+{
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+th
+{
+  padding: 10px 0 10px 10px;
+}
+
+td
+{
+  border-bottom: 1px solid #dddddd;
+  padding: 5px 0 5px 10px;
+}
+
+dt
+{
+  float: left;
+  width: 10em;
+  text-align: right;
+  font-weight: bold;
+  margin-right: 16px;
+}
+
+dd
+{
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+a
+{
+  color: DarkRed;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+a:hover
+{
+  text-decoration: underline;
+}
+
+.generated
+{
+  font-size: 90%;
+  color: #aaaaaa;
+}
+
+.highlighted
+{
+  background-color: DarkRed;
+  color: White;
+  padding: 4px 8px;
+}
+
+.special-message
+{
+  background-color: #eeeeee;
+  border: 1px solid #aaaaaa;
+  font-size: 105%;
+  margin: 2em;
+  padding: 1em;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.special-message h2
+{
+  margin: 0 0 0.5em 0;
+}
+
+#nav
+{
+  float: left;
+  width: 100%;
+  height: 200px;
+  padding-top: 6px;
+  background: transparent url("resources/banner") no-repeat top;
+}
+
+#nav #logo
+{
+  float: left;
+  width: 130px;
+  height: 55px;
+  background: transparent url("logo.png") no-repeat;
+}
+
+#nav #logo h1
+{
+  display: none;
+}
+
+#nav ul
+{
+  float: left;
+  list-style: none;
+  padding-top: 9px;
+  padding-bottom: 2px;
+  border-bottom: 2px solid #dddddd;
+}
+
+#nav li
+{
+  display: inline;
+  padding: 0 20px 0 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+
+#main
+{
+  clear: both;
+}
+
+#top
+{
+  padding-bottom: 40px;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+#top #description
+{
+  float: left;
+  width: 500px;
+}
+
+#top #downloads
+{
+  margin-left: 550px;
+  text-align: center;
+}
+
+#left
+{
+  float: left;
+  width: 500px;
+}
+
+#right
+{
+  margin-left: 550px;
+}
+
+#footer
+{
+  clear: both;
+  margin-top: 24px;
+}
+
+div#videos
+{
+  float: left;
+  width: 150px;
+  margin-top: 4em;
+}
+
+div#player
+{
+  float: left;
+  width: 750px;
+  margin-top: 1em;
+}
+
+img.thumbnail
+{
+  background: darkred;
+  padding: 1px;
+  margin: 2px;
+}
+
+img.thumbnail:hover
+{
+  background: darkred;
+  padding: 3px;
+  margin: 0px;
+}
+

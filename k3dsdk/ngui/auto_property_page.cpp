@@ -21,44 +21,44 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "angle_axis.h"
-#include "auto_property_page.h"
-#include "bitmap_preview.h"
-#include "bounding_box.h"
-#include "button.h"
-#include "check_button.h"
-#include "collapsible_frame.h"
-#include "color_chooser.h"
-#include "combo_box.h"
-#include "custom_property_control.h"
-#include "document_state.h"
-#include "entry.h"
-#include "enumeration_chooser.h"
-#include "node_chooser.h"
-#include "node_collection_chooser.h"
-#include "path_chooser.h"
-#include "point3.h"
-#include "property_button.h"
-#include "property_label.h"
-#include "script_button.h"
-#include "spin_button.h"
-#include "text.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/angle_axis.h>
+#include <k3dsdk/ngui/auto_property_page.h>
+#include <k3dsdk/ngui/bitmap_preview.h>
+#include <k3dsdk/ngui/bounding_box.h>
+#include <k3dsdk/ngui/button.h>
+#include <k3dsdk/ngui/check_button.h>
+#include <k3dsdk/ngui/collapsible_frame.h>
+#include <k3dsdk/ngui/color_chooser.h>
+#include <k3dsdk/ngui/combo_box.h>
+#include <k3dsdk/ngui/custom_property_control.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/entry.h>
+#include <k3dsdk/ngui/enumeration_chooser.h>
+#include <k3dsdk/ngui/node_chooser.h>
+#include <k3dsdk/ngui/node_collection_chooser.h>
+#include <k3dsdk/ngui/path_chooser.h>
+#include <k3dsdk/ngui/point3.h>
+#include <k3dsdk/ngui/property_button.h>
+#include <k3dsdk/ngui/property_label.h>
+#include <k3dsdk/ngui/script_button.h>
+#include <k3dsdk/ngui/spin_button.h>
+#include <k3dsdk/ngui/text.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/imetadata.h>
+#include <k3dsdk/metadata_keys.h>
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/iuser_property.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/type_registry.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 #include <k3dsdk/utility.h>
 
-// Not strictly required to compile, but this #include ensures that we have a std::typeinfo for legacy::mesh that matches the SDK (i.e. we don't break the ODR)
-#include <k3dsdk/legacy_mesh.h>
+// Not strictly required to compile, but this #include ensures that we have a std::typeinfo for k3d::mesh that matches the SDK (i.e. we don't break the ODR)
 #include <k3dsdk/mesh.h>
 
 #include <gtkmm/box.h>
@@ -208,41 +208,76 @@ public:
 				// Keep track of the control that's created (if any) ...
 				Gtk::Widget* control = 0;
 
-				// Allow custom property controls to override our defaults ...
+				// Look for custom property controls that match our property role ...
 				if(!control)
 				{
-					// Look for an explicit property control type ...
-					string_t property_control_type;
+					// Look for an explicit property role ...
 					if(imetadata* const property_metadata = dynamic_cast<imetadata*>(&property))
-						property_control_type = property_metadata->get_metadata()["k3d:property-type"];
-
-					// Otherwise, fall-back on the C++ property type ...
-					if(property_control_type.empty())
-						property_control_type = k3d::type_string(property_type);
-
-					static plugin::factory::collection_t control_factories = plugin::factory::lookup("ngui:component-type", "property-control");
-					for(plugin::factory::collection_t::const_iterator factory = control_factories.begin(); factory != control_factories.end(); ++factory)
 					{
-						if((**factory).metadata()["ngui:property-type"] != property_control_type)
-							continue;
-
-						if(custom_property::control* const custom_control = plugin::create<custom_property::control>(**factory))
+						const string_t property_control_role = property_metadata->get_metadata()[k3d::metadata::key::role()];
+						if(property_control_role.size())
 						{
-							if(control = dynamic_cast<Gtk::Widget*>(custom_control))
+							// Now see if we can find a custom property control that matches the role ...
+							static plugin::factory::collection_t control_factories = plugin::factory::lookup("ngui:component-type", "property-control");
+							for(plugin::factory::collection_t::const_iterator factory = control_factories.begin(); factory != control_factories.end(); ++factory)
 							{
-								custom_control->initialize(m_document_state, property);
+								if((**factory).metadata()["ngui:property-role"] != property_control_role)
+									continue;
+
+								if(custom_property::control* const custom_control = plugin::create<custom_property::control>(**factory))
+								{
+									if(control = dynamic_cast<Gtk::Widget*>(custom_control))
+									{
+										custom_control->initialize(m_document_state, property);
+									}
+									else
+									{
+										k3d::log() << error << "custom property control must derive from Gtk::Widget" << std::endl;
+									}
+								}
+								else
+								{
+									k3d::log() << error << "error creating custom property control" << std::endl;
+								}
+
+								break;
+							}
+						}
+					}
+				}
+
+				// Look for custom property controls that match our property type ...
+				if(!control)
+				{
+					// Get the C++ property type ...
+					const string_t property_control_type = k3d::type_string(property_type);
+					if(property_control_type.size())
+					{
+						// Now see if we can find a custom property control that matches the type ...
+						static plugin::factory::collection_t control_factories = plugin::factory::lookup("ngui:component-type", "property-control");
+						for(plugin::factory::collection_t::const_iterator factory = control_factories.begin(); factory != control_factories.end(); ++factory)
+						{
+							if((**factory).metadata()["ngui:property-type"] != property_control_type)
+								continue;
+
+							if(custom_property::control* const custom_control = plugin::create<custom_property::control>(**factory))
+							{
+								if(control = dynamic_cast<Gtk::Widget*>(custom_control))
+								{
+									custom_control->initialize(m_document_state, property);
+								}
+								else
+								{
+									k3d::log() << error << "custom property control must derive from Gtk::Widget" << std::endl;
+								}
 							}
 							else
 							{
-								k3d::log() << error << "custom property control must derive from Gtk::Widget" << std::endl;
+								k3d::log() << error << "error creating custom property control" << std::endl;
 							}
-						}
-						else
-						{
-							k3d::log() << error << "error creating custom property control" << std::endl;
-						}
 
-						break;
+							break;
+						}
 					}
 				}
 
@@ -337,9 +372,6 @@ public:
 					{
 					}
 					// Mesh properties ...
-					else if(property_type == typeid(legacy::mesh*))
-					{
-					}
 					else if(property_type == typeid(mesh*))
 					{
 					}

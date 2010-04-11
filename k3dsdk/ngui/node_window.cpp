@@ -21,8 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "asynchronous_update.h"
-#include "node_window.h"
+#include <k3dsdk/ngui/asynchronous_update.h>
+#include <k3dsdk/ngui/node_window.h>
 
 #include <k3dsdk/inode.h>
 

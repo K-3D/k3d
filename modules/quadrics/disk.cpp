@@ -88,10 +88,10 @@ public:
 	{
 		static k3d::document_plugin_factory<disk > factory(
 			k3d::uuid(0x63be82ef, 0x184a6396, 0xc34f4988, 0x790b936d),
-			"Disk",
+			"QuadricDisk",
 			"Creates a disk primitive",
 			"Quadric",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

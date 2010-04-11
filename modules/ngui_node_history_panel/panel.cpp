@@ -35,6 +35,7 @@
 #include <k3dsdk/ngui/hotkey_cell_renderer_text.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/state_change_set.h>
@@ -81,7 +82,8 @@ class implementation :
 	public k3d::ngui::asynchronous_update
 {
 public:
-	implementation(document_state& DocumentState) :
+	implementation(k3d::iunknown& Owner, document_state& DocumentState) :
+    m_owner(Owner),
 		m_document_state(DocumentState),
 		m_node(0)
 	{
@@ -113,7 +115,7 @@ public:
 		m_document_state.document().nodes().remove_nodes_signal().connect(sigc::mem_fun(*this, &implementation::on_nodes_removed));
 		m_document_state.document().nodes().rename_node_signal().connect(sigc::mem_fun(*this, &implementation::on_node_renamed));
 
-		m_document_state.view_node_history_signal().connect(sigc::mem_fun(*this, &implementation::on_view_node_history));
+		panel::mediator(m_document_state.document()).connect_focus_node_signal(sigc::mem_fun(*this, &implementation::on_view_node_history));
 
 		schedule_update();
 	}
@@ -187,8 +189,11 @@ public:
 		node->set_name(NewText);
 	}
 
-	bool on_view_node_history(k3d::inode* const Object)
+	void on_view_node_history(k3d::inode* const Object, k3d::iunknown* const Sender)
 	{
+    if(Sender == &m_owner)
+      return;
+
 		if(Object != m_node)
 		{
 			m_node = Object;
@@ -206,16 +211,12 @@ public:
 					m_node_properties_changed_connection = property_collection->connect_properties_changed_signal(sigc::hide(sigc::mem_fun(*this, &implementation::schedule_update)));
 
 			}
-
-			return true;
 		}
-
-		return false;
 	}
 
 	void on_node_deleted()
 	{
-		on_view_node_history(0);
+		on_view_node_history(0, 0);
 	}
 
 	/// Defines a mapping of properties to their owning node
@@ -298,14 +299,16 @@ public:
 		return_if_fail(node);
 		
 		// Select only the selected node
-		selection::state(m_document_state.document()).set_current_mode(selection::NODES);
+		selection::state(m_document_state.document()).set_current_mode(selection::NODE);
 		selection::state(m_document_state.document()).deselect_all();
 		selection::state(m_document_state.document()).select(*node);
 
 		// Request that (somebody somewhere) show node details ...
-		m_document_state.view_node_properties_signal().emit(node);
+		panel::mediator(m_document_state.document()).set_focus(*node, m_owner);
 	}
 
+  /// Stores a reference to the owner object
+  k3d::iunknown& m_owner;
 	/// Stores a reference to the owning document
 	document_state& m_document_state;
 	/// Stores a reference to the currently-selected node (if any)
@@ -349,7 +352,6 @@ public:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -368,7 +370,7 @@ public:
 
 	void initialize(document_state& DocumentState)
 	{
-		m_implementation = new detail::implementation(DocumentState);
+		m_implementation = new detail::implementation(*this, DocumentState);
 
 		m_implementation->m_view.signal_focus_in_event().connect(sigc::bind_return(sigc::hide(m_implementation->m_panel_grab_signal.make_slot()), false), false);
 		
@@ -393,7 +395,7 @@ public:
 			"NGUINodeHistoryPanel",
 			_("Displays a hierarchical list of node inputs"),
 			"NGUI Panel",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Node History"));
 
 		return factory;

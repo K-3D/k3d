@@ -69,7 +69,7 @@ public:
 				"MeshToStdout",
 				_("Prints mesh information to stdout"),
 				"Test",
-				k3d::iplugin_factory::STABLE);
+				k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;
 	}

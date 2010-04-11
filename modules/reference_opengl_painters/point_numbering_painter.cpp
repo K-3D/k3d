@@ -89,7 +89,7 @@ public:
 	}
 
 	template<typename FunctorT>
-	static void draw(const k3d::mesh& Mesh, const k3d::typed_array<k3d::point3>& Points, const k3d::color& Color, const FunctorT& PointTest, FTFont& Font)
+	static void draw(const k3d::mesh& Mesh, const k3d::typed_array<k3d::point3>& Points, const k3d::color& Color, FunctorT PointTest, FTFont& Font)
 	{
 		k3d::gl::color3d(Color);
 
@@ -106,7 +106,7 @@ public:
 		}
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		const bool draw_selected = m_draw_selected.pipeline_value();
 		const bool draw_unselected = m_draw_unselected.pipeline_value();
@@ -151,7 +151,7 @@ public:
 			"OpenGLPointNumberingPainter",
 			_("Numbers points"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

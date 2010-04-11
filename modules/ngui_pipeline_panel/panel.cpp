@@ -38,10 +38,11 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/pipeline.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/rectangle.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/vectors.h>
@@ -100,7 +101,6 @@ private:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
 public:
@@ -177,7 +177,7 @@ public:
 		m_document_state->document().nodes().remove_nodes_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::reset_graph)));
 		m_document_state->document().nodes().rename_node_signal().connect(sigc::hide(sigc::mem_fun(*this, &panel::schedule_redraw)));
 
-		m_document_state->view_node_properties_signal().connect(sigc::bind_return(sigc::mem_fun(*this, &panel::selected_node_changed), false));
+		k3d::ngui::panel::mediator(m_document_state->document()).connect_focus_node_signal(sigc::mem_fun(*this, &panel::selected_node_changed));
 
 		show_all();
 	}
@@ -385,10 +385,10 @@ public:
 
 	void reset_graph()
 	{
-		m_create_graph->make_reset_graph_slot()(0);
+		m_create_graph->make_update_graph_slot()(0);
 	}
 
-	void selected_node_changed(k3d::inode* Node)
+	void selected_node_changed(k3d::inode* const Node, k3d::iunknown* const Sender)
 	{
 		if(m_root_node == Node)
 			return;
@@ -468,10 +468,10 @@ public:
 
 	void draw_box(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::rectangle& Box)
 	{
-		Context->move_to(Box.left, Box.top);
-		Context->line_to(Box.right, Box.top);
-		Context->line_to(Box.right, Box.bottom);
-		Context->line_to(Box.left, Box.bottom);
+		Context->move_to(Box.x1, Box.y1);
+		Context->line_to(Box.x2, Box.y1);
+		Context->line_to(Box.x2, Box.y2);
+		Context->line_to(Box.x1, Box.y2);
 		Context->close_path();
 
 		Context->stroke();
@@ -479,10 +479,10 @@ public:
 
 	void draw_filled_box(const Cairo::RefPtr<Cairo::Context>& Context, const k3d::rectangle& Box)
 	{
-		Context->move_to(Box.left, Box.top);
-		Context->line_to(Box.right, Box.top);
-		Context->line_to(Box.right, Box.bottom);
-		Context->line_to(Box.left, Box.bottom);
+		Context->move_to(Box.x1, Box.y1);
+		Context->line_to(Box.x2, Box.y1);
+		Context->line_to(Box.x2, Box.y2);
+		Context->line_to(Box.x1, Box.y2);
 		Context->close_path();
 
 		Context->fill();
@@ -581,8 +581,6 @@ public:
 			// Get the graph to be rendered ...
 			const k3d::graph::undirected& graph = *boost::any_cast<k3d::graph::undirected*>(k3d::property::pipeline_value(m_tree_layout->output()));
 
-//k3d::log() << debug << "input graph:\n" << graph << std::endl;
-
 			return_if_fail(graph.topology);
 			return_if_fail(graph.vertex_data.count("node"));
 			return_if_fail(graph.vertex_data.count("position"));
@@ -679,7 +677,7 @@ public:
 			"NGUIPipelinePanel",
 			_("Displays the visualization pipeline"),
 			"NGUI Panel",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Pipeline"));
 
 		return factory;

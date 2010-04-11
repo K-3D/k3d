@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "types.h"
+#include <k3dsdk/types.h>
 #include <typeinfo>
 
 namespace k3d

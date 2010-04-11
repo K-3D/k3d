@@ -5,8 +5,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-08-03 14:52:24.626335 Z
 references: []
 
@@ -16,3 +16,7 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - created
   - ""
+- - 2009-11-14 04:22:27.956574 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - Switched to rendered-highlighting, instead of playing tricks with framebuffer bits.

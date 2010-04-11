@@ -44,15 +44,15 @@
 #include <k3dsdk/istream_ri.h>
 #include <k3dsdk/irenderable_ri.h>
 #include <k3dsdk/itexture_ri.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/ivolume_shader_ri.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/property_group_collection.h>
 #include <k3dsdk/stream_ri.h>
 #include <k3dsdk/renderable_ri.h>
@@ -484,7 +484,7 @@ private:
 
 			writable_time_property->property_set_value(sample_time);
 
-			const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(Camera.transformation().transform_source_output()));
+			const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(Camera.transformation().matrix_source_output()));
 			const k3d::angle_axis orientation(k3d::euler_angles(transform_matrix, k3d::euler_angles::ZXYstatic));
 			const k3d::point3 position(k3d::position(transform_matrix));
 
@@ -523,7 +523,7 @@ private:
 					const double far = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->far()));
 					return_val_if_fail(near > 0, false);
 
-					const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(Camera.transformation().transform_source_output()));
+					const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(Camera.transformation().matrix_source_output()));
 					const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 					const k3d::point3 world_target = boost::any_cast<k3d::point3>(Camera.world_target().property_internal_value());
 

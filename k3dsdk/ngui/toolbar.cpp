@@ -21,7 +21,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "toolbar.h"
+#include <k3dsdk/ngui/toolbar.h>
 
 #include <k3dsdk/result.h>
 

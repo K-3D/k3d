@@ -17,10 +17,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh_python.h"
-#include "owned_instance_wrapper_python.h"
-#include "nurbs_patch_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/owned_instance_wrapper_python.h>
+#include <k3dsdk/python/nurbs_patch_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/nurbs_patch.h>
 
@@ -72,8 +72,8 @@ public:
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
 		static object point_selections(wrapper& Self) { return wrap(Self.wrapped().point_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 	class primitive
@@ -110,8 +110,8 @@ public:
 		static object points(wrapper& Self) { return wrap(Self.wrapped().points); }
 		static object point_selections(wrapper& Self) { return wrap(Self.wrapped().point_selections); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 
@@ -171,8 +171,8 @@ void define_namespace_nurbs_patch()
 		.def("points", &nurbs_patch::const_primitive::points)
 		.def("point_selections", &nurbs_patch::const_primitive::point_selections)
 		.def("constant_attributes", &nurbs_patch::const_primitive::constant_attributes)
-		.def("uniform_attributes", &nurbs_patch::const_primitive::uniform_attributes)
-		.def("varying_attributes", &nurbs_patch::const_primitive::varying_attributes)
+		.def("patch_attributes", &nurbs_patch::const_primitive::patch_attributes)
+		.def("parameter_attributes", &nurbs_patch::const_primitive::parameter_attributes)
 		;
 
 	class_<nurbs_patch::primitive::wrapper>("primitive", no_init)
@@ -205,8 +205,8 @@ void define_namespace_nurbs_patch()
 		.def("points", &nurbs_patch::primitive::points)
 		.def("point_selections", &nurbs_patch::primitive::point_selections)
 		.def("constant_attributes", &nurbs_patch::primitive::constant_attributes)
-		.def("uniform_attributes", &nurbs_patch::primitive::uniform_attributes)
-		.def("varying_attributes", &nurbs_patch::primitive::varying_attributes)
+		.def("patch_attributes", &nurbs_patch::primitive::patch_attributes)
+		.def("parameter_attributes", &nurbs_patch::primitive::parameter_attributes)
 		;
 }
 

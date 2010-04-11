@@ -42,7 +42,7 @@
 #include <k3dsdk/ngui/scripting.h>
 #include <k3dsdk/ngui/widget_manip.h>
 #include <k3dsdk/options.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 
 #include <gtkmm/action.h>
@@ -366,9 +366,9 @@ public:
 
 		const k3d::string_t name = get_title();
 
-		k3d::iscript_engine::context_t context;
+		k3d::iscript_engine::context context;
 		if(m_document)
-			context["Document"] = m_document;
+			context["document"] = m_document;
 
 		m_running = true;
 		update_title();

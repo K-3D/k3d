@@ -42,7 +42,7 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 
 	print """Creating main article for """ + plugin.name() + """ ..."""
 	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/articles/" + plugin.name(), "w")
-	article.write("<plugin>{{PAGENAME}}</plugin>\n")
+	article.write("{{" + plugin.name() + "}}\n")
 
 # Create an article listing every plugin category ...
 print """Creating plugin categories article ..."""
@@ -143,7 +143,7 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 	article.write("|}\n")
 
 	if plugin.is_document_plugin():
-		node = doc.new_node(plugin.name())
+		node = k3d.plugin.create(plugin, doc)
 
 		if node:
 			article.write("== Properties == " + "\n")
@@ -159,10 +159,12 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 				if property.name() == "name":
 					continue
 
+				type_link = "[[Property Types#" + property.type() + "|" + property.type() + "]]" if len(property.type()) else ""
+
 				article.write("|-\n")
 				article.write("|'''" + property.label() + "'''\n")
 				article.write("|" + property.description() + "\n")
-				article.write("|[[Property Types#" + property.type() + "|" + property.type() + "]]\n")
+				article.write("|" + type_link + "\n")
 				article.write("|" + property.name() + "\n")
 
 			article.write("|}\n")

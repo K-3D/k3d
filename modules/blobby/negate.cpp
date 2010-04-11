@@ -33,7 +33,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
 namespace module
@@ -83,7 +83,7 @@ public:
 			"BlobbyNegate",
 			_("Combines blobbies using the Negation operator."),
 			"Blobby",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

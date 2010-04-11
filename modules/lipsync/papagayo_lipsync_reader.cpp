@@ -29,7 +29,7 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/string_source.h>
 
 // #include <iostream>
@@ -282,7 +282,7 @@ k3d::iplugin_factory& factory()
 			k3d::uuid(0x9e43b56a, 0x3c4198c9, 0xfd0d46b4, 0xb18446ae),
 			"PapagayoLipsyncReader",
 			_("Load a papagayo lipsync (.dat) file and output its values given a time source"),
-			"Lipsync",
+			"Animation",
 			k3d::iplugin_factory::EXPERIMENTAL);
 
 		return factory;

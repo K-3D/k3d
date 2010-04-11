@@ -1,3 +1,2 @@
-FILE(GLOB SVG_FILES *.svg)
-INSTALL(FILES ${SVG_FILES} DESTINATION share/k3d/logo)
+INSTALL_GLOB(*.svg share/k3d/logo)
 

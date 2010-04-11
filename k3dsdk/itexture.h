@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "almost_equal.h"
-#include "iunknown.h"
+#include <k3dsdk/difference.h>
+#include <k3dsdk/iunknown.h>
 
 namespace k3d
 {
@@ -41,14 +41,16 @@ protected:
 	virtual ~itexture() {}
 };
 
-/// Specialization of almost_equal that tests itexture pointers for equality
-template<>
-class almost_equal<itexture*>
+/// Specialization of difference::test that tests itexture pointers for equality
+namespace difference
 {
-public:
-	almost_equal(const boost::uint64_t) { } 
-	inline bool_t operator()(itexture* const A, itexture* const B) const { return A == B; }
-};
+
+inline void test(itexture* const A, itexture* const B, accumulator& Result)
+{
+	Result.exact(A == B);
+}
+
+} // namespace difference
 
 } // namespace k3d
 

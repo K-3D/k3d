@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iplugin_factory.h"
-#include "uuid.h"
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/uuid.h>
 
 #include <string>
 

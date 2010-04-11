@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh.h"
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {
@@ -68,8 +68,8 @@ public:
 		const mesh::doubles_t& Floats,
 		const mesh::indices_t& Operands,
 		const mesh::table_t& ConstantAttributes,
-		const mesh::table_t& UniformAttributes,
-		const mesh::table_t& VaryingAttributes,
+		const mesh::table_t& SurfaceAttributes,
+		const mesh::table_t& ParameterAttributes,
 		const mesh::table_t& VertexAttributes
 		);
 
@@ -87,8 +87,8 @@ public:
 	const mesh::doubles_t& floats;
 	const mesh::indices_t& operands;
 	const mesh::table_t& constant_attributes;
-	const mesh::table_t& uniform_attributes;
-	const mesh::table_t& varying_attributes;
+	const mesh::table_t& surface_attributes;
+	const mesh::table_t& parameter_attributes;
 	const mesh::table_t& vertex_attributes;
 };
 
@@ -111,8 +111,8 @@ public:
 		mesh::doubles_t& Floats,
 		mesh::indices_t& Operands,
 		mesh::table_t& ConstantAttributes,
-		mesh::table_t& UniformAttributes,
-		mesh::table_t& VaryingAttributes,
+		mesh::table_t& SurfaceAttributes,
+		mesh::table_t& ParameterAttributes,
 		mesh::table_t& VertexAttributes
 		);
 
@@ -130,8 +130,8 @@ public:
 	mesh::doubles_t& floats;
 	mesh::indices_t& operands;
 	mesh::table_t& constant_attributes;
-	mesh::table_t& uniform_attributes;
-	mesh::table_t& varying_attributes;
+	mesh::table_t& surface_attributes;
+	mesh::table_t& parameter_attributes;
 	mesh::table_t& vertex_attributes;
 };
 

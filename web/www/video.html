@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>K-3D</title>
+		<link rel="icon" type="image/png" href="k3d.png" />
+		<link rel="stylesheet" type="text/css" href="k3d.css" />
+	</head>
+
+	<body>
+<%include file="navigation.html"/>
+
+		<div id="main">
+				<div>
+					<div id="videos">
+						<ul id="thumbnails">
+						</ul>
+					</div>
+
+					<div id="player">
+						<div id="video_metadata">
+							<h4 id="video_name"></h4>
+							<p id="video_description"></p>
+						</div>
+						<div id="video_content"></div>
+					</div>
+				</div>
+
+		</div>
+
+		<script type="text/javascript">
+			var videos = [
+				{id:"Jz-vUn0ajk8",name:"K-3D Mug Tutorial",description:"A simple introduction to K-3D modeling."},
+				{id:"0o99IJIQZmM",name:"K-3D Subdivision Surface Introduction",description:"Demonstrates realtime editing of subdivision surfaces."}
+				];
+
+			for(i in videos)
+			{
+				video = videos[i];
+				thumbnail = new Image();
+				thumbnail.className = "thumbnail";
+				thumbnail.video = video;
+				thumbnail.src = "http://img.youtube.com/vi/" + video.id + "/default.jpg";
+				thumbnail.onclick=function() { show_video(this.video); };
+				document.getElementById("thumbnails").appendChild(thumbnail);
+			}
+
+			show_video(videos[0]);
+
+			function show_video(video)
+			{
+				document.getElementById("video_name").innerHTML = video.name;
+				document.getElementById("video_description").innerHTML = video.description;
+				document.getElementById("video_content").innerHTML = "<object width='750' height='440'><param name='movie' value='http://www.youtube-nocookie.com/v/" + video.id + "&hl=en_US&fs=1&rel=0&hd=1&showinfo=0'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='http://www.youtube-nocookie.com/v/" + video.id + "&hl=en_US&fs=1&rel=0&hd=1&showinfo=0' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='750' height='440'></embed></object>";
+			}
+		</script>
+
+		<script type="text/javascript" src="http://www.google-analytics.com/ga.js"></script>
+		<script type="text/javascript">
+			try { var pageTracker = _gat._getTracker("UA-3773195-1"); pageTracker._trackPageview(); } catch(err) { }
+		</script>
+	</body>
+</html>
+

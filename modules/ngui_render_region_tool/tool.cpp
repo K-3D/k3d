@@ -39,11 +39,12 @@
 #include <k3dsdk/ngui/keyboard.h>
 #include <k3dsdk/ngui/navigation_input_model.h>
 #include <k3dsdk/ngui/render.h>
-#include <k3dsdk/ngui/rubber_band.h>
+#include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/tool.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
+#include <k3dsdk/rectangle.h>
 #include <k3dsdk/state_change_set.h>
 
 #include <boost/assign/list_of.hpp>
@@ -67,7 +68,6 @@ struct implementation
 public:
 	implementation(document_state& DocumentState) :
 		m_document_state(DocumentState),
-		m_rubber_band(k3d::color(0, 0, 0.8)),
 		m_navigation_model(DocumentState)
 	{
 		m_input_model.connect_lbutton_double_click(sigc::mem_fun(*this, &implementation::on_lbutton_double_click));
@@ -131,30 +131,47 @@ public:
 
 	void on_lbutton_start_drag(viewport::control& Viewport, const GdkEventMotion& Event)
 	{
-		m_rubber_band.box = k3d::rectangle(Event.x, Event.x, Event.y, Event.y);
-		m_rubber_band.draw(Viewport);
+		if(k3d::inode* const rubber_band = k3d::ngui::selection::state(m_document_state.document()).rubber_band())
+		{
+			k3d::property::set_internal_value(*rubber_band, "camera", dynamic_cast<k3d::inode*>(Viewport.camera()));
+			k3d::property::set_internal_value(*rubber_band, "color", k3d::color(0, 0, 1));
+			k3d::property::set_internal_value(*rubber_band, "opacity", 0.1);
+			k3d::property::set_internal_value(*rubber_band, "border_color", k3d::color(0, 0, 1));
+			k3d::property::set_internal_value(*rubber_band, "border_opacity", 0.5);
+			k3d::property::set_internal_value(*rubber_band, "rectangle", k3d::rectangle(Event.x, Event.x, Viewport.get_height() - Event.y, Viewport.get_height() - Event.y));
+		}
 
 		m_timer.restart();
 	}
 
 	void on_lbutton_drag(viewport::control& Viewport, const GdkEventMotion& Event)
 	{
-		m_rubber_band.draw(Viewport);
-		m_rubber_band.box.right = Event.x;
-		m_rubber_band.box.bottom = Event.y;
-		m_rubber_band.draw(Viewport);
+		if(k3d::inode* const rubber_band = k3d::ngui::selection::state(m_document_state.document()).rubber_band())
+		{
+			k3d::rectangle new_rectangle = k3d::property::pipeline_value<k3d::rectangle>(*rubber_band, "rectangle");
+			new_rectangle.x2 = Event.x;
+			new_rectangle.y2 = Viewport.get_height() - Event.y;
+			k3d::property::set_internal_value(*rubber_band, "rectangle", new_rectangle);
+		}
 	}
 
 	void on_lbutton_end_drag(viewport::control& Viewport, const GdkEventButton& Event)
 	{
-		m_rubber_band.draw(Viewport);
+		k3d::rectangle selection_rectangle;
+		if(k3d::inode* const rubber_band = k3d::ngui::selection::state(m_document_state.document()).rubber_band())
+		{
+			selection_rectangle = k3d::property::pipeline_value<k3d::rectangle>(*rubber_band, "rectangle");
+			selection_rectangle.y1 = Viewport.get_height() - selection_rectangle.y1;
+			selection_rectangle.y2 = Viewport.get_height() - selection_rectangle.y2;
+			k3d::property::set_internal_value(*rubber_band, "camera", static_cast<k3d::inode*>(0));
+		}
 
 		k3d::icrop_window* const crop_window = dynamic_cast<k3d::icrop_window*>(Viewport.camera());
 		return_if_fail(crop_window);
 
-		const k3d::rectangle box = k3d::normalize(m_rubber_band.box);
-		const k3d::point2 top_left = widget_to_ndc(Viewport, k3d::point2(box.left, box.top));
-		const k3d::point2 bottom_right = widget_to_ndc(Viewport, k3d::point2(box.right, box.bottom));
+		const k3d::rectangle box = k3d::rectangle::normalize(selection_rectangle);
+		const k3d::point2 top_left = widget_to_ndc(Viewport, k3d::point2(box.x1, box.y1));
+		const k3d::point2 bottom_right = widget_to_ndc(Viewport, k3d::point2(box.x2, box.y2));
 
 		k3d::record_state_change_set change_set(m_document_state.document(), _("Set Camera Crop Window"), K3D_CHANGE_SET_CONTEXT);
 
@@ -176,8 +193,6 @@ public:
 
 	/// Stores the owning document
 	document_state& m_document_state;
-	/// Draws a rubber-band selection into the viewport
-	rubber_band m_rubber_band;
 	/// Provides interactive navigation behavior
 	navigation_input_model m_navigation_model;
 	/// Dispatches incoming user input events
@@ -222,7 +237,7 @@ public:
 			"NGUIRenderRegionTool",
 			_("Provides interactive controls for cropped rendering."),
 			"NGUI Tool",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "tool"));
 
 		return factory;

@@ -21,14 +21,14 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iapplication_plugin_factory.h"
-#include "iplugin_factory.h"
-#include "iscript_engine.h"
-#include "mime_types.h"
-#include "plugins.h"
-#include "result.h"
-#include "scripting.h"
-#include "uuid.h"
+#include <k3dsdk/iapplication_plugin_factory.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iscript_engine.h>
+#include <k3dsdk/mime_types.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/scripting.h>
+#include <k3dsdk/uuid.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -45,7 +45,7 @@ namespace detail
 {
 
 /// Executes a script using the given plugin factory to create the script engine
-bool execute_script(const code& Script, const string_t& ScriptName, iscript_engine::context_t& Context, const language& Language)
+bool execute_script(const code& Script, const string_t& ScriptName, iscript_engine::context& Context, const language& Language)
 {
 	return_val_if_fail(ScriptName.size(), false);
 	return_val_if_fail(Language.factory(), false);
@@ -156,7 +156,7 @@ iplugin_factory* language::factory() const
 ///////////////////////////////////////////////////////////////////////////////
 // execute
 
-bool execute(const code& Script, const string_t& ScriptName, iscript_engine::context_t& Context, const language& Language)
+bool execute(const code& Script, const string_t& ScriptName, iscript_engine::context& Context, const language& Language)
 {
 	return detail::execute_script(Script, ScriptName, Context, Language);
 }
@@ -164,7 +164,7 @@ bool execute(const code& Script, const string_t& ScriptName, iscript_engine::con
 ///////////////////////////////////////////////////////////////////////////////
 // execute
 
-void execute(const code& Script, const string_t& ScriptName, iscript_engine::context_t& Context, bool& Recognized, bool& Executed)
+void execute(const code& Script, const string_t& ScriptName, iscript_engine::context& Context, bool& Recognized, bool& Executed)
 {
 	// Starting state ...
 	Recognized = false;

@@ -84,7 +84,7 @@ public:
 				k3d::uuid(0xc030994f, 0x97ed4165, 0x9ac0b7f0, 0xa777abbc),
 				"CenterPoints",
 				_("Centers mesh points around the origin"),
-				"Mesh",
+				"Deformation",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

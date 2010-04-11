@@ -25,7 +25,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "uuid.h"
+#include <k3dsdk/uuid.h>
 
 namespace k3d
 {
@@ -87,8 +87,7 @@ inline const uuid RenderManVolumeShader() { return uuid(0xfd07a255, 0x9bb84841, 
 inline const uuid Position() { return uuid(0xe2edd795, 0x08f9416a, 0x84139876, 0x9c25a60a); }
 inline const uuid Orientation() { return uuid(0xcf562348, 0x02624035, 0xae649a84, 0xf42e0b69); }
 inline const uuid Scale() { return uuid(0x542de0d6, 0xe1e94e4a, 0x883eb23c, 0x3612fb8a); }
-inline const uuid K3DScriptEngine() { return uuid(0x6598ab84, 0xfa0f48f2, 0xbc690f11, 0xe686e11b); }
-inline const uuid FrozenTransformation() { return uuid(0x6ea85710, 0x90da4d35, 0xacec30ee, 0xa6aacb9d); }
+inline const uuid FrozenMatrix() { return uuid(0x6ea85710, 0x90da4d35, 0xacec30ee, 0xa6aacb9d); }
 inline const uuid Camera() { return uuid(0x45ce1872, 0xaf184b6d, 0xb391e136, 0x0dcfe8b5); }
 inline const uuid DocumentExporter() { return uuid(0x0cbc9131, 0x172541b2, 0xb424afab, 0x25143d55); }
 inline const uuid DocumentImporter() { return uuid(0xf02e8dac, 0xa57d4d76, 0xa6170c3a, 0x9bf09d3b); }

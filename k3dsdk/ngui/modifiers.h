@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <string>
 #include <vector>
 
@@ -33,8 +33,8 @@ namespace k3d { class inode; }
 namespace k3d { class imesh_sink; }
 namespace k3d { class imesh_source; }
 namespace k3d { class iplugin_factory; }
-namespace k3d { class itransform_sink; }
-namespace k3d { class itransform_source; }
+namespace k3d { class imatrix_sink; }
+namespace k3d { class imatrix_source; }
 namespace k3d { class uuid; }
 
 namespace k3d
@@ -80,7 +80,7 @@ struct transform_modifier
 	{
 	}
 
-	transform_modifier(k3d::inode& Object, k3d::itransform_sink& Sink, k3d::itransform_source& Source) :
+	transform_modifier(k3d::inode& Object, k3d::imatrix_sink& Sink, k3d::imatrix_source& Source) :
 		node(&Object),
 		sink(&Sink),
 		source(&Source)
@@ -98,8 +98,8 @@ struct transform_modifier
 	}
 
 	k3d::inode* node;
-	k3d::itransform_sink* sink;
-	k3d::itransform_source* source;
+	k3d::imatrix_sink* sink;
+	k3d::imatrix_source* source;
 };
 
 struct mesh_modifier

@@ -80,12 +80,12 @@ public:
       edges_t edges;
 
       const k3d::uint_t edge_begin = 0;
-      const k3d::uint_t edge_end = edge_begin + polyhedron->edge_points.size();
+      const k3d::uint_t edge_end = edge_begin + polyhedron->clockwise_edges.size();
       for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
       {
         edges.insert(std::make_pair(
-          std::min(polyhedron->edge_points[edge], polyhedron->edge_points[polyhedron->clockwise_edges[edge]]),
-          std::max(polyhedron->edge_points[edge], polyhedron->edge_points[polyhedron->clockwise_edges[edge]])));
+          std::min(polyhedron->vertex_points[edge], polyhedron->vertex_points[polyhedron->clockwise_edges[edge]]),
+          std::max(polyhedron->vertex_points[edge], polyhedron->vertex_points[polyhedron->clockwise_edges[edge]])));
       }
 
       // Setup arrays to build a new blobby ...

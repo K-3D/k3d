@@ -1,0 +1,43 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Errors creating VirtualOpenGLSDSPainter at startup with advanced painters disabled
+desc: |-
+  We get harmless-but-annoying errors loading the VirtualOpenGLSDSFacePainter plugin at startup:
+  
+  ERROR: /home/jared/k3d/modules/virtual_opengl_painters/sds_point_painter.cpp line 73: assertion
+  
+  delegate' failed
+  ERROR: Error creating document plugin: VirtualOpenGLSDSPointPainter
+  ERROR: /home/jared/k3d/modules/virtual_opengl_painters/sds_edge_painter.cpp line 73: assertion `delegate' failed
+  ERROR: Error creating document plugin: VirtualOpenGLSDSEdgePainter
+  ERROR: /home/jared/k3d/modules/virtual_opengl_painters/sds_face_painter.cpp line 73: assertion `delegate' failed
+  ERROR: Error creating document plugin: VirtualOpenGLSDSFacePainter
+  
+  ... this is because the UI layer unconditionally loads the virtual SDS painters at startup, but all the
+  SDS painters are in the advanced painter module, which is off by default.
+  
+  We need to: move the SDS painters out of the advanced module; turn the advanced module on by default; don't create
+  SDS painters by default; best - figure-out a way to avoid creating any painters until they're needed.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-02-03 02:04:10.510360 Z
+references: []
+
+id: 9b2e091f7e3b9e36ff649b48155458080d7da913
+log_events: 
+- - 2010-02-03 02:04:11.830300 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-02-06 05:16:24.063715 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - edited title, description
+  - ""
+- - 2010-02-14 01:34:32.062239 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - In the short-term, we've disabled all of the experimental painters and enabled the SDS painters, so the advanced painter module can be enabled by default.
+claimer: 

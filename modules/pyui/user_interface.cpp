@@ -24,12 +24,12 @@
 #include <Python.h>
 
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/ievent_loop.h>
+#include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
-
 #include <k3dsdk/python/object_model_python.h>
+#include <k3dsdk/result.h>
 
 #include <iostream>
 
@@ -52,12 +52,12 @@ public:
 	{
 	}
 
-	const arguments_t parse_startup_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
+	const arguments_t parse_startup_arguments(const arguments_t& Arguments, k3d::bool_t& Quit, k3d::bool_t& Error)
 	{
 		return Arguments;
 	}
 
-	const arguments_t parse_runtime_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
+	const arguments_t parse_runtime_arguments(const arguments_t& Arguments, k3d::bool_t& Quit, k3d::bool_t& Error)
 	{
 		return Arguments;
 	}
@@ -98,7 +98,7 @@ public:
 
 	void stop_event_loop()
 	{
-		k3d::log() << debug << k3d_file_reference << std::endl;
+		assert_not_implemented();
 	}
 
 	void open_uri(const k3d::string_t& URI)
@@ -107,35 +107,35 @@ public:
 
 	void message(const k3d::string_t& Message)
 	{
-		std::cout << "message: " << Message << std::endl;
+		std::cout << "MESSAGE: " << Message << std::endl;
 	}
 
 	void warning_message(const k3d::string_t& Message)
 	{
-		std::cout << "warning: " << Message << std::endl;
+		std::cout << "WARNING: " << Message << std::endl;
 	}
 
 	void error_message(const k3d::string_t& Message)
 	{
-		std::cout << "error: " << Message << std::endl;
+		std::cout << "ERROR: " << Message << std::endl;
 	}
 
-	unsigned int query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
+	k3d::uint_t query_message(const k3d::string_t& Message, const k3d::uint_t DefaultOption, const std::vector<k3d::string_t>& Options)
 	{
 		return 0;
 	}
 
-	bool tutorial_message(const k3d::string_t& Message)
+	void nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
+	{
+		std::cout << "MESSAGE: " << Message.utf8_str() << " " << SecondaryMessage.utf8_str() << std::endl;
+	}
+
+	k3d::bool_t get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
 	{
 		return false;
 	}
 
-	bool get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)
-	{
-		return false;
-	}
-
-	bool show(iunknown& Object)
+	k3d::bool_t show(iunknown& Object)
 	{
 		return false;
 	}
@@ -144,7 +144,7 @@ public:
 	{
 	}
 
-	sigc::connection get_timer(const double FrameRate, sigc::slot<void> Slot)
+	sigc::connection get_timer(const k3d::double_t FrameRate, sigc::slot<void> Slot)
 	{
 		return sigc::connection();
 	}

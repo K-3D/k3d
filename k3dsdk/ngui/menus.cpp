@@ -21,9 +21,9 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "icons.h"
-#include "menus.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/menus.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/iplugin_factory.h>

@@ -24,7 +24,7 @@
 		\author Ashish Myles (marcianx@gmail.com)
 */
 
-#include "mesh.h"
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {
@@ -44,8 +44,8 @@ public:
 		const mesh::indices_t& PatchPoints,
 		const mesh::weights_t& PatchPointWeights,
 		const mesh::table_t& ConstantAttributes,
-		const mesh::table_t& UniformAttributes,
-		const mesh::table_t& VaryingAttributes,
+		const mesh::table_t& PatchAttributes,
+		const mesh::table_t& ParameterAttributes,
 		const mesh::table_t& VertexAttributes
 		);
 
@@ -56,8 +56,8 @@ public:
 	const mesh::indices_t& patch_points;
 	const mesh::weights_t& patch_point_weights;
 	const mesh::table_t& constant_attributes;
-	const mesh::table_t& uniform_attributes;
-	const mesh::table_t& varying_attributes;
+	const mesh::table_t& patch_attributes;
+	const mesh::table_t& parameter_attributes;
 	const mesh::table_t& vertex_attributes;
 };
 
@@ -73,8 +73,8 @@ public:
 		mesh::indices_t& PatchPoints,
 		mesh::weights_t& PatchPointWeights,
 		mesh::table_t& ConstantAttributes,
-		mesh::table_t& UniformAttributes,
-		mesh::table_t& VaryingAttributes,
+		mesh::table_t& PatchAttributes,
+		mesh::table_t& ParameterAttributes,
 		mesh::table_t& VertexAttributes
 		);
 
@@ -85,8 +85,8 @@ public:
 	mesh::indices_t& patch_points;
 	mesh::weights_t& patch_point_weights;
 	mesh::table_t& constant_attributes;
-	mesh::table_t& uniform_attributes;
-	mesh::table_t& varying_attributes;
+	mesh::table_t& patch_attributes;
+	mesh::table_t& parameter_attributes;
 	mesh::table_t& vertex_attributes;
 };
 

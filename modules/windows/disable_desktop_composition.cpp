@@ -28,6 +28,8 @@
 #include <k3dsdk/types.h>
 #include <k3dsdk/win32.h>
 
+#include <boost/assign/list_of.hpp>
+
 #include <iostream>
 
 namespace module
@@ -66,16 +68,14 @@ public:
 	
 	static k3d::iplugin_factory& get_factory()
 		{
-			k3d::iplugin_factory::metadata_t metadata;
-			metadata["k3d:application-start"] = "";
 			static k3d::application_plugin_factory<disable_desktop_composition,
 				k3d::interface_list<k3d::iunknown> > factory(
 					k3d::uuid(0xecd15ac7, 0x4abf42ca, 0x9ec918a4, 0xbdf4b9de),
-					"DisableDesktopComposition",
+					"WindowsDisableDesktopComposition",
 					_("Disables Desktop Composition on Vista"),
 					"Desktop",
-					k3d::iplugin_factory::EXPERIMENTAL,
-					metadata);
+					k3d::iplugin_factory::STABLE,
+					boost::assign::map_list_of("ngui:application-start", "true"));
 
 			return factory;
 		}

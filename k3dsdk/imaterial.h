@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "almost_equal.h"
-#include "iunknown.h"
+#include <k3dsdk/difference.h>
+#include <k3dsdk/iunknown.h>
 
 namespace k3d
 {
@@ -41,14 +41,16 @@ protected:
 	virtual ~imaterial() {}
 };
 
-/// Specialization of almost_equal that tests imaterial pointers for equality
-template<>
-class almost_equal<imaterial*>
+/// Specialization of difference::test that tests imaterial pointers for equality
+namespace difference
 {
-public:
-	almost_equal(const boost::uint64_t) { } 
-	inline bool_t operator()(imaterial* const A, imaterial* const B) const { return A == B; }
-};
+
+inline void test(imaterial* const A, imaterial* const B, accumulator& Result)
+{
+	Result.exact(A == B);
+}
+
+} // namespace difference
 
 } // namespace k3d
 

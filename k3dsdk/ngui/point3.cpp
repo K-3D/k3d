@@ -21,9 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "point3.h"
-#include "spin_button.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/point3.h>
+#include <k3dsdk/ngui/spin_button.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/iproperty.h>

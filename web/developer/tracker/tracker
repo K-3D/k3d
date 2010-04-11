@@ -1,0 +1,59 @@
+#!/usr/bin/python
+
+import glob
+from mako.template import Template
+from mako.lookup import TemplateLookup
+import optparse
+import sys
+import yaml
+
+parser = optparse.OptionParser()
+parser.add_option("--project", help="Ditz project directory containing project.yaml.", dest="project_directory", default=".")
+parser.add_option("--templates", help="Directory containing HTML template files.", dest="template_directory", default=".")
+parser.add_option("--output", help="HTML output directory.", dest="output_directory", default=".")
+parser.add_option("--html-index", help="HTML index filename.", dest="html_index", default="index.html")
+(options, args) = parser.parse_args()
+
+def generic_constructor(loader, node):
+    return loader.construct_mapping(node)
+
+yaml.add_constructor("!ditz.rubyforge.org,2008-03-06/project", generic_constructor)
+yaml.add_constructor("!ditz.rubyforge.org,2008-03-06/component", generic_constructor)
+yaml.add_constructor("!ditz.rubyforge.org,2008-03-06/release", generic_constructor)
+yaml.add_constructor("!ditz.rubyforge.org,2008-03-06/issue", generic_constructor)
+
+project = yaml.load(file(options.project_directory + "/project.yaml", "r"))
+project["filename"] = options.html_index
+
+for release in project["releases"]:
+	release["filename"] = "release-" + release["name"] + ".html"
+
+issues = []
+for issue in glob.glob(options.project_directory + "/issue-*.yaml"):
+	issue = yaml.load(file(issue, "r"))
+	issue["filename"] = "issue-" + issue["id"] + ".html"
+	issues.append(issue)
+	
+
+lookup = TemplateLookup(directories=[options.template_directory])
+project_template = Template(filename="project.html", output_encoding='utf-8', lookup=lookup)
+file(options.output_directory + "/" + options.html_index, "w").write(project_template.render(project=project, issues=issues))
+
+release_template = Template(filename="release.html", output_encoding='utf-8', lookup=lookup)
+for release in project["releases"]:
+	release_issues = []
+	for issue in issues:
+		if issue["release"] == release["name"]:
+			release_issues.append(issue)
+
+	file(options.output_directory + "/" + release["filename"], "w").write(release_template.render(project=project, release=release, issues=release_issues))
+
+issue_template = Template(filename="issue.html", output_encoding='utf-8', lookup=lookup)
+for issue in issues:
+	issue_release = None 
+	for release in project["releases"]:
+		if issue["release"] == release["name"]:
+			issue_release = release
+
+	file(options.output_directory + "/" + issue["filename"], "w").write(issue_template.render(project=project, release=issue_release, issue=issue))
+

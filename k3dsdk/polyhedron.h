@@ -2,7 +2,7 @@
 #define K3DSDK_POLYHEDRON_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -20,12 +20,12 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file Declares structures to add extra "convenience" data to a mesh
+/** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "mesh.h"
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {
@@ -47,40 +47,40 @@ class const_primitive
 {
 public:
 	const_primitive(
-		const mesh::indices_t& ShellFirstFaces,
-		const mesh::counts_t& ShellFaceCounts,
 		const typed_array<int32_t>& ShellTypes,
+		const mesh::indices_t& FaceShells,
 		const mesh::indices_t& FaceFirstLoops,
 		const mesh::counts_t& FaceLoopCounts,
 		const mesh::selection_t& FaceSelections,
 		const mesh::materials_t& FaceMaterials,
 		const mesh::indices_t& LoopFirstEdges,
-		const mesh::indices_t& EdgePoints,
 		const mesh::indices_t& ClockwiseEdges,
 		const mesh::selection_t& EdgeSelections,
+		const mesh::indices_t& VertexPoints,
+		const mesh::selection_t& VertexSelections,
 		const mesh::table_t& ConstantAttributes,
-		const mesh::table_t& UniformAttributes,
-		const mesh::table_t& FaceVaryingAttributes,
+		const mesh::table_t& FaceAttributes,
+		const mesh::table_t& EdgeAttributes,
 		const mesh::table_t& VertexAttributes
 		);
 
 	/// Implicit conversion
 	const_primitive(const primitive& Primitive);
 
-	const mesh::indices_t& shell_first_faces;
-	const mesh::counts_t& shell_face_counts;
 	const typed_array<int32_t>& shell_types;
+	const mesh::indices_t& face_shells;
 	const mesh::indices_t& face_first_loops;
 	const mesh::counts_t& face_loop_counts;
 	const mesh::selection_t& face_selections;
 	const mesh::materials_t& face_materials;
 	const mesh::indices_t& loop_first_edges;
-	const mesh::indices_t& edge_points;
 	const mesh::indices_t& clockwise_edges;
 	const mesh::selection_t& edge_selections;
+	const mesh::indices_t& vertex_points;
+	const mesh::selection_t& vertex_selections;
 	const mesh::table_t& constant_attributes;
-	const mesh::table_t& uniform_attributes;
-	const mesh::table_t& face_varying_attributes;
+	const mesh::table_t& face_attributes;
+	const mesh::table_t& edge_attributes;
 	const mesh::table_t& vertex_attributes;
 };
 
@@ -89,37 +89,37 @@ class primitive
 {
 public:
 	primitive(
-		mesh::indices_t& ShellFirstFaces,
-		mesh::counts_t& ShellFaceCounts,
 		typed_array<int32_t>& ShellTypes,
+		mesh::indices_t& FaceShells,
 		mesh::indices_t& FaceFirstLoops,
 		mesh::counts_t& FaceLoopCounts,
 		mesh::selection_t& FaceSelections,
 		mesh::materials_t& FaceMaterials,
 		mesh::indices_t& LoopFirstEdges,
-		mesh::indices_t& EdgePoints,
 		mesh::indices_t& ClockwiseEdges,
 		mesh::selection_t& EdgeSelections,
+		mesh::indices_t& VertexPoints,
+		mesh::selection_t& VertexSelections,
 		mesh::table_t& ConstantAttributes,
-		mesh::table_t& UniformAttributes,
-		mesh::table_t& FaceVaryingAttributes,
+		mesh::table_t& FaceAttributes,
+		mesh::table_t& EdgeAttributes,
 		mesh::table_t& VertexAttributes
 		);
 
-	mesh::indices_t& shell_first_faces;
-	mesh::counts_t& shell_face_counts;
 	typed_array<int32_t>& shell_types;
+	mesh::indices_t& face_shells;
 	mesh::indices_t& face_first_loops;
 	mesh::counts_t& face_loop_counts;
 	mesh::selection_t& face_selections;
 	mesh::materials_t& face_materials;
 	mesh::indices_t& loop_first_edges;
-	mesh::indices_t& edge_points;
 	mesh::indices_t& clockwise_edges;
 	mesh::selection_t& edge_selections;
+	mesh::indices_t& vertex_points;
+	mesh::selection_t& vertex_selections;
 	mesh::table_t& constant_attributes;
-	mesh::table_t& uniform_attributes;
-	mesh::table_t& face_varying_attributes;
+	mesh::table_t& face_attributes;
+	mesh::table_t& edge_attributes;
 	mesh::table_t& vertex_attributes;
 };
 
@@ -139,17 +139,6 @@ primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts
 /// The caller is responsible for the lifetime of the returned object.
 primitive* create(mesh& Mesh, const mesh::points_t& Vertices, const mesh::counts_t& VertexCounts, const mesh::indices_t& VertexIndices, const mesh::texture_coordinates_t& TextureCoordinates, imaterial* const Material);
 
-/// Creates a new polyhedron mesh primitive whose faces form a topological "grid" with the given number of rows and columns.
-/// The geometry (vertex coordinates) of the grid is undefined, and must be set by the caller after create_grid() returns.
-/// The caller is responsible for the lifetime of the returned object.
-primitive* create_grid(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
-/// Creates a new polyhedron mesh primitive whose faces form a topological "cylinder" with the given number of rows and columns,
-/// and the first and last columns stitched-together.  The geometry (vertex coordinates) of the cylinder is undefined, and must
-/// be set by the caller after create_grid() returns.  Note that many surfaces-of-revolution can be represented as topological
-/// cylinders, including disks, cones, cylinders, hyperboloids, paraboloids, and spheres.  The caller is responsible for the
-/// lifetime of the returned object.
-primitive* create_cylinder(mesh& Mesh, const uint_t Rows, const uint_t Columns, imaterial* const Material);
-
 /// Tests the given mesh primitive to see if it is a valid polyhedron, returning references to its member arrays, or NULL.
 /// The caller is responsible for the lifetime of the returned object.
 const_primitive* validate(const mesh& Mesh, const mesh::primitive& GenericPrimitive);
@@ -160,10 +149,31 @@ primitive* validate(const mesh& Mesh, mesh::primitive& GenericPrimitive);
 /// The caller is responsible for the lifetime of the returned object.
 primitive* validate(const mesh& Mesh, pipeline_data<mesh::primitive>& GenericPrimitive);
 
-/// Adds a face to an existing primitive.
-void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, imaterial* const Material);
-/// Adds a face with holes to an existing primitive.
-void add_face(mesh& Mesh, primitive& Polyhedron, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material);
+/// Adds a triangle to an existing polyhedron shell.  Preconditions: the polyhedron must already contain at least one shell.
+void add_triangle(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t V1, const uint_t V2, const uint_t V3, imaterial* const Material);
+/// Adds a quadrilateral to an existing polyhedron shell.  Preconditions: the polyhedron must already contain at least one shell.
+void add_quadrilateral(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t V1, const uint_t V2, const uint_t V3, const uint_t V4, imaterial* const Material);
+/// Adds a face to an existing polyhedron shell.  Preconditions: the polyhedron must already contain at least one shell.
+void add_face(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const mesh::points_t& Vertices, imaterial* const Material);
+/// Adds a face with holes to an existing polyhedron shell.  Preconditions: the polyhedron must already contain at least one shell.
+void add_face(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const mesh::points_t& Vertices, const std::vector<mesh::points_t>& Holes, imaterial* const Material);
+/// Adds a set of points and faces that form a topological "grid" with the given number of rows and columns to an existing polyhedron.
+/// The geometry (vertex coordinates) of the grid is undefined, and must be set by the caller after add_grid() returns.
+/// Preconditions: the polyhedron must contain at last one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
+/// Rows x Columns x 4 new half edges, and the mesh contains (Rows + 1) x (Columns + 1) new points.
+void add_grid(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t Rows, const uint_t Columns, imaterial* const Material);
+/// Adds a set of points and faces that form a topological "cylinder" with the given number of rows and columns to an existing polyhedron.
+/// The geometry (vertex coordinates) of the cylinder is undefined, and must be set by the caller after add_cylinder() returns.
+/// Note that many surfaces-of-revolution can be represented as topological cylinders, including disks, cones, cylinders,
+/// hyperboloids, paraboloids, and spheres.
+/// Preconditions: the polyhedron must contain at least one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
+/// Rows x Columns x 4 new half edges, and the mesh contains (Rows + 1) x Columns new points.
+void add_cylinder(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t Rows, const uint_t Columns, imaterial* const Material);
+/// Adds a set of points and faces that form a topological "torus" with the given number of rows and columns to an existing polyhedron.
+/// The geometry (vertex coordinates) of the torus is undefined, and must be set by the caller after add_torus() returns.
+/// Preconditions: the polyhedron must contain at least one shell.  Postconditions: the polyhedron contains Rows x Columns new faces and
+/// Rows x Columns x 4 new half edges, and the mesh contains Rows x Columns new points.
+void add_torus(mesh& Mesh, primitive& Polyhedron, const uint_t Shell, const uint_t Rows, const uint_t Columns, imaterial* const Material);
 
 /// Returns true iff every face in the given polyhedron is a triangle.
 bool_t is_triangles(const const_primitive& Polyhedron);
@@ -174,33 +184,58 @@ bool_t is_solid(const const_primitive& Polyhedron);
 should consider whether SDS should be set on a per-shell basis? */
 bool_t is_sds(const const_primitive& Polyhedron);
 
+/// Initializes arrays for constant-time lookup of counterclockwise edges.
+void create_counterclockwise_edge_lookup(const const_primitive& Polyhedron, mesh::indices_t& CounterclockwiseEdges);
+
 /// Calculates the center (average) for an edge loop (returns the origin for degenerate cases).
-const point3 center(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
+const point3 center(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
 /// Calculates the normal for an edge loop (returns a zero-length normal for degenerate cases).
-const normal3 normal(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
+const normal3 normal(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, const uint_t EdgeIndex);
+/// Calculates the normal for a triangle (returns a zero-length normal for degenerate cases).
+const normal3 normal(const point3& A, const point3& B, const point3& C);
+/// Initializes arrays for constant-time lookup from faces to normal vectors.
+void create_face_normal_lookup(const mesh& Mesh, const const_primitive& Polyhedron, mesh::normals_t& Normals);
 
 /// Initializes arrays for constant-time lookup from an edge to the adjacent edge (if any)
-void create_edge_adjacency_lookup(const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
+void create_edge_adjacency_lookup(const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, mesh::bools_t& BoundaryEdges, mesh::indices_t& AdjacentEdges);
 
 /// Initializes an array for constant-time lookup from an edge to the face that owns it
-void create_edge_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, mesh::indices_t& EdgeFaces);
+void create_edge_face_lookup(const const_primitive& Polyhedron, mesh::indices_t& EdgeFaces);
+
+/// Initializes an array for constant-time lookup from loops to edge counts
+void create_loop_edge_count_lookup(const const_primitive& Polyhedron, mesh::counts_t& LoopEdgeCounts);
 
 /// Initialize arrays for fast lookup from a vertex to its adjacent faces
-void create_vertex_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces);
+/** \deprecated Use the adjacency-list version of create_point_face_lookup() instead */
+void create_point_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::points_t& Points, mesh::indices_t& PointFirstFaces, mesh::counts_t& PointFaceCounts, mesh::indices_t& PointFaces);
+/// Creates an adjacency list for fast lookup from a vertex to its adjacent faces.
+void create_point_face_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList);
+
+/// Creates an adjacency list for fast lookup from a vertex to its out-edges.
+void create_point_out_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList);
+/// Creates an adjacency list for fast lookup from a vertex to its in-edges.
+void create_point_in_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList);
+/// Creates an adjacency list for fast lookup from a vertex to its incident (in- or out-) edges.
+void create_point_edge_lookup(const mesh& Mesh, const const_primitive& Polyhedron, std::vector<mesh::indices_t>& AdjacencyList);
+
+/// Initialize arrays for fast lookup from a point index to all edges that start from it. If PointEdgeCounts is filled (by create_vertex_valence_lookup) it is used, otherwise it is created
+/** \deprecated Use create_point_out_edge_lookup() instead */
+void create_point_edge_lookup(const mesh::indices_t& VertexPoints, mesh::indices_t& PointEdges, mesh::indices_t& PointFirstEdges, mesh::counts_t& PointEdgeCounts);
 
 /// Initialize Valences array for constant time lookup of vertex valence (number of incoming edges)
 /**
  * \param PointCount Initial guess for the number of points. Valences will be expanded to the correct size if this is too small
- * \param EdgePoints The indices of the edge points
+ * \param VertexPoints The indices of the edge points
  * \param Valences will store the number of edges for each point
  */
-void create_vertex_valence_lookup(const uint_t PointCount, const mesh::indices_t& EdgePoints, mesh::counts_t& Valences);
+/** \deprecated Use create_point_in_edge_lookup() instead */
+void create_point_valence_lookup(const uint_t PointCount, const mesh::indices_t& VertexPoints, mesh::counts_t& Valences);
 
 /// Initialise boundary_faces array for constant time lookup of faces that are on the mesh boundary. BoundaryEdges and AdjacentEdges can be created using create_edge_adjacency_lookup
 void create_boundary_face_lookup(const mesh::indices_t& FaceFirstLoops, const mesh::indices_t& FaceLoopCounts, const mesh::indices_t& LoopFirstEdges, const mesh::indices_t& ClockwiseEdges, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, mesh::bools_t& BoundaryFaces);
 
 /// Adds edges that are collinear and with points of valence 1 for boundary edges or valence 2 otherwise to EdgeList
-void mark_collinear_edges(mesh::indices_t& RedundantEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& EdgePoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold = 1e-8);
+void mark_collinear_edges(mesh::indices_t& RedundantEdges, const mesh::selection_t& EdgeSelection, const mesh::points_t& Points, const mesh::indices_t& VertexPoints, const mesh::indices_t& ClockwiseEdges, const mesh::counts_t& VertexValences, const mesh::bools_t& BoundaryEdges, const mesh::indices_t& AdjacentEdges, const double_t Threshold = 1e-8);
 
 /// Marks edges that are shared by coplanar faces among the selected faces
 void mark_coplanar_edges(const mesh::indices_t& Companions,
@@ -213,6 +248,9 @@ void mark_coplanar_edges(const mesh::indices_t& Companions,
 
 /// Triangulates the input polyhedron, storing the resulting primitive and storing point data in Output
 mesh::primitive* triangulate(const mesh& Input, const const_primitive& Polyhedron, mesh& Output);
+
+/// Removes edges, loops, and faces from a polyhedron, cleaning-up references and attributes.
+void delete_components(const mesh& Mesh, primitive& Polyhedron, const mesh::bools_t& RemovePoints, mesh::bools_t& RemoveEdges, mesh::bools_t& RemoveLoops, mesh::bools_t& RemoveFaces);
 
 } // namespace polyhedron
 

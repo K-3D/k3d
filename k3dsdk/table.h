@@ -20,9 +20,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "almost_equal.h"
-#include "pipeline_data.h"
-#include "types.h"
+#include <k3dsdk/difference.h>
+#include <k3dsdk/pipeline_data.h>
+#include <k3dsdk/types.h>
 
 #include <map>
 #include <vector>
@@ -80,8 +80,8 @@ public:
 	table clone() const;
 	/// Returns an table containing copies of a half-open range of all the original arrays.
 	table clone(const uint_t Begin, const uint_t End) const;
-	/// Returns true iff two tables are equivalent, using the imprecise semantics of almost_equal to compare values.
-	bool_t almost_equal(const table& Other, const uint64_t Threshold) const;
+	/// Returns the difference between two tables, using the imprecise semantics of difference().
+	void difference(const table& Other, difference::accumulator& Result) const;
 
 	typedef std::vector<const table*> table_collection;
 	static table clone_types(const table_collection& AttributeArrays);
@@ -101,25 +101,16 @@ private:
 /// Serialization
 std::ostream& operator<<(std::ostream& Stream, const table& RHS);
 
-/// Specialization of almost_equal that tests table for equality
-template<>
-class almost_equal<table>
+/// Specialization of difference::test for k3d::table
+namespace difference
 {
-	typedef table T;
 
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
+inline void test(const table& A, const table& B, accumulator& Result)
+{
+	A.difference(B, Result);
+}
 
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
+} // namespace difference
 
 } // namespace k3d
 

@@ -17,8 +17,8 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "blobby.h"
-#include "primitive_validation.h"
+#include <k3dsdk/blobby.h>
+#include <k3dsdk/primitive_validation.h>
 
 #include <numeric>
 
@@ -46,8 +46,8 @@ const_primitive::const_primitive(
 	const mesh::doubles_t& Floats,
 	const mesh::indices_t& Operands,
 	const mesh::table_t& ConstantAttributes,
-	const mesh::table_t& UniformAttributes,
-	const mesh::table_t& VaryingAttributes,
+	const mesh::table_t& SurfaceAttributes,
+	const mesh::table_t& ParameterAttributes,
 	const mesh::table_t& VertexAttributes
 		) :
 	first_primitives(FirstPrimitives),
@@ -64,8 +64,8 @@ const_primitive::const_primitive(
 	floats(Floats),
 	operands(Operands),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes),
-	varying_attributes(VaryingAttributes),
+	surface_attributes(SurfaceAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -88,8 +88,8 @@ primitive::primitive(
 	mesh::doubles_t& Floats,
 	mesh::indices_t& Operands,
 	mesh::table_t& ConstantAttributes,
-	mesh::table_t& UniformAttributes,
-	mesh::table_t& VaryingAttributes,
+	mesh::table_t& SurfaceAttributes,
+	mesh::table_t& ParameterAttributes,
 	mesh::table_t& VertexAttributes
 		) :
 	first_primitives(FirstPrimitives),
@@ -106,8 +106,8 @@ primitive::primitive(
 	floats(Floats),
 	operands(Operands),
 	constant_attributes(ConstantAttributes),
-	uniform_attributes(UniformAttributes),
-	varying_attributes(VaryingAttributes),
+	surface_attributes(SurfaceAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -120,11 +120,11 @@ primitive* create(mesh& Mesh)
 	mesh::primitive& generic_primitive = Mesh.primitives.create("blobby");
 
 	primitive* const result = new primitive(
-		generic_primitive.structure["uniform"].create<mesh::indices_t>("first_primitives"),
-		generic_primitive.structure["uniform"].create<mesh::counts_t>("primitive_counts"),
-		generic_primitive.structure["uniform"].create<mesh::indices_t>("first_operators"),
-		generic_primitive.structure["uniform"].create<mesh::counts_t>("operator_counts"),
-		generic_primitive.structure["uniform"].create<mesh::materials_t>("materials"),
+		generic_primitive.structure["surface"].create<mesh::indices_t>("first_primitives"),
+		generic_primitive.structure["surface"].create<mesh::counts_t>("primitive_counts"),
+		generic_primitive.structure["surface"].create<mesh::indices_t>("first_operators"),
+		generic_primitive.structure["surface"].create<mesh::counts_t>("operator_counts"),
+		generic_primitive.structure["surface"].create<mesh::materials_t>("materials"),
 		generic_primitive.structure["vertex"].create<typed_array<int32_t> >("primitives"),
 		generic_primitive.structure["vertex"].create<mesh::indices_t>("primitive_first_floats"),
 		generic_primitive.structure["vertex"].create<mesh::counts_t>("primitive_float_counts"),
@@ -134,8 +134,8 @@ primitive* create(mesh& Mesh)
 		generic_primitive.structure["float"].create<mesh::doubles_t>("floats"),
 		generic_primitive.structure["operand"].create<mesh::indices_t>("operands"),
 		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["uniform"],
-		generic_primitive.attributes["varying"],
+		generic_primitive.attributes["surface"],
+		generic_primitive.attributes["parameter"],
 		generic_primitive.attributes["vertex"]
 		);
 
@@ -154,22 +154,22 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Mesh, Primitive);
 
-		const mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		const mesh::table_t& surface_structure = require_structure(Primitive, "surface");
 		const mesh::table_t& vertex_structure = require_structure(Primitive, "vertex");
 		const mesh::table_t& operator_structure = require_structure(Primitive, "operator");
 		const mesh::table_t& float_structure = require_structure(Primitive, "float");
 		const mesh::table_t& operand_structure = require_structure(Primitive, "operand");
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		const mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
-		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		const mesh::table_t& surface_attributes = require_attributes(Primitive, "surface");
+		const mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		const mesh::indices_t& first_primitives = require_array<mesh::indices_t>(Primitive, uniform_structure, "first_primitives");
-		const mesh::counts_t& primitive_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "primitive_counts");
-		const mesh::indices_t& first_operators = require_array<mesh::indices_t>(Primitive, uniform_structure, "first_operators");
-		const mesh::counts_t& operator_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "operator_counts");
-		const mesh::materials_t& materials = require_array<mesh::materials_t>(Primitive, uniform_structure, "materials");
+		const mesh::indices_t& first_primitives = require_array<mesh::indices_t>(Primitive, surface_structure, "first_primitives");
+		const mesh::counts_t& primitive_counts = require_array<mesh::counts_t>(Primitive, surface_structure, "primitive_counts");
+		const mesh::indices_t& first_operators = require_array<mesh::indices_t>(Primitive, surface_structure, "first_operators");
+		const mesh::counts_t& operator_counts = require_array<mesh::counts_t>(Primitive, surface_structure, "operator_counts");
+		const mesh::materials_t& materials = require_array<mesh::materials_t>(Primitive, surface_structure, "materials");
 		const typed_array<int32_t>& primitives = require_array<typed_array<int32_t> >(Primitive, vertex_structure, "primitives");
 		const mesh::indices_t& primitive_first_floats = require_array<mesh::indices_t>(Primitive, vertex_structure, "primitive_first_floats");
 		const mesh::counts_t& primitive_float_counts = require_array<mesh::counts_t>(Primitive, vertex_structure, "primitive_float_counts");
@@ -181,7 +181,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		/** \todo Validate table lengths here */
 
-		return new const_primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
+		return new const_primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, surface_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -200,22 +200,22 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 	{
 		require_valid_primitive(Mesh, Primitive);
 
-		mesh::table_t& uniform_structure = require_structure(Primitive, "uniform");
+		mesh::table_t& surface_structure = require_structure(Primitive, "surface");
 		mesh::table_t& vertex_structure = require_structure(Primitive, "vertex");
 		mesh::table_t& operator_structure = require_structure(Primitive, "operator");
 		mesh::table_t& float_structure = require_structure(Primitive, "float");
 		mesh::table_t& operand_structure = require_structure(Primitive, "operand");
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
-		mesh::table_t& uniform_attributes = require_attributes(Primitive, "uniform");
-		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		mesh::table_t& surface_attributes = require_attributes(Primitive, "surface");
+		mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
-		mesh::indices_t& first_primitives = require_array<mesh::indices_t>(Primitive, uniform_structure, "first_primitives");
-		mesh::counts_t& primitive_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "primitive_counts");
-		mesh::indices_t& first_operators = require_array<mesh::indices_t>(Primitive, uniform_structure, "first_operators");
-		mesh::counts_t& operator_counts = require_array<mesh::counts_t>(Primitive, uniform_structure, "operator_counts");
-		mesh::materials_t& materials = require_array<mesh::materials_t>(Primitive, uniform_structure, "materials");
+		mesh::indices_t& first_primitives = require_array<mesh::indices_t>(Primitive, surface_structure, "first_primitives");
+		mesh::counts_t& primitive_counts = require_array<mesh::counts_t>(Primitive, surface_structure, "primitive_counts");
+		mesh::indices_t& first_operators = require_array<mesh::indices_t>(Primitive, surface_structure, "first_operators");
+		mesh::counts_t& operator_counts = require_array<mesh::counts_t>(Primitive, surface_structure, "operator_counts");
+		mesh::materials_t& materials = require_array<mesh::materials_t>(Primitive, surface_structure, "materials");
 		typed_array<int32_t>& primitives = require_array<typed_array<int32_t> >(Primitive, vertex_structure, "primitives");
 		mesh::indices_t& primitive_first_floats = require_array<mesh::indices_t>(Primitive, vertex_structure, "primitive_first_floats");
 		mesh::counts_t& primitive_float_counts = require_array<mesh::counts_t>(Primitive, vertex_structure, "primitive_float_counts");
@@ -227,7 +227,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		/** \todo Validate table lengths here */
 
-		return new primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, uniform_attributes, varying_attributes, vertex_attributes);
+		return new primitive(first_primitives, primitive_counts, first_operators, operator_counts, materials, primitives, primitive_first_floats, primitive_float_counts, operators, operator_first_operands, operator_operand_counts, floats, operands, constant_attributes, surface_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{

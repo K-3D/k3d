@@ -107,8 +107,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<spot_light,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 				k3d::uuid(0x5e363371, 0xf8464895, 0x99f0ddf0, 0x4e26ee4a),
 				"YafraySpotLight",
 				_("Yafray Spot Light"),

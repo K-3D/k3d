@@ -24,11 +24,11 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "k3d-i18n-config.h"
-#include "plugins.h"
-#include "scripting.h"
-#include "user_property_changed_signal.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/scripting.h>
+#include <k3dsdk/user_property_changed_signal.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -62,7 +62,7 @@ protected:
 		m_user_property_changed_signal.connect(Slot);
 	}
 
-	bool execute_script(iscript_engine::context_t& Context)
+	bool execute_script(iscript_engine::context& Context)
 	{
 		if(m_executing) // prevent recursion when writing properties in the script (infinite loop!)
 			return true;

@@ -1,7 +1,7 @@
 #ifndef K3DSDK_SERIALIZATION_XML_H
 #define K3DSDK_SERIALIZATION_XML_H
 
-#include "ipersistent.h"
+#include <k3dsdk/ipersistent.h>
 
 namespace k3d
 {

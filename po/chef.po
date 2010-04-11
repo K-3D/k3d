@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: K-3D 0.7\n"
 "Report-Msgid-Bugs-To: k3d-development@lists.sourceforge.net\n"
-"POT-Creation-Date: 2008-09-18 07:34-0600\n"
+"POT-Creation-Date: 2009-08-16 23:29-0600\n"
 "PO-Revision-Date: 2007-04-21 11:20+7\n"
 "Last-Translator: Timothy M. Shead <tshead@k3d.com>\n"
 "Language-Team: Swedish Chef <LL@li.org>\n"
@@ -17,11 +17,12 @@ msgstr ""
 msgid " [changed]"
 msgstr " [chunged]"
 
-msgid " [recording]"
-msgstr " [recurdeeng]"
-
 msgid " [running]"
 msgstr " [roonneeng]"
+
+#, fuzzy
+msgid " mouth value."
+msgstr "Groot felooe-a"
 
 msgid "%"
 msgstr "%"
@@ -30,7 +31,11 @@ msgstr "%"
 msgid "%.2f%%"
 msgstr "%.2f%%"
 
-msgid "%1% Properties"
+msgid "%1%"
+msgstr ""
+
+#, fuzzy
+msgid "%1% \"%2%\" property"
 msgstr "%1% Pruperteees"
 
 msgid "+_X view"
@@ -41,9 +46,6 @@ msgstr "+_Y feeoo"
 
 msgid "+_Z view"
 msgstr "+_Z feeoo"
-
-msgid "-- Enter a message to be recorded --"
-msgstr "-- Inter a messege-a tu be-a recurded --"
 
 msgid "--New %1%"
 msgstr "--Noo %1%"
@@ -87,18 +89,6 @@ msgstr "<span color=\"red\" strikethrough=\"true\">%1%</span><span color=\"red\"
 
 msgid "<span color=\"red\" strikethrough=\"true\">Create %1%</span><span color=\"red\"> (Deprecated)</span>"
 msgstr "<span color=\"red\" strikethrough=\"true\">Creete-a %1%</span><span color=\"red\"> (Depreceted)</span>"
-
-msgid "<span size=\"xx-large\" weight=\"heavy\">Welcome to K-3D Bug Buddy</span>"
-msgstr "<span size=\"xx-large\" weight=\"heavy\">Velcume-a tu K-3D Boog Booddy</span>"
-
-msgid "<span weight=\"bold\">Required</span> - describe what happened in detail:"
-msgstr "<span weight=\"bold\">Reqooured</span> - descreebe-a vhet heppened in deteeel:"
-
-msgid "<span weight=\"bold\">Required</span> - enter a one-line summary of what happened:"
-msgstr "<span weight=\"bold\">Reqooured</span> - inter a oone-a-leene-a soommery ooff vhet heppened:"
-
-msgid "<span weight=\"bold\">Required</span> - enter your contact <span weight=\"bold\">e-mail</span> address:"
-msgstr "<span weight=\"bold\">Reqooured</span> - inter yuoor cuntect <span weight=\"bold\">i-meeel</span> eddress:"
 
 msgid "A RenderMan surface / displacement material"
 msgstr "A RenderMun soorffece-a / deesplecement metereeel"
@@ -156,12 +146,12 @@ msgid "Absolute"
 msgstr "Ebsuloote-a"
 
 #, fuzzy
-msgid "Actions"
-msgstr "Decureshuns"
+msgid "Absorptive color."
+msgstr "Unnuteshun culur"
 
 #, fuzzy
-msgid "Active Tool"
-msgstr "_Kneeffe-a Tuul"
+msgid "Actions"
+msgstr "Decureshuns"
 
 msgid "Add"
 msgstr "Edd"
@@ -231,20 +221,11 @@ msgstr ""
 msgid "All Files"
 msgstr "Ell Feeles"
 
-msgid "All components are deselected"
-msgstr "Ell cumpunents ere-a deselected"
-
-msgid "All components are selected"
-msgstr "Ell cumpunents ere-a selected"
-
 msgid "Allows panel to change depending on active tool"
 msgstr "Elloos punel tu chunge-a dependeeng oon ecteefe-a tuul"
 
 msgid "Along"
 msgstr "Elung"
-
-msgid "Alpha"
-msgstr ""
 
 msgid "Alpha threshold"
 msgstr "Elpha threshuld"
@@ -258,8 +239,13 @@ msgstr "ElterneteErrey2D"
 msgid "AlternateArray3D"
 msgstr "ElterneteErrey3D"
 
-msgid "Ambient Color"
-msgstr "Embeeent Culur"
+#, fuzzy
+msgid "Amount"
+msgstr "Cuoont"
+
+#, fuzzy
+msgid "Amount Texture"
+msgstr "Textoore-a U"
 
 msgid "Amplitude"
 msgstr "Empleetoode-a"
@@ -298,8 +284,20 @@ msgstr "Untee-eleeesing type-a"
 msgid "Append filename extension automatically"
 msgstr "Eppend feeleneme-a ixtenseeun ootumeteecelly"
 
+#, fuzzy
+msgid "Applies a gain function to the texture."
+msgstr "Eppleees a seene-a fooncshun tu its inpoot"
+
+#, fuzzy
+msgid "Applies a gamma function to the texture."
+msgstr "Eppleees a seene-a fooncshun tu its inpoot"
+
 msgid "Applies a linear noise offset to mesh points"
 msgstr "Eppleees a leeneer nueese-a ooffffset tu mesh pueents"
+
+#, fuzzy
+msgid "Applies a selection to a mesh."
+msgstr "Eppleees a seene-a fooncshun tu its inpoot"
 
 msgid "Applies a sine function to its input"
 msgstr "Eppleees a seene-a fooncshun tu its inpoot"
@@ -335,11 +333,14 @@ msgstr "Epply ooffffset oon Y cumpunent"
 msgid "Apply offset on Z component"
 msgstr "Epply ooffffset oon Z cumpunent"
 
-msgid "Aproximates points with a surface given a set of equations."
+msgid "Apply the Kill Edge And Vertex (KEV) Euler operation to the selected edges"
 msgstr ""
 
-msgid "Are you sure?  The only way to get a bug fixed is to report it ..."
-msgstr "Ere-a yuoo soore-a?  Zee oonly vey tu get a boog feexed is tu repurt it ..."
+msgid "Apply the Kill Edge Make Loop (KEML) Euler operation to the selected edges"
+msgstr ""
+
+msgid "Aproximates points with a surface given a set of equations."
+msgstr ""
 
 msgid "Around"
 msgstr "Eruoond"
@@ -347,8 +348,16 @@ msgstr "Eruoond"
 msgid "Array Name"
 msgstr ""
 
+#, fuzzy
+msgid "Array Type"
+msgstr "Pruperty Type-a"
+
 msgid "Array storage class"
 msgstr ""
+
+#, fuzzy
+msgid "Arrow size"
+msgstr "Pueent Seeze-a"
 
 msgid "Aspect Ratio"
 msgstr "Espect Reteeu"
@@ -434,9 +443,6 @@ msgstr "Beckgruoond Culur"
 msgid "Background color"
 msgstr "Beckgruoond culur"
 
-msgid "Base radius"
-msgstr "Bese-a redeeoos"
-
 msgid "Basic angle"
 msgstr "Beseec ungle-a"
 
@@ -444,11 +450,8 @@ msgid "Beam falloff"
 msgstr "Beem felluffff"
 
 msgid ""
-"Below are interactive tutorials and example documents you can\n"
-"use to become familiar with K-3D.\n"
-"\n"
-"If this is the first time you've used the program, we recommend\n"
-"you begin with the \"Getting Started\" tutorial."
+"Below are example documents you can\n"
+"use to become familiar with K-3D."
 msgstr ""
 
 msgid "Bend angle"
@@ -468,12 +471,6 @@ msgstr "Bezeeer coorfes soobdeefisiun noomber"
 
 msgid "Bias"
 msgstr "Beees"
-
-msgid "Bicubic Patch Count"
-msgstr "Beecoobic Petch Cuoont"
-
-msgid "Bilinear patch count"
-msgstr "Beelineer petch cuoont"
 
 msgid "Binding plugin module %1%"
 msgstr "Beending ploogeen mudoole-a %1%"
@@ -505,17 +502,21 @@ msgstr "Beetmep vreeter thet sefes PNG (*.png) feeles"
 msgid "Bitmap writer that saves TIFF (*.tiff) files"
 msgstr "Beetmep vreeter thet sefes TIFF (*.teeffff) feeles"
 
-msgid "Blobby dividend"
-msgstr "Blubby deefidend"
+msgid "Blackbody Gain"
+msgstr ""
 
-msgid "Blobby divisor"
-msgstr "Blubby deefisur"
+msgid "Blackbody Temperature"
+msgstr ""
 
-msgid "Blobby minuend"
-msgstr "Blubby meenooend"
+msgid "Blackbody Temperature Gain, multiplier."
+msgstr ""
 
-msgid "Blobby subtrahend"
-msgstr "Blubby soobtrehend"
+msgid "Blackbody Temperature of the light source in degrees kelvin."
+msgstr ""
+
+#, fuzzy
+msgid "Blue"
+msgstr "Felooe-a"
 
 msgid "Blue threshold"
 msgstr "Blooe-a threshuld"
@@ -528,9 +529,6 @@ msgstr "Buuleun oopereshun (intersecshun, uneeun, deefffference-a, referse-a dee
 
 msgid "Bottom"
 msgstr "Buttum"
-
-msgid "Bottom cap position"
-msgstr "Buttum cep puseeshun"
 
 msgid "Bottom radius"
 msgstr "Buttum redeeoos"
@@ -572,6 +570,10 @@ msgstr "Boolge-a type-a"
 msgid "Bulges mesh points around a point"
 msgstr "Boolges mesh pueents eruoond a pueent"
 
+#, fuzzy
+msgid "Bumpmap"
+msgstr "Beetmep"
+
 msgid "By default the knot gets inserted into the patch in u direction, by checking this box you choose to insert it to v"
 msgstr ""
 
@@ -601,6 +603,9 @@ msgstr ""
 msgid "Calculates input mesh volume"
 msgstr ""
 
+msgid "Calculates the position of the Sun based on observer position, date, and time."
+msgstr ""
+
 msgid "Camera"
 msgstr "Cemera"
 
@@ -624,9 +629,6 @@ msgstr "Cun't undu ell"
 
 msgid "Cancel"
 msgstr "Cuncel"
-
-msgid "Cancel Tutorial"
-msgstr "Cuncel Tootureeel"
 
 msgid "Cannot render animation with zero frame rate."
 msgstr ""
@@ -658,6 +660,15 @@ msgstr "Ceps (feells) hules in a pulyhedrun"
 msgid "Cast shadows"
 msgstr "Cest shedoos"
 
+msgid "Cauchy B"
+msgstr ""
+
+msgid "Cauchy B Texture"
+msgstr ""
+
+msgid "Cauchy B coefficient."
+msgstr ""
+
 msgid "Caustics"
 msgstr "Coosteecs"
 
@@ -684,6 +695,14 @@ msgstr "Center Z cumpunents eruoond ooreegin"
 
 msgid "Center around which scaling or rotation happen"
 msgstr "Center eruoond vheech sceleeng oor ruteshun heppee"
+
+#, fuzzy
+msgid "Center on Origin"
+msgstr "Render Ingeene-a"
+
+#, fuzzy
+msgid "Center the output mesh around the origin."
+msgstr "Centers mesh pueents eruoond zee ooreegin"
 
 msgid "Centers mesh points around the origin"
 msgstr "Centers mesh pueents eruoond zee ooreegin"
@@ -727,9 +746,6 @@ msgstr "Frum RenderMun speceefficeshun"
 
 msgid "Choose a camera"
 msgstr "Chuuse-a a cemera"
-
-msgid "Choose a file to open:"
-msgstr "Chuuse-a a feele-a tu oopee:"
 
 msgid "Choose a predefined aspect ratio"
 msgstr "Chuuse-a a predeffeened espect reteeu"
@@ -783,14 +799,8 @@ msgstr "Clemp Greee chunnel tu threshuld"
 msgid "Clamp Red channel to threshold"
 msgstr "Clemp Red chunnel tu threshuld"
 
-msgid "Clear"
-msgstr "Cleer"
-
 msgid "Clear Selection"
 msgstr "Cleer Selecshun"
-
-msgid "Close"
-msgstr "Cluse-a"
 
 msgid "Closed"
 msgstr "Clused"
@@ -834,6 +844,17 @@ msgstr "Culur 2"
 #, fuzzy
 msgid "Color Array"
 msgstr "Culur 1"
+
+#, fuzzy
+msgid "Color Texture"
+msgstr "Textoore-a U"
+
+#, fuzzy
+msgid "Color of the numbers"
+msgstr "Culoomn noomber"
+
+msgid "Color of the text"
+msgstr ""
 
 #, fuzzy
 msgid "Color selected components are drawn in"
@@ -890,11 +911,12 @@ msgstr "Cumbeenes suleeds useeng buuleun oopereturs et render-teeme-a"
 msgid "Combines solids using boolean operators at render-time"
 msgstr "Cumbeenes suleeds useeng buuleun oopereturs et render-teeme-a"
 
-msgid "Command Node Inspector"
-msgstr "Cummund Nude-a Inspectur"
+#, fuzzy
+msgid "Commit"
+msgstr "imeet"
 
-msgid "Command Node Inspector ..."
-msgstr "Cummund Nude-a Inspectur ..."
+msgid "Commit modifications to the underlying property."
+msgstr ""
 
 msgid "Compactness ratio"
 msgstr "Cumpectness reteeu"
@@ -914,11 +936,8 @@ msgstr "Cumpunents tu be-a selected (feces oor idges)"
 msgid "Compress output file"
 msgstr "Cumpress ooootpoot feele-a"
 
-msgid "Cone height"
-msgstr "Cune-a heeeght"
-
-msgid "Cone primitive"
-msgstr "Cune-a preemitife-a"
+msgid "Computes skylight without atmospheric scattering."
+msgstr ""
 
 msgid "Configurable set of axes to help in visualizing the 3D workspace"
 msgstr "Cunffeegooreble-a set ooff exes tu help in feesooelizing zee 3D vurkspece-a"
@@ -936,14 +955,15 @@ msgstr "Renders NOoRBS coorfes"
 msgid "Connects the 2 end points of the selected curve"
 msgstr ""
 
+#, fuzzy
+msgid "Constant"
+msgstr "Instunteeete-a"
+
 msgid "Constrains points to the surface of a sphere"
 msgstr "Cunstreeens pueents tu zee soorffece-a ooff a sphere-a"
 
 msgid "Contains records storing the execution time for individual node tasks."
 msgstr ""
-
-msgid "Continue Tutorial"
-msgstr "Cunteenooe-a Tootureeel"
 
 msgid "Continuous playback"
 msgstr "Cunteenoouoos pleybeck"
@@ -957,14 +977,19 @@ msgstr "Cuntrecshun type-a"
 msgid "Control the rendered edge width (in pixels)."
 msgstr ""
 
+msgid "Controls sky clarity / haziness."
+msgstr ""
+
+msgid "Controls sky_light clarity / haziness."
+msgstr ""
+
+msgid "Controls sun_light clarity / haziness."
+msgstr ""
+
 msgid "Controls the alignment of adjacent lines of text."
 msgstr ""
 
 msgid "Controls the amount of taper, 0 = no taper, 1 = taper to a point."
-msgstr "Cuntruls zee emuoont ooff teper, 0 = nu teper, 1 = teper tu a pueent."
-
-#, fuzzy
-msgid "Controls the color of the output teapot."
 msgstr "Cuntruls zee emuoont ooff teper, 0 = nu teper, 1 = teper tu a pueent."
 
 msgid "Controls the current time displayed in the viewports."
@@ -980,7 +1005,41 @@ msgstr "Cuntruls zee ind teeme-a (in secunds) fur rendereeng uneemeshuns."
 msgid "Controls the frame rate (in frames-per-second) for rendering animations."
 msgstr "Cuntruls zee freme-a rete-a (in fremes-per-secund) fur rendereeng uneemeshuns."
 
+#, fuzzy
+msgid "Controls the major radius of the output torus."
+msgstr "Cuntruls zee emuoont ooff teper, 0 = nu teper, 1 = teper tu a pueent."
+
+#, fuzzy
+msgid "Controls the minor radius of the output torus."
+msgstr "Cuntruls zee emuoont ooff teper, 0 = nu teper, 1 = teper tu a pueent."
+
 msgid "Controls the radius of each blobby segment."
+msgstr ""
+
+#, fuzzy
+msgid "Controls the radius of the output cone."
+msgstr "Cuntruls zee emuoont ooff teper, 0 = nu teper, 1 = teper tu a pueent."
+
+#, fuzzy
+msgid "Controls the radius of the output cylinder."
+msgstr "Cuntruls zee emuoont ooff teper, 0 = nu teper, 1 = teper tu a pueent."
+
+#, fuzzy
+msgid "Controls the radius of the output disk."
+msgstr "Cuntruls zee emuoont ooff teper, 0 = nu teper, 1 = teper tu a pueent."
+
+#, fuzzy
+msgid "Controls the radius of the output paraboloid."
+msgstr "Cuntruls zee emuoont ooff teper, 0 = nu teper, 1 = teper tu a pueent."
+
+#, fuzzy
+msgid "Controls the radius the output sphere."
+msgstr "Cuntruls zee emuoont ooff teper, 0 = nu teper, 1 = teper tu a pueent."
+
+msgid "Controls the sensitivity for deciding when to simplify coplanar faces or collinear edges."
+msgstr ""
+
+msgid "Controls the sensitivity for deciding when two edges are collinear."
 msgstr ""
 
 msgid "Controls the sharpness of subdivision surface corners"
@@ -994,6 +1053,10 @@ msgstr ""
 
 msgid "Controls the start time (in seconds) for rendering animations."
 msgstr "Cuntruls zee stert teeme-a (in secunds) fur rendereeng uneemeshuns."
+
+#, fuzzy
+msgid "Controls the width of the output points."
+msgstr "Cuntruls zee emuoont ooff teper, 0 = nu teper, 1 = teper tu a pueent."
 
 msgid "Controls whether this node will be visibile in the viewport."
 msgstr "Cuntruls vhezeer thees nude-a veell be-a feesibile-a in zee feeoopurt."
@@ -1035,7 +1098,8 @@ msgstr "Cunferts un inpoot mesh tu zee legecy mesh furmet, zeen beck, fur regres
 msgid "Converts input faces into triangles"
 msgstr "Cunferts inpoot feces intu treeungles"
 
-msgid "Converts input gprims into a single point group"
+#, fuzzy
+msgid "Converts input geometric points into a single group of particles."
 msgstr "Cunferts inpoot gpreems intu a seengle-a pueent gruoop"
 
 msgid "Converts input polyhedra to SDS surfaces"
@@ -1065,7 +1129,7 @@ msgid "Could not determine scripting language.  K-3D supports multiple scripting
 msgstr "Cuoold nut determeene-a screepting lungooege-a.  K-3D sooppurts moolteeple-a screepting lungooeges, boot zee lungooege-a fur thees screept ves nut recugneezed. Must K-3D screept ingeenes use-a sume-a type-a ooff \"magic tukee\" et zee begeenning ooff a screept tu recugneeze-a it, i.g. \"#k3dscript\" in zee furst 12 cherecters ooff a screept fur K-3D's booeelt-in K3DScreept ingeene-a.  Iff yuoo ere-a vreeting a K-3D screept, check zee ducoomenteshun fur zee screepting lungooege-a yuoo're-a vreeting in tu see-a hoo tu meke-a it recugneezeble-a."
 
 #, fuzzy
-msgid "Could not identify the MIME-type for this script.  K-3D supports multiple scripting languages, and the MIME-type is used to match a script to the correct script engine. You can add a \"magic token\" at the beginning of a script to  in the first 12 characters of a script for K-3D's built-in K3DScript engine.  If you are writing a K-3D script, check the documentation for the scripting language you're writing in to see how to make it recognizable."
+msgid "Could not identify the MIME-type for this script.  K-3D supports multiple scripting languages, and the MIME-type is used to match scripts to the correct script engines. You can add a \"magic token\" at the beginning of a script to force identification of its MIME-type - for example, add \"#python\" at the beginning of a Python script."
 msgstr "Cuoold nut determeene-a screepting lungooege-a.  K-3D sooppurts moolteeple-a screepting lungooeges, boot zee lungooege-a fur thees screept ves nut recugneezed. Must K-3D screept ingeenes use-a sume-a type-a ooff \"magic tukee\" et zee begeenning ooff a screept tu recugneeze-a it, i.g. \"#k3dscript\" in zee furst 12 cherecters ooff a screept fur K-3D's booeelt-in K3DScreept ingeene-a.  Iff yuoo ere-a vreeting a K-3D screept, check zee ducoomenteshun fur zee screepting lungooege-a yuoo're-a vreeting in tu see-a hoo tu meke-a it recugneezeble-a."
 
 msgid "Could not locate the yafray executable."
@@ -1156,6 +1220,9 @@ msgstr "Creetes a scele-a trunsffurm metreex"
 msgid "Creates an orientation transform matrix"
 msgstr "Creetes un ooreeenteshun trunsffurm metreex"
 
+msgid "Creates or updates a named array with string data"
+msgstr ""
+
 msgid "Crop Window Bottom"
 msgstr "Crup Veendoo Buttum"
 
@@ -1183,12 +1250,6 @@ msgstr "Coobe-a heeeght"
 msgid "Cube width"
 msgstr "Coobe-a veedt"
 
-msgid "Cubic curve count"
-msgstr "Coobeec coorfe-a cuoont"
-
-msgid "Cubic curve group count"
-msgstr "Coobeec coorfe-a gruoop cuoont"
-
 #, fuzzy
 msgid "Curve Index"
 msgstr "Idge-a Index"
@@ -1197,11 +1258,18 @@ msgstr "Idge-a Index"
 msgid "Curve Number"
 msgstr "Culur noomber"
 
+#, fuzzy
+msgid "Curve Number."
+msgstr "Culur noomber"
+
 msgid "Curve subdivisions"
 msgstr "Coorfe-a soobdeefisiuns"
 
 msgid "Curve width"
 msgstr "Coorfe-a veedt"
+
+msgid "Curves"
+msgstr ""
 
 msgid "Cut off chanels at a certain value"
 msgstr "Coot ooffff chunels et a certeeen felooe-a"
@@ -1210,20 +1278,15 @@ msgstr "Coot ooffff chunels et a certeeen felooe-a"
 msgid "Cut off chanels at a certain value using the CUDA API"
 msgstr "Coot ooffff chunels et a certeeen felooe-a"
 
-msgid "Cylinder bending into sphere"
-msgstr "Cyleender bendeeng intu sphere-a"
-
-msgid "Cylinder primitive"
-msgstr "Cyleender preemitife-a"
-
 msgid "Cylinder radius"
 msgstr "Cyleender redeeoos"
 
-msgid "Cylinder test"
-msgstr "Cyleender test"
+msgid "D"
+msgstr ""
 
-msgid "Cylindrical projection map"
-msgstr "Cyleendricel prujecshun mep"
+#, fuzzy
+msgid "D Texture"
+msgstr "Textoore-a U"
 
 msgid "DOF"
 msgstr "DOF"
@@ -1245,14 +1308,17 @@ msgstr "Felooe-a Type-a"
 msgid "Data source that uses a script to create a k3d::double_t output value"
 msgstr "Sceler suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
 
+msgid "Day"
+msgstr ""
+
+msgid "Day."
+msgstr ""
+
 msgid "Decorations"
 msgstr "Decureshuns"
 
 msgid "Default Atmosphere Shader"
 msgstr "Deffoolt Etmusphere-a Sheder"
-
-msgid "Default Color"
-msgstr "Deffoolt Culur"
 
 msgid "Default Exterior Shader"
 msgstr "Deffoolt Ixtereeur Sheder"
@@ -1260,17 +1326,12 @@ msgstr "Deffoolt Ixtereeur Sheder"
 msgid "Default Interior Shader"
 msgstr "Deffoolt Intereeur Sheder"
 
-msgid "Default S"
+#, fuzzy
+msgid "Default Value"
 msgstr "Deffoolt S"
-
-msgid "Default T"
-msgstr "Deffoolt T"
 
 msgid "Default atmosphere shader"
 msgstr "Deffoolt etmusphere-a sheder"
-
-msgid "Default color"
-msgstr "Deffoolt culur"
 
 msgid "Default exterior shader"
 msgstr "Deffoolt ixtereeur sheder"
@@ -1278,11 +1339,32 @@ msgstr "Deffoolt ixtereeur sheder"
 msgid "Default interior shader"
 msgstr "Deffoolt intereeur sheder"
 
-msgid "Default s"
-msgstr "Deffoolt s"
+msgid "Default value, associated with unselected items"
+msgstr ""
 
-msgid "Default t"
-msgstr "Deffoolt t"
+#, fuzzy
+msgid "Defines the cone height along the +Z axis."
+msgstr "Ineble-a pueent deesplecement elung zee Z exees."
+
+#, fuzzy
+msgid "Defines the cylinder length along the +Z axis."
+msgstr "Ineble-a pueent deesplecement elung zee Z exees."
+
+#, fuzzy
+msgid "Defines the cylinder length along the -Z axis."
+msgstr "Ineble-a pueent deesplecement elung zee Z exees."
+
+#, fuzzy
+msgid "Defines the disk height along the +Z axis."
+msgstr "Ineble-a pueent deesplecement elung zee Z exees."
+
+#, fuzzy
+msgid "Defines the paraboloid length along the +Z axis."
+msgstr "Ineble-a pueent deesplecement elung zee Z exees."
+
+#, fuzzy
+msgid "Defines the paraboloid length along the -Z axis."
+msgstr "Ineble-a pueent deesplecement elung zee Z exees."
 
 #, fuzzy
 msgid "Degree"
@@ -1332,6 +1414,9 @@ msgstr "Dept"
 msgid "Depth of Field"
 msgstr "Dept ooff Feeeld"
 
+msgid "Depth of the coating layer for absorption effects."
+msgstr ""
+
 msgid "Description"
 msgstr "Descreepshun"
 
@@ -1351,20 +1436,29 @@ msgstr "Reset Mesh"
 msgid "Device mesh"
 msgstr ""
 
+msgid "Dialogs"
+msgstr ""
+
 msgid "Diameter"
 msgstr "Deeemeter"
 
 msgid "Difference"
 msgstr "Deefffference-a"
 
-msgid "Difference of inputs"
+#, fuzzy
+msgid "Difference of inputs."
 msgstr "Deefffference-a ooff inpoots"
 
 msgid "Diffuse Color"
 msgstr "Deeffffoose-a Culur"
 
-msgid "Dimension"
-msgstr "Deemensiun"
+#, fuzzy
+msgid "Diffuse Color."
+msgstr "Deeffffoose-a Culur"
+
+#, fuzzy
+msgid "Diffuse color."
+msgstr "Deeffffoose-a Culur"
 
 msgid "Dimension 1 Count"
 msgstr "Deemensiun 1 Cuoont"
@@ -1390,15 +1484,6 @@ msgstr ""
 
 msgid "Disconnect"
 msgstr "Deescunnect"
-
-msgid "Disk position"
-msgstr "Deesk puseeshun"
-
-msgid "Disk primitive"
-msgstr "Deesk preemitife-a"
-
-msgid "Disk radius"
-msgstr "Deesk redeeoos"
 
 msgid "Displace X"
 msgstr "Deesplece-a X"
@@ -1467,12 +1552,6 @@ msgstr ""
 msgid "Display property labels in the rendered image."
 msgstr "Feesible-a in zee feenel rendered imege-a"
 
-msgid "Display strip Number"
-msgstr "Deespley streep Noomber"
-
-msgid "Display strips"
-msgstr "Deespley streeps"
-
 msgid "Display this message again in the future"
 msgstr ""
 
@@ -1489,20 +1568,14 @@ msgstr "Deespleys a beetmep imege-a oon a reseezeble-a plune-a veethin zee feeoo
 msgid "Displays a hierarchical list of node inputs"
 msgstr "Deespleys steteestics ebuoot zee inpoot mesh"
 
-msgid "Displays a menu containing interactive tutorials and sample documents"
+msgid "Displays a menu containing sample documents"
 msgstr ""
 
 msgid "Displays a normal"
 msgstr "Deespleys a nurmel"
 
-msgid "Displays input matrix values"
-msgstr "Deespleys inpoot metreex felooes"
-
 msgid "Displays properties for one node"
 msgstr ""
-
-msgid "Displays statistics about the input mesh"
-msgstr "Deespleys steteestics ebuoot zee inpoot mesh"
 
 msgid "Displays text annotations in the 3D document, primarily for documentation / tutorials"
 msgstr "Deespleys text unnuteshuns in zee 3D ducooment, preemerily fur ducoomenteshun / tootureeels"
@@ -1534,9 +1607,6 @@ msgstr "Deestribootes rendereeng ecruss moolteeple-a mesh peeenters"
 
 msgid "Divide two scalar inputs and produce their quotient as output"
 msgstr "Deefide-a tvu sceler inpoots und prudooce-a zeeur qoouteeent es ooootpoot"
-
-msgid "Division type"
-msgstr "Deefisiun type-a"
 
 msgid "Do you want to replace it with the one you are saving?"
 msgstr "Du yuoo vunt tu replece-a it veet zee oone-a yuoo ere-a sefeeng?"
@@ -1575,10 +1645,6 @@ msgstr "Duooble-a cleeck sveetches beck tu oobject selecshun mude-a vhee cleecki
 msgid "Double-click to open an example document:"
 msgstr ""
 
-#, fuzzy
-msgid "Double-click to play a tutorial:"
-msgstr "Duooble-a-cleeck a tootureeel tu begeen:"
-
 msgid "Draw Aim Point"
 msgstr "Drev Eeem Pueent"
 
@@ -1588,32 +1654,11 @@ msgstr "Drev Beheend"
 msgid "Draw Camera Frustum"
 msgstr "Drev Cemera Froostoom"
 
-msgid "Draw Checkerboard Texture"
-msgstr ""
-
 msgid "Draw Crop Window"
 msgstr "Drev Crup Veendoo"
 
 msgid "Draw Frustum"
 msgstr "Drev Froostoom"
-
-msgid "Draw Iso-line Texture"
-msgstr ""
-
-msgid "Draw Major Curvature"
-msgstr ""
-
-msgid "Draw Minor Curvature"
-msgstr ""
-
-msgid "Draw Optimized Theta"
-msgstr ""
-
-msgid "Draw Pre-Optimization Phi"
-msgstr ""
-
-msgid "Draw Pre-Optimization Theta"
-msgstr ""
 
 msgid "Draw Safe Zone"
 msgstr "Drev Seffe-a Zune-a"
@@ -1632,12 +1677,6 @@ msgstr "Drev buoondeeng rectungle-a fur ooootpoot rendereeng"
 
 msgid "Draw center screen cross"
 msgstr "Drev center screee cruss"
-
-msgid "Draw major curvature direction"
-msgstr ""
-
-msgid "Draw minor curvature direction"
-msgstr ""
 
 #, fuzzy
 msgid "Draw normals for selected curves."
@@ -1681,6 +1720,10 @@ msgstr "Drev tvu seeded"
 msgid "Draws arrows to show polyhedron face orientation"
 msgstr "Drevs erroos tu shoo pulyhedrun fece-a ooreeenteshun"
 
+#, fuzzy
+msgid "Draws arrows to show polyhedron half edge orientation"
+msgstr "Drevs erroos tu shoo pulyhedrun fece-a ooreeenteshun"
+
 msgid "Dual"
 msgstr "Dooel"
 
@@ -1696,11 +1739,11 @@ msgstr "Doopleecete-a"
 msgid "Duplicate %1%"
 msgstr "Doopleecete-a %1%"
 
+msgid "East"
+msgstr ""
+
 msgid "Edge Count"
 msgstr "Idge-a Cuoont"
-
-msgid "Edge Index"
-msgstr "Idge-a Index"
 
 #, fuzzy
 msgid "Edge Offset"
@@ -1708,9 +1751,6 @@ msgstr "X Ooffffset"
 
 msgid "Edge count"
 msgstr "Idge-a cuoont"
-
-msgid "Edge number"
-msgstr "Idge-a noomber"
 
 msgid "Edge softness"
 msgstr "Idge-a sufftness"
@@ -1737,9 +1777,6 @@ msgstr "Ileeminetes pueents veet doopleecete-a 3D cuurdeenetes"
 msgid "Ellipsoid color"
 msgstr "Illeepsuid culur"
 
-msgid "Emission Color"
-msgstr "Imeessiun Culur"
-
 msgid "Emit Light"
 msgstr "Imeet Leeght"
 
@@ -1765,8 +1802,15 @@ msgstr "Inebled"
 msgid "Enabled Lights"
 msgstr "Inebled"
 
+msgid "Enables linear interpolation between mouths values."
+msgstr ""
+
 msgid "Encapsulates a RenderMan displacement shader instance"
 msgstr "Incepsooletes a RenderMun deesplecement sheder instunce-a"
+
+#, fuzzy
+msgid "End Point"
+msgstr "Pueent"
 
 msgid "End Time"
 msgstr "Ind Teeme-a"
@@ -1782,9 +1826,6 @@ msgstr "Inter a noo felooe-a.  Reel-vurld uneets und seemple-a met ixpresseeuns 
 
 msgid "Equal"
 msgstr "Iqooel"
-
-msgid "Error"
-msgstr "Irrur"
 
 msgid "Error compiling shader %1%"
 msgstr "Irrur cumpeeling sheder %1%"
@@ -1805,17 +1846,12 @@ msgstr "Irrur ixpurteeng ducooment"
 msgid "Error reading document %1%"
 msgstr "Irrur reedeeng ducooment %1%"
 
-msgid "Error reading document."
-msgstr "Irrur reedeeng ducooment."
-
 msgid "Error reading document.  The document could not be reverted."
 msgstr "Irrur reedeeng ducooment.  Zee ducooment cuoold nut be-a referted."
 
-msgid "Event Recorder ..."
-msgstr "Ifent Recurder ..."
-
-msgid "Eversion Time : between 0 and 1"
-msgstr "Iferseeun Teeme-a : betveee 0 und 1"
+#, fuzzy
+msgid "Example documents ..."
+msgstr "Unteetled Ducooment %1%"
 
 msgid "Exchanges the profile curve and the traverse curve"
 msgstr ""
@@ -1830,6 +1866,14 @@ msgid "Expand All"
 msgstr "Ixpund Ell"
 
 msgid "Export Document:"
+msgstr "Ixpurt Ducooment:"
+
+#, fuzzy
+msgid "Export File ..."
+msgstr "_Ixpurt ..."
+
+#, fuzzy
+msgid "Export File:"
 msgstr "Ixpurt Ducooment:"
 
 msgid "Exposure"
@@ -1860,6 +1904,9 @@ msgstr "Ixtereeur Sheder"
 msgid "Exterior shader"
 msgstr "Ixtereeur sheder"
 
+msgid "Extra-Atmospheric"
+msgstr ""
+
 #, fuzzy
 msgid "Extrude along"
 msgstr "Exees tu boolge-a elung"
@@ -1886,15 +1933,20 @@ msgstr "Ixtrooseeun durecshun : inseede-a / ooootseede-a"
 msgid "Eye Splits"
 msgstr "Iye-a Spleets"
 
+#, fuzzy
+msgid "Face"
+msgstr "Feces"
+
 msgid "Face Index"
 msgstr "Fece-a Index"
 
 #, fuzzy
+msgid "Face Normals"
+msgstr "Scele-a nurmels"
+
+#, fuzzy
 msgid "Face Offset"
 msgstr "X Ooffffset"
-
-msgid "Face count"
-msgstr "Fece-a cuoont"
 
 msgid "Face distance"
 msgstr "Fece-a deestunce-a"
@@ -1902,13 +1954,10 @@ msgstr "Fece-a deestunce-a"
 msgid "Face number"
 msgstr "Fece-a noomber"
 
+msgid "Face output array name."
+msgstr ""
+
 msgid "Face-Varying Array Name"
-msgstr ""
-
-msgid "Face-Varying Normals"
-msgstr ""
-
-msgid "Face-varying output array name."
 msgstr ""
 
 msgid "Faces"
@@ -1947,6 +1996,21 @@ msgstr "Feele-a pet fur lsystem descreepshun"
 msgid "Fillet radius"
 msgstr "Feellet redeeoos"
 
+#, fuzzy
+msgid "Film"
+msgstr "Feele-a"
+
+#, fuzzy
+msgid "Film Index"
+msgstr "Fece-a Index"
+
+msgid "Film Index Texture"
+msgstr ""
+
+#, fuzzy
+msgid "Film Texture"
+msgstr "Textoore-a U"
+
 msgid "Filter"
 msgstr "Feelter"
 
@@ -1968,9 +2032,6 @@ msgstr ""
 msgid "Find loop using the edgering on the other side of the selected edge(s)"
 msgstr ""
 
-msgid "First addition operand (should be a blobby)"
-msgstr "Furst eddeeshun ooperund (shuoold be-a a blubby)"
-
 msgid "First check color"
 msgstr "Furst check culur"
 
@@ -1981,17 +2042,8 @@ msgstr "Furst inpoot fluet"
 msgid "First input mesh."
 msgstr "Furst inpoot fluet"
 
-msgid "First matrix line or row"
-msgstr "Furst metreex leene-a oor roo"
-
-msgid "First maximum operand (should be a blobby)"
-msgstr "Furst mexeemoom ooperund (shuoold be-a a blubby)"
-
-msgid "First minimum operand (should be a blobby)"
-msgstr "Furst meenimoom ooperund (shuoold be-a a blubby)"
-
-msgid "First multiplication operand (should be a blobby)"
-msgstr "Furst moolteepliceshun ooperund (shuoold be-a a blubby)"
+msgid "First point in the swept line segment that defines the output hyperboloid."
+msgstr ""
 
 msgid "First segment end X position"
 msgstr "Furst segment ind X puseeshun"
@@ -2078,11 +2130,8 @@ msgstr "Furmet"
 msgid "Format string, printf() like"
 msgstr "Furmet streeng, preentff() leeke-a"
 
-msgid "Fourth matrix line or row"
-msgstr "Fuoort metreex leene-a oor roo"
-
-msgid "Fractal dimension"
-msgstr "Frectel deemensiun"
+msgid "Fraction of light transmitted through the surface."
+msgstr ""
 
 msgid "Fragment Shader"
 msgstr "Fregment Sheder"
@@ -2103,14 +2152,27 @@ msgstr ""
 msgid "Frame rate"
 msgstr "Freme-a rete-a"
 
+msgid "Frame rate of the papagayo lipsync file. Frames are converted to time units according to this value."
+msgstr ""
+
 msgid "Frame selection"
 msgstr "Freme-a selecshun"
 
 msgid "Freezes its input for manual editing"
 msgstr "Freezes its inpoot fur munooel ideeting"
 
-msgid "Frequency"
-msgstr "Freqooency"
+msgid "Fresnel Constant 1"
+msgstr ""
+
+msgid "Fresnel Constant 2"
+msgstr ""
+
+msgid "Fresnel Constant 3"
+msgstr ""
+
+#, fuzzy
+msgid "From"
+msgstr "_Freme-a"
 
 msgid "From RenderMan specification"
 msgstr "Frum RenderMun speceefficeshun"
@@ -2137,17 +2199,21 @@ msgstr ""
 msgid "Function to be plotted. C-like notation"
 msgstr ""
 
+msgid "Gain"
+msgstr ""
+
 msgid "Gamma"
 msgstr "Gemma"
 
 msgid "Gamma value"
 msgstr "Gemma felooe-a"
 
-msgid "Generate face-varying (per-edge) normals."
-msgstr ""
+#, fuzzy
+msgid "Generate per-face normals."
+msgstr "Generetes a uneeffurm pulyhedrun"
 
 #, fuzzy
-msgid "Generate uniform (per-face) normals."
+msgid "Generate varying (per-vertex) normals."
 msgstr "Generetes a uneeffurm pulyhedrun"
 
 msgid "Generate vertex normals."
@@ -2248,20 +2314,11 @@ msgstr "Generetes a trunsffurmeshun metreex frum a puseeshun, a luuk fectur, und
 msgid "Generates a uniform polyhedron"
 msgstr "Generetes a uneeffurm pulyhedrun"
 
-msgid "Generates an FFT-based fractal terrain"
-msgstr "Generetes un FFT-besed frectel terreeen"
-
-msgid "Generates an HfBM-based fractal terrain"
-msgstr "Generetes un HffBM-besed frectel terreeen"
-
 msgid "Generates an L-System object from a configuration file"
 msgstr "Generetes un L-System oobject frum a cunffeegooreshun feele-a"
 
 msgid "Generates polygonal text using Freetype 2"
 msgstr "Generetes pulygunel text useeng Freetype-a 2"
-
-msgid "Generates sphere eversion at any stage"
-msgstr "Generetes sphere-a iferseeun et uny stege-a"
 
 msgid "Geometry"
 msgstr "Geumetry"
@@ -2272,6 +2329,10 @@ msgstr ""
 msgid "Gives chosen side number"
 msgstr "Geefes chusee seede-a noomber"
 
+#, fuzzy
+msgid "Glossy color."
+msgstr "Fug culur"
+
 msgid "Glow intensity"
 msgstr "Gloo intenseety"
 
@@ -2281,9 +2342,6 @@ msgstr "Gloo ooffffset"
 msgid "Glow type"
 msgstr "Gloo type-a"
 
-msgid "Gradient spacing"
-msgstr "Gredeeent speceeng"
-
 msgid "GraphViz Render Engine"
 msgstr "GrephFeez Render Ingeene-a"
 
@@ -2291,6 +2349,9 @@ msgid "Gravity"
 msgstr ""
 
 msgid "Gravity to affect the system"
+msgstr ""
+
+msgid "Green"
 msgstr ""
 
 msgid "Green threshold"
@@ -2335,8 +2396,16 @@ msgstr "Groot felooe-a"
 msgid "H_ide Unpinned Panels"
 msgstr "H_ide-a Unpeenned Punels"
 
-msgid "Half strips"
-msgstr "Helff streeps"
+#, fuzzy
+msgid "Halt Samples"
+msgstr "Semples"
+
+#, fuzzy
+msgid "Halt Time"
+msgstr "Stert Teeme-a"
+
+msgid "Halt rendering once the number of samples per pixel reaches this value."
+msgstr ""
 
 msgid "Halt running script?"
 msgstr "Helt roonneeng screept?"
@@ -2383,17 +2452,18 @@ msgstr "Heeder Elgureethm"
 msgid "Hides/shows decorations"
 msgstr "Heedes/shoos decureshuns"
 
-msgid "Holes only"
-msgstr "Hules oonly"
+#, fuzzy
+msgid "Hour"
+msgstr "Suoorce-a"
+
+msgid "Hour."
+msgstr ""
 
 msgid "How far to extrude the curve"
 msgstr ""
 
 msgid "How far to extrude the patch"
 msgstr ""
-
-msgid "Hyperboloid primitive"
-msgstr "Hyperbulueed preemitife-a"
 
 msgid "Identifies a file's MIME Type based on filename extensions"
 msgstr ""
@@ -2431,14 +2501,52 @@ msgstr "Impurt %1%"
 msgid "Import Document:"
 msgstr "Impurt Ducooment:"
 
+#, fuzzy
+msgid "Import File ..."
+msgstr "_Impurt ..."
+
+#, fuzzy
+msgid "Import File:"
+msgstr "Impurt Ducooment:"
+
+#, fuzzy
+msgid "Index"
+msgstr "Idge-a Index"
+
+#, fuzzy
+msgid "Index Texture"
+msgstr "Textoore-a U"
+
 msgid "Index of Refraction"
+msgstr "Index ooff Reffrecshun"
+
+msgid "Index of refraction of the thin film coating."
+msgstr ""
+
+#, fuzzy
+msgid "Index of refraction."
 msgstr "Index ooff Reffrecshun"
 
 msgid "Indices of points being transformed"
 msgstr "Indeeces ooff pueents beeeng trunsffurmed"
 
-msgid "Information"
-msgstr "Inffurmeshun"
+#, fuzzy
+msgid "Indigo Background"
+msgstr "Beckgruoond Culur"
+
+msgid "Indigo Diffuse Material"
+msgstr ""
+
+#, fuzzy
+msgid "Indigo Rectangle Light"
+msgstr "Check (rectungle-a) heeeght"
+
+#, fuzzy
+msgid "Indigo Render Engine"
+msgstr "Render Ingeene-a"
+
+msgid "Indigo Skylight"
+msgstr ""
 
 msgid "Inline"
 msgstr "Inleene-a"
@@ -2481,7 +2589,8 @@ msgstr "Inpoot Mesh Selecshun"
 msgid "Input bitmap"
 msgstr "Inpoot beetmep"
 
-msgid "Input file"
+#, fuzzy
+msgid "Input file path."
 msgstr "Inpoot feele-a"
 
 msgid "Input matrix"
@@ -2489,12 +2598,6 @@ msgstr "Inpoot metreex"
 
 msgid "Input mesh"
 msgstr "Inpoot mesh"
-
-msgid "Input mesh 1"
-msgstr "Inpoot mesh 1"
-
-msgid "Input mesh 2"
-msgstr "Inpoot mesh 2"
 
 #, fuzzy
 msgid "Input mesh."
@@ -2554,8 +2657,16 @@ msgstr "Intereeur sheder"
 msgid "Internal error creating user property."
 msgstr ""
 
+#, fuzzy
+msgid "Interpolate"
+msgstr "Interpulete-a buoondery"
+
 msgid "Interpolate boundary"
 msgstr "Interpulete-a buoondery"
+
+#, fuzzy
+msgid "Interpolation Time"
+msgstr "Shedeeng Interpuleshun"
 
 msgid "Intersection"
 msgstr "Intersecshun"
@@ -2577,35 +2688,14 @@ msgstr "Inferts a beetmep's elpha chunnel"
 msgid "Inverts a matrix mathematically speaking"
 msgstr ""
 
-#, fuzzy
-msgid "Iso line divisions"
-msgstr "Coorfe-a soobdeefisiuns"
-
-msgid "Iso spacing"
-msgstr "Isu speceeng"
-
-msgid "Iterations"
-msgstr "Itereshuns"
-
 msgid "JPEG (*.jpeg)"
 msgstr "JPEG (*.jpeg)"
 
 msgid "Join : center to midpoints, midpoints, center to points"
 msgstr "Jueen : center tu meedpuints, meedpuints, center tu pueents"
 
-msgid "K-3D Bug Buddy"
-msgstr "K-3D Boog Booddy"
-
-msgid ""
-"K-3D Bug Buddy will help you generate a bug report - please complete the following fields,\n"
-"and provide an e-mail address where you can be reached."
-msgstr ""
-
 msgid "K-3D Document (*.k3d)"
 msgstr "K-3D Ducooment (*.k3d)"
-
-msgid "K-3D Documents (*.k3d)"
-msgstr "K-3D Ducooments (*.k3d)"
 
 msgid "K-3D Fatal Error"
 msgstr "K-3D Fetel Irrur"
@@ -2616,8 +2706,8 @@ msgstr "K-3D Lug Veendoo"
 msgid "K-3D Native ( .k3d )"
 msgstr "K-3D Neteefe-a ( .k3d )"
 
-msgid "K-3D Script (*.k3dscript)"
-msgstr "K-3D Screept (*.k3dscreept)"
+msgid "K-3D Python Shell"
+msgstr ""
 
 #, fuzzy
 msgid "K-3D Tutorials and Examples"
@@ -2628,6 +2718,32 @@ msgstr "K-3D _Oonleene-a"
 
 msgid "K3DScript scripting engine"
 msgstr "K3DScreept screepting ingeene-a"
+
+msgid "Ka"
+msgstr ""
+
+#, fuzzy
+msgid "Ka Texture"
+msgstr "Textoore-a U"
+
+msgid "Kd"
+msgstr ""
+
+#, fuzzy
+msgid "Kd Texture"
+msgstr "Textoore-a U"
+
+#, fuzzy
+msgid "Keep Face Selection"
+msgstr "Mesh Selecshun"
+
+#, fuzzy
+msgid "Keep Original Selection"
+msgstr "Mesh Selecshun"
+
+#, fuzzy
+msgid "Keep Point Selection"
+msgstr "Mesh Selecshun"
 
 #, fuzzy
 msgid "Keep Selection"
@@ -2640,11 +2756,64 @@ msgid "Keep selection from the old modes when switching between modes"
 msgstr ""
 
 #, fuzzy
+msgid "Keep the original face selection."
+msgstr "Replece-a Selecshun"
+
+msgid "Keep the original point selection, just adding points of selected faces."
+msgstr ""
+
+msgid "Keep the original selection, rather than selecting only the companions"
+msgstr ""
+
+#, fuzzy
 msgid "Knot Vector"
 msgstr "Fectur"
 
 msgid "Knot scale"
 msgstr "Knut scele-a"
+
+msgid "Kr"
+msgstr ""
+
+#, fuzzy
+msgid "Kr Texture"
+msgstr "Textoore-a U"
+
+msgid "Ks"
+msgstr ""
+
+#, fuzzy
+msgid "Ks Texture"
+msgstr "Textoore-a U"
+
+#, fuzzy
+msgid "Ks1"
+msgstr "s1"
+
+#, fuzzy
+msgid "Ks1 Texture"
+msgstr "Textoore-a U"
+
+msgid "Ks2"
+msgstr ""
+
+#, fuzzy
+msgid "Ks2 Texture"
+msgstr "Textoore-a U"
+
+msgid "Ks3"
+msgstr ""
+
+#, fuzzy
+msgid "Ks3 Texture"
+msgstr "Textoore-a U"
+
+msgid "Kt"
+msgstr ""
+
+#, fuzzy
+msgid "Kt Texture"
+msgstr "Textoore-a U"
 
 msgid "LMB-Click to expand/collapse.  RMB-Click for other options."
 msgstr "LMB-Cleeck tu ixpund/cullepse-a.  RMB-Cleeck fur oozeer oopshuns."
@@ -2658,14 +2827,9 @@ msgstr "LMB-Dreg tu mudeeffy, LMB-Cleeck tu step, Tep Sheefft und Cuntrul vheele
 msgid "Label"
 msgstr "Lebel"
 
-msgid "Lacunarity"
-msgstr "Lecoonereety"
-
-msgid "Latitudinal Patches Per Hemisphere"
-msgstr "Leteetoodinel Petches Per Hemeesphere-a"
-
-msgid "Latitudinal patches"
-msgstr "Leteetoodinel petches"
+#, fuzzy
+msgid "Latitude"
+msgstr "X empleetoode-a"
 
 msgid "Layout"
 msgstr "Leyuoot"
@@ -2700,10 +2864,30 @@ msgstr "Lefel"
 msgid "Levels"
 msgstr "Lefels"
 
+#, fuzzy
+msgid "Light Group"
+msgstr "Leeght culur"
+
 msgid "Light color"
 msgstr "Leeght culur"
 
+#, fuzzy
+msgid "Light color."
+msgstr "Leeght culur"
+
+#, fuzzy
+msgid "Light group."
+msgstr "Leeght culur"
+
+#, fuzzy
+msgid "Light origin."
+msgstr "Leeght culur"
+
 msgid "Light shader"
+msgstr "Leeght sheder"
+
+#, fuzzy
+msgid "Light target."
 msgstr "Leeght sheder"
 
 #, fuzzy
@@ -2714,26 +2898,8 @@ msgstr "Gredeeent speceeng"
 msgid "Line Width"
 msgstr "Peexel Veedt"
 
-msgid "Line1"
-msgstr "Leene-a1"
-
-msgid "Line2"
-msgstr "Leene-a2"
-
-msgid "Line3"
-msgstr "Leene-a3"
-
-msgid "Line4"
-msgstr "Leene-a4"
-
 msgid "Line: %1% Column: %2%"
 msgstr "Leene-a: %1% Culoomn: %2%"
-
-msgid "Linear curve count"
-msgstr "Leeneer coorfe-a cuoont"
-
-msgid "Linear curve group count"
-msgstr "Leeneer coorfe-a gruoop cuoont"
 
 msgid "Lines"
 msgstr "Leenes"
@@ -2746,6 +2912,9 @@ msgstr "Lued"
 
 msgid "Load Script:"
 msgstr "Lued Screept:"
+
+msgid "Load a papagayo lipsync (.dat) file and output its values given a time source"
+msgstr ""
 
 msgid "Load a script from disk, replacing the current script"
 msgstr "Lued a screept frum deesk, repleceeng zee coorrent screept"
@@ -2780,10 +2949,13 @@ msgstr "Shoo cumpunent selecshun"
 msgid "Local Z component function"
 msgstr "Shoo cumpunent selecshun"
 
-msgid "Longitudinal Patches Per Strip"
-msgstr "Lungeetoodinel Petches Per Streep"
+msgid ""
+"Logging SpaceNavigator events to stderr ...\n"
+"Close window to cancel logging."
+msgstr ""
 
-msgid "Longitudinal patches"
+#, fuzzy
+msgid "Longitude"
 msgstr "Lungeetoodinel petches"
 
 msgid "Longitudinal wraps"
@@ -2795,28 +2967,122 @@ msgstr "Luuk Puseeshun"
 msgid "Low-level control of memory pools, primarily for testing"
 msgstr "Loo-lefel cuntrul ooff memury puuls, preemerily fur testeeng"
 
-msgid "Lower hemisphere"
-msgstr "Looer hemeesphere-a"
-
 msgid "Luminance"
 msgstr "Loomeenunce-a"
 
-msgid "Maintain the image aspect ratio"
-msgstr "Meeentein zee imege-a espect reteeu"
+msgid "Luminous Efficacy"
+msgstr ""
+
+msgid "Luminous efficacy of the light source in luminous flux per Watt."
+msgstr ""
+
+msgid "LuxRender Bilinear Interpolation Texture"
+msgstr ""
 
 #, fuzzy
-msgid "Major Color"
-msgstr "Mejur Pooer"
+msgid "LuxRender Carpaint Material"
+msgstr "RenderMun Metereeel"
+
+msgid "LuxRender Distant Light"
+msgstr ""
+
+#, fuzzy
+msgid "LuxRender EnvironmentLight"
+msgstr "Render Ingeene-a"
+
+#, fuzzy
+msgid "LuxRender Glass Material"
+msgstr "RenderMun Metereeel"
+
+#, fuzzy
+msgid "LuxRender Glossy Material"
+msgstr "RenderMun Metereeel"
+
+msgid "LuxRender Goniometric Light"
+msgstr ""
+
+#, fuzzy
+msgid "LuxRender Image Texture"
+msgstr "Render Imege-a"
+
+#, fuzzy
+msgid "LuxRender Matte Material"
+msgstr "RenderMun Metereeel"
+
+#, fuzzy
+msgid "LuxRender Matte Translucent Material"
+msgstr "RenderMun Metereeel"
+
+#, fuzzy
+msgid "LuxRender Metal Material"
+msgstr "RenderMun Metereeel"
+
+#, fuzzy
+msgid "LuxRender Mirror Material"
+msgstr "RenderMun Metereeel"
+
+#, fuzzy
+msgid "LuxRender Mix Material"
+msgstr "RenderMun Metereeel"
+
+#, fuzzy
+msgid "LuxRender Null Material"
+msgstr "RenderMun Metereeel"
+
+#, fuzzy
+msgid "LuxRender Point Light"
+msgstr "Yeffrey Pueent Leeght"
+
+#, fuzzy
+msgid "LuxRender Render Engine"
+msgstr "RenderMun Render Ingeene-a"
+
+#, fuzzy
+msgid "LuxRender Rough Glass Material"
+msgstr "RenderMun Metereeel"
+
+msgid "LuxRender Scalar Image Texture"
+msgstr ""
+
+#, fuzzy
+msgid "LuxRender Shiny Metal Material"
+msgstr "RenderMun Metereeel"
+
+msgid "LuxRender SkyLight"
+msgstr ""
+
+msgid "LuxRender SunLight"
+msgstr ""
+
+msgid "M1"
+msgstr ""
+
+#, fuzzy
+msgid "M1 Texture"
+msgstr "Textoore-a U"
+
+msgid "M2"
+msgstr ""
+
+#, fuzzy
+msgid "M2 Texture"
+msgstr "Textoore-a U"
+
+msgid "M3"
+msgstr ""
+
+#, fuzzy
+msgid "M3 Texture"
+msgstr "Textoore-a U"
+
+msgid "Maintain the image aspect ratio"
+msgstr "Meeentein zee imege-a espect reteeu"
 
 msgid "Major Power"
 msgstr "Mejur Pooer"
 
 msgid "Major Radius"
 msgstr "Mejur Redeeoos"
-
-#, fuzzy
-msgid "Major color"
-msgstr "Mejur Pooer"
 
 msgid "Major radius"
 msgstr "Mejur redeeoos"
@@ -2839,19 +3105,28 @@ msgstr "Mekes cupeees ooff a mesh elung tvu deemensiuns"
 msgid "Manipulators' world position"
 msgstr "Muneepooleturs' vurld puseeshun"
 
+msgid "Map"
+msgstr ""
+
 msgid "Map containing the difference vectors for all transformations performed by this node"
 msgstr "Mep cunteeening zee deefffference-a fecturs fur ell trunsffurmeshuns perffurmed by thees nude-a"
 
-msgid "Mapping Type"
+#, fuzzy
+msgid "Mapping"
 msgstr "Meppeeng Type-a"
-
-msgid "Maps texture values to geometry using an external texture mapping transformation"
-msgstr "Meps textoore-a felooes tu geumetry useeng un ixternel textoore-a meppeeng trunsffurmeshun"
 
 msgid "Match Groups"
 msgstr "Metch Gruoops"
 
 msgid "Material"
+msgstr "Metereeel"
+
+#, fuzzy
+msgid "Material 1"
+msgstr "Metereeel"
+
+#, fuzzy
+msgid "Material 2"
 msgstr "Metereeel"
 
 msgid "Material Manager Panel"
@@ -2863,23 +3138,11 @@ msgstr "Metreex"
 msgid "Matte"
 msgstr "Mette-a"
 
-msgid "Max index"
-msgstr "Mex index"
-
 msgid "Max stack size"
 msgstr "Mex steck seeze-a"
 
 msgid "Max. distance"
 msgstr "Mex. deestunce-a"
-
-msgid "Maxima Selection"
-msgstr "Mexeema Selecshun"
-
-msgid "Maxima selection"
-msgstr "Mexeema selecshun"
-
-msgid "Maxima value"
-msgstr "Mexeema felooe-a"
 
 msgid "Maximize active panel"
 msgstr "Mexeemize-a ecteefe-a punel"
@@ -2894,8 +3157,15 @@ msgstr "Mexeemoom fuld ungle-a"
 msgid "Maximum distance between points"
 msgstr "Mexeemoom deestunce-a betveee pueents"
 
+msgid "Maximum number of samples-per-pixel."
+msgstr ""
+
 msgid "Maximum point position"
 msgstr "Mexeemoom pueent puseeshun"
+
+#, fuzzy
+msgid "Maximum rendering time in seconds."
+msgstr "Mexeemoom idge-a cust"
 
 msgid "Maximum width of a single line of text.."
 msgstr ""
@@ -2903,11 +3173,14 @@ msgstr ""
 msgid "Merge K-3D Document:"
 msgstr "Merge-a K-3D Ducooment:"
 
-msgid "Merge meshes in a single polyhedron"
-msgstr "Merge-a meshes in a seengle-a pulyhedrun"
-
 msgid "Merge?"
 msgstr "Merge-a?"
+
+msgid "Merges edges that are collinear, up to a threshold"
+msgstr ""
+
+msgid "Merges faces that are coplanar, up to a given threshold"
+msgstr ""
 
 msgid "Merges two meshes into one"
 msgstr "Merges tvu meshes intu oone-a"
@@ -2920,6 +3193,10 @@ msgstr "Mesh"
 
 msgid "Mesh Modifier"
 msgstr "Mesh Mudeeffier"
+
+#, fuzzy
+msgid "Mesh Options"
+msgstr "Mesh Selecshun"
 
 msgid "Mesh Selection"
 msgstr "Mesh Selecshun"
@@ -2956,6 +3233,10 @@ msgid "Mesh reader that loads external Wavefront (.obj) files into the document 
 msgstr "Mesh reeder thet lueds ixternel Vefeffrunt (.oobj) feeles intu zee ducooment by refference-a"
 
 #, fuzzy
+msgid "Mesh reader that loads external Wavefront (.stl) files into the document by reference"
+msgstr "Mesh reeder thet lueds ixternel Vefeffrunt (.oobj) feeles intu zee ducooment by refference-a"
+
+#, fuzzy
 msgid "Mesh reader that reads external GNU Triangulated Surface (.gts) files"
 msgstr "Mesh reeder thet lueds ixternel K-3D XML (.k3d) feeles"
 
@@ -2975,11 +3256,35 @@ msgstr "Mesh vreeter thet sefes K-3D XML (.k3d) feeles"
 msgid "Mesh writer that saves external COLLADA (.dae) files"
 msgstr "Mesh vreeter thet sefes ixternel Vefeffrunt (.oobj) feeles"
 
+#, fuzzy
+msgid "Mesh writer that saves external Stanford PLY (.ply) files"
+msgstr "Mesh suoorce-a thet reeds ixternel Stunffurd PLY (.ply) feeles"
+
+#, fuzzy
+msgid "Mesh writer that saves external Stereo Triangulation Lithograph (.stl) files"
+msgstr "Mesh vreeter thet sefes ixternel Vefeffrunt (.oobj) feeles"
+
 msgid "Mesh writer that saves external Wavefront (.obj) files"
+msgstr "Mesh vreeter thet sefes ixternel Vefeffrunt (.oobj) feeles"
+
+#, fuzzy
+msgid "Mesh writer that saves meshes as GraphViz (.dot) files"
 msgstr "Mesh vreeter thet sefes ixternel Vefeffrunt (.oobj) feeles"
 
 msgid "Meshing penalty"
 msgstr "Mesheeng penelty"
+
+msgid "Metal name, or the path to an NK optical properties file."
+msgstr ""
+
+msgid "Microfacet Roughness 1"
+msgstr ""
+
+msgid "Microfacet Roughness 2"
+msgstr ""
+
+msgid "Microfacet Roughness 3"
+msgstr ""
 
 msgid "Middle offset"
 msgstr "Meeddle-a ooffffset"
@@ -2987,27 +3292,11 @@ msgstr "Meeddle-a ooffffset"
 msgid "Middle offset, for midpoints only"
 msgstr "Meeddle-a ooffffset, fur meedpuints oonly"
 
-msgid "Min index"
-msgstr "Meen index"
-
 msgid "Min. depth"
 msgstr "Meen. dept"
 
-msgid "Minima Selection"
-msgstr "Meenima Selecshun"
-
-msgid "Minima selection"
-msgstr "Meenima selecshun"
-
-msgid "Minima value"
-msgstr "Meenima felooe-a"
-
 msgid "Minimum Reflection"
 msgstr "Meenimoom Refflecshun"
-
-#, fuzzy
-msgid "Minor Color"
-msgstr "Meenur Pooer"
 
 msgid "Minor Power"
 msgstr "Meenur Pooer"
@@ -3015,12 +3304,15 @@ msgstr "Meenur Pooer"
 msgid "Minor Radius"
 msgstr "Meenur Redeeoos"
 
-#, fuzzy
-msgid "Minor color"
-msgstr "Meenur Pooer"
-
 msgid "Minor radius"
 msgstr "Meenur redeeoos"
+
+#, fuzzy
+msgid "Minute"
+msgstr "ZMeen"
+
+msgid "Minute."
+msgstr ""
 
 msgid "Mode"
 msgstr "Mude-a"
@@ -3048,6 +3340,17 @@ msgstr "Mudooleshun phese-a"
 
 msgid "Modulo two scalar inputs and produce their remainder as output"
 msgstr "Mudoolu tvu sceler inpoots und prudooce-a zeeur remeeender es ooootpoot"
+
+msgid "Monitors files for changes, using the Linux inotify system"
+msgstr ""
+
+#, fuzzy
+msgid "Month"
+msgstr "Funt"
+
+#, fuzzy
+msgid "Month."
+msgstr "Funt"
 
 msgid "Motion Blur"
 msgstr "Mushun Bloor"
@@ -3113,7 +3416,13 @@ msgstr "Nudes"
 msgid "Name"
 msgstr "Neme-a"
 
+msgid "Name of a per-face array containing solid labels (as used in OpenFOAM)"
+msgstr ""
+
 msgid "Name of the array to visualize."
+msgstr ""
+
+msgid "Name of the output array"
 msgstr ""
 
 msgid "Navigation Target"
@@ -3124,12 +3433,6 @@ msgstr "Neer"
 
 msgid "Near Plane Distance"
 msgstr "Neer Plune-a Deestunce-a"
-
-msgid "New Color"
-msgstr "Noo Culur"
-
-msgid "New color"
-msgstr "Noo culur"
 
 msgid "No"
 msgstr "Nu"
@@ -3163,9 +3466,6 @@ msgstr ""
 
 msgid "Nodes"
 msgstr "Nudes"
-
-msgid "Noise offset"
-msgstr "Nueese-a ooffffset"
 
 msgid "Normal"
 msgstr "Nurmel"
@@ -3216,11 +3516,8 @@ msgstr "Nurmels scele-a"
 msgid "Normals will not be smoothed across points sharper than this angle (only applies to Face-Varying Normals)."
 msgstr ""
 
-msgid "Nucurve count"
-msgstr "Noocoorfe-a cuoont"
-
-msgid "Nucurve group count"
-msgstr "Noocoorfe-a gruoop cuoont"
+msgid "North"
+msgstr ""
 
 msgid "Number"
 msgstr "Noomber"
@@ -3268,11 +3565,11 @@ msgstr "Noombers pulyhedrun feces"
 msgid "Numbers polyhedron faces"
 msgstr "Noombers pulyhedrun feces"
 
-msgid "Nupatch Count"
-msgstr "Noopetch Cuoont"
+msgid "Observer latitude (decimal degrees)."
+msgstr ""
 
-msgid "Octaves"
-msgstr "Ooctefes"
+msgid "Observer longitude (decimal degrees)."
+msgstr ""
 
 msgid "Offset"
 msgstr "Ooffffset"
@@ -3291,6 +3588,10 @@ msgstr "Ooffffset elung ixternel idges"
 
 msgid "Offset factor for the point, in units of edge length"
 msgstr ""
+
+#, fuzzy
+msgid "Offset from edge"
+msgstr "Ooffffset elung ixternel idges"
 
 #, fuzzy
 msgid "Offsets numbers away from their curve."
@@ -3315,20 +3616,15 @@ msgstr "Ooffffsets noombers evey frum zeeur pulyguns"
 msgid "Offsets numbers away from their polygons."
 msgstr "Ooffffsets noombers evey frum zeeur pulyguns"
 
-msgid "Omega parameter"
-msgstr ""
-
 msgid "Opacity"
 msgstr "Oopeceety"
 
+#, fuzzy
+msgid "Open File:"
+msgstr "Oopee Tootureeel:"
+
 msgid "Open K-3D Document:"
 msgstr "Oopee K-3D Ducooment:"
-
-msgid "Open Script:"
-msgstr "Oopee Screept:"
-
-msgid "Open Tutorial:"
-msgstr "Oopee Tootureeel:"
 
 msgid "Open _Log Window ..."
 msgstr "Oopee _Lug Veendoo ..."
@@ -3345,9 +3641,6 @@ msgstr ""
 
 msgid "OpenEXR (*.exr)"
 msgstr "OopenEXR (*.ixr)"
-
-msgid "OpenGL Material"
-msgstr "OopenGL Metereeel"
 
 msgid "OpenGL Mesh Painter"
 msgstr "OopenGL Mesh Peeenter"
@@ -3378,8 +3671,44 @@ msgstr "Ooperetur"
 msgid "Option Name"
 msgstr "Oopereshun"
 
+msgid "Optional bumpmap texture."
+msgstr ""
+
+msgid "Optionally limits the sweep angle of the cone to less-than 360 degrees."
+msgstr ""
+
+msgid "Optionally limits the sweep angle of the cylinder to less-than 360 degrees."
+msgstr ""
+
+msgid "Optionally limits the sweep angle of the disk to less-than 360 degrees."
+msgstr ""
+
+msgid "Optionally limits the sweep angle of the hyperboloid to less-than 360 degrees."
+msgstr ""
+
+msgid "Optionally limits the sweep angle of the paraboloid to less-than 360 degrees."
+msgstr ""
+
+msgid "Optionally limits the sweep angle of the sphere to less-than 360 degrees."
+msgstr ""
+
+msgid "Optionally limits the sweep angle of the torus to less-than 360 degrees."
+msgstr ""
+
+#, fuzzy
+msgid "Optionally truncates the sphere along the +Z axis."
+msgstr "Ineble-a pueent deesplecement elung zee Z exees."
+
+#, fuzzy
+msgid "Optionally truncates the sphere along the -Z axis."
+msgstr "Ineble-a pueent deesplecement elung zee Z exees."
+
 msgid "Orbit Viewport"
 msgstr "Oorbeet Feeoopurt"
+
+#, fuzzy
+msgid "Order"
+msgstr "U Oorder"
 
 msgid "Order of the curve (2-linear - 4-cubic)"
 msgstr ""
@@ -3448,9 +3777,6 @@ msgstr "Ooootpoot Mesh"
 msgid "Output String"
 msgstr "Ooootpoot Streeng"
 
-msgid "Output Value"
-msgstr "Ooootpoot Felooe-a"
-
 msgid "Output Values of the coficients"
 msgstr ""
 
@@ -3467,20 +3793,18 @@ msgstr "Ooootpoot culur"
 msgid "Output file"
 msgstr "Ooootpoot feele-a"
 
-msgid "Output half strips"
-msgstr "Ooootpoot helff streeps"
-
-msgid "Output lower hemisphere"
-msgstr "Ooootpoot looer hemeesphere-a"
-
-msgid "Output matrix"
-msgstr "Ooootpoot metreex"
+#, fuzzy
+msgid "Output file path."
+msgstr "Ooootpoot feele-a"
 
 msgid "Output matrix (read only)"
 msgstr "Ooootpoot metreex (reed oonly)"
 
 msgid "Output mesh"
 msgstr "Ooootpoot mesh"
+
+msgid "Output mesh size when \"Scale to Size\" is enabled."
+msgstr ""
 
 msgid "Output pixel aspect ratio"
 msgstr "Ooootpoot peexel espect reteeu"
@@ -3490,9 +3814,6 @@ msgstr "Ooootpoot peexel heeeght"
 
 msgid "Output pixel width"
 msgstr "Ooootpoot peexel veedt"
-
-msgid "Output polygons (true) or patches (false)"
-msgstr "Ooootpoot pulyguns (trooe-a) oor petches (felse-a)"
 
 msgid "Output string"
 msgstr "Ooootpoot streeng"
@@ -3540,17 +3861,21 @@ msgstr "Peeent Deselect"
 msgid "Paint Select"
 msgstr "Peeent Select"
 
+#, fuzzy
+msgid "Paint name."
+msgstr "Peremeter neme-a"
+
 msgid "Pan & Tilt Viewport"
 msgstr "Pun & Teelt Feeoopurt"
 
-msgid "Paraboloid primitive"
-msgstr "Perebulueed preemitife-a"
+msgid "Papagayo File"
+msgstr ""
+
+msgid "Papagayo Lipsync File to Load"
+msgstr ""
 
 msgid "Parent"
 msgstr "Perent"
-
-msgid "Partial selection"
-msgstr "Perteeel selecshun"
 
 msgid "Patch Index"
 msgstr "Petch Index"
@@ -3562,23 +3887,42 @@ msgstr "Fece-a noomber"
 msgid "Patch subdivision number"
 msgstr "Petch soobdeefisiun noomber"
 
+msgid "Path to a bitmap image."
+msgstr ""
+
+msgid "Path to an HDR environment map."
+msgstr ""
+
+msgid "Path to goniometric file."
+msgstr ""
+
 msgid "Penalty for bad meshes"
 msgstr "Penelty fur bed meshes"
 
 msgid "Phase"
 msgstr "Phese-a"
 
+#, fuzzy
+msgid "Phi Max"
+msgstr "Phee mex"
+
+#, fuzzy
+msgid "Phi Max."
+msgstr "Phee mex"
+
 msgid "Phi Maximum"
 msgstr "Phee Mexeemoom"
 
+#, fuzzy
+msgid "Phi Min"
+msgstr "Phee meen"
+
+#, fuzzy
+msgid "Phi Min."
+msgstr "Phee meen"
+
 msgid "Phi Minimum"
 msgstr "Phee Meenimoom"
-
-msgid "Phi max"
-msgstr "Phee mex"
-
-msgid "Phi min"
-msgstr "Phee meen"
 
 msgid "Photons"
 msgstr "Phutuns"
@@ -3643,14 +3987,8 @@ msgstr "Plecement puleecy (oopteemel, leene-a, indpueent oor meedpuint, indpueen
 msgid "Places a shader on a bilinear patch, aligned with the farplane"
 msgstr "Pleces a sheder oon a beelineer petch, eleegned veet zee ferplune-a"
 
-msgid "Planar projection map"
-msgstr "Pluner prujecshun mep"
-
 msgid "Play"
 msgstr "Pley"
-
-msgid "Play From Cursor"
-msgstr "Pley Frum Coorsur"
 
 msgid "Play Script:"
 msgstr "Pley Screept:"
@@ -3658,15 +3996,13 @@ msgstr "Pley Screept:"
 msgid "Playback Mode"
 msgstr "Pleybeck Mude-a"
 
-msgid "Please include a contact email address"
-msgstr "Pleese-a incloode-a a cuntect imeeel eddress"
-
-msgid "Please include a summary for this bug report"
-msgstr "Pleese-a incloode-a a soommery fur thees boog repurt"
-
 #, fuzzy
 msgid "Poin_ts"
 msgstr "Pueents"
+
+#, fuzzy
+msgid "Point Count"
+msgstr "Pueent cuoont"
 
 msgid "Point Index"
 msgstr "Pueent Index"
@@ -3674,8 +4010,9 @@ msgstr "Pueent Index"
 msgid "Point Size"
 msgstr "Pueent Seeze-a"
 
-msgid "Point count"
-msgstr "Pueent cuoont"
+#, fuzzy
+msgid "Point Spacing"
+msgstr "Gredeeent speceeng"
 
 msgid "Pointer to device mesh"
 msgstr ""
@@ -3689,20 +4026,11 @@ msgstr "Pueents redeeoos"
 msgid "Points to approximate"
 msgstr ""
 
-msgid "Polygonal"
-msgstr "Pulygunel"
-
 msgid "Polygonizes bicubic patches"
 msgstr "Pulyguneezes beecoobic petches"
 
-msgid "Polyhedron Count"
-msgstr "Pulyhedrun Cuoont"
-
 msgid "Polyhedron Number"
 msgstr "Pulyhedrun Noomber"
-
-msgid "Polyhedron count"
-msgstr "Pulyhedrun cuoont"
 
 msgid "Polyhedron size (scale)"
 msgstr "Pulyhedrun seeze-a (scele-a)"
@@ -3728,10 +4056,21 @@ msgstr ""
 msgid "Power"
 msgstr "Pooer"
 
+msgid "Power-drawn by the light source in Watts."
+msgstr ""
+
 msgid "Preview SDS"
 msgstr "Prefeeoo SDS"
 
 msgid "Primitive"
+msgstr "Preemitife-a"
+
+#, fuzzy
+msgid "Primitive Number"
+msgstr "Preemitife-a"
+
+#, fuzzy
+msgid "Primitive Number."
 msgstr "Preemitife-a"
 
 msgid "Primitive size (scale)"
@@ -3746,6 +4085,9 @@ msgstr "Preemitife-a type-a (teeput, teecoop oor teespuun"
 msgid "Prints an input string value to stdout"
 msgstr "Preents un inpoot streeng felooe-a tu stduoot"
 
+msgid "Prints associated varying data near each edge, for debugging purposes"
+msgstr ""
+
 msgid "Prints input string to console's stdout"
 msgstr "Preents inpoot streeng tu cunsule's stduoot"
 
@@ -3756,10 +4098,15 @@ msgstr "Preents mesh inffurmeshun tu stduoot"
 msgid "Prints selection information to stdout"
 msgstr "Preents mesh inffurmeshun tu stduoot"
 
-msgid "Product of inputs"
+msgid "Prints vertex data near each corresponding vertex"
+msgstr ""
+
+#, fuzzy
+msgid "Product of inputs."
 msgstr "Prudooct ooff inpoots"
 
-msgid "Projection Axis"
+#, fuzzy
+msgid "Projection mapping."
 msgstr "Prujecshun Exees"
 
 msgid "Property Type"
@@ -3771,10 +4118,7 @@ msgstr ""
 msgid "Provides a custom property page for the MorphPoints modifier."
 msgstr ""
 
-msgid "Provides a general-purpose dialog for editing text, scripts, and shaders."
-msgstr ""
-
-msgid "Provides a graphical view of the command-node hierarchy"
+msgid "Provides a general-purpose dialog for editing source-code, text, scripts, and shaders."
 msgstr ""
 
 msgid "Provides a panel for displaying the undo tree"
@@ -3799,16 +4143,21 @@ msgstr "Prufeedes a suoorce-a oobject tu leenk culur pruperteees tu"
 msgid "Provides a source object to link scalar properties to"
 msgstr "Prufeedes a suoorce-a oobject tu leenk sceler pruperteees tu"
 
+#, fuzzy
+msgid "Provides a standard control for mesh properties."
+msgstr "Prufeedes a suoorce-a oobject tu leenk culur pruperteees tu"
+
+#, fuzzy
+msgid "Provides a standard control for selection properties."
+msgstr "Prufeedes a suoorce-a oobject tu leenk culur pruperteees tu"
+
 msgid "Provides a time source for a K-3D document"
 msgstr "Prufeedes a teeme-a suoorce-a fur a K-3D ducooment"
 
-msgid "Provides a user interface for recording interactive tutorials."
-msgstr ""
-
-msgid "Provides a user interface for recording test cases, including situations where the application crashes."
-msgstr ""
-
 msgid "Provides a user-interface for assigning menu hotkeys."
+msgstr ""
+
+msgid "Provides an interactive Python shell window"
 msgstr ""
 
 msgid "Provides interactive controls for 'snapping' nodes."
@@ -3862,14 +4211,11 @@ msgstr "Pruxyeeng ploogeen %1%"
 msgid "Proxying plugin module %1%"
 msgstr "Pruxyeeng ploogeen mudoole-a %1%"
 
-msgid "Python Script (*.py)"
-msgstr "Pythun Screept (*.py)"
+msgid "Python _Shell ..."
+msgstr ""
 
 msgid "Python scripting engine"
 msgstr "Pythun screepting ingeene-a"
-
-msgid "Quad remeshing using the PGP algorithm"
-msgstr ""
 
 msgid "Quadric weighting"
 msgstr "Qooedreec veeeghting"
@@ -3879,6 +4225,27 @@ msgstr "Qooedreec veeeghting puleecy (uneeffurm, erea, ungle-a)"
 
 msgid "Quotient of inputs"
 msgstr "Qoouteeent ooff inpoots"
+
+msgid "R1"
+msgstr ""
+
+#, fuzzy
+msgid "R1 Texture"
+msgstr "Textoore-a U"
+
+msgid "R2"
+msgstr ""
+
+#, fuzzy
+msgid "R2 Texture"
+msgstr "Textoore-a U"
+
+msgid "R3"
+msgstr ""
+
+#, fuzzy
+msgid "R3 Texture"
+msgstr "Textoore-a U"
 
 msgid "RIB archive to be inserted in output"
 msgstr "RIB ercheefe-a tu be-a inserted in ooootpoot"
@@ -3901,9 +4268,6 @@ msgstr "Redeeoos"
 msgid "Random seed"
 msgstr "Rundum seed"
 
-msgid "Read only"
-msgstr "Reed oonly"
-
 #, fuzzy
 msgid "Reader that loads external MD2 (.md2) files into the document by reference"
 msgstr "Mesh reeder thet lueds ixternel Vefeffrunt (.oobj) feeles intu zee ducooment by refference-a"
@@ -3912,23 +4276,13 @@ msgstr "Mesh reeder thet lueds ixternel Vefeffrunt (.oobj) feeles intu zee ducoo
 msgid "Reader that loads external Scalable Vector Graphics (.svg) files into the document by reference"
 msgstr "Mesh reeder thet lueds ixternel Vefeffrunt (.oobj) feeles intu zee ducooment by refference-a"
 
-msgid "Record Message"
-msgstr "Recurd Messege-a"
-
-msgid "Record _Test Case..."
-msgstr "Recurd _Test Cese-a..."
-
-msgid "Recording"
+#, fuzzy
+msgid "Record"
 msgstr "Recurdeeng"
 
 msgid ""
-"Recording GTK+ events and K-3D commands to stderr ...\n"
+"Recording GTK+ events to stderr ...\n"
 "Close window to cancel recording"
-msgstr ""
-
-msgid ""
-"Recording test case to %1%,\n"
-"close window to cancel recording"
 msgstr ""
 
 #, fuzzy
@@ -3937,6 +4291,10 @@ msgstr "Recurdeeng"
 
 msgid "Records data profiling execution of the visualization pipeline"
 msgstr ""
+
+#, fuzzy
+msgid "Red"
+msgstr "_Redu"
 
 msgid "Red threshold"
 msgstr "Red threshuld"
@@ -3971,7 +4329,12 @@ msgstr "Regeeun"
 msgid "Relative"
 msgstr "Releteefe-a"
 
-msgid "Remainder of inputs"
+#, fuzzy
+msgid "Relative size."
+msgstr "Releteefe-a"
+
+#, fuzzy
+msgid "Remainder of inputs."
 msgstr "Remeeender ooff inpoots"
 
 msgid "Rename local x y z"
@@ -4066,6 +4429,10 @@ msgstr "RenderMun leeght suoorce-a"
 msgid "RenderMan shader (*.sl)"
 msgstr "RenderMun sheder (*.sl)"
 
+#, fuzzy
+msgid "Renders Bezier triangle patches"
+msgstr "Renders beelineer petches"
+
 msgid "Renders NURBS curves"
 msgstr "Renders NOoRBS coorfes"
 
@@ -4074,9 +4441,6 @@ msgstr "Renders NOoRBS petches"
 
 msgid "Renders a one-dimensional array of geometric object instances"
 msgstr "Renders a oone-a-deemensiunel errey ooff geumetreec oobject instunces"
-
-msgid "Renders a teapot primitive in render engines that support one (Aqsis!)"
-msgstr "Renders a teeput preemitife-a in render ingeenes thet sooppurt oone-a (Eqsees!)"
 
 msgid "Renders a three-dimensional array of geometric object instances"
 msgstr "Renders a three-a-deemensiunel errey ooff geumetreec oobject instunces"
@@ -4099,15 +4463,43 @@ msgstr "Renders blubbeees (impleecit soorffeces)"
 msgid "Renders blobby primitives using points and lines"
 msgstr "Renders blubby preemitifes useeng pueents und leenes"
 
+#, fuzzy
+msgid "Renders cone primitives"
+msgstr "Cune-a preemitife-a"
+
+#, fuzzy
+msgid "Renders cone primitives using OpenGL"
+msgstr "Renders blubby preemitifes useeng pueents und leenes"
+
 msgid "Renders cubic curves"
 msgstr "Renders coobeec coorfes"
 
-msgid "Renders linear curves"
-msgstr "Renders leeneer coorfes"
+#, fuzzy
+msgid "Renders cylinder primitives"
+msgstr "Cyleender preemitife-a"
 
 #, fuzzy
-msgid "Renders mean curvature normal vector at each vertex"
-msgstr "Renders pulyhedrun fece-a nurmel fecturs"
+msgid "Renders cylinder primitives using OpoenGL"
+msgstr "Renders blubby preemitifes useeng pueents und leenes"
+
+#, fuzzy
+msgid "Renders disk primitives"
+msgstr "Deesk preemitife-a"
+
+#, fuzzy
+msgid "Renders disk primitives using OpenGL"
+msgstr "Renders blubby preemitifes useeng pueents und leenes"
+
+#, fuzzy
+msgid "Renders hyperboloid primitives"
+msgstr "Hyperbulueed preemitife-a"
+
+#, fuzzy
+msgid "Renders hyperboloid primitives using OpenGL"
+msgstr "Renders blubby preemitifes useeng pueents und leenes"
+
+msgid "Renders linear curves"
+msgstr "Renders leeneer coorfes"
 
 #, fuzzy
 msgid "Renders mesh as SDS faces using OpenGL 1.1"
@@ -4148,16 +4540,8 @@ msgid "Renders mesh faces"
 msgstr "Renders mesh feces"
 
 #, fuzzy
-msgid "Renders mesh faces using a face-varying color array"
-msgstr "Renders mesh feces, useeng flet shedeeng"
-
-#, fuzzy
 msgid "Renders mesh faces using a per-face color array"
 msgstr "Renders mesh feces, useeng smuut nurmels"
-
-#, fuzzy
-msgid "Renders mesh faces with PGP"
-msgstr "Renders mesh feces"
 
 #, fuzzy
 msgid "Renders mesh faces, after trianglulating them (OpenGL 1.1)"
@@ -4166,9 +4550,6 @@ msgstr "Renders mesh feces, useeng flet shedeeng"
 #, fuzzy
 msgid "Renders mesh faces, after trianglulating them (OpenGL VBOs)"
 msgstr "Renders mesh feces, useeng smuut nurmels"
-
-msgid "Renders mesh point groups"
-msgstr "Renders mesh pueent gruoops"
 
 msgid "Renders mesh points"
 msgstr "Renders mesh pueents"
@@ -4196,6 +4577,18 @@ msgstr "Renders mesh soobdeefisiun soorffeces"
 msgid "Renders meshes using a classic hidden-line effect."
 msgstr "Renders mesh feces, useeng flet shedeeng"
 
+#, fuzzy
+msgid "Renders paraboloid primitives"
+msgstr "Perebulueed preemitife-a"
+
+#, fuzzy
+msgid "Renders paraboloid primitives using OpoenGL"
+msgstr "Renders blubby preemitifes useeng pueents und leenes"
+
+#, fuzzy
+msgid "Renders particle primitives."
+msgstr "Renders blubby preemitifes useeng pueents und leenes"
+
 msgid "Renders polyhedron face normal vectors"
 msgstr "Renders pulyhedrun fece-a nurmel fecturs"
 
@@ -4205,6 +4598,18 @@ msgstr "Renders pulyhedrun fece-a nurmel fecturs"
 
 msgid "Renders selection hooks for facevarying data"
 msgstr ""
+
+#, fuzzy
+msgid "Renders sphere primitives"
+msgstr "Sphere-a preemitife-a"
+
+#, fuzzy
+msgid "Renders sphere primitives using OpoenGL"
+msgstr "Renders blubby preemitifes useeng pueents und leenes"
+
+#, fuzzy
+msgid "Renders teapot primitives"
+msgstr "Renders blubby preemitifes useeng pueents und leenes"
 
 #, fuzzy
 msgid "Renders teapot primitives using OpoenGL"
@@ -4219,11 +4624,16 @@ msgstr "Renders zee scene-a tu a beetmep useeng OopenGL"
 msgid "Renders the scene to a bitmap using WGL"
 msgstr "Renders zee scene-a tu a beetmep useeng VGL"
 
+#, fuzzy
+msgid "Renders torus primitives"
+msgstr "Turoos preemitife-a"
+
+#, fuzzy
+msgid "Renders torus primitives using OpenGL"
+msgstr "Renders blubby preemitifes useeng pueents und leenes"
+
 msgid "Replace"
 msgstr "Replece-a"
-
-msgid "Replace Selection"
-msgstr "Replece-a Selecshun"
 
 msgid "Requested script file %1% doesn't exist."
 msgstr "Reqooested screept feele-a %1% duesn't ixeest."
@@ -4308,6 +4718,12 @@ msgstr "Rutetes mesh pueents"
 msgid "Rotation"
 msgstr "Ruteshun"
 
+msgid "Roughness of the surface in the u direction."
+msgstr ""
+
+msgid "Roughness of the surface in the v direction."
+msgstr ""
+
 msgid "Rounded parts diameter"
 msgstr "Ruoonded perts deeemeter"
 
@@ -4336,12 +4752,6 @@ msgstr "Roobber Bund Select"
 msgid "S Wrap"
 msgstr "S Vrep"
 
-msgid "S0"
-msgstr "S0"
-
-msgid "S1"
-msgstr "S1"
-
 #, fuzzy
 msgid "SVG Document (*.svg)"
 msgstr "K-3D Ducooment (*.k3d)"
@@ -4352,17 +4762,24 @@ msgstr "S_creepting"
 msgid "S_nap Tool"
 msgstr "S_nep Tuul"
 
-msgid "Same polyhedron"
-msgstr "Seme-a pulyhedrun"
-
 msgid "Samples"
 msgstr "Semples"
 
 msgid "Save"
 msgstr "Sefe-a"
 
+msgid "Save GraphViz (.dot) file ..."
+msgstr ""
+
 msgid "Save K-3D Document As:"
 msgstr "Sefe-a K-3D Ducooment Es:"
+
+#, fuzzy
+msgid "Save Mesh ..."
+msgstr "Sefe-a _Es..."
+
+msgid "Save Mesh as GraphViz .dot file:"
+msgstr ""
 
 #, fuzzy
 msgid "Save PDF Document:"
@@ -4385,17 +4802,23 @@ msgstr "Sefe-a Screept Es::"
 msgid "Save Script:"
 msgstr "Sefe-a Screept:"
 
-msgid "Save Test Case As:"
-msgstr "Sefe-a Test Cese-a Es:"
-
-msgid "Save Tutorial As:"
-msgstr "Sefe-a Tootureeel Es:"
-
 msgid "Save _As..."
 msgstr "Sefe-a _Es..."
 
 msgid "Save alpha"
 msgstr "Sefe-a elpha"
+
+#, fuzzy
+msgid "Save mesh file:"
+msgstr "Sefe-a Test Cese-a Es:"
+
+#, fuzzy
+msgid "Save selection ..."
+msgstr "Freme-a selecshun"
+
+#, fuzzy
+msgid "Save selection file:"
+msgstr "Freme-a selecshun"
 
 msgid "Save the changes to document \"%1%\" before closing?"
 msgstr "Sefe-a zee chunges tu ducooment \"%1%\" beffure-a cluseeng?"
@@ -4442,8 +4865,19 @@ msgstr "Scele-a nurmels"
 msgid "Scale the TrimCurve"
 msgstr ""
 
+msgid "Scale the output mesh to fit within a fixed-size bounding-box."
+msgstr ""
+
+#, fuzzy
+msgid "Scale to Size"
+msgstr "Scele-a X"
+
 msgid "Scale vectors for display"
 msgstr ""
+
+#, fuzzy
+msgid "Scales light intensity."
+msgstr "Sceles mesh pueents"
 
 msgid "Scales mesh points"
 msgstr "Sceles mesh pueents"
@@ -4451,14 +4885,8 @@ msgstr "Sceles mesh pueents"
 msgid "Scaling"
 msgstr "Sceleeng"
 
-msgid "Scaling of vectors"
-msgstr ""
-
 msgid "Script"
 msgstr "Screept"
-
-msgid "Script Language"
-msgstr "Screept Lungooege-a"
 
 msgid "Script node that acts as a render engine"
 msgstr "Screept nude-a thet ects es a render ingeene-a"
@@ -4489,8 +4917,9 @@ msgstr "Seerch"
 msgid "Searching for plugins in %1%"
 msgstr "Seercheeng fur ploogeens in %1%"
 
-msgid "Second addition operand (should be a blobby)"
-msgstr "Secund eddeeshun ooperund (shuoold be-a a blubby)"
+#, fuzzy
+msgid "Second"
+msgstr "Send"
 
 msgid "Second check color"
 msgstr "Secund check culur"
@@ -4502,17 +4931,8 @@ msgstr "Secund inpoot fluet"
 msgid "Second input mesh."
 msgstr "Secund inpoot fluet"
 
-msgid "Second matrix line or row"
-msgstr "Secund metreex leene-a oor roo"
-
-msgid "Second maximum operand (should be a blobby)"
-msgstr "Secund mexeemoom ooperund (shuoold be-a a blubby)"
-
-msgid "Second minimum operand (should be a blobby)"
-msgstr "Secund meenimoom ooperund (shuoold be-a a blubby)"
-
-msgid "Second multiplication operand (should be a blobby)"
-msgstr "Secund moolteepliceshun ooperund (shuoold be-a a blubby)"
+msgid "Second point in the swept line segment that defines the output hyperboloid."
+msgstr ""
 
 msgid "Second segment end X position"
 msgstr "Secund segment ind X puseeshun"
@@ -4522,6 +4942,10 @@ msgstr "Secund segment ind Y puseeshun"
 
 msgid "Second segment end Z position"
 msgstr "Secund segment ind Z puseeshun"
+
+#, fuzzy
+msgid "Second."
+msgstr "Send"
 
 msgid "Segment color"
 msgstr "Segment culur"
@@ -4547,11 +4971,12 @@ msgstr "Select %1%"
 msgid "Select All"
 msgstr "Select Ell"
 
+#, fuzzy
+msgid "Select Curves"
+msgstr "Delete-a nudes"
+
 msgid "Select Faces"
 msgstr "Select Feces"
-
-msgid "Select Faces mode"
-msgstr "Select Feces mude-a"
 
 msgid "Select Invert"
 msgstr "Select Infert"
@@ -4559,26 +4984,34 @@ msgstr "Select Infert"
 msgid "Select Lines"
 msgstr "Select Leenes"
 
-msgid "Select Lines mode"
-msgstr "Select Leenes mude-a"
-
 msgid "Select Nodes"
 msgstr "Select Nudes"
-
-msgid "Select Nodes mode"
-msgstr "Select Nudes mude-a"
 
 msgid "Select None"
 msgstr "Select Nune-a"
 
-msgid "Select Objects"
-msgstr "Select Oobjects"
-
 msgid "Select Points"
 msgstr "Select Pueents"
 
-msgid "Select Points mode"
-msgstr "Select Pueents mude-a"
+#, fuzzy
+msgid "Select Polygon Edges"
+msgstr "Select Nudes"
+
+#, fuzzy
+msgid "Select Polygon Faces"
+msgstr "Select Feces"
+
+#, fuzzy
+msgid "Select Polygons"
+msgstr "Select Pueents"
+
+#, fuzzy
+msgid "Select Split Edges"
+msgstr "Select Leenes"
+
+#, fuzzy
+msgid "Select Uniform"
+msgstr "Select nudes"
 
 msgid "Select backfacing components when painting a selection"
 msgstr ""
@@ -4631,6 +5064,10 @@ msgstr "Selected Culur"
 msgid "Selected points"
 msgstr "Selected pueents"
 
+#, fuzzy
+msgid "Selection Options"
+msgstr "Selecshun Type-a"
+
 msgid "Selection Type"
 msgstr "Selecshun Type-a"
 
@@ -4657,7 +5094,8 @@ msgstr "Selects a beecoobic petch frum zee inpoot mesh by its index noomber"
 msgid "Selects a bilinear patch from the input mesh by its index number"
 msgstr "Selects a beelineer petch frum zee inpoot mesh by its index noomber"
 
-msgid "Selects a cubic curve from the input mesh by its index number"
+#, fuzzy
+msgid "Selects a cubic curve from based on its index number."
 msgstr "Selects a coobeec coorfe-a frum zee inpoot mesh by its index noomber"
 
 msgid "Selects a face from the input mesh by its index number"
@@ -4681,8 +5119,15 @@ msgstr "Selects pueents oor feces thet hefe-a noombers ooff seedes veethin a spe
 msgid "Selects portions of the input mesh that intersect a cube"
 msgstr "Selects purshuns ooff zee inpoot mesh thet intersect a coobe-a"
 
-msgid "Send"
-msgstr "Send"
+#, fuzzy
+msgid "Selects the points belonging to selected faces"
+msgstr "Selects idge-a reengs cunteeening selected igdes"
+
+msgid "Sends a stream of ATK user interface events to stderr, primarily intended for troubleshooting"
+msgstr ""
+
+msgid "Sends a stream of SpaceNavigator events to stderr, intended mainly for debugging."
+msgstr ""
 
 msgid "Sends a stream of user interface events to stderr, primarily intended for troubleshooting"
 msgstr ""
@@ -4713,9 +5158,6 @@ msgstr "Set _Cemera ..."
 
 msgid "Set alpha channel using color difference"
 msgstr "Set elpha chunnel useeng culur deefffference-a"
-
-msgid "Set the transparency (0 is transparent)"
-msgstr ""
 
 msgid "Set view"
 msgstr "Set feeoo"
@@ -4750,6 +5192,10 @@ msgstr "Shedoo"
 msgid "Shadow Map Camera"
 msgstr "Shedoo Mep Cemera"
 
+#, fuzzy
+msgid "Shadow samples."
+msgstr "Semples"
+
 msgid "Shadowmap bias"
 msgstr "Shedoomep beees"
 
@@ -4773,9 +5219,6 @@ msgstr "Sheer fectur"
 
 msgid "Shears mesh points along an axis"
 msgstr "Sheers mesh pueents elung un exees"
-
-msgid "Shininess"
-msgstr "Sheeniness"
 
 msgid "Show All"
 msgstr "Shoo Ell"
@@ -4818,15 +5261,15 @@ msgstr "Shoo ell"
 msgid "Show component selection"
 msgstr "Shoo cumpunent selecshun"
 
+#, fuzzy
+msgid "Show examples at startup"
+msgstr "Shoo tootureeels et stertoop"
+
 msgid "Show lights (on/off)"
 msgstr "Shoo leeghts (oon/ooffff)"
 
 msgid "Show selection"
 msgstr "Shoo selecshun"
-
-#, fuzzy
-msgid "Show tutorials and examples at startup"
-msgstr "Shoo tootureeels et stertoop"
 
 msgid "Show viewing projection"
 msgstr "Shoo feeooing prujecshun"
@@ -4840,14 +5283,24 @@ msgstr "Seede-a noomber"
 msgid "Sides"
 msgstr "Seedes"
 
-msgid "Simulates smooth geometry by averaging polygon normals"
-msgstr "Seemooletes smuut geumetry by eferegeeng pulygun nurmels"
+#, fuzzy
+msgid "Sigma"
+msgstr "gemma"
 
-msgid "Sine wave function applied on input"
+#, fuzzy
+msgid "Sigma Texture"
+msgstr "Textoore-a U"
+
+#, fuzzy
+msgid "Sine wave function applied to input."
 msgstr "Seene-a vefe-a fooncshun eppleeed oon inpoot"
 
 msgid "Size"
 msgstr "Seeze-a"
+
+#, fuzzy
+msgid "Size for the arrow"
+msgstr "Selected pueents"
 
 #, fuzzy
 msgid "Size for the points"
@@ -4868,27 +5321,11 @@ msgstr "Sleece-a noomber (Z exees)"
 msgid "Slices"
 msgstr "Sleeces"
 
-#, fuzzy
-msgid "Smooth Curvature"
-msgstr "Smuutheeng fectur"
-
 msgid "Smoothing"
 msgstr "Smuutheeng"
 
 msgid "Smoothing factor"
 msgstr "Smuutheeng fectur"
-
-#, fuzzy
-msgid "Smoothing steps"
-msgstr "Smuutheeng"
-
-#, fuzzy
-msgid "Smoothing timestep"
-msgstr "Smuutheeng"
-
-#, fuzzy
-msgid "Smoothing timesteps"
-msgstr "Smuutheeng"
 
 msgid "Smooths mesh points by averaging their positions with their neighbors'"
 msgstr "Smuuths mesh pueents by eferegeeng zeeur puseeshuns veet zeeur neeeghburs'"
@@ -4914,6 +5351,17 @@ msgstr "Sneps oone-a nude-a tu unuzeer"
 msgid "Softness"
 msgstr "Sufftness"
 
+#, fuzzy
+msgid "Solar Position"
+msgstr "X Puseeshun"
+
+#, fuzzy
+msgid "Solar position."
+msgstr "Vurld puseeshun"
+
+msgid "Solid Labels"
+msgstr ""
+
 msgid "Source"
 msgstr "Suoorce-a"
 
@@ -4924,33 +5372,79 @@ msgstr "Suoorce-a Nude-a"
 msgid "Space between points"
 msgstr "Mexeemoom deestunce-a betveee pueents"
 
+msgid "Specifies how to filter the texture."
+msgstr ""
+
+msgid "Specifies how to wrap the texture."
+msgstr ""
+
 msgid "Specifies the array to be used for face colors"
 msgstr ""
 
+msgid "Specifies the array to draw"
+msgstr ""
+
+msgid "Specifies which direction will be treated as 'East'."
+msgstr ""
+
+msgid "Specifies which direction will be treated as 'North'."
+msgstr ""
+
+msgid "Specifies which direction will be treated as 'up'."
+msgstr ""
+
 msgid "Specify the GraphViz command to use for rendering."
+msgstr ""
+
+msgid "Specify the U axis for planar mapping."
+msgstr ""
+
+msgid "Specify the V axis for planar mapping."
 msgstr ""
 
 #, fuzzy
 msgid "Specify the mathematical operator to merge segments: addition, multiplication, minimum or maximum."
 msgstr "Eddeeshun, moolteepliceshun, meenimoom oor mexeemoom"
 
+#, fuzzy
+msgid "Spectrum Type"
+msgstr "Selecshun Type-a"
+
+#, fuzzy
+msgid "Spectrum type."
+msgstr "Ooperetur type-a"
+
 msgid "Specular Color"
+msgstr "Specooler Culur"
+
+#, fuzzy
+msgid "Specular Color 1"
+msgstr "Specooler Culur"
+
+#, fuzzy
+msgid "Specular Color 2"
+msgstr "Specooler Culur"
+
+#, fuzzy
+msgid "Specular Color 3"
+msgstr "Specooler Culur"
+
+#, fuzzy
+msgid "Specular color."
 msgstr "Specooler Culur"
 
 msgid "Sphere factor"
 msgstr "Sphere-a fectur"
 
-msgid "Sphere primitive"
-msgstr "Sphere-a preemitife-a"
-
 msgid "Sphere radius"
 msgstr "Sphere-a redeeoos"
 
-msgid "Spherical projection map"
-msgstr "Sphereecel prujecshun mep"
-
 msgid "Split Curve at u in ]0,1["
 msgstr ""
+
+#, fuzzy
+msgid "Split Edges"
+msgstr "Sherp idges"
 
 msgid "Split Panel _Horizontally"
 msgstr "Spleet Punel _Hureezuntelly"
@@ -4960,6 +5454,10 @@ msgstr "Spleet Punel _Ferteecelly"
 
 msgid "Splits a patch at the selected u/v value"
 msgstr ""
+
+#, fuzzy
+msgid "Start Point"
+msgstr "Select Pueents"
 
 msgid "Start Time"
 msgstr "Stert Teeme-a"
@@ -4980,9 +5478,6 @@ msgstr ""
 msgid "Stop"
 msgstr "Stup"
 
-msgid "Stop Recording"
-msgstr "Stup Recurdeeng"
-
 msgid "Stop function"
 msgstr "Stup fooncshun"
 
@@ -5001,15 +5496,6 @@ msgstr "Stretch zee imege-a tu feell zee cemera espect reteeu"
 
 msgid "String source that uses a script to create the output value"
 msgstr "Streeng suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
-
-msgid "Strip Number"
-msgstr "Streep Noomber"
-
-msgid "Strips"
-msgstr "Streeps"
-
-msgid "Subdivision iterations"
-msgstr "Soobdeefisiun itereshuns"
 
 msgid "Subdivision level"
 msgstr "Soobdeefisiun lefel"
@@ -5036,14 +5522,9 @@ msgstr "Soobtrect felooe-a tu iech peexel culur cumpunent"
 msgid "Subtract value to each pixel color component"
 msgstr "Soobtrect felooe-a tu iech peexel culur cumpunent"
 
-msgid "Subtraction type"
-msgstr "Soobtrecshun type-a"
-
-msgid "Sum of inputs"
+#, fuzzy
+msgid "Sum of inputs."
 msgstr "Soom ooff inpoots"
-
-msgid "Surface"
-msgstr "Soorffece-a"
 
 msgid "Surface Material"
 msgstr "Soorffece-a Metereeel"
@@ -5054,89 +5535,33 @@ msgstr "Soorffece-a Sheder"
 msgid "Surface material"
 msgstr "Soorffece-a metereeel"
 
+msgid "Surface reflectivity."
+msgstr ""
+
+msgid "Surface roughness along the u direction."
+msgstr ""
+
+msgid "Surface roughness along the v direction."
+msgstr ""
+
 msgid "Surface shader"
 msgstr "Soorffece-a sheder"
-
-msgid "Swap dividend and divisor"
-msgstr "Svep deefidend und deefisur"
-
-msgid "Swap subtrahend and minuend"
-msgstr "Svep soobtrehend und meenooend"
 
 msgid "Swap the curves?"
 msgstr ""
 
+#, fuzzy
+msgid "Sweep Angle"
+msgstr "Ungle-a"
+
 msgid "T Wrap"
 msgstr "T Vrep"
-
-msgid "T0"
-msgstr "T0"
-
-msgid "T1"
-msgstr "T1"
 
 msgid "TIFF (*.tiff)"
 msgstr "TIFF (*.teeffff)"
 
 msgid "TIFF Image (*.tiff)"
 msgstr "TIFF Imege-a (*.teeffff)"
-
-msgid "Tag Bicubic Patches"
-msgstr "Teg Beecoobic Petches"
-
-msgid "Tag Bilinear Patches"
-msgstr "Teg Beelineer Petches"
-
-msgid "Tag Cubic Curve Groups"
-msgstr "Teg Coobeec Coorfe-a Gruoops"
-
-msgid "Tag Edges"
-msgstr "Teg Idges"
-
-msgid "Tag Faces"
-msgstr "Teg Feces"
-
-msgid "Tag Linear Groups"
-msgstr "Teg Leeneer Gruoops"
-
-msgid "Tag Point Groups"
-msgstr "Teg Pueent Gruoops"
-
-msgid "Tag Points"
-msgstr "Teg Pueents"
-
-msgid "Tag Polyhedra"
-msgstr "Teg Pulyhedra"
-
-msgid "Tag bicubic patches"
-msgstr "Teg beecoobic petches"
-
-msgid "Tag bilinear patches"
-msgstr "Teg beelineer petches"
-
-msgid "Tag cubic curve groups"
-msgstr "Teg coobeec coorfe-a gruoops"
-
-msgid "Tag edges"
-msgstr "Teg idges"
-
-msgid "Tag faces"
-msgstr "Teg feces"
-
-msgid "Tag linear curve groups"
-msgstr "Teg leeneer coorfe-a gruoops"
-
-msgid "Tag point groups"
-msgstr "Teg pueent gruoops"
-
-msgid "Tag points"
-msgstr "Teg pueents"
-
-msgid "Tag polyhedra"
-msgstr "Teg pulyhedra"
-
-msgid "Tags geometry with a color"
-msgstr "Tegs geumetry veet a culur"
 
 msgid "Take a NURBS curve and rotate it around one of the coordinate system axis"
 msgstr ""
@@ -5177,46 +5602,16 @@ msgstr "Terget metreex"
 msgid "Task"
 msgstr "Tesk"
 
-msgid "Tells whether the tutorial recorder records user actions"
-msgstr "Tells vhezeer zee tootureeel recurder recurds user ecshuns"
-
 msgid "Text"
 msgstr "Text"
-
-#, fuzzy
-msgid "Texture Coordinate Set"
-msgstr "Cuurdeenete-a spece-a"
 
 msgid "Texture File"
 msgstr "Textoore-a Feele-a"
 
-#, fuzzy
-msgid "Texture Mapping Set"
-msgstr "Textoore-a Meppeeng Type-a"
-
-msgid "Texture Mapping Type"
-msgstr "Textoore-a Meppeeng Type-a"
-
 msgid "Texture Memory"
 msgstr "Textoore-a Memury"
 
-#, fuzzy
-msgid "Texture Scaling"
-msgstr "Textoore-a Meppeeng Type-a"
-
-msgid "Texture U"
-msgstr "Textoore-a U"
-
-msgid "Texture V"
-msgstr "Textoore-a F"
-
-msgid "Texture W"
-msgstr "Textoore-a V"
-
-msgid ""
-"Thanks!  Your bug report has been submitted.  You can track your report at:\n"
-"\n"
-"http://sourceforge.net/tracker/index.php?func=detail&aid=%1%&group_id=11113&atid=111113"
+msgid "The color of the light."
 msgstr ""
 
 msgid "The coordinates of the trim curve need to be in the interval [0,1]. When being created these are scaled to fit in, but you can adjust the scaling here"
@@ -5253,6 +5648,9 @@ msgstr ""
 msgid "The requested RenderMan implementation could not be found.  Check to ensure that you have it installed and your PATH is up-to-date."
 msgstr ""
 
+msgid "The sigma parameter in the Oren-Nayer shader in degrees.  Zero for pure Lambertian reflection."
+msgstr ""
+
 msgid "The size of each grid square"
 msgstr "Zee seeze-a ooff iech greed sqooere-a"
 
@@ -5268,14 +5666,6 @@ msgstr ""
 msgid "There are %1% documents with unsaved changes. Save changes before closing?"
 msgstr "Zeere-a ere-a %1% ducooments veet unsefed chunges. Sefe-a chunges beffure-a cluseeng?"
 
-msgid ""
-"There was an error sending your report - please visit\n"
-"\n"
-"http://sourceforge.net/tracker/?group_id=11113&atid=111113\n"
-"\n"
-"and file a report manually instead."
-msgstr ""
-
 msgid "Theta Maximum"
 msgstr "Zeeta Mexeemoom"
 
@@ -5285,8 +5675,8 @@ msgstr "Zeeta mex"
 msgid "Thickness"
 msgstr "Theeckness"
 
-msgid "Third matrix line or row"
-msgstr "Thurd metreex leene-a oor roo"
+msgid "Thin film coating thickness (nanometers)."
+msgstr ""
 
 #, fuzzy
 msgid "Threshold"
@@ -5301,11 +5691,28 @@ msgstr "Teeghtness"
 msgid "Time"
 msgstr "Teeme-a"
 
+#, fuzzy
+msgid "Time Zone Offset"
+msgstr "Z Ooffffset"
+
+msgid "Time for the current mouths' values(should be connected to a time source)"
+msgstr ""
+
+msgid "Time for the transition from mouth to mouth"
+msgstr ""
+
+msgid "Time since 1970-1-1, in seconds."
+msgstr ""
+
+msgid "Time zone offset in minutes, [-720, +720].  Note that you must adjust the timezone manually to account for daylight savings time."
+msgstr ""
+
 msgid "Timestamp value, or 0 to use current system time"
 msgstr "Teemestemp felooe-a, oor 0 tu use-a coorrent system teeme-a"
 
-msgid "Tip"
-msgstr "Teep"
+#, fuzzy
+msgid "To"
+msgstr "Tup"
 
 msgid "To assign hotkeys, hover the mouse over a menu item, and hit the desired hotkey combination.  Use \"delete\" to remove hotkeys.  Close this window to turn-off Assign Hotkeys Mode."
 msgstr "Tu esseegn hutkeys, hufer zee muoose-a oofer a menoo item, und heet zee desured hutkey cumbeeneshun.  Use-a \"delete\" tu remufe-a hutkeys.  Cluse-a thees veendoo tu toorn-ooffff Esseegn Hutkeys Mude-a."
@@ -5318,23 +5725,14 @@ msgstr "Drev Selected"
 msgid "Toggle Selected %1%"
 msgstr "Select %1%"
 
+msgid "Toggle the recording of actions"
+msgstr ""
+
 msgid "Top"
 msgstr "Tup"
 
-msgid "Top cap position"
-msgstr "Tup cep puseeshun"
-
 msgid "Top segments"
 msgstr "Tup segments"
-
-msgid "Torus major radius"
-msgstr "Turoos mejur redeeoos"
-
-msgid "Torus minor radius"
-msgstr "Turoos meenur redeeoos"
-
-msgid "Torus primitive"
-msgstr "Turoos preemitife-a"
 
 msgid "Track Viewport"
 msgstr "Treck Feeoopurt"
@@ -5368,7 +5766,35 @@ msgid "Transformation matrix"
 msgstr "Trunsffurmeshun metreex"
 
 #, fuzzy
+msgid "Transformation matrix used to position / orient / scale the output cone."
+msgstr "Trunsffurm suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
+
+#, fuzzy
+msgid "Transformation matrix used to position / orient / scale the output cylinder."
+msgstr "Trunsffurm suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
+
+#, fuzzy
+msgid "Transformation matrix used to position / orient / scale the output disk."
+msgstr "Trunsffurm suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
+
+#, fuzzy
+msgid "Transformation matrix used to position / orient / scale the output hyperboloid."
+msgstr "Trunsffurm suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
+
+#, fuzzy
+msgid "Transformation matrix used to position / orient / scale the output paraboloid."
+msgstr "Trunsffurm suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
+
+#, fuzzy
+msgid "Transformation matrix used to position / orient / scale the output sphere."
+msgstr "Trunsffurm suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
+
+#, fuzzy
 msgid "Transformation matrix used to position / orient / scale the output teapot."
+msgstr "Trunsffurm suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
+
+#, fuzzy
+msgid "Transformation matrix used to position / orient / scale the output torus."
 msgstr "Trunsffurm suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
 
 msgid "TranslateArray1D"
@@ -5389,21 +5815,9 @@ msgstr "Trunsletes mesh pueents"
 msgid "Transmitted Color"
 msgstr "Trunsmeetted Culur"
 
-msgid "Transpose"
-msgstr "Trunspuse-a"
-
-msgid "Transpose shown matrix"
-msgstr "Trunspuse-a shoon metreex"
-
-msgid "Triangulate Non-Quads"
-msgstr ""
-
-msgid "Triangulate only faces that contain holes"
-msgstr "Treeungoolete-a oonly feces thet cunteeen hules"
-
 #, fuzzy
-msgid "Triangulates faces with more than 4 edges"
-msgstr "Treeungoolete-a oonly feces thet cunteeen hules"
+msgid "Transparent Color."
+msgstr "Trunsmeetted Culur"
 
 msgid "TrimCurve offset in u direction"
 msgstr ""
@@ -5413,6 +5827,9 @@ msgstr ""
 
 msgid "True iff all input meshes are completely equivalent"
 msgstr "Trooe-a iffff ell inpoot meshes ere-a cumpletely iqooeefelent"
+
+msgid "Turbidity"
+msgstr ""
 
 msgid "Tweak array translates each point in a custom diretion, those values are set by the application"
 msgstr "Tveek errey trunsletes iech pueent in a coostum dureshun, thuse-a felooes ere-a set by zee eppleeceshun"
@@ -5444,8 +5861,40 @@ msgstr "Tvu-Seeded"
 msgid "Type"
 msgstr "Type-a"
 
+msgid "Type of array to use"
+msgstr ""
+
+#, fuzzy
+msgid "U Axis"
+msgstr "Exees"
+
+#, fuzzy
+msgid "U Delta"
+msgstr "Delete-a"
+
+msgid "U Delta."
+msgstr ""
+
 msgid "U Order"
 msgstr "U Oorder"
+
+#, fuzzy
+msgid "U Roughness"
+msgstr "Teeghtness"
+
+msgid "U Roughness Texture"
+msgstr ""
+
+msgid "U Roughness."
+msgstr ""
+
+#, fuzzy
+msgid "U Scale"
+msgstr "Scele-a"
+
+#, fuzzy
+msgid "U Scale."
+msgstr "Scele-a"
 
 msgid "U Segments"
 msgstr "U Segments"
@@ -5474,14 +5923,11 @@ msgstr "Undu Ell"
 msgid "Undo all %1%"
 msgstr "Undu ell %1%"
 
-msgid "Uniform Array Name"
-msgstr ""
-
 #, fuzzy
-msgid "Uniform Normals"
-msgstr "Nurmeleeze-a nurmels"
+msgid "Uniform"
+msgstr "Uneeun"
 
-msgid "Uniform output array name."
+msgid "Uniform Array Name"
 msgstr ""
 
 msgid "Union"
@@ -5489,6 +5935,10 @@ msgstr "Uneeun"
 
 msgid "Unknown object type"
 msgstr ""
+
+#, fuzzy
+msgid "Unknown script language"
+msgstr "Screept Lungooege-a"
 
 msgid "Unparent"
 msgstr "Unperent"
@@ -5503,20 +5953,18 @@ msgstr "Unselected Culur"
 msgid "Unselected Mesh Color"
 msgstr "Unselected Culur"
 
+#, fuzzy
+msgid "Untitled"
+msgstr "Unteetled Screept"
+
 msgid "Untitled Document %1%"
 msgstr "Unteetled Ducooment %1%"
 
-msgid "Untitled Script"
-msgstr "Unteetled Screept"
-
-msgid "Untitled Tutorial"
-msgstr "Unteetled Tootureeel"
+msgid "Up"
+msgstr ""
 
 msgid "Up Position"
 msgstr "Up Puseeshun"
-
-msgid "Use File > Open to load a document"
-msgstr "Use-a Feele-a > Oopee tu lued a ducooment"
 
 msgid "Use QMC"
 msgstr "Use-a QMC"
@@ -5530,6 +5978,18 @@ msgstr "Use-a Y"
 msgid "Use Z"
 msgstr "Use-a Z"
 
+msgid "Use an array of constant data"
+msgstr ""
+
+msgid "Use an array of face data"
+msgstr ""
+
+msgid "Use an array of varying data"
+msgstr ""
+
+msgid "Use an array of vertex data"
+msgstr ""
+
 msgid "Use boundary preservation planes with given weight"
 msgstr "Use-a buoondery preserfeshun plunes veet geefee veeeght"
 
@@ -5540,6 +6000,9 @@ msgid "Use mouse pointer to paint-select geometry components"
 msgstr "Use-a muoose-a pueenter tu peeent-select geumetry cumpunents"
 
 msgid "Used for editing of UV coordinates"
+msgstr ""
+
+msgid "Used to do linear interpolation between Material 1 and Material 2."
 msgstr ""
 
 #, fuzzy
@@ -5553,11 +6016,37 @@ msgstr "Lung suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
 msgid "Uses a script to render meshes"
 msgstr ""
 
-msgid "Using upstream component selection"
-msgstr "Useeng upstreem cumpunent selecshun"
+#, fuzzy
+msgid "V Axis"
+msgstr "Exees"
+
+#, fuzzy
+msgid "V Delta"
+msgstr "Delete-a"
+
+msgid "V Delta."
+msgstr ""
 
 msgid "V Order"
 msgstr "F Oorder"
+
+#, fuzzy
+msgid "V Roughness"
+msgstr "Teeghtness"
+
+msgid "V Roughness Texture"
+msgstr ""
+
+msgid "V Roughness."
+msgstr ""
+
+#, fuzzy
+msgid "V Scale"
+msgstr "Scele-a"
+
+#, fuzzy
+msgid "V Scale."
+msgstr "Scele-a"
 
 msgid "V Segments"
 msgstr "F Segments"
@@ -5567,6 +6056,39 @@ msgstr "F pooer"
 
 msgid "V segments"
 msgstr "F segments"
+
+msgid "V00"
+msgstr ""
+
+msgid "V01"
+msgstr ""
+
+msgid "V10"
+msgstr ""
+
+msgid "V11"
+msgstr ""
+
+#, fuzzy
+msgid "Value"
+msgstr "Felooe-a"
+
+msgid "Value, associated with selected items"
+msgstr ""
+
+#, fuzzy
+msgid "Varying"
+msgstr "Verneeng"
+
+#, fuzzy
+msgid "Varying Normals"
+msgstr "Nurmel"
+
+msgid "Varying output array name."
+msgstr ""
+
+msgid "Vector pointing to the sun."
+msgstr ""
 
 msgid "Vector3 source that uses a script to create the output value"
 msgstr "Fectur3 suoorce-a thet uses a screept tu creete-a zee ooootpoot felooe-a"
@@ -5623,14 +6145,12 @@ msgstr ""
 msgid "Volume"
 msgstr "Felooe-a"
 
-msgid "Voxel subdivisions along blobby's bounding-box width, height and depth "
-msgstr "Fuxel soobdeefisiuns elung blubby's buoondeeng-bux veedt, heeeght und dept "
+#, fuzzy
+msgid "Watch"
+msgstr "Veedt"
 
-msgid "Voxels"
-msgstr "Fuxels"
-
-msgid "Warning"
-msgstr "Verneeng"
+msgid "Watch/unwatch file for changes"
+msgstr ""
 
 msgid "Wave amplitude"
 msgstr "Vefe-a empleetoode-a"
@@ -5672,6 +6192,10 @@ msgstr "Vurld puseeshun"
 
 msgid "World target"
 msgstr "Vurld terget"
+
+#, fuzzy
+msgid "Wrap"
+msgstr "S Vrep"
 
 msgid "X"
 msgstr "X"
@@ -5745,6 +6269,9 @@ msgstr "X2"
 
 msgid "X2 Position"
 msgstr "X2 Puseeshun"
+
+msgid "XTrackCAD Tracks File ( .xtc )"
+msgstr ""
 
 msgid "XY Plane"
 msgstr "XY Plune-a"
@@ -5858,6 +6385,14 @@ msgstr "Yeffrey Sput Leeght"
 msgid "Yafray Sun Light"
 msgstr "Yeffrey Soon Leeght"
 
+#, fuzzy
+msgid "Year"
+msgstr "Neer"
+
+#, fuzzy
+msgid "Year."
+msgstr "Neer"
+
 msgid "Yes"
 msgstr "Yes"
 
@@ -5888,8 +6423,16 @@ msgstr "Z Culur"
 msgid "Z Frequency"
 msgstr "Z Freqooency"
 
+#, fuzzy
+msgid "Z Max"
+msgstr "ZMex"
+
 msgid "Z Max (RenderMan convention)"
 msgstr "Z Mex (RenderMun cunfenshun)"
+
+#, fuzzy
+msgid "Z Min"
+msgstr "ZMeen"
 
 msgid "Z Offset"
 msgstr "Z Ooffffset"
@@ -5976,6 +6519,9 @@ msgstr "Zuum Feeoopurt"
 msgid "_About K-3D ..."
 msgstr "_Ebuoot K-3D ..."
 
+msgid "_Advanced"
+msgstr ""
+
 msgid "_All"
 msgstr "_Ell"
 
@@ -5994,6 +6540,10 @@ msgstr "_Decurete-a Selected Punel"
 msgid "_Delete"
 msgstr "_Delete-a"
 
+#, fuzzy
+msgid "_Edges"
+msgstr "Nudes"
+
 msgid "_Edit"
 msgstr "_Ideet"
 
@@ -6002,9 +6552,6 @@ msgstr "_Ideetur ..."
 
 msgid "_Export ..."
 msgstr "_Ixpurt ..."
-
-msgid "_Faces"
-msgstr "_Feces"
 
 msgid "_File"
 msgstr "_Feele-a"
@@ -6041,9 +6588,6 @@ msgstr "_Kneeffe-a Tuul"
 
 msgid "_Layout"
 msgstr "_Leyuoot"
-
-msgid "_Lines"
-msgstr "_Leenes"
 
 msgid "_Manual"
 msgstr "_Munooel"
@@ -6083,9 +6627,6 @@ msgstr "_Prefeeoo"
 
 msgid "_Quit"
 msgstr "_Qooeet"
-
-msgid "_Record Tutorial..."
-msgstr "_Recurd Tootureeel..."
 
 msgid "_Redo"
 msgstr "_Redu"
@@ -6130,12 +6671,12 @@ msgstr "_Seebling"
 msgid "_Tools"
 msgstr "_Tuuls"
 
-#, fuzzy
-msgid "_Tutorials and Examples ..."
-msgstr "_Tootureeels ..."
-
 msgid "_Undo"
 msgstr "_Undu"
+
+#, fuzzy
+msgid "_Uniform"
+msgstr "Uneeun"
 
 msgid "_Unparent"
 msgstr "_Unperent"
@@ -6157,6 +6698,9 @@ msgstr "beem_felluffff"
 
 msgid "bias"
 msgstr "beees"
+
+msgid "blah"
+msgstr ""
 
 msgid "bounding_box"
 msgstr "buoondeeng_bux"
@@ -6184,10 +6728,6 @@ msgstr "clooster"
 
 msgid "color"
 msgstr "culur"
-
-#, fuzzy
-msgid "control_points"
-msgstr "teg_pueents"
 
 msgid "cos(pi/2)"
 msgstr ""
@@ -6328,9 +6868,6 @@ msgstr "nblend"
 msgid "normalize_all"
 msgstr "Nurmeleeze-a"
 
-msgid "number"
-msgstr "noomber"
-
 #, fuzzy
 msgid "offset_u"
 msgstr "X ooffffset"
@@ -6338,10 +6875,6 @@ msgstr "X ooffffset"
 #, fuzzy
 msgid "offset_v"
 msgstr "X ooffffset"
-
-#, fuzzy
-msgid "order"
-msgstr "u_oorder"
 
 msgid "phimax"
 msgstr "pheemex"
@@ -6360,10 +6893,6 @@ msgstr "peexel_heeeght"
 
 msgid "pixel_width"
 msgstr "peexel_veedt"
-
-#, fuzzy
-msgid "point_spacing"
-msgstr "Gredeeent speceeng"
 
 msgid "power"
 msgstr "pooer"
@@ -6385,12 +6914,6 @@ msgstr "refflected_culur"
 
 msgid "resolution"
 msgstr "resulooshun"
-
-msgid "s0"
-msgstr "s0"
-
-msgid "s1"
-msgstr "s1"
 
 msgid "samples"
 msgstr "semples"
@@ -6433,12 +6956,6 @@ msgstr "sveedt"
 
 msgid "swrap"
 msgstr "svrep"
-
-msgid "t0"
-msgstr "t0"
-
-msgid "t1"
-msgstr "t1"
 
 msgid "thetamax"
 msgstr "zeetemex"
@@ -6522,11 +7039,42 @@ msgstr "zmex"
 msgid "zmin"
 msgstr "zmeen"
 
+#~ msgid " [recording]"
+#~ msgstr " [recurdeeng]"
+
+#~ msgid "-- Enter a message to be recorded --"
+#~ msgstr "-- Inter a messege-a tu be-a recurded --"
+
 #~ msgid "3D Studio Max ( .3ds )"
 #~ msgstr "3D Stoodeeu Mex ( .3ds )"
 
+#~ msgid "<span size=\"xx-large\" weight=\"heavy\">Welcome to K-3D Bug Buddy</span>"
+#~ msgstr "<span size=\"xx-large\" weight=\"heavy\">Velcume-a tu K-3D Boog Booddy</span>"
+
+#~ msgid "<span weight=\"bold\">Required</span> - describe what happened in detail:"
+#~ msgstr "<span weight=\"bold\">Reqooured</span> - descreebe-a vhet heppened in deteeel:"
+
+#~ msgid "<span weight=\"bold\">Required</span> - enter a one-line summary of what happened:"
+#~ msgstr "<span weight=\"bold\">Reqooured</span> - inter a oone-a-leene-a soommery ooff vhet heppened:"
+
+#~ msgid "<span weight=\"bold\">Required</span> - enter your contact <span weight=\"bold\">e-mail</span> address:"
+#~ msgstr "<span weight=\"bold\">Reqooured</span> - inter yuoor cuntect <span weight=\"bold\">i-meeel</span> eddress:"
+
+#, fuzzy
+#~ msgid "Active Tool"
+#~ msgstr "_Kneeffe-a Tuul"
+
 #~ msgid "Add a user property to this node"
 #~ msgstr "Edd a user pruperty tu thees nude-a"
+
+#~ msgid "All components are deselected"
+#~ msgstr "Ell cumpunents ere-a deselected"
+
+#~ msgid "All components are selected"
+#~ msgstr "Ell cumpunents ere-a selected"
+
+#~ msgid "Ambient Color"
+#~ msgstr "Embeeent Culur"
 
 #~ msgid "Aqsis Displacement Layer"
 #~ msgstr "Eqsees Deesplecement Leyer"
@@ -6534,17 +7082,68 @@ msgstr "zmeen"
 #~ msgid "Aqsis Surface Layer"
 #~ msgstr "Eqsees Soorffece-a Leyer"
 
+#~ msgid "Are you sure?  The only way to get a bug fixed is to report it ..."
+#~ msgstr "Ere-a yuoo soore-a?  Zee oonly vey tu get a boog feexed is tu repurt it ..."
+
+#~ msgid "Base radius"
+#~ msgstr "Bese-a redeeoos"
+
+#~ msgid "Bicubic Patch Count"
+#~ msgstr "Beecoobic Petch Cuoont"
+
+#~ msgid "Bilinear patch count"
+#~ msgstr "Beelineer petch cuoont"
+
+#~ msgid "Blobby dividend"
+#~ msgstr "Blubby deefidend"
+
+#~ msgid "Blobby divisor"
+#~ msgstr "Blubby deefisur"
+
+#~ msgid "Blobby minuend"
+#~ msgstr "Blubby meenooend"
+
+#~ msgid "Blobby subtrahend"
+#~ msgstr "Blubby soobtrehend"
+
+#~ msgid "Bottom cap position"
+#~ msgstr "Buttum cep puseeshun"
+
+#~ msgid "Cancel Tutorial"
+#~ msgstr "Cuncel Tootureeel"
+
+#~ msgid "Choose a file to open:"
+#~ msgstr "Chuuse-a a feele-a tu oopee:"
+
 #~ msgid "Choose property type"
 #~ msgstr "Chuuse-a pruperty type-a"
 
 #~ msgid "Choose value type"
 #~ msgstr "Chuuse-a felooe-a type-a"
 
+#~ msgid "Clear"
+#~ msgstr "Cleer"
+
+#~ msgid "Close"
+#~ msgstr "Cluse-a"
+
 #~ msgid "Coarsens polygonal surfaces"
 #~ msgstr "Cuersens pulygunel soorffeces"
 
 #~ msgid "Color number in the virtual color list"
 #~ msgstr "Culur noomber in zee furtooel culur leest"
+
+#~ msgid "Command Node Inspector"
+#~ msgstr "Cummund Nude-a Inspectur"
+
+#~ msgid "Command Node Inspector ..."
+#~ msgstr "Cummund Nude-a Inspectur ..."
+
+#~ msgid "Cone height"
+#~ msgstr "Cune-a heeeght"
+
+#~ msgid "Continue Tutorial"
+#~ msgstr "Cunteenooe-a Tootureeel"
 
 #~ msgid "Cost function (length, optimized, angle)"
 #~ msgstr "Cust fooncshun (lengt, oopteemized, ungle-a)"
@@ -6561,11 +7160,90 @@ msgstr "zmeen"
 #~ msgid "Could not locate the sdrc executable."
 #~ msgstr "Cuoold nut lucete-a zee sdrc ixecooteble-a."
 
+#~ msgid "Cubic curve count"
+#~ msgstr "Coobeec coorfe-a cuoont"
+
+#~ msgid "Cubic curve group count"
+#~ msgstr "Coobeec coorfe-a gruoop cuoont"
+
+#~ msgid "Cylinder bending into sphere"
+#~ msgstr "Cyleender bendeeng intu sphere-a"
+
+#~ msgid "Cylinder test"
+#~ msgstr "Cyleender test"
+
+#~ msgid "Cylindrical projection map"
+#~ msgstr "Cyleendricel prujecshun mep"
+
+#~ msgid "Default Color"
+#~ msgstr "Deffoolt Culur"
+
+#~ msgid "Default T"
+#~ msgstr "Deffoolt T"
+
+#~ msgid "Default color"
+#~ msgstr "Deffoolt culur"
+
+#~ msgid "Default s"
+#~ msgstr "Deffoolt s"
+
+#~ msgid "Default t"
+#~ msgstr "Deffoolt t"
+
+#~ msgid "Dimension"
+#~ msgstr "Deemensiun"
+
+#~ msgid "Disk position"
+#~ msgstr "Deesk puseeshun"
+
+#~ msgid "Disk radius"
+#~ msgstr "Deesk redeeoos"
+
+#~ msgid "Display strip Number"
+#~ msgstr "Deespley streep Noomber"
+
+#~ msgid "Display strips"
+#~ msgstr "Deespley streeps"
+
+#~ msgid "Displays input matrix values"
+#~ msgstr "Deespleys inpoot metreex felooes"
+
+#~ msgid "Displays statistics about the input mesh"
+#~ msgstr "Deespleys steteestics ebuoot zee inpoot mesh"
+
+#~ msgid "Division type"
+#~ msgstr "Deefisiun type-a"
+
+#, fuzzy
+#~ msgid "Double-click to play a tutorial:"
+#~ msgstr "Duooble-a-cleeck a tootureeel tu begeen:"
+
+#~ msgid "Edge number"
+#~ msgstr "Idge-a noomber"
+
+#~ msgid "Emission Color"
+#~ msgstr "Imeessiun Culur"
+
+#~ msgid "Error"
+#~ msgstr "Irrur"
+
+#~ msgid "Error reading document."
+#~ msgstr "Irrur reedeeng ducooment."
+
+#~ msgid "Event Recorder ..."
+#~ msgstr "Ifent Recurder ..."
+
+#~ msgid "Eversion Time : between 0 and 1"
+#~ msgstr "Iferseeun Teeme-a : betveee 0 und 1"
+
 #~ msgid "Extended mode"
 #~ msgstr "Ixtended mude-a"
 
 #~ msgid "Extended mode follows quads instead of edgeloops"
 #~ msgstr "Ixtended mude-a fulloos qooeds insteed ooff idgeluups"
+
+#~ msgid "Face count"
+#~ msgstr "Fece-a cuoont"
 
 #~ msgid "Filter faces by color"
 #~ msgstr "Feelter feces by culur"
@@ -6573,11 +7251,35 @@ msgstr "zmeen"
 #~ msgid "Final edge number"
 #~ msgstr "Feenel idge-a noomber"
 
+#~ msgid "First addition operand (should be a blobby)"
+#~ msgstr "Furst eddeeshun ooperund (shuoold be-a a blubby)"
+
+#~ msgid "First matrix line or row"
+#~ msgstr "Furst metreex leene-a oor roo"
+
+#~ msgid "First maximum operand (should be a blobby)"
+#~ msgstr "Furst mexeemoom ooperund (shuoold be-a a blubby)"
+
 #~ msgid "First mesh to merge"
 #~ msgstr "Furst mesh tu merge-a"
 
+#~ msgid "First minimum operand (should be a blobby)"
+#~ msgstr "Furst meenimoom ooperund (shuoold be-a a blubby)"
+
+#~ msgid "First multiplication operand (should be a blobby)"
+#~ msgstr "Furst moolteepliceshun ooperund (shuoold be-a a blubby)"
+
+#~ msgid "Fourth matrix line or row"
+#~ msgstr "Fuoort metreex leene-a oor roo"
+
+#~ msgid "Fractal dimension"
+#~ msgstr "Frectel deemensiun"
+
 #~ msgid "Freezes the defined parameter"
 #~ msgstr "Freezes zee deffeened peremeter"
+
+#~ msgid "Frequency"
+#~ msgstr "Freqooency"
 
 #~ msgid "GL Material"
 #~ msgstr "GL Metereeel"
@@ -6585,8 +7287,35 @@ msgstr "zmeen"
 #~ msgid "GNU Triangulated Surface ( .gts )"
 #~ msgstr "GNOo Treeungooleted Soorffece-a ( .gts )"
 
+#~ msgid "Generates an FFT-based fractal terrain"
+#~ msgstr "Generetes un FFT-besed frectel terreeen"
+
+#~ msgid "Generates an HfBM-based fractal terrain"
+#~ msgstr "Generetes un HffBM-besed frectel terreeen"
+
+#~ msgid "Generates sphere eversion at any stage"
+#~ msgstr "Generetes sphere-a iferseeun et uny stege-a"
+
+#~ msgid "Gradient spacing"
+#~ msgstr "Gredeeent speceeng"
+
 #~ msgid "HPoint"
 #~ msgstr "HPueent"
+
+#~ msgid "Half strips"
+#~ msgstr "Helff streeps"
+
+#~ msgid "Holes only"
+#~ msgstr "Hules oonly"
+
+#~ msgid "Information"
+#~ msgstr "Inffurmeshun"
+
+#~ msgid "Input mesh 1"
+#~ msgstr "Inpoot mesh 1"
+
+#~ msgid "Input mesh 2"
+#~ msgstr "Inpoot mesh 2"
 
 #~ msgid "Input transformation matrix"
 #~ msgstr "Inpoot trunsffurmeshun metreex"
@@ -6594,14 +7323,77 @@ msgstr "zmeen"
 #~ msgid "Integer"
 #~ msgstr "Integer"
 
+#, fuzzy
+#~ msgid "Iso line divisions"
+#~ msgstr "Coorfe-a soobdeefisiuns"
+
+#~ msgid "Iso spacing"
+#~ msgstr "Isu speceeng"
+
+#~ msgid "Iterations"
+#~ msgstr "Itereshuns"
+
+#~ msgid "K-3D Bug Buddy"
+#~ msgstr "K-3D Boog Booddy"
+
+#~ msgid "K-3D Documents (*.k3d)"
+#~ msgstr "K-3D Ducooments (*.k3d)"
+
+#~ msgid "K-3D Script (*.k3dscript)"
+#~ msgstr "K-3D Screept (*.k3dscreept)"
+
+#~ msgid "Lacunarity"
+#~ msgstr "Lecoonereety"
+
+#~ msgid "Latitudinal Patches Per Hemisphere"
+#~ msgstr "Leteetoodinel Petches Per Hemeesphere-a"
+
+#~ msgid "Latitudinal patches"
+#~ msgstr "Leteetoodinel petches"
+
 #~ msgid "LightWave 6 ( .lwo )"
 #~ msgstr "LeeghtVefe-a 6 ( .lvu )"
+
+#~ msgid "Line1"
+#~ msgstr "Leene-a1"
+
+#~ msgid "Line2"
+#~ msgstr "Leene-a2"
+
+#~ msgid "Line3"
+#~ msgstr "Leene-a3"
+
+#~ msgid "Line4"
+#~ msgstr "Leene-a4"
+
+#~ msgid "Linear curve count"
+#~ msgstr "Leeneer coorfe-a cuoont"
+
+#~ msgid "Linear curve group count"
+#~ msgstr "Leeneer coorfe-a gruoop cuoont"
 
 #~ msgid "List with edge indices that are marked as sharp by this node"
 #~ msgstr "Leest veet idge-a indeeces thet ere-a merked es sherp by thees nude-a"
 
+#~ msgid "Longitudinal Patches Per Strip"
+#~ msgstr "Lungeetoodinel Petches Per Streep"
+
+#~ msgid "Lower hemisphere"
+#~ msgstr "Looer hemeesphere-a"
+
+#, fuzzy
+#~ msgid "Major Color"
+#~ msgstr "Mejur Pooer"
+
+#, fuzzy
+#~ msgid "Major color"
+#~ msgstr "Mejur Pooer"
+
 #~ msgid "Make selected edges sharp"
 #~ msgstr "Meke-a selected idges sherp"
+
+#~ msgid "Maps texture values to geometry using an external texture mapping transformation"
+#~ msgstr "Meps textoore-a felooes tu geumetry useeng un ixternel textoore-a meppeeng trunsffurmeshun"
 
 #~ msgid "Maps values to geometry using a planar projection map"
 #~ msgstr "Meps felooes tu geumetry useeng a pluner prujecshun mep"
@@ -6612,8 +7404,20 @@ msgstr "zmeen"
 #~ msgid "Max fold angle"
 #~ msgstr "Mex fuld ungle-a"
 
-#~ msgid "Maximum edge cost"
-#~ msgstr "Mexeemoom idge-a cust"
+#~ msgid "Max index"
+#~ msgstr "Mex index"
+
+#~ msgid "Maxima Selection"
+#~ msgstr "Mexeema Selecshun"
+
+#~ msgid "Maxima selection"
+#~ msgstr "Mexeema selecshun"
+
+#~ msgid "Maxima value"
+#~ msgstr "Mexeema felooe-a"
+
+#~ msgid "Merge meshes in a single polyhedron"
+#~ msgstr "Merge-a meshes in a seengle-a pulyhedrun"
 
 #~ msgid "Merges polygonal surfaces using boolean operations"
 #~ msgstr "Merges pulygunel soorffeces useeng buuleun oopereshuns"
@@ -6624,6 +7428,32 @@ msgstr "zmeen"
 #~ msgid "Mid-vertex function"
 #~ msgstr "Meed-fertex fooncshun"
 
+#~ msgid "Min index"
+#~ msgstr "Meen index"
+
+#~ msgid "Minima Selection"
+#~ msgstr "Meenima Selecshun"
+
+#~ msgid "Minima selection"
+#~ msgstr "Meenima selecshun"
+
+#~ msgid "Minima value"
+#~ msgstr "Meenima felooe-a"
+
+#, fuzzy
+#~ msgid "Minor Color"
+#~ msgstr "Meenur Pooer"
+
+#, fuzzy
+#~ msgid "Minor color"
+#~ msgstr "Meenur Pooer"
+
+#~ msgid "New Color"
+#~ msgstr "Noo Culur"
+
+#~ msgid "New color"
+#~ msgstr "Noo culur"
+
 #~ msgid "Node History"
 #~ msgstr "Nude-a Heestury"
 
@@ -6633,14 +7463,47 @@ msgstr "zmeen"
 #~ msgid "Node selection state, 1 = selected, 0 = unselected."
 #~ msgstr "Nude-a selecshun stete-a, 1 = selected, 0 = unselected."
 
-#~ msgid "Operator type"
-#~ msgstr "Ooperetur type-a"
+#~ msgid "Noise offset"
+#~ msgstr "Nueese-a ooffffset"
+
+#~ msgid "Nucurve count"
+#~ msgstr "Noocoorfe-a cuoont"
+
+#~ msgid "Nucurve group count"
+#~ msgstr "Noocoorfe-a gruoop cuoont"
+
+#~ msgid "Nupatch Count"
+#~ msgstr "Noopetch Cuoont"
+
+#~ msgid "Octaves"
+#~ msgstr "Ooctefes"
+
+#~ msgid "Open Script:"
+#~ msgstr "Oopee Screept:"
+
+#~ msgid "OpenGL Material"
+#~ msgstr "OopenGL Metereeel"
 
 #~ msgid "Output Scalar"
 #~ msgstr "Ooootpoot Sceler"
 
+#~ msgid "Output Value"
+#~ msgstr "Ooootpoot Felooe-a"
+
+#~ msgid "Output half strips"
+#~ msgstr "Ooootpoot helff streeps"
+
+#~ msgid "Output lower hemisphere"
+#~ msgstr "Ooootpoot looer hemeesphere-a"
+
+#~ msgid "Output matrix"
+#~ msgstr "Ooootpoot metreex"
+
 #~ msgid "Output matrix generated by the script"
 #~ msgstr "Ooootpoot metreex genereted by zee screept"
+
+#~ msgid "Output polygons (true) or patches (false)"
+#~ msgstr "Ooootpoot pulyguns (trooe-a) oor petches (felse-a)"
 
 #~ msgid "P_lug"
 #~ msgstr "P_loog"
@@ -6648,11 +7511,11 @@ msgstr "zmeen"
 #~ msgid "Parameter List"
 #~ msgstr "Peremeter Leest"
 
-#~ msgid "Parameter name"
-#~ msgstr "Peremeter neme-a"
-
 #~ msgid "Parameter value"
 #~ msgstr "Peremeter felooe-a"
+
+#~ msgid "Partial selection"
+#~ msgstr "Perteeel selecshun"
 
 #~ msgid "Pipeline Profiler"
 #~ msgstr "Peepeline-a Pruffeeler"
@@ -6660,17 +7523,50 @@ msgstr "zmeen"
 #~ msgid "Places a shader on a sphere, centered on the camera and aligned with world coordinates"
 #~ msgstr "Pleces a sheder oon a sphere-a, centered oon zee cemera und eleegned veet vurld cuurdeenetes"
 
+#~ msgid "Planar projection map"
+#~ msgstr "Pluner prujecshun mep"
+
+#~ msgid "Play From Cursor"
+#~ msgstr "Pley Frum Coorsur"
+
+#~ msgid "Please include a contact email address"
+#~ msgstr "Pleese-a incloode-a a cuntect imeeel eddress"
+
+#~ msgid "Please include a summary for this bug report"
+#~ msgstr "Pleese-a incloode-a a soommery fur thees boog repurt"
+
 #~ msgid "Plug"
 #~ msgstr "Ploog"
 
-#~ msgid "Point"
-#~ msgstr "Pueent"
+#~ msgid "Polygonal"
+#~ msgstr "Pulygunel"
+
+#~ msgid "Polyhedron Count"
+#~ msgstr "Pulyhedrun Cuoont"
+
+#~ msgid "Polyhedron count"
+#~ msgstr "Pulyhedrun cuoont"
+
+#~ msgid "Python Script (*.py)"
+#~ msgstr "Pythun Screept (*.py)"
 
 #~ msgid "Raw ( .raw )"
 #~ msgstr "Rev ( .rev )"
 
+#~ msgid "Read only"
+#~ msgstr "Reed oonly"
+
 #~ msgid "Real"
 #~ msgstr "Reel"
+
+#~ msgid "Record Message"
+#~ msgstr "Recurd Messege-a"
+
+#~ msgid "Record _Test Case..."
+#~ msgstr "Recurd _Test Cese-a..."
+
+#~ msgid "Recording"
+#~ msgstr "Recurdeeng"
 
 #~ msgid "Render engine"
 #~ msgstr "Render ingeene-a"
@@ -6681,26 +7577,108 @@ msgstr "zmeen"
 #~ msgid "RenderMan Attribute"
 #~ msgstr "RenderMun Ettreeboote-a"
 
-#~ msgid "RenderMan Material"
-#~ msgstr "RenderMun Metereeel"
-
 #~ msgid "RenderMan Option"
 #~ msgstr "RenderMun Oopshun"
+
+#~ msgid "Renders a teapot primitive in render engines that support one (Aqsis!)"
+#~ msgstr "Renders a teeput preemitife-a in render ingeenes thet sooppurt oone-a (Eqsees!)"
+
+#, fuzzy
+#~ msgid "Renders mean curvature normal vector at each vertex"
+#~ msgstr "Renders pulyhedrun fece-a nurmel fecturs"
+
+#, fuzzy
+#~ msgid "Renders mesh faces using a face-varying color array"
+#~ msgstr "Renders mesh feces, useeng flet shedeeng"
+
+#, fuzzy
+#~ msgid "Renders mesh faces with PGP"
+#~ msgstr "Renders mesh feces"
 
 #~ msgid "Renders mesh faces, determining flat or smooth shading based on edge sharpness"
 #~ msgstr "Renders mesh feces, determeening flet oor smuut shedeeng besed oon idge-a sherpness"
 
+#~ msgid "Renders mesh point groups"
+#~ msgstr "Renders mesh pueent gruoops"
+
+#~ msgid "S0"
+#~ msgstr "S0"
+
+#~ msgid "S1"
+#~ msgstr "S1"
+
+#~ msgid "Same polyhedron"
+#~ msgstr "Seme-a pulyhedrun"
+
+#~ msgid "Save Tutorial As:"
+#~ msgstr "Sefe-a Tootureeel Es:"
+
+#~ msgid "Second addition operand (should be a blobby)"
+#~ msgstr "Secund eddeeshun ooperund (shuoold be-a a blubby)"
+
+#~ msgid "Second matrix line or row"
+#~ msgstr "Secund metreex leene-a oor roo"
+
+#~ msgid "Second maximum operand (should be a blobby)"
+#~ msgstr "Secund mexeemoom ooperund (shuoold be-a a blubby)"
+
 #~ msgid "Second mesh to merge"
 #~ msgstr "Secund mesh tu merge-a"
+
+#~ msgid "Second minimum operand (should be a blobby)"
+#~ msgstr "Secund meenimoom ooperund (shuoold be-a a blubby)"
+
+#~ msgid "Second multiplication operand (should be a blobby)"
+#~ msgstr "Secund moolteepliceshun ooperund (shuoold be-a a blubby)"
 
 #~ msgid "Segments radius"
 #~ msgstr "Segments redeeoos"
 
+#~ msgid "Select Faces mode"
+#~ msgstr "Select Feces mude-a"
+
+#~ msgid "Select Lines mode"
+#~ msgstr "Select Leenes mude-a"
+
+#~ msgid "Select Nodes mode"
+#~ msgstr "Select Nudes mude-a"
+
+#~ msgid "Select Objects"
+#~ msgstr "Select Oobjects"
+
+#~ msgid "Select Points mode"
+#~ msgstr "Select Pueents mude-a"
+
 #~ msgid "Shape weight"
 #~ msgstr "Shepe-a veeeght"
 
-#~ msgid "Sharp edges"
-#~ msgstr "Sherp idges"
+#~ msgid "Shininess"
+#~ msgstr "Sheeniness"
+
+#~ msgid "Simulates smooth geometry by averaging polygon normals"
+#~ msgstr "Seemooletes smuut geumetry by eferegeeng pulygun nurmels"
+
+#, fuzzy
+#~ msgid "Smooth Curvature"
+#~ msgstr "Smuutheeng fectur"
+
+#, fuzzy
+#~ msgid "Smoothing steps"
+#~ msgstr "Smuutheeng"
+
+#, fuzzy
+#~ msgid "Smoothing timestep"
+#~ msgstr "Smuutheeng"
+
+#, fuzzy
+#~ msgid "Smoothing timesteps"
+#~ msgstr "Smuutheeng"
+
+#~ msgid "Spherical projection map"
+#~ msgstr "Sphereecel prujecshun mep"
+
+#~ msgid "Stop Recording"
+#~ msgstr "Stup Recurdeeng"
 
 #~ msgid "Stop function (edge number or cost)"
 #~ msgstr "Stup fooncshun (idge-a noomber oor cust)"
@@ -6708,26 +7686,181 @@ msgstr "zmeen"
 #~ msgid "String"
 #~ msgstr "Streeng"
 
+#~ msgid "Strip Number"
+#~ msgstr "Streep Noomber"
+
+#~ msgid "Strips"
+#~ msgstr "Streeps"
+
+#~ msgid "Subdivision iterations"
+#~ msgstr "Soobdeefisiun itereshuns"
+
+#~ msgid "Subtraction type"
+#~ msgstr "Soobtrecshun type-a"
+
+#~ msgid "Surface"
+#~ msgstr "Soorffece-a"
+
+#~ msgid "Swap dividend and divisor"
+#~ msgstr "Svep deefidend und deefisur"
+
+#~ msgid "Swap subtrahend and minuend"
+#~ msgstr "Svep soobtrehend und meenooend"
+
+#~ msgid "T0"
+#~ msgstr "T0"
+
+#~ msgid "T1"
+#~ msgstr "T1"
+
+#~ msgid "Tag Bicubic Patches"
+#~ msgstr "Teg Beecoobic Petches"
+
+#~ msgid "Tag Bilinear Patches"
+#~ msgstr "Teg Beelineer Petches"
+
+#~ msgid "Tag Cubic Curve Groups"
+#~ msgstr "Teg Coobeec Coorfe-a Gruoops"
+
+#~ msgid "Tag Edges"
+#~ msgstr "Teg Idges"
+
+#~ msgid "Tag Faces"
+#~ msgstr "Teg Feces"
+
+#~ msgid "Tag Linear Groups"
+#~ msgstr "Teg Leeneer Gruoops"
+
+#~ msgid "Tag Point Groups"
+#~ msgstr "Teg Pueent Gruoops"
+
+#~ msgid "Tag Points"
+#~ msgstr "Teg Pueents"
+
+#~ msgid "Tag Polyhedra"
+#~ msgstr "Teg Pulyhedra"
+
+#~ msgid "Tag bicubic patches"
+#~ msgstr "Teg beecoobic petches"
+
+#~ msgid "Tag bilinear patches"
+#~ msgstr "Teg beelineer petches"
+
+#~ msgid "Tag cubic curve groups"
+#~ msgstr "Teg coobeec coorfe-a gruoops"
+
+#~ msgid "Tag edges"
+#~ msgstr "Teg idges"
+
+#~ msgid "Tag faces"
+#~ msgstr "Teg feces"
+
+#~ msgid "Tag linear curve groups"
+#~ msgstr "Teg leeneer coorfe-a gruoops"
+
+#~ msgid "Tag point groups"
+#~ msgstr "Teg pueent gruoops"
+
+#~ msgid "Tag points"
+#~ msgstr "Teg pueents"
+
+#~ msgid "Tag polyhedra"
+#~ msgstr "Teg pulyhedra"
+
+#~ msgid "Tags geometry with a color"
+#~ msgstr "Tegs geumetry veet a culur"
+
+#~ msgid "Tells whether the tutorial recorder records user actions"
+#~ msgstr "Tells vhezeer zee tootureeel recurder recurds user ecshuns"
+
 #~ msgid "Tessellation Level"
 #~ msgstr "Tesselleshun Lefel"
 
 #~ msgid "Tessellation level"
 #~ msgstr "Tesselleshun lefel"
 
+#, fuzzy
+#~ msgid "Texture Coordinate Set"
+#~ msgstr "Cuurdeenete-a spece-a"
+
+#, fuzzy
+#~ msgid "Texture Mapping Set"
+#~ msgstr "Textoore-a Meppeeng Type-a"
+
+#~ msgid "Texture Mapping Type"
+#~ msgstr "Textoore-a Meppeeng Type-a"
+
+#, fuzzy
+#~ msgid "Texture Scaling"
+#~ msgstr "Textoore-a Meppeeng Type-a"
+
+#~ msgid "Texture V"
+#~ msgstr "Textoore-a F"
+
+#~ msgid "Texture W"
+#~ msgstr "Textoore-a V"
+
+#~ msgid "Third matrix line or row"
+#~ msgstr "Thurd metreex leene-a oor roo"
+
 #~ msgid "Timeline"
 #~ msgstr "Teemeline-a"
+
+#~ msgid "Tip"
+#~ msgstr "Teep"
 
 #~ msgid "Toolbar"
 #~ msgstr "Tuulber"
 
+#~ msgid "Top cap position"
+#~ msgstr "Tup cep puseeshun"
+
+#~ msgid "Torus major radius"
+#~ msgstr "Turoos mejur redeeoos"
+
+#~ msgid "Torus minor radius"
+#~ msgstr "Turoos meenur redeeoos"
+
+#~ msgid "Transpose"
+#~ msgstr "Trunspuse-a"
+
+#~ msgid "Transpose shown matrix"
+#~ msgstr "Trunspuse-a shoon metreex"
+
+#~ msgid "Triangulate only faces that contain holes"
+#~ msgstr "Treeungoolete-a oonly feces thet cunteeen hules"
+
+#, fuzzy
+#~ msgid "Triangulates faces with more than 4 edges"
+#~ msgstr "Treeungoolete-a oonly feces thet cunteeen hules"
+
 #~ msgid "Undo Tree"
 #~ msgstr "Undu Tree-a"
+
+#, fuzzy
+#~ msgid "Uniform Normals"
+#~ msgstr "Nurmeleeze-a nurmels"
+
+#~ msgid "Untitled Tutorial"
+#~ msgstr "Unteetled Tootureeel"
+
+#~ msgid "Use File > Open to load a document"
+#~ msgstr "Use-a Feele-a > Oopee tu lued a ducooment"
 
 #~ msgid "User"
 #~ msgstr "User"
 
+#~ msgid "Using upstream component selection"
+#~ msgstr "Useeng upstreem cumpunent selecshun"
+
 #~ msgid "Volume weight"
 #~ msgstr "Fuloome-a veeeght"
+
+#~ msgid "Voxel subdivisions along blobby's bounding-box width, height and depth "
+#~ msgstr "Fuxel soobdeefisiuns elung blubby's buoondeeng-bux veedt, heeeght und dept "
+
+#~ msgid "Voxels"
+#~ msgstr "Fuxels"
 
 #~ msgid "Weight used for boundary optimization"
 #~ msgstr "Veeeght used fur buoondery oopteemizeshun"
@@ -6750,14 +7883,31 @@ msgstr "zmeen"
 #~ msgid "Without it, shaders cannot be compiled.  Check to ensure that you have Pixie installed, and that the PATH environment variable points to the Pixie binary installation directory."
 #~ msgstr "Veethuoot it, sheders cunnut be-a cumpeeled.  Check tu insoore-a thet yuoo hefe-a Peexie-a instelled, und thet zee PETH infurunment fereeeble-a pueents tu zee Peexie-a beenery instelleshun durectury."
 
+#~ msgid "_Faces"
+#~ msgstr "_Feces"
+
+#~ msgid "_Lines"
+#~ msgstr "_Leenes"
+
 #~ msgid "_Nodes"
 #~ msgstr "_Nudes"
 
 #~ msgid "_Points"
 #~ msgstr "_Pueents"
 
+#~ msgid "_Record Tutorial..."
+#~ msgstr "_Recurd Tootureeel..."
+
+#, fuzzy
+#~ msgid "_Tutorials and Examples ..."
+#~ msgstr "_Tootureeels ..."
+
 #~ msgid "axis"
 #~ msgstr "exees"
+
+#, fuzzy
+#~ msgid "control_points"
+#~ msgstr "teg_pueents"
 
 #~ msgid "default_s"
 #~ msgstr "deffoolt_s"
@@ -6765,11 +7915,31 @@ msgstr "zmeen"
 #~ msgid "default_t"
 #~ msgstr "deffoolt_t"
 
+#~ msgid "number"
+#~ msgstr "noomber"
+
+#, fuzzy
+#~ msgid "order"
+#~ msgstr "u_oorder"
+
+#, fuzzy
+#~ msgid "point_spacing"
+#~ msgstr "Gredeeent speceeng"
+
 #~ msgid "raw ASCII format ( .raw )"
 #~ msgstr "rev ESCII furmet ( .rev )"
 
 #~ msgid "render_final"
 #~ msgstr "render_feenel"
+
+#~ msgid "s0"
+#~ msgstr "s0"
+
+#~ msgid "t0"
+#~ msgstr "t0"
+
+#~ msgid "t1"
+#~ msgstr "t1"
 
 #~ msgid "tag_edges"
 #~ msgstr "teg_idges"

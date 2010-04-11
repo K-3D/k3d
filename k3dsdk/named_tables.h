@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "table.h"
+#include <k3dsdk/table.h>
 
 namespace k3d
 {
@@ -35,32 +35,23 @@ public:
 	const table* lookup(const string_t& Name) const;
 	/// Return an attribute_array by name, or NULL
 	table* writable(const string_t& Name);
-	/// Returns true iff two collections are equivalent, using the imprecise semantics of almost_equal to compare values.
-	bool_t almost_equal(const named_tables& Other, const uint64_t Threshold) const;
+	/// Returns the difference between two collections, using the imprecise semantics of difference::test().
+	void difference(const named_tables& Other, difference::accumulator& Result) const;
 };
 
 /// Serialization
 std::ostream& operator<<(std::ostream& Stream, const named_tables& RHS);
 
-/// Specialization of almost_equal that tests named_tables for equality
-template<>
-class almost_equal<named_tables>
+/// Specialization of difference::test for k3d::named_tables
+namespace difference
 {
-	typedef named_tables T;
 
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
+inline void test(const named_tables& A, const named_tables& B, accumulator& Result)
+{
+	A.difference(B, Result);
+}
 
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
+} // namespace difference
 
 } // namespace k3d
 

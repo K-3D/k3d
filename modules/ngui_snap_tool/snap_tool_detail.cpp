@@ -40,7 +40,7 @@
 #include <k3dsdk/isnap_source.h>
 #include <k3dsdk/isnap_target.h>
 #include <k3dsdk/isnappable.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/icons.h>
 #include <k3dsdk/ngui/interactive.h>
@@ -49,7 +49,7 @@
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/xml.h>
@@ -139,9 +139,9 @@ void snap_tool_detail::transform_target::start_transform()
 
 const k3d::matrix4 upstream_matrix(k3d::inode& Node)
 {
-	if(k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(&Node))
+	if(k3d::imatrix_sink* const downstream_sink = dynamic_cast<k3d::imatrix_sink*>(&Node))
 	{
-		if(k3d::iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_sink->transform_sink_input()))
+		if(k3d::iproperty* const upstream_output = Node.document().pipeline().dependency(downstream_sink->matrix_sink_input()))
 			return boost::any_cast<k3d::matrix4>(upstream_output->property_internal_value());
 	}
 
@@ -257,14 +257,14 @@ bool snap_tool_detail::transform_target::create_transform_modifier(const std::st
 	// Check for an existing transform modifier
 	k3d::inode* upstream_node = upstream_transform_modifier(*node);
 	/** \todo check for same name too */
-	if(upstream_node && (k3d::classes::FrozenTransformation() == upstream_node->factory().factory_id()))
+	if(upstream_node && (k3d::classes::FrozenMatrix() == upstream_node->factory().factory_id()))
 	{
 		set_transform_modifier(upstream_node);
 		return false;
 	}
 
 	const std::string modifier_name = Name + node->name();
-	set_transform_modifier(insert_transform_modifier(*node, k3d::classes::FrozenTransformation(), modifier_name));
+	set_transform_modifier(insert_transform_modifier(*node, k3d::classes::FrozenMatrix(), modifier_name));
 
 	return true;
 }
@@ -293,7 +293,6 @@ unsigned long snap_tool_detail::mesh_target::target_number()
 
 void snap_tool_detail::mesh_target::reset_selection()
 {
-k3d::log() << debug << K3D_CHANGE_SET_CONTEXT << std::endl;
 	k3d::mesh* const mesh = boost::any_cast<k3d::mesh*>(mesh_source_property.property_internal_value());
 	return_if_fail(mesh);
 
@@ -496,7 +495,7 @@ void snap_tool_detail::lbutton_down(viewport::control& Viewport, const k3d::poin
 	// If a node was hit ...
 	if(k3d::selection::get_node(m_mouse_down_selection))
 	{
-		if(m_document_state.is_selected(m_mouse_down_selection))
+		if(k3d::ngui::selection::state(m_document_state.document()).is_selected(m_mouse_down_selection))
 			lmb_down_selected();
 		else
 			lmb_down_deselected();
@@ -995,14 +994,14 @@ void snap_tool_detail::get_current_selection()
 
 	const k3d::nodes_t nodes = selection::state(m_document_state.document()).selected_nodes();
 
-	if(selection::NODES == selection::state(m_document_state.document()).current_mode())
+	if(selection::NODE == selection::state(m_document_state.document()).current_mode())
 	{
 		// Save transformable nodes as targets
 		for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
 		{
 			if(!dynamic_cast<k3d::gl::irenderable*>(*node))
 				continue;
-			if(!dynamic_cast<k3d::itransform_sink*>(*node))
+			if(!dynamic_cast<k3d::imatrix_sink*>(*node))
 				continue;
 
 			m_targets.push_back(new transform_target(*node));

@@ -31,7 +31,8 @@
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/share.h>
 
 #include <QAction>
@@ -214,7 +215,7 @@ void main_window::on_file_open()
 	m_document = k3d::application().create_document();
 	return_if_fail(m_document);
 
-	if(!importer->read_file(*m_document, document_path))
+	if(!importer->read_file(document_path, *m_document))
 	{
 		QMessageBox::warning(this, _("Open K-3D Document:"), _("Error reading document."), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
 		return;
@@ -223,19 +224,19 @@ void main_window::on_file_open()
 	setWindowTitle(("K-3D Sample Qt User Interface - " + document_path.leaf().raw()).c_str());
 	statusBar()->showMessage(("Loaded document " + document_path.leaf().raw()).c_str(), 0);
 
-	m_cameras = k3d::find_nodes<k3d::icamera>(m_document->nodes());
-	m_render_engines = k3d::find_nodes<k3d::gl::irender_viewport>(m_document->nodes());
+	m_cameras = k3d::node::lookup<k3d::icamera>(*m_document);
+	m_render_engines = k3d::node::lookup<k3d::gl::irender_viewport>(*m_document);
 
 	m_camera_combo->clear();
 	m_camera_combo->setEnabled(m_cameras.size());
-	for(k3d::nodes_t::iterator camera = m_cameras.begin(); camera != m_cameras.end(); ++camera)
-		m_camera_combo->addItem((*camera)->name().c_str());
+	for(std::vector<k3d::icamera*>::iterator camera = m_cameras.begin(); camera != m_cameras.end(); ++camera)
+		m_camera_combo->addItem(dynamic_cast<k3d::inode*>(*camera)->name().c_str());
 	m_camera_combo->adjustSize();
 
 	m_render_engine_combo->clear();
 	m_render_engine_combo->setEnabled(m_render_engines.size());
-	for(k3d::nodes_t::iterator render_engine = m_render_engines.begin(); render_engine != m_render_engines.end(); ++render_engine)
-		m_render_engine_combo->addItem((*render_engine)->name().c_str());
+	for(std::vector<k3d::gl::irender_viewport*>::iterator render_engine = m_render_engines.begin(); render_engine != m_render_engines.end(); ++render_engine)
+		m_render_engine_combo->addItem(dynamic_cast<k3d::inode*>(*render_engine)->name().c_str());
 	m_render_engine_combo->adjustSize();
 	
 	emit camera_changed(m_cameras.size() ? dynamic_cast<k3d::icamera*>(*m_cameras.begin()) : 0);
@@ -244,14 +245,14 @@ void main_window::on_file_open()
 
 void main_window::on_camera_changed(int Index)
 {
-	k3d::nodes_t::iterator it = m_cameras.begin();
+	std::vector<k3d::icamera*>::iterator it = m_cameras.begin();
 	std::advance(it, Index);
 	emit camera_changed(dynamic_cast<k3d::icamera*>(*it));
 }
 
 void main_window::on_render_engine_changed(int Index)
 {
-	k3d::nodes_t::iterator it = m_render_engines.begin();
+	std::vector<k3d::gl::irender_viewport*>::iterator it = m_render_engines.begin();
 	std::advance(it, Index);
 	emit render_engine_changed(dynamic_cast<k3d::gl::irender_viewport*>(*it));
 }
@@ -352,14 +353,14 @@ void user_interface::error_message(const k3d::string_t& Message)
 	QMessageBox::critical(0, _("Error"), Message.c_str());
 }
 
+void user_interface::nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
+{
+//	QMessageBox::information(0, _("Information"), Message.c_str());
+}
+
 unsigned int user_interface::query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
 {
 	return 0;
-}
-
-bool user_interface::tutorial_message(const k3d::string_t& Message)
-{
-	return false;
 }
 
 bool user_interface::get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)

@@ -20,9 +20,9 @@
 /** \author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "application_state.h"
-#include "safe_close_dialog.h"
-#include "unsaved_document.h"
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/safe_close_dialog.h>
+#include <k3dsdk/ngui/unsaved_document.h>
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>

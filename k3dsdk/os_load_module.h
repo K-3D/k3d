@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "module.h"
+#include <k3dsdk/module.h>
 
 namespace k3d
 {

@@ -25,13 +25,13 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "data.h"
-#include "k3d-i18n-config.h"
-#include "idocument.h"
-#include "imesh_sink.h"
-#include "imesh_source.h"
-#include "ipipeline_profiler.h"
-#include "mesh.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/imesh_sink.h>
+#include <k3dsdk/imesh_source.h>
+#include <k3dsdk/ipipeline_profiler.h>
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {

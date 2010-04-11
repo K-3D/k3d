@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Optionally create 'back' faces in ExtrudeFaces.
+desc: When extruding outlines (such as 2D text), it would be useful for ExtrudeFaces to create 'back' faces, so the result is a solid polyhedron.
+type: :feature
+component: K-3D
+release: 1.0.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-23 04:03:15.931930 Z
+references: []
+
+id: 40ed654ea75987f34bbe51980b5622cc079d3c7e
+log_events: 
+- - 2010-02-23 04:03:16.451870 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-02-27 06:42:08.882958 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.0
+  - ""
+claimer: 

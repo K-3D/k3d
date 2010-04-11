@@ -33,7 +33,7 @@
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/mesh_source.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 
 namespace module
 {
@@ -93,7 +93,7 @@ public:
 			"BlobbyDivide",
 			_("Combines blobbies using the Division operator."),
 			"Blobby",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

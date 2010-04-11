@@ -26,6 +26,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
+#include <k3dsdk/material_sink.h>
 #include <k3dsdk/mesh_reader.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/nurbs_patch.h>
@@ -46,21 +47,22 @@ namespace io
 // mesh_reader
 
 class mesh_reader :
-	public k3d::mesh_reader<k3d::node >
+	public k3d::material_sink<k3d::mesh_reader<k3d::node > >
 {
-	typedef k3d::mesh_reader<k3d::node > base;
+	typedef k3d::material_sink<k3d::mesh_reader<k3d::node > > base;
 
 public:
 	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document)
 	{
+		m_material.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reload_mesh_slot()));
 	}
 
 	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
 
-		k3d::log() << info << "Loading .obj file: " << Path.native_console_string() << std::endl;
 		k3d::filesystem::ifstream file(Path);
 		if(!file)
 		{
@@ -68,7 +70,7 @@ public:
 			return;
 		}
 
-		my_parser parser(Output);
+		my_parser parser(Output, m_material.pipeline_value());
 		parser.parse(file);
 	}
 
@@ -91,8 +93,9 @@ private:
 		public obj_parser
 	{
 	public:
-		my_parser(k3d::mesh& Mesh) :
+		my_parser(k3d::mesh& Mesh, k3d::imaterial* const Material) :
 			mesh(Mesh),
+			material(Material),
 			points(0),
 			point_selection(0),
 			u_order(0),
@@ -106,6 +109,7 @@ private:
 
 	private:
 		k3d::mesh& mesh;
+		k3d::imaterial* const material;
 		k3d::mesh::points_t* points;
 		k3d::mesh::selection_t* point_selection;
 		boost::scoped_ptr<k3d::mesh::weights_t> point_weights; // Note: *not* part of the mesh!
@@ -147,29 +151,27 @@ private:
 			if(!polyhedron)
 			{
 				polyhedron.reset(k3d::polyhedron::create(mesh));
-				polyhedron->shell_first_faces.push_back(0);
-				polyhedron->shell_face_counts.push_back(0);
 				polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 			}
 
+			polyhedron->face_shells.push_back(0);
 			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 			polyhedron->face_loop_counts.push_back(1);
 			polyhedron->face_selections.push_back(0.0);
-			polyhedron->face_materials.push_back(static_cast<k3d::imaterial*>(0));
-			polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
+			polyhedron->face_materials.push_back(material);
+			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
 			const k3d::uint_t point_begin = 0;
 			const k3d::uint_t point_end = point_begin + Points.size();
-			const k3d::uint_t first_edge = polyhedron->edge_points.size();
+			const k3d::uint_t first_edge = polyhedron->clockwise_edges.size();
 			for(k3d::uint_t point = point_begin; point != point_end; ++point)
 			{
-				polyhedron->edge_points.push_back(Points[point]);
-				polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 				polyhedron->edge_selections.push_back(0.0);
+				polyhedron->vertex_points.push_back(Points[point]);
+				polyhedron->vertex_selections.push_back(0.0);
 			}
 			polyhedron->clockwise_edges.back() = first_edge;
-
-			polyhedron->shell_face_counts.back() = polyhedron->shell_face_counts.back() + 1;
 		}
 
 		void on_curve_surface_type(const k3d::string_t& Type)

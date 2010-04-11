@@ -29,8 +29,8 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_engine_ri.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/ilight_ri.h>
@@ -38,7 +38,7 @@
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/share.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 
 using namespace k3d::ngui;
 

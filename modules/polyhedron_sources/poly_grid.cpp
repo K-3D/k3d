@@ -76,7 +76,9 @@ public:
 	void on_update_mesh_topology(k3d::mesh& Output)
 	{
 		Output = k3d::mesh();
-		k3d::polyhedron::create_grid(Output, m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
+		k3d::polyhedron::add_grid(Output, *polyhedron, 0, m_rows.pipeline_value(), m_columns.pipeline_value(), m_material.pipeline_value());
 	}
 
 	void on_update_mesh_geometry(k3d::mesh& Output)
@@ -119,11 +121,11 @@ public:
 		k3d::mesh::points_t::iterator point = const_cast<k3d::mesh::points_t&>(*Output.points).begin();
 		for(k3d::int32_t row = 0; row != point_rows; ++row)
 		{
-			const k3d::double_t row_percent = 0.5 - (static_cast<k3d::double_t>(row) / static_cast<k3d::double_t>(point_rows-1));
+			const k3d::double_t row_percent = 0.5 - k3d::ratio(row, point_rows-1);
 
 			for(k3d::int32_t column = 0; column != point_columns; ++column)
 			{
-				const k3d::double_t column_percent = (static_cast<k3d::double_t>(column) / static_cast<k3d::double_t>(point_columns-1)) - 0.5;
+				const k3d::double_t column_percent = k3d::ratio(column, point_columns-1) - 0.5;
 
 				*point++ = k3d::to_point((column_percent * x) + (row_percent * y));
 			}
@@ -136,7 +138,7 @@ public:
 			k3d::uuid(0xacb3b4f8, 0x5cd6471c, 0xaed72686, 0xc576987c),
 			"PolyGrid",
 			_("Generates a polygonal grid"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

@@ -22,8 +22,8 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "stream_io_ri.h"
-#include "texture3.h"
+#include <k3dsdk/stream_io_ri.h>
+#include <k3dsdk/texture3.h>
 #include <set>
 
 namespace k3d

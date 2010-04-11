@@ -81,7 +81,7 @@ public:
 					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
 					for(k3d::uint_t edge = first_edge; ;)
 					{
-						point_selection[polyhedron->edge_points[edge]] = polyhedron->face_selections[face];
+						point_selection[polyhedron->vertex_points[edge]] = polyhedron->face_selections[face];
 
 						edge = polyhedron->clockwise_edges[edge];
 						if(edge == first_edge)

@@ -26,8 +26,8 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "event_button.h"
-#include "property_widget.h"
+#include <k3dsdk/ngui/event_button.h>
+#include <k3dsdk/ngui/property_widget.h>
 
 namespace Gtk { class Image; }
 

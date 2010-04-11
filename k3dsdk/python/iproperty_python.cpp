@@ -21,10 +21,10 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "any_python.h"
-#include "iproperty_python.h"
-#include "iunknown_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/any_python.h>
+#include <k3dsdk/python/iproperty_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/ienumeration_property.h>
@@ -32,7 +32,7 @@
 #include <k3dsdk/imeasurement_property.h>
 #include <k3dsdk/iwritable_property.h>
 #include <k3dsdk/measurement.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/type_registry.h>
 
 #include <boost/python.hpp>

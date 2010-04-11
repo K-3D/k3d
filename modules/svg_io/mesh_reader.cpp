@@ -402,13 +402,9 @@ static void parse_path(const k3d::xml::element& SVG, transform_stack& Transforma
 
 	std::stringstream data(k3d::xml::attribute_text(SVG, "d"));
 
-//k3d::log() << debug << data.str() << std::endl;
-
 	k3d::point3 current_point(0, 0, 0);
 	for(char token = data.get(); data; token = data.get())
 	{
-k3d::log() << debug << token << std::endl;
-
 		k3d::bool_t relative = false;
 		switch(token)
 		{

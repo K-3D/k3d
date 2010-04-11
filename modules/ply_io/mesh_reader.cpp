@@ -144,18 +144,18 @@ public:
 			{
 				boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
 		
-				polyhedron->shell_first_faces.push_back(polyhedron->face_first_loops.size());
-				polyhedron->shell_face_counts.push_back(element_count);
 				polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
 
+				polyhedron->face_shells.reserve(element_count);
 				polyhedron->face_first_loops.reserve(element_count);
 				polyhedron->face_loop_counts.reserve(element_count);
 				polyhedron->face_selections.reserve(element_count);
 				polyhedron->face_materials.reserve(element_count);
 				polyhedron->loop_first_edges.reserve(element_count);
-				polyhedron->edge_points.reserve(3 * element_count);
 				polyhedron->clockwise_edges.reserve(3 * element_count);
 				polyhedron->edge_selections.reserve(3 * element_count);
+				polyhedron->vertex_points.reserve(3 * element_count);
+				polyhedron->vertex_selections.reserve(3 * element_count);
 				
 				for(k3d::uint_t j = 0; j != element_count; ++j)
 				{
@@ -170,20 +170,22 @@ public:
 					k3d::uint_t point_count = 0;
 					line_buffer >> point_count;
 
+					polyhedron->face_shells.push_back(0);
 					polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
 					polyhedron->face_loop_counts.push_back(1);
 					polyhedron->face_selections.push_back(0.0);
 					polyhedron->face_materials.push_back(0);
-					polyhedron->loop_first_edges.push_back(polyhedron->edge_points.size());
+					polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 					
 					for(k3d::uint_t k = 0; k != point_count; ++k)
 					{
 						k3d::uint_t point = 0;
 						line_buffer >> point;
 
-						polyhedron->edge_points.push_back(point);
-						polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
+						polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
 						polyhedron->edge_selections.push_back(0.0);
+						polyhedron->vertex_points.push_back(point);
+						polyhedron->vertex_selections.push_back(0.0);
 					}
 
 					if(polyhedron->loop_first_edges.size() && polyhedron->clockwise_edges.size())

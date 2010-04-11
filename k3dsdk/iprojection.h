@@ -25,9 +25,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "k3d-platform-config.h"
+#include <k3d-platform-config.h>
 
-#include "iunknown.h"
+#include <k3dsdk/iunknown.h>
 #ifdef	K3D_API_WIN32
 #ifdef	near
 #undef	near

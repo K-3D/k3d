@@ -17,14 +17,14 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "color.h"
-#include "imaterial.h"
-#include "iomanip.h"
-#include "legacy_mesh.h"
-#include "mesh.h"
-#include "metadata_keys.h"
-#include "polyhedron.h"
-#include "type_registry.h"
+#include <k3dsdk/color.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/iomanip.h>
+#include <k3dsdk/mesh.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/polyhedron.h>
+#include <k3dsdk/table_copier.h>
+#include <k3dsdk/type_registry.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -34,225 +34,65 @@
 namespace k3d
 {
 
-namespace detail
+////////////////////////////////////////////////////////////////////////////////////////////
+// difference::test
+
+/// Return the difference between two shared arrays (handles "fuzzy" floating-point comparisons).
+namespace difference
 {
 
-/*
-////////////////////////////////////////////////////////////////////////////////////////////
-// print_array
-
-class print_array
-{
-public:
-	print_array(std::ostream& Stream, const string_t& ArrayName, const array& Array, bool_t& Printed) :
-		m_stream(Stream),
-		m_array_name(ArrayName),
-		m_array(Array),
-		m_printed(Printed)
-	{
-		// Special-case k3d::uint_t_array so the type is labeled correctly ...
-		if(const uint_t_array* const array = dynamic_cast<const uint_t_array*>(&m_array))
-		{
-			m_printed = true;
-			m_stream << standard_indent << "array \"" << m_array_name << "\" [k3d::uint_t] (" << m_array.size() << "):\n";
-			m_stream << push_indent;
-			
-			block_output<uint_t>(array->begin(), array->end(), m_stream, " ");
-			print_metadata();
-
-			m_stream << pop_indent;
-		}
-	}
-
-	template<typename T>
-	void operator()(T)
-	{
-		if(m_printed)
-			return;
-
-		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
-		{
-			m_printed = true;
-			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
-			m_stream << push_indent;
-
-			block_output<T>(array->begin(), array->end(), m_stream, " ");
-			print_metadata();
-
-			m_stream << pop_indent;
-		}
-	}
-
-	/// Special-case printing of 8-bit integers so they aren't printed as characters
-	void operator()(int8_t)
-	{
-		typedef int8_t T;
-
-		if(m_printed)
-			return;
-
-		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
-		{
-			m_printed = true;
-			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
-			m_stream << push_indent;
-
-			block_output<int16_t>(array->begin(), array->end(), m_stream, " ");
-			print_metadata();
-
-			m_stream << pop_indent;
-		}
-	}
-
-	/// Special-case printing of 8-bit unsigned integers so they aren't printed as characters
-	void operator()(uint8_t)
-	{
-		typedef uint8_t T;
-
-		if(m_printed)
-			return;
-
-		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
-		{
-			m_printed = true;
-			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
-			m_stream << push_indent;
-
-			block_output<uint16_t>(array->begin(), array->end(), m_stream, " ");
-			print_metadata();
-
-			m_stream << pop_indent;
-		}
-	}
-
-	/// Special-case printing of strings so whitespace is handled correctly
-	void operator()(string_t)
-	{
-		typedef string_t T;
-
-		if(m_printed)
-			return;
-
-		if(const typed_array<T>* const array = dynamic_cast<const typed_array<T>*>(&m_array))
-		{
-			m_printed = true;
-			m_stream << standard_indent << "array \"" << m_array_name << "\" [" << type_string<T>() << "] (" << m_array.size() << "):\n";
-			m_stream << push_indent;
-
-			string_block_output(array->begin(), array->end(), m_stream, " ");
-			print_metadata();
-
-			m_stream << pop_indent;
-		}
-	}
-
-private:
-	void print_metadata()
-	{
-		const array::metadata_t metadata = m_array.get_metadata();
-		for(array::metadata_t::const_iterator pair = metadata.begin(); pair != metadata.end(); ++pair)
-			m_stream << standard_indent << "metadata: " << pair->first << " = " << pair->second << "\n";
-	}
-
-	std::ostream& m_stream;
-	const string_t& m_array_name;
-	const array& m_array;
-	bool_t& m_printed;
-};
-*/
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
 template<typename T>
-bool_t almost_equal(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, const uint64_t Threshold)
+void test(const pipeline_data<typed_array<T> >& A, const pipeline_data<typed_array<T> >& B, accumulator& Result)
 {
-	if(A.get() == B.get())
-		return true;
-
 	if(A && B)
-		return A->almost_equal(*B, Threshold);
-
-	return false;
+		A->difference(*B, Result);
+	else if(!A && !B)
+		Result.exact(true);
+	else
+		Result.exact(false);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-/// Return true iff two shared arrays are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
-bool_t almost_equal(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, const uint64_t Threshold)
+/// Return the difference between two shared arrays (handles "fuzzy" floating-point comparisons).
+void test(const pipeline_data<uint_t_array>& A, const pipeline_data<uint_t_array>& B, accumulator& Result)
 {
-	if(A.get() == B.get())
-		return true;
-
 	if(A && B)
-		return A->almost_equal(*B, Threshold);
-
-	return false;
+		A->difference(*B, Result);
+	else if(!A && !B)
+		Result.exact(true);
+	else
+		Result.exact(false);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-/// Return true iff two shared objects are equivalent (handles cases where they point to the same memory, and handles "fuzzy" floating-point comparisons).
+/// Return the difference between two shared objects (handles "fuzzy" floating-point comparisons).
 template<typename T>
-bool_t almost_equal(const pipeline_data<T>& A, const pipeline_data<T>& B, const uint64_t Threshold)
+void test(const pipeline_data<T>& A, const pipeline_data<T>& B, accumulator& Result)
 {
-	if(A.get() == B.get())
-		return true;
-
 	if(A && B)
-		return k3d::almost_equal<T>(Threshold)(*A, *B);
-
-	return false;
+		k3d::difference::test(*A, *B, Result);
+	else if(!A && !B)
+		Result.exact(true);
+	else
+		Result.exact(false);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-/// Return true iff two sets of attributes arrays are equivalent (we provide this function mainly for consistency).
-
-bool_t almost_equal(const mesh::table_t& A, const mesh::table_t& B, const uint64_t Threshold)
+/// Return the difference between two sets of primitives.
+void test(const mesh::primitives_t& A, const mesh::primitives_t& B, accumulator& Result)
 {
-	return k3d::almost_equal<mesh::table_t>(Threshold)(A, B);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// almost_equal
-
-/// Return true iff two sets of primitives are equivalent.
-
-bool_t almost_equal(const mesh::primitives_t& A, const mesh::primitives_t& B, const uint64_t Threshold)
-{
-	// If we have differing numbers of primitives, they definitely aren't equal
-	if(A.size() != B.size())
-		return false;
+	// If they have differing numbers of primitives, they definitely aren't equal
+	Result.exact(A.size() == B.size());
 
 	for(mesh::primitives_t::const_iterator a = A.begin(), b = B.begin(); a != A.end() && b != B.end(); ++a, ++b)
 	{
-		// If both primitives point to the same memory, they're equal
-		if(a->get() == b->get())
-			continue;
-
-		// Perform element-wise comparisons of the two primitives ...
 		if(a->get() && b->get())
-		{
-			if(!(**a).almost_equal((**b), Threshold))
-				return false;
-		}
-		// One array was NULL and the other wasn't
-		else if(a->get() || b->get())
-		{
-			return false;
-		}
+			(**a).difference((**b), Result);
+		else if(!a->get() && !b->get())
+			Result.exact(true);
+		else
+			Result.exact(false);
 	}
-
-	return true;
 }
 
-
-} // namespace detail
+} // namespace difference
 
 ////////////////////////////////////////////////////////////////////////////////////
 // mesh
@@ -261,107 +101,12 @@ mesh::mesh()
 {
 }
 
-bool_t mesh::almost_equal(const mesh& Other, const uint64_t Threshold) const
+void mesh::difference(const mesh& Other, difference::accumulator& Result) const
 {
-	return
-		detail::almost_equal(points, Other.points, Threshold) &&
-		detail::almost_equal(point_selection, Other.point_selection, Threshold) &&
-		detail::almost_equal(point_attributes, Other.point_attributes, Threshold) &&
-		detail::almost_equal(primitives, Other.primitives, Threshold)
-		;
-}
-
-mesh& mesh::operator=(const legacy::mesh& RHS)
-{
-	// Convert points ...
-	std::map<legacy::point*, uint_t> point_map;
-
-	const uint_t point_size = RHS.points.size();
-	points_t& points = this->points.create(new points_t(point_size));
-	selection_t& point_selection = this->point_selection.create(new selection_t(point_size));
-
-	for(uint_t i = 0; i != point_size; ++i)
-	{
-		points[i] = RHS.points[i]->position;
-		point_selection[i] = RHS.points[i]->selection_weight;
-		point_map[RHS.points[i]] = i;
-	}
-
-	// Convert primitives ...
-	primitives = RHS.primitives;
-
-	// Convert polyhedra ...
-	if(RHS.polyhedra.size())
-	{
-		boost::scoped_ptr<polyhedron::primitive> polyhedron(k3d::polyhedron::create(*this));
-
-		for(legacy::mesh::polyhedra_t::const_iterator legacy_polyhedron = RHS.polyhedra.begin(); legacy_polyhedron != RHS.polyhedra.end(); ++legacy_polyhedron)
-		{
-			uint_t first_face = polyhedron->face_first_loops.size();
-			uint_t face_count = 0;
-			int32_t type = (*legacy_polyhedron)->type == legacy::polyhedron::POLYGONS ? polyhedron::POLYGONS : polyhedron::CATMULL_CLARK;
-
-			for(legacy::polyhedron::faces_t::const_iterator legacy_face = (*legacy_polyhedron)->faces.begin(); legacy_face != (*legacy_polyhedron)->faces.end(); ++legacy_face)
-			{
-				++face_count;
-
-				uint_t face_first_loop = polyhedron->loop_first_edges.size();
-				uint_t face_loop_count = 1 + (*legacy_face)->holes.size();
-
-				const uint_t first_edge = polyhedron->edge_points.size();
-
-				polyhedron->loop_first_edges.push_back(first_edge);
-				for(legacy::split_edge* edge = (*legacy_face)->first_edge; edge; edge = edge->face_clockwise)
-				{
-					if(edge->vertex && edge->face_clockwise)
-					{
-						polyhedron->edge_points.push_back(point_map[edge->vertex]);
-						polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
-						polyhedron->edge_selections.push_back(edge->selection_weight);
-					}
-
-					if(edge->face_clockwise == (*legacy_face)->first_edge)
-					{
-						polyhedron->clockwise_edges.back() = first_edge;
-						break;
-					}
-				}
-
-				for(legacy::face::holes_t::iterator hole = (*legacy_face)->holes.begin(); hole != (*legacy_face)->holes.end(); ++hole)
-				{
-					const uint_t first_edge = polyhedron->edge_points.size();
-
-					polyhedron->loop_first_edges.push_back(first_edge);
-					for(legacy::split_edge* edge = *hole; edge; edge = edge->face_clockwise)
-					{
-						if(edge->vertex && edge->face_clockwise && edge->face_clockwise->vertex)
-						{
-							polyhedron->edge_points.push_back(point_map[edge->vertex]);
-							polyhedron->clockwise_edges.push_back(polyhedron->edge_points.size());
-							polyhedron->edge_selections.push_back(edge->selection_weight);
-						}
-
-						if(edge->face_clockwise == (*hole))
-						{
-							polyhedron->clockwise_edges.back() = first_edge;
-							break;
-						}
-					}
-				}
-
-				polyhedron->face_first_loops.push_back(face_first_loop);
-				polyhedron->face_loop_counts.push_back(face_loop_count);
-				polyhedron->face_selections.push_back((*legacy_face)->selection_weight);
-				polyhedron->face_materials.push_back((*legacy_face)->material);
-			}
-
-			polyhedron->shell_first_faces.push_back(first_face);
-			polyhedron->shell_face_counts.push_back(face_count);
-			polyhedron->shell_types.push_back(type);
-		}
-	}
-
-	return *this;
+	k3d::difference::test(points, Other.points, Result);
+	k3d::difference::test(point_selection, Other.point_selection, Result);
+	k3d::difference::test(point_attributes, Other.point_attributes, Result);
+	k3d::difference::test(primitives, Other.primitives, Result);
 }
 
 namespace detail
@@ -386,7 +131,7 @@ struct mark_used_primitive_points
 
 	void operator()(const string_t&, const table&, const string_t&, const pipeline_data<array>& Array)
 	{
-		if(Array->get_metadata_value(metadata::key::domain()) != metadata::value::mesh_point_indices_domain())
+		if(Array->get_metadata_value(metadata::key::domain()) != metadata::value::point_indices_domain())
 			return;
 
 		if(const mesh::indices_t* const array = dynamic_cast<const mesh::indices_t*>(Array.get()))
@@ -427,10 +172,37 @@ void mesh::lookup_unused_points(const mesh& Mesh, mesh::bools_t& UnusedPoints)
 	visit_arrays(Mesh, detail::mark_used_primitive_points(UnusedPoints));
 }
 
+void mesh::create_index_removal_map(const mesh::bools_t& KeepIndices, mesh::indices_t& IndexMap)
+{
+	IndexMap.resize(KeepIndices.size());
+
+	const uint_t begin = 0;
+	const uint_t end = KeepIndices.size();
+	for(uint_t current_index = begin, new_index = begin; current_index != end; ++current_index)
+	{
+		IndexMap[current_index] = new_index;
+		if(!KeepIndices[current_index])
+			++new_index;
+	}
+}
+
+void mesh::create_index_list(const mesh::bools_t& SelectedIndices, mesh::indices_t& IndexSet)
+{
+	IndexSet.resize(0);
+
+	const uint_t begin = 0;
+	const uint_t end = SelectedIndices.size();
+	for(uint_t index = begin; index != end; ++index)
+	{
+		if(SelectedIndices[index])
+			IndexSet.push_back(index);
+	}
+}
+
 namespace detail
 {
 
-/// Helper function used by delete_unused_points()
+/// Helper function used by delete_points()
 void remap_points(mesh::indices_t& PrimitivePoints, const mesh::indices_t& PointMap)
 {
 	const uint_t begin = 0;
@@ -439,68 +211,148 @@ void remap_points(mesh::indices_t& PrimitivePoints, const mesh::indices_t& Point
 		PrimitivePoints[i] = PointMap[PrimitivePoints[i]];
 }
 
-/// Helper object used by delete_unused_points()
+/// Helper object used by delete_points()
 struct remap_primitive_points
 {
-	remap_primitive_points(mesh::indices_t& PointMap) :
+	remap_primitive_points(const mesh::indices_t& PointMap) :
 		point_map(PointMap)
 	{
 	}
 
 	void operator()(const string_t&, const table&, const string_t&, pipeline_data<array>& Array)
 	{
-		if(Array->get_metadata_value(metadata::key::domain()) != metadata::value::mesh_point_indices_domain())
+		if(Array->get_metadata_value(metadata::key::domain()) != metadata::value::point_indices_domain())
 			return;
 
 		if(mesh::indices_t* const array = dynamic_cast<mesh::indices_t*>(&Array.writable()))
 			remap_points(*array, point_map);
 	}
 
-	mesh::indices_t& point_map;
+	const mesh::indices_t& point_map;
 };
 
 } // namespace detail
 
-void mesh::delete_unused_points(mesh& Mesh)
+void mesh::remap_points(mesh& Mesh, const mesh::indices_t& PointMap)
 {
-	// Create a bitmap marking which points are unused ...
-	mesh::bools_t unused_points;
-	lookup_unused_points(Mesh, unused_points);
+	visit_arrays(Mesh, detail::remap_primitive_points(PointMap));
+}
+
+void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points)
+{
+	mesh::indices_t point_map;
+	delete_points(Mesh, Points, point_map);
+}
+
+void mesh::delete_points(mesh& Mesh, const mesh::bools_t& Points, mesh::indices_t& PointMap)
+{
+	// Enforce preconditions ...
+	return_if_fail(Mesh.points);
+	return_if_fail(Mesh.point_selection);
+	return_if_fail(Mesh.points->size() == Mesh.point_selection->size());
+	return_if_fail(Mesh.points->size() == Mesh.point_attributes.row_count() || 0 == Mesh.point_attributes.column_count());
 
 	// Count how many points will be left when we're done ...
-	const uint_t points_remaining = std::count(unused_points.begin(), unused_points.end(), false);
+	const uint_t points_remaining = std::count(Points.begin(), Points.end(), false);
 
-	// Create an array that will map from current-point-indices to new-point-indices,
-	// taking into account the points that will be removed.
-	mesh::indices_t point_map(unused_points.size());
+	// Create a mapping from current point indices to indices after we've removed points ...
+	create_index_removal_map(Points, PointMap);
 
-	const uint_t begin = 0;
-	const uint_t end = unused_points.size();
-	for(uint_t current_index = begin, new_index = begin; current_index != end; ++current_index)
-	{
-		point_map[current_index] = new_index;
-		if(!unused_points[current_index])
-			++new_index;
-	}
-
-	// Move leftover points (and point selections) into their final positions ...
+	// Move leftover points, point selections, and attributes into their final positions ...
 	mesh::points_t& points = Mesh.points.writable();
 	mesh::selection_t& point_selection = Mesh.point_selection.writable();
-	for(uint_t i = begin; i != end; ++i)
+	table_copier point_attributes(Mesh.point_attributes);
+
+	const uint_t point_begin = 0;
+	const uint_t point_end = point_begin + Points.size();
+	for(uint_t point = point_begin; point != point_end; ++point)
 	{
-		if(!unused_points[i])
-		{
-			points[point_map[i]] = points[i];
-			point_selection[point_map[i]] = point_selection[i];
-		}
+		if(Points[point])
+			continue;
+		
+		points[PointMap[point]] = points[point];
+		point_selection[PointMap[point]] = point_selection[point];
+		point_attributes.copy(point, PointMap[point]);
 	}
 
 	// Update generic mesh primitives so they use the correct indices ...
-	visit_arrays(Mesh, detail::remap_primitive_points(point_map));
+	visit_arrays(Mesh, detail::remap_primitive_points(PointMap));
 
 	// Free leftover memory ...
 	points.resize(points_remaining);
 	point_selection.resize(points_remaining);
+	Mesh.point_attributes.set_row_count(points_remaining);
+}
+
+namespace detail
+{
+
+class offset_point_indices
+{
+public:
+	offset_point_indices(const uint_t Offset) :
+		offset(Offset)
+	{
+	}
+
+	void operator()(const string_t&, const table&, const string_t& ArrayName, pipeline_data<array>& Array)
+	{
+		if(Array->get_metadata_value(metadata::key::domain()) != metadata::value::point_indices_domain())
+			return;
+
+		uint_t_array* const array = dynamic_cast<uint_t_array*>(&Array.writable());
+		if(!array)
+		{
+			log() << error << "array [" << ArrayName << "] must be a k3d::uint_t_array." << std::endl;
+			return;
+		}
+
+		std::transform(array->begin(), array->end(), array->begin(), std::bind2nd(std::plus<uint_t>(), offset));
+	}
+
+private:
+	const uint_t offset;	
+};
+
+} // namespace detail
+
+void mesh::append(const mesh& Source, mesh& Target, uint_t* const PointBegin, uint_t* const PointEnd, uint_t* const PrimitiveBegin, uint_t* const PrimitiveEnd)
+{
+	const uint_t point_begin = Target.points ? Target.points->size() : 0;
+	if(PointBegin)
+		*PointBegin = point_begin;
+
+	if(PrimitiveBegin)
+		*PrimitiveBegin = Target.primitives.size();
+
+	// Append source points to the target ...
+	if(Source.points)
+	{
+		mesh::points_t& target_points = Target.points ? Target.points.writable() : Target.points.create();
+		target_points.insert(target_points.end(), Source.points->begin(), Source.points->end());
+	}
+
+	if(Source.point_selection)
+	{
+		mesh::selection_t& target_point_selection = Target.point_selection ? Target.point_selection.writable() : Target.point_selection.create();
+		target_point_selection.insert(target_point_selection.end(), Source.point_selection->begin(), Source.point_selection->end());
+	}
+
+	// Append source primitives to the target ...
+	for(mesh::primitives_t::const_iterator primitive = Source.primitives.begin(); primitive != Source.primitives.end(); ++primitive)
+	{
+		Target.primitives.push_back(*primitive);
+		mesh::primitive& new_primitive = Target.primitives.back().writable();
+
+		if(point_begin)
+			mesh::visit_arrays(new_primitive, detail::offset_point_indices(point_begin));
+	}
+
+	if(PointEnd)
+		*PointEnd = Target.points ? Target.points->size() : 0;
+
+	if(PrimitiveEnd)
+		*PrimitiveEnd = Target.primitives.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -515,12 +367,11 @@ mesh::primitive::primitive(const string_t& Type) :
 {
 }
 
-bool_t mesh::primitive::almost_equal(const primitive& Other, const uint64_t Threshold) const
+void mesh::primitive::difference(const primitive& Other, difference::accumulator& Result) const
 {
-	return
-		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&
-		k3d::almost_equal<named_tables_t>(Threshold)(structure, Other.structure) &&
-		k3d::almost_equal<named_tables_t>(Threshold)(attributes, Other.attributes);
+	k3d::difference::test(type, Other.type, Result);
+	k3d::difference::test(structure, Other.structure, Result);
+	k3d::difference::test(attributes, Other.attributes, Result);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

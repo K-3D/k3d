@@ -1,18 +1,18 @@
 #python
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
 # Perform required one-time setup to store geometric points in the mesh ...
-points = Output.create_points()
-point_selection = Output.create_point_selection()
+points = context.output.create_points()
+point_selection = context.output.create_point_selection()
 
 # Perform required one-time setup to store bilinear patches in the mesh ...
-patches = k3d.bilinear_patch.create(Output)
+patches = k3d.bilinear_patch.create(context.output)
 
 # Create an (optional) array to hold color values at the parametric
 # corners of each patch ...
-Cs = patches.varying_attributes().create("Cs", "k3d::color")
+Cs = patches.parameter_attributes().create("Cs", "k3d::color")
 
 # We will create two identical bilinear patches
 for i in range(2):

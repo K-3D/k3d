@@ -17,11 +17,11 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "array.h"
-#include "table.h"
-#include "iomanip.h"
-#include "log.h"
-#include "type_registry.h"
+#include <k3dsdk/array.h>
+#include <k3dsdk/table.h>
+#include <k3dsdk/iomanip.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/type_registry.h>
 
 namespace k3d
 {
@@ -71,35 +71,19 @@ table table::clone(const uint_t Begin, const uint_t End) const
 	return result;
 }
 
-bool_t table::almost_equal(const table& Other, const uint64_t Threshold) const
+void table::difference(const table& Other, difference::accumulator& Result) const
 {
 	// If we have differing numbers of arrays, we definitely aren't equal
-	if(column_count() != Other.column_count())
-		return false;
+	Result.exact(column_count() == Other.column_count());
 
 	for(table::const_iterator a = begin(), b = Other.begin(); a != end() && b != Other.end(); ++a, ++b)
 	{
 		// Each pair of arrays must have equal names
-		if(a->first != b->first)
-			return false;
+		Result.exact(a->first == b->first);
 
-		// If both arrays point to the same memory, they're equal
-		if(a->second.get() == b->second.get())
-			continue;
-
-		// Perform element-wise comparisons of the two arrays
-		if(a->second && b->second)
-		{
-			// The array::almost_equal method correctly handles type-mismatches between arrays
-			if(a->second->almost_equal(*b->second, Threshold))
-				continue;
-		}
-
-		// Either the element-wise comparison failed or one array was NULL and the other wasn't
-		return false;
+		// Perform element-wise comparisons of the arrays
+		a->second->difference(*b->second, Result);
 	}
-
-	return true;
 }
 
 table table::clone_types(const table_collection& AttributeArrays)
@@ -154,7 +138,7 @@ std::ostream& operator<<(std::ostream& Stream, const table& RHS)
 {
 	for(table::const_iterator array_iterator = RHS.begin(); array_iterator != RHS.end(); ++array_iterator)
 	{
-		Stream << standard_indent << "\"" << array_iterator->first << "\" [" << array_iterator->second->type_string() << "] (" << array_iterator->second->size() << "):\n";
+		Stream << standard_indent << "array \"" << array_iterator->first << "\" [" << array_iterator->second->type_string() << "] (" << array_iterator->second->size() << "):\n";
 		if(array_iterator->second->size())
 			Stream << push_indent << start_block() << *array_iterator->second << finish_block << pop_indent << "\n";
 	}

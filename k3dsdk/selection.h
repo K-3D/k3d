@@ -2,7 +2,7 @@
 #define K3DSDK_SELECTION_H
 
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -20,15 +20,15 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "gl.h"
-#include "inode_collection.h"
-#include "inode_selection.h"
-#include "ipersistent.h"
-#include "iselectable.h"
-#include "named_arrays.h"
-#include "nodes.h"
-#include "serialization_xml.h"
-#include "xml.h"
+#include <k3dsdk/gl.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/inode_selection.h>
+#include <k3dsdk/ipersistent.h>
+#include <k3dsdk/iselectable.h>
+#include <k3dsdk/named_arrays.h>
+#include <k3dsdk/nodes.h>
+#include <k3dsdk/serialization_xml.h>
+#include <k3dsdk/xml.h>
 
 #include <vector>
 
@@ -36,8 +36,6 @@ namespace k3d
 {
 
 class inode;
-
-class mesh;
 
 /// Functor object for deciding whether an object is selected (i.e. has a non-zero selection weight)
 struct is_selected
@@ -69,45 +67,28 @@ NONE = 0,
 NODE = 1,
 /// Storage for a zero-based mesh index (relative to a node)
 MESH = 2,
-//POINT_GROUP = 3,
-//POINT = 4,
-//ABSOLUTE_POINT = 5,
-//POLYHEDRON = 6,
-//FACE = 7,
-//ABSOLUTE_FACE = 8,
-//FACE_HOLE = 9,
-//SPLIT_EDGE = 10,
-//ABSOLUTE_SPLIT_EDGE = 11,
-//LINEAR_CURVE_GROUP = 12,
-//LINEAR_CURVE = 13,
-//ABSOLUTE_LINEAR_CURVE = 14,
-//CUBIC_CURVE_GROUP = 15,
-//CUBIC_CURVE = 16,
-//ABSOLUTE_CUBIC_CURVE = 17,
-//NUCURVE_GROUP = 18,
-//NUCURVE = 19,
-//ABSOLUTE_NURBS_CURVE = 20,
-//ABSOLUTE_BILINEAR_PATCH = 21,
-//ABSOLUTE_BICUBIC_PATCH = 22,
-//ABSOLUTE_NURBS_PATCH = 23,
 /// Storage for a user-defined index
 USER1 = 24,
 /// Storage for a zero-based primitive index (relative to a mesh)
 PRIMITIVE = 25,
 /// Storage for a zero-based constant index (relative to a primitive)
 CONSTANT = 26,
-/// Storage for a zero-based uniform index (relative to a primitive)
-UNIFORM = 27,
-/// Storage for a zero-based varying index (relative to a primitive)
-VARYING = 28,
-/// Storage for a zero-based face-varying index (relative to a primitive)
-FACE_VARYING = 29,
+/// Storage for a zero-based surface index (relative to a primitive)
+SURFACE = 27,
+/// Storage for a zero-based parameter corner index (relative to a primitive)
+PARAMETER = 28,
 /// Storage for a zero-based split-edge index (relative to a primitive)
-SPLIT_EDGE = 30,
+EDGE = 30,
 /// Storage for a zero-based point index (relative to a mesh)
 POINT = 31,
 /// Storage for a zero-based curve index (relative to a primitive)
 CURVE = 32,
+/// Storage for a zero-based face index (relative to a primitive)
+FACE = 33,
+/// Storage for a zero-based patch index (relative to a primitive)
+PATCH = 34,
+/// Storage for a zero-based vertex index (relative to a primitive)
+VERTEX = 35,
 
 };
 
@@ -154,7 +135,6 @@ typedef std::vector<record> records;
 const record make_record(inode*);
 
 inode* get_node(const record& Record);
-mesh* get_mesh(const record& Record);
 
 template<typename T>
 bool is_selected(T* Object)
@@ -214,8 +194,8 @@ public:
 	/// Stores array data that defines the selection.
 	named_arrays structure;
 
-	/// Compares two selections for equality using the fuzzy semantics of almost_equal.
-	bool_t almost_equal(const storage& Other, const uint64_t Threshold) const;
+	/// Returns the difference between two selections using the fuzzy semantics of k3d::difference::test().
+	void difference(const storage& Other, difference::accumulator& Result) const;
 };
 
 /// Stream serialization
@@ -229,8 +209,11 @@ public:
 	/// Create a new selection, appending it to the collection.
 	storage& create(const string_t& Type);
 
-	/// Compares two selection sets for equality using the fuzzy semantics of almost_equal.
-	bool_t almost_equal(const set& Other, const uint64_t Threshold) const;
+	/// Returns the difference between two selection sets using the fuzzy semantics of k3d::difference::test().
+	void difference(const set& Other, difference::accumulator& Result) const;
+
+	/// Combines two selection sets by appending one to another.
+	static void append(const set& Source, set& Target);
 };
 
 /// Stream serialization
@@ -238,45 +221,22 @@ std::ostream& operator<<(std::ostream& Stream, const set& RHS);
 
 } // namespace selection
 
-/// Specialization of almost_equal that tests k3d::selection::storage for equality
-template<>
-class almost_equal<selection::storage>
+namespace difference
 {
-	typedef selection::storage T;
 
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
-
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
-
-/// Specialization of almost_equal that tests k3d::selection::set for equality
-template<>
-class almost_equal<selection::set>
+/// Specialization of difference::test for k3d::selection::storage
+inline void test(const k3d::selection::storage& A, const k3d::selection::storage& B, accumulator& Result)
 {
-	typedef selection::set T;
+	A.difference(B, Result);
+}
 
-public:
-	almost_equal(const uint64_t Threshold) :
-		threshold(Threshold)
-	{
-	}
+/// Specialization of difference::test for k3d::selection::set
+inline void test(const k3d::selection::set& A, const k3d::selection::set& B, accumulator& Result)
+{
+	A.difference(B, Result);
+}
 
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return A.almost_equal(B, threshold);
-	}
-
-	const uint64_t threshold;
-};
+} // namespace difference
 
 /////////////////////////////////////////////////////////////////////////////
 // selection_set_serialization

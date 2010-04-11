@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "metadata_keys.h"
+#include <k3dsdk/metadata_keys.h>
 
 namespace k3d
 {
@@ -52,24 +52,34 @@ const string_t role()
 	return "k3d:role";
 }
 
+const string_t version()
+{
+	return "k3d:version";
+}
+
 } // namespace key
 
 namespace value
 {
 
-const string_t mesh_point_indices_domain()
+const string_t point_indices_domain()
 {
-	return "/points/indices()";
+	return "k3d:point-indices";
 }
 
-const string_t nurbs_knot_vector_domain()
+const string_t multi_line_text_role()
 {
-	return "k3d:nurbs-knot-vector";
+	return "k3d:multi-line-text";
 }
 
 const string_t selection_role()
 {
 	return "k3d:selection";
+}
+
+const string_t nurbs_knot_vector_role()
+{
+	return "k3d:nurbs-knot-vector";
 }
 
 } // namespace value

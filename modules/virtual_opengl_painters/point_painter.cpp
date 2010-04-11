@@ -23,7 +23,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/extension_gl.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/imesh_painter_gl.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/result.h>
@@ -49,7 +49,7 @@ public:
 			"VirtualOpenGLPointPainter",
 			_("Renders mesh points"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL),
+			k3d::iplugin_factory::STABLE),
 		delegate(0)
 	{
 		// Note ... this ctor may be executed before k3d::application is initialized, so

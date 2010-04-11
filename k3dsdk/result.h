@@ -26,7 +26,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "log.h"
+#include <k3dsdk/log.h>
 #include <iostream>
 
 #define assert_not_reached() \

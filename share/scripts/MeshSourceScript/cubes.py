@@ -1,10 +1,10 @@
 #python
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
 # Construct a cube mesh primitive ...
-cubes = Output.primitives().create("cube")
+cubes = context.output.primitives().create("cube")
 matrices = cubes.topology().create("matrices", "k3d::matrix4")
 materials = cubes.topology().create("materials", "k3d::imaterial*")
 uniform = cubes.attributes().create("uniform")
@@ -23,4 +23,4 @@ matrices.append(k3d.translate3(k3d.vector3(7, 0, 0)))
 materials.append(None)
 color.append(k3d.color(0, 0, 1))
 
-print repr(Output)
+print repr(context.output)

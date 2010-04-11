@@ -21,8 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "basic_math.h"
-#include "bezier.h"
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/bezier.h>
 
 namespace k3d
 {

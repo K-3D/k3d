@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Add explicit check / nag screen when loading legacy documents.
+desc: Like it says.
+type: :task
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-01-01 03:51:58.501547 Z
+references: []
+
+id: c920698bb22ce982c3f377ceebe1c146ff08fa9e
+log_events: 
+- - 2010-01-01 03:51:59.029477 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-02-27 23:42:23.922874 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""
+claimer: 

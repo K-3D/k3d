@@ -46,14 +46,13 @@
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_camera_preview.h>
 #include <k3dsdk/irenderable_gl.h>
-#include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
@@ -89,7 +88,7 @@ public:
 		base(Factory, Document),
 		m_visible_nodes(init_owner(*this) + init_name("visible_nodes") + init_label(_("Visible Nodes")) + init_description(_("A list of nodes that will be visible in the rendered output.")) + init_value(std::vector<k3d::inode*>())),
 		m_enabled_lights(init_owner(*this) + init_name("enabled_lights") + init_label(_("Enabled Lights")) + init_description(_("A list of light sources that will contribute to the rendered output.")) + init_value(std::vector<k3d::inode*>())),
-		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("Resolution")) + init_description(_("Choose a predefined image resolution")) + init_enumeration(k3d::resolution_values()) + init_value(std::string(""))),
+		m_resolution(init_owner(*this) + init_name("resolution") + init_label(_("Resolution")) + init_description(_("Choose a predefined image resolution")) + init_enumeration(k3d::resolution_values()) + init_value(k3d::string_t(""))),
 		m_pixel_width(init_owner(*this) + init_name("pixel_width") + init_label(_("pixel_width")) + init_description(_("The horizontal size in pixels of the rendered output image.")) + init_value(320) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
 		m_pixel_height(init_owner(*this) + init_name("pixel_height") + init_label(_("pixel_height")) + init_description(_("The vertical size in pixels of the rendered output image.")) + init_value(240) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(1))),
 		m_AA_passes(init_owner(*this) + init_name("AA_passes") + init_label(_("AA_passes")) + init_description(_("AA passes")) + init_value(3) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)) + init_constraint(constraint::minimum<k3d::int32_t>(0))),
@@ -103,7 +102,8 @@ public:
 		m_gamma(init_owner(*this) + init_name("gamma") + init_label(_("gamma")) + init_description(_("gamma")) + init_value(1)),
 		m_fog_density(init_owner(*this) + init_name("fog_density") + init_label(_("fog_density")) + init_description(_("fog_density")) + init_value(0.0)),
 		m_fog_color(init_owner(*this) + init_name("fog_color") + init_label(_("fog_color")) + init_description(_("Fog color")) + init_value(k3d::color(1, 1, 1))),
-		m_preview_sds(init_owner(*this) + init_name("preview_sds") + init_label(_("Preview SDS")) + init_description(_("Show SDS Surfaces")) + init_value(true))
+		m_preview_sds(init_owner(*this) + init_name("preview_sds") + init_label(_("Preview SDS")) + init_description(_("Show SDS Surfaces")) + init_value(true)),
+		m_executable(init_owner(*this) + init_name("executable") + init_label(_("Executable")) + init_description(_("Choose the name of the executable that will be run to render YAFRAY scene files.")) + init_value(k3d::string_t("yafray")))
 	{
 		m_resolution.changed_signal().connect(sigc::mem_fun(*this, &render_engine::on_resolution_changed));
 	}
@@ -119,7 +119,7 @@ public:
 
 	void on_resolution_changed(k3d::iunknown*)
 	{
-		const std::string new_resolution = m_resolution.pipeline_value();
+		const k3d::string_t new_resolution = m_resolution.pipeline_value();
 
 		const k3d::resolutions_t& resolutions = k3d::resolutions();
 		for(k3d::resolutions_t::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
@@ -135,7 +135,7 @@ public:
 		assert_not_reached();
 	}
 
-	bool render_camera_preview(k3d::icamera& Camera)
+	k3d::bool_t render_camera_preview(k3d::icamera& Camera)
 	{
 		// Start a new render job ...
 		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-yafray-preview");
@@ -158,7 +158,7 @@ public:
 		return true;
 	}
 
-	bool render_camera_frame(k3d::icamera& Camera, const k3d::filesystem::path& OutputImage, const bool ViewImage)
+	k3d::bool_t render_camera_frame(k3d::icamera& Camera, const k3d::filesystem::path& OutputImage, const k3d::bool_t ViewImage)
 	{
 		// Sanity checks ...
 		return_val_if_fail(!OutputImage.empty(), false);
@@ -188,7 +188,7 @@ public:
 		return true;
 	}
 
-	bool render_camera_animation(k3d::icamera& Camera, k3d::iproperty& Time, const k3d::frames& Frames, const bool ViewCompletedImages)
+	k3d::bool_t render_camera_animation(k3d::icamera& Camera, k3d::iproperty& Time, const k3d::frames& Frames, const k3d::bool_t ViewCompletedImages)
 	{
 		// Start a new render job ...
 		k3d::inetwork_render_job& job = k3d::get_network_render_farm().create_job("k3d-yafray-render-animation");
@@ -269,7 +269,7 @@ private:
 			m_current_face = Face;
 		}
 
-		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], double Weights[4], k3d::uint_t& NewVertex)
+		void add_vertex(const k3d::point3& Coordinates, k3d::uint_t Vertices[4], k3d::uint_t Edges[4], k3d::double_t Weights[4], k3d::uint_t& NewVertex)
 		{
 			NewVertex = m_points.size();
 			m_points.push_back(Coordinates);
@@ -335,29 +335,29 @@ private:
         const faces_t& faces = i->second;
 
         k3d::string_t shader_name = "shader_0";
-        bool shadow = true;
-        bool emit_rad = true;
-        bool recv_rad = true;
-        bool caustics = true;
-        double caus_IOR = 1.0;
+        k3d::bool_t shadow = true;
+        k3d::bool_t emit_rad = true;
+        k3d::bool_t recv_rad = true;
+        k3d::bool_t caustics = true;
+        k3d::double_t caus_IOR = 1.0;
         k3d::color caus_rcolor(0, 0, 0);
         k3d::color caus_tcolor(0, 0, 0);
-        double autosmooth_value = 89.9;
-        bool has_orco = false;
+        k3d::double_t autosmooth_value = 89.9;
+        k3d::bool_t has_orco = false;
 
         if(k3d::yafray::imaterial* const yafray_material = k3d::material::lookup<k3d::yafray::imaterial>(material))
         {
           shader_name = ShaderNames.count(yafray_material) ? ShaderNames.find(yafray_material)->second : "shader_0";
 
-          shadow = k3d::property::pipeline_value<bool>(*yafray_material, "shadow");
-          emit_rad = k3d::property::pipeline_value<bool>(*yafray_material, "emit_rad");
-          recv_rad = k3d::property::pipeline_value<bool>(*yafray_material, "recv_rad");
-          caustics = k3d::property::pipeline_value<bool>(*yafray_material, "caustics");
-          caus_IOR = k3d::property::pipeline_value<double>(*yafray_material, "caus_IOR");
+          shadow = k3d::property::pipeline_value<k3d::bool_t>(*yafray_material, "shadow");
+          emit_rad = k3d::property::pipeline_value<k3d::bool_t>(*yafray_material, "emit_rad");
+          recv_rad = k3d::property::pipeline_value<k3d::bool_t>(*yafray_material, "recv_rad");
+          caustics = k3d::property::pipeline_value<k3d::bool_t>(*yafray_material, "caustics");
+          caus_IOR = k3d::property::pipeline_value<k3d::double_t>(*yafray_material, "caus_IOR");
           caus_rcolor = k3d::property::pipeline_value<k3d::color>(*yafray_material, "caus_rcolor");
           caus_tcolor = k3d::property::pipeline_value<k3d::color>(*yafray_material, "caus_tcolor");
-          autosmooth_value = k3d::property::pipeline_value<double>(*yafray_material, "mesh_autosmooth_value");
-          has_orco = k3d::property::pipeline_value<bool>(*yafray_material, "has_orco");
+          autosmooth_value = k3d::property::pipeline_value<k3d::double_t>(*yafray_material, "mesh_autosmooth_value");
+          has_orco = k3d::property::pipeline_value<k3d::bool_t>(*yafray_material, "has_orco");
         }
 
 
@@ -389,7 +389,7 @@ private:
     }
 	}
 
-	bool render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath, const bool VisibleRender)
+	k3d::bool_t render(k3d::icamera& Camera, k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& OutputImagePath, const k3d::bool_t VisibleRender)
 	{
 		try
 		{
@@ -409,7 +409,7 @@ private:
 			k3d::inetwork_render_frame::arguments arguments;
 			arguments.push_back(k3d::inetwork_render_frame::argument(filepath.native_filesystem_string()));
 
-			Frame.add_exec_command("yafray", environment, arguments);
+			Frame.add_exec_command(m_executable.pipeline_value(), environment, arguments);
 
 			// Setup a YafRay scene description ...
 			stream << "<!-- Yafray scene generated by K-3D Version " K3D_VERSION ", http://www.k-3d.org -->\n";
@@ -462,7 +462,7 @@ private:
 			if(!camera_node)
 				throw std::runtime_error("camera not a node");
 
-			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output());
+			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().matrix_source_output());
 			const k3d::point3 camera_position = k3d::position(camera_matrix);
 			const k3d::point3 camera_to_vector = camera_matrix * k3d::point3(0, 0, 1);
 			const k3d::point3 camera_up_vector = camera_matrix * k3d::point3(0, 1, 0);
@@ -504,25 +504,6 @@ private:
 		return true;
 	}
 
-/*
-	/// Apply SDS if needed
-	void sds_filter(const k3d::legacy::mesh& Input, const std::string& RenderType, k3d::legacy::mesh& Output, int Levels)
-	{
-		if (!m_preview_sds.pipeline_value() || !(Input.polyhedra.size() > 0 && (RenderType == "catmull-clark")))
-		{
-			k3d::legacy::deep_copy(Input, Output);
-			return;
-		}
-		k3d::sds::k3d_mesh_sds_cache sds_cache;
-
-		// Set levels -before- input
-		sds_cache.set_levels(Levels);
-		sds_cache.set_input(&Input);
-		sds_cache.update();
-		sds_cache.output(&Output);
-	}
-*/
-
 	/// Helper class that limits the list of visible nodes to those that we can render
 	template<typename value_t, class name_policy_t>
 	class yafray_visible_nodes_property :
@@ -532,7 +513,7 @@ private:
 		typedef k3d::data::writable_property<value_t, name_policy_t> base;
 
 	public:
-		bool property_allow(k3d::inode& Node)
+		k3d::bool_t property_allow(k3d::inode& Node)
 		{
 			return Node.factory().factory_id() == k3d::classes::MeshInstance();
 		}
@@ -554,7 +535,7 @@ private:
 		typedef k3d::data::writable_property<value_t, name_policy_t> base;
 
 	public:
-		bool property_allow(k3d::inode& Node)
+		k3d::bool_t property_allow(k3d::inode& Node)
 		{
 			return dynamic_cast<k3d::yafray::ilight*>(&Node) ? true : false;
 		}
@@ -569,22 +550,23 @@ private:
 
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, yafray_visible_nodes_property, node_collection_serialization) m_visible_nodes;
 	k3d_data(k3d::inode_collection_property::nodes_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, yafray_enabled_lights_property, node_collection_serialization) m_enabled_lights;
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_resolution;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_width;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_pixel_height;
 
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_AA_passes;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_AA_minsamples;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_AA_pixelwidth;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_AA_threshold;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_AA_pixelwidth;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_AA_threshold;
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_raydepth;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_bias;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_save_alpha;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_exposure;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gamma;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_fog_density;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_bias;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_save_alpha;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_exposure;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gamma;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_fog_density;
 	k3d_data(k3d::color, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_fog_color;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_preview_sds;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_preview_sds;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_executable;
 };
 
 k3d::iplugin_factory& render_engine_factory()

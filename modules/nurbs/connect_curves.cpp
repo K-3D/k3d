@@ -21,7 +21,8 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_curve_modifier.h"
+#include "nurbs_curves.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -70,46 +71,65 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		std::vector<k3d::uint_t> curves;
-		std::vector<k3d::uint_t> points;
-
-		const k3d::uint_t curve_begin = 0;
-		const k3d::uint_t curve_end = nurbs->curve_first_points.size();
-		for (k3d::uint_t curve = curve_begin; curve != curve_end; ++curve)
+		k3d::mesh::indices_t selected_primitives, selected_curves; // Keeps track of primitives and curves containing selected points
+		k3d::mesh::bools_t first_point_selections; // True if the first point of a curve was selected, false otherwise
+		const k3d::mesh::selection_t point_selections = *Output.point_selection;
+		for(k3d::uint_t prim_idx = 0; prim_idx != Input.primitives.size(); ++prim_idx)
 		{
-			const k3d::uint_t curve_point_begin = nurbs->curve_first_points[curve];
-			const k3d::uint_t curve_point_end = curve_point_begin + nurbs->curve_point_counts[curve];
-
-			const k3d::mesh::weights_t& orig_weights = nurbs->curve_point_weights;
-
-			boost::shared_ptr<k3d::mesh::weights_t> curve_point_weights(new k3d::mesh::weights_t());
-
-			for (k3d::uint_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
+			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> curves(k3d::nurbs_curve::validate(Input, *Input.primitives[prim_idx]));
+			if(!curves)
+				continue;
+			for(k3d::uint_t curve = 0; curve != curves->curve_first_points.size(); ++curve)
 			{
-				if ((*Output.point_selection)[nurbs->curve_points[curve_point]])
+				const k3d::uint_t first_curve_point = curves->curve_first_points[curve];
+				const k3d::uint_t last_curve_point = first_curve_point + curves->curve_point_counts[curve] - 1;
+				if(point_selections[curves->curve_points[first_curve_point]] && point_selections[curves->curve_points[last_curve_point]])
 				{
-					curves.push_back(curve);
-					points.push_back(curve_point);
+					k3d::log() << error << "NurbsConnectCurves: selected points must lie on different curves" << std::endl;
+					return;
+				}
+				if(point_selections[curves->curve_points[first_curve_point]] || point_selections[curves->curve_points[last_curve_point]])
+				{
+					selected_primitives.push_back(prim_idx);
+					selected_curves.push_back(curve);
+					first_point_selections.push_back(point_selections[curves->curve_points[first_curve_point]]);
 				}
 			}
 		}
 
-		if (curves.size() != 2 || points.size() != 2 || curves[0] == curves[1])
+		if(selected_curves.size() != 2)
 		{
-			k3d::log() << error << "You need to select exactly 2 points on 2 different curves!\n" << "Selected: " << points.size() << " points on " << curves.size() << " curves" << std::endl;
+			k3d::log() << error << "NurbsConnectCurves: you must select two end points on two different NURBS curves" << std::endl;
+			return;
+		}
+
+		// Create a new primitive if the original curves belonged to different primitives, or append to the existing primitive if they were the same.
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> output_curves;
+		if(selected_primitives[0] == selected_primitives[1])
+			output_curves.reset(k3d::nurbs_curve::validate(Output, Output.primitives[selected_primitives[0]]));
+		else
+			output_curves.reset(k3d::nurbs_curve::create(Output));
+		module::nurbs::connect_curves(Output, *output_curves, Input, selected_primitives[0], selected_curves[0], first_point_selections[0], selected_primitives[1], selected_curves[1], first_point_selections[1]);
+		if(selected_primitives[0] == selected_primitives[1])
+		{
+			delete_curve(*output_curves, selected_curves[0]);
+			delete_curve(*output_curves, selected_curves[1]);
 		}
 		else
 		{
-			nurbs_curve_modifier mod(Output, *nurbs);
-			mod.join_curves(points[0], curves[0], points[1], curves[1]);
+			boost::scoped_ptr<k3d::nurbs_curve::primitive> prim1(k3d::nurbs_curve::validate(Output, Output.primitives[selected_primitives[0]]));
+			boost::scoped_ptr<k3d::nurbs_curve::primitive> prim2(k3d::nurbs_curve::validate(Output, Output.primitives[selected_primitives[1]]));
+			output_curves->material.push_back(prim1->material.back());
+			delete_curve(*prim1, selected_curves[0]);
+			delete_curve(*prim2, selected_curves[1]);
 		}
+		delete_empty_primitives(Output);
+
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -123,8 +143,6 @@ public:
 
 		return factory;
 	}
-
-private:
 };
 
 //Create connect_curve factory
@@ -134,4 +152,5 @@ k3d::iplugin_factory& connect_curves_factory()
 }
 
 }//namespace nurbs
+
 } //namespace module

@@ -21,42 +21,46 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "idocument.h"
-#include "nodes.h"
-#include "properties.h"
-#include "time_source.h"
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
+#include <k3dsdk/time_source.h>
 
 namespace k3d
 {
 
 inode* get_time_source(idocument& Document)
 {
-	const nodes_t nodes = find_nodes(Document.nodes(), "TimeSource");
-	return (1 == nodes.size()) ? *nodes.begin() : 0;
+	static iplugin_factory* const factory = plugin::factory::lookup("TimeSource");
+	return_val_if_fail(factory, 0);
+
+	const std::vector<inode*> nodes = node::lookup(Document, factory->factory_id());
+	return (1 == nodes.size()) ? nodes[0] : 0;
 }
 
 iproperty* get_start_time(idocument& Document)
 {
 	inode* const object = get_time_source(Document);
-	return object ? property::get<double>(*object, "start_time") : 0;
+	return object ? property::get<double_t>(*object, "start_time") : 0;
 }
 
 iproperty* get_end_time(idocument& Document)
 {
 	inode* const object = get_time_source(Document);
-	return object ? property::get<double>(*object, "end_time") : 0;
+	return object ? property::get<double_t>(*object, "end_time") : 0;
 }
 
 iproperty* get_frame_rate(idocument& Document)
 {
 	inode* const object = get_time_source(Document);
-	return object ? property::get<double>(*object, "frame_rate") : 0;
+	return object ? property::get<double_t>(*object, "frame_rate") : 0;
 }
 
 iproperty* get_time(idocument& Document)
 {
 	inode* const object = get_time_source(Document);
-	return object ? property::get<double>(*object, "time") : 0;
+	return object ? property::get<double_t>(*object, "time") : 0;
 }
 
 } // namespace k3d

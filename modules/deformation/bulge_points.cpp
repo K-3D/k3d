@@ -52,6 +52,7 @@ public:
 	bulge_points(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_bulge_factor(init_owner(*this) + init_name("bulge_factor") + init_label(_("Bulge factor")) + init_description(_("Bulge amount")) + init_value(1.0) + init_step_increment(0.1) + init_units(typeid(k3d::measurement::scalar))),
+		m_origin(init_owner(*this) + init_name("origin") + init_label(_("Origin")) + init_description(_("Origin of the bulge.")) + init_value(k3d::point3(0, 0, 0))),
 		m_displace_x(init_owner(*this) + init_name("displace_x") + init_label(_("Displace x")) + init_description(_("Displace on X axis")) + init_value(true)),
 		m_displace_y(init_owner(*this) + init_name("displace_y") + init_label(_("Displace y")) + init_description(_("Displace on Y axis")) + init_value(true)),
 		m_displace_z(init_owner(*this) + init_name("displace_z") + init_label(_("Displace z")) + init_description(_("Displace on Z axis")) + init_value(true)),
@@ -59,6 +60,7 @@ public:
 		m_type(init_owner(*this) + init_name("type") + init_label(_("Type")) + init_description(_("Bulge type")) + init_value(RADIAL) + init_enumeration(type_values()))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
+		m_origin.changed_signal().connect(make_update_mesh_slot());
 		m_bulge_factor.changed_signal().connect(make_update_mesh_slot());
 		m_displace_x.changed_signal().connect(make_update_mesh_slot());
 		m_displace_y.changed_signal().connect(make_update_mesh_slot());
@@ -70,11 +72,11 @@ public:
 	class worker
 	{
 	public:
-		worker(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints, const k3d::point3& Origin, const k3d::point3& Min, const k3d::point3& Max, const k3d::axis Axis, const bool Radial, const bool displace_x, const bool displace_y, const bool displace_z, const double bulge_factor) :
+		worker(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints, const k3d::point3& Origin, const k3d::point3& Min, const k3d::point3& Max, const k3d::axis Axis, const k3d::bool_t Radial, const k3d::bool_t displace_x, const k3d::bool_t displace_y, const k3d::bool_t displace_z, const k3d::double_t bulge_factor) :
 			input_points(InputPoints),
 			point_selection(PointSelection),
 			output_points(OutputPoints),
-			m_origin(Origin),
+			m_origin(k3d::to_vector(Origin)),
 			m_min(Min),
 			m_max(Max),
 			m_axis(Axis),
@@ -93,29 +95,29 @@ public:
 			const k3d::uint_t point_end = range.end();
 			for(k3d::uint_t point = point_begin; point != point_end; ++point)
 			{
-				const k3d::point3& Coords = input_points[point];
+				k3d::point3 coords = input_points[point];
 
-				k3d::point3 coords = Coords + m_origin;
+				coords -= m_origin;
 
-				double delta = 0;
-				double length = m_size[m_axis];
+				k3d::double_t delta = 0;
+				k3d::double_t length = m_size[m_axis];
 				if(length != 0)
 				{
-					double min = m_min[m_axis];
-					double max = m_max[m_axis];
-					double value = coords[m_axis];
+					k3d::double_t min = m_min[m_axis];
+					k3d::double_t max = m_max[m_axis];
+					k3d::double_t value = coords[m_axis];
 
-					double down = value - min;
-					double up = max - value;
+					k3d::double_t down = value - min;
+					k3d::double_t up = max - value;
 
 					delta = 2 * down * up / (length*length);
 				}
 
-				double bulge_amount = delta;
+				k3d::double_t bulge_amount = delta;
 				if(m_radial)
 				{
-					double distance = k3d::to_vector(coords).length();
-					double scale;
+					k3d::double_t distance = k3d::to_vector(coords).length();
+					k3d::double_t scale;
 					if(0 == distance)
 						scale = 1.0;
 					else
@@ -132,7 +134,7 @@ public:
 				}
 				else
 				{
-					double offset = m_bulge_factor * bulge_amount;
+					k3d::double_t offset = m_bulge_factor * bulge_amount;
 
 					if(m_displace_x && (k3d::X != m_axis))
 						coords[0] += offset;
@@ -144,7 +146,7 @@ public:
 						coords[2] += offset;
 				}
 
-				coords = coords - k3d::to_vector(m_origin);
+				coords += m_origin;
 
 				output_points[point] = k3d::mix(input_points[point], coords, point_selection[point]);
 			}
@@ -154,15 +156,15 @@ public:
 		const k3d::mesh::points_t& input_points;
 		const k3d::mesh::selection_t& point_selection;
 		k3d::mesh::points_t& output_points;
-		const k3d::point3 m_origin;
+		const k3d::vector3 m_origin;
 		const k3d::point3 m_min;
 		const k3d::point3 m_max;
 		const k3d::axis m_axis;
-		const bool m_radial;
-		const bool m_displace_x;
-		const bool m_displace_y;
-		const bool m_displace_z;
-		const double m_bulge_factor;
+		const k3d::bool_t m_radial;
+		const k3d::bool_t m_displace_x;
+		const k3d::bool_t m_displace_y;
+		const k3d::bool_t m_displace_z;
+		const k3d::double_t m_bulge_factor;
 		const k3d::vector3 m_size;
 	};
 
@@ -170,16 +172,16 @@ public:
 	{
 		const k3d::bounding_box3 bounds = k3d::mesh::bounds(InputPoints);
 
-		const double bulge_factor = m_bulge_factor.pipeline_value();
-		const double displace_x = m_displace_x.pipeline_value();
-		const double displace_y = m_displace_y.pipeline_value();
-		const double displace_z = m_displace_z.pipeline_value();
+		const k3d::double_t bulge_factor = m_bulge_factor.pipeline_value();
+		const k3d::double_t displace_x = m_displace_x.pipeline_value();
+		const k3d::double_t displace_y = m_displace_y.pipeline_value();
+		const k3d::double_t displace_z = m_displace_z.pipeline_value();
 		const k3d::axis axis = m_axis.pipeline_value();
 
-		const k3d::point3 origin(0, 0, 0);
+		const k3d::point3 origin = m_origin.pipeline_value();
 		const k3d::point3 min(bounds.nx, bounds.ny, bounds.nz);
 		const k3d::point3 max(bounds.px, bounds.py, bounds.pz);
-		const bool radial = m_type.pipeline_value() == RADIAL;
+		const k3d::bool_t radial = m_type.pipeline_value() == RADIAL;
 
 		k3d::parallel::parallel_for(
 			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),
@@ -249,10 +251,11 @@ private:
 		return values;
 	}
 
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_bulge_factor;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_displace_x;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_displace_y;
-	k3d_data(bool, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_displace_z;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_bulge_factor;
+	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_origin;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_displace_x;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_displace_y;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_displace_z;
 	k3d_data(k3d::axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_axis;
 	k3d_data(Type, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_type;
 };

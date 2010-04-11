@@ -32,6 +32,15 @@ namespace k3d
 
 /// Helper methods for use with in mesh primitive validate() functions only!
 
+/// Performs automated validation of mesh point data:
+///
+/// * Validates that the number of points, point selections, and point attributes match.
+/// * Validates that every array in the point attributes table is the same length.
+///
+/// Note: this is called implicitly by require_valid_primitive() if your primitive
+/// uses points, you don't need to call it yourself in most circumstances.
+void require_valid_points(const mesh& Mesh);
+
 /// Performs automated validation of the structure of a mesh primitive:
 ///
 /// * Validates that "constant" tables have length 1.

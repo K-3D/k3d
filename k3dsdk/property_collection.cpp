@@ -21,10 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iproperty.h"
-#include "iuser_property.h"
-#include "property_collection.h"
-#include "result.h"
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/iuser_property.h>
+#include <k3dsdk/property_collection.h>
+#include <k3dsdk/result.h>
 
 namespace k3d
 {

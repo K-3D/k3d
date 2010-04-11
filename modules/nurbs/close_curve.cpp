@@ -22,7 +22,8 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_curve_modifier.h"
+#include "nurbs_curves.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -71,22 +72,14 @@ public:
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		return_if_fail(nurbs);
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		nurbs_curve_modifier mod(Output, *nurbs);
-		int my_curve = mod.selected_curve();
+		modify_selected_curves(Input, Output, curve_closer(m_keep_ends.pipeline_value()));
+		replace_duplicate_points(Output);
 
-		if (my_curve < 0)
-		{
-			k3d::log() << error << "You need to select exactly one curve!" << std::endl;
-			return;
-		}
-
-		mod.close_curve(my_curve, m_keep_ends.pipeline_value());
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -102,6 +95,16 @@ public:
 	}
 
 private:
+	struct curve_closer
+	{
+		curve_closer(const k3d::bool_t KeepEnds) : keep_ends(KeepEnds) {}
+		void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
+		{
+			module::nurbs::close_curve(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve, keep_ends);
+		}
+		const k3d::bool_t keep_ends;
+	};
+
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_keep_ends;
 };
 

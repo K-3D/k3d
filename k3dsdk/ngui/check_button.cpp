@@ -21,8 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "check_button.h"
-#include "utility.h"
+#include <k3dsdk/ngui/check_button.h>
+#include <k3dsdk/ngui/utility.h>
 
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/state_change_set.h>

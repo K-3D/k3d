@@ -95,8 +95,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<goniometric_light,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > factory(
 				k3d::uuid(0x4e372287, 0x66475408, 0x1b51468e, 0x8979b418),
 				"LuxRenderGoniometricLight",
 				_("LuxRender Goniometric Light"),

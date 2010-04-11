@@ -22,8 +22,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "combo_box.h"
-#include "utility.h"
+#include <k3dsdk/ngui/combo_box.h>
+#include <k3dsdk/ngui/utility.h>
 
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/state_change_set.h>

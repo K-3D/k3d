@@ -24,7 +24,7 @@
 #include "file_notification.h"
 
 #include <k3dsdk/ifile_change_notifier.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 
 #include <glibmm/dispatcher.h>
 #include <glibmm/thread.h>

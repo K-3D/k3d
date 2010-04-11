@@ -16,10 +16,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "log.h"
-#include "log_control.h"
-#include "k3d-platform-config.h"
-#include "result.h"
+#include <k3dsdk/log.h>
+#include <k3dsdk/log_control.h>
+#include <k3d-platform-config.h>
+#include <k3dsdk/result.h>
 
 #include <cstdlib>
 #include <iostream>
@@ -29,7 +29,7 @@
 #ifdef K3D_API_WIN32
 
 	#include <time.h>
-	#include "win32.h"
+	#include <k3dsdk/win32.h>
 
 #elif defined K3D_API_DARWIN
 

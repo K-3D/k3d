@@ -20,18 +20,18 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "algebra.h"
-#include "color.h"
-#include "imaterial.h"
-#include "inode.h"
-#include "normal3.h"
-#include "point2.h"
-#include "point3.h"
-#include "point4.h"
-#include "texture3.h"
-#include "types.h"
-#include "vector2.h"
-#include "vector3.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/color.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/normal3.h>
+#include <k3dsdk/point2.h>
+#include <k3dsdk/point3.h>
+#include <k3dsdk/point4.h>
+#include <k3dsdk/texture3.h>
+#include <k3dsdk/types.h>
+#include <k3dsdk/vector2.h>
+#include <k3dsdk/vector3.h>
 
 #include <boost/mpl/vector/vector30.hpp>
 

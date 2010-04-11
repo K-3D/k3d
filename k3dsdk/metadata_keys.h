@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "types.h"
+#include <k3dsdk/types.h>
 
 namespace k3d
 {
@@ -48,18 +48,24 @@ const string_t domain();
 /// A common key value will be k3d::metadata::value::selection(), to identify arrays that hold selection state.
 const string_t role();
 
+/// Metadata key "k3d:version" is used to store an arbitrary version string.  It is typically associated with
+/// serialized K-3D documents in native XML format.
+const string_t version();
+
 } // namespace key
 
 namespace value
 {
 
 /// Metadata value for use with "k3d:domain" that specifies the mesh point array.
-const string_t mesh_point_indices_domain();
-/// Metadata value for use with "k3d:domain" that specifies that an array of floating-point values is a NURBS knot vector.
-const string_t nurbs_knot_vector_domain();
+const string_t point_indices_domain();
 
+/// Metadata value for use with "k3d:role" that specifies that a string can contain multiple lines of text.
+const string_t multi_line_text_role();
 /// Metadata value for use with "k3d:role" that specifies that an array of floating-point values is a selection state.
 const string_t selection_role();
+/// Metadata value for use with "k3d:role" that specifies that an array of floating-point values is a NURBS knot vector.
+const string_t nurbs_knot_vector_role();
 
 } // namespace value
 

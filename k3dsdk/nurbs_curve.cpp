@@ -17,13 +17,13 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "basic_math.h"
-#include "geometric_operations.h"
-#include "metadata_keys.h"
-#include "nurbs_curve.h"
-#include "primitive_validation.h"
-#include "selection.h"
-#include "string_cast.h"
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/geometric_operations.h>
+#include <k3dsdk/metadata_keys.h>
+#include <k3dsdk/nurbs_curve.h>
+#include <k3dsdk/primitive_validation.h>
+#include <k3dsdk/selection.h>
+#include <k3dsdk/string_cast.h>
 
 #include <numeric>
 
@@ -48,7 +48,7 @@ const_primitive::const_primitive(
 	const mesh::knots_t& CurveKnots,
 	const mesh::table_t& ConstantAttributes,
 	const mesh::table_t& CurveAttributes,
-	const mesh::table_t& VaryingAttributes,
+	const mesh::table_t& ParameterAttributes,
 	const mesh::table_t& VertexAttributes
 		) :
 	material(Material),
@@ -62,8 +62,25 @@ const_primitive::const_primitive(
 	curve_knots(CurveKnots),
 	constant_attributes(ConstantAttributes),
 	curve_attributes(CurveAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
+{
+}
+
+const_primitive::const_primitive(const primitive& Primitive) :
+	material(Primitive.material),
+	curve_first_points(Primitive.curve_first_points),
+	curve_point_counts(Primitive.curve_point_counts),
+	curve_orders(Primitive.curve_orders),
+	curve_first_knots(Primitive.curve_first_knots),
+	curve_selections(Primitive.curve_selections),
+	curve_points(Primitive.curve_points),
+	curve_point_weights(Primitive.curve_point_weights),
+	curve_knots(Primitive.curve_knots),
+	constant_attributes(Primitive.constant_attributes),
+	curve_attributes(Primitive.curve_attributes),
+	parameter_attributes(Primitive.parameter_attributes),
+	vertex_attributes(Primitive.vertex_attributes)
 {
 }
 
@@ -82,7 +99,7 @@ primitive::primitive(
 	mesh::knots_t& CurveKnots,
 	mesh::table_t& ConstantAttributes,
 	mesh::table_t& CurveAttributes,
-	mesh::table_t& VaryingAttributes,
+	mesh::table_t& ParameterAttributes,
 	mesh::table_t& VertexAttributes
 		) :
 	material(Material),
@@ -96,7 +113,7 @@ primitive::primitive(
 	curve_knots(CurveKnots),
 	constant_attributes(ConstantAttributes),
 	curve_attributes(CurveAttributes),
-	varying_attributes(VaryingAttributes),
+	parameter_attributes(ParameterAttributes),
 	vertex_attributes(VertexAttributes)
 {
 }
@@ -106,26 +123,30 @@ primitive::primitive(
 
 primitive* create(mesh& Mesh)
 {
-	mesh::primitive& generic_primitive = Mesh.primitives.create("nurbs_curve");
+	return create(Mesh.primitives.create("nurbs_curve"));
+}
 
+primitive* create(mesh::primitive& Primitive)
+{
+	return_val_if_fail(Primitive.type == "nurbs_curve", 0);
 	primitive* const result = new primitive(
-		generic_primitive.structure["constant"].create<mesh::materials_t>("material"),
-		generic_primitive.structure["curve"].create<mesh::indices_t>("curve_first_points"),
-		generic_primitive.structure["curve"].create<mesh::counts_t>("curve_point_counts"),
-		generic_primitive.structure["curve"].create<mesh::orders_t>("curve_orders"),
-		generic_primitive.structure["curve"].create<mesh::indices_t>("curve_first_knots"),
-		generic_primitive.structure["curve"].create<mesh::selection_t>("curve_selections"),
-		generic_primitive.structure["vertex"].create<mesh::indices_t>("curve_points"),
-		generic_primitive.structure["vertex"].create<mesh::weights_t>("curve_point_weights"),
-		generic_primitive.structure["knot"].create<mesh::knots_t>("curve_knots"),
-		generic_primitive.attributes["constant"],
-		generic_primitive.attributes["curve"],
-		generic_primitive.attributes["varying"],
-		generic_primitive.attributes["vertex"]
+		Primitive.structure["constant"].create<mesh::materials_t>("material"),
+		Primitive.structure["curve"].create<mesh::indices_t>("curve_first_points"),
+		Primitive.structure["curve"].create<mesh::counts_t>("curve_point_counts"),
+		Primitive.structure["curve"].create<mesh::orders_t>("curve_orders"),
+		Primitive.structure["curve"].create<mesh::indices_t>("curve_first_knots"),
+		Primitive.structure["curve"].create<mesh::selection_t>("curve_selections"),
+		Primitive.structure["vertex"].create<mesh::indices_t>("curve_points"),
+		Primitive.structure["vertex"].create<mesh::weights_t>("curve_point_weights"),
+		Primitive.structure["knot"].create<mesh::knots_t>("curve_knots"),
+		Primitive.attributes["constant"],
+		Primitive.attributes["curve"],
+		Primitive.attributes["parameter"],
+		Primitive.attributes["vertex"]
 		);
 
 	result->curve_selections.set_metadata_value(metadata::key::role(), metadata::value::selection_role());
-	result->curve_points.set_metadata_value(metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+	result->curve_points.set_metadata_value(metadata::key::domain(), metadata::value::point_indices_domain());
 
 	return result;
 }
@@ -149,7 +170,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 
 		const mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		const mesh::table_t& curve_attributes = require_attributes(Primitive, "curve");
-		const mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		const mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		const mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		const mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, constant_structure, "material");
@@ -163,16 +184,15 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		const mesh::knots_t& curve_knots = require_array<mesh::knots_t>(Primitive, knot_structure, "curve_knots");
 
 		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_structure, "vertex", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 		require_table_row_count(Primitive, knot_structure, "knots",
 			std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0)
 			+ std::accumulate(curve_orders.begin(), curve_orders.end(), 0));
+		require_table_row_count(Primitive, parameter_attributes, "parameter", curve_structure.row_count() * 2);
 
-		/** \todo Calculate varying attributes size */
-
-		return new const_primitive(material, curve_first_points, curve_point_counts, curve_orders, curve_first_knots, curve_selections, curve_points,curve_point_weights, curve_knots, constant_attributes, curve_attributes, varying_attributes, vertex_attributes);
+		return new const_primitive(material, curve_first_points, curve_point_counts, curve_orders, curve_first_knots, curve_selections, curve_points,curve_point_weights, curve_knots, constant_attributes, curve_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{
@@ -198,7 +218,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 
 		mesh::table_t& constant_attributes = require_attributes(Primitive, "constant");
 		mesh::table_t& curve_attributes = require_attributes(Primitive, "curve");
-		mesh::table_t& varying_attributes = require_attributes(Primitive, "varying");
+		mesh::table_t& parameter_attributes = require_attributes(Primitive, "parameter");
 		mesh::table_t& vertex_attributes = require_attributes(Primitive, "vertex");
 
 		mesh::materials_t& material = require_array<mesh::materials_t>(Primitive, constant_structure, "material");
@@ -212,16 +232,15 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		mesh::knots_t& curve_knots = require_array<mesh::knots_t>(Primitive, knot_structure, "curve_knots");
 
 		require_metadata(Primitive, curve_selections, "curve_selections", metadata::key::role(), metadata::value::selection_role());
-		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::mesh_point_indices_domain());
+		require_metadata(Primitive, curve_points, "curve_points", metadata::key::domain(), metadata::value::point_indices_domain());
 
 		require_table_row_count(Primitive, vertex_structure, "vertex", std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0));
 		require_table_row_count(Primitive, knot_structure, "knots",
 			std::accumulate(curve_point_counts.begin(), curve_point_counts.end(), 0)
 			+ std::accumulate(curve_orders.begin(), curve_orders.end(), 0));
+		require_table_row_count(Primitive, parameter_attributes, "parameter", curve_structure.row_count() * 2);
 
-		/** \todo Calculate varying attributes size */
-
-		return new primitive(material, curve_first_points, curve_point_counts, curve_orders, curve_first_knots, curve_selections, curve_points,curve_point_weights, curve_knots, constant_attributes, curve_attributes, varying_attributes, vertex_attributes);
+		return new primitive(material, curve_first_points, curve_point_counts, curve_orders, curve_first_knots, curve_selections, curve_points,curve_point_weights, curve_knots, constant_attributes, curve_attributes, parameter_attributes, vertex_attributes);
 	}
 	catch(std::exception& e)
 	{

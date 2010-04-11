@@ -110,6 +110,10 @@ ADD_LIBRARY(k3dsdk-python-interfaces SHARED
 	iproperty_collection_python.h
 	iproperty_python.cpp
 	iproperty_python.h
+	irender_camera_frame_python.cpp
+	irender_camera_frame_python.h
+	irender_camera_preview_python.cpp
+	irender_camera_preview_python.h
 	isnappable_python.cpp
 	isnappable_python.h
 	iunknown_python.cpp
@@ -142,9 +146,13 @@ ADD_LIBRARY(k3dsdk-python-b SHARED
 	named_arrays_python.h
 	named_tables_python.cpp
 	named_tables_python.h
+	node_python.cpp
+	node_python.h
 	parallel_python.cpp
 	plugin_python.cpp
 	plugin_python.h
+	property_python.cpp
+	property_python.h
 	resource_python.cpp
 	resource_python.h
 	ri_python.cpp
@@ -200,11 +208,15 @@ K3D_GENERATE_DEF_FILE(k3dsdk-python-primitives)
 TARGET_LINK_LIBRARIES(k3dsdk-python-primitives k3dsdk-python-b)
 
 ADD_LIBRARY(k3dsdk-python SHARED
+	difference_python.cpp
+	difference_python.h
 	instance_wrapper_python.h
 	file_signal_python.cpp
 	file_signal_python.h
 	object_model_python.cpp
 	object_model_python.h
+	script_python.cpp
+	script_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python)
 TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-primitives)

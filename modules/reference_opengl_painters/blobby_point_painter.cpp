@@ -54,7 +54,7 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
@@ -122,7 +122,7 @@ public:
 		}
 	}
 	
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		k3d::uint_t primitive_index = 0;
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive, ++primitive_index)
@@ -136,13 +136,13 @@ public:
 
 			k3d::gl::push_selection_token(k3d::selection::PRIMITIVE, primitive_index);
 			k3d::gl::push_selection_token(k3d::selection::CONSTANT, 0);
-			k3d::gl::push_selection_token(k3d::selection::UNIFORM, 0);
+			k3d::gl::push_selection_token(k3d::selection::SURFACE, 0);
 
 			const k3d::uint_t primitives_begin = 0;
 			const k3d::uint_t primitives_end = primitives_begin + blobby->primitives.size();
 			for(k3d::uint_t primitive = primitives_begin; primitive != primitives_end; ++primitive)
 			{
-				k3d::gl::push_selection_token(k3d::selection::VARYING, primitive);
+				k3d::gl::push_selection_token(k3d::selection::PARAMETER, primitive);
 				k3d::gl::push_selection_token(k3d::selection::POINT, primitive);
 
 				const k3d::uint_t first_float = blobby->primitive_first_floats[primitive];
@@ -193,11 +193,11 @@ public:
 				}
 
 				k3d::gl::pop_selection_token(); // POINT
-				k3d::gl::pop_selection_token(); // VARYING
+				k3d::gl::pop_selection_token(); // PARAMETER
 
 			}
 
-			k3d::gl::pop_selection_token(); // UNIFORM
+			k3d::gl::pop_selection_token(); // SURFACE
 			k3d::gl::pop_selection_token(); // CONSTANT
 			k3d::gl::pop_selection_token(); // PRIMITIVE
 
@@ -211,7 +211,7 @@ public:
 			"OpenGLBlobbyPointPainter",
 			_("Renders blobby primitives using points and lines"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

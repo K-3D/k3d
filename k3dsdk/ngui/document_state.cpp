@@ -30,24 +30,9 @@
 
 #include <k3d-i18n-config.h>
 #include <k3d-platform-config.h>
-
-#include "application_state.h"
-#include "context_menu.h"
-#include "detail.h"
-#include "document_state.h"
-#include "move_tool.h"
-#include "rotate_tool.h"
-#include "safe_close_dialog.h"
-#include "scale_tool.h"
-#include "selection_tool.h"
-#include "unsaved_document.h"
-#include "utility.h"
-#include "viewport.h"
-
 #include <k3dsdk/application.h>
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/imaterial.h>
@@ -58,19 +43,32 @@
 #include <k3dsdk/imulti_mesh_sink.h>
 #include <k3dsdk/inode_collection_sink.h>
 #include <k3dsdk/ipipeline.h>
-#include <k3dsdk/ireset_properties.h>
 #include <k3dsdk/iscripted_action.h>
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/itime_sink.h>
-#include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/mesh.h>
+#include <k3dsdk/ngui/application_state.h>
+#include <k3dsdk/ngui/context_menu.h>
+#include <k3dsdk/ngui/pipeline.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/move_tool.h>
+#include <k3dsdk/ngui/panel_mediator.h>
+#include <k3dsdk/ngui/rotate_tool.h>
+#include <k3dsdk/ngui/safe_close_dialog.h>
+#include <k3dsdk/ngui/scale_tool.h>
+#include <k3dsdk/ngui/selection_tool.h>
+#include <k3dsdk/ngui/unsaved_document.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
-#include <k3dsdk/user_properties.h>
+#include <k3dsdk/user_property.h>
 
 #include <iterator>
 #include <functional>
@@ -100,666 +98,6 @@ const k3d::ienumeration_property::enumeration_values_t& selection_mode_values()
 	return values;
 }
 
-/*
-const bool is_point_selected(const k3d::selection::record& Record)
-{
-	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
-	if(!mesh)
-		return false;
-
-	if(mesh->point_selection)
-	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::POINT);
-		if(id < mesh->point_selection->size())
-			return (*mesh->point_selection)[id];
-	}
-
-	return false;
-}
-
-const bool is_split_edge_selected(const k3d::selection::record& Record)
-{
-	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
-	if(!mesh)
-		return false;
-
-	if(mesh->polyhedra && mesh->polyhedra->edge_selection)
-	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_SPLIT_EDGE);
-		if(id < mesh->polyhedra->edge_selection->size())
-			return (*mesh->polyhedra->edge_selection)[id];
-	}
-
-	if(mesh->linear_curve_groups && mesh->linear_curve_groups->curve_selection)
-	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_LINEAR_CURVE);
-		if(id < mesh->linear_curve_groups->curve_selection->size())
-			return (*mesh->linear_curve_groups->curve_selection)[id];
-	}
-
-	if(mesh->cubic_curve_groups && mesh->cubic_curve_groups->curve_selection)
-	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_CUBIC_CURVE);
-		if(id < mesh->cubic_curve_groups->curve_selection->size())
-			return (*mesh->cubic_curve_groups->curve_selection)[id];
-	}
-
-	return false;
-}
-
-const bool is_uniform_selected(const k3d::selection::record& Record)
-{
-	k3d::mesh* const mesh = k3d::selection::get_mesh(Record);
-	if(!mesh)
-		return false;
-
-	if(mesh->polyhedra && mesh->polyhedra->face_selection)
-	{
-		const k3d::selection::id id = Record.get_id(k3d::selection::ABSOLUTE_FACE);
-		if(id < mesh->polyhedra->face_selection->size())
-			return (*mesh->polyhedra->face_selection)[id];
-	}
-
-	return false;
-}
-
-void deselect_gaps(k3d::mesh_selection::records_t& Records)
-{
-    Records.insert(Records.begin(), k3d::mesh_selection::record(0, size_t(-1), 0.0));
-}
-
-void deselect_gaps(k3d::mesh_selection& Selection)
-{
-	deselect_gaps(Selection.points);
-	deselect_gaps(Selection.edges);
-	deselect_gaps(Selection.faces);
-}
-
-struct convert_to_points
-{
-	convert_to_points(bool KeepSelection) : m_keep_selection(KeepSelection) {}
-	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
-	{
-		if(!(Mesh.points && Mesh.point_selection))
-			return;
-		
-		// Sync with existing point selections
-		for (k3d::uint_t point = 0; point != Mesh.point_selection->size(); ++point)
-		{
-			if (Mesh.point_selection->at(point))
-				Selection.points.push_back(k3d::mesh_selection::record(point, 1.0));
-		}
-
-		// Convert edge selections to point selections ...
-		if(Mesh.polyhedra && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges)
-		{
-			const size_t edge_begin = 0;
-			const size_t edge_end = edge_begin + Mesh.polyhedra->edge_points->size();
-			for(size_t edge = edge_begin; edge != edge_end; ++edge)
-			{
-				if(!(*Mesh.polyhedra->edge_selection)[edge])
-				continue;
-
-				Selection.points.push_back(k3d::mesh_selection::record((*Mesh.polyhedra->edge_points)[edge], 1.0));
-			}
-		}
-
-		// Convert face selections to point selections ...
-		if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges)
-		{
-			const size_t face_begin = 0;
-			const size_t face_end = face_begin + Mesh.polyhedra->face_first_loops->size();
-			for(size_t face = face_begin; face != face_end; ++face)
-			{
-				if(!(*Mesh.polyhedra->face_selection)[face])
-					continue;
-
-				const size_t face_loop_begin = (*Mesh.polyhedra->face_first_loops)[face];
-				const size_t face_loop_end = face_loop_begin + (*Mesh.polyhedra->face_loop_counts)[face];
-				for(size_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
-				{
-					const size_t first_edge = (*Mesh.polyhedra->loop_first_edges)[face_loop];
-					for(size_t edge = first_edge; ; )
-					{
-						Selection.points.push_back(k3d::mesh_selection::record((*Mesh.polyhedra->edge_points)[edge], 1.0));
-
-						edge = (*Mesh.polyhedra->clockwise_edges)[edge];
-						if(edge == first_edge)
-							break;
-					}
-				}
-			} 
-		}
-
-		// Convert linear curve selections to point selections ...
-		if(Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_first_points && Mesh.linear_curve_groups->curve_point_counts && Mesh.linear_curve_groups->curve_selection && Mesh.linear_curve_groups->curve_points)
-		{
-			const size_t curve_begin = 0;
-			const size_t curve_end = curve_begin + Mesh.linear_curve_groups->curve_first_points->size();
-			for(size_t curve = curve_begin; curve != curve_end; ++curve)
-			{
-				if(!(*Mesh.linear_curve_groups->curve_selection)[curve])
-					continue;
-
-				const size_t curve_point_begin = (*Mesh.linear_curve_groups->curve_first_points)[curve];
-				const size_t curve_point_end = curve_point_begin + (*Mesh.linear_curve_groups->curve_point_counts)[curve];
-				for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
-				{
-					Selection.points.push_back(k3d::mesh_selection::record((*Mesh.linear_curve_groups->curve_points)[curve_point], 1.0));
-				}
-			}
-		}
-
-		// Convert cubic curve selections to point selections ...
-		if(Mesh.cubic_curve_groups && Mesh.cubic_curve_groups->curve_first_points && Mesh.cubic_curve_groups->curve_point_counts && Mesh.cubic_curve_groups->curve_selection && Mesh.cubic_curve_groups->curve_points)
-		{
-			const size_t curve_begin = 0;
-			const size_t curve_end = curve_begin + Mesh.cubic_curve_groups->curve_first_points->size();
-			for(size_t curve = curve_begin; curve != curve_end; ++curve)
-			{
-				if(!(*Mesh.cubic_curve_groups->curve_selection)[curve])
-					continue;
-
-				const size_t curve_point_begin = (*Mesh.cubic_curve_groups->curve_first_points)[curve];
-				const size_t curve_point_end = curve_point_begin + (*Mesh.cubic_curve_groups->curve_point_counts)[curve];
-				for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
-				{
-					Selection.points.push_back(k3d::mesh_selection::record((*Mesh.cubic_curve_groups->curve_points)[curve_point], 1.0));
-				}
-			}
-		}
-
-		// Convert nurbs curve selections to point selections ...
-		if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_first_points && Mesh.nurbs_curve_groups->curve_point_counts && Mesh.nurbs_curve_groups->curve_selection && Mesh.nurbs_curve_groups->curve_points)
-		{
-			const size_t curve_begin = 0;
-			const size_t curve_end = curve_begin + Mesh.nurbs_curve_groups->curve_first_points->size();
-			for(size_t curve = curve_begin; curve != curve_end; ++curve)
-			{
-				if(!(*Mesh.nurbs_curve_groups->curve_selection)[curve])
-					continue;
-
-				const size_t curve_point_begin = (*Mesh.nurbs_curve_groups->curve_first_points)[curve];
-				const size_t curve_point_end = curve_point_begin + (*Mesh.nurbs_curve_groups->curve_point_counts)[curve];
-				for(size_t curve_point = curve_point_begin; curve_point != curve_point_end; ++curve_point)
-				{
-					Selection.points.push_back(k3d::mesh_selection::record((*Mesh.nurbs_curve_groups->curve_points)[curve_point], 1.0));
-				}
-			}
-		}
-
-		// Convert bilinear patch selections to point selections ...
-		if(Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection && Mesh.bilinear_patches->patch_points)
-		{
-			const size_t patch_begin = 0;
-			const size_t patch_end = patch_begin + (Mesh.bilinear_patches->patch_points->size() / 4);
-			for(size_t patch = patch_begin; patch != patch_end; ++patch)
-			{
-				if(!(*Mesh.bilinear_patches->patch_selection)[patch])
-					continue;
-
-				const size_t patch_point_begin = patch * 4;
-				const size_t patch_point_end = patch_point_begin + 4;
-				for(size_t patch_point = patch_point_begin; patch_point != patch_point_end; ++patch_point)
-				{
-					Selection.points.push_back(k3d::mesh_selection::record((*Mesh.bilinear_patches->patch_points)[patch_point], 1.0));
-				}
-			}
-		}
-
-		// Convert bicubic patch selections to point selections ...
-		if(Mesh.bicubic_patches && Mesh.bicubic_patches->patch_selection && Mesh.bicubic_patches->patch_points)
-		{
-			const size_t patch_begin = 0;
-			const size_t patch_end = patch_begin + (Mesh.bicubic_patches->patch_points->size() / 16);
-			for(size_t patch = patch_begin; patch != patch_end; ++patch)
-			{
-				if(!(*Mesh.bicubic_patches->patch_selection)[patch])
-					continue;
-
-				const size_t patch_point_begin = patch * 16;
-				const size_t patch_point_end = patch_point_begin + 16;
-				for(size_t patch_point = patch_point_begin; patch_point != patch_point_end; ++patch_point)
-				{
-					Selection.points.push_back(k3d::mesh_selection::record((*Mesh.bicubic_patches->patch_points)[patch_point], 1.0));
-				}
-			}
-		}
-
-		// Convert nurbs patch selections to point selections ...
-		if(Mesh.nurbs_patches && Mesh.nurbs_patches->patch_first_points && Mesh.nurbs_patches->patch_u_point_counts && Mesh.nurbs_patches->patch_v_point_counts && Mesh.nurbs_patches->patch_selection && Mesh.nurbs_patches->patch_points)
-		{
-			const size_t patch_begin = 0;
-			const size_t patch_end = patch_begin + Mesh.nurbs_patches->patch_first_points->size();
-			for(size_t patch = patch_begin; patch != patch_end; ++patch)
-			{
-				if(!(*Mesh.nurbs_patches->patch_selection)[patch])
-					continue;
-
-				const size_t patch_point_begin = (*Mesh.nurbs_patches->patch_first_points)[patch];
-				const size_t patch_point_end = patch_point_begin + ((*Mesh.nurbs_patches->patch_u_point_counts)[patch] * (*Mesh.nurbs_patches->patch_v_point_counts)[patch]);
-				for(size_t patch_point = patch_point_begin; patch_point != patch_point_end; ++patch_point)
-				{
-					Selection.points.push_back(k3d::mesh_selection::record((*Mesh.nurbs_patches->patch_points)[patch_point], 1.0));
-				}
-			}
-		}
-
-		if (!m_keep_selection)
-		{
-			Selection.edges.clear();
-			Selection.faces.clear();
-		}
-
-		// Ensure that anything not explicitly selected gets explicitly deselected ...
-		deselect_gaps(Selection);
-	}
-	bool m_keep_selection;
-};
-
-struct convert_to_split_edges
-{
-	struct implementation
-	{
-		implementation() : mesh(0) {}
-		k3d::mesh::indices_t companions;
-		k3d::mesh::bools_t boundary_edges;
-		const k3d::mesh* mesh;
-	};
-	
-	convert_to_split_edges(bool KeepSelection) : m_keep_selection(KeepSelection)
-	{
-		m_implementation = new implementation();
-	}
-	
-	~convert_to_split_edges()
-	{
-		delete m_implementation;
-	}
-	
-	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
-	{
-		// Convert point selections to edge selections ...
-		if(Mesh.polyhedra && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges && Mesh.polyhedra->edge_selection && Mesh.point_selection)
-		{
-			const k3d::mesh::indices_t& edge_points = *Mesh.polyhedra->edge_points;
-			const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-			const k3d::mesh::selection_t edge_selection = *Mesh.polyhedra->edge_selection;
-			const k3d::mesh::selection_t point_selection = *Mesh.point_selection;
-			
-			if(m_implementation->mesh != &Mesh)
-			{
-				k3d::polyhedron::create_edge_adjacency_lookup(edge_points, clockwise_edges, m_implementation->boundary_edges, m_implementation->companions);
-				m_implementation->mesh = &Mesh;
-			}
-
-			const size_t edge_begin = 0;
-			const size_t edge_end = edge_begin + edge_points.size();
-			for(size_t edge = edge_begin; edge != edge_end; ++edge)
-			{
-				if(edge_selection[edge])
-				{
-					Selection.edges.push_back(k3d::mesh_selection::record(edge, 1.0));
-					continue;
-				}
-
-				if(point_selection[edge_points[edge]] || point_selection[edge_points[clockwise_edges[edge]]])
-					Selection.edges.push_back(k3d::mesh_selection::record(edge, 1.0));
-			}
-		}
-
-		// Convert point selections to linear curve selections ...
-		if(Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_first_points && Mesh.linear_curve_groups->curve_point_counts && Mesh.linear_curve_groups->curve_selection && Mesh.linear_curve_groups->curve_points && Mesh.point_selection)
-		{
-			const k3d::mesh::indices_t& curve_first_points = *Mesh.linear_curve_groups->curve_first_points;
-			const k3d::mesh::counts_t& curve_point_counts = *Mesh.linear_curve_groups->curve_point_counts;
-			const k3d::mesh::selection_t& curve_selection = *Mesh.linear_curve_groups->curve_selection;
-			const k3d::mesh::indices_t& curve_points = *Mesh.linear_curve_groups->curve_points;
-			const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
-
-			const size_t curve_begin = 0;
-			const size_t curve_end = curve_begin + curve_first_points.size();
-			for(size_t curve = curve_begin; curve != curve_end; ++curve)
-			{
-				if(curve_selection[curve])
-				{
-					Selection.linear_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
-					continue;
-				}
-
-				const size_t point_begin = curve_first_points[curve];
-				const size_t point_end = point_begin + curve_point_counts[curve];
-				for(size_t point = point_begin; point != point_end; ++point)
-				{
-					if(point_selection[curve_points[point]])
-						Selection.linear_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
-				}
-			}
-		}
-
-		// Convert point selections to cubic curve selections ...
-		if(Mesh.cubic_curve_groups && Mesh.cubic_curve_groups->curve_first_points && Mesh.cubic_curve_groups->curve_point_counts && Mesh.cubic_curve_groups->curve_selection && Mesh.cubic_curve_groups->curve_points && Mesh.point_selection)
-		{
-			const k3d::mesh::indices_t& curve_first_points = *Mesh.cubic_curve_groups->curve_first_points;
-			const k3d::mesh::counts_t& curve_point_counts = *Mesh.cubic_curve_groups->curve_point_counts;
-			const k3d::mesh::selection_t& curve_selection = *Mesh.cubic_curve_groups->curve_selection;
-			const k3d::mesh::indices_t& curve_points = *Mesh.cubic_curve_groups->curve_points;
-			const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
-
-			const size_t curve_begin = 0;
-			const size_t curve_end = curve_begin + curve_first_points.size();
-			for(size_t curve = curve_begin; curve != curve_end; ++curve)
-			{
-				if(curve_selection[curve])
-				{
-					Selection.cubic_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
-					continue;
-				}
-
-				const size_t point_begin = curve_first_points[curve];
-				const size_t point_end = point_begin + curve_point_counts[curve];
-				for(size_t point = point_begin; point != point_end; ++point)
-				{
-					if(point_selection[curve_points[point]])
-						Selection.cubic_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
-				}
-			}
-		}
-		
-		// Convert point selections to nurbs curve selections ...
-		if(Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_first_points && Mesh.nurbs_curve_groups->curve_point_counts && Mesh.nurbs_curve_groups->curve_selection && Mesh.nurbs_curve_groups->curve_points && Mesh.point_selection)
-		{
-			const k3d::mesh::indices_t& curve_first_points = *Mesh.nurbs_curve_groups->curve_first_points;
-			const k3d::mesh::counts_t& curve_point_counts = *Mesh.nurbs_curve_groups->curve_point_counts;
-			const k3d::mesh::selection_t& curve_selection = *Mesh.nurbs_curve_groups->curve_selection;
-			const k3d::mesh::indices_t& curve_points = *Mesh.nurbs_curve_groups->curve_points;
-			const k3d::mesh::selection_t& point_selection = *Mesh.point_selection;
-
-			const size_t curve_begin = 0;
-			const size_t curve_end = curve_begin + curve_first_points.size();
-			for(size_t curve = curve_begin; curve != curve_end; ++curve)
-			{
-				if(curve_selection[curve])
-				{
-					Selection.nurbs_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
-					continue;
-				}
-
-				const size_t point_begin = curve_first_points[curve];
-				const size_t point_end = point_begin + curve_point_counts[curve];
-				for(size_t point = point_begin; point != point_end; ++point)
-				{
-					if(point_selection[curve_points[point]])
-						Selection.nurbs_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
-				}
-			}
-		}
-
-		// Convert face selections to edge selections ...
-		if(Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->clockwise_edges)
-		{
-			const k3d::mesh::indices_t& face_first_loops = *Mesh.polyhedra->face_first_loops;
-			const k3d::mesh::counts_t& face_loop_counts = *Mesh.polyhedra->face_loop_counts;
-			const k3d::mesh::selection_t& face_selection = *Mesh.polyhedra->face_selection;
-			const k3d::mesh::indices_t& loop_first_edges = *Mesh.polyhedra->loop_first_edges;
-			const k3d::mesh::indices_t& clockwise_edges = *Mesh.polyhedra->clockwise_edges;
-
-			const size_t face_begin = 0;
-			const size_t face_end = face_begin + face_first_loops.size();
-			for(size_t face = face_begin; face != face_end; ++face)
-			{
-				if(!face_selection[face])
-					continue;
-
-				const size_t face_loop_begin = face_first_loops[face];
-				const size_t face_loop_end = face_loop_begin + face_loop_counts[face];
-				for(size_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
-				{
-					const size_t first_edge = loop_first_edges[face_loop];
-					for(size_t edge = first_edge; ; )
-					{
-						Selection.edges.push_back(k3d::mesh_selection::record(edge, 1.0));
-						if(!m_implementation->boundary_edges[edge])
-							Selection.edges.push_back(k3d::mesh_selection::record(m_implementation->companions[edge], 1.0));
-						edge = clockwise_edges[edge];
-						if(edge == first_edge)
-							break;
-					}
-				}
-			}
-		}
-
-		if (!m_keep_selection)
-		{
-			Selection.points.clear();
-			Selection.faces.clear();
-		}
-
-		// Ensure that anything not explicitly selected gets explicitly deselected ...
-		deselect_gaps(Selection);
-	}
-	bool m_keep_selection;
-	implementation* m_implementation;
-};
-
-struct convert_to_uniform
-{
-	convert_to_uniform(bool KeepSelection) : m_keep_selection(KeepSelection) {}
-	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
-	{
-		// Convert point and edge selections to face selections ...
-		if(Mesh.point_selection && Mesh.polyhedra && Mesh.polyhedra->face_first_loops && Mesh.polyhedra->face_loop_counts && Mesh.polyhedra->face_selection && Mesh.polyhedra->loop_first_edges && Mesh.polyhedra->edge_points && Mesh.polyhedra->clockwise_edges && Mesh.polyhedra->edge_selection)
-		{
-			const size_t face_begin = 0;
-			const size_t face_end = face_begin + Mesh.polyhedra->face_first_loops->size();
-			for(size_t face = face_begin; face != face_end; ++face)
-			{
-				if((*Mesh.polyhedra->face_selection)[face])
-				{
-					Selection.faces.push_back(k3d::mesh_selection::record(face, 1.0));
-					continue;
-				}
-
-				const size_t face_loop_begin = (*Mesh.polyhedra->face_first_loops)[face];
-				const size_t face_loop_end = face_loop_begin + (*Mesh.polyhedra->face_loop_counts)[face];
-				for(size_t face_loop = face_loop_begin; face_loop != face_loop_end; ++face_loop)
-				{
-					const size_t first_edge = (*Mesh.polyhedra->loop_first_edges)[face_loop];
-					for(size_t edge = first_edge; ; )
-					{
-						if((*Mesh.polyhedra->edge_selection)[edge] || (*Mesh.point_selection)[(*Mesh.polyhedra->edge_points)[edge]])
-						{
-							Selection.faces.push_back(k3d::mesh_selection::record(face, 1.0));
-							break;
-						}
-
-						edge = (*Mesh.polyhedra->clockwise_edges)[edge];
-						if(edge == first_edge)
-							break;
-					}
-				}
-			}
-		}
-
-		// Convert point selections to bilinear patch selections ...
-		if(Mesh.point_selection && Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection && Mesh.bilinear_patches->patch_points)
-		{
-			const size_t patch_begin = 0;
-			const size_t patch_end = patch_begin + (Mesh.bilinear_patches->patch_points->size() / 4);
-			for(size_t patch = patch_begin; patch != patch_end; ++patch)
-			{
-				if((*Mesh.bilinear_patches->patch_selection)[patch])
-				{
-					Selection.bilinear_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
-					continue;
-				}
-
-				const size_t patch_point_begin = patch * 4;
-				const size_t patch_point_end = patch_point_begin + 4;
-				for(size_t patch_point = patch_point_begin; patch_point != patch_point_end; ++patch_point)
-				{
-					if((*Mesh.point_selection)[(*Mesh.bilinear_patches->patch_points)[patch_point]])
-					{
-						Selection.bilinear_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
-						break;
-					}
-				}
-			}
-		}
-
-		// Convert point selections to bicubic patch selections ...
-		if(Mesh.point_selection && Mesh.bicubic_patches && Mesh.bicubic_patches->patch_selection && Mesh.bicubic_patches->patch_points)
-		{
-			const size_t patch_begin = 0;
-			const size_t patch_end = patch_begin + (Mesh.bicubic_patches->patch_points->size() / 16);
-			for(size_t patch = patch_begin; patch != patch_end; ++patch)
-			{
-				if((*Mesh.bicubic_patches->patch_selection)[patch])
-				{
-					Selection.bicubic_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
-					continue;
-				}
-
-				const size_t patch_point_begin = patch * 16;
-				const size_t patch_point_end = patch_point_begin + 16;
-				for(size_t patch_point = patch_point_begin; patch_point != patch_point_end; ++patch_point)
-				{
-					if((*Mesh.point_selection)[(*Mesh.bicubic_patches->patch_points)[patch_point]])
-					{
-						Selection.bicubic_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
-						break;
-					}
-				}
-			}
-		}
-
-		// Convert point selections to nurbs patch selections ...
-		if(Mesh.point_selection && Mesh.nurbs_patches && Mesh.nurbs_patches->patch_first_points && Mesh.nurbs_patches->patch_u_point_counts && Mesh.nurbs_patches->patch_v_point_counts && Mesh.nurbs_patches->patch_selection && Mesh.nurbs_patches->patch_points)
-		{
-			const size_t patch_begin = 0;
-			const size_t patch_end = patch_begin + Mesh.nurbs_patches->patch_first_points->size();
-			for(size_t patch = patch_begin; patch != patch_end; ++patch)
-			{
-				if((*Mesh.nurbs_patches->patch_selection)[patch])
-				{
-					Selection.nurbs_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
-					continue;
-				}
-
-				const size_t patch_point_begin = (*Mesh.nurbs_patches->patch_first_points)[patch];
-				const size_t patch_point_end = patch_point_begin + ((*Mesh.nurbs_patches->patch_u_point_counts)[patch] * (*Mesh.nurbs_patches->patch_v_point_counts)[patch]);
-				for(size_t patch_point = patch_point_begin; patch_point != patch_point_end; ++patch_point)
-				{
-					if((*Mesh.point_selection)[(*Mesh.nurbs_patches->patch_points)[patch_point]])
-					{
-						Selection.nurbs_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
-						break;
-					}
-				}
-			}
-		}
-
-		if (!m_keep_selection)
-		{
-			Selection.points.clear();
-			Selection.edges.clear();
-		}
-
-		// Ensure that anything not explicitly selected gets explicitly deselected ...
-		deselect_gaps(Selection);
-	}
-	bool m_keep_selection;
-};
-
-/// Keeps the existing components explicitely selected
-struct keep_selection
-{
-	void operator()(const k3d::mesh& Mesh, k3d::mesh_selection& Selection) const
-	{
-		if(Mesh.points && Mesh.point_selection)
-		{
-			for (k3d::uint_t point = 0; point != Mesh.point_selection->size(); ++point)
-			{
-				if (Mesh.point_selection->at(point))
-					Selection.points.push_back(k3d::mesh_selection::record(point, 1.0));
-			}
-		}
-		
-		if (Mesh.polyhedra && Mesh.polyhedra->edge_selection)
-		{
-			for (k3d::uint_t edge = 0; edge != Mesh.polyhedra->edge_selection->size(); ++edge)
-			{
-				if (Mesh.polyhedra->edge_selection->at(edge))
-					Selection.edges.push_back(k3d::mesh_selection::record(edge, 1.0));
-			}
-		}
-		
-		if (Mesh.polyhedra && Mesh.polyhedra->face_selection)
-		{
-			for (k3d::uint_t face = 0; face != Mesh.polyhedra->face_selection->size(); ++face)
-			{
-				if (Mesh.polyhedra->face_selection->at(face))
-					Selection.faces.push_back(k3d::mesh_selection::record(face, 1.0));
-			}
-		}
-
-		if (Mesh.linear_curve_groups && Mesh.linear_curve_groups->curve_selection)
-		{
-			for (k3d::uint_t curve = 0; curve != Mesh.linear_curve_groups->curve_selection->size(); ++curve)
-			{
-				if (Mesh.linear_curve_groups->curve_selection->at(curve))
-					Selection.linear_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
-			}
-		}
-
-		if (Mesh.cubic_curve_groups && Mesh.cubic_curve_groups->curve_selection)
-		{
-			for (k3d::uint_t curve = 0; curve != Mesh.cubic_curve_groups->curve_selection->size(); ++curve)
-			{
-				if (Mesh.cubic_curve_groups->curve_selection->at(curve))
-					Selection.cubic_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
-			}
-		}
-		
-		if (Mesh.nurbs_curve_groups && Mesh.nurbs_curve_groups->curve_selection)
-		{
-			for (k3d::uint_t curve = 0; curve != Mesh.nurbs_curve_groups->curve_selection->size(); ++curve)
-			{
-				if (Mesh.nurbs_curve_groups->curve_selection->at(curve))
-					Selection.nurbs_curves.push_back(k3d::mesh_selection::record(curve, 1.0));
-			}
-		}
-
-		if (Mesh.bilinear_patches && Mesh.bilinear_patches->patch_selection)
-		{
-			for (k3d::uint_t patch = 0; patch != Mesh.bilinear_patches->patch_selection->size(); ++patch)
-			{
-				if (Mesh.bilinear_patches->patch_selection->at(patch))
-					Selection.bilinear_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
-			}
-		}
-		
-		if (Mesh.bicubic_patches && Mesh.bicubic_patches->patch_selection)
-		{
-			for (k3d::uint_t patch = 0; patch != Mesh.bicubic_patches->patch_selection->size(); ++patch)
-			{
-				if (Mesh.bicubic_patches->patch_selection->at(patch))
-					Selection.bicubic_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
-			}
-		}
-
-		if (Mesh.nurbs_patches && Mesh.nurbs_patches->patch_selection)
-		{
-			for (k3d::uint_t patch = 0; patch != Mesh.nurbs_patches->patch_selection->size(); ++patch)
-			{
-				if (Mesh.nurbs_patches->patch_selection->at(patch))
-					Selection.nurbs_patches.push_back(k3d::mesh_selection::record(patch, 1.0));
-			}
-		}
-	}
-};
-*/
-
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
@@ -773,7 +111,7 @@ public:
 	implementation(k3d::idocument& Document) :
 		m_document(Document),
 		m_gdkgl_share_list(0),
-		m_last_selection_mode(selection::NODES),
+		m_last_selection_mode(selection::NODE),
 		m_active_tool(0),
 		m_selection_tool(0),
 		m_move_tool(0),
@@ -782,10 +120,6 @@ public:
 		m_context_menu(0),
 		m_node_selection(0)
 	{
-/*
-		m_selection_mode.connect_explicit_change_signal(sigc::mem_fun(*this, &implementation::on_selection_mode_changed));
-*/
-
 		// Process remove_nodes_signal
 		m_document.nodes().remove_nodes_signal().connect(sigc::mem_fun(*this, &implementation::on_nodes_removed));
 	}
@@ -876,18 +210,6 @@ public:
 
 #endif
 
-	/// Returns a signal that can be emitted to request display of the history for an node
-	view_node_history_signal_t& view_node_history_signal()
-	{
-		return m_view_node_history_signal;
-	}
-
-	/// Returns a signal that can be emitted to request display of the properties for an node
-	view_node_properties_signal_t& view_node_properties_signal()
-	{
-		return m_view_node_properties_signal;
-	}
-
 	/// Returns a signal that can be emitted to acknowledge of a document selection change
 	document_selection_change_signal_t& document_selection_change_signal()
 	{
@@ -944,48 +266,6 @@ assert_not_implemented();
 		}
 		return m_node_selection;
 	}
-	
-	const bool is_selected(const k3d::selection::record& Record)
-	{
-		switch(m_selection_mode.internal_value())
-		{
-			case SELECT_NODES:
-				return is_selected(k3d::selection::get_node(Record));
-			case SELECT_POINTS:
-				return detail::is_point_selected(Record);
-			case SELECT_SPLIT_EDGES:
-				return detail::is_split_edge_selected(Record);
-			case SELECT_UNIFORM:
-				return detail::is_uniform_selected(Record);
-		}
-
-		return false;
-	}
-
-	void selection_changed()
-	{
-		// Switch to node selection mode when there's no selected mesh in the document
-		if(SELECT_NODES != m_selection_mode.internal_value())
-		{
-			unsigned long selected_mesh_count = 0;
-
-			const k3d::nodes_t nodes = selected_nodes();
-			for(k3d::nodes_t::const_iterator node = nodes.begin(); node != nodes.end(); ++node)
-			{
-//				if(dynamic_cast<k3d::imesh_source*>(*node))
-				{
-					++selected_mesh_count;
-					break;
-				}
-			}
-
-			if(!selected_mesh_count)
-				set_selection_mode(SELECT_NODES);
-		}
-
-		m_active_tool->document_selection_changed();
-		m_document_selection_change_signal.emit();
-	}
 */
 
 	document_state::set_cursor_signal_t& set_cursor_signal()
@@ -998,196 +278,6 @@ assert_not_implemented();
 		return m_clear_cursor_signal;
 	}
 
-	k3d::inode* default_gl_painter()
-	{
-		const k3d::nodes_t nodes = k3d::find_nodes(m_document.nodes(), "GL Default Painter");
-	        return (1 == nodes.size()) ? *nodes.begin() : 0;
-	}
-
-	k3d::inode* default_ri_painter()
-	{
-		const k3d::nodes_t nodes = k3d::find_nodes(m_document.nodes(), "RenderMan Default Painter");
-	        return (1 == nodes.size()) ? *nodes.begin() : 0;
-	}
-	
-	k3d::inode* instantiate_mesh(k3d::inode* Node)
-	{
-		k3d::inode* mesh_instance = 0;
-		k3d::iproperty* mesh_source_property = 0;
-		if(k3d::classes::MeshInstance() == Node->factory().factory_id()) // Instantiate the input in case of a mesh instance
-		{
-			k3d::imesh_sink* sink = dynamic_cast<k3d::imesh_sink*>(Node);
-			mesh_source_property = Node->document().pipeline().dependency(sink->mesh_sink_input());
-			if(mesh_source_property)
-				mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), Node->name() + " Instance"));
-		}
-		else
-		{
-			k3d::ipipeline& pipeline = Node->document().pipeline();
-			const k3d::ipipeline::dependencies_t& dependencies = pipeline.dependencies();
-			k3d::imesh_source* mesh_source = dynamic_cast<k3d::imesh_source*>(Node);
-			if(!mesh_source)
-				return 0;
-			mesh_source_property = &(mesh_source->mesh_source_output());
-			if(mesh_source_property)
-				mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), m_document, k3d::unique_name(m_document.nodes(), Node->name() + " Instance"));
-				
-			k3d::iproperty* instance_mesh_source_property = &dynamic_cast<k3d::imesh_source*>(mesh_instance)->mesh_source_output();
-			k3d::iproperty* instance_transform_source_property = &dynamic_cast<k3d::itransform_source*>(mesh_instance)->transform_source_output();
-			
-			k3d::itransform_source* transform_source = dynamic_cast<k3d::itransform_source*>(Node);
-			k3d::iproperty* transform_source_property = 0;
-			if(transform_source)
-				transform_source_property = &(transform_source->transform_source_output());
-			
-			// Connect the MeshInstance outputs to the inputs of the downstream node, if any
-			k3d::ipipeline::dependencies_t new_dependencies;
-			for(k3d::ipipeline::dependencies_t::const_iterator dependency = dependencies.begin(); dependency != dependencies.end(); ++dependency)
-			{
-				if(dependency->second == mesh_source_property)
-				{
-					dependency->first->property_set_dependency(0);
-					new_dependencies.insert(std::make_pair(dependency->first, instance_mesh_source_property));
-				}
-				if(transform_source_property && dependency->second == transform_source_property)
-				{
-					dependency->first->property_set_dependency(0);
-					new_dependencies.insert(std::make_pair(dependency->first, instance_transform_source_property));
-				}
-			}
-			pipeline.set_dependencies(new_dependencies);
-			
-		}
-		 
-		if(!mesh_source_property)
-			return 0;
-		
-		// Assign a default painter ...
-		k3d::property::set_internal_value(*mesh_instance, "gl_painter", default_gl_painter());
-		k3d::property::set_internal_value(*mesh_instance, "ri_painter", default_ri_painter());
-
-		// Connect the mesh instance to the source ...
-		k3d::ipipeline::dependencies_t dependencies;
-		k3d::imesh_sink* const mesh_sink = dynamic_cast<k3d::imesh_sink*>(mesh_instance);
-		if(mesh_sink)
-			dependencies.insert(std::make_pair(&mesh_sink->mesh_sink_input(), mesh_source_property));
-		Node->document().pipeline().set_dependencies(dependencies);
-		
-		freeze_transformation(*Node, *mesh_instance, m_document);
-		
-		return mesh_instance;
-	}
-
-	k3d::inode* create_node(k3d::iplugin_factory* Factory)
-	{
-		return_val_if_fail(Factory, 0);
-
-		// Switch to node selection mode
-		if(selection::NODES != selection::state(document()).current_mode())
-			selection::state(document()).set_current_mode(selection::NODES);
-
-		// Create the requested node ...
-		k3d::record_state_change_set changeset(m_document, k3d::string_cast(boost::format(_("Create %1%")) % Factory->name()), K3D_CHANGE_SET_CONTEXT);
-		const std::string node_name = k3d::unique_name(m_document.nodes(), Factory->name());
-		k3d::inode* const node = k3d::plugin::create<k3d::inode>(*Factory, m_document, node_name);
-		return_val_if_fail(node, 0);
-
-		// Keep track of the node to be selected ...
-		k3d::inode* to_be_selected = node;
-
-		// Keep track of every new node created ...
-		std::vector<k3d::inode*> new_nodes;
-		new_nodes.push_back(node);
-
-		// Prepare to make connections to other nodes ...
-		k3d::ipipeline::dependencies_t dependencies;
-
-		// If the new node is a mesh source (but not a MeshInstance!), create a MeshInstance node and attach it so it's immediately visible ...
-		k3d::imesh_source* const mesh_source = dynamic_cast<k3d::imesh_source*>(node);
-		if(mesh_source && k3d::classes::MeshInstance() != Factory->factory_id())
-		{
-			// Create a mesh instance ...
-			k3d::inode* const mesh_instance = instantiate_mesh(node);
-			return_val_if_fail(mesh_instance, 0);
-			new_nodes.push_back(mesh_instance);
-
-			// In this case, we want to select the mesh instance instead of the mesh source ...
-			to_be_selected = mesh_instance;
-		}
-
-		// If the new node is a material sink, assign a default material ...
-		if(k3d::imaterial_sink* const material_sink = dynamic_cast<k3d::imaterial_sink*>(node))
-		{
-			const k3d::nodes_t materials = k3d::find_nodes<k3d::imaterial>(m_document.nodes());
-			if(materials.size())
-				k3d::property::set_internal_value(material_sink->material_sink_input(), dynamic_cast<k3d::inode*>(*materials.rbegin()));
-		}
-
-		// If the new node is a time sink, connect it to the document time source ...
-		if(k3d::itime_sink* const time_sink = dynamic_cast<k3d::itime_sink*>(node))
-			dependencies.insert(std::make_pair(&time_sink->time_sink_input(), k3d::get_time(m_document)));
-
-		if(!dependencies.empty())
-			m_document.pipeline().set_dependencies(dependencies);
-
-		// If the new node is a camera, orient it horizontally
-		if(k3d::classes::Camera() == Factory->factory_id())
-			k3d::set_matrix(*node, k3d::rotate3(k3d::radians(90.0), k3d::vector3(1, 0, 0)));
-		
-		// If the new node is a multiple mesh sink, add two mesh inputs
-		if(Factory->implements(typeid(k3d::imulti_mesh_sink)))
-		{
-			k3d::property::create<k3d::mesh*>(*node, "input_mesh1", "Input Mesh 1", "", static_cast<k3d::mesh*>(0));
-			k3d::property::create<k3d::mesh*>(*node, "input_mesh2", "Input Mesh 2", "", static_cast<k3d::mesh*>(0));
-		}
-
-		// If the new node is a render-engine, default to making every node in the document visible ...
-		if(k3d::inode_collection_sink* const node_collection_sink = dynamic_cast<k3d::inode_collection_sink*>(node))
-		{
-			const k3d::inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
-			for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-				k3d::property::set_internal_value(**property, document().nodes().collection());
-		}
-
-		// By default, make the new node visible in any node collection sinks that already exist ...
-		const k3d::inode_collection::nodes_t::const_iterator doc_node_end = document().nodes().collection().end();
-		for(k3d::inode_collection::nodes_t::const_iterator doc_node = document().nodes().collection().begin(); doc_node != doc_node_end; ++doc_node)
-		{
-			if(k3d::inode_collection_sink* const node_collection_sink = dynamic_cast<k3d::inode_collection_sink*>(*doc_node))
-			{
-				const k3d::inode_collection_sink::properties_t properties = node_collection_sink->node_collection_properties();
-				for(k3d::inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
-				{
-					if(k3d::inode_collection_property* const node_collection_property = dynamic_cast<k3d::inode_collection_property*>(*property))
-					{
-						k3d::inode_collection_property::nodes_t nodes = k3d::property::internal_value<k3d::inode_collection_property::nodes_t>(**property);
-						for(k3d::uint_t i = 0; i != new_nodes.size(); ++i)
-						{
-							if(node_collection_property->property_allow(*new_nodes[i]))
-								nodes.push_back(new_nodes[i]);
-						}
-						k3d::property::set_internal_value(**property, nodes);
-					}
-				}
-			}
-		}
-
-		// Give nodes a chance to initialize their property values based on their inputs, if any ...
-		if(k3d::ireset_properties* const reset_properties = dynamic_cast<k3d::ireset_properties*>(node))
-			reset_properties->reset_properties();
-
-		// Replace the current selection
-		selection::state(document()).deselect_all();
-		selection::state(document()).select(*to_be_selected);
-
-		// Make the newly-created node properties visible ...
-		view_node_properties_signal().emit(node);
-
-		k3d::gl::redraw_all(m_document, k3d::gl::irender_viewport::ASYNCHRONOUS);
-
-		return node;
-	}
-
 	void popup_context_menu(const bool UserAction)
 	{
 		if(UserAction)
@@ -1196,76 +286,6 @@ assert_not_implemented();
 			m_context_menu->popup(0, GDK_CURRENT_TIME);
 	}
 
-/*
-	/// Sets the current selection when node selection mode is chosen
-	void on_set_node_mode()
-	{
-		if (!m_selection_tool->keep_selection())
-		{
-			detail::update_component_selection(selected_nodes(), detail::deselect_all(), false);
-		}
-		else
-		{
-			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
-		}
-	}
-
-	/// Sets the current selection when point selection mode is chosen
-	void on_set_point_mode()
-	{
-		if (m_selection_tool->convert_selection())
-			detail::update_component_selection(selected_nodes(), detail::convert_to_points(m_selection_tool->keep_selection()), true);
-		else
-			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
-	}
-
-	/// Sets the current selection when split edge selection mode is chosen
-	void on_set_split_edge_mode()
-	{
-		if (m_selection_tool->convert_selection())
-			detail::update_component_selection(selected_nodes(), detail::convert_to_split_edges(m_selection_tool->keep_selection()), true);
-		else
-			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
-	}
-
-	/// Sets the current selection when uniform selection mode is chosen
-	void on_set_uniform_mode()
-	{
-		if (m_selection_tool->convert_selection())
-			detail::update_component_selection(selected_nodes(), detail::convert_to_uniform(m_selection_tool->keep_selection()), true);
-		else
-			detail::update_component_selection(selected_nodes(), detail::keep_selection(), true);
-	}
-
-	/// Called by the signal system when the selection mode changes
-	void on_selection_mode_changed(k3d::iunknown*)
-	{
-		if (!m_selection_tool->keep_selection() && !m_selection_tool->convert_selection())
-		{
-			detail::update_component_selection(selected_nodes(), detail::deselect_all(), true);
-		}
-		switch(m_selection_mode.internal_value())
-		{
-			case SELECT_NODES:
-				on_set_node_mode();
-				break;
-			case SELECT_POINTS:
-				on_set_point_mode();
-				break;
-			case SELECT_SPLIT_EDGES:
-				on_set_split_edge_mode();
-				break;
-			case SELECT_UNIFORM:
-				on_set_uniform_mode();
-				break;
-		}
-
-		m_last_selection_mode = m_selection_mode.internal_value();
-
-		selection_changed();
-	}
-*/
-
 	/// Stores a reference to the owning document
 	k3d::idocument& m_document;
 	sigc::signal<bool, k3d::signal::cancelable> m_safe_to_close_signal;
@@ -1273,10 +293,6 @@ assert_not_implemented();
 	Glib::RefPtr<Gdk::Pixmap> m_gdkgl_share_pixmap;
 	/// Stores a gdkgl context that can be used to share display lists for the entire document
 	GdkGLContext* m_gdkgl_share_list;
-	/// A signal that can be emitted to request display of the history for an node
-	view_node_history_signal_t m_view_node_history_signal;
-	/// A signal that can be emitted to request display of the properties for an node
-	view_node_properties_signal_t m_view_node_properties_signal;
 	/// A signal that can be emitted to acknowledge of a document selection change
 	document_selection_change_signal_t m_document_selection_change_signal;
 	/// A signal that will be emitted whenever the active tool changes
@@ -1354,9 +370,9 @@ document_state::document_state(k3d::idocument& Document) :
 
 		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
 		{
-			k3d::iscript_engine::context_t context;
-			context["Command"] = k3d::string_t("startup");
-			context["Document"] = &Document;
+			k3d::iscript_engine::context context;
+			context["command"] = k3d::string_t("startup");
+			context["document"] = &Document;
 			scripted_action->execute(context);
 		}
 	}
@@ -1382,9 +398,9 @@ document_state::~document_state()
 	{
 		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(*plugin))
 		{
-			k3d::iscript_engine::context_t context;
-			context["Command"] = k3d::string_t("shutdown");
-			context["Document"] = &document();
+			k3d::iscript_engine::context context;
+			context["command"] = k3d::string_t("shutdown");
+			context["document"] = &document();
 			scripted_action->execute(context);
 		}
 	}
@@ -1459,16 +475,6 @@ GdkGLContext* document_state::gdkgl_share_list()
 	return m_implementation->gdkgl_share_list();
 }
 
-document_state::view_node_history_signal_t& document_state::view_node_history_signal()
-{
-	return m_implementation->view_node_history_signal();
-}
-
-document_state::view_node_properties_signal_t& document_state::view_node_properties_signal()
-{
-	return m_implementation->view_node_properties_signal();
-}
-
 document_state::document_selection_change_signal_t& document_state::document_selection_change_signal()
 {
 	return m_implementation->document_selection_change_signal();
@@ -1526,15 +532,6 @@ tool& document_state::scale_tool()
 	return *m_implementation->m_scale_tool;
 }
 
-const bool document_state::is_selected(const k3d::selection::record& Selection)
-{
-	assert_not_implemented();
-	return false;
-/*
-	return m_implementation->is_selected(Selection);
-*/
-}
-
 bool document_state::pick_backfacing()
 {
 	return m_implementation->m_selection_tool->pick_backfacing();
@@ -1558,16 +555,6 @@ document_state::set_cursor_signal_t& document_state::set_cursor_signal()
 document_state::clear_cursor_signal_t& document_state::clear_cursor_signal()
 {
 	return m_implementation->clear_cursor_signal();
-}
-
-k3d::inode* document_state::create_node(k3d::iplugin_factory* Factory)
-{
-	return m_implementation->create_node(Factory);
-}
-
-k3d::inode* document_state::instantiate_mesh(k3d::inode* Node)
-{
-	return m_implementation->instantiate_mesh(Node);
 }
 
 void document_state::popup_context_menu(const bool UserAction)

@@ -17,9 +17,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh_python.h"
-#include "owned_instance_wrapper_python.h"
-#include "bicubic_patch_python.h"
+#include <k3dsdk/python/mesh_python.h>
+#include <k3dsdk/python/owned_instance_wrapper_python.h>
+#include <k3dsdk/python/bicubic_patch_python.h>
 
 #include <k3dsdk/bicubic_patch.h>
 
@@ -46,8 +46,8 @@ public:
 		static object patch_materials(wrapper& Self) { return wrap(Self.wrapped().patch_materials); }
 		static object patch_points(wrapper& Self) { return wrap(Self.wrapped().patch_points); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 	class primitive
@@ -59,8 +59,8 @@ public:
 		static object patch_materials(wrapper& Self) { return wrap(Self.wrapped().patch_materials); }
 		static object patch_points(wrapper& Self) { return wrap(Self.wrapped().patch_points); }
 		static object constant_attributes(wrapper& Self) { return wrap(Self.wrapped().constant_attributes); }
-		static object uniform_attributes(wrapper& Self) { return wrap(Self.wrapped().uniform_attributes); }
-		static object varying_attributes(wrapper& Self) { return wrap(Self.wrapped().varying_attributes); }
+		static object patch_attributes(wrapper& Self) { return wrap(Self.wrapped().patch_attributes); }
+		static object parameter_attributes(wrapper& Self) { return wrap(Self.wrapped().parameter_attributes); }
 	};
 
 
@@ -95,8 +95,8 @@ void define_namespace_bicubic_patch()
 		.def("patch_materials", &bicubic_patch::const_primitive::patch_materials)
 		.def("patch_points", &bicubic_patch::const_primitive::patch_points)
 		.def("constant_attributes", &bicubic_patch::const_primitive::constant_attributes)
-		.def("uniform_attributes", &bicubic_patch::const_primitive::uniform_attributes)
-		.def("varying_attributes", &bicubic_patch::const_primitive::varying_attributes)
+		.def("patch_attributes", &bicubic_patch::const_primitive::patch_attributes)
+		.def("parameter_attributes", &bicubic_patch::const_primitive::parameter_attributes)
 		;
 
 	class_<bicubic_patch::primitive::wrapper>("primitive", no_init)
@@ -104,8 +104,8 @@ void define_namespace_bicubic_patch()
 		.def("patch_materials", &bicubic_patch::primitive::patch_materials)
 		.def("patch_points", &bicubic_patch::primitive::patch_points)
 		.def("constant_attributes", &bicubic_patch::primitive::constant_attributes)
-		.def("uniform_attributes", &bicubic_patch::primitive::uniform_attributes)
-		.def("varying_attributes", &bicubic_patch::primitive::varying_attributes)
+		.def("patch_attributes", &bicubic_patch::primitive::patch_attributes)
+		.def("parameter_attributes", &bicubic_patch::primitive::parameter_attributes)
 		;
 }
 

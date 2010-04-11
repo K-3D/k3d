@@ -22,7 +22,8 @@
 		\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_curve_modifier.h"
+#include "nurbs_curves.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -57,7 +58,7 @@ class curve_degree_elevation :
 public:
 	curve_degree_elevation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_degree(init_owner(*this) + init_name("degree") + init_label(_("The degree which will be added to the curve")) + init_description(_("The curve degree gets elevated to the amount you specify here")) + init_value(1) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+		m_degree(init_owner(*this) + init_name("degree") + init_label(_("The degree which will be added to the curve")) + init_description(_("The curve degree gets elevated by the amount you specify here")) + init_value(1) + init_constraint(constraint::minimum(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_degree.changed_signal().connect(make_update_mesh_slot());
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
@@ -65,33 +66,13 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		Output = Input;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
-
-		nurbs_curve_modifier mod(Output, *nurbs);
-
-		int my_curve = mod.selected_curve();
-
-
-		if (my_curve < 0)
-		{
-			k3d::log() << error << "You need to select exactly curve!" << std::endl;
-			return;
-		}
-
-		int t = m_degree.pipeline_value();
-		for (int i = 0; i < t; i++)
-			mod.curve_degree_elevate(my_curve);
+		modify_selected_curves(Input, Output, degree_elevator(m_degree.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -107,6 +88,15 @@ public:
 	}
 
 private:
+	struct degree_elevator
+	{
+		degree_elevator(const k3d::uint_t Elevations) : elevations(Elevations) {}
+		void operator()(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurves, const k3d::mesh& InputMesh, const k3d::nurbs_curve::const_primitive& InputCurves, const k3d::uint_t& Curve)
+		{
+			elevate_curve_degree(OutputMesh, OutputCurves, InputMesh, InputCurves, Curve, elevations);
+		}
+		const k3d::uint_t elevations;
+	};
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_degree;
 };
 

@@ -68,8 +68,8 @@ public:
 		static k3d::document_plugin_factory<transform_points,
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink > > > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink > > > > > factory(
 				k3d::uuid(0x8543cf2d, 0x170c4edc, 0x9bf821bd, 0xe8567b6f),
 				"TransformPoints",
 				_("Transform mesh points using input matrix"),

@@ -21,22 +21,22 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "fstream.h"
-#include "iapplication_plugin_factory.h"
-#include "idocument_plugin_factory.h"
-#include "iplugin_factory.h"
-#include "iplugin_registry.h"
-#include "iscript_engine.h"
-#include "k3d-i18n-config.h"
-#include "log.h"
-#include "os_load_module.h"
-#include "plugin_factory_collection.h"
-#include "result.h"
-#include "string_cast.h"
-#include "string_modifiers.h"
-#include "system.h"
-#include "type_registry.h"
-#include "xml.h"
+#include <k3dsdk/fstream.h>
+#include <k3dsdk/iapplication_plugin_factory.h>
+#include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/iplugin_registry.h>
+#include <k3dsdk/iscript_engine.h>
+#include <k3d-i18n-config.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/os_load_module.h>
+#include <k3dsdk/plugin_factory_collection.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/string_modifiers.h>
+#include <k3dsdk/system.h>
+#include <k3dsdk/type_registry.h>
+#include <k3dsdk/xml.h>
 
 #include <iostream>
 
@@ -234,14 +234,22 @@ public:
 		{
 			m_factory = load_proxied_factory(m_factory_id);
 			if(!m_factory)
+			{
 				k3d::log() << error << "Couldn't load proxied factory for plugin: " << name() << std::endl;
-
-			m_application_factory = dynamic_cast<iapplication_plugin_factory*>(m_factory);
-			if(!m_application_factory)
-				k3d::log() << error << "Not an application plugin factory: " << name() << std::endl;
+				return 0;
+			}
 		}
 
-		return_val_if_fail(m_application_factory, 0);
+		if(!m_application_factory)
+		{
+			m_application_factory = dynamic_cast<iapplication_plugin_factory*>(m_factory);
+			if(!m_application_factory)
+			{
+				k3d::log() << error << "Not an application plugin factory: " << name() << std::endl;
+				return 0;
+			}
+		}
+
 		return m_application_factory->create_plugin();
 	}
 
@@ -332,14 +340,22 @@ public:
 		{
 			m_factory = load_proxied_factory(m_factory_id);
 			if(!m_factory)
+			{
 				k3d::log() << error << "Couldn't load proxied factory for plugin: " << name() << std::endl;
-
-			m_document_factory = dynamic_cast<idocument_plugin_factory*>(m_factory);
-			if(!m_document_factory)
-				k3d::log() << error << "Not a document plugin factory: " << name() << std::endl;
+				return 0;
+			}
 		}
 
-		return_val_if_fail(m_document_factory, 0);
+		if(!m_document_factory)
+		{
+			m_document_factory = dynamic_cast<idocument_plugin_factory*>(m_factory);
+			if(!m_document_factory)
+			{
+				k3d::log() << error << "Not a document plugin factory: " << name() << std::endl;
+				return 0;
+			}
+		}
+
 		return m_document_factory->create_plugin(Factory, Document);
 	}
 

@@ -21,10 +21,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "log.h"
-#include "result.h"
-#include "user_interface_init.h"
-#include "user_interface.h"
+#include <k3dsdk/log.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/user_interface_init.h>
+#include <k3dsdk/user_interface.h>
 
 namespace k3d
 {

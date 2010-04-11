@@ -25,7 +25,7 @@
 	\author Anders Dahnielson (anders@dahnielson.com)
 */
 
-#include "point3.h"
+#include <k3dsdk/point3.h>
 
 #include <algorithm>
 #include <cassert>

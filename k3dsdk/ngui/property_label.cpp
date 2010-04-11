@@ -28,12 +28,12 @@
 #include <gtkmm/targetlist.h>
 #include <gtk/gtkmain.h>
 
-#include "document_state.h"
-#include "icons.h"
-#include "messages.h"
-#include "property_label.h"
-#include "utility.h"
-#include "widget_manip.h"
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/property_label.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/widget_manip.h>
 
 #include <k3d-i18n-config.h>
 

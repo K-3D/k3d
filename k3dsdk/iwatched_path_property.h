@@ -26,8 +26,8 @@
 		\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "iunknown.h"
-#include "signal_system.h"
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/signal_system.h>
 
 #include <string>
 #include <vector>

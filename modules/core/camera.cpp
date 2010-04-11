@@ -66,7 +66,7 @@ class camera :
 public:
 	camera(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_navigation_target(init_owner(*this) + init_name("navigation_target") + init_label(_("Navigation Target")) + init_description(_("Navigation Target")) + init_value<k3d::itransform_source*>(this)),
+		m_navigation_target(init_owner(*this) + init_name("navigation_target") + init_label(_("Navigation Target")) + init_description(_("Navigation Target")) + init_value<k3d::imatrix_source*>(this)),
 		m_world_target(init_owner(*this) + init_name("world_target") + init_label(_("World target")) + init_description(_("World target")) + init_value(k3d::point3(0, -5, 0))),
 		m_target_distance(init_owner(*this) + init_name("target_distance") + init_label(_("Target distance")) + init_description(_("Target distance from camera position")) + init_value(0) + init_units(typeid(k3d::measurement::distance)) + init_slot(sigc::mem_fun(*this, &camera::get_target_distance))),
 		m_aspect_ratio(init_owner(*this) + init_name("aspect_ratio") + init_label(_("Aspect Ratio")) + init_description(_("Choose a predefined aspect ratio")) + init_enumeration(k3d::aspect_ratio_values()) + init_value(std::string(""))),
@@ -134,7 +134,7 @@ public:
 		m_world_target.changed_signal().connect(sigc::mem_fun(*this, &camera::on_position_changed));
 	}
 
-	k3d::itransform_source& transformation()
+	k3d::imatrix_source& transformation()
 	{
 		return *this;
 	}
@@ -154,9 +154,9 @@ public:
 		return *this;
 	}
 
-	k3d::itransform_source& navigation_target()
+	k3d::imatrix_source& navigation_target()
 	{
-		k3d::itransform_source* target = m_navigation_target.pipeline_value();
+		k3d::imatrix_source* target = m_navigation_target.pipeline_value();
 		if(!target)
 			target = this;
 
@@ -507,12 +507,12 @@ public:
 	{
 		static k3d::document_plugin_factory<camera,
 			k3d::interface_list<k3d::icamera,
-			k3d::interface_list<k3d::itransform_source,
-			k3d::interface_list<k3d::itransform_sink> > > > factory(
+			k3d::interface_list<k3d::imatrix_source,
+			k3d::interface_list<k3d::imatrix_sink> > > > factory(
 				k3d::classes::Camera(),
 				"Camera",
 				_("Camera"),
-				"Camera",
+				"RenderEngine",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -625,7 +625,7 @@ private:
 		k3d::iproperty& m_far;
 	};
 
-	k3d_data(k3d::itransform_source*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_navigation_target;
+	k3d_data(k3d::imatrix_source*, immutable_name, change_signal, with_undo, node_storage, no_constraint, node_property, node_serialization) m_navigation_target;
 	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_world_target;
 	k3d_data(k3d::double_t, immutable_name, change_signal, no_undo, value_demand_storage, no_constraint, read_only_property, no_serialization) m_target_distance;
 	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_aspect_ratio;

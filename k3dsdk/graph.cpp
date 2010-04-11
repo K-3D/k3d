@@ -17,9 +17,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "color.h"
-#include "graph.h"
-#include "type_registry.h"
+#include <k3dsdk/color.h>
+#include <k3dsdk/graph.h>
+#include <k3dsdk/type_registry.h>
 
 #include <boost/graph/adjacency_list_io.hpp>
 

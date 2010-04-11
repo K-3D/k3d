@@ -21,7 +21,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "snap_source.h"
+#include <k3dsdk/snap_source.h>
 
 namespace k3d
 {

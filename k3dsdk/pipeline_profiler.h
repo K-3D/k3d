@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "ipipeline_profiler.h"
+#include <k3dsdk/ipipeline_profiler.h>
 
 namespace k3d
 {

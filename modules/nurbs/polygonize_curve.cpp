@@ -21,7 +21,8 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_patch_modifier.h"
+#include "nurbs_curves.h"
+#include "utility.h"
 
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -57,7 +58,7 @@ class polygonize_curve :
 public:
 	polygonize_curve(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_segments(init_owner(*this) + init_name(_("segments")) + init_label(_("Segments")) + init_description(_("The more segments the better the result")) + init_value(10) + init_constraint(constraint::minimum(3))),
+		m_segments(init_owner(*this) + init_name(_("segments")) + init_label(_("Segments")) + init_description(_("Segments per knot interval. The more segments the better the result")) + init_value(10) + init_constraint(constraint::minimum(1))),
 		m_delete_original(init_owner(*this) + init_name(_("delete_original")) + init_label(_("Delete original?")) + init_description(_("Delete original NURBS curve?")) + init_value(true))
 	{
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
@@ -67,34 +68,26 @@ public:
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		Output = Input;
-
-		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
-
-		boost::scoped_ptr<k3d::nurbs_curve::primitive> nurbs(get_first_nurbs_curve(Output));
-		if(!nurbs)
-			return;
-
-		const k3d::int32_t segments = m_segments.pipeline_value();
-		const k3d::bool_t delete_original = m_delete_original.pipeline_value();
-
-		nurbs_curve_modifier mod(Output, *nurbs);
-		const int my_curve = mod.selected_curve();
-
-		if (my_curve < 0)
-		{
-			k3d::log() << error << nurbs_debug << "You need to select exactly one curve!" << std::endl;
-			return;
-		}
-
-		mod.polygonize_curve(my_curve, segments, delete_original);
-
-		if (delete_original)
-			k3d::mesh::delete_unused_points(Output);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		Output = Input;
+		if(!Output.points.get())
+			return;
+		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+		boost::scoped_ptr<k3d::linear_curve::primitive> curves(k3d::linear_curve::create(Output));
+		visit_selected_curves(Output, curve_polygonizer(Output, *curves, m_segments.pipeline_value()));
+
+		if(m_delete_original.pipeline_value())
+		{
+			delete_selected_curves(Output);
+		}
+		delete_empty_primitives(Output);
+
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -110,6 +103,19 @@ public:
 	}
 
 private:
+	struct curve_polygonizer
+	{
+		curve_polygonizer(k3d::mesh& Mesh, k3d::linear_curve::primitive& Curves, const k3d::uint_t Samples) : mesh(Mesh), curves(Curves), samples(Samples) {}
+		k3d::mesh& mesh;
+		k3d::linear_curve::primitive& curves;
+		const k3d::uint_t samples;
+		void operator()(const k3d::mesh& Mesh, const k3d::nurbs_curve::const_primitive& Curves, const k3d::uint_t& Curve)
+		{
+			polygonize(mesh, curves, Mesh, Curves, Curve, samples);
+			curves.material.back() = Curves.material.back();
+		}
+
+	};
 	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, writable_property, with_serialization) m_segments;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_delete_original;
 };

@@ -21,9 +21,11 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "k3d-i18n-config.h"
-#include "iplugin_factory.h"
-#include "node.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/inode_collection_sink.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/property.h>
 
 #include <algorithm>
 #include <iostream>
@@ -98,6 +100,120 @@ void node::load(xml::element& Element, const ipersistent::load_context& Context)
 
 	// Load Variables
 	persistent_property_collection::load(Element, Context);
+}
+
+const std::vector<inode*> node::lookup(idocument& Document)
+{
+	return Document.nodes().collection();
+}
+
+const std::vector<inode*> node::lookup(idocument& Document, const uuid FactoryID)
+{
+	std::vector<inode*> result;
+
+	const std::vector<inode*>::const_iterator end = Document.nodes().collection().end();
+	for(std::vector<inode*>::const_iterator node = Document.nodes().collection().begin(); node != end; ++node)
+	{
+		if((**node).factory().factory_id() == FactoryID)
+			result.push_back(*node);
+	}
+
+	return result;
+}
+
+const std::vector<inode*> node::lookup(idocument& Document, const string_t& NodeName)
+{
+	std::vector<inode*> result;
+
+	const std::vector<inode*>::const_iterator end = Document.nodes().collection().end();
+	for(std::vector<inode*>::const_iterator node = Document.nodes().collection().begin(); node != end; ++node)
+	{
+		if((**node).name() == NodeName)
+			result.push_back(*node);
+	}
+
+	return result;
+}
+
+const std::vector<inode*> node::lookup(idocument& Document, const string_t& MetaName, const string_t& MetaValue)
+{
+	std::vector<inode*> result;
+
+	const std::vector<inode*>::const_iterator end = Document.nodes().collection().end();
+	for(std::vector<inode*>::const_iterator node = Document.nodes().collection().begin(); node != end; ++node)
+	{
+		if(imetadata* const metadata = dynamic_cast<imetadata*>(*node))
+		{
+			imetadata::metadata_t pairs = metadata->get_metadata();
+			imetadata::metadata_t::iterator pair = pairs.find(MetaName);
+			if(pair != pairs.end() && pair->second == MetaValue)
+				result.push_back(*node);
+		}
+	}
+	
+	return result;
+}
+
+inode* node::lookup_one(idocument& Document, const string_t& NodeName)
+{
+	std::vector<inode*> nodes = lookup(Document, NodeName);
+	return nodes.size() == 1 ? nodes[0] : 0;
+}
+
+void node::show(idocument& Document, inode& Node)
+{
+	show(Document, std::vector<inode*>(1, &Node));
+}
+
+void node::show(idocument& Document, const std::vector<inode*>& Nodes)
+{
+	const std::vector<inode_collection_sink*> sinks = lookup<inode_collection_sink>(Document);
+	for(uint_t i = 0; i != sinks.size(); ++i)
+	{
+		const inode_collection_sink::properties_t properties = sinks[i]->node_collection_properties();
+		for(inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+		{
+			if(inode_collection_property* const node_collection_property = dynamic_cast<inode_collection_property*>(*property))
+			{
+				inode_collection_property::nodes_t nodes = property::internal_value<inode_collection_property::nodes_t>(**property);
+				for(uint_t i = 0; i != Nodes.size(); ++i)
+				{
+					if(node_collection_property->property_allow(*Nodes[i]))
+					{
+						nodes.erase(std::remove(nodes.begin(), nodes.end(), Nodes[i]), nodes.end());
+						nodes.push_back(Nodes[i]);
+					}
+				}
+				property::set_internal_value(**property, nodes);
+			}
+		}
+	}
+}
+
+void node::hide(idocument& Document, inode& Node)
+{
+	hide(Document, std::vector<inode*>(1, &Node));
+}
+
+void node::hide(idocument& Document, const std::vector<inode*>& Nodes)
+{
+	const std::vector<inode_collection_sink*> sinks = lookup<inode_collection_sink>(Document);
+	for(uint_t i = 0; i != sinks.size(); ++i)
+	{
+		const inode_collection_sink::properties_t properties = sinks[i]->node_collection_properties();
+		for(inode_collection_sink::properties_t::const_iterator property = properties.begin(); property != properties.end(); ++property)
+		{
+			if(inode_collection_property* const node_collection_property = dynamic_cast<inode_collection_property*>(*property))
+			{
+				inode_collection_property::nodes_t nodes = property::internal_value<inode_collection_property::nodes_t>(**property);
+				for(uint_t i = 0; i != Nodes.size(); ++i)
+				{
+					nodes.erase(std::remove(nodes.begin(), nodes.end(), Nodes[i]), nodes.end());
+				}
+				property::set_internal_value(**property, nodes);
+			}
+		}
+	}
 }
 
 } // namespace k3d

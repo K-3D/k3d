@@ -21,9 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "const_table_python.h"
-#include "const_typed_array_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/const_table_python.h>
+#include <k3dsdk/python/const_typed_array_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;

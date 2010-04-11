@@ -30,19 +30,20 @@
 #include <dom/domGeometry.h>
 #include <dom/domNode.h>
 #include <dom/domCOLLADA.h>
-#include <k3dsdk/algebra.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/idocument_plugin_factory.h>
 
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/classes.h>
+#include <k3dsdk/icamera.h>
+#include <k3dsdk/idocument_plugin_factory.h>
 #include <k3dsdk/imesh_sink.h>
 #include <k3dsdk/imesh_source.h>
 #include <k3dsdk/imesh_storage.h>
-#include <k3dsdk/ipipeline.h>
-#include <k3dsdk/properties.h>
 #include <k3dsdk/inode_collection_sink.h>
-#include <k3dsdk/classes.h>
+#include <k3dsdk/ipipeline.h>
+#include <k3dsdk/node.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 
-#include <k3dsdk/icamera.h>
 
 #include "integration.h"
 #include "int_elements.h"
@@ -65,9 +66,9 @@ k3d::inode* create_frozen_mesh(k3d::idocument& Document, const std::string& Name
 	// The mesh instance
 	k3d::inode* const mesh_instance = k3d::plugin::create<k3d::inode>(k3d::classes::MeshInstance(), Document, unique_name + " Instance");
 	// Set painters
-	const k3d::nodes_t gl_nodes = k3d::find_nodes(Document.nodes(), "GL Default Painter");
+	const k3d::nodes_t gl_nodes = k3d::node::lookup(Document, "GL Default Painter");
 	k3d::inode* gl_painter = (1 == gl_nodes.size()) ? *gl_nodes.begin() : 0;
-	const k3d::nodes_t ri_nodes = k3d::find_nodes(Document.nodes(), "RenderMan Default Painter");
+	const k3d::nodes_t ri_nodes = k3d::node::lookup(Document, "RenderMan Default Painter");
 	k3d::inode* ri_painter = (1 == ri_nodes.size()) ? *ri_nodes.begin() : 0;
 	k3d::property::set_internal_value(*mesh_instance, "gl_painter", gl_painter);
 	k3d::property::set_internal_value(*mesh_instance, "ri_painter", ri_painter);
@@ -179,7 +180,6 @@ Node::Node(domNode& node, const k3d::matrix4& mat)
 			k3d::log() << "Invalid <instance_light> element\n";
 			return;
 		}
-		k3d::log() << debug << "A light" << std::endl;
 		lights.push_back(&lookup<intLight, domLight>(*light, mcurrent));
 	}
 
@@ -193,7 +193,6 @@ Node::Node(domNode& node, const k3d::matrix4& mat)
 			k3d::log() << "Invalid <instance_camera> element\n";
 			return;
 		}
-		k3d::log() << debug << "A camera" << std::endl;
 		cameras.push_back(&lookup<intCamera, domCamera>(*camera, mcurrent));
 	}
 }

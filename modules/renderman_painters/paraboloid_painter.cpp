@@ -81,12 +81,12 @@ public:
 				ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
 
 				array_copier ri_uniform_attributes;
-				ri_uniform_attributes.add_arrays(paraboloid->uniform_attributes);
+				ri_uniform_attributes.add_arrays(paraboloid->surface_attributes);
 				ri_uniform_attributes.push_back(i);
 				ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
 
 				array_copier ri_varying_attributes;
-				ri_varying_attributes.add_arrays(paraboloid->varying_attributes);
+				ri_varying_attributes.add_arrays(paraboloid->parameter_attributes);
 				for(k3d::uint_t j = 0; j != 4; ++j)
 					ri_varying_attributes.push_back((i * 4) + j);
 				ri_varying_attributes.copy_to(k3d::ri::VARYING, ri_parameters);
@@ -114,7 +114,7 @@ public:
 			"RenderManParaboloidPainter",
 			_("Renders paraboloid primitives"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

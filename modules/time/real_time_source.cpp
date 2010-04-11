@@ -74,7 +74,7 @@ public:
 	{
 		static k3d::document_plugin_factory<real_time_source > factory(
 			k3d::uuid(0xf7c119e7, 0xd87b465a, 0x9b7e0289, 0x82d91702),
-			"RealtimeSource",
+			"RealTimeSource",
 			_("Provides a realtime time source for a K-3D document"),
 			"Animation",
 			k3d::iplugin_factory::STABLE);

@@ -21,8 +21,11 @@
 	\author Carsten Haubold (CarstenHaubold@web.de)
 */
 
-#include "nurbs_patch_modifier.h"
+#include "nurbs_curves.h"
+#include "nurbs_patches.h"
+#include "utility.h"
 
+#include <k3dsdk/axis.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/geometry.h>
@@ -56,41 +59,87 @@ class extrude_patch :
 public:
 	extrude_patch(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_distance(init_owner(*this) + init_name(_("distance")) + init_label(_("Distance")) + init_description(_("How far to extrude the patch")) + init_step_increment(0.5) + init_units(typeid(k3d::measurement::scalar)) + init_value(1.0)),
-		m_along(init_owner(*this) + init_name("along") + init_label(_("Extrude along")) + init_description(_("Axis along which the patch gets extruded")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values())),
-		m_cap(init_owner(*this) + init_name(_("cap")) + init_label(_("Create Cap?")) + init_description(_("Extrusion can either create a cap or not")) + init_value(true))
+		m_distance(init_owner(*this) + init_name(_("distance")) + init_label(_("Distance")) + init_description(_("How far to extrude the curve")) + init_step_increment(0.5) + init_units(typeid(k3d::measurement::scalar)) + init_value(1.0)),
+		m_segments(init_owner(*this) + init_name("segments") + init_label(_("segments")) + init_description(_("Segments")) + init_value(1) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
+		m_along(init_owner(*this) + init_name("along") + init_label(_("Extrude along")) + init_description(_("Axis along which the curve gets extruded")) + init_value(k3d::Z) + init_enumeration(k3d::axis_values()))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_distance.changed_signal().connect(make_update_mesh_slot());
+		m_segments.changed_signal().connect(make_update_mesh_slot());
 		m_along.changed_signal().connect(make_update_mesh_slot());
-		m_cap.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		Output = Input;
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		Output = Input;
-
-		boost::scoped_ptr<k3d::nurbs_patch::primitive> nurbs(get_first_nurbs_patch(Output));
-		if(!nurbs)
-			return;
-
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		nurbs_patch_modifier mod(Output, *nurbs);
-		int my_patch = mod.get_selected_patch();
+		double distance = m_distance.pipeline_value();
+		k3d::axis axis = m_along.pipeline_value();
+		int segments = m_segments.pipeline_value();
 
-		if (my_patch < 0)
+		// Determine the start and end point of the extrusion vector
+		const k3d::point3 startpoint(0,0,0);
+		k3d::point3 endpoint;
+		switch (axis)
 		{
-			k3d::log() << error << nurbs_debug << "You need to select exactly one patch!" << std::endl;
-			return;
+		case k3d::X:
+			endpoint = k3d::point3(distance, 0.0, 0.0);
+			break;
+		case k3d::Y:
+			endpoint = k3d::point3(0.0, distance, 0.0);
+			break;
+		case k3d::Z:
+			endpoint = k3d::point3(0.0, 0.0, distance);
+			break;
 		}
 
-		mod.extrude_patch(my_patch, m_along.pipeline_value(), m_distance.pipeline_value(), m_cap.pipeline_value());
+		// Create a straight curve from this vector to traverse along
+		k3d::mesh extrusion_vector_mesh;
+		extrusion_vector_mesh.point_selection.create();
+		extrusion_vector_mesh.points.create();
+		boost::scoped_ptr<k3d::nurbs_curve::primitive> extrusion_vector_primitive(k3d::nurbs_curve::create(extrusion_vector_mesh));
+		straight_line(startpoint, endpoint, segments, *extrusion_vector_primitive, extrusion_vector_mesh);
+		extrusion_vector_primitive->curve_selections[0] = 1.0;
+		extrusion_vector_primitive->material.push_back(0);
+
+		const k3d::uint_t prim_count = Output.primitives.size();
+		for(k3d::uint_t prim_idx = 0; prim_idx != prim_count; ++prim_idx)
+		{
+			boost::scoped_ptr<k3d::nurbs_patch::primitive> patches(k3d::nurbs_patch::validate(Output, Output.primitives[prim_idx]));
+			if(!patches)
+				continue;
+			const k3d::mesh::selection_t patch_selections = patches->patch_selections;
+			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> const_patches(k3d::nurbs_patch::validate(Output, *Output.primitives[prim_idx]));
+
+			for(k3d::uint_t patch = 0; patch != patch_selections.size(); ++patch)
+			{
+				if(!patch_selections[patch])
+					continue;
+				// storage for the patch boundary curves
+				k3d::mesh tmp_mesh;
+				tmp_mesh.points.create();
+				tmp_mesh.point_selection.create();
+				boost::scoped_ptr<k3d::nurbs_curve::primitive> tmp_curves(k3d::nurbs_curve::create(tmp_mesh));
+				extract_patch_curve_by_number(tmp_mesh, *tmp_curves, Output, *const_patches, patch, 0, true);
+				extract_patch_curve_by_number(tmp_mesh, *tmp_curves, Output, *const_patches, patch, 0, false);
+				extract_patch_curve_by_number(tmp_mesh, *tmp_curves, Output, *const_patches, patch, const_patches->patch_v_point_counts[patch] - 1, true);
+				extract_patch_curve_by_number(tmp_mesh, *tmp_curves, Output, *const_patches, patch, const_patches->patch_u_point_counts[patch] - 1, false);
+				tmp_curves->curve_selections.assign(4, 1.0);
+				tmp_curves->material.push_back(const_patches->patch_materials[patch]);
+
+				traverse_curve(tmp_mesh, 0, extrusion_vector_mesh, Output, *patches);
+			}
+		}
+		replace_duplicate_points(Output);
+
+		k3d::mesh::bools_t unused_points;
+		k3d::mesh::lookup_unused_points(Output, unused_points);
+		k3d::mesh::delete_points(Output, unused_points);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -108,7 +157,7 @@ public:
 private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_distance;
 	k3d_data(k3d::axis, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_along;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_cap;
+	k3d_data(k3d::int32_t, immutable_name, change_signal, with_undo, local_storage, with_constraint, measurement_property, with_serialization) m_segments;
 };
 
 //Create connect_curve factory

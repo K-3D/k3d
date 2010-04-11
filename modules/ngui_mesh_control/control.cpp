@@ -30,7 +30,7 @@
 #include <k3dsdk/ngui/entry.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/type_registry.h>
 
 #include <gtkmm/box.h>
@@ -251,7 +251,7 @@ public:
 			"NGUIMeshControl",
 			_("Provides a standard control for mesh properties."),
 			"NGUI Control",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "property-control")("ngui:property-type", "k3d::mesh*"));
 
 		return factory;

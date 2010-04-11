@@ -25,14 +25,14 @@
 #include <gdkmm/cursor.h>
 #include <gtkmm/widget.h>
 
-#include "document_state.h"
-#include "modifiers.h"
-#include "icons.h"
-#include "keyboard.h"
-#include "move_tool.h"
-#include "transform_tool.h"
-#include "utility.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/modifiers.h>
+#include <k3dsdk/ngui/icons.h>
+#include <k3dsdk/ngui/keyboard.h>
+#include <k3dsdk/ngui/move_tool.h>
+#include <k3dsdk/ngui/transform_tool.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3d-i18n-config.h>
 
@@ -43,8 +43,9 @@
 #include <k3dsdk/line2.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/plane.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/share.h>
+#include <k3dsdk/selectable.h>
 #include <k3dsdk/xml.h>
 
 namespace k3d

@@ -24,6 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/iunknown.h>
 #include <k3dsdk/signal_system.h>
 #include <k3dsdk/types.h>
 
@@ -39,7 +40,8 @@ namespace panel
 {
 
 /// Abstract interface for a "panel", a UI component that can be "mounted" in a panel_container
-class control
+class control :
+  public virtual iunknown
 {
 public:
 	/// Set the document and parent command node for this panel - this is ugly, but application plugins don't take ctor arguments

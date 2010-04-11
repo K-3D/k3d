@@ -24,9 +24,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "k3d-i18n-config.h"
-#include "iparentable.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/iparentable.h>
 
 namespace k3d
 {

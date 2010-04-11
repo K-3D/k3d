@@ -2,13 +2,13 @@
 
 import k3d
 
-selection_node = Document.get_node_by_metadata("inode_selection", "ngui:unique_node", "node_selection")
+k3d.log.debug("***** Selected Nodes *****")
 
-for node in selection_node.selected_nodes():
-		print "Selected:", node.name
+selection_nodes = k3d.node.lookup(context.document, "ngui:unique_node", "node_selection")
+if len(selection_nodes):
+	for node in selection_nodes[0].selected_nodes():
+		k3d.log.debug(node.name)
+k3d.log.debug("**************************")
 
-import sys
-sys.stdout.flush()
-
-k3d.ui().message("Output sent to console")
+k3d.ui().message("Output sent to the K-3D log ... check your console output, or use Help > Open Log Window.")
 

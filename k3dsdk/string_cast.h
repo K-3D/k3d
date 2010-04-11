@@ -1,7 +1,7 @@
 #ifndef K3DSDK_STRING_CAST_H
 #define K3DSDK_STRING_CAST_H
 
-#include "path.h"
+#include <k3dsdk/path.h>
 
 #include <boost/format.hpp>
 

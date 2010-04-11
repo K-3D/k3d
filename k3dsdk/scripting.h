@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iscript_engine.h"
-#include "types.h"
+#include <k3dsdk/iscript_engine.h>
+#include <k3dsdk/types.h>
 
 #include <iosfwd>
 
@@ -84,9 +84,9 @@ private:
 };
 
 /// Executes a script using an explicitly-specified language
-bool execute(const code& Script, const string_t& ScriptName, iscript_engine::context_t& Context, const language& Language);
+bool execute(const code& Script, const string_t& ScriptName, iscript_engine::context& Context, const language& Language);
 /// Executes a script, attempting to automatically recognize the language
-void execute(const code& Script, const string_t& ScriptName, iscript_engine::context_t& Context, bool& Recognized, bool& Executed);
+void execute(const code& Script, const string_t& ScriptName, iscript_engine::context& Context, bool& Recognized, bool& Executed);
 
 } // namespace script
 

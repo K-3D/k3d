@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iunknown.h"
+#include <k3dsdk/iunknown.h>
 #include <vector>
 
 namespace k3d

@@ -22,10 +22,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iomanip.h"
-#include "log.h"
-#include "string_cast.h"
-#include "xml.h"
+#include <k3dsdk/iomanip.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/xml.h>
 
 #include <iostream>
 #include <iterator>

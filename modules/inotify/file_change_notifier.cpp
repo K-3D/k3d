@@ -80,7 +80,6 @@ public:
 				watch.reset(new InotifyWatch(Path.native_filesystem_string(), IN_CLOSE_WRITE));
 				inotify->Add(*watch);
 				paths[Path] = watch;
-				k3d::log() << debug << "Adding watch on " << Path.native_console_string() << std::endl;
 			}
 
 			for(k3d::uint_t i = 0; i != watches.size(); ++i)
@@ -137,7 +136,6 @@ public:
 				{
 					if(path->second.get() == watch)
 					{	
-						k3d::log() << debug << "Removing watch on " << path->first.native_console_string() << std::endl;
 						inotify->Remove(*watch);
 						paths.erase(path);
 						return;
@@ -190,13 +188,10 @@ public:
 		InotifyEvent event;
 		if(!inotify->GetEvent(&event))
 		{
-			k3d::log() << debug << "file_change_notifier::handle_event: Did not get an event" << std::endl;
 			return;
 		}
 
 		InotifyWatch* watch = event.GetWatch();
-		k3d::log() << debug << "Triggering event for " << watch->GetPath() << std::endl;
-
 		for(k3d::uint_t i = 0; i != watches.size(); ++i)
 		{
 			if(watches[i] == watch)

@@ -20,10 +20,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "color.h"
-#include "data.h"
-#include "icolor_source.h"
-#include "value_demand_storage.h"
+#include <k3dsdk/color.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/icolor_source.h>
+#include <k3dsdk/value_demand_storage.h>
 
 namespace k3d
 {

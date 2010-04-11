@@ -18,8 +18,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Romain Behar (romainbehar@yahoo.com)
-		\author Bart Janssens (bart.janssens@lid.kviv.be)
+	\author Romain Behar (romainbehar@yahoo.com)
+	\author Bart Janssens (bart.janssens@lid.kviv.be)
+	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
 #include <k3dsdk/table.h>
@@ -34,320 +35,11 @@
 
 #include <boost/scoped_ptr.hpp>
 
-#include <list>
-#include <set>
-
 namespace module
 {
 
 namespace polyhedron
 {
-
-namespace detail
-{
-
-/// For each point, create a fast lookup of the outbound edges
-// TODO: Move to mesh_topology_data and provide an alternate create_edge_adjacency_lookup that uses the result from this.
-void create_vertex_edge_lookup(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh::counts_t& Valences, k3d::mesh::indices_t& PointFirstEdges, k3d::mesh::indices_t& PointEdges)
-{
-	k3d::mesh::counts_t found_edges(Valences.size(), 0);
-	PointFirstEdges.resize(Valences.size(), 0);
-	PointEdges.resize(EdgePoints.size(), 0);
-	k3d::uint_t count = 0;
-	for(k3d::uint_t point = 0; point != Valences.size(); ++point)
-	{
-		PointFirstEdges[point] = count;
-		count += Valences[point];
-	}
-	
-	const k3d::uint_t edge_begin = 0;
-	const k3d::uint_t edge_end = edge_begin + EdgePoints.size();
-	for(k3d::uint_t edge = edge_begin; edge != edge_end; ++edge)
-	{
-		const k3d::uint_t point = EdgePoints[edge];
-		PointEdges[PointFirstEdges[point] + found_edges[point]] = edge;
-		++found_edges[point];
-	}
-}
-
-/// Return true for selected components
-class selected
-{
-public:
-	selected(const k3d::mesh::selection_t& Selection) : m_selection(Selection)
-	{
-	}
-	
-	const k3d::bool_t operator()(const k3d::uint_t Index) const
-	{
-		return m_selection[Index];
-	}
-	
-private:
-	const k3d::mesh::selection_t& m_selection;
-};
-
-/// Marks the components that will be removed
-template<typename FunctorT>
-class marker
-{
-public:
-	marker(const k3d::mesh::indices_t& FaceFirstLoops,
-			const k3d::mesh::counts_t& FaceLoopCounts,
-			const k3d::mesh::indices_t& LoopFirstEdges,
-			const k3d::mesh::indices_t& ClockwiseEdges,
-			const k3d::mesh::indices_t& EdgePoints,
-			const FunctorT& PointTest,
-			const FunctorT& EdgeTest,
-			const FunctorT& FaceTest,
-			k3d::mesh::counts_t& AdjustedFaceLoopCounts,
-			k3d::mesh::counts_t& EdgesToRemove,
-			k3d::mesh::counts_t& LoopsToRemove,
-			k3d::mesh::counts_t& FacesToRemove) :
-				m_face_first_loops(FaceFirstLoops),
-				m_face_loop_counts(FaceLoopCounts),
-				m_loop_first_edges(LoopFirstEdges),
-				m_clockwise_edges(ClockwiseEdges),
-				m_edge_points(EdgePoints),
-				m_point_test(PointTest),
-				m_edge_test(EdgeTest),
-				m_face_test(FaceTest),
-				m_adjusted_face_loop_counts(AdjustedFaceLoopCounts),
-				m_edges_to_remove(EdgesToRemove),
-				m_loops_to_remove(LoopsToRemove),
-				m_faces_to_remove(FacesToRemove)
-	{}
-	
-	void operator()(const k3d::uint_t Face)
-	{
-		const k3d::uint_t loop_begin = m_face_first_loops[Face];
-		const k3d::uint_t loop_end = loop_begin + m_face_loop_counts[Face];
-		if(m_face_test(Face))
-		{
-			m_faces_to_remove[Face] = 1;
-		}
-		for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-		{
-			k3d::uint_t edge_count = 0;
-			k3d::uint_t removed_edge_count = 0;
-			const k3d::uint_t first_edge = m_loop_first_edges[loop];
-			for(k3d::uint_t edge = first_edge; ;)
-			{
-				++edge_count;
-				if(m_edge_test(edge) || m_point_test(m_edge_points[edge]) || m_face_test(Face))
-				{
-					++removed_edge_count;
-					m_loops_to_remove[loop] = 1;
-					m_edges_to_remove[edge] = 1;
-				}
-				
-				edge = m_clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
-			}
-			
-			if(m_loops_to_remove[loop])
-				--m_adjusted_face_loop_counts[Face];
-			
-			if(loop == loop_begin && m_loops_to_remove[loop]) // We only remove the whole face if the first loop is removed
-				m_faces_to_remove[Face] = 1;
-			
-			// second loop in case an edge triggered face removal
-			if(m_loops_to_remove[loop] && edge_count != removed_edge_count)
-			{
-				for(k3d::uint_t edge = first_edge; ;)
-				{
-					m_edges_to_remove[edge] = 1;
-					
-					edge = m_clockwise_edges[edge];
-					if(edge == first_edge)
-						break;
-				}		
-			}
-		}
-	}
-private:
-	const k3d::mesh::indices_t& m_face_first_loops;
-	const k3d::mesh::counts_t& m_face_loop_counts;
-	const k3d::mesh::indices_t& m_loop_first_edges;
-	const k3d::mesh::indices_t& m_clockwise_edges;
-	const k3d::mesh::indices_t& m_edge_points;
-	const FunctorT& m_point_test;
-	const FunctorT& m_edge_test;
-	const FunctorT& m_face_test;
-	k3d::mesh::counts_t& m_adjusted_face_loop_counts;
-	k3d::mesh::counts_t& m_edges_to_remove;
-	k3d::mesh::counts_t& m_loops_to_remove;
-	k3d::mesh::counts_t& m_faces_to_remove;
-};
-
-/// Marks the points to remove
-class point_marker
-{
-public:
-	point_marker(const k3d::mesh::counts_t& Valences,
-			const k3d::mesh::indices_t& PointFirstEdges,
-			const k3d::mesh::indices_t& PointEdges,
-			const k3d::mesh::counts_t& EdgesToRemove,
-			k3d::mesh::counts_t& PointsToRemove) :
-				m_valences(Valences),
-				m_point_first_edges(PointFirstEdges),
-				m_point_edges(PointEdges),
-				m_edges_to_remove(EdgesToRemove),
-				m_points_to_remove(PointsToRemove)
-	{}
-	
-	void operator()(const k3d::uint_t Point)
-	{
-		k3d::uint_t selected_edge_count = 0;
-		const k3d::uint_t edge_begin = m_point_first_edges[Point];
-		const k3d::uint_t edge_end = edge_begin + m_valences[Point];
-		for(k3d::uint_t edge_index = edge_begin; edge_index != edge_end; ++edge_index)
-			selected_edge_count += m_edges_to_remove[m_point_edges[edge_index]];
-		if(selected_edge_count == m_valences[Point])
-			m_points_to_remove[Point] = 1;
-	}
-
-private:
-	const k3d::mesh::counts_t& m_valences;
-	const k3d::mesh::indices_t& m_point_first_edges;
-	const k3d::mesh::indices_t& m_point_edges;
-	const k3d::mesh::counts_t& m_edges_to_remove;
-	k3d::mesh::counts_t& m_points_to_remove;
-};
-
-/// Replace the elements of Array with their cumulative sum
-template<class ArrayT> void cumulative_sum(ArrayT& Array)
-{
-	const k3d::uint_t array_begin = 0;
-	const k3d::uint_t array_end = Array.size();
-	for(k3d::uint_t i = array_begin + 1; i != array_end; ++i)
-		Array[i] += Array[i-1];
-}
-
-class index_updater
-{
-public:
-	/// Create a new functor to update an array of indices and the values of those indexes
-	/**
-	 * \param ToRemoveIndicesSum Each ToRemoveIndicesSum[i] contains the number of removed
-	 * items from InputArray up until index i in InputArray
-	 * \param ToRemoveValuesSum Is the ToRemoveIndicesSum for the array for which InputArray contains indices
-	 */
-	index_updater(const k3d::mesh::counts_t& ToRemoveIndicesSum,
-			const k3d::mesh::counts_t& ToRemoveValuesSum,
-			const k3d::mesh::indices_t& InputArray,
-			k3d::mesh::indices_t& OutputArray) :
-				m_to_remove_indices_sum(ToRemoveIndicesSum),
-				m_to_remove_values_sum(ToRemoveValuesSum),
-				m_input_array(InputArray),
-				m_output_array(OutputArray)
-	{}
-	
-	void operator()(const k3d::uint_t Index)
-	{
-		if((Index == 0 && m_to_remove_indices_sum[0] == 0) || (Index != 0 && m_to_remove_indices_sum[Index - 1] == m_to_remove_indices_sum[Index]))
-		{
-			const k3d::uint_t new_value = m_input_array[Index] < m_to_remove_values_sum[m_input_array[Index]] ? 0 : m_input_array[Index] - m_to_remove_values_sum[m_input_array[Index]];
-			m_output_array[Index - m_to_remove_indices_sum[Index]] = new_value;
-		}
-	}
-	
-private:
-	const k3d::mesh::counts_t& m_to_remove_indices_sum;
-	const k3d::mesh::counts_t& m_to_remove_values_sum;
-	const k3d::mesh::indices_t& m_input_array;
-	k3d::mesh::indices_t& m_output_array;
-	
-};
-
-/// Delete elements of an array
-template<typename ArrayT>
-class array_element_deleter
-{
-public:
-	array_element_deleter(const k3d::mesh::counts_t& ToRemoveIndicesSum,
-			const ArrayT& InputArray,
-			ArrayT& OutputArray) :
-				m_to_remove_indices_sum(ToRemoveIndicesSum),
-				m_input_array(InputArray),
-				m_output_array(OutputArray)
-	{
-		OutputArray.resize(InputArray.size() - ToRemoveIndicesSum.back());
-	}
-	
-	void operator()(const k3d::uint_t Index)
-	{
-		if((Index == 0 && m_to_remove_indices_sum[0] == 0) || (Index != 0 && m_to_remove_indices_sum[Index - 1] == m_to_remove_indices_sum[Index]))
-			m_output_array[Index - m_to_remove_indices_sum[Index]] = m_input_array[Index];
-	}
-	
-private:
-	const k3d::mesh::counts_t& m_to_remove_indices_sum;
-	const ArrayT& m_input_array;
-	ArrayT& m_output_array;
-};
-
-/// Delete elements of an attribute array
-template<>
-class array_element_deleter<k3d::mesh::table_t>
-{
-public:
-	array_element_deleter(const k3d::mesh::counts_t& ToRemoveIndicesSum,
-			const k3d::mesh::table_t& InputArray,
-			k3d::mesh::table_t& OutputArray) :
-				m_to_remove_indices_sum(ToRemoveIndicesSum)
-	{
-		OutputArray = InputArray.clone_types();
-		OutputArray.set_row_count(ToRemoveIndicesSum.size() - ToRemoveIndicesSum.back());
-		m_copier.reset(new k3d::table_copier(InputArray, OutputArray));
-	}
-	
-	void operator()(const k3d::uint_t Index)
-	{
-		if((Index == 0 && m_to_remove_indices_sum[0] == 0) || (Index != 0 && m_to_remove_indices_sum[Index - 1] == m_to_remove_indices_sum[Index]))
-			m_copier->copy(Index, Index - m_to_remove_indices_sum[Index]);
-	}
-	
-private:
-	const k3d::mesh::counts_t& m_to_remove_indices_sum;
-	boost::scoped_ptr<k3d::table_copier> m_copier;
-};
-
-
-
-void update_indices(const k3d::mesh::counts_t& ToRemoveIndicesSum,
-			const k3d::mesh::counts_t& ToRemoveValuesSum,
-			const k3d::mesh::indices_t& InputArray,
-			k3d::mesh::indices_t& OutputArray)
-{
-	OutputArray.resize(InputArray.size() - ToRemoveIndicesSum.back());
-	index_updater updater(ToRemoveIndicesSum, ToRemoveValuesSum, InputArray, OutputArray);
-	for(k3d::uint_t i = 0; i != ToRemoveIndicesSum.size(); ++i) updater(i);
-}
-
-template<typename ArrayT>
-void delete_elements(const k3d::mesh::counts_t& ToRemoveIndicesSum,
-			const ArrayT& InputArray,
-			ArrayT& OutputArray)
-{
-	if(InputArray.size() == 0)
-		return;
-	array_element_deleter<ArrayT> deleter(ToRemoveIndicesSum, InputArray, OutputArray);
-	for(k3d::uint_t i = 0; i != ToRemoveIndicesSum.size(); ++i) deleter(i);
-}
-
-void delete_elements(const k3d::mesh::counts_t& ToRemoveIndicesSum,
-			const k3d::table& InputTable,
-			k3d::table& OutputTable)
-{
-	if(InputTable.row_count() == 0)
-		return;
-	array_element_deleter<k3d::table> deleter(ToRemoveIndicesSum, InputTable, OutputTable);
-	for(k3d::uint_t i = 0; i != ToRemoveIndicesSum.size(); ++i) deleter(i);
-}
-
-} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // delete_components
@@ -369,112 +61,53 @@ public:
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
 
-		k3d::mesh::primitives_t::iterator output_primitive = Output.primitives.begin();
-		for(k3d::mesh::primitives_t::const_iterator input_primitive = Input.primitives.begin(); input_primitive != Input.primitives.end(); ++input_primitive)
-		{
-			boost::scoped_ptr<k3d::polyhedron::const_primitive> input_polyhedron(k3d::polyhedron::validate(Input, **input_primitive));
-			if(!input_polyhedron)
-			{
-				++output_primitive;
-				continue;
-			}
-			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::validate(Output, *output_primitive));
-			++output_primitive;
+		if(!Output.points)
+			return;
+		if(!Output.point_selection)
+			return;
 
-			k3d::mesh::selection_t point_selection = *Output.point_selection;
-			k3d::mesh::selection_t edge_selection = output_polyhedron->edge_selections;
-			k3d::mesh::selection_t face_selection = output_polyhedron->face_selections;
-			const k3d::uint_t point_count = point_selection.size();
-			const k3d::uint_t edge_count = edge_selection.size();
-			const k3d::uint_t face_count = face_selection.size();
-			const k3d::uint_t loop_count = input_polyhedron->loop_first_edges.size();
-			m_points_to_remove.assign(point_count, 0);
-			k3d::mesh::counts_t adjusted_face_loop_counts = input_polyhedron->face_loop_counts;
-			k3d::mesh::counts_t edges_to_remove(edge_count, 0);
-			k3d::mesh::counts_t loops_to_remove(loop_count, 0);
-			k3d::mesh::counts_t faces_to_remove(face_count, 0);
-			detail::marker<detail::selected> marker(input_polyhedron->face_first_loops,
-					input_polyhedron->face_loop_counts,
-					input_polyhedron->loop_first_edges,
-					input_polyhedron->clockwise_edges,
-					input_polyhedron->edge_points,
-					detail::selected(point_selection),
-					detail::selected(edge_selection),
-					detail::selected(face_selection),
-					adjusted_face_loop_counts,
-					edges_to_remove,
-					loops_to_remove,
-					faces_to_remove);
-			for(k3d::uint_t face = 0; face != face_count; ++face) marker(face);
-			
-			k3d::mesh::counts_t valences;
-			k3d::polyhedron::create_vertex_valence_lookup(Input.points->size(), input_polyhedron->edge_points, valences);
-			k3d::mesh::indices_t point_first_edges, point_edges;
-			detail::create_vertex_edge_lookup(input_polyhedron->edge_points, valences, point_first_edges, point_edges);
-			
-			detail::point_marker point_marker(valences, point_first_edges, point_edges, edges_to_remove, m_points_to_remove);
-			for(k3d::uint_t point = 0; point != Input.points->size(); ++point) point_marker(point);
-			
-			detail::cumulative_sum(m_points_to_remove);
-			detail::cumulative_sum(edges_to_remove);
-			detail::cumulative_sum(loops_to_remove);
-			detail::cumulative_sum(faces_to_remove);
-			
-			output_polyhedron->face_first_loops.clear();
-			output_polyhedron->face_selections.clear();
-			output_polyhedron->face_loop_counts.clear();
-			output_polyhedron->face_materials.clear();
-			output_polyhedron->loop_first_edges.clear();
-			output_polyhedron->edge_points.clear();
-			output_polyhedron->clockwise_edges.clear();
-			output_polyhedron->edge_selections.clear();
-			
-			detail::update_indices(faces_to_remove, loops_to_remove, input_polyhedron->face_first_loops, output_polyhedron->face_first_loops);
-			detail::delete_elements(faces_to_remove, face_selection, output_polyhedron->face_selections);
-			detail::delete_elements(faces_to_remove, adjusted_face_loop_counts, output_polyhedron->face_loop_counts);
-			detail::delete_elements(faces_to_remove, input_polyhedron->face_materials, output_polyhedron->face_materials);
-			detail::update_indices(loops_to_remove, edges_to_remove, input_polyhedron->loop_first_edges, output_polyhedron->loop_first_edges);
-			detail::update_indices(edges_to_remove, m_points_to_remove, input_polyhedron->edge_points, output_polyhedron->edge_points);
-			detail::update_indices(edges_to_remove, edges_to_remove, input_polyhedron->clockwise_edges, output_polyhedron->clockwise_edges);
-			detail::delete_elements(edges_to_remove, edge_selection, output_polyhedron->edge_selections);
-			detail::delete_elements(m_points_to_remove, point_selection, Output.point_selection.writable());
-			detail::delete_elements(m_points_to_remove, Input.point_attributes, Output.point_attributes);
-			detail::delete_elements(edges_to_remove, input_polyhedron->face_varying_attributes, output_polyhedron->face_varying_attributes);
-			detail::delete_elements(faces_to_remove, input_polyhedron->uniform_attributes, output_polyhedron->uniform_attributes);
-			
-			// Update the per-polyhedra arrays
-			output_polyhedron->shell_face_counts.clear();
-			output_polyhedron->shell_first_faces.clear();
-			output_polyhedron->shell_types.clear();
-			const k3d::mesh::indices_t& input_first_faces = input_polyhedron->shell_first_faces;
-			const k3d::mesh::counts_t& input_face_counts = input_polyhedron->shell_face_counts;
-			k3d::mesh::indices_t& output_first_faces = output_polyhedron->shell_first_faces;
-			k3d::mesh::counts_t& output_face_counts = output_polyhedron->shell_face_counts;
-			const k3d::uint_t polyhedra_count = input_first_faces.size();
-			k3d::uint_t new_first_face = 0;
-			k3d::uint_t total_removed_faces = 0;
-			output_polyhedron->constant_attributes = input_polyhedron->constant_attributes.clone_types();
-			k3d::table_copier constant_copier(input_polyhedron->constant_attributes, output_polyhedron->constant_attributes);
-			for(k3d::uint_t polyhedron = 0; polyhedron < polyhedra_count; ++polyhedron)
-			{
-				k3d::uint_t deleted_face_count = faces_to_remove[input_first_faces[polyhedron] + input_face_counts[polyhedron] - 1] - total_removed_faces;
-				total_removed_faces += deleted_face_count;
-				k3d::uint_t new_face_count = input_face_counts[polyhedron] - deleted_face_count;
-				if(new_face_count > 0)
-				{
-					output_face_counts.push_back(new_face_count);
-					output_first_faces.push_back(new_first_face);
-					constant_copier.push_back(polyhedron);
-					output_polyhedron->shell_types.push_back(input_polyhedron->shell_types[polyhedron]);
-				}
-				new_first_face = output_first_faces.empty() ? 0 : output_first_faces.back() + output_face_counts.back();
-			}
+		// Mark points to be explicitly removed by the user ...
+		k3d::mesh::bools_t remove_points(Output.point_selection->begin(), Output.point_selection->end());
+		const k3d::uint_t point_begin = 0;
+		const k3d::uint_t point_end = point_begin + Output.point_selection->size();
+
+		// For each polyhedron ...
+		for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
+		{
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, *primitive));
+			if(!polyhedron)
+				continue;
+
+			// Mark edges to be explicitly removed by the user ...
+			k3d::mesh::bools_t remove_edges(polyhedron->edge_selections.begin(), polyhedron->edge_selections.end());
+
+			// Keep track of loops to be deleted ...
+			k3d::mesh::bools_t remove_loops(polyhedron->loop_first_edges.size(), false);
+
+			// Mark faces to be explicitly removed by the user ...
+			k3d::mesh::bools_t remove_faces(polyhedron->face_selections.begin(), polyhedron->face_selections.end());
+
+			// Make it happen ...
+			k3d::polyhedron::delete_components(Output, *polyhedron, remove_points, remove_edges, remove_loops, remove_faces);
 		}
+
+		// Mark points to be implicitly removed because they're no-longer used ...
+		k3d::mesh::bools_t unused_point;
+		k3d::mesh::lookup_unused_points(Output, unused_point);
+		for(k3d::uint_t point = point_begin; point != point_end; ++point)
+		{
+			if(!unused_point[point])
+				continue;
+
+			remove_points[point] = true;
+		}	
+
+		// Delete points ...
+		k3d::mesh::delete_points(Output, remove_points);
 	}
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
-		detail::delete_elements(m_points_to_remove, *Input.points, Output.points.writable());
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -483,15 +116,13 @@ public:
 			k3d::interface_list<k3d::imesh_source,
 			k3d::interface_list<k3d::imesh_sink > > > factory(
 				k3d::uuid(0x2d738b7a, 0x6f473349, 0x53a066ad, 0xa857f734),
-				"Delete",
+				"DeleteComponents",
 				"Deletes selected faces, edges and vertices",
-				"Mesh",
+				"Polyhedron",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
-private:
-	k3d::mesh::counts_t m_points_to_remove;
 };
 
 /////////////////////////////////////////////////////////////////////////////

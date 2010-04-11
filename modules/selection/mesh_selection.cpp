@@ -39,9 +39,9 @@ namespace selection
 // mesh_selection
 
 class mesh_selection :
-	public k3d::mesh_selection_sink<k3d::mesh_selection_modifier<k3d::node> >
+	public k3d::mesh_selection_modifier<k3d::mesh_selection_sink<k3d::node> >
 {
-	typedef k3d::mesh_selection_sink<k3d::mesh_selection_modifier<k3d::node> > base;
+	typedef k3d::mesh_selection_modifier<k3d::mesh_selection_sink<k3d::node> > base;
 
 public:
 	mesh_selection(k3d::iplugin_factory& Factory, k3d::idocument& Document) :

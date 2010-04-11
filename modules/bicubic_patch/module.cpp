@@ -30,7 +30,7 @@ namespace bicubic_patch
 {
 
 extern k3d::iplugin_factory& newell_primitive_factory();
-extern k3d::iplugin_factory& polygonize_bicubic_patches_factory();
+extern k3d::iplugin_factory& bicubic_to_poly_factory();
 
 } // namespace bicubic_patch
 
@@ -38,6 +38,6 @@ extern k3d::iplugin_factory& polygonize_bicubic_patches_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::bicubic_patch::newell_primitive_factory());
-	Registry.register_factory(module::bicubic_patch::polygonize_bicubic_patches_factory());
+	Registry.register_factory(module::bicubic_patch::bicubic_to_poly_factory());
 K3D_MODULE_END
 

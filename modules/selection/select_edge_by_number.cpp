@@ -10,12 +10,12 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 /** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
@@ -66,11 +66,11 @@ public:
 		if(!polyhedron)
 			return;
 		
-    std::fill(polyhedron->edge_selections.begin(), polyhedron->edge_selections.end(), 0.0);
+		std::fill(polyhedron->edge_selections.begin(), polyhedron->edge_selections.end(), 0.0);
 
-    const k3d::int32_t index = m_index.pipeline_value();
-    if(index < polyhedron->edge_selections.size())
-      polyhedron->edge_selections[index] = 1.0;
+		const k3d::int32_t index = m_index.pipeline_value();
+		if(index < polyhedron->edge_selections.size())
+			polyhedron->edge_selections[index] = 1.0;
 	}
 
 	static k3d::iplugin_factory& get_factory()

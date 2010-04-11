@@ -10,7 +10,7 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
@@ -22,8 +22,6 @@
 */
 
 #include "colored_selection_painter_gl.h"
-#include "normal_cache.h"
-#include "utility.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/document_plugin_factory.h>
@@ -59,7 +57,7 @@ public:
 	{
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		if(!Mesh.points)
 			return;
@@ -72,25 +70,21 @@ public:
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
-		const color_t color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
-		const color_t selected_color = RenderState.show_component_selection ? selected_component_color() : color;
-
-		enable_blending();
+		const k3d::color color = RenderState.node_selection ? selected_mesh_color() : unselected_mesh_color(RenderState.parent_selection);
+		const k3d::color selected_color = RenderState.show_component_selection ? selected_component_color() : color;
 
 		glBegin(GL_POINTS);
 		const k3d::uint_t point_begin = 0;
 		const k3d::uint_t point_end = points.size();
 		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			color4d(point_selection[point] ? selected_color : color);
+			k3d::gl::color3d(point_selection[point] ? selected_color : color);
 			k3d::gl::vertex3d(points[point]);
 		}
 		glEnd();
-
-		disable_blending();
 	}
 
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		if(!SelectionState.select_component.count(k3d::selection::POINT))
 			return;
@@ -100,8 +94,6 @@ public:
 
 		const k3d::mesh::points_t& points = *Mesh.points;
 
-		bool valid_polyhedra = has_non_empty_polyhedra(Mesh);
-
 		k3d::gl::store_attributes attributes;
 		glDisable(GL_LIGHTING);
 
@@ -109,24 +101,14 @@ public:
 		const k3d::uint_t point_end = points.size();
 		for(k3d::uint_t point = point_begin; point != point_end; ++point)
 		{
-			if (!valid_polyhedra || SelectionState.select_backfacing ||
-					(!SelectionState.select_backfacing &&
-							!backfacing(Mesh.points->at(point) * RenderState.matrix,RenderState.camera, get_data<normal_cache>(&Mesh, this).point_normals(this).at(point))))
-			{
-				k3d::gl::push_selection_token(k3d::selection::POINT, point);
+			k3d::gl::push_selection_token(k3d::selection::POINT, point);
 
-				glBegin(GL_POINTS);
-				k3d::gl::vertex3d(points[point]);
-				glEnd();
+			glBegin(GL_POINTS);
+			k3d::gl::vertex3d(points[point]);
+			glEnd();
 
-				k3d::gl::pop_selection_token(); // k3d::selection::POINT
-			}
+			k3d::gl::pop_selection_token(); // k3d::selection::POINT
 		}
-	}
-
-	void on_mesh_changed(const k3d::mesh& Mesh, k3d::ihint* Hint)
-	{
-		schedule_data<normal_cache>(&Mesh, Hint, this);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -136,7 +118,7 @@ public:
 			"OpenGLPointPainter",
 			_("Renders mesh points"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}
@@ -155,5 +137,4 @@ k3d::iplugin_factory& point_painter_factory()
 } // namespace opengl
 
 } // namespace module
-
 

@@ -75,20 +75,20 @@ public:
 private:
 	void on_update_color(k3d::color& Output)
 	{
-		k3d::iscript_engine::context_t context;
-		context["Document"] = &document();
-		context["Node"] = static_cast<k3d::inode*>(this);
-		context["Output"] = k3d::color(1, 1, 1);
+		k3d::iscript_engine::context context;
+		context["document"] = &document();
+		context["node"] = static_cast<k3d::inode*>(this);
+		context["output"] = k3d::color(1, 1, 1);
 
 		execute_script(context);
 
-		if(context["Output"].type() == typeid(k3d::color))
+		if(context["output"].type() == typeid(k3d::color))
 		{
-			Output = boost::any_cast<k3d::color>(context["Output"]);
+			Output = boost::any_cast<k3d::color>(context["output"]);
 			return;
 		}
 
-		k3d::log() << error << "unsupported output type: " << k3d::demangle(context["Output"].type()) << std::endl;
+		k3d::log() << error << "unsupported output type: " << k3d::demangle(context["output"].type()) << std::endl;
 		Output = k3d::color(1, 1, 1);
 	}
 };

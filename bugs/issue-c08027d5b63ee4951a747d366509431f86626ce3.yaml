@@ -1,0 +1,29 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Selected polygon face colors rendered incorrectly.
+desc: |-
+  Is anyone else having trouble seeing the selected face color (red)
+  when selecting polygon faces? Debug output shows the color gets set,
+  but somehow it doesn't show in the viewport (only orientation and
+  normal show up). The code (regular_opengl_painters/face_painter.cpp)
+  seems fine to me, so I suspect this is another bug in the Intel X
+  driver for laptop chipsets. I am using a GM965/GL960 and Ubuntu
+  Jaunty.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2009-08-23 23:46:39.829705 Z
+references: []
+
+id: c08027d5b63ee4951a747d366509431f86626ce3
+log_events: 
+- - 2009-08-23 23:46:40.749610 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2009-11-17 05:00:20.826238 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""

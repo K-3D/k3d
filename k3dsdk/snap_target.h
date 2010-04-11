@@ -24,8 +24,8 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "isnap_target.h"
-#include "signal_system.h"
+#include <k3dsdk/isnap_target.h>
+#include <k3dsdk/signal_system.h>
 
 namespace k3d
 {

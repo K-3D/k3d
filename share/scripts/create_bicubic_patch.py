@@ -2,21 +2,18 @@
 
 import k3d
 
-doc = Document
-doc.start_change_set()
+context.document.start_change_set()
 try:
-	frozen_mesh = doc.new_node("FrozenMesh")
+	# Create a FrozenMesh node to act as a mesh source ...
+	frozen_mesh = k3d.plugin.create("FrozenMesh", context.document)
 	frozen_mesh.name = "Bicubic Patch"
 
-	mesh = k3d.dynamic_cast(frozen_mesh, "imesh_storage").reset_mesh()
+	# Create a mesh ...
+	mesh = frozen_mesh.create_mesh()
 
+	# Add geometric points to the mesh ...
 	points = mesh.create_points()
 	point_selection = mesh.create_point_selection()
-	bicubic_patches = mesh.create_bicubic_patches()
-	patch_selection = bicubic_patches.create_patch_selection()
-	patch_materials = bicubic_patches.create_patch_materials()
-	patch_points = bicubic_patches.create_patch_points()
-	Cs = bicubic_patches.writable_varying_data().create_array("Cs", "k3d::color")
 
 	positions = [
 		(-5, -5, 0), (-2, -5, 2), (2, -5, -2), (5, -5, 0),
@@ -29,27 +26,38 @@ try:
 		points.append(k3d.point3(position[0], position[2], -position[1]))
 		point_selection.append(0)
 
-	patch_selection.append(0)
-	patch_materials.append(None)
+	# Create a bicubic_patch primitive ...
+	patches = k3d.bicubic_patch.create(mesh)
 
+	# Create a custom attribute array to store color values at each parametric corner of each patch ...
+	Cs = patches.parameter_attributes().create("Cs", "k3d::color")
+
+	# Add a single patch to the primitive ...
+	patches.patch_selections().append(0)
+	patches.patch_materials().append(None)
 	for i in range(16):
-		patch_points.append(i)
+		patches.patch_points().append(len(patches.patch_points()))
 
+	# Add some colors to the patch corners ...
 	Cs.append(k3d.color(1, 0, 0))
 	Cs.append(k3d.color(0, 1, 0))
 	Cs.append(k3d.color(0, 0, 1))
 	Cs.append(k3d.color(1, 1, 1))
 
-	mesh_instance = doc.new_node("MeshInstance")
+	# Connect the FrozenMesh to a MeshInstance to place it in the scene ...
+	mesh_instance = k3d.plugin.create("MeshInstance", context.document)
 	mesh_instance.name = "Bicubic Patch Instance"
-	mesh_instance.gl_painter = doc.get_node("GL Default Painter")
-	mesh_instance.ri_painter = doc.get_node("RenderMan Default Painter")
+	mesh_instance.gl_painter = k3d.node.lookup_one(context.document, "GL Default Painter")
+	mesh_instance.ri_painter = k3d.node.lookup_one(context.document, "RenderMan Default Painter")
 
-	doc.set_dependency(mesh_instance.get_property("input_mesh"), frozen_mesh.get_property("output_mesh"))
+	k3d.property.connect(context.document, frozen_mesh.get_property("output_mesh"), mesh_instance.get_property("input_mesh"))
 
-	doc.finish_change_set("Create Bicubic Patch")
+	# Make the MeshInstance visible to render engines ...
+	k3d.node.show(context.document, mesh_instance)
+
+	context.document.finish_change_set("Create Bicubic Patch")
 
 except:
-	doc.cancel_change_set()
+	context.document.cancel_change_set()
 	raise
 

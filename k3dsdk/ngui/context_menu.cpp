@@ -10,12 +10,12 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 /** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
@@ -42,12 +42,11 @@
 #include <k3dsdk/ipipeline.h>
 #include <k3dsdk/iproperty_collection.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/ngui/check_menu_item.h>
 #include <k3dsdk/ngui/context_menu.h>
-#include <k3dsdk/ngui/detail.h>
+#include <k3dsdk/ngui/pipeline.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/file_chooser_dialog.h>
 #include <k3dsdk/ngui/icons.h>
@@ -55,15 +54,16 @@
 #include <k3dsdk/ngui/messages.h>
 #include <k3dsdk/ngui/modifiers.h>
 #include <k3dsdk/ngui/node.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/render.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/ngui/widget_manip.h>
-#include <k3dsdk/nodes.h>
+#include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/persistent_lookup.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/utility_gl.h>
@@ -252,7 +252,7 @@ public:
 
 			if(dynamic_cast<k3d::imesh_sink*>(*node))
 				++selected_mesh_counter;
-			if(dynamic_cast<k3d::itransform_sink*>(*node))
+			if(dynamic_cast<k3d::imatrix_sink*>(*node))
 				++selected_transform_counter;
 		}
 
@@ -491,13 +491,13 @@ private:
 	/// Instantiates selected meshes
 	void on_instantiate()
 	{
-		instantiate_selected_nodes(m_document_state);
+		pipeline::instantiate_selected_nodes(m_document_state.document());
 	}
 
 	/// Duplicates selected meshes
 	void on_duplicate()
 	{
-		duplicate_selected_nodes(m_document_state);
+		pipeline::duplicate_selected_nodes(m_document_state.document());
 	}
 	
 	/// Easy animation of transformation matrix
@@ -509,10 +509,10 @@ private:
 			k3d::inode* upstream_node = 0;
 			
 			// Check if the selected node can be transformed
-			k3d::itransform_sink* const downstream_sink = dynamic_cast<k3d::itransform_sink*>(*node);
+			k3d::imatrix_sink* const downstream_sink = dynamic_cast<k3d::imatrix_sink*>(*node);
 			if (!downstream_sink)
 				continue;
-			k3d::iproperty& downstream_input = downstream_sink->transform_sink_input();
+			k3d::iproperty& downstream_input = downstream_sink->matrix_sink_input();
 			k3d::iproperty* upstream_output = (*node)->document().pipeline().dependency(downstream_input);
 	
 			// Check upstream object
@@ -527,18 +527,18 @@ private:
 			if (k3d::inode* const track = k3d::plugin::create<k3d::inode>("AnimationTrackDoubleMatrix4", m_document_state.document(), (*node)->name() + " Track"))
 			{
 				// Create a default interpolator, if it didn't exist already
-				k3d::inode* interpolator;
-				const k3d::nodes_t nodes = k3d::find_nodes(m_document_state.document().nodes(), "Linear Transformation Interpolator");
-	      if (1 == nodes.size())
-	      {
-	      	interpolator = *nodes.begin();
-	      }
-	      else
-	      {
-	      	interpolator = k3d::plugin::create<k3d::inode>("InterpolatorDoubleMatrix4Linear", m_document_state.document(), "Linear Transformation Interpolator");
-	      }
-	       
-	      // Set the interpolator
+				k3d::inode* interpolator = 0;
+				const std::vector<k3d::inode*> nodes = k3d::node::lookup(m_document_state.document(), "Linear Transformation Interpolator");
+				if(1 == nodes.size())
+				{
+					interpolator = nodes[0];
+				}
+				else
+				{
+					interpolator = k3d::plugin::create<k3d::inode>("InterpolatorDoubleMatrix4Linear", m_document_state.document(), "Linear Transformation Interpolator");
+				}
+				 
+				// Set the interpolator
 				k3d::property::set_internal_value(*track, "interpolator", interpolator);
 				
 				k3d::ipipeline::dependencies_t dependencies;
@@ -576,6 +576,9 @@ private:
 	/// Modify selected meshes
 	void on_modify_meshes(k3d::iplugin_factory* Modifier)
 	{
+		if(cancel_plugin(*Modifier))
+			return;
+
 		modify_selected_meshes(m_document_state, Modifier);
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}
@@ -583,7 +586,8 @@ private:
 	/// Modify selected transforms
 	void on_modifier_transform(k3d::iplugin_factory* Modifier)
 	{
-		return_if_fail(Modifier);
+		if(cancel_plugin(*Modifier))
+			return;
 
 		k3d::nodes_t selected_nodes = selection::state(m_document_state.document()).selected_nodes();
 
@@ -596,7 +600,7 @@ private:
 
 		// Show the new modifier properties if only one was processed
 		if(selected_nodes.size() == 1)
-			m_document_state.view_node_properties_signal().emit(new_modifier);
+			panel::mediator(m_document_state.document()).set_focus(*new_modifier);
 
 		k3d::gl::redraw_all(m_document_state.document(), k3d::gl::irender_viewport::ASYNCHRONOUS);
 	}

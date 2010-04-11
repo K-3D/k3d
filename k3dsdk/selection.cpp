@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -17,13 +17,12 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "imesh_source.h"
-#include "inode.h"
-#include "iomanip.h"
-#include "iproperty.h"
-#include "legacy_mesh.h"
-#include "persistent_lookup.h"
-#include "selection.h"
+#include <k3dsdk/imesh_source.h>
+#include <k3dsdk/inode.h>
+#include <k3dsdk/iomanip.h>
+#include <k3dsdk/iproperty.h>
+#include <k3dsdk/persistent_lookup.h>
+#include <k3dsdk/selection.h>
 
 namespace k3d
 {
@@ -60,17 +59,14 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case CONSTANT:
 			Stream << "constant";
 			break;
-		case UNIFORM:
-			Stream << "uniform";
+		case SURFACE:
+			Stream << "surface";
 			break;
-		case VARYING:
-			Stream << "varying";
+		case PARAMETER:
+			Stream << "parameter";
 			break;
-		case FACE_VARYING:
-			Stream << "face_varying";
-			break;
-		case SPLIT_EDGE:
-			Stream << "split_edge";
+		case EDGE:
+			Stream << "edge";
 			break;
 		case POINT:
 			Stream << "point";
@@ -78,8 +74,18 @@ std::ostream& operator<<(std::ostream& Stream, const type& RHS)
 		case CURVE:
 			Stream << "curve";
 			break;
+		case FACE:
+			Stream << "face";
+			break;
+		case PATCH:
+			Stream << "patch";
+			break;
+		case VERTEX:
+			Stream << "vertex";
+			break;
 		default:
-			Stream << RHS;
+			// Note: we coerce the type here to prevent an infinite loop!
+			log() << error << k3d_file_reference << ": unknown selection type: " << int(RHS) << std::endl;
 			break;
 	}
 
@@ -97,44 +103,28 @@ std::istream& operator>>(std::istream& Stream, type& RHS)
 		RHS = NODE;
 	else if(buffer == "mesh")
 		RHS = MESH;
-/*
-	else if(buffer == "absolute_point")
-		RHS = ABSOLUTE_POINT;
-	else if(buffer == "absolute_face")
-		RHS = ABSOLUTE_FACE;
-	else if(buffer == "absolute_split_edge")
-		RHS = ABSOLUTE_SPLIT_EDGE;
-	else if(buffer == "absolute_linear_curve")
-		RHS = ABSOLUTE_LINEAR_CURVE;
-	else if(buffer == "absolute_cubic_curve")
-		RHS = ABSOLUTE_CUBIC_CURVE;
-	else if(buffer == "absolute_nurbs_curve" || buffer == "absolute_nucurve")
-		RHS = ABSOLUTE_NURBS_CURVE;
-	else if(buffer == "absolute_bilinear_patch")
-		RHS = ABSOLUTE_BILINEAR_PATCH;
-	else if(buffer == "absolute_bicubic_patch")
-		RHS = ABSOLUTE_BICUBIC_PATCH;
-	else if(buffer == "absolute_nurbs_patch" || buffer == "absolute_nupatch")
-		RHS = ABSOLUTE_NURBS_PATCH;
-*/
 	else if(buffer == "user1")
 		RHS = USER1;
 	else if(buffer == "primitive")
 		RHS = PRIMITIVE;
 	else if(buffer == "constant")
 		RHS = CONSTANT;
-	else if(buffer == "uniform")
-		RHS = UNIFORM;
-	else if(buffer == "varying")
-		RHS = VARYING;
-	else if(buffer == "face_varying")
-		RHS = FACE_VARYING;
-	else if(buffer == "split_edge")
-		RHS = SPLIT_EDGE;
+	else if(buffer == "surface")
+		RHS = SURFACE;
+	else if(buffer == "parameter")
+		RHS = PARAMETER;
+	else if(buffer == "edge")
+		RHS = EDGE;
 	else if(buffer == "point")
 		RHS = POINT;
 	else if(buffer == "curve")
 		RHS = CURVE;
+	else if(buffer == "face")
+		RHS = FACE;
+	else if(buffer == "patch")
+		RHS = PATCH;
+	else if(buffer == "vertex")
+		RHS = VERTEX;
 	else
 		log() << error << k3d_file_reference << ": could not extract value [" << buffer << "]" << std::endl;
 
@@ -275,6 +265,7 @@ inode* get_node(const record& Record)
 	return 0;
 }
 
+/*
 ///////////////////////////////////////////////////////////////////////////////////
 // get_mesh
 
@@ -292,6 +283,26 @@ mesh* get_mesh(const record& Record)
 
 	return boost::any_cast<k3d::mesh*>(mesh_source->mesh_source_output().property_internal_value());
 }
+
+///////////////////////////////////////////////////////////////////////////////////
+// get_mesh
+
+const mesh::primitive* get_primitive(const record& Record)
+{
+	const mesh* const m = get_mesh(Record);
+	if(!mesh)
+		return 0;
+
+	const selection::id primitive_id = Record.get_id(PRIMITIVE);
+	if(primitive_id == null_id())
+		return 0;
+
+	primitive_id = token->id;
+	return_val_if_fail(mesh, 0);
+	return_val_if_fail(primitive_id < mesh->primitives.size(), 0);
+	return mesh->primitives[primitive_id].get();
+}
+*/
 
 } // namespace selection
 
@@ -351,12 +362,10 @@ storage::storage(const string_t& Type) :
 {
 }
 
-bool_t storage::almost_equal(const storage& Other, const uint64_t Threshold) const
+void storage::difference(const storage& Other, difference::accumulator& Result) const
 {
-	return
-		k3d::almost_equal<string_t>(Threshold)(type, Other.type) &&
-		k3d::almost_equal<named_arrays>(Threshold)(structure, Other.structure)
-		;
+	k3d::difference::test(type, Other.type, Result);
+	k3d::difference::test(structure, Other.structure, Result);
 }
 
 std::ostream& operator<<(std::ostream& Stream, const storage& RHS)
@@ -377,19 +386,19 @@ storage& set::create(const string_t& Type)
 	return back().create(new storage(Type));
 }
 
-bool_t set::almost_equal(const set& Other, const uint64_t Threshold) const
+void set::difference(const set& Other, difference::accumulator& Result) const
 {
-	if(size() != Other.size())
-		return false;
-
 	const set& self = *this;
-	for(uint_t i = 0; i != self.size(); ++i)
-	{
-		if(!k3d::almost_equal<storage>(Threshold)(*self[i], *Other[i]))
-			return false;
-	}
 
-	return true;
+	Result.exact(self.size() == Other.size());
+
+	for(uint_t i = 0; i != self.size() && i != Other.size(); ++i)
+		k3d::difference::test(*self[i], *Other[i], Result);
+}
+
+void set::append(const set& Source, set& Target)
+{
+	Target.insert(Target.end(), Source.begin(), Source.end());
 }
 
 std::ostream& operator<<(std::ostream& Stream, const set& RHS)

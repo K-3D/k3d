@@ -70,14 +70,6 @@ public:
 	/// Returns a gdkgl context node that can be used to share display lists between viewports
 	GdkGLContext* gdkgl_share_list();
 
-	/// Defines a signal that can be emitted to request display of the history for an node
-	typedef sigc::signal1<bool, k3d::inode*, k3d::signal::consumable> view_node_history_signal_t;
-	/// Returns a signal that can be emitted to request display of the history for an node
-	view_node_history_signal_t& view_node_history_signal();
-	/// Defines a signal that can be emitted to request display of the properties for an node
-	typedef sigc::signal1<bool, k3d::inode*, k3d::signal::consumable> view_node_properties_signal_t;
-	/// Returns a signal that can be emitted to request display of the properties for an node
-	view_node_properties_signal_t& view_node_properties_signal();
 	/// Defines a signal that can be emitted to acknowledge of a document selection change
 	typedef sigc::signal<void> document_selection_change_signal_t;
 	/// Returns a signal that can be emitted to acknowledge of a document selection change
@@ -102,8 +94,6 @@ public:
 	/// Returns a reference to the builtin Scale Tool that can be passed to set_active_tool()
 	tool& scale_tool();
 
-	const bool is_selected(const k3d::selection::record&);
-	
 	/// True if backfacing components are to be picked
 	bool pick_backfacing();
 	
@@ -126,12 +116,6 @@ public:
 	viewport::control* get_focus_viewport() { return m_focus_viewport; }
 	/// Sets focused viewport
 	void set_focus_viewport(viewport::control* Viewport) { m_focus_viewport = Viewport; }
-
-	/// Creates the requested node, attach a MeshInstance iff it's a mesh source
-	k3d::inode* create_node(k3d::iplugin_factory* const Factory);
-	
-	/// Instantiates the given node, returning the mesh instance if it was a mesh or null otherwise
-	k3d::inode* instantiate_mesh(k3d::inode* Node);
 
 	/// Shows context menu, pass false in interactive mode
 	void popup_context_menu(const bool UserAction = true);

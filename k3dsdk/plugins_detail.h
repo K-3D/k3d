@@ -24,10 +24,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "idocument.h"
-#include "inode_collection.h"
-#include "iplugin_factory.h"
+#include <k3dsdk/data.h>
+#include <k3dsdk/idocument.h>
+#include <k3dsdk/inode_collection.h>
+#include <k3dsdk/iplugin_factory.h>
 
 namespace k3d
 {

@@ -24,8 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "inode_change_signal.h"
-#include "signal_slots.h"
+#include <k3dsdk/inode_change_signal.h>
+#include <k3dsdk/signal_slots.h>
 
 namespace k3d
 {

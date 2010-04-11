@@ -172,9 +172,9 @@ public:
 	{
 		static k3d::document_plugin_factory<lissajous_curve > factory(
 		k3d::uuid(0x7fdcbdc1, 0xd1c6404e, 0xae15a8eb, 0x45ffc793),
-			"LissajousCurve",
+			"LinearLissajousCurve",
 			_("Generates a lissajous (sine-wave) curve"),
-			"Curve",
+			"LinearCurve",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;

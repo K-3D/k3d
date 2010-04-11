@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "const_named_tables_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/const_named_tables_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <boost/python.hpp>
 using namespace boost::python;

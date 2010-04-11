@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "console.h"
+#include <k3dsdk/ngui/console.h>
 
 #include <k3dsdk/log.h>
 

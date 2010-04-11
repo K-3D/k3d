@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "istream_ri.h"
+#include <k3dsdk/istream_ri.h>
 #include <set>
 
 namespace k3d

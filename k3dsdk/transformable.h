@@ -24,22 +24,22 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "algebra.h"
-#include "data.h"
-#include "hints.h"
-#include "itransform_sink.h"
-#include "itransform_source.h"
-#include "value_demand_storage.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/hints.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
+#include <k3dsdk/value_demand_storage.h>
 
 namespace k3d
 {
 
-/// Provides a boilerplate implementation of an object that can act as a transform source and a transform sink
+/// Provides a boilerplate implementation of an object that can act as a matrix source and sink
 template<typename base_t>
 class transformable :
 	public base_t,
-	public itransform_source,
-	public itransform_sink
+	public imatrix_source,
+	public imatrix_sink
 {
 public:
 	transformable(iplugin_factory& Factory, idocument& Document) :
@@ -53,12 +53,12 @@ public:
 		m_output_matrix.set_update_slot(sigc::mem_fun(*this, &transformable<base_t>::execute));
 	}
 
-	iproperty& transform_source_output()
+	iproperty& matrix_source_output()
 	{
 		return m_output_matrix;
 	}
 
-	iproperty& transform_sink_input()
+	iproperty& matrix_sink_input()
 	{
 		return m_input_matrix;
 	}

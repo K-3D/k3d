@@ -38,7 +38,7 @@
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/extension_gl.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
@@ -53,7 +53,7 @@
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/options_policy.h>
 #include <k3dsdk/parallel/threads.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/register_application.h>
 #include <k3dsdk/register_plugin_factories.h>
 #include <k3dsdk/scripting.h>
@@ -84,10 +84,10 @@ typedef std::vector<boost::program_options::basic_option<char> > arguments_t;
 /////////////////////////////////////////////////////////////////////////////
 // User options specified on the command line
 
-bool g_show_timestamps = false;
-bool g_show_process = false;
-bool g_syslog = false;
-bool g_color_level = false;
+k3d::bool_t g_show_timestamps = false;
+k3d::bool_t g_show_process = false;
+k3d::bool_t g_syslog = false;
+k3d::bool_t g_color_level = false;
 k3d::log_level_t g_minimum_log_level = k3d::K3D_LOG_LEVEL_WARNING;
 
 k3d::filesystem::path g_default_ngui_path;
@@ -113,7 +113,7 @@ k3d::ievent_loop* g_user_interface = 0;
 /////////////////////////////////////////////////////////////////////////////
 // handle_error
 
-void handle_error(const k3d::string_t& Message, bool& Quit, bool& Error)
+void handle_error(const k3d::string_t& Message, k3d::bool_t& Quit, k3d::bool_t& Error)
 {
 	Quit = true;
 	Error = true;
@@ -137,7 +137,7 @@ void startup_message_handler(const k3d::string_t& Message)
 // exit_request_handler
 
 /// Called when the user wants to shut everything down
-bool exit_request_handler()
+k3d::bool_t exit_request_handler()
 {
 	if(g_user_interface)
 		g_user_interface->stop_event_loop();
@@ -149,7 +149,7 @@ bool exit_request_handler()
 // set_default_options
 
 /// Sets-up default user options for various platforms
-void set_default_options(bool& Quit, bool& Error)
+void set_default_options(k3d::bool_t& Quit, k3d::bool_t& Error)
 {
 	const k3d::filesystem::path data_path = k3d::system::get_home_directory() / k3d::filesystem::generic_path(".k3d");
 
@@ -211,15 +211,15 @@ void set_default_options(bool& Quit, bool& Error)
 	if(!k3d::system::getenv("K3D_USER_INTERFACE_PATH").empty())
 		g_user_interface_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::system::getenv("K3D_USER_INTERFACE_PATH")));
 
-	// Needed for ATK events on non-gnome systems
-	k3d::system::setenv("GTK_MODULES", "gail:atk-bridge");
+	// This ensures that we can use ATK for testing, even when the user hasn't enabled desktop accessibility.
+	k3d::system::setenv("GTK_MODULES", "gail");
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // parse_log_arguments
 
 /// Looks for command-line arguments that apply to logging (so we can set them up right away)
-const arguments_t parse_log_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
+const arguments_t parse_log_arguments(const arguments_t& Arguments, k3d::bool_t& Quit, k3d::bool_t& Error)
 {
 	// Keep track of "unused" options ...
 	arguments_t unused;
@@ -241,6 +241,10 @@ const arguments_t parse_log_arguments(const arguments_t& Arguments, bool& Quit, 
 		else if(argument->string_key == "color")
 		{
 			g_color_level = true;
+		}
+		else if(argument->string_key == "no-color")
+		{
+			g_color_level = false;
 		}
 		else if(argument->string_key == "log-level")
 		{
@@ -276,7 +280,7 @@ const arguments_t parse_log_arguments(const arguments_t& Arguments, bool& Quit, 
 // parse_startup_arguments
 
 /// Handles "normal" command-line arguments that specify initial application state
-const arguments_t parse_startup_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
+const arguments_t parse_startup_arguments(const arguments_t& Arguments, k3d::bool_t& Quit, k3d::bool_t& Error)
 {
 	// We return any "unused" options ...
 	arguments_t unused;
@@ -355,7 +359,7 @@ const arguments_t parse_startup_arguments(const arguments_t& Arguments, bool& Qu
 // check_dependencies
 
 /// Checks for any runtime resources required to continue program execution
-void check_dependencies(bool& Quit, bool& Error)
+void check_dependencies(k3d::bool_t& Quit, k3d::bool_t& Error)
 {
 	k3d::log() << info << "package: " << K3D_PACKAGE << std::endl;
 	k3d::log() << info << "version: " << K3D_VERSION << std::endl;
@@ -430,7 +434,7 @@ void check_dependencies(bool& Quit, bool& Error)
 // create_user_interface
 
 /// Instantiates the (optional) user interface plugin
-void create_user_interface(k3d::plugin_factory_collection& Plugins, bool& Quit, bool& Error)
+void create_user_interface(k3d::plugin_factory_collection& Plugins, k3d::bool_t& Quit, k3d::bool_t& Error)
 {
 	const k3d::string_t module_name = g_user_interface_path.native_console_string();
 	if(!g_user_interface_path.empty() && !k3d::filesystem::exists(g_user_interface_path))
@@ -471,7 +475,7 @@ void create_user_interface(k3d::plugin_factory_collection& Plugins, bool& Quit, 
 // load_modules
 
 /// Loads (statically- or dynamically-linked) plugin modules
-void load_modules(k3d::plugin_factory_collection& Plugins, bool& Quit, bool& Error)
+void load_modules(k3d::plugin_factory_collection& Plugins, k3d::bool_t& Quit, k3d::bool_t& Error)
 {
 	Plugins.load_modules(g_plugin_paths, true, k3d::plugin_factory_collection::LOAD_PROXIES);
 }
@@ -480,43 +484,55 @@ void load_modules(k3d::plugin_factory_collection& Plugins, bool& Quit, bool& Err
 // parse_runtime_arguments
 
 /// Handles any command-line options that run once startup is complete (e.g. running a script / tutorial)
-const arguments_t parse_runtime_arguments(const arguments_t& Arguments, bool& Quit, bool& Error, k3d::iapplication& Application)
+const arguments_t parse_runtime_arguments(const arguments_t& Arguments, k3d::bool_t& Quit, k3d::bool_t& Error, k3d::iapplication& Application)
 {
-	// Keep track of "unused" arguments
+	// Keep track of "unused" arguments ...
 	arguments_t unused;
+
+	// Provide a single script context object that will be used by all scripts, so they can share state ...
+	k3d::iscript_engine::context context;
 
 	// For each command-line argument ...
 	for(arguments_t::const_iterator argument = Arguments.begin(); argument != Arguments.end(); ++argument)
 	{
-		if(argument->string_key == "script")
+		if(argument->string_key == "script" || argument->string_key == "script-file")
 		{
-			bool recognized = false;
-			bool executed = false;
-			k3d::string_t script_name(argument->value[0]);
+			k3d::bool_t recognized = false;
+			k3d::bool_t executed = false;
+			k3d::string_t script_name;
+			k3d::script::code script_code("");
 
-			if(script_name == "-")
+			if(argument->string_key == "script")
 			{
-				script_name = "STDIN";
-				k3d::log() << info << "Running script [STDIN]" << std::endl;
-				k3d::iscript_engine::context_t context;
-				k3d::script::execute(k3d::script::code(std::cin), script_name, context, recognized, executed);
+				script_name = "COMMANDLINE";
+				script_code = k3d::script::code(argument->value[0]);
 			}
-			else
+			else if(argument->string_key == "script-file")
 			{
-				const k3d::filesystem::path script_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(script_name));
-				if(!k3d::filesystem::exists(script_path))
+				if(argument->value[0] == "-")
 				{
-					k3d::log() << error << "Script [" << script_name << "] doesn't exist" << std::endl;
-					Quit = true;
-					Error = true;
-					return arguments_t();
+					script_name = "STDIN";
+					script_code = k3d::script::code(std::cin);
 				}
+				else
+				{
+					script_name = argument->value[0];
+					const k3d::filesystem::path script_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(script_name));
+					if(!k3d::filesystem::exists(script_path))
+					{
+						k3d::log() << error << "Script [" << script_name << "] doesn't exist" << std::endl;
+						Quit = true;
+						Error = true;
+						return arguments_t();
+					}
 
-				k3d::log() << info << "Running script [" << script_name << "]" << std::endl;
-				k3d::filesystem::igzstream file(script_path);
-				k3d::iscript_engine::context_t context;
-				k3d::script::execute(k3d::script::code(file), script_name, context, recognized, executed);
+					k3d::log() << info << "Running script [" << script_name << "]" << std::endl;
+					k3d::filesystem::igzstream script_stream(script_path);
+					script_code = k3d::script::code(script_stream);
+				}
 			}
+
+			k3d::script::execute(script_code, script_name, context, recognized, executed);
 
 			if(!recognized)
 			{
@@ -561,7 +577,7 @@ const arguments_t parse_runtime_arguments(const arguments_t& Arguments, bool& Qu
 // check_unused_arguments
 
 /// Handles any arguments that weren't recognized by either the application or the user interface plugin
-void check_unused_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
+void check_unused_arguments(const arguments_t& Arguments, k3d::bool_t& Quit, k3d::bool_t& Error)
 {
 	// If there aren't any leftover arguments, we're done ...
 	if(Arguments.empty())
@@ -569,7 +585,7 @@ void check_unused_arguments(const arguments_t& Arguments, bool& Quit, bool& Erro
 
 	k3d::log() << warning << "The following unknown command-line arguments will be ignored: " << std::endl;
 	for(arguments_t::const_iterator argument = Arguments.begin(); argument != Arguments.end(); ++argument)
-	    k3d::log() << debug << "name: " << argument->string_key << " value: " << argument->value[0] << std::endl;
+	    k3d::log() << warning << "name: " << argument->string_key << " value: " << argument->value[0] << std::endl;
 
 	Quit = true;
 	Error = true;
@@ -583,7 +599,7 @@ typedef std::vector<k3d::iunknown*> auto_start_plugins_t;
 void create_auto_start_plugins(auto_start_plugins_t& Plugins)
 {
 	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
-	for(k3d::iplugin_factory_collection::factories_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
 	{
 		k3d::iplugin_factory::metadata_t metadata = (**factory).metadata();
 
@@ -602,8 +618,8 @@ void create_auto_start_plugins(auto_start_plugins_t& Plugins)
 
 		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
 		{
-			k3d::iscript_engine::context_t context;
-			context["Command"] = k3d::string_t("startup");
+			k3d::iscript_engine::context context;
+			context["command"] = k3d::string_t("startup");
 			scripted_action->execute(context);
 		}
 	}
@@ -618,8 +634,8 @@ void delete_auto_start_plugins(auto_start_plugins_t& Plugins)
 	{
 		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(*plugin))
 		{
-			k3d::iscript_engine::context_t context;
-			context["Command"] = k3d::string_t("shutdown");
+			k3d::iscript_engine::context context;
+			context["command"] = k3d::string_t("shutdown");
 			scripted_action->execute(context);
 		}
 	}
@@ -640,8 +656,8 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 	
 	try
 	{
-		bool quit = false;
-		bool error = false;
+		k3d::bool_t quit = false;
+		k3d::bool_t error = false;
 
 		// Set default values for all user-configurable options ...
 		set_default_options(quit, error);
@@ -663,9 +679,11 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 			("locale", boost::program_options::value<k3d::string_t>(), "Overrides the path for loading locales")
 #endif // K3D_ENABLE_NLS
 			("log-level", boost::program_options::value<k3d::string_t>(), "Specifies the minimum message priority to log - valid values are \"warning\", \"information\", \"debug\" [default: warning].")
+			("no-color", "Disable color-coding of log messages based on their level.")
 			("options", boost::program_options::value<k3d::string_t>(), "Overrides the filepath for storing user options [default: /home/tshead/.k3d/options.k3d].")
 			("plugins", boost::program_options::value<k3d::string_t>(), "Overrides the path(s) for loading plugin libraries [default: /usr/local/k3d/lib/k3d].")
-			("script", boost::program_options::value<k3d::string_t>(), "Play the given script after startup (use - for stdin).")
+			("script,e", boost::program_options::value<k3d::string_t>(), "Executes the given script text after startup.")
+			("script-file,f", boost::program_options::value<k3d::string_t>(), "Executes the given script file after startup (use - for stdin).")
 			("setenv", boost::program_options::value<k3d::string_t>(), "Set an environment variable using name=value syntax.")
 			("shadercache", boost::program_options::value<k3d::string_t>(), "Overrides the path for storing compiled shaders [default: /home/tshead/.k3d/shadercache].")
 			("share", boost::program_options::value<k3d::string_t>(), "Overrides the path for loading shared data files [default: /usr/local/k3d/share/k3d].")

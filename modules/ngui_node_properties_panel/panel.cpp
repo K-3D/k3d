@@ -32,10 +32,11 @@
 #include <k3dsdk/ngui/custom_property_page.h>
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/panel.h>
+#include <k3dsdk/ngui/panel_mediator.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/ngui/uri.h>
 #include <k3dsdk/ngui/widget_manip.h>
-#include <k3dsdk/plugins.h>
+#include <k3dsdk/plugin.h>
 
 #include <gtkmm/box.h>
 #include <gtkmm/label.h>
@@ -44,6 +45,8 @@
 
 #include <boost/assign/list_of.hpp>
 #include <boost/scoped_ptr.hpp>
+
+#include <iterator>
 
 using namespace k3d::ngui;
 
@@ -88,25 +91,23 @@ public:
 		m_main_widget.pack_start(m_label, Gtk::PACK_SHRINK);
 		m_main_widget.pack_start(m_auto_page, Gtk::PACK_EXPAND_WIDGET);
 
-		m_document_state.view_node_properties_signal().connect(sigc::mem_fun(*this, &implementation::on_view_node_properties));
+		panel::mediator(m_document_state.document()).connect_focus_node_signal(sigc::mem_fun(*this, &implementation::on_view_node_properties));
 		m_document_state.document().close_signal().connect(sigc::mem_fun(*this, &implementation::on_document_closed));
 
 		// Initial update ...
 		m_nodes = selection::state(m_document_state.document()).selected_nodes();
+
 		if(m_nodes.size() > 1)
 			m_nodes.resize(1);
 		update_connections();
 		schedule_update();
 	}
 
-	bool on_view_node_properties(k3d::inode* const Node)
+	void on_view_node_properties(k3d::inode* const Node, k3d::iunknown* const Sender)
 	{
-		m_nodes = k3d::nodes_t(1, Node);
+		m_nodes = Node ? k3d::nodes_t(1, Node) : k3d::nodes_t();
 		update_connections();
-		
 		schedule_update();
-
-		return false;
 	}
 
 	void on_document_closed()
@@ -310,7 +311,6 @@ public:
 
 class panel :
 	public k3d::ngui::panel::control,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -351,7 +351,7 @@ public:
 			"NGUINodePropertiesPanel",
 			_("Displays properties for one node"),
 			"NGUI Panel",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Node Properties"));
 
 		return factory;

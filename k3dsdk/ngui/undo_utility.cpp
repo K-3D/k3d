@@ -20,7 +20,7 @@
 /** \author Timothy M. Shead <tshead@k-3d.com>
 */
 
-#include "undo_utility.h"
+#include <k3dsdk/ngui/undo_utility.h>
 #include <algorithm>
 
 namespace k3d

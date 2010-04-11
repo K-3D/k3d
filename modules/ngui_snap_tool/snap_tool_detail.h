@@ -30,7 +30,6 @@
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/iselectable.h>
-#include <k3dsdk/legacy_mesh.h>
 #include <k3dsdk/ngui/basic_viewport_input_model.h>
 #include <k3dsdk/ngui/navigation_input_model.h>
 #include <k3dsdk/ngui/selection.h>
@@ -38,7 +37,7 @@
 #include <k3dsdk/ngui/transform_tool.h>
 #include <k3dsdk/ngui/utility.h>
 #include <k3dsdk/ngui/viewport.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/transform.h>
 
 using namespace k3d::ngui;

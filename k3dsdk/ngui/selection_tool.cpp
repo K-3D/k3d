@@ -22,11 +22,11 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "basic_viewport_input_model.h"
-#include "document_state.h"
-#include "navigation_input_model.h"
-#include "selection_input_model.h"
-#include "selection_tool.h"
+#include <k3dsdk/ngui/basic_viewport_input_model.h>
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/navigation_input_model.h>
+#include <k3dsdk/ngui/selection_input_model.h>
+#include <k3dsdk/ngui/selection_tool.h>
 
 #include <k3dsdk/data.h>
 #include <k3d-i18n-config.h>
@@ -70,8 +70,6 @@ public:
 		m_extended_component_mode(init_owner(*this) + init_name("extended_component_mode") + init_label(_("Extended Component Selection Mode")) + init_description(_("Extended mode adds newly clicked components instead of replacing selection")) + init_value(false)),
 		m_paint_mode(init_owner(*this) + init_name("component_paint_mode") + init_label(_("Component Paint Mode")) + init_description(_("Use mouse pointer to paint-select geometry components")) + init_value(true)),
 		m_double_click_mode(init_owner(*this) + init_name("double_click_mode") + init_label(_("Double Click Mode")) + init_description(_("Double click switches back to object selection mode when clicking on nothing")) + init_value(true)),
-		m_convert_selection(init_owner(*this) + init_name("convert_selection") + init_label(_("Convert Selection")) + init_description(_("Convert selection when switching between modes")) + init_value(true)),
-		m_keep_selection(init_owner(*this) + init_name("keep_selection") + init_label(_("Keep Selection")) + init_description(_("Keep selection from the old modes when switching between modes")) + init_value(false)),
 		m_pick_backfacing(init_owner(*this) + init_name("pick_backfacing") + init_label(_("Pick Backfacing")) + init_description(_("Select backfacing components when picking (clicking)")) + init_value(false)),
 		m_paint_backfacing(init_owner(*this) + init_name("paint_backfacing") + init_label(_("Paint Backfacing")) + init_description(_("Select backfacing components when painting a selection")) + init_value(false)),
 		m_rubber_band_backfacing(init_owner(*this) + init_name("rubber_band_backfacing") + init_label(_("Rubber Band Backfacing")) + init_description(_("Select backfacing components when rubber band selecting")) + init_value(true))
@@ -163,10 +161,6 @@ public:
 	bool_property_t m_paint_mode;
 	/// Enables double-click actions
 	bool_property_t m_double_click_mode;
-	/// Convert selection when switching selection modes
-	bool_property_t m_convert_selection;
-	/// Keep selection when switching selection modes
-	bool_property_t m_keep_selection;
 	/// Pick backfacing elements
 	bool_property_t m_pick_backfacing;
 	/// Paint-select backfacing elements
@@ -187,16 +181,6 @@ selection_tool::selection_tool(document_state& DocumentState, const std::string&
 selection_tool::~selection_tool()
 {
 	delete m_implementation;
-}
-
-bool selection_tool::convert_selection()
-{
-	return m_implementation->m_convert_selection.internal_value();
-}
-
-bool selection_tool::keep_selection()
-{
-	return m_implementation->m_keep_selection.internal_value();
 }
 
 bool selection_tool::pick_backfacing()

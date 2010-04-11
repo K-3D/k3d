@@ -72,21 +72,27 @@ private:
 extract_tree::extract_tree() :
 	m_root(init_owner(*this) + init_name("root") + init_label("") + init_description("") + init_value(0))
 {
-	m_root.changed_signal().connect(make_reset_graph_slot());
+	m_root.changed_signal().connect(k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::any, k3d::hint::graph_topology_changed> >(make_update_graph_slot()));
 }
 
-void extract_tree::on_initialize_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
+void extract_tree::on_update_graph_topology(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
+	Output = k3d::graph::undirected();
+
 	return_if_fail(Input.topology);
 	const k3d::graph::undirected::adjacency_list_t& input_topology = *Input.topology;
 	const k3d::uint_t vertex_count = boost::num_vertices(input_topology);
 	const k3d::uint_t edge_count = boost::num_edges(input_topology);
 
+	const k3d::uint_t root = m_root.pipeline_value();
+	return_if_fail(root < vertex_count);
+
 	// Use a simple BFS to determine which vertices and edges should appear in the output tree ...
 	k3d::graph::bools_t extract_vertex(vertex_count, false);
 	k3d::graph::bools_t extract_edge(edge_count, false);
 	detail::extract_tree_visitor extract_tree_visitor(extract_vertex, extract_edge);
-	boost::breadth_first_search(input_topology, m_root.pipeline_value(), visitor(extract_tree_visitor));
+	boost::breadth_first_search(input_topology, root, visitor(extract_tree_visitor));
 
 	// Create a new graph, only copying those vertices and edges that were marked for extraction ...
 	k3d::graph::undirected::adjacency_list_t& output_topology = Output.topology.create();
@@ -121,11 +127,11 @@ void extract_tree::on_initialize_graph(const k3d::graph::undirected& Input, k3d:
 	}
 
 	// Mark the new graph as a tree by specifying the index of the root vertex
-	k3d::graph::indices_t& root = Output.graph_data.create<k3d::graph::indices_t>("root");
-	root.push_back(vertex_map[m_root.pipeline_value()]);
+	k3d::graph::indices_t& root_array = Output.graph_data.create<k3d::graph::indices_t>("root");
+	root_array.push_back(vertex_map[root]);
 }
 
-void extract_tree::on_update_graph(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
+void extract_tree::on_update_graph_attributes(const k3d::graph::undirected& Input, k3d::graph::undirected& Output)
 {
 }
 

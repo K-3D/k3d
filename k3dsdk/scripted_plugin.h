@@ -24,10 +24,10 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "k3d-i18n-config.h"
-#include "plugins.h"
-#include "scripting.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/scripting.h>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -52,7 +52,7 @@ protected:
 		m_script.set_value(Script);
 	}
 
-	bool execute_script(iscript_engine::context_t& Context)
+	bool execute_script(iscript_engine::context& Context)
 	{
 		const script::code code(m_script.pipeline_value());
 

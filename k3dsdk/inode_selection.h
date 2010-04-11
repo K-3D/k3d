@@ -27,9 +27,9 @@
 
 #include <list>
 
-#include "iunknown.h"
-#include "signal_system.h"
-#include "types.h"
+#include <k3dsdk/iunknown.h>
+#include <k3dsdk/signal_system.h>
+#include <k3dsdk/types.h>
 
 namespace k3d
 {

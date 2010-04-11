@@ -1,10 +1,10 @@
 #python
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
-blobby = k3d.blobby.create(Output)
-Cs = blobby.varying_attributes().create("Cs", "k3d::color")
+blobby = k3d.blobby.create(context.output)
+Cs = blobby.parameter_attributes().create("Cs", "k3d::color")
 
 # Add four ellipsoids to the blobby ...
 ellipsoids = [k3d.point3(-1, 0, 1), k3d.point3(1, 0, 1), k3d.point3(1, 0, -1), k3d.point3(-1, 0, -1)]
@@ -13,13 +13,13 @@ blobby.first_primitives().append(len(blobby.primitives()))
 blobby.primitive_counts().append(len(ellipsoids) + 1)
 blobby.first_operators().append(len(blobby.operators()))
 blobby.operator_counts().append(1)
-blobby.materials().append(Document.get_node("Material"))
+blobby.materials().append(k3d.node.lookup_one(context.document, "Material"))
 
 for center in ellipsoids:
 	blobby.primitives().append(k3d.blobby.primitive_type.ELLIPSOID)
 	blobby.primitive_first_floats().append(len(blobby.floats()))
 	blobby.primitive_float_counts().append(16)
-	for i in (k3d.translate3(center[0], center[1], center[2]) * k3d.scale3(1)).column_major_list():
+	for i in (k3d.translate3(center[0], center[1], center[2]) * k3d.scale3(1)).column_major_values():
 		blobby.floats().append(i)
 
 # Add a segment to the blobby ...
@@ -33,7 +33,7 @@ blobby.floats().append(1)
 blobby.floats().append(0)
 blobby.floats().append(0)
 blobby.floats().append(1)
-for i in k3d.identity3().column_major_list():
+for i in k3d.identity3().column_major_values():
 	blobby.floats().append(i)
 
 # Assign colors to each ellipsoid and segment ...

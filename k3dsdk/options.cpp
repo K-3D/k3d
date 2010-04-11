@@ -21,15 +21,15 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "fstream.h"
-#include "k3d-platform-config.h"
-#include "log.h"
-#include "options.h"
-#include "options_policy.h"
-#include "result.h"
-#include "share.h"
-#include "system.h"
-#include "xml.h"
+#include <k3dsdk/fstream.h>
+#include <k3d-platform-config.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/options.h>
+#include <k3dsdk/options_policy.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/share.h>
+#include <k3dsdk/system.h>
+#include <k3dsdk/xml.h>
 
 #include <boost/lexical_cast.hpp>
 

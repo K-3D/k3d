@@ -21,9 +21,9 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "iunknown_python.h"
-#include "typed_array_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/typed_array_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/named_array_types.h>
@@ -91,6 +91,14 @@ static void set_item_inode(instance_wrapper<k3d::typed_array<k3d::inode*> >& Sel
 	{
 		Self.wrapped()[Item] = static_cast<k3d::inode*>(0);
 	}
+}
+
+template<typename array_type>
+static const string_t array_str(instance_wrapper<array_type>& Self)
+{
+	std::ostringstream buffer;
+	buffer << Self.wrapped();
+	return buffer.str();
 }
 
 template<typename array_type>
@@ -214,6 +222,7 @@ static void define_class_typed_array(const char* const ClassName, const char* co
 		.def("__len__", &utility::wrapped_len<wrapper_type>)
 		.def("__getitem__", &utility::wrapped_get_item<wrapper_type, typename array_type::value_type>)
 		.def("__setitem__", &set_item<array_type>)
+		.def("__str__", &array_str<array_type>)
 		.def("append", &append<array_type>,
 			"Append a value to the end of the array, growing its size by one.")
 		.def("assign", &assign<array_type>,

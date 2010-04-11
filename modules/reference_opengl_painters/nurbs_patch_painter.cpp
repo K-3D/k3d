@@ -55,7 +55,7 @@ namespace painters
 
 static void on_nurbs_error(GLenum ErrorCode)
 {
-		k3d::log() << debug << "NURBS patch error: " << gluErrorString(ErrorCode) << std::endl;
+	k3d::log() << error << "NURBS patch error: " << gluErrorString(ErrorCode) << std::endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -85,17 +85,13 @@ public:
                         gluDeleteNurbsRenderer(nurbs_renderer);
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs(k3d::nurbs_patch::validate(Mesh, **primitive));
 			if(!nurbs)
-			{
-				if((*primitive)->type == "nurbs_patch")
-					k3d::log() << debug << "NurbsPatchPainter: found an invalid NURBS primitive" << std::endl;
 				continue;
-			}
 
 			const k3d::mesh::points_t& points = *Mesh.points;
 
@@ -146,7 +142,6 @@ public:
 				}
 
 				gluBeginSurface(nurbs_renderer);
-				//k3d::log() << debug << "Painting patch with knot sizes: " << gl_u_knot_vector.size() << ", " << gl_v_knot_vector.size() << " and orders " << patch_u_order << ", " << patch_v_order  << " with " << gl_control_points.size() << " control points. " << std::endl;
 				gluNurbsSurface(nurbs_renderer, gl_u_knot_vector.size(), &gl_u_knot_vector[0], gl_v_knot_vector.size(), &gl_v_knot_vector[0], gl_u_stride, gl_v_stride, &gl_control_points[0], patch_u_order, patch_v_order, GL_MAP2_VERTEX_4);
 
 				if(nurbs->patch_trim_loop_counts[patch])
@@ -155,19 +150,14 @@ public:
 					k3d::uint_t loops_end = loops_start + nurbs->patch_trim_loop_counts[patch];
 					for (k3d::uint_t loop_index = loops_start; loop_index != loops_end; ++loop_index)
 					{
-						//k3d::log() << debug << "  drawing loop " << loop_index << std::endl;
 						gluBeginTrim(nurbs_renderer);
 						k3d::uint_t curves_start = nurbs->trim_loop_first_curves[loop_index];
 						k3d::uint_t curves_end = curves_start + nurbs->trim_loop_curve_counts[loop_index];
 						for (k3d::uint_t curve = curves_start; curve != curves_end; ++curve)
 						{
-							//k3d::log() << debug << "    drawing curve " << curve << std::endl;
 							k3d::uint_t knots_end = nurbs->curve_first_knots[curve] + nurbs->curve_point_counts[curve] + nurbs->curve_orders[curve];
 							return_if_fail(knots_end <= nurbs->curve_knots.size());
 							std::vector<GLfloat> gl_trim_knot_vector(&nurbs->curve_knots[nurbs->curve_first_knots[curve]], &nurbs->curve_knots[knots_end]);
-							//k3d::log() << debug << "      knot vector:" << std::endl;
-							//for (k3d::uint_t knot = 0; knot != gl_trim_knot_vector.size(); ++knot)
-								//k3d::log() << debug << "                   " << gl_trim_knot_vector[knot] << std::endl;
 							std::vector<GLfloat> gl_trim_control_points;
 							k3d::uint_t points_start = nurbs->curve_first_points[curve];
 							k3d::uint_t points_end = points_start + nurbs->curve_point_counts[curve];
@@ -176,7 +166,6 @@ public:
 							{
 								k3d::point2 control_point = nurbs->points[nurbs->curve_points[point]];
 								double weight = nurbs->curve_point_weights[point];
-								//k3d::log() << debug << "        drawing point " << control_point << " with weight " << weight << std::endl;
 								gl_trim_control_points.push_back(static_cast<GLfloat>(control_point[0] * weight));
 								gl_trim_control_points.push_back(static_cast<GLfloat>(control_point[1] * weight));
 								gl_trim_control_points.push_back(static_cast<GLfloat>(weight));
@@ -191,9 +180,9 @@ public:
 		}
 	}
 
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
-		if(!SelectionState.select_component.count(k3d::selection::UNIFORM))
+		if(!SelectionState.select_component.count(k3d::selection::PATCH))
 			return;
 
 		k3d::uint_t primitive_index = 0;
@@ -201,11 +190,7 @@ public:
 		{
 			boost::scoped_ptr<k3d::nurbs_patch::const_primitive> nurbs(k3d::nurbs_patch::validate(Mesh, **primitive));
 			if(!nurbs)
-			{
-				if((*primitive)->type == "nurbs_patch")
-					k3d::log() << debug << "NurbsPatchPainter: found an invalid NURBS primitive" << std::endl;
 				continue;
-			}
 
 			const k3d::mesh::points_t& points = *Mesh.points;
 
@@ -252,7 +237,7 @@ public:
 					gl_control_points.push_back(static_cast<GLfloat>(patch_point_weight));
 				}
 
-				k3d::gl::push_selection_token(k3d::selection::UNIFORM, patch);
+				k3d::gl::push_selection_token(k3d::selection::PATCH, patch);
 
 				gluBeginSurface(nurbs_renderer);
 				gluNurbsSurface(nurbs_renderer, gl_u_knot_vector.size(), &gl_u_knot_vector[0], gl_v_knot_vector.size(), &gl_v_knot_vector[0], gl_u_stride, gl_v_stride, &gl_control_points[0], patch_u_order, patch_v_order, GL_MAP2_VERTEX_4);
@@ -287,7 +272,7 @@ public:
 				}
 				gluEndSurface(nurbs_renderer);
 
-				k3d::gl::pop_selection_token(); // UNIFORM
+				k3d::gl::pop_selection_token(); // PATCH
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE
@@ -301,7 +286,7 @@ public:
 			"OpenGLNURBSPatchPainter",
 			_("Renders NURBS patches"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

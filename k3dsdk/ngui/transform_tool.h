@@ -25,13 +25,13 @@
 		\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "basic_viewport_input_model.h"
-#include "navigation_input_model.h"
-#include "selection.h"
-#include "tool.h"
-#include "tool_selection.h"
-#include "utility.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/basic_viewport_input_model.h>
+#include <k3dsdk/ngui/navigation_input_model.h>
+#include <k3dsdk/ngui/selection.h>
+#include <k3dsdk/ngui/tool.h>
+#include <k3dsdk/ngui/tool_selection.h>
+#include <k3dsdk/ngui/utility.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3dsdk/gl.h>
 #include <k3d-i18n-config.h>
@@ -40,7 +40,7 @@
 #include <k3dsdk/iselectable.h>
 #include <k3dsdk/keyboard.h>
 #include <k3dsdk/mesh.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/transform.h>
 
 namespace k3d
@@ -387,6 +387,12 @@ private:
 		/// Inserts a tweak modifier
 		void create_mesh_modifier(const std::string& Name);
 
+		/// Updates the mesh modifier with the new tweaks
+		void update_mesh_modifier();
+
+		/// Initialize the transformation
+		void init_transformation();
+
 		/// Stores the owning document_state
 		document_state& m_document_state;
 		/// Stores the mesh_source property instead of the mesh itself because the k3d::mesh pointer can change
@@ -396,6 +402,10 @@ private:
 		k3d::point3 component_center;
 		/// Stores the list of selected points with their index
 		detail::component_points_t selected_points;
+		/// Stores the new point positions, for each selected point
+		k3d::mesh::points_t point_positions;
+		/// Initial positions
+		k3d::mesh::points_t initial_positions;
 
 		/// Mesh change signal
 		sigc::connection m_mesh_change_signal;

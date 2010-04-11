@@ -43,9 +43,9 @@ class gamma :
 public:
 	gamma(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_value(init_owner(*this) + init_name("value") + init_label(_("Gamma value")) + init_description(_("Apply gamma value to each pixel")) + init_value(1.0))
+		m_gamma(init_owner(*this) + init_name("gamma") + init_label(_("Gamma Value")) + init_description(_("Apply gamma value to each pixel.")) + init_value(1.0))
 	{
-		m_value.changed_signal().connect(k3d::hint::converter<
+		m_gamma.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::bitmap_pixels_changed> >(make_update_bitmap_slot()));
 	}
 
@@ -70,7 +70,7 @@ public:
 
 	void on_assign_pixels(const k3d::bitmap& Input, k3d::bitmap& Output)
 	{
-		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_value.pipeline_value()));
+		boost::gil::transform_pixels(const_view(Input), view(Output), functor(m_gamma.pipeline_value()));
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -88,7 +88,7 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_value;
+	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_gamma;
 };
 
 /////////////////////////////////////////////////////////////////////////////

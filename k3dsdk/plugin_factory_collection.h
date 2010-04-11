@@ -25,9 +25,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "iplugin_factory_collection.h"
-#include "module.h"
-#include "signal_system.h"
+#include <k3dsdk/iplugin_factory_collection.h>
+#include <k3dsdk/module.h>
+#include <k3dsdk/signal_system.h>
 
 #include <string>
 

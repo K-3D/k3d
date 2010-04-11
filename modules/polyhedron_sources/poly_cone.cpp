@@ -42,15 +42,15 @@ namespace sources
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// poly_cone_implementation
+// poly_cone
 
-class poly_cone_implementation :
+class poly_cone :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
 
 public:
-	poly_cone_implementation(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
+	poly_cone(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_u_segments(init_owner(*this) + init_name("u_segments") + init_label(_("U segments")) + init_description(_("Columns")) + init_value(32) + init_constraint(constraint::minimum<k3d::int32_t>(3)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
 		m_v_segments(init_owner(*this) + init_name("v_segments") + init_label(_("V segments")) + init_description(_("Rows")) + init_value(5) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar))),
@@ -89,42 +89,47 @@ public:
 		const k3d::bool_t bottom = m_bottom.pipeline_value();
 
 		// Create the cone topology ...
-		boost::scoped_ptr<k3d::polyhedron::primitive> primitive(k3d::polyhedron::create_cylinder(Output, v_segments, u_segments, material));
+		boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::create(Output));
+
+		polyhedron->shell_types.push_back(k3d::polyhedron::POLYGONS);
+		k3d::polyhedron::add_cylinder(Output, *polyhedron, 0, v_segments, u_segments, material);
 
 		// Ensure that the top of the cone is "closed" topologically ...
-		primitive->shell_face_counts[0] += 1;
-		primitive->face_first_loops.push_back(primitive->loop_first_edges.size());
-		primitive->face_loop_counts.push_back(1);
-		primitive->face_selections.push_back(0);
-		primitive->face_materials.push_back(material);
-		primitive->loop_first_edges.push_back(primitive->edge_points.size());
+		polyhedron->face_shells.push_back(0);
+		polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+		polyhedron->face_loop_counts.push_back(1);
+		polyhedron->face_selections.push_back(0);
+		polyhedron->face_materials.push_back(material);
+		polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
 		for(k3d::int32_t u = u_segments; u != 0; --u)
 		{
-			primitive->edge_points.push_back(u % u_segments);
-			primitive->edge_selections.push_back(0);
-			primitive->clockwise_edges.push_back(primitive->edge_points.size());
+			polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+			polyhedron->edge_selections.push_back(0);
+			polyhedron->vertex_points.push_back(u % u_segments);
+			polyhedron->vertex_selections.push_back(0);
 		}
-		primitive->clockwise_edges.back() = primitive->loop_first_edges.back();
+		polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
 
 		// Optionally close the bottom of the cone ...
 		if(bottom)
 		{
-			primitive->shell_face_counts[0] += 1;
-			primitive->face_first_loops.push_back(primitive->loop_first_edges.size());
-			primitive->face_loop_counts.push_back(1);
-			primitive->face_selections.push_back(0);
-			primitive->face_materials.push_back(material);
-			primitive->loop_first_edges.push_back(primitive->edge_points.size());
+			polyhedron->face_shells.push_back(0);
+			polyhedron->face_first_loops.push_back(polyhedron->loop_first_edges.size());
+			polyhedron->face_loop_counts.push_back(1);
+			polyhedron->face_selections.push_back(0);
+			polyhedron->face_materials.push_back(material);
+			polyhedron->loop_first_edges.push_back(polyhedron->clockwise_edges.size());
 
 			const k3d::uint_t offset = v_segments * u_segments;
 			for(k3d::int32_t u = 0; u != u_segments; ++u)
 			{
-				primitive->edge_points.push_back(offset + u);
-				primitive->edge_selections.push_back(0);
-				primitive->clockwise_edges.push_back(primitive->edge_points.size());
+				polyhedron->clockwise_edges.push_back(polyhedron->clockwise_edges.size() + 1);
+				polyhedron->edge_selections.push_back(0);
+				polyhedron->vertex_points.push_back(offset + u);
+				polyhedron->vertex_selections.push_back(0);
 			}
-			primitive->clockwise_edges.back() = primitive->loop_first_edges.back();
+			polyhedron->clockwise_edges.back() = polyhedron->loop_first_edges.back();
 		}
 	}
 
@@ -146,12 +151,12 @@ public:
 		k3d::uint_t point = 0;
 		for(k3d::int32_t v = 0; v != point_v_segments; ++v)
 		{
-			const k3d::double_t percent = static_cast<k3d::double_t>(v) / static_cast<k3d::double_t>(point_v_segments - 1);
+			const k3d::double_t percent = k3d::ratio(v, point_v_segments - 1);
 			const k3d::double_t varying_radius = k3d::mix(0.001 * radius, radius, percent);
 
 			for(k3d::int32_t u = 0; u != point_u_segments; ++u, ++point)
 			{
-				const k3d::double_t theta = k3d::pi_times_2() * static_cast<k3d::double_t>(u) / static_cast<k3d::double_t>(point_u_segments);
+				const k3d::double_t theta = k3d::pi_times_2() * k3d::ratio(u, point_u_segments);
 
 				k3d::double_t x = cos(theta);
 				k3d::double_t y = -sin(theta);
@@ -167,11 +172,11 @@ public:
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::document_plugin_factory<poly_cone_implementation, k3d::interface_list<k3d::imesh_source > > factory(
+		static k3d::document_plugin_factory<poly_cone, k3d::interface_list<k3d::imesh_source > > factory(
 			k3d::uuid(0x7c41b43f, 0x385143ab, 0x86969795, 0x368d6199),
 			"PolyCone",
 			_("Generates a polygonal cone with optional endcap"),
-			"Polygon",
+			"Polyhedron",
 			k3d::iplugin_factory::STABLE);
 
 		return factory;
@@ -192,7 +197,7 @@ private:
 
 k3d::iplugin_factory& poly_cone_factory()
 {
-	return poly_cone_implementation::get_factory();
+	return poly_cone::get_factory();
 }
 
 } // namespace sources

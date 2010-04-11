@@ -26,11 +26,12 @@
 // Standard C++ Library".
 // ============================================================================
 
-#include "gzstream.h"
-#include "path.h"
+#include <k3dsdk/gzstream.h>
+#include <k3dsdk/path.h>
 
 #include <zlib.h>
 #include <string.h>
+#include <cstdio> // for EOF
 
 namespace k3d
 {

@@ -1,0 +1,32 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: MakeSDS segfault.
+desc: |-
+  Steps to reproduce:
+  
+  * Start K-3D.
+  * Create a PolyCube.
+  * Right-click on the cube and choose Mesh Modifier > MakeSDS
+  * Segfault with the following output:
+  
+  DEBUG: SDS create timings: Total: 0.0007319, copy input: 1.6909e-05 (2.31029%), calculate companions/point to face: 0.00032312 (44.1482%), calculate indices: 0.000109156 (14.914%), allocate memory: 7.10989e-05 (9.7143%), subdivide topology: 2.19508e-05 (2.99916%), vertex valences: 2.81077e-05 (3.84037%)
+  DEBUG: SDS update timings: Total: 0.00153288, face centers: 0.000555908 (36.2655%), edge midpoints: 0.000259009 (16.8968%), point positions: 0.000253795 (16.5567%)
+  Segmentation fault (core dumped)
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-01-01 03:48:25.796512 Z
+references: []
+
+id: f7a6867233d707004a53404495ec68af38de7dc2
+log_events: 
+- - 2010-01-01 03:48:26.509507 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-01-19 03:53:50.509215 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""

@@ -4,8 +4,8 @@ import k3d
 import sys
 import os
 
-primitive_types = [k3d.bezier_triangle_patch, k3d.bicubic_patch, k3d.bilinear_patch, k3d.blobby, k3d.cone, k3d.cubic_curve, k3d.cylinder, k3d.disk, k3d.hyperboloid, k3d.linear_curve, k3d.nurbs_curve, k3d.nurbs_patch, k3d.paraboloid, k3d.point_group, k3d.polyhedron, k3d.sphere, k3d.teapot, k3d.torus]
-primitive_names = ["Bezier Triangle Patch", "Bicubic Patch", "Bilinear Patch", "Blobby", "Cone", "Cubic Curve", "Cylinder", "Disk", "Hyperboloid", "Linear Curve", "NURBS Curve", "NURBS Patch", "Paraboloid", "Point Group", "Polyhedron", "Sphere", "Teapot", "Torus"]
+primitive_types = [k3d.bezier_triangle_patch, k3d.bicubic_patch, k3d.bilinear_patch, k3d.blobby, k3d.cone, k3d.cubic_curve, k3d.cylinder, k3d.disk, k3d.hyperboloid, k3d.linear_curve, k3d.nurbs_curve, k3d.nurbs_patch, k3d.paraboloid, k3d.particle, k3d.polyhedron, k3d.sphere, k3d.teapot, k3d.torus]
+primitive_names = ["Bezier Triangle Patch", "Bicubic Patch", "Bilinear Patch", "Blobby", "Cone", "Cubic Curve", "Cylinder", "Disk", "Hyperboloid", "Linear Curve", "NURBS Curve", "NURBS Patch", "Paraboloid", "Particle", "Polyhedron", "Sphere", "Teapot", "Torus"]
 
 # Create a table listing primitive components ...
 print """Creating primitive components table ..."""
@@ -19,7 +19,7 @@ for i in range(len(primitive_types)):
 	primitive_name = primitive_names[i]
 
 	document = k3d.new_document()
-	source = document.new_node("FrozenMesh")
+	source = k3d.plugin.create("FrozenMesh", document)
 	mesh = source.create_mesh()
 	primitive_type.create(mesh)
 	primitive = mesh.primitives()[0]
@@ -54,7 +54,7 @@ for i in range(len(primitive_types)):
 	article.write("<graphviz>\n")
 
 	document = k3d.new_document()
-	source = document.new_node("FrozenMesh")
+	source = k3d.plugin.create("FrozenMesh", document)
 	mesh = source.create_mesh()
 	primitive_type.create(mesh)
 
@@ -64,15 +64,15 @@ for i in range(len(primitive_types)):
 		table = primitive.structure()[table_name]
 		for array_name in table.keys():
 			array = table[array_name]
-			if array.get_metadata_value("k3d:domain") == "/points/indices()":
+			if array.get_metadata_value("k3d:domain") == "k3d:point-indices":
 				need_points = True
 
 	if need_points:
 		mesh.create_points()
 		mesh.create_point_selection()
 
-	writer = document.new_node("GraphVizMeshWriter")
-	document.set_dependency(writer.get_property("input_mesh"), source.get_property("output_mesh"))
+	writer = k3d.plugin.create("GraphVizMeshWriter", document)
+	k3d.property.connect(document, source.get_property("output_mesh"), writer.get_property("input_mesh"))
 	article.write(writer.output_string)
 
 	k3d.close_document(document)

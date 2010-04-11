@@ -21,8 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "utility_python.h"
-#include "uuid_python.h"
+#include <k3dsdk/python/utility_python.h>
+#include <k3dsdk/python/uuid_python.h>
 
 #include <k3dsdk/uuid.h>
 #include <boost/python.hpp>

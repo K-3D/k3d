@@ -22,14 +22,14 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "algebra.h"
-#include "iattribute_property_ri.h"
-#include "imaterial_ri.h"
-#include "ioption_property_ri.h"
-#include "material.h"
-#include "renderable_ri.h"
-#include "render_state_ri.h"
-#include "vectors.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/iattribute_property_ri.h>
+#include <k3dsdk/imaterial_ri.h>
+#include <k3dsdk/ioption_property_ri.h>
+#include <k3dsdk/material.h>
+#include <k3dsdk/renderable_ri.h>
+#include <k3dsdk/render_state_ri.h>
+#include <k3dsdk/vectors.h>
 
 #include <boost/array.hpp>
 

@@ -51,14 +51,14 @@ class color_face_painter :
 public:
 	color_face_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_color_array(init_owner(*this) + init_name("color_array") + init_label(_("Color Array")) + init_description(_("Specifies the array to be used for face colors")) + init_value(std::string("Cs"))),
-		m_array_type(init_owner(*this) + init_name("array_type") + init_label(_("Array Type")) + init_description(_("Type of array to use")) + init_value(UNIFORM) + init_enumeration(array_type_values()))
+		m_color_array(init_owner(*this) + init_name("color_array") + init_label(_("Color Array")) + init_description(_("Specifies the array name to be used for face colors")) + init_value(std::string("Cs"))),
+		m_array_type(init_owner(*this) + init_name("array_type") + init_label(_("Array Type")) + init_description(_("Type of array to use")) + init_value(k3d::string_t("face")) + init_values(component_values()))
 	{
 		m_color_array.changed_signal().connect(make_async_redraw_slot());
 		m_array_type.changed_signal().connect(make_async_redraw_slot());
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
@@ -76,7 +76,7 @@ public:
 			// Calculate face normals ...
 			k3d::typed_array<k3d::normal3> normals(face_count, k3d::normal3(0, 0, 1));
 			for(k3d::uint_t face = 0; face != face_count; ++face)
-				normals[face] = k3d::polyhedron::normal(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+				normals[face] = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 	
 			// Define a default face color array (in case the user's choice of color array doesn't exist) ...
 			k3d::typed_array<k3d::color> default_color_array;
@@ -94,34 +94,30 @@ public:
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonOffset(1.0, 1.0);
 			
-			const k3d::uint_t shell_count = polyhedron->shell_first_faces.size();
-			for(k3d::uint_t shell = 0; shell != shell_count; ++shell)
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
-				const k3d::uint_t face_begin = polyhedron->shell_first_faces[shell];
-				const k3d::uint_t face_end = face_begin + polyhedron->shell_face_counts[shell];
-				for(k3d::uint_t face = face_begin; face != face_end; ++face)
+				k3d::gl::normal3d(normals[face]);
+	
+				glBegin(GL_POLYGON);
+				const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
+				for(k3d::uint_t edge = first_edge; ; )
 				{
-					k3d::gl::normal3d(normals[face]);
-		
-					glBegin(GL_POLYGON);
-					const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
-					for(k3d::uint_t edge = first_edge; ; )
-					{
-						k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, color(shell, face, edge));
-						k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
-						edge = polyhedron->clockwise_edges[edge];
-						if(edge == first_edge)
-							break;
-					}
-					glEnd();
+					k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, color(face, edge));
+					k3d::gl::vertex3d(points[polyhedron->vertex_points[edge]]);
+					edge = polyhedron->clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
 				}
+				glEnd();
 			}
 		}
 	}
 	
-	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState)
+	void on_select_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, const k3d::gl::painter_selection_state& SelectionState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
-		if(!SelectionState.select_component.count(k3d::selection::UNIFORM))
+		if(!SelectionState.select_component.count(k3d::selection::FACE))
 			return;
 
 		k3d::uint_t primitive_index = 0;
@@ -149,20 +145,20 @@ public:
 	
 			for(k3d::uint_t face = 0; face != face_count; ++face)
 			{
-				k3d::gl::push_selection_token(k3d::selection::UNIFORM, face);
+				k3d::gl::push_selection_token(k3d::selection::FACE, face);
 	
 				glBegin(GL_POLYGON);
 				const k3d::uint_t first_edge = polyhedron->loop_first_edges[polyhedron->face_first_loops[face]];
 				for(k3d::uint_t edge = first_edge; ; )
 				{
-					k3d::gl::vertex3d(points[polyhedron->edge_points[edge]]);
+					k3d::gl::vertex3d(points[polyhedron->vertex_points[edge]]);
 					edge = polyhedron->clockwise_edges[edge];
 					if(edge == first_edge)
 						break;
 				}
 				glEnd();
 	
-				k3d::gl::pop_selection_token(); // UNIFORM
+				k3d::gl::pop_selection_token(); // FACE
 			}
 
 			k3d::gl::pop_selection_token(); // PRIMITIVE
@@ -182,122 +178,68 @@ public:
 	}
 
 private:
-	typedef enum
+	const k3d::ilist_property<k3d::string_t>::values_t& component_values()
 	{
-		CONSTANT,
-		UNIFORM,
-		VARYING,
-		VERTEX
-		
-	} array_t;
-
-	static const k3d::ienumeration_property::enumeration_values_t& array_type_values()
-	{
-		static k3d::ienumeration_property::enumeration_values_t values;
+		static k3d::ilist_property<k3d::string_t>::values_t values;
 		if(values.empty())
 		{
-			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Constant"), "constant", _("Use an array of constant data")));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Uniform"), "uniform", _("Use an array of uniform data")));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Varying"), "varying", _("Use an array of varying data")));
-			values.push_back(k3d::ienumeration_property::enumeration_value_t(_("Vertex"), "vertex", _("Use an array of vertex data")));
+			values.push_back("constant");
+			values.push_back("edge");
+			values.push_back("face");
+			values.push_back("vertex");
+			values.push_back("point");
 		}
 
 		return values;
-	}
-
-	friend std::ostream& operator<<(std::ostream& Stream, const array_t& Value)
-	{
-		switch(Value)
-		{
-			case CONSTANT:
-				Stream << "constant";
-				break;
-			case UNIFORM:
-				Stream << "uniform";
-				break;
-			case VARYING:
-				Stream << "varying";
-				break;
-			case VERTEX:
-				Stream << "vertex";
-				break;
-		}
-
-		return Stream;
-	}
-
-	friend std::istream& operator>>(std::istream& Stream, array_t& Value)
-	{
-		std::string text;
-		Stream >> text;
-
-		if(text == "constant")
-			Value = CONSTANT;
-		else if(text == "uniform")
-			Value = UNIFORM;
-		else if(text == "varying")
-			Value = VARYING;
-		else if(text == "vertex")
-			Value = VERTEX;
-		else
-			k3d::log() << k3d_file_reference << ": unknown enumeration [" << text << "]"<< std::endl;
-
-		return Stream;
 	}
 	
 	struct color_array_proxy
 	{
 		// Note: we assume the polyhedra are valid here
-		color_array_proxy(const array_t ArrayType,
+		color_array_proxy(const k3d::string_t ArrayType,
 				const k3d::string_t& ArrayName,
 				const k3d::polyhedron::const_primitive& Polyhedron,
-				const k3d::table& VertexData) :
+				const k3d::table& PointData) :
 					m_array_type(ArrayType),
-					m_edge_points(Polyhedron.edge_points)
+					m_vertex_points(Polyhedron.vertex_points)
 		{
 			m_color_array = 0;
-			switch(m_array_type)
-			{
-			case CONSTANT:
+			if(m_array_type == "constant")
 				m_color_array = Polyhedron.constant_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
-				break;
-			case UNIFORM:
-				m_color_array = Polyhedron.uniform_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
-				break;
-			case VARYING:
-				m_color_array = Polyhedron.face_varying_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
-				break;
-			case VERTEX:
-				m_color_array = VertexData.lookup<k3d::mesh::colors_t>(ArrayName);
-			}
+			else if(m_array_type == "face")
+				m_color_array = Polyhedron.face_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
+			else if(m_array_type == "edge")
+				m_color_array = Polyhedron.edge_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
+			else if(m_array_type == "vertex")
+				m_color_array = Polyhedron.vertex_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
+			else if(m_array_type == "point")
+				m_color_array = PointData.lookup<k3d::mesh::colors_t>(ArrayName);
+			assert_not_reached();
 		}
 		
-		const k3d::color operator()(const k3d::uint_t Shell, const k3d::uint_t Face, const k3d::uint_t Edge)
+		const k3d::color operator()(const k3d::uint_t Face, const k3d::uint_t Edge)
 		{
 			if(!m_color_array)
 				return k3d::color(0.9,0.9,0.9);
-			switch(m_array_type)
-			{
-			case CONSTANT:
-				return m_color_array->at(Shell);
-			case UNIFORM:
+			if(m_array_type == "constant")
+				return m_color_array->at(0);
+			else if(m_array_type == "face")
 				return m_color_array->at(Face);
-			case VARYING:
+			else if(m_array_type == "edge" || m_array_type == "vertex")
 				return m_color_array->at(Edge);
-			case VERTEX:
-				return m_color_array->at(m_edge_points[Edge]);
-			}
+			else if(m_array_type == "point")
+				return m_color_array->at(m_vertex_points[Edge]);
 			assert_not_reached();
 		}
 		
 	private:
-		const array_t m_array_type;
+		const k3d::string_t m_array_type;
 		const k3d::mesh::colors_t* m_color_array;
-		const k3d::mesh::indices_t& m_edge_points;
+		const k3d::mesh::indices_t& m_vertex_points;
 	};
 	
-	k3d_data(std::string, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color_array;
-	k3d_data(array_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_array_type;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color_array;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, list_property, with_serialization) m_array_type;
 };
 
 /////////////////////////////////////////////////////////////////////////////

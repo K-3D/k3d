@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "toggle_button.h"
+#include <k3dsdk/ngui/toggle_button.h>
 
 namespace Gtk { class Image; }
 namespace Gdk { class Pixbuf; }

@@ -21,12 +21,12 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "inode.h"
-#include "iplugin_factory.h"
-#include "node_name_map.h"
-#include "result.h"
-#include "string_cast.h"
-#include "uuid.h"
+#include <k3dsdk/inode.h>
+#include <k3dsdk/iplugin_factory.h>
+#include <k3dsdk/node_name_map.h>
+#include <k3dsdk/result.h>
+#include <k3dsdk/string_cast.h>
+#include <k3dsdk/uuid.h>
 
 namespace k3d
 {

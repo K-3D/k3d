@@ -24,11 +24,11 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "data.h"
-#include "k3d-i18n-config.h"
-#include "istream_ri.h"
-#include "irenderable_ri.h"
-#include "render_state_ri.h"
+#include <k3d-i18n-config.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/istream_ri.h>
+#include <k3dsdk/irenderable_ri.h>
+#include <k3dsdk/render_state_ri.h>
 
 namespace k3d
 {

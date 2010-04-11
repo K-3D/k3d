@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Add support for merging polyhedra.
+desc: |-
+  The MergeMesh modifier generates the 'union' of geometric primitives in its output, but many operations (BridgeFaces and BridgeEdges come to mind) can only work on individual primitives.  Similarly, multiple polyhedron primitives must be merged into one to create a solid / manifold for operations such as CatmullClark.
+  
+  Create a MergePolyhedra filter to address these cases.
+type: :feature
+component: K-3D
+release: 1.0.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-27 06:47:22.555937 Z
+references: []
+
+id: 71e0e500fc3a528e690296d69e5f6c8d62cb0076
+log_events: 
+- - 2010-02-27 06:47:23.178841 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 

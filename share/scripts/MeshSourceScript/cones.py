@@ -3,11 +3,11 @@
 from math import radians
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
 # Construct a cone mesh primitive ...
-cone = k3d.cone.create(Output)
-color = cone.varying_attributes().create("Cs", "k3d::color")
+cone = k3d.cone.create(context.output)
+color = cone.parameter_attributes().create("Cs", "k3d::color")
 
 # Add two cones ...
 cone.matrices().append(k3d.translate3(k3d.vector3(-5, 0, 0)))

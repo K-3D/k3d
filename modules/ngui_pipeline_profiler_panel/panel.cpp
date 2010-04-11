@@ -55,7 +55,6 @@ namespace pipeline_profiler
 class panel :
 	public k3d::ngui::panel::control,
 	public k3d::ngui::asynchronous_update,
-	public k3d::iunknown,
 	public Gtk::VBox
 {
 	typedef Gtk::VBox base;
@@ -121,7 +120,7 @@ public:
 			"NGUIPipelineProfilerPanel",
 			_("Provides a panel for profiling execution of the visualization pipeline"),
 			"NGUI Panel",
-			k3d::iplugin_factory::EXPERIMENTAL,
+			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("ngui:component-type", "panel")("ngui:panel-label", "Pipeline Profiler"));
 
 		return factory;

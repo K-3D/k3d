@@ -61,7 +61,7 @@ public:
 				k3d::uuid(0x896ac401, 0x5fae47ce, 0x92836627, 0x934dacdc),
 				"PixieRaytraceMap",
 				_("Dummy shadow map source for raytracing with Pixie"),
-				"RenderMan Pixie",
+				"RenderMan",
 				k3d::iplugin_factory::STABLE);
 
 		return factory;

@@ -22,10 +22,10 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
-#include "any_python.h"
-#include "inode_selection_python.h"
-#include "iunknown_python.h"
-#include "utility_python.h"
+#include <k3dsdk/python/any_python.h>
+#include <k3dsdk/python/inode_selection_python.h>
+#include <k3dsdk/python/iunknown_python.h>
+#include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/inode.h>
 #include <k3dsdk/inode_selection.h>

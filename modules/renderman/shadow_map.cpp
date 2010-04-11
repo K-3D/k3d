@@ -29,10 +29,10 @@
 #include <k3dsdk/iprojection.h>
 #include <k3dsdk/istream_ri.h>
 #include <k3dsdk/itexture_ri.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/renderable_ri.h>
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/types_ri.h>
@@ -137,7 +137,7 @@ public:
 			const double far = boost::any_cast<double>(k3d::property::pipeline_value(orthographic->far()));
 			return_if_fail(near > 0);
 
-			const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().transform_source_output()));
+			const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().matrix_source_output()));
 			const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
 			const k3d::point3 world_target = boost::any_cast<k3d::point3>(camera->world_target().property_internal_value());
 
@@ -155,7 +155,7 @@ public:
 		}
 
 		// Setup the camera viewing transform ...
-		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().transform_source_output()));
+		const k3d::matrix4 transform_matrix = boost::any_cast<k3d::matrix4>(k3d::property::pipeline_value(camera->transformation().matrix_source_output()));
 		Stream.RiTransform(k3d::ri::convert(k3d::inverse(transform_matrix)));
 
 		Stream.RiWorldBegin();

@@ -24,9 +24,9 @@
 
 #include <gtkmm/widget.h>
 
-#include "document_state.h"
-#include "target.h"
-#include "viewport.h"
+#include <k3dsdk/ngui/document_state.h>
+#include <k3dsdk/ngui/target.h>
+#include <k3dsdk/ngui/viewport.h>
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/ibounded.h>
@@ -37,7 +37,7 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/ngui/selection.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/transform.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -149,9 +149,6 @@ void traverse_selected_face_points(const k3d::mesh& Mesh, visitor_t& Visitor)
 /// Computes the average position of selected nodes, returns false when no selected node was found.
 bool selection_position(const selection::mode& SelectionMode, const k3d::nodes_t& Selection, k3d::bounding_box3& BoundingBox, k3d::mesh::points_t& Points)
 {
-	if (Selection.empty())
-		k3d::log() << debug << "Empty node selection!" << std::endl;
-	
 	// Expand the bounding box around the selection
 	for(k3d::nodes_t::const_iterator node = Selection.begin(); node != Selection.end(); ++node)
 	{
@@ -161,7 +158,7 @@ bool selection_position(const selection::mode& SelectionMode, const k3d::nodes_t
 		const k3d::matrix4 transformation = k3d::node_to_world_matrix(**node);
 		point_visitor visitor(BoundingBox, Points, transformation);
 
-		if(SelectionMode == selection::NODES)
+		if(SelectionMode == selection::NODE)
 		{
 			if(k3d::ibounded* bounded = dynamic_cast<k3d::ibounded*>(*node))
 			{
@@ -179,21 +176,21 @@ bool selection_position(const selection::mode& SelectionMode, const k3d::nodes_t
 			continue;
 		if(!mesh->points)
 			continue;
-		if(SelectionMode == selection::NODES)
+		if(SelectionMode == selection::NODE)
 		{
 			const k3d::mesh::points_t& points = *mesh->points;
 			for (k3d::uint_t point = 0; point != points.size(); ++point)
 				Points.push_back(transformation * points[point]);
 		}
-		if(SelectionMode == selection::POINTS)
+		if(SelectionMode == selection::POINT)
 		{
 			traverse_selected_points(*mesh, visitor);
 		}
-		if(SelectionMode == selection::SPLIT_EDGES)
+		if(SelectionMode == selection::EDGE)
 		{
 			traverse_selected_edge_points(*mesh, visitor);
 		}
-		if(SelectionMode == selection::UNIFORM)
+		if(SelectionMode == selection::FACE)
 		{
 			traverse_selected_face_points(*mesh, visitor);
 		}
@@ -202,7 +199,6 @@ bool selection_position(const selection::mode& SelectionMode, const k3d::nodes_t
 	// Nothing was selected...
 	if (BoundingBox.empty())
 	{
-		k3d::log() << debug << "Empty bbox" << std::endl;
 		return false;
 	}
 	

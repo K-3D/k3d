@@ -25,9 +25,9 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "basic_math.h"
-#include "log.h"
-#include "vectors.h"
+#include <k3dsdk/basic_math.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/vectors.h>
 
 #include <cfloat>
 #include <cstring>
@@ -96,6 +96,16 @@ public:
 	matrix4(const vector4& v0, const vector4& v1, const vector4& v2, const vector4& v3);
 	matrix4(const double d);
 	matrix4(euler_angles Angles);
+
+	/// Creates a new matrix4 from values in row-major order
+	template<typename IteratorT>
+	static matrix4 row_major(IteratorT Begin, IteratorT End)
+	{
+		matrix4 result;
+		std::copy(Begin, End, &result.v[0][0]);
+		return result;
+	}
+
 	/// Copy constructor
 	matrix4(const matrix4& m);
 	/// Assignment of an matrix4
@@ -1271,21 +1281,16 @@ inline std::istream& operator>>(std::istream& Stream, euler_angles& Arg)
 	return Stream;
 }
 
-/// Specialization of almost_equal that tests two matrix4 objects for near-equality
-template<>
-class almost_equal<matrix4>
+namespace difference
 {
-	typedef matrix4 T;
-public:
-	almost_equal(const boost::uint64_t Threshold) : threshold(Threshold) { }
-	inline bool_t operator()(const T& A, const T& B) const
-	{
-		return std::equal(A.v, A.v + 4, B.v, almost_equal<vector4>(threshold));
-	}
 
-private:
-	const boost::uint64_t threshold;
-};
+/// Specialization of difference::test for matrix4 
+inline void test(const matrix4& A, const matrix4& B, accumulator& Result)
+{
+	range_test(A.v, A.v + 4, B.v, B.v + 4, Result);
+}
+
+} // namespace difference
 
 } // namespace k3d
 

@@ -24,6 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/mesh.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/selection.h>
 
@@ -45,16 +46,20 @@ namespace selection
 /// Enumerates available interactive selection modes
 enum mode
 {
-	/// Select individual nodes
-	NODES,
-	/// Select points
-	POINTS,
-	/// Select polyhedron split-edges
-	SPLIT_EDGES,
-	/// Select uniform components
-	UNIFORM,
 	/// Select curve components
-	CURVES,
+	CURVE,
+	/// Select face components
+	FACE,
+	/// Select individual nodes
+	NODE,
+	/// Select patches
+	PATCH,
+	/// Select points
+	POINT,
+	/// Select polyhedron split-edges
+	EDGE,
+	/// Select surface components
+	SURFACE,
 };
 
 std::ostream& operator<<(std::ostream& Stream, const mode& Value);
@@ -72,6 +77,27 @@ public:
 	void set_current_mode(const mode Mode);
 	/// Connect a slot to a signal that will be emitted whenever the selection mode changes.
 	sigc::connection connect_current_mode_changed_signal(const sigc::slot<void, ihint*>& Slot);
+
+	/// Returns whether the current selection should be retained when switching the selection mode
+	bool_t keep_selection();
+	/// Sets whether the current selection should be retained when switching the selection mode
+	void set_keep_selection(const bool_t Keep);
+	/// Connect a slot to a signal that will be emitted whenever the keep selection mode changes.
+	sigc::connection connect_keep_selection_changed_signal(const sigc::slot<void, ihint*>& Slot);
+
+	/// Returns whether the current selection should be converted when switching the selection mode
+	bool_t convert_selection();
+	/// Sets whether the current selection should be converted when switching the selection mode
+	void set_convert_selection(const bool_t Convert);
+	/// Connect a slot to a signal that will be emitted whenever the convert selection mode changes.
+	sigc::connection connect_convert_selection_changed_signal(const sigc::slot<void, ihint*>& Slot);
+
+	/// Returns whether edge selections should be automatically expanded to include adjacent edges.
+	bool_t select_adjacent_edges();
+	/// Sets whether edge selections should be automatically expanded to include adjacent edges.
+	void set_select_adjacent_edges(const bool_t Expand);
+	/// Connect a slot to a signal that will be emitted whenever the adjacent edge selection state changes.
+	sigc::connection connect_select_adjacent_edges_changed_signal(const sigc::slot<void, ihint*>& Slot);
 
 	/// Returns the current set of selected nodes.
 	const nodes_t selected_nodes();
@@ -98,6 +124,8 @@ public:
 
 	/// Returns true iff the given node is selected.
 	const bool_t is_selected(inode& Node);
+	/// Returns true iff the given component is already selected.
+	const bool_t is_selected(const k3d::selection::record& Record);
 
 	/// Deselects one node.
 	void deselect(inode& Node);
@@ -114,10 +142,15 @@ public:
 	/// Deselects all nodes.
 	void deselect_all_nodes();
 
+	/// Returns a node suitable for interactive rubber-band operations
+	inode* rubber_band();
+
 private:
 	class implementation;
 	implementation& internal;
 };
+
+mesh* get_mesh(inode* Node, const k3d::selection::id& MeshID);
 
 } // namespace selection
 

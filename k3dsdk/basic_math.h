@@ -2,7 +2,7 @@
 #define K3DSDK_BASIC_MATH_H
 
 // K-3D
-// Copyright (c) 1995-2004, Timothy M. Shead
+// Copyright (c) 1995-2009, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,9 +21,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\brief Basic math functions
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
+
+#include <k3dsdk/types.h>
 
 #include <algorithm>
 #include <cmath>
@@ -32,40 +33,40 @@ namespace k3d
 {
 
 /// Pi
-inline double pi()
+inline double_t pi()
 {
 	return 3.1415926535897932384626433832795;
 }
 
 /// Pi divided-by two
-inline double pi_over_2()
+inline double_t pi_over_2()
 {
 	return pi() * 0.5;
 }
 
 /// Pi times two
-inline double pi_times_2()
+inline double_t pi_times_2()
 {
 	return pi() * 2.0;
 }
 
 /// Converts degrees to radians
-inline double radians(const double degrees)
+inline double_t radians(const double_t degrees)
 {
 	return degrees * 0.01745329252;
 }
 
 /// Converts radians to degrees
-inline double degrees(const double radians)
+inline double_t degrees(const double_t radians)
 {
 	return radians * 57.2957795131;
 }
 
 /// Computes N!
-inline double factorial(double N)
+inline double_t factorial(double_t N)
 {
-	double result = 1;
-	for(double i = 2; i <= N; ++i)
+	double_t result = 1;
+	for(double_t i = 2; i <= N; ++i)
 		result *= i;
 
 	return result;
@@ -99,7 +100,7 @@ Type fast_pow(Type base, int exponent)
 }
 
 /// Returns the sign of an argument: -1 if negative, 0 if zero, +1 if positive
-template<class type> double sign(const type& Arg)
+template<class type> double_t sign(const type& Arg)
 {
 	if(Arg > 0.0) return 1.0;
 	if(Arg < 0.0) return -1.0;
@@ -108,21 +109,30 @@ template<class type> double sign(const type& Arg)
 }
 
 /// Rounds a value to the closest integer
-inline double round(const double Value)
+inline double_t round(const double_t Value)
 {
 	return (Value - std::floor(Value)) < 0.5 ? std::floor(Value) : std::ceil(Value);
 }
 
 /// Clamps a value within the specified range (conforms to SL usage)
-template<class type> type clamp(const type& x, const type& minval, const type& maxval)
+template<class type>
+type clamp(const type& x, const type& minval, const type& maxval)
 {
 	return std::min(std::max(x, minval), maxval);
 }
 
 /// Returns the linear interpolation of two values
-template<class type> type mix(const type& x, const type& y, const double alpha)
+template<class type>
+type mix(const type& x, const type& y, const double_t alpha)
 {
 	return x * (1 - alpha) + y * (alpha);
+}
+
+/// Returns the ratio of two values (handles type-casting to a floating-point value)
+template<typename type>
+double_t ratio(const type& x, const type& y)
+{
+	return static_cast<double_t>(x) / static_cast<double_t>(y);
 }
 
 } // namespace k3d

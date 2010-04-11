@@ -30,6 +30,7 @@ namespace opengl
 {
 
 extern k3d::iplugin_factory& render_engine_factory();
+extern k3d::iplugin_factory& version_check_factory();
 
 } // namespace opengl
 
@@ -37,5 +38,6 @@ extern k3d::iplugin_factory& render_engine_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::opengl::render_engine_factory());
+	Registry.register_factory(module::opengl::version_check_factory());
 K3D_MODULE_END
 

@@ -25,7 +25,7 @@
 */
 
 #include <k3d-platform-config.h>
-#include "Half/half.h"
+#include <k3dsdk/Half/half.h>
 #include <boost/cstdint.hpp>
 #include <string>
 

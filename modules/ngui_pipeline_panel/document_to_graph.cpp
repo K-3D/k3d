@@ -42,11 +42,14 @@ document_to_graph::document_to_graph(k3d::idocument& Document) :
 	m_include_materials(init_owner(*this) + init_name("include_materials") + init_label("") + init_description("") + init_value(false)),
 	m_include_painters(init_owner(*this) + init_name("include_painters") + init_label("") + init_description("") + init_value(false))
 {
-	m_include_materials.changed_signal().connect(make_reset_graph_slot());
-	m_include_painters.changed_signal().connect(make_reset_graph_slot());
+	m_include_materials.changed_signal().connect(k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::any, k3d::hint::graph_topology_changed> >(make_update_graph_slot()));
+
+	m_include_painters.changed_signal().connect(k3d::hint::converter<
+		k3d::hint::convert<k3d::hint::any, k3d::hint::graph_topology_changed> >(make_update_graph_slot()));
 }
 
-void document_to_graph::on_initialize_graph(k3d::graph::undirected& Output)
+void document_to_graph::on_update_graph_topology(k3d::graph::undirected& Output)
 {
 	const bool include_materials = m_include_materials.pipeline_value();
 	const bool include_painters = m_include_painters.pipeline_value();
@@ -115,7 +118,7 @@ void document_to_graph::on_initialize_graph(k3d::graph::undirected& Output)
 	}
 }
 
-void document_to_graph::on_update_graph(k3d::graph::undirected& Output)
+void document_to_graph::on_update_graph_attributes(k3d::graph::undirected& Output)
 {
 }
 

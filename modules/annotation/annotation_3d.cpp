@@ -133,8 +133,8 @@ public:
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::document_plugin_factory<annotation_3d,
-				k3d::interface_list<k3d::itransform_source,
-				k3d::interface_list<k3d::itransform_sink > > >factory(
+				k3d::interface_list<k3d::imatrix_source,
+				k3d::interface_list<k3d::imatrix_sink > > >factory(
 			k3d::uuid(0xc507e5ea, 0x8f425637, 0x85b2829d, 0x7eb1c4c4),
 			"Annotation3D",
 			_("Displays text annotations in the 3D document, primarily for documentation / tutorials"),

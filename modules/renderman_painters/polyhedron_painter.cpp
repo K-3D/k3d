@@ -10,12 +10,12 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 /** \file
 	\author Timothy M. Shead (tshead@k-3d.com)
@@ -65,100 +65,106 @@ public:
 	{
 		for(k3d::mesh::primitives_t::const_iterator primitive = Mesh.primitives.begin(); primitive != Mesh.primitives.end(); ++primitive)
 		{
-      boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **primitive));
-      if(!polyhedron)
-        continue;
+			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Mesh, **primitive));
+			if(!polyhedron)
+				continue;
 
-      const k3d::mesh::points_t& points = *Mesh.points;
-      const k3d::mesh::table_t& vertex_attributes = Mesh.point_attributes;
+			const k3d::mesh::points_t& points = *Mesh.points;
+			const k3d::mesh::table_t& point_attributes = Mesh.point_attributes;
 
-      const k3d::uint_t shell_begin = 0;
-      const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();
-      for(k3d::uint_t shell = shell_begin; shell != shell_end; ++shell)
-      {
-        if(polyhedron->shell_types[shell] != k3d::polyhedron::POLYGONS)
-          continue;
+			const k3d::uint_t shell_begin = 0;
+			const k3d::uint_t shell_end = shell_begin + polyhedron->shell_types.size();
+			for(k3d::uint_t shell = shell_begin; shell != shell_end; ++shell)
+			{
+				if(polyhedron->shell_types[shell] != k3d::polyhedron::POLYGONS)
+					continue;
 
-        // Get the set of all materials used in this polyhedron ...
-        typedef std::set<k3d::imaterial*> materials_t;
-        materials_t materials;
+				// Get the set of all materials used in this polyhedron ...
+				typedef std::set<k3d::imaterial*> materials_t;
+				materials_t materials;
 
-        const k3d::uint_t faces_begin = polyhedron->shell_first_faces[shell];
-        const k3d::uint_t faces_end = faces_begin + polyhedron->shell_face_counts[shell];
-        for(k3d::uint_t face = faces_begin; face != faces_end; ++face)
-          materials.insert(polyhedron->face_materials[face]);
+				const k3d::uint_t faces_begin = 0;
+				const k3d::uint_t faces_end = faces_begin + polyhedron->face_shells.size();
+				for(k3d::uint_t face = faces_begin; face != faces_end; ++face)
+				{
+					if(polyhedron->face_shells[face] != shell)
+						continue;
 
-        // Iterate over each material, rendering all the faces that use that material in a single pass
-        for(materials_t::iterator m = materials.begin(); m != materials.end(); ++m)
-        {
-          k3d::imaterial* const material = *m;
+					materials.insert(polyhedron->face_materials[face]);
+				}
 
-          k3d::ri::unsigned_integers loop_counts;
-          k3d::ri::unsigned_integers vertex_counts;
-          k3d::ri::unsigned_integers vertex_ids;
+				// Iterate over each material, rendering all the faces that use that material in a single pass
+				for(materials_t::iterator m = materials.begin(); m != materials.end(); ++m)
+				{
+					k3d::imaterial* const material = *m;
 
-          array_copier ri_constant_attributes;
-          ri_constant_attributes.add_arrays(polyhedron->constant_attributes);
+					k3d::ri::unsigned_integers loop_counts;
+					k3d::ri::unsigned_integers vertex_counts;
+					k3d::ri::unsigned_integers vertex_ids;
 
-          array_copier ri_uniform_attributes;
-          ri_uniform_attributes.add_arrays(polyhedron->uniform_attributes);
+					array_copier ri_constant_attributes;
+					ri_constant_attributes.add_arrays(polyhedron->constant_attributes);
 
-          array_copier ri_facevarying_attributes;
-          ri_facevarying_attributes.add_arrays(polyhedron->face_varying_attributes);
+					array_copier ri_uniform_attributes;
+					ri_uniform_attributes.add_arrays(polyhedron->face_attributes);
 
-          array_copier ri_vertex_attributes;
-          ri_vertex_attributes.add_arrays(vertex_attributes);
-          ri_vertex_attributes.add_array(k3d::ri::RI_P(), points);
+					array_copier ri_facevarying_attributes;
+					ri_facevarying_attributes.add_arrays(polyhedron->vertex_attributes);
 
-          const k3d::uint_t faces_begin = polyhedron->shell_first_faces[shell];
-          const k3d::uint_t faces_end = faces_begin + polyhedron->shell_face_counts[shell];
-          for(k3d::uint_t face = faces_begin; face != faces_end; ++face)
-          {
-            if(polyhedron->face_materials[face] != material)
-              continue;
+					array_copier ri_vertex_attributes;
+					ri_vertex_attributes.add_array(k3d::ri::RI_P(), points);
+					ri_vertex_attributes.add_arrays(point_attributes);
 
-            loop_counts.push_back(polyhedron->face_loop_counts[face]);
+					ri_constant_attributes.push_back(0);
 
-            ri_uniform_attributes.push_back(face);
+					for(k3d::uint_t face = faces_begin; face != faces_end; ++face)
+					{
+						if(polyhedron->face_shells[face] != shell)
+							continue;
 
-            const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
-            const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
-            for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-            {
-              k3d::uint_t vertex_count = 0;
+						if(polyhedron->face_materials[face] != material)
+							continue;
 
-              const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
-              for(k3d::uint_t edge = first_edge; ; )
-              {
-                ri_facevarying_attributes.push_back(edge);
+						loop_counts.push_back(polyhedron->face_loop_counts[face]);
 
-                ++vertex_count;
-                vertex_ids.push_back(polyhedron->edge_points[edge]);
+						ri_uniform_attributes.push_back(face);
 
-                edge = polyhedron->clockwise_edges[edge];
-                if(edge == first_edge)
-                  break;
-              }
+						const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+						const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+						for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+						{
+							k3d::uint_t vertex_count = 0;
 
-              vertex_counts.push_back(vertex_count);
-            }
-          }
+							const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+							for(k3d::uint_t edge = first_edge; ; )
+							{
+								ri_facevarying_attributes.push_back(edge);
 
-          ri_constant_attributes.push_back(shell);
+								++vertex_count;
+								vertex_ids.push_back(polyhedron->vertex_points[edge]);
 
-          ri_vertex_attributes.insert(0, points.size());
+								edge = polyhedron->clockwise_edges[edge];
+								if(edge == first_edge)
+									break;
+							}
 
-          k3d::ri::parameter_list ri_parameters;
-          ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
-          ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
-          ri_facevarying_attributes.copy_to(k3d::ri::FACEVARYING, ri_parameters);
-          ri_vertex_attributes.copy_to(k3d::ri::VERTEX, ri_parameters);
+							vertex_counts.push_back(vertex_count);
+						}
+					}
 
-          k3d::ri::setup_material(material, RenderState);
-          RenderState.stream.RiPointsGeneralPolygonsV(loop_counts, vertex_counts, vertex_ids, ri_parameters);
-        }
-      }
-    }
+					ri_vertex_attributes.insert(0, points.size());
+
+					k3d::ri::parameter_list ri_parameters;
+					ri_constant_attributes.copy_to(k3d::ri::CONSTANT, ri_parameters);
+					ri_uniform_attributes.copy_to(k3d::ri::UNIFORM, ri_parameters);
+					ri_facevarying_attributes.copy_to(k3d::ri::FACEVARYING, ri_parameters);
+					ri_vertex_attributes.copy_to(k3d::ri::VERTEX, ri_parameters);
+
+					k3d::ri::setup_material(material, RenderState);
+					RenderState.stream.RiPointsGeneralPolygonsV(loop_counts, vertex_counts, vertex_ids, ri_parameters);
+				}
+			}
+		}
 	}
 
 	void paint_complete(const k3d::mesh& Mesh, const k3d::ri::render_state& RenderState)
@@ -172,7 +178,7 @@ public:
 			"RenderManPolyhedronPainter",
 			_("Renders mesh polyhedra"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

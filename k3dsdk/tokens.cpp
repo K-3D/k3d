@@ -21,7 +21,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "tokens.h"
+#include <k3dsdk/tokens.h>
 #include <string.h>
 
 namespace k3d

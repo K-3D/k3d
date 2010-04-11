@@ -24,8 +24,8 @@
 		\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include "Half/half.h"
-#include "result.h"
+#include <k3dsdk/Half/half.h>
+#include <k3dsdk/result.h>
 
 #include <algorithm>
 #include <cmath>

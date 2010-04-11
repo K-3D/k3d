@@ -36,15 +36,14 @@
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iproperty_collection.h>
-#include <k3dsdk/itransform_sink.h>
-#include <k3dsdk/itransform_source.h>
-#include <k3dsdk/legacy_mesh.h>
+#include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/nurbs_curve.h>
 #include <k3dsdk/nurbs_patch.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/selection.h>
 #include <k3dsdk/serialization_xml.h>
@@ -654,10 +653,10 @@ void upgrade_transformable_nodes(element& XMLDocument)
 		if(!node_id)
 			continue;
 
-		if(!node_factory->implements(typeid(itransform_source)))
+		if(!node_factory->implements(typeid(imatrix_source)))
 			continue;
 
-		if(!node_factory->implements(typeid(itransform_sink)))
+		if(!node_factory->implements(typeid(imatrix_sink)))
 			continue;
 
 		element* const xml_properties = find_element(*xml_node, "properties");
@@ -708,7 +707,7 @@ void upgrade_transformable_nodes(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "Transformation"),
-				attribute("factory", classes::FrozenTransformation()),
+				attribute("factory", classes::FrozenMatrix()),
 				attribute("id", next_node_id),
 				element("properties",
 					element("property", string_cast(identity3()),
@@ -992,7 +991,7 @@ void upgrade_painters(element& XMLDocument)
 	if (!has_ri_painter)
 	{
 		return_if_fail(plugin::factory::lookup("RenderManMultiPainter"));
-		return_if_fail(plugin::factory::lookup("RenderManPointGroupPainter"));
+		return_if_fail(plugin::factory::lookup("RenderManParticlePainter"));
 		return_if_fail(plugin::factory::lookup("RenderManPolyhedronPainter"));
 		return_if_fail(plugin::factory::lookup("RenderManSubdivisionSurfacePainter"));
 		return_if_fail(plugin::factory::lookup("RenderManLinearCurvePainter"));
@@ -1068,7 +1067,7 @@ void upgrade_painters(element& XMLDocument)
 		new_nodes.push_back(
 			element("node",
 				attribute("name", "RenderMan Point Group Painter"),
-				attribute("factory", plugin::factory::lookup("RenderManPointGroupPainter")->factory_id()),
+				attribute("factory", plugin::factory::lookup("RenderManParticlePainter")->factory_id()),
 				attribute("id", next_node_id)));
 		++next_node_id;
 		new_nodes.push_back(

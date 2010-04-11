@@ -3,11 +3,11 @@
 from math import radians
 
 import k3d
-k3d.check_node_environment(locals(), "MeshSourceScript")
+k3d.check_node_environment(context, "MeshSourceScript")
 
 # Construct a sphere mesh primitive ...
-sphere = k3d.sphere.create(Output)
-color = sphere.varying_attributes().create("Cs", "k3d::color")
+sphere = k3d.sphere.create(context.output)
+color = sphere.parameter_attributes().create("Cs", "k3d::color")
 
 # Add two spheres ...
 sphere.matrices().append(k3d.translate3(k3d.vector3(-3, 0, 0)))

@@ -27,11 +27,11 @@
 #include <k3dsdk/types.h>
 #include <k3dsdk/metadata.h>
 #include <k3dsdk/ngui/document_state.h>
-#include <k3dsdk/plugins.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/transform.h>
-#include <k3dsdk/itransform_sink.h>
+#include <k3dsdk/imatrix_sink.h>
 #include <k3dsdk/irender_camera_frame.h>
 
 

@@ -26,7 +26,7 @@
 #include <k3dsdk/imesh_painter_ri.h>
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/node.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 
 namespace module
 {
@@ -91,7 +91,7 @@ public:
 			"RenderManMultiPainter",
 			_("Distributes rendering across multiple mesh painters"),
 			"RenderMan Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

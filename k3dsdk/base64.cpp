@@ -210,7 +210,7 @@ VERSION HISTORY:
 
 \******************************************************************* */
 
-#include "base64.h"
+#include <k3dsdk/base64.h>
 
 #include <istream>
 #include <ostream>

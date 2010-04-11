@@ -1,0 +1,26 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Harmless warning messages when ATK is disabled.
+desc: |-
+  At startup, ATK code emits warning messages if the user hasn't enabled accessibility.  Typically (but not exclusively), this is done by checking "Enable assistive technologies" in the Gnome Assistive Technologies Preferences control center applet.
+  
+  Ideally, we should try to disable, prevent, or hide these warnings, since they generate support requests.
+type: :bugfix
+component: K-3D
+release: 0.8.0.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-02-03 01:58:46.629278 Z
+references: []
+
+id: 25c0b2699b08309f7452d4d7390d05a3fa78bf57
+log_events: 
+- - 2010-02-03 01:58:47.589285 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-02-06 06:04:53.400647 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - Forcing GTK to load atk-bridge at startup when the user didn't have accessibility turned-on for their desktop caused these warning messages.  We dont' actually need atk-bridge, since we call ATK interfaces directly in-process.  So turning this off fixes everything.
+claimer: 

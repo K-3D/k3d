@@ -22,9 +22,8 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "bounding_box3.h"
-
-#include "algebra.h"
+#include <k3dsdk/bounding_box3.h>
+#include <k3dsdk/algebra.h>
 
 namespace k3d
 {

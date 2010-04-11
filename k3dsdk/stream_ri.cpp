@@ -22,13 +22,12 @@
 	\author Romain Behar (romainbehar@yahoo.com)
 */
 
-#include "algebra.h"
-#include "imaterial.h"
-#include "legacy_mesh.h"
-#include "stream_ri.h"
-#include "stream_io_ri.h"
-#include "types_ri.h"
-#include "vectors.h"
+#include <k3dsdk/algebra.h>
+#include <k3dsdk/imaterial.h>
+#include <k3dsdk/stream_ri.h>
+#include <k3dsdk/stream_io_ri.h>
+#include <k3dsdk/types_ri.h>
+#include <k3dsdk/vectors.h>
 
 #include <boost/array.hpp>
 

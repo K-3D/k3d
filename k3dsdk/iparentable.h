@@ -1,7 +1,7 @@
 #ifndef K3DSDK_IPARENTABLE_H
 #define K3DSDK_IPARENTABLE_H
 
-#include "iunknown.h"
+#include <k3dsdk/iunknown.h>
 
 namespace k3d
 {

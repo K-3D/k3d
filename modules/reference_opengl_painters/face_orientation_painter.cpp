@@ -72,7 +72,7 @@ public:
 	}
 
 	template<typename FunctorT>
-	static void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::mesh::points_t& Points, const k3d::typed_array<k3d::point3>& Centers, const k3d::color& Color, const FunctorT& FaceTest)
+	static void draw(const k3d::polyhedron::const_primitive& Polyhedron, const k3d::mesh::points_t& Points, const k3d::typed_array<k3d::point3>& Centers, const k3d::color& Color, FunctorT FaceTest)
 	{
 		const k3d::uint_t face_count = Polyhedron.face_first_loops.size();
 
@@ -83,8 +83,8 @@ public:
 		{
 			if(FaceTest(Polyhedron.face_selections, face))
 			{
-				const k3d::point3 first_point = Points[Polyhedron.edge_points[Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]]];
-				const k3d::point3 second_point = Points[Polyhedron.edge_points[Polyhedron.clockwise_edges[Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]]]];
+				const k3d::point3 first_point = Points[Polyhedron.vertex_points[Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]]];
+				const k3d::point3 second_point = Points[Polyhedron.vertex_points[Polyhedron.clockwise_edges[Polyhedron.loop_first_edges[Polyhedron.face_first_loops[face]]]]];
 				const k3d::point3 center_point = Centers[face];
 
 				const k3d::point3 glyph_point1 = ((first_point - center_point) * 0.9) + center_point;
@@ -100,7 +100,7 @@ public:
 		glEnd();
 	}
 
-	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState)
+	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
 	{
 		const k3d::bool_t draw_selected = m_draw_selected.pipeline_value() && RenderState.show_component_selection;
 		const k3d::bool_t draw_unselected = m_draw_unselected.pipeline_value();
@@ -119,7 +119,7 @@ public:
 			// Calculate face centers ...
 			k3d::typed_array<k3d::point3> centers(face_count);
 			for(k3d::uint_t face = 0; face != face_count; ++face)
-				centers[face] = k3d::polyhedron::center(polyhedron->edge_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
+				centers[face] = k3d::polyhedron::center(polyhedron->vertex_points, polyhedron->clockwise_edges, points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 	
 			k3d::gl::store_attributes attributes;
 			glDisable(GL_LIGHTING);
@@ -139,7 +139,7 @@ public:
 			"OpenGLFaceOrientationPainter",
 			_("Draws arrows to show polyhedron face orientation"),
 			"OpenGL Painter",
-			k3d::iplugin_factory::EXPERIMENTAL);
+			k3d::iplugin_factory::STABLE);
 
 		return factory;
 	}

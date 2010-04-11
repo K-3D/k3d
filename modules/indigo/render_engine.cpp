@@ -46,14 +46,14 @@
 #include <k3dsdk/irender_camera_animation.h>
 #include <k3dsdk/irender_camera_frame.h>
 #include <k3dsdk/irender_camera_preview.h>
-#include <k3dsdk/itransform_source.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/material.h>
 #include <k3dsdk/measurement.h>
 #include <k3dsdk/network_render_farm.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/nodes.h>
 #include <k3dsdk/polyhedron.h>
-#include <k3dsdk/properties.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/resolutions.h>
 #include <k3dsdk/time_source.h>
 #include <k3dsdk/transform.h>
@@ -397,7 +397,7 @@ private:
 			stream << k3d::pop_indent << k3d::standard_indent << "</renderer_settings>\n";
 
 			// Setup the camera ...
-			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().transform_source_output());
+			const k3d::matrix4 camera_matrix = k3d::property::pipeline_value<k3d::matrix4>(Camera.transformation().matrix_source_output());
 			const k3d::point3 camera_pos = k3d::position(camera_matrix);
 			const k3d::vector3 camera_up = camera_matrix * k3d::vector3(0, 1, 0);
 			const k3d::vector3 camera_forwards = camera_matrix * k3d::vector3(0, 0, 1);

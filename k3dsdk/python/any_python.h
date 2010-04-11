@@ -24,6 +24,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/ustring.h>
+
 #include <boost/any.hpp>
 #include <boost/python/object.hpp>
 
@@ -39,6 +41,8 @@ const boost::python::object any_to_python(const boost::any& Value);
 const boost::any python_to_any(const boost::python::object& Value);
 /// Converts a Python value to a boost::any object, with the target type explicitly specified
 const boost::any python_to_any(const boost::python::object& Value, const std::type_info& TargetType);
+/// Converts a Python value to a Unicode string
+const ustring python_to_ustring(const boost::python::object& Value);
 
 } // namespace python
 

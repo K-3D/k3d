@@ -1,0 +1,14 @@
+#!/usr/bin/python
+
+#import cgitb; cgitb.enable()
+
+import mimetypes
+import os
+import random
+
+image = random.choice(os.listdir("banners"))
+print "Content-Type: %s" % mimetypes.guess_type(image)[0]
+print "Cache-Control: max-age=300"
+print ""
+print file("banners/" + image, "rb").read()
+

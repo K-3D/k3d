@@ -20,7 +20,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "mesh.h"
+#include <k3dsdk/mesh.h>
 
 namespace k3d
 {
@@ -41,7 +41,7 @@ public:
 		const mesh::indices_t& CurvePoints,
 		const mesh::table_t& ConstantAttributes,
 		const mesh::table_t& CurveAttributes,
-		const mesh::table_t& VaryingAttributes,
+		const mesh::table_t& ParameterAttributes,
 		const mesh::table_t& VertexAttributes
 		);
 
@@ -53,7 +53,7 @@ public:
 	const mesh::indices_t& curve_points;
 	const mesh::table_t& constant_attributes;
 	const mesh::table_t& curve_attributes;
-	const mesh::table_t& varying_attributes;
+	const mesh::table_t& parameter_attributes;
 	const mesh::table_t& vertex_attributes;
 };
 
@@ -70,7 +70,7 @@ public:
 		mesh::indices_t& CurvePoints,
 		mesh::table_t& ConstantAttributes,
 		mesh::table_t& CurveAttributes,
-		mesh::table_t& VaryingAttributes,
+		mesh::table_t& ParameterAttributes,
 		mesh::table_t& VertexAttributes
 		);
 
@@ -82,7 +82,7 @@ public:
 	mesh::indices_t& curve_points;
 	mesh::table_t& constant_attributes;
 	mesh::table_t& curve_attributes;
-	mesh::table_t& varying_attributes;
+	mesh::table_t& parameter_attributes;
 	mesh::table_t& vertex_attributes;
 };
 
