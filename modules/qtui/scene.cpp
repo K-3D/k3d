@@ -21,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "canvas.h"
+#include "scene.h"
 #include <ui_extrude_faces.h>
 
 #include <k3d-i18n-config.h>
@@ -58,9 +58,9 @@ namespace qtui
 {
 
 //////////////////////////////////////////////////////////////////////////
-// viewport_scene
+// scene
 
-viewport_scene::viewport_scene() :
+scene::scene() :
 	m_camera(init_value<k3d::icamera*>(0)),
 	m_gl_engine(init_value<k3d::gl::irender_viewport*>(0)),
 	m_fps(0),
@@ -112,7 +112,7 @@ viewport_scene::viewport_scene() :
 	engine_combo_proxy->setPos(200, 10);
 }
 
-void viewport_scene::drawBackground(QPainter *painter, const QRectF &rect)
+void scene::drawBackground(QPainter *painter, const QRectF &rect)
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glMatrixMode(GL_PROJECTION);
@@ -145,7 +145,7 @@ void viewport_scene::drawBackground(QPainter *painter, const QRectF &rect)
 	glPopAttrib();
 }
 
-void viewport_scene::on_document_changed(k3d::idocument& Document)
+void scene::on_document_changed(k3d::idocument& Document)
 {
 	m_cameras = k3d::node::lookup<k3d::icamera>(Document);
 	m_render_engines = k3d::node::lookup<k3d::gl::irender_viewport>(Document);
@@ -167,34 +167,16 @@ void viewport_scene::on_document_changed(k3d::idocument& Document)
 	update();
 }
 
-void viewport_scene::on_camera_changed(int Index)
+void scene::on_camera_changed(int Index)
 {
 	m_camera.set_value(m_cameras[Index]);
 	update();
 }
 
-void viewport_scene::on_render_engine_changed(int Index)
+void scene::on_render_engine_changed(int Index)
 {
 	m_gl_engine.set_value(m_render_engines[Index]);
 	update();
-}
-
-//////////////////////////////////////////////////////////////////////////
-// viewport_view
-
-viewport_view::viewport_view(QWidget* parent) :
-	QGraphicsView(parent)
-{
-//	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-	setViewport(new QGLWidget(QGLFormat()));
-	setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-}
-
-void viewport_view::resizeEvent(QResizeEvent *event)
-{
-	if(scene())
-		scene()->setSceneRect(QRect(QPoint(0, 0), event->size()));
-	QGraphicsView::resizeEvent(event);
 }
 
 } // namespace qtui

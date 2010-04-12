@@ -1,6 +1,3 @@
-#ifndef MODULES_QTUI_MAIN_WINDOW_H
-#define MODULES_QTUI_MAIN_WINDOW_H
-
 // K-3D
 // Copyright (c) 1995-2006, Timothy M. Shead
 //
@@ -24,10 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <QMainWindow>
-#include <ui_main_window.h>
+#include "viewport.h"
 
-namespace k3d { class idocument; }
+#include <QGLWidget>
+#include <QResizeEvent>
 
 namespace module
 {
@@ -35,34 +32,25 @@ namespace module
 namespace qtui
 {
 
-class scene;
-
 //////////////////////////////////////////////////////////////////////////
-// main_window
-	
-class main_window :
-	public QMainWindow
+// viewport
+
+viewport::viewport(QWidget* parent) :
+	QGraphicsView(parent)
 {
-	Q_OBJECT
+//	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+	setViewport(new QGLWidget(QGLFormat()));
+	setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+}
 
-public:
-	main_window(QApplication& Application);
+void viewport::resizeEvent(QResizeEvent *event)
+{
+	if(scene())
+		scene()->setSceneRect(QRect(QPoint(0, 0), event->size()));
+	QGraphicsView::resizeEvent(event);
+}
 
-Q_SIGNALS:
-	void document_changed(k3d::idocument&);
-	
-private Q_SLOTS:
-	void on_file_open();
-
-private:
-	Ui::main_window ui;
-	scene* m_scene;
-	k3d::idocument* m_document;
-};
-	
 } // namespace qtui
 
 } // namespace module
-
-#endif // !MODULES_QTUI_MAIN_WINDOW_H
 

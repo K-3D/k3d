@@ -21,13 +21,12 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "canvas.h"
 #include "main_window.h"
+#include "scene.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/node.h>
@@ -57,22 +56,18 @@ namespace qtui
 // main_window
 	
 main_window::main_window(QApplication& Application) :
-	m_viewport_view(0),
-	m_viewport_scene(0),
+	m_scene(0),
 	m_document(0)
 {
 	ui.setupUi(this);
-
-	m_viewport_scene = new viewport_scene();
-	m_viewport_view = new viewport_view(this);
-	m_viewport_view->setScene(m_viewport_scene);
-
-	setCentralWidget(m_viewport_view);
 	statusBar()->setVisible(false);
+
+	m_scene = new scene();
+	ui.viewport->setScene(m_scene);
 
 	connect(ui.actionOpen, SIGNAL(activated()), this, SLOT(on_file_open()));
 	connect(ui.actionQuit, SIGNAL(activated()), &Application, SLOT(quit()));
-	connect(this, SIGNAL(document_changed(k3d::idocument&)), m_viewport_scene, SLOT(on_document_changed(k3d::idocument&)));
+	connect(this, SIGNAL(document_changed(k3d::idocument&)), m_scene, SLOT(on_document_changed(k3d::idocument&)));
 }
 
 void main_window::on_file_open()

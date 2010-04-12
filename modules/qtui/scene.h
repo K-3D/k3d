@@ -1,5 +1,5 @@
-#ifndef MODULES_QTUI_CANVAS_H
-#define MODULES_QTUI_CANVAS_H
+#ifndef MODULES_QTUI_SCENE_H
+#define MODULES_QTUI_SCENE_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -29,7 +29,6 @@
 #include <k3dsdk/irender_viewport_gl.h>
 
 #include <QGraphicsScene>
-#include <QGraphicsView>
 
 class QComboBox;
 class QGraphicsTextItem;
@@ -41,15 +40,15 @@ namespace qtui
 {
 
 //////////////////////////////////////////////////////////////////////////
-// viewport_scene
+// scene
 
-class viewport_scene :
+class scene :
 	public QGraphicsScene
 {
 	Q_OBJECT
 
 public:
-	viewport_scene();
+	scene();
  
 	virtual void drawBackground(QPainter *painter, const QRectF &rect);
 
@@ -74,24 +73,9 @@ private:
 	std::vector<k3d::gl::irender_viewport*> m_render_engines;
 };
 
-//////////////////////////////////////////////////////////////////////////
-// viewport_view
-
-class viewport_view :
-	public QGraphicsView
-{
-	Q_OBJECT
-
-public:
-	viewport_view(QWidget* parent = 0);
-
-protected:
-	void resizeEvent(QResizeEvent *event);
-};
-
 } // namespace qtui
 
 } // namespace module
 
-#endif // !MODULES_QTUI_CANVAS_H
+#endif // !MODULES_QTUI_SCENE_H
 

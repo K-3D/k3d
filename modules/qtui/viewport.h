@@ -1,8 +1,8 @@
-#ifndef MODULES_QTUI_MAIN_WINDOW_H
-#define MODULES_QTUI_MAIN_WINDOW_H
+#ifndef MODULES_QTUI_VIEWPORT_H
+#define MODULES_QTUI_VIEWPORT_H
 
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -24,10 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <QMainWindow>
-#include <ui_main_window.h>
-
-namespace k3d { class idocument; }
+#include <QGraphicsView>
 
 namespace module
 {
@@ -35,34 +32,24 @@ namespace module
 namespace qtui
 {
 
-class scene;
-
 //////////////////////////////////////////////////////////////////////////
-// main_window
-	
-class main_window :
-	public QMainWindow
+// viewport
+
+class viewport :
+	public QGraphicsView
 {
 	Q_OBJECT
 
 public:
-	main_window(QApplication& Application);
+	viewport(QWidget* parent = 0);
 
-Q_SIGNALS:
-	void document_changed(k3d::idocument&);
-	
-private Q_SLOTS:
-	void on_file_open();
-
-private:
-	Ui::main_window ui;
-	scene* m_scene;
-	k3d::idocument* m_document;
+protected:
+	void resizeEvent(QResizeEvent *event);
 };
-	
+
 } // namespace qtui
 
 } // namespace module
 
-#endif // !MODULES_QTUI_MAIN_WINDOW_H
+#endif // !MODULES_QTUI_VIEWPORT_H
 
