@@ -39,7 +39,7 @@ viewport::viewport(QWidget* parent) :
 	QGraphicsView(parent)
 {
 //	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-	setViewport(new QGLWidget(QGLFormat()));
+	setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer | QGL::Rgba | QGL::SampleBuffers)));
 	setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 }
 

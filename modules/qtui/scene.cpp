@@ -85,21 +85,12 @@ scene::scene() :
 	m_fps->setPos(5, 5);
 	addItem(m_fps);
 
-	QGraphicsProxyWidget* const extrude_faces_widget = addWidget(new QWidget());
+	QGraphicsProxyWidget* const extrude_faces_proxy = addWidget(new QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint));
 	Ui::ExtrudeFaces* const extrude_faces = new Ui::ExtrudeFaces();
-	extrude_faces->setupUi(extrude_faces_widget->widget());
-
-/*
-	QGroupBox* const group_box = new QGroupBox("ExtrudeFaces");
-	QVBoxLayout* const vbox = new QVBoxLayout();
-	vbox->addWidget(new QCheckBox("Option A"));
-	vbox->addWidget(new QCheckBox("Option B"));
-	vbox->addWidget(new QCheckBox("Option C"));
-	group_box->setLayout(vbox);
-	QGraphicsProxyWidget* const group_box_proxy = addWidget(group_box);
-*/
-	extrude_faces_widget->setPos(10, 200);
-	extrude_faces_widget->setOpacity(0.8);
+	extrude_faces->setupUi(static_cast<QDialog*>(extrude_faces_proxy->widget()));
+	extrude_faces_proxy->setFlag(QGraphicsItem::ItemIsMovable);
+	extrude_faces_proxy->setPos(10, 200);
+	extrude_faces_proxy->setOpacity(0.8);
 
 	m_camera_combo = new QComboBox();
 	connect(m_camera_combo, SIGNAL(activated(int)), this, SLOT(on_camera_changed(int)));
