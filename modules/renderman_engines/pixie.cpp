@@ -80,8 +80,8 @@ public:
 
 		std::ostringstream command_line;
 		command_line << "sdrc";
-		command_line << " -I\"" << shader_source_directory.native_filesystem_string()  << "\"";
-		command_line << " -I\"" << global_source_directory.native_filesystem_string()  << "\"";
+		command_line << " \"-I" << shader_source_directory.native_filesystem_string()  << "\"";
+		command_line << " \"-I" << global_source_directory.native_filesystem_string()  << "\"";
 		command_line << " -o \"" << shader_binary_path.native_filesystem_string() << "\"";
 		command_line << " " << shader_source_path.native_filesystem_string();
 
