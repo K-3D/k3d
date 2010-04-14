@@ -468,6 +468,28 @@ def require_scalar_value(value, expected_value):
 	if value != expected_value:
 		raise Exception("value does not match expected value")
 
+#####################################################################################33
+# Shader-related testing
+
+def surface_shader_test(render_engine_name, shader_name):
+	class result_object:
+		def render(self):
+			self.render_engine.render_camera_frame(self.camera, self.output, False)
+
+	result = result_object
+	result.document = k3d.open_document(k3d.filesystem.generic_path(source_path() + "/shaders/surface_shader_test.k3d"))
+	result.camera = k3d.node.lookup_one(result.document, "Camera")
+	result.render_engine = k3d.node.lookup_one(result.document, "RenderMan Engine")
+	result.material = k3d.node.lookup_one(result.document, "RenderManMaterial")
+	result.shader = k3d.node.lookup_one(result.document, "Surface Shader")
+
+	result.shader.shader_path = k3d.share_path() / k3d.filesystem.generic_path("shaders/surface/" + shader_name + ".sl")
+	result.output = k3d.filesystem.generic_path(binary_path() + "/shaders/surface/" + shader_name + "." + render_engine_name + ".tiff")
+	result.render_engine.render_engine = k3d.node.lookup_one(result.document, render_engine_name)
+
+	result.render_engine.render_camera_frame(result.camera, result.output, False)
+
+	return result
 
 #####################################################################################33
 # Deprecated stuff

@@ -4,7 +4,7 @@ INCLUDE(K3DParseArguments)
 
 # Provides a consistent interface for running all K-3D tests
 FUNCTION(K3D_TEST TEST_NAME)
-	K3D_PARSE_ARGUMENTS(TEST "COMMAND;TARGET;CMAKE_SCRIPT;PYTHON_SCRIPT;K3D_PYTHON_SCRIPT;REQUIRES;LABELS;WORKING_DIRECTORY;ARGUMENTS" "NGUI;XFAIL" ${ARGN})
+	K3D_PARSE_ARGUMENTS(TEST "COMMAND;TARGET;CMAKE_SCRIPT;PYTHON_SCRIPT;K3D_PYTHON_SCRIPT;K3D_PYTHON_COMMAND_SCRIPT;REQUIRES;LABELS;WORKING_DIRECTORY;ARGUMENTS" "NGUI;XFAIL" ${ARGN})
 
 	FOREACH(REQUIREMENT ${TEST_REQUIRES})
 		IF(NOT ${REQUIREMENT})
@@ -51,6 +51,29 @@ FUNCTION(K3D_TEST TEST_NAME)
 			--batch
 			--exit
 			)
+	ELSEIF(TEST_K3D_PYTHON_COMMAND_SCRIPT)
+		SET(TEST_UI --ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-nui.module)
+		IF(TEST_NGUI)
+			IF(NOT K3D_BUILD_NGUI_MODULE)
+				RETURN()
+			ENDIF()
+			SET(TEST_UI --ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-ngui.module --batch --no-custom-layouts --no-splash)
+		ENDIF()
+
+		ADD_TEST(${TEST_NAME}
+			${k3d_BINARY_DIR}/bin/k3d
+			--log-level=debug
+			--plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins
+			--share=${k3d_SOURCE_DIR}/share
+			${TEST_UI}
+			--setenv "PYTHONPATH=${tests_SOURCE_DIR}"
+			--setenv "K3D_TEST_SOURCE_PATH=${tests_SOURCE_DIR}"
+			--setenv "K3D_TEST_BINARY_PATH=${tests_BINARY_DIR}"
+			${TEST_ARGUMENTS}
+			--script=${TEST_K3D_PYTHON_COMMAND_SCRIPT}
+			--batch
+			--exit
+			)
 	ELSE()
 		MESSAGE(SEND_ERROR "Unknown K3D_TEST type")
 		RETURN()
@@ -72,6 +95,7 @@ FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bitmaps)
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bitmaps/differences)
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/meshes)
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/meshes/differences)
+FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/shaders/surface)
 
 # Run tests that extract information about the underlying platform
 ADD_SUBDIRECTORY(platform)
