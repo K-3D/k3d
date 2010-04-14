@@ -96,6 +96,7 @@ FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bitmaps/differences)
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/meshes)
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/meshes/differences)
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/shaders/surface)
+FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/shaders/displacement)
 
 # Run tests that extract information about the underlying platform
 ADD_SUBDIRECTORY(platform)
