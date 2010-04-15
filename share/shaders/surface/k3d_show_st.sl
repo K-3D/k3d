@@ -5,10 +5,10 @@
 /*
  * show_st(): color surface point according to its s,t coordinates.
  */
-surface
-k3d_show_st()
+
+surface k3d_show_st()
 {
-	Ci = color(s, t, 0);
+	Ci = color "rgb" (s, t, 0);
 	Oi = 1;
 }
 
