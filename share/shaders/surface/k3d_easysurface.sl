@@ -5,18 +5,20 @@
 /*
  * easysurface(): orientation-sensitive surface shading without a light source
  */
-surface
-k3d_easysurface(
-	float	Kd	= .8, 
-		Ka	= .2, 
-		falloff	= 2.0 )
+
+surface k3d_easysurface(
+	float Kd = 0.8;
+	float Ka = 0.2;
+	float falloff= 2.0;
+	)
 {
-	float diffuse ;
+	float diffuse;
 	point II = normalize(I);
 	point NN = normalize(N);
 
 	diffuse = II.NN / (II.II * NN.NN);
 	diffuse = pow(diffuse, falloff);
 
-	Ci = Cs * (Ka + Kd * diffuse ) ;
+	Ci = Cs * (Ka + Kd * diffuse);
 }
+
