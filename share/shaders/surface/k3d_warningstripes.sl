@@ -18,44 +18,25 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
- #include "k3d_rmannotes.h"
-/// Filtering code courtesy of the Advanced RenderMan book ... where else?
-
-#define MIN_FILTER_WIDTH 1.0e-6
-#define filter_width(x) max(abs(Du(x)*du) + abs(Dv(x)*dv), MIN_FILTER_WIDTH)
-
-float filtered_pulse_train(float edge, period, x, dx)
-{
-	float w = dx / period;
-	float x0 = x/period - w/2;
-	float x1 = x0 + w;
-	float nedge = edge / period;
-	
-	float integral(float t)
-	{
-		extern float nedge;
-		return ((1 - nedge) * floor(t) + max(0, t-floor(t)-nedge));
-	}
-	
-	return (integral(x1) - integral(x0)) / w;
-}
+#include "k3d_patterns.h"
 
 surface k3d_warningstripes(
-	float Frequency = 8.0;
+	float Ka = 1;
+	float Kd = 1;
+	float Frequency = 4;
 	color StripeColor = color(0, 0, 0)
 	)
 {
-	float stripe_position = filtered_pulse_train(0.5 / Frequency, 1.0 / Frequency, u+v, filter_width(u+v));
-
-	color Ct = mix(Cs, StripeColor, stripe_position);
-
 	vector Nf = normalize(faceforward(N, I));
 	
+	float stripe_position = filteredpulsetrain(0.5 / Frequency, 1.0 / Frequency, u+v, filterwidth(u+v));
+	color Ct = mix(Cs, StripeColor, stripe_position);
+
 	Oi = Os;
-	Ci = (Os * Ct * (ambient() + diffuse(Nf)));
+	Ci = Os * Ct * (Ka * ambient() + Kd * diffuse(Nf));
 }
 
 
