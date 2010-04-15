@@ -1,12 +1,15 @@
 # Get the set(s) of available shaders ...
-FILE(GLOB_RECURSE SURFACE_SHADER_LIST ${share_SOURCE_DIR}/shaders/surface/*.sl)
-LIST(SORT SURFACE_SHADER_LIST)
-
 FILE(GLOB_RECURSE DISPLACEMENT_SHADER_LIST ${share_SOURCE_DIR}/shaders/displacement/*.sl)
 LIST(SORT DISPLACEMENT_SHADER_LIST)
 
 FILE(GLOB_RECURSE LIGHT_SHADER_LIST ${share_SOURCE_DIR}/shaders/light/*.sl)
 LIST(SORT LIGHT_SHADER_LIST)
+
+FILE(GLOB_RECURSE SURFACE_SHADER_LIST ${share_SOURCE_DIR}/shaders/surface/*.sl)
+LIST(SORT SURFACE_SHADER_LIST)
+
+FILE(GLOB_RECURSE VOLUME_SHADER_LIST ${share_SOURCE_DIR}/shaders/volume/*.sl)
+LIST(SORT VOLUME_SHADER_LIST)
 
 FILE(GLOB_RECURSE SHADER_LIST ${share_SOURCE_DIR}/shaders/*.sl)
 LIST(SORT SHADER_LIST)
@@ -65,6 +68,13 @@ IF(AQSIS_COMMAND)
 		K3D_PYTHON_COMMAND_SCRIPT "#python\nimport testing\ntesting.surface_shader_test(\"Aqsis\", \"${SHADER_NAME}\")"
 		LABELS shader surface aqsis)
 	ENDFOREACH()
+
+	FOREACH(SHADER ${VOLUME_SHADER_LIST})
+	GET_FILENAME_COMPONENT(SHADER_NAME ${SHADER} NAME_WE)
+	K3D_TEST(shader.volume.render.${SHADER_NAME}.aqsis
+		K3D_PYTHON_COMMAND_SCRIPT "#python\nimport testing\ntesting.volume_shader_test(\"Aqsis\", \"${SHADER_NAME}\")"
+		LABELS shader volume aqsis)
+	ENDFOREACH()
 ENDIF()
 
 # Generate sample shader images with Pixie ...
@@ -88,6 +98,13 @@ IF(RNDR_COMMAND)
 	K3D_TEST(shader.surface.render.${SHADER_NAME}.pixie
 		K3D_PYTHON_COMMAND_SCRIPT "#python\nimport testing\ntesting.surface_shader_test(\"Pixie\", \"${SHADER_NAME}\")"
 		LABELS shader surface pixie)
+	ENDFOREACH()
+
+	FOREACH(SHADER ${VOLUME_SHADER_LIST})
+	GET_FILENAME_COMPONENT(SHADER_NAME ${SHADER} NAME_WE)
+	K3D_TEST(shader.volume.render.${SHADER_NAME}.pixie
+		K3D_PYTHON_COMMAND_SCRIPT "#python\nimport testing\ntesting.volume_shader_test(\"Pixie\", \"${SHADER_NAME}\")"
+		LABELS shader volume pixie)
 	ENDFOREACH()
 ENDIF()
 

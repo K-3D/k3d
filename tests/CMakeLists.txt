@@ -98,6 +98,7 @@ FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/meshes/differences)
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/shaders/displacement)
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/shaders/light)
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/shaders/surface)
+FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/shaders/volume)
 
 # Run tests that extract information about the underlying platform
 ADD_SUBDIRECTORY(platform)
