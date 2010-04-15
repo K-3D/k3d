@@ -6,8 +6,11 @@
  * RenderMan (R) is a registered trademark of Pixar.
  */
 
-surface k3d_constant(float intensity = 1.0)
+surface k3d_constant(
+	float intensity = 1.0;
+	)
 {
-  Oi = Os;
-  Ci = Os * Cs * intensity;
+	Oi = Os;
+	Ci = Os * Cs * intensity;
 }
+

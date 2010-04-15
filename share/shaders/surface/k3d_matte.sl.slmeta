@@ -5,7 +5,7 @@
 			<authors>Pixar</authors>
 			<copyright>(c) Copyright 1988, Pixar</copyright>
 			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
-			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
 		</shader>
 	</shaders>
 </k3dml>
