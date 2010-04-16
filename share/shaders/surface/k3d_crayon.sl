@@ -40,28 +40,27 @@ aanoise(float sp, tp, width)
 	/* calculate smallest integer f for which width / f < .5 */
 	f = ceil(width /.5);
 	mag = max(pow(0.85, f - 1),.1);
-	/*(printf("f = %f, mag = %f\n",f,mag)*/;
-	ns  = mag * snoise(sp / f, tp / f) * (1 - smoothstep(0, .5, width / f))
-		+ snoise(sp / (f * 1.33), tp / (f * 1.33)) * mag * .25 * smoothstep(0, .5, width / f);
+	ns  = mag * snoisexy(sp / f, tp / f) * (1 - smoothstep(0, .5, width / f))
+		+ snoisexy(sp / (f * 1.33), tp / (f * 1.33)) * mag * .25 * smoothstep(0, .5, width / f);
 	return ns;
 }
 
 
-surface
-k3d_crayon (	float Ka = 1;
-        	float Kd = .5;
-         	float Ks = .5;
-         	float roughness = .1;
-	 		color specularcolor = 1;
-			float txtscale = 1;
-			float width = .05;
-			float micro = 15.32;
-			float stretch = 10;
-			float density0 = .5;
-			float density1 = .5;
-			color topcolor = 1;
-			color basecolor = 0;
-		)
+surface k3d_crayon(
+	float Ka = 1;
+	float Kd = .5;
+	float Ks = .1;
+	float roughness = .1;
+	color specularcolor = 1;
+	float txtscale = 1;
+	float width = .05;
+	float micro = 15.32;
+	float stretch = 10;
+	float density0 = 0.8;
+	float density1 = 0.8;
+	color topcolor = color "rgb" (1, 0.2, 0.2);
+	color basecolor = color "rgb" (0, 0, 0);
+	)
 {
   color Csurf;
     float density = density0 + t * (density1 - density0);
