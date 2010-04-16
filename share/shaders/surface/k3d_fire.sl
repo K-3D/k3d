@@ -33,9 +33,9 @@ surface k3d_fire(float frame = 1)
 
   turb = 0;
   for (f = 1; f < 0.5 * cutoff; f *= 2) 
-    turb += abs(snoise2(ss * f, tt * f)) / f;
+    turb += abs(snoisexy(ss * f, tt * f)) / f;
   fade = clamp(2 * (cutoff - f) / cutoff, 0, 1);
-  turb += fade * abs(snoise2(ss * f, tt * f)) / f;
+  turb += fade * abs(snoisexy(ss * f, tt * f)) / f;
   turb *= 0.5;
 
   /* index into color spline using turbulence */
