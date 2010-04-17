@@ -15,10 +15,10 @@ for icon in glob.glob(str(k3d.share_path() / k3d.filesystem.generic_path("ngui/r
 scalable_icons.sort()
 rasterized_icons.sort()
 
-unrasterized_icons = []
+unrasterized = []
 for icon in scalable_icons:
 	if icon not in rasterized_icons:
-		unrasterized_icons.append(icon)
+		unrasterized.append(icon)
 
 if len(unrasterized):
 	print "\nScalable icons without corresponding rasterized icons:\n"
