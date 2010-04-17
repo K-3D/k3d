@@ -6,9 +6,15 @@
  * RenderMan (R) is a registered trademark of Pixar.
  */
 
-light k3d_pointlight(float intensity = 3000;
-		     color lightcolor = 1;
-		     point from = point "shader"(0, 0, 0);)
+light k3d_pointlight(
+	float intensity = 1;
+	color lightcolor = 1;
+	point from = point "shader"(0, 0, 0);
+	)
 {
-  illuminate(from) Cl = intensity * lightcolor / (L.L);
+	illuminate(from)
+	{
+		Cl = intensity * lightcolor / (L.L);
+	}
 }
+
