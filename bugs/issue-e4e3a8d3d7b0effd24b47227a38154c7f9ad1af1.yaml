@@ -3,7 +3,7 @@ title: Material Manager crashes
 desc: Mount a material manager panel -> boom!
 type: :bugfix
 component: K-3D
-release: 0.8.0.1
+release: 1.0.0.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -15,5 +15,9 @@ log_events:
 - - 2010-04-17 15:23:53.593123 Z
   - Timothy M. Shead <tshead@k-3d.com>
   - created
+  - ""
+- - 2010-04-17 21:19:57.921139 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 1.0.0.0 from 0.8.0.1
   - ""
 claimer: 
