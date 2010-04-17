@@ -8,12 +8,10 @@
  * PARAMETERS:
  *	Ka, Kd, Ks - the usual
  *  roughness -  Contols the specular reflection
- *	fuzz -       Amount to blur edge
  *	innerRadius - inner ring
  *	outerRadius - outer ring
  *	sfreq - # of tiles in s
  *	tfreq - # of tiles in t 
- *	cstate1 - foreground color
  *	specularcolor - color of specular highlight
  * 
  * HINTS:
@@ -30,22 +28,20 @@
  * History:
  *	Created: 8/12/95
  */ 
- #include "k3d_rmannotes.h"
- #include "k3d_functions.h"
+#include "k3d_rmannotes.h"
+#include "k3d_functions.h"
+#include "k3d_patterns.h"
 
-
-surface
-k3d_shifteddrtile (
+surface k3d_dots (
 	uniform float Ka = 1;
 	uniform float Kd = .5;
 	uniform float Ks = .5;
 	uniform float roughness = .1;
-	uniform float fuzz = .025;          /* amount to blur edge */
 	uniform float innerRadius = 0.3;    /* inner ring */
 	uniform float outerRadius = 0.45;   /* outer ring */
 	uniform float sfreq = 4.0;          /* # of tiles in s */
 	uniform float tfreq = 4.0;          /* # of tiles in t */
-	uniform color cstate1 = color(1, 0, 0);  /* foreground color */
+	uniform color dotcolor = color(1, 0, 0);  /* foreground color */
 	uniform color specularcolor = 1;)
 {
 	point Nf;
@@ -59,7 +55,6 @@ k3d_shifteddrtile (
 	
 	Nf = faceforward (normalize(N),I);
 
-	surfColor = Cs;
 	center = (0.5, 0.5, 0);  /* This should really be */
 	                         /* put in the paramter list */
 
@@ -77,15 +72,10 @@ k3d_shifteddrtile (
 	tt = repeat (t, tfreq);
 	d = distance (center, (ss, tt, 0));
 
-	if (wasOdd == 1)
-		/* Do ring */
-		mix_opacity = smoothPulse (innerRadius, outerRadius, fuzz, d);
-	else
-		/* Do disk */
-		mix_opacity = 1 - smoothstep (outerRadius-fuzz, outerRadius+fuzz, d);
+	/* Do ring */
+	mix_opacity = filteredpulse (innerRadius, outerRadius, d, filterwidth(d));
 		
-	surfColor = mix (surfColor, cstate1, mix_opacity);
-	
+	surfColor = mix (Cs, dotcolor, mix_opacity);
 	
 	Oi = Os;
 	Ci = Os * (surfColor * (Ka*ambient() + Kd*diffuse(Nf)) +
