@@ -4,7 +4,7 @@
 			<description>A cloudy, Venus-like planet</description>
 			<authors>Ken Musgrave, Larry Gritz</authors>
 			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
-			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
 			<argument name="offset" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
 			<argument name="scale" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.6"/>
 			<argument name="twist" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.22"/>
