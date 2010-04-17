@@ -6,28 +6,6 @@ components:
   name: K-3D
 releases: 
 - !ditz.rubyforge.org,2008-03-06/release 
-  name: 0.8.0.0
-  status: :released
-  release_time: 2010-04-07 04:41:08.206138 Z
-  log_events: 
-  - - 2009-04-29 01:21:57.847477 Z
-    - Timothy M. Shead <tshead@k-3d.com>
-    - created
-    - ""
-  - - 2010-04-07 04:41:08.206160 Z
-    - Timothy M. Shead <tshead@k-3d.com>
-    - released
-    - ""
-- !ditz.rubyforge.org,2008-03-06/release 
-  name: 1.0.0.0
-  status: :unreleased
-  release_time: 
-  log_events: 
-  - - 2009-04-29 01:22:55.792756 Z
-    - Timothy M. Shead <tshead@k-3d.com>
-    - created
-    - ""
-- !ditz.rubyforge.org,2008-03-06/release 
   name: 0.7.11.0
   status: :released
   release_time: 2009-03-19 04:17:40.762513 Z
@@ -41,11 +19,33 @@ releases:
     - released
     - ""
 - !ditz.rubyforge.org,2008-03-06/release 
+  name: 0.8.0.0
+  status: :released
+  release_time: 2010-04-07 04:41:08.206138 Z
+  log_events: 
+  - - 2009-04-29 01:21:57.847477 Z
+    - Timothy M. Shead <tshead@k-3d.com>
+    - created
+    - ""
+  - - 2010-04-07 04:41:08.206160 Z
+    - Timothy M. Shead <tshead@k-3d.com>
+    - released
+    - ""
+- !ditz.rubyforge.org,2008-03-06/release 
   name: 0.8.0.1
   status: :unreleased
   release_time: 
   log_events: 
   - - 2010-04-16 04:43:07.032042 Z
+    - Timothy M. Shead <tshead@k-3d.com>
+    - created
+    - ""
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: 1.0.0.0
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2009-04-29 01:22:55.792756 Z
     - Timothy M. Shead <tshead@k-3d.com>
     - created
     - ""
