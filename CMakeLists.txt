@@ -135,7 +135,7 @@ OPTION(K3D_BUILD_NGUI_ATK_EVENT_RECORDER_MODULE "Build the user interface ATK 'e
 OPTION(K3D_BUILD_NGUI_KNOT_VECTOR_CONTROL_MODULE "Build the custom knot-vector property control plugin module" ON)
 OPTION(K3D_BUILD_NGUI_LEARNING_MODULE "Build the user interface learning (tutorial) dialog plugin module" ON)
 OPTION(K3D_BUILD_NGUI_LOG_MODULE "Build the user interface log window plugin module" ON)
-OPTION(K3D_BUILD_NGUI_MATERIAL_MANAGER_PANEL_MODULE "Build the user interface manager manager panel plugin module" ON)
+OPTION(K3D_BUILD_NGUI_MATERIAL_MANAGER_PANEL_MODULE "Build the user interface manager manager panel plugin module" OFF)
 OPTION(K3D_BUILD_NGUI_MESH_CONTROL_MODULE "Build the mesh property control plugin module" ON)
 OPTION(K3D_BUILD_NGUI_MODULE "Build the standard graphical user interface plugin module" ON)
 OPTION(K3D_BUILD_NGUI_MORPH_POINTS_PAGE_MODULE "Build the MorphPoints custom property page module" ON)
