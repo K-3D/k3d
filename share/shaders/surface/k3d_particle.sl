@@ -3,6 +3,6 @@
 surface k3d_particle()
 {
 	Ci = Cs * Os;
-	Oi = 0;
+	Oi = 0.0001;
 }
 

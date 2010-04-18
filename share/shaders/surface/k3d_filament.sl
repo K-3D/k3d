@@ -5,22 +5,18 @@
 /*
  * filament(): map a filament-like spiral onto the surface of a cylinder.
  */
-surface 
-k3d_filament ( 
-	float	frequency	= 5.0,
-		phase 		= 0.0, 
-		width		= 0.3 )
+
+#include "k3d_patterns.h"
+
+surface k3d_filament ( 
+	float frequency	= 5.0;
+	float phase = 0.0;
+	float width = 0.3;
+	)
 {
-	/* Calculate the distance of (s,t) from a spiral as a fraction [0,1] */
 	float offset = mod((t*frequency + s + phase), 1.0);
 
-	/* Threshold the fraction against the fractional filament width */
-	if (offset < width) {
-		Ci = Cs;
-		Oi = 1.0;
-	} else {
-		Ci = 0.0;
-		Oi = 0.0;
-	}
+	Oi = filteredpulse(0.5 - width / 2, 0.5 + width / 2, offset, filterwidth(offset));
+	Ci = Cs * Oi;
 }
 

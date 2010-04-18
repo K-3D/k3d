@@ -11,13 +11,13 @@
 					<node name="PolySphereTessellation"/>
 					<node name="PolyTorus"/>
 					<separator/>
-					<node name="Cone"/>
-					<node name="Cylinder"/>
-					<node name="Disk"/>
-					<node name="Sphere"/>
-					<node name="Torus"/>
-					<node name="Hyperboloid"/>
-					<node name="Paraboloid"/>
+					<node name="QuadricCone"/>
+					<node name="QuadricCylinder"/>
+					<node name="QuadricDisk"/>
+					<node name="QuadricSphere"/>
+					<node name="QuadricTorus"/>
+					<node name="QuadricHyperboloid"/>
+					<node name="QuadricParaboloid"/>
 					<separator/>
 					<node name="NurbsCone"/>
 					<node name="NurbsCylinder"/>
@@ -40,27 +40,6 @@
 					<separator/>
 					<node name="BevelFaces"/>
 					<node name="BevelPoints"/>
-				</toolbar>
-				<toolbar name="bitmap" label="Bitmap" description="Bitmap effects and pipeline">
-					<node name="BitmapImageAdd"/>
-					<node name="BitmapImageSubtract"/>
-					<node name="BitmapImageSubtractAbs"/>
-					<node name="BitmapImageMultiply"/>
-					<node name="BitmapImageDivide"/>
-					<node name="BitmapImageMin"/>
-					<node name="BitmapImageMax"/>
-					<node name="BitmapImageMix"/>
-					<node name="BitmapImageXOR"/>
-					<node name="BitmapImageUnder"/>
-					<node name="BitmapImageOver"/>
-					<node name="BitmapImageAtop"/>
-					<node name="BitmapImageInside"/>
-					<node name="BitmapImageOutside"/>
-				</toolbar>
-				<toolbar name="light" label="Light" description="Light Sources">
-					<node name="RenderManLight"/>
-					<separator/>
-					<node name="YafrayPointLight"/>
 				</toolbar>
 			</toolbars>
 		</user_interface>

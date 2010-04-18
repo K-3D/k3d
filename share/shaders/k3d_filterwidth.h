@@ -37,7 +37,7 @@
  * point data.
  */
 #define filterwidthp(p) max (sqrt(area(p)), MINFILTWIDTH)
-#define filterwidth_point(p) (max(sqrt(area(p)), MINFILTERWIDTH)) /* need to clean this out of our code and use name above */
+#define filterwidth_point(p) (max(sqrt(area(p)), MINFILTWIDTH)) /* need to clean this out of our code and use name above */
 
 
 

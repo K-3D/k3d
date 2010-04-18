@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Cleanup icons
+desc: We have many misnamed, obsolete, and missing icons - clean 'em up.
+type: :bugfix
+component: K-3D
+release: 0.8.0.1
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-04-17 03:12:11.601190 Z
+references: []
+
+id: 45a8e81c24329d52763349b662988a9969e2a929
+log_events: 
+- - 2010-04-17 03:12:12.249148 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-04-17 21:17:47.089170 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""
+claimer: 

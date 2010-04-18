@@ -2,6 +2,7 @@
 
 SET(ERROR_COUNT 0)
 SET(SKIP_FILES
+	"[.]DS_Store$"
 	"^AUTHORS$"
 	"^.*CMakeLists.txt$"
 	"^cmake/modules/K3D.*$"

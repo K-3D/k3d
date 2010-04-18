@@ -1,7 +1,0 @@
-<k3dml>
-	<shaders>
-		<shader type="surface" name="k3d_null">
-			<description>Does nothing to a surface</description>
-		</shader>
-	</shaders>
-</k3dml>

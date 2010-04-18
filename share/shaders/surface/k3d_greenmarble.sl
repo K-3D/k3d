@@ -18,7 +18,6 @@
  */
 
 #include "k3d_noises.h"
-#include "k3d_rayserver.h"
 #include "k3d_material.h"
 
 

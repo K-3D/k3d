@@ -1,8 +1,0 @@
-<k3dml>
-	<shaders>
-		<shader type="surface" name="k3d_cloudplane">
-			<argument name="cloudcolor" storage_class="uniform" type="color" extended_type="color" array_count="1" space="" output="0" default_value="0 0 0"/>
-		</shader>
-	</shaders>
-</k3dml>
-

@@ -25,9 +25,3 @@
 /* separate fuzzes */
 #define smoothPulse2Fuzz(a, b, afuzz, bfuzz, loc)   (smoothstep (a-afuzz, a, loc) - smoothstep (b, b+bfuzz, loc))
 
-	
-	
- 
- 
- 
- 

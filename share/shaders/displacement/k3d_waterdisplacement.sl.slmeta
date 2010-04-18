@@ -1,9 +1,0 @@
-<k3dml>
-	<shaders>
-		<shader type="displacement" name="k3d_waterdisplacement">
-			<argument name="Km" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="0" default_value="1.0"/>
-			<argument name="bumpmap" storage_class="uniform" type="string" extended_type="texture" array_count="1" space="" output="0" default_value=""/>
-		</shader>
-	</shaders>
-</k3dml>
-
