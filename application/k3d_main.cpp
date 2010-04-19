@@ -170,7 +170,7 @@ void set_default_options(k3d::bool_t& Quit, k3d::bool_t& Error)
 	g_default_pyui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-pyui.module");
 	g_default_qtui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-qtui.module");
 	g_default_share_path = executable_path / k3d::filesystem::generic_path("../share/k3d");
-	g_default_user_interface_path = g_default_ngui_path;
+	g_default_user_interface_path = g_default_qtui_path;
 
 	// Add the executable path to PATH
 	k3d::system::setenv("PATH", executable_path.native_filesystem_string() + ";" + k3d::system::getenv("PATH"));
@@ -183,7 +183,7 @@ void set_default_options(k3d::bool_t& Quit, k3d::bool_t& Error)
 	g_default_pyui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins/k3d-pyui.module");
 	g_default_qtui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins/k3d-qtui.module");
 	g_default_share_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGDATADIR));
-	g_default_user_interface_path = g_default_ngui_path;
+	g_default_user_interface_path = g_default_qtui_path;
 
 #endif // !K3D_API_WIN32
 
@@ -690,7 +690,7 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 			("show-process", "Prints the process name next to log messages.")
 			("show-timestamps", "Prints timestamps next to log messages.")
 			("syslog", "Logs messages to syslog.")
-			("ui,u", boost::program_options::value<k3d::string_t>(), "Specifies the user interface plugin to use - valid values are a plugin path, \"nui\", \"ngui\", \"qtui\", or \"pyui\" [default: ngui].")
+			("ui,u", boost::program_options::value<k3d::string_t>(), "Specifies the user interface plugin to use - valid values are a plugin path, \"nui\", \"ngui\", \"qtui\", or \"pyui\" [default: qtui].")
 			("user-interface-help,H", "Prints user interface help message and exits.")
 			("version", "Prints program version information and exits.")
 			;
