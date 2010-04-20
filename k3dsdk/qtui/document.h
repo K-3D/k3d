@@ -1,5 +1,5 @@
-#ifndef MODULES_QTUI_VIEWPORT_H
-#define MODULES_QTUI_VIEWPORT_H
+#ifndef K3DSDK_QTUI_DOCUMENT_H
+#define K3DSDK_QTUI_DOCUMENT_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -9,7 +9,7 @@
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
-// version 2 of the License, or (at your argument) any later version.
+// version 2 of the License, or (at your option) any later version.
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,33 +24,20 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <QGraphicsView>
-
-namespace module
+namespace k3d
 {
+
+class idocument;
 
 namespace qtui
 {
 
-//////////////////////////////////////////////////////////////////////////
-// viewport
-
-class viewport :
-	public QGraphicsView
-{
-	Q_OBJECT
-
-public:
-	viewport(QWidget* parent = 0);
-	~viewport();
-
-protected:
-	void resizeEvent(QResizeEvent *event);
-};
+/// Populates a newly-created document to provide users with a good out-of-box experience.
+void populate_new_document(idocument& Document);
 
 } // namespace qtui
 
-} // namespace module
+} // namespace k3d
 
-#endif // !MODULES_QTUI_VIEWPORT_H
+#endif // !K3DSDK_QTUI_DOCUMENT_H
 

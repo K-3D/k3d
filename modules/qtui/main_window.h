@@ -27,7 +27,10 @@
 #include <QMainWindow>
 #include <ui_main_window.h>
 
+#include <boost/scoped_ptr.hpp>
+
 namespace k3d { class idocument; }
+namespace k3d { namespace filesystem { class path; } }
 
 namespace module
 {
@@ -46,18 +49,18 @@ class main_window :
 	Q_OBJECT
 
 public:
-	main_window(QApplication& Application);
+	main_window(k3d::idocument& Document);
+	main_window(const k3d::filesystem::path& DocumentPath, k3d::idocument& Document);
+	~main_window();
 
-Q_SIGNALS:
-	void document_changed(k3d::idocument&);
-	
 private Q_SLOTS:
+	void on_file_new();
 	void on_file_open();
 
 private:
+	k3d::idocument& m_document;
 	Ui::main_window ui;
-	scene* m_scene;
-	k3d::idocument* m_document;
+	boost::scoped_ptr<scene> m_scene;
 };
 	
 } // namespace qtui

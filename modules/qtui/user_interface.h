@@ -74,7 +74,6 @@ public:
 private:
 	std::auto_ptr<QApplication> m_application;
 	std::auto_ptr<QSplashScreen> m_splash_box;
-	std::auto_ptr<QWidget> m_window;
 };
 
 } // namespace qtui

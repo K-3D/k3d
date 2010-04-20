@@ -179,7 +179,8 @@ OPTION(K3D_BUILD_POLYHEDRON_SOURCES_MODULE "Build the polyhedron sources module"
 OPTION(K3D_BUILD_PYTHON_MODULE "Build the Python scripting language module" ON)
 OPTION(K3D_BUILD_PYUI_MODULE "Build the Python user interface plugin" ON)
 OPTION(K3D_BUILD_QSLIM_MODULE "Build the qslim module" ON)
-OPTION(K3D_BUILD_QTUI_MODULE "Build the sample Qt graphical user interface plugin" OFF)
+OPTION(K3D_BUILD_QTUI_MODULE "Build the sample Qt graphical user interface plugin" ON)
+OPTION(K3D_BUILD_QTUI_DEFAULT_MODE_MODULE "Build the Qt graphical user interface default mode plugin" ON)
 OPTION(K3D_BUILD_QUADRICS_MODULE "Build the quadrics module" ON)
 OPTION(K3D_BUILD_REFERENCE_OPENGL_PAINTERS_MODULE "Build the reference OpenGL mesh painters module" ON)
 OPTION(K3D_BUILD_RENDERMAN_ENGINES_MODULE "Provides integration with many RenderMan-compatible render engines." ON)
@@ -289,6 +290,8 @@ K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_TOOLBAR_PANEL_MODULE)
 K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_TOOL_PROPERTIES_PANEL_MODULE)
 K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_UNDO_TREE_PANEL_MODULE)
 K3D_CHECK_NGUI_DEPENDENCY(K3D_BUILD_NGUI_UV_EDITOR_PANEL_MODULE)
+
+K3D_CHECK_QTUI_DEPENDENCY(K3D_BUILD_QTUI_DEFAULT_MODE_MODULE)
 
 INCLUDE(K3DFindBoost)
 K3D_CHECK_REQUIRED_DEPENDENCY(K3D_BOOST_FOUND "Boost" "http://www.boost.org" "Note: in addition to the main Boost libraries, K-3D requires Boost.Program_options, Boost.Python, Boost.Regex, and Boost.UnitTest which may be distributed separately on some systems.")

@@ -60,13 +60,15 @@ namespace qtui
 //////////////////////////////////////////////////////////////////////////
 // scene
 
-scene::scene() :
+scene::scene(k3d::idocument& Document) :
 	m_camera(init_value<k3d::icamera*>(0)),
 	m_gl_engine(init_value<k3d::gl::irender_viewport*>(0)),
 	m_fps(0),
 	m_camera_combo(0),
 	m_engine_combo(0)
 {
+	k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+
 	QToolButton* const file_menu_button = new QToolButton();
 	file_menu_button->setText("Stuff");
 	file_menu_button->setPopupMode(QToolButton::MenuButtonPopup);
@@ -101,6 +103,35 @@ scene::scene() :
 	connect(m_engine_combo, SIGNAL(activated(int)), this, SLOT(on_render_engine_changed(int)));
 	QGraphicsProxyWidget* const engine_combo_proxy = addWidget(m_engine_combo);
 	engine_combo_proxy->setPos(200, 10);
+
+	m_cameras = k3d::node::lookup<k3d::icamera>(Document);
+	m_render_engines = k3d::node::lookup<k3d::gl::irender_viewport>(Document);
+
+	m_camera_combo->clear();
+	m_camera_combo->setEnabled(m_cameras.size());
+	for(std::vector<k3d::icamera*>::iterator camera = m_cameras.begin(); camera != m_cameras.end(); ++camera)
+		m_camera_combo->addItem(dynamic_cast<k3d::inode*>(*camera)->name().c_str());
+	m_camera_combo->adjustSize();
+
+	m_engine_combo->clear();
+	m_engine_combo->setEnabled(m_render_engines.size());
+	for(std::vector<k3d::gl::irender_viewport*>::iterator render_engine = m_render_engines.begin(); render_engine != m_render_engines.end(); ++render_engine)
+		m_engine_combo->addItem(dynamic_cast<k3d::inode*>(*render_engine)->name().c_str());
+	m_engine_combo->adjustSize();
+
+	m_camera.set_value(m_cameras.size() ? m_cameras[0] : 0);
+	m_gl_engine.set_value(m_render_engines.size() ? m_render_engines[0] : 0);
+
+	m_active_mode.reset(k3d::plugin::create<k3d::qtui::mode>("QTUIDefaultMode"));
+	if(m_active_mode)
+		m_active_mode->enable();
+
+	update();
+}
+
+scene::~scene()
+{
+	k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void scene::drawBackground(QPainter *painter, const QRectF &rect)
@@ -134,28 +165,6 @@ void scene::drawBackground(QPainter *painter, const QRectF &rect)
 	glMatrixMode(GL_PROJECTION);
         glPopMatrix();
 	glPopAttrib();
-}
-
-void scene::on_document_changed(k3d::idocument& Document)
-{
-	m_cameras = k3d::node::lookup<k3d::icamera>(Document);
-	m_render_engines = k3d::node::lookup<k3d::gl::irender_viewport>(Document);
-
-	m_camera_combo->clear();
-	m_camera_combo->setEnabled(m_cameras.size());
-	for(std::vector<k3d::icamera*>::iterator camera = m_cameras.begin(); camera != m_cameras.end(); ++camera)
-		m_camera_combo->addItem(dynamic_cast<k3d::inode*>(*camera)->name().c_str());
-	m_camera_combo->adjustSize();
-
-	m_engine_combo->clear();
-	m_engine_combo->setEnabled(m_render_engines.size());
-	for(std::vector<k3d::gl::irender_viewport*>::iterator render_engine = m_render_engines.begin(); render_engine != m_render_engines.end(); ++render_engine)
-		m_engine_combo->addItem(dynamic_cast<k3d::inode*>(*render_engine)->name().c_str());
-	m_engine_combo->adjustSize();
-
-	m_camera.set_value(m_cameras.size() ? m_cameras[0] : 0);
-	m_gl_engine.set_value(m_render_engines.size() ? m_render_engines[0] : 0);	
-	update();
 }
 
 void scene::on_camera_changed(int Index)

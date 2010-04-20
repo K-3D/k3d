@@ -1,12 +1,12 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
-// version 2 of the License, or (at your argument) any later version.
+// version 2 of the License, or (at your option) any later version.
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,40 +21,26 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include "viewport.h"
+#include <k3dsdk/qtui/mode.h>
 
-#include <QGLWidget>
-#include <QResizeEvent>
-
-namespace module
+namespace k3d
 {
 
 namespace qtui
 {
 
-//////////////////////////////////////////////////////////////////////////
-// viewport
+/////////////////////////////////////////////////////////////////////////////
+// mode
 
-viewport::viewport(QWidget* parent) :
-	QGraphicsView(parent)
-{
-//	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-	setViewport(new QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer)));
-	setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-}
-
-viewport::~viewport()
+mode::mode()
 {
 }
 
-void viewport::resizeEvent(QResizeEvent *event)
+mode::~mode()
 {
-	if(scene())
-		scene()->setSceneRect(QRect(QPoint(0, 0), event->size()));
-	QGraphicsView::resizeEvent(event);
 }
 
 } // namespace qtui
 
-} // namespace module
+} // namespace k3d
 

@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -34,6 +34,7 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/plugin.h>
+#include <k3dsdk/qtui/document.h>
 #include <k3dsdk/share.h>
 
 #include <QAction>
@@ -73,8 +74,8 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 	// Qt expects to parse and modify argc / argv, so create some temporary storage for it to fiddle with ...
 	static std::vector<char*> argv_buffer;
 	argv_buffer.push_back(const_cast<char*>("k3d"));
-	int argc = argv_buffer.size();
-	char** argv = &argv_buffer[0];
+	static int argc = argv_buffer.size();
+	static char** argv = &argv_buffer[0];
 
 	// We return any "unused" arguments ...
 	arguments_t unused;
@@ -112,8 +113,14 @@ void user_interface::startup_message_handler(const k3d::string_t& Message)
 
 void user_interface::display_user_interface()
 {
-	m_window.reset(new main_window(*m_application));
-	m_window->show();
+	k3d::idocument* const document = k3d::application().create_document();
+	return_if_fail(document);
+
+	k3d::qtui::populate_new_document(*document);
+
+	main_window* const window = new main_window(*document);
+	window->show();
+
 	m_splash_box.reset();
 }
 

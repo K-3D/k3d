@@ -27,11 +27,17 @@
 #include <k3dsdk/data.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/irender_viewport_gl.h>
+#include <k3dsdk/qtui/mode.h>
+
+#include <boost/scoped_ptr.hpp>
 
 #include <QGraphicsScene>
 
 class QComboBox;
 class QGraphicsTextItem;
+
+namespace k3d { class idocument; }
+namespace k3d { namespace qtui { class mode; } }
 
 namespace module
 {
@@ -48,12 +54,12 @@ class scene :
 	Q_OBJECT
 
 public:
-	scene();
+	scene(k3d::idocument& Document);
+	~scene();
  
 	virtual void drawBackground(QPainter *painter, const QRectF &rect);
 
 private Q_SLOTS:
-	void on_document_changed(k3d::idocument&);
 	void on_camera_changed(int Index);
 	void on_render_engine_changed(int Index);
 	
@@ -71,6 +77,7 @@ private:
 	QComboBox* m_engine_combo;
 	std::vector<k3d::icamera*> m_cameras;
 	std::vector<k3d::gl::irender_viewport*> m_render_engines;
+	boost::scoped_ptr<k3d::qtui::mode> m_active_mode;
 };
 
 } // namespace qtui
