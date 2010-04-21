@@ -31,6 +31,7 @@
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/plugin.h>
+#include <k3dsdk/qtui/action.h>
 #include <k3dsdk/qtui/document.h>
 #include <k3dsdk/share.h>
 
@@ -56,40 +57,17 @@ namespace qtui
 //////////////////////////////////////////////////////////////////////////
 // main_window
 	
-main_window::main_window(k3d::idocument& Document) :
-	m_document(Document)
+main_window::main_window(k3d::idocument& Document)
 {
 k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-
-	ui.setupUi(this);
-	statusBar()->setVisible(false);
-	setAttribute(Qt::WA_DeleteOnClose);
-
-	m_scene.reset(new scene(Document));
-	ui.viewport->setScene(m_scene.get());
-
-	connect(ui.actionNew, SIGNAL(activated()), this, SLOT(on_file_new()));
-	connect(ui.actionOpen, SIGNAL(activated()), this, SLOT(on_file_open()));
-	connect(ui.actionQuit, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
+	initialize(Document);
 }
 
-main_window::main_window(const k3d::filesystem::path& DocumentPath, k3d::idocument& Document) :
-	m_document(Document)
+main_window::main_window(const k3d::filesystem::path& DocumentPath, k3d::idocument& Document)
 {
 k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-
-	ui.setupUi(this);
-	statusBar()->setVisible(false);
-	setAttribute(Qt::WA_DeleteOnClose);
-
+	initialize(Document);
 	setWindowTitle(("K-3D - " + DocumentPath.leaf().raw()).c_str());
-
-	m_scene.reset(new scene(Document));
-	ui.viewport->setScene(m_scene.get());
-
-	connect(ui.actionNew, SIGNAL(activated()), this, SLOT(on_file_new()));
-	connect(ui.actionOpen, SIGNAL(activated()), this, SLOT(on_file_open()));
-	connect(ui.actionQuit, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 }
 
 main_window::~main_window()
@@ -134,6 +112,33 @@ void main_window::on_file_open()
 
 	main_window* const window = new main_window(document_path, *document);
 	window->show();
+}
+
+void main_window::initialize(k3d::idocument& Document)
+{
+	ui.setupUi(this);
+	statusBar()->setVisible(false);
+	setAttribute(Qt::WA_DeleteOnClose);
+
+	m_scene.reset(new scene(Document));
+	ui.viewport->setScene(m_scene.get());
+
+	QMenu* const mode_menu = ui.menuEdit->addMenu(tr("Mode"));
+
+	mode_menu->addAction(new k3d::qtui::action(tr("-- None --"), mode_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_edit_mode), static_cast<k3d::iplugin_factory*>(0))));
+	mode_menu->addSeparator();
+	std::vector<k3d::iplugin_factory*> modes = k3d::plugin::factory::lookup("qtui:component-type", "mode");
+	for(int i = 0; i != modes.size(); ++i)
+		mode_menu->addAction(new k3d::qtui::action(modes[i]->name().c_str(), mode_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_edit_mode), modes[i])));
+
+	connect(ui.actionNew, SIGNAL(activated()), this, SLOT(on_file_new()));
+	connect(ui.actionOpen, SIGNAL(activated()), this, SLOT(on_file_open()));
+	connect(ui.actionQuit, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
+}
+
+void main_window::on_edit_mode(k3d::iplugin_factory* const Mode)
+{
+	m_scene->set_active_mode(Mode ? k3d::plugin::create<k3d::qtui::mode>(*Mode) : static_cast<k3d::qtui::mode*>(0));
 }
 
 } // namespace qtui

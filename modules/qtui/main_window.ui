@@ -22,7 +22,20 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="module::qtui::viewport" name="viewport"/>
+     <widget class="module::qtui::viewport" name="viewport">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="midLineWidth">
+       <number>0</number>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -44,11 +57,17 @@
     <addaction name="actionQuit"/>
     <addaction name="actionClose"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </widget>
   <action name="actionOpen">

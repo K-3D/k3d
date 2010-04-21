@@ -23,7 +23,13 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/qtui/mode.h>
 
+#include <QGraphicsProxyWidget>
+#include <QGraphicsScene>
+#include <QMenu>
+#include <QToolButton>
+
 #include <boost/assign/list_of.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace module
 {
@@ -55,9 +61,23 @@ public:
 		k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 	}
 
-	void enable()
+	void enable(QGraphicsScene& Scene)
 	{
 		k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+
+		QToolButton* const file_menu_button = new QToolButton();
+		file_menu_button->setText("Default Stuff");
+		file_menu_button->setPopupMode(QToolButton::MenuButtonPopup);
+
+		QMenu* const file_menu = new QMenu(file_menu_button);
+		file_menu->addAction("Stampede");
+		file_menu->addAction("Framulize");
+		file_menu->addAction("Transmogrify");
+
+		file_menu_button->setMenu(file_menu);
+
+		button_proxy.reset(Scene.addWidget(file_menu_button));
+		button_proxy->setPos(10, 10);
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -72,6 +92,8 @@ public:
 
 		return factory;
 	}
+
+	boost::scoped_ptr<QGraphicsProxyWidget> button_proxy;
 };
 
 } // namespace def

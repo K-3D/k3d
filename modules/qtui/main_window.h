@@ -30,6 +30,7 @@
 #include <boost/scoped_ptr.hpp>
 
 namespace k3d { class idocument; }
+namespace k3d { class iplugin_factory; }
 namespace k3d { namespace filesystem { class path; } }
 
 namespace module
@@ -58,7 +59,10 @@ private Q_SLOTS:
 	void on_file_open();
 
 private:
-	k3d::idocument& m_document;
+	void initialize(k3d::idocument& Document);
+
+	void on_edit_mode(k3d::iplugin_factory* const Mode);
+
 	Ui::main_window ui;
 	boost::scoped_ptr<scene> m_scene;
 };

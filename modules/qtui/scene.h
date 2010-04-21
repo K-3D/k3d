@@ -34,10 +34,8 @@
 #include <QGraphicsScene>
 
 class QComboBox;
-class QGraphicsTextItem;
 
 namespace k3d { class idocument; }
-namespace k3d { namespace qtui { class mode; } }
 
 namespace module
 {
@@ -59,6 +57,8 @@ public:
  
 	virtual void drawBackground(QPainter *painter, const QRectF &rect);
 
+	void set_active_mode(k3d::qtui::mode* const Mode);
+
 private Q_SLOTS:
 	void on_camera_changed(int Index);
 	void on_render_engine_changed(int Index);
@@ -72,7 +72,6 @@ private:
 	GLdouble m_gl_view_matrix[16];
 	GLdouble m_gl_projection_matrix[16];
 	GLint m_gl_viewport[4];
-	QGraphicsTextItem* m_fps;
 	QComboBox* m_camera_combo;
 	QComboBox* m_engine_combo;
 	std::vector<k3d::icamera*> m_cameras;

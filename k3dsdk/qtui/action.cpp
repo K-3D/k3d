@@ -1,6 +1,3 @@
-#ifndef K3DSDK_QTUI_MODE_H
-#define K3DSDK_QTUI_MODE_H
-
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -24,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-class QGraphicsScene;
+#include <k3dsdk/qtui/action.h>
 
 namespace k3d
 {
@@ -33,24 +30,38 @@ namespace qtui
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// mode
+// action
 
-/// Abstract base class for Modes - objects that control user-interaction by
-/// combining rendering, interaction, and business logic in one place.
-class mode
+action::action(QObject* Parent, const sigc::slot<void>& Slot) :
+	base(Parent)
 {
-public:
-	virtual ~mode();
+	initialize(Slot);
+}
 
-	virtual void enable(QGraphicsScene& scene) = 0;
+action::action(const QString& Text, QObject* Parent, const sigc::slot<void>& Slot) :
+	base(Text, Parent)
+{
+	initialize(Slot);
+}
 
-protected:
-	mode();
-};
+action::action(const QIcon& Icon, const QString& Text, QObject* Parent, const sigc::slot<void>& Slot) :
+	base(Icon, Text, Parent)
+{
+	initialize(Slot);
+}
+
+void action::initialize(const sigc::slot<void>& Slot)
+{
+	connect(this, SIGNAL(triggered(bool)), this, SLOT(on_triggered(bool)));
+	triggered_signal.connect(sigc::hide(Slot));
+}
+
+void action::on_triggered(bool checked)
+{
+	triggered_signal.emit(checked);
+}
 
 } // namespace qtui
 
 } // namespace k3d
-
-#endif // !K3DSDK_QTUI_MODE_H
 
