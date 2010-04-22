@@ -73,7 +73,7 @@ main_window::~main_window()
 k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 }
 
-void main_window::on_file_new()
+void main_window::on_file_new_activated()
 {
 	k3d::idocument* const document = k3d::application().create_document();
 	return_if_fail(document);
@@ -84,7 +84,7 @@ void main_window::on_file_new()
 	window->show();
 }
 
-void main_window::on_file_open()
+void main_window::on_file_open_activated()
 {
 	boost::scoped_ptr<k3d::idocument_importer> importer(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
 	if(!importer.get())
@@ -112,12 +112,12 @@ void main_window::on_file_open()
 	window->show();
 }
 
-void main_window::on_file_quit()
+void main_window::on_file_quit_activated()
 {
 	k3d::qtui::application::instance().close();
 }
 
-void main_window::on_help_about()
+void main_window::on_help_about_activated()
 {
 	QDialog* const dialog = k3d::plugin::create<QDialog>("QTUIAboutDialog");
 	return_if_fail(dialog);
@@ -146,11 +146,6 @@ void main_window::initialize(k3d::idocument& Document)
 	std::vector<k3d::iplugin_factory*> dialogs = k3d::plugin::factory::lookup("qtui:component-type", "dialog");
 	for(int i = 0; i != dialogs.size(); ++i)
 		dialog_menu->addAction(new k3d::qtui::action(dialogs[i]->name().c_str(), dialog_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_advanced_dialog), dialogs[i])));
-
-	connect(ui.actionNew, SIGNAL(activated()), this, SLOT(on_file_new()));
-	connect(ui.actionOpen, SIGNAL(activated()), this, SLOT(on_file_open()));
-	connect(ui.actionQuit, SIGNAL(activated()), this, SLOT(on_file_quit()));
-	connect(ui.actionAbout, SIGNAL(activated()), this, SLOT(on_help_about()));
 }
 
 void main_window::on_edit_mode(k3d::iplugin_factory* const Mode)

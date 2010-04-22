@@ -52,10 +52,10 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew"/>
-    <addaction name="actionOpen"/>
-    <addaction name="actionQuit"/>
-    <addaction name="actionClose"/>
+    <addaction name="file_new"/>
+    <addaction name="file_open"/>
+    <addaction name="file_quit"/>
+    <addaction name="file_close"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -66,7 +66,7 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionAbout"/>
+    <addaction name="help_about"/>
    </widget>
    <widget class="QMenu" name="menuAdvanced">
     <property name="title">
@@ -83,7 +83,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <action name="actionOpen">
+  <action name="file_open">
    <property name="text">
     <string>Open</string>
    </property>
@@ -91,7 +91,7 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="actionQuit">
+  <action name="file_quit">
    <property name="text">
     <string>Quit</string>
    </property>
@@ -99,7 +99,7 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionNew">
+  <action name="file_new">
    <property name="text">
     <string>New</string>
    </property>
@@ -107,7 +107,7 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionClose">
+  <action name="file_close">
    <property name="text">
     <string>Close</string>
    </property>
@@ -115,7 +115,7 @@
     <string>Ctrl+W</string>
    </property>
   </action>
-  <action name="actionAbout">
+  <action name="help_about">
    <property name="text">
     <string>About K-3D</string>
    </property>
@@ -131,7 +131,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>actionClose</sender>
+   <sender>file_close</sender>
    <signal>triggered()</signal>
    <receiver>main_window</receiver>
    <slot>close()</slot>

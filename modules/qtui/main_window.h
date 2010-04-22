@@ -55,10 +55,10 @@ public:
 	~main_window();
 
 private Q_SLOTS:
-	void on_file_new();
-	void on_file_open();
-	void on_file_quit();
-	void on_help_about();
+	void on_file_new_activated();
+	void on_file_open_activated();
+	void on_file_quit_activated();
+	void on_help_about_activated();
 
 private:
 	void initialize(k3d::idocument& Document);
