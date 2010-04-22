@@ -24,7 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <QMainWindow>
+#include <k3dsdk/qtui/document_window.h>
 #include <ui_main_window.h>
 
 #include <boost/scoped_ptr.hpp>
@@ -45,7 +45,7 @@ class scene;
 // main_window
 	
 class main_window :
-	public QMainWindow
+	public k3d::qtui::document_window
 {
 	Q_OBJECT
 
@@ -57,6 +57,7 @@ public:
 private Q_SLOTS:
 	void on_file_new();
 	void on_file_open();
+	void on_file_quit();
 	void on_help_about();
 
 private:

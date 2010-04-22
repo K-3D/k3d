@@ -32,18 +32,15 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/qtui/action.h>
+#include <k3dsdk/qtui/application.h>
 #include <k3dsdk/qtui/document.h>
 #include <k3dsdk/share.h>
 
 #include <QAction>
-#include <QApplication>
-#include <QComboBox>
 #include <QDialog>
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QStatusBar>
-#include <QToolBar>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -115,6 +112,11 @@ void main_window::on_file_open()
 	window->show();
 }
 
+void main_window::on_file_quit()
+{
+	k3d::qtui::application::instance().close();
+}
+
 void main_window::on_help_about()
 {
 	QDialog* const dialog = k3d::plugin::create<QDialog>("QTUIAboutDialog");
@@ -147,8 +149,8 @@ void main_window::initialize(k3d::idocument& Document)
 
 	connect(ui.actionNew, SIGNAL(activated()), this, SLOT(on_file_new()));
 	connect(ui.actionOpen, SIGNAL(activated()), this, SLOT(on_file_open()));
+	connect(ui.actionQuit, SIGNAL(activated()), this, SLOT(on_file_quit()));
 	connect(ui.actionAbout, SIGNAL(activated()), this, SLOT(on_help_about()));
-	connect(ui.actionQuit, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 }
 
 void main_window::on_edit_mode(k3d::iplugin_factory* const Mode)

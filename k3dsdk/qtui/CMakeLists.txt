@@ -6,7 +6,12 @@ FILE(GLOB SOURCES *.cpp)
 LIST(SORT HEADERS)
 LIST(SORT SOURCES)
 
-QT4_WRAP_CPP(MOC_BUILT_SOURCES action.h)
+QT4_WRAP_CPP(MOC_BUILT_SOURCES
+	action.h
+	application.h
+	application_dialog.h
+	document_window.h
+	)
 
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 

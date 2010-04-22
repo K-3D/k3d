@@ -25,8 +25,7 @@
 #include <k3dsdk/contributors.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
-
-#include <QDialog>
+#include <k3dsdk/qtui/application_dialog.h>
 
 #include <boost/assign/list_of.hpp>
 #include <sstream>
@@ -45,7 +44,7 @@ namespace about
 
 /// Creates an "about" box that displays program version and copyright
 class dialog :
-	public QDialog,
+	public k3d::qtui::application_dialog,
 	public k3d::iunknown
 {
 public:
@@ -70,7 +69,7 @@ public:
 			else
 			{
 				buffer << "<div align='center' style='color: #000000; font-size: 16px; font-weight: bold;'>" << contributor->name.raw() << "</div>";
-				buffer << "<div align='center' style='color: #555555; font-size: 12px;'>" << contributor->description << "</div><br/>";
+				buffer << "<div align='center' style='color: #555555; font-size: 10px;'>" << contributor->description << "</div><br/>";
 			}
 		}
 		buffer << "</body>";
