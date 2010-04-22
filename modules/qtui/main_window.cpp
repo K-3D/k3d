@@ -38,6 +38,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QComboBox>
+#include <QDialog>
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -114,6 +115,13 @@ void main_window::on_file_open()
 	window->show();
 }
 
+void main_window::on_help_about()
+{
+	QDialog* const dialog = k3d::plugin::create<QDialog>("QTUIAboutDialog");
+	return_if_fail(dialog);
+	dialog->show();
+}
+
 void main_window::initialize(k3d::idocument& Document)
 {
 	ui.setupUi(this);
@@ -123,22 +131,37 @@ void main_window::initialize(k3d::idocument& Document)
 	m_scene.reset(new scene(Document));
 	ui.viewport->setScene(m_scene.get());
 
+	// Setup manual access to edit modes ...
 	QMenu* const mode_menu = ui.menuEdit->addMenu(tr("Mode"));
-
 	mode_menu->addAction(new k3d::qtui::action(tr("-- None --"), mode_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_edit_mode), static_cast<k3d::iplugin_factory*>(0))));
 	mode_menu->addSeparator();
 	std::vector<k3d::iplugin_factory*> modes = k3d::plugin::factory::lookup("qtui:component-type", "mode");
 	for(int i = 0; i != modes.size(); ++i)
 		mode_menu->addAction(new k3d::qtui::action(modes[i]->name().c_str(), mode_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_edit_mode), modes[i])));
 
+	// Setup manual access to dialogs ...
+	QMenu* const dialog_menu = ui.menuAdvanced->addMenu(tr("Dialogs"));
+	std::vector<k3d::iplugin_factory*> dialogs = k3d::plugin::factory::lookup("qtui:component-type", "dialog");
+	for(int i = 0; i != dialogs.size(); ++i)
+		dialog_menu->addAction(new k3d::qtui::action(dialogs[i]->name().c_str(), dialog_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_advanced_dialog), dialogs[i])));
+
 	connect(ui.actionNew, SIGNAL(activated()), this, SLOT(on_file_new()));
 	connect(ui.actionOpen, SIGNAL(activated()), this, SLOT(on_file_open()));
+	connect(ui.actionAbout, SIGNAL(activated()), this, SLOT(on_help_about()));
 	connect(ui.actionQuit, SIGNAL(activated()), QCoreApplication::instance(), SLOT(quit()));
 }
 
 void main_window::on_edit_mode(k3d::iplugin_factory* const Mode)
 {
 	m_scene->set_active_mode(Mode ? k3d::plugin::create<k3d::qtui::mode>(*Mode) : static_cast<k3d::qtui::mode*>(0));
+}
+
+void main_window::on_advanced_dialog(k3d::iplugin_factory* const Dialog)
+{
+	QDialog* const dialog = Dialog ? k3d::plugin::create<QDialog>(*Dialog) : static_cast<QDialog*>(0);
+	return_if_fail(dialog);
+
+	dialog->show();
 }
 
 } // namespace qtui

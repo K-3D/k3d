@@ -57,11 +57,13 @@ public:
 private Q_SLOTS:
 	void on_file_new();
 	void on_file_open();
+	void on_help_about();
 
 private:
 	void initialize(k3d::idocument& Document);
 
 	void on_edit_mode(k3d::iplugin_factory* const Mode);
+	void on_advanced_dialog(k3d::iplugin_factory* const Dialog);
 
 	Ui::main_window ui;
 	boost::scoped_ptr<scene> m_scene;
