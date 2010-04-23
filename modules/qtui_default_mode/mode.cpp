@@ -26,6 +26,7 @@
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
 #include <QMenu>
+#include <QScriptEngine>
 #include <QToolButton>
 
 #include <boost/assign/list_of.hpp>
@@ -53,12 +54,10 @@ class mode :
 public:
 	mode()
 	{
-		k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-	}
-
-	~mode()
-	{
-		k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+		k3d::log() << debug << script_engine.availableExtensions().join(" ").toAscii().data() << std::endl;
+		script_engine.importExtension("qt");
+		script_engine.importExtension("qt.core");
+		script_engine.importExtension("qt.gui");
 	}
 
 	void enable(QGraphicsScene& Scene)
@@ -78,6 +77,12 @@ public:
 
 		button_proxy.reset(Scene.addWidget(file_menu_button));
 		button_proxy->setPos(10, 10);
+
+		script_engine.globalObject().setProperty("scene", script_engine.newQObject(&Scene));
+		QScriptValue result = script_engine.evaluate("button = new QPushButton('Push Me'); wrapper = scene.addWidget(button); wrapper.pos = new QPointF(100, 10); button.clicked.connect(function(){ print('ouch'); }); button.show();");
+
+		if(result.isError())
+			k3d::log() << error << result.toString().toAscii().data() << std::endl;
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -93,6 +98,7 @@ public:
 		return factory;
 	}
 
+	QScriptEngine script_engine;
 	boost::scoped_ptr<QGraphicsProxyWidget> button_proxy;
 };
 
