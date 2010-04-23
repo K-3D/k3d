@@ -45,7 +45,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -53,9 +53,10 @@
      <string>File</string>
     </property>
     <addaction name="file_new"/>
-    <addaction name="file_open"/>
-    <addaction name="file_quit"/>
     <addaction name="file_close"/>
+    <addaction name="file_open"/>
+    <addaction name="separator"/>
+    <addaction name="file_quit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -75,8 +76,8 @@
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
-   <addaction name="menuHelp"/>
    <addaction name="menuAdvanced"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="enabled">
