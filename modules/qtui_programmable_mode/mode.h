@@ -17,13 +17,16 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <k3d-i18n-config.h>
-#include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/log.h>
-#include <k3dsdk/module.h>
+#include <k3dsdk/iunknown.h>
 #include <k3dsdk/qtui/mode.h>
 
-#include <boost/assign/list_of.hpp>
+#include <QGraphicsProxyWidget>
+#include <QScriptEngine>
+
+#include <boost/scoped_ptr.hpp>
+
+namespace k3d { class iplugin_factory; }
+class QGraphicsProxyWidget;
 
 namespace module
 {
@@ -31,49 +34,46 @@ namespace module
 namespace qtui
 {
 
-namespace def
+namespace programmable
 {
 
 /////////////////////////////////////////////////////////////////////////////
 // mode
 
-/// Sets-up a default mode for use when no other mode is in-effect.
+/// Provides a programmable edit mode, mainly intended for development.
 class mode :
+	public QObject,
 	public k3d::qtui::mode,
 	public k3d::iunknown
 {
+	Q_OBJECT
+
 	typedef k3d::qtui::mode base;
 
 public:
-	mode()
-	{
-	}
+	mode();
 
-	void enable(QGraphicsScene& Scene)
-	{
-	}
+	void enable(QGraphicsScene& Scene);
 
-	static k3d::iplugin_factory& get_factory()
-	{
-		static k3d::application_plugin_factory<mode> factory(
-			k3d::uuid(0x6b5cbfd7, 0x8742246c, 0x5345988d, 0x2e14ecf7),
-			"QTUIDefaultMode",
-			_("Provides default behavior when no other mode is in-use."),
-			"QTUI Mode",
-			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("qtui:component-type", "mode"));
+	static k3d::iplugin_factory& get_factory();
 
-		return factory;
-	}
+private Q_SLOTS:
+	void on_load();
+	void on_edit();
+	void on_save();
+	void on_reload();
+	void on_scene_rect_changed(const QRectF& Rect);
+
+private:
+	QGraphicsScene* scene;
+	QString program;
+	boost::scoped_ptr<QScriptEngine> script_engine;
+	boost::scoped_ptr<QGraphicsProxyWidget> edit_menu_proxy;
 };
 
-} // namespace def
+} // namespace programmable
 
 } // namespace qtui
 
 } // namespace module
-
-K3D_MODULE_START(Registry)
-	Registry.register_factory(module::qtui::def::mode::get_factory());
-K3D_MODULE_END
 

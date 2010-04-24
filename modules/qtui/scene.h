@@ -33,8 +33,6 @@
 
 #include <QGraphicsScene>
 
-class QComboBox;
-
 namespace k3d { class idocument; }
 
 namespace module
@@ -53,7 +51,6 @@ class scene :
 
 public:
 	scene(k3d::idocument& Document);
-	~scene();
  
 	virtual void drawBackground(QPainter *painter, const QRectF &rect);
 
@@ -72,8 +69,6 @@ private:
 	GLdouble m_gl_view_matrix[16];
 	GLdouble m_gl_projection_matrix[16];
 	GLint m_gl_viewport[4];
-	QComboBox* m_camera_combo;
-	QComboBox* m_engine_combo;
 	std::vector<k3d::icamera*> m_cameras;
 	std::vector<k3d::gl::irender_viewport*> m_render_engines;
 	boost::scoped_ptr<k3d::qtui::mode> m_active_mode;
