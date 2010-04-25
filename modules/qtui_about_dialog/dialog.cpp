@@ -25,7 +25,9 @@
 #include <k3dsdk/contributors.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/qtui/application_dialog.h>
+#include <k3dsdk/qtui/application_widget.h>
+
+#include <QDialog>
 
 #include <boost/assign/list_of.hpp>
 #include <sstream>
@@ -44,11 +46,12 @@ namespace about
 
 /// Creates an "about" box that displays program version and copyright
 class dialog :
-	public k3d::qtui::application_dialog,
+	public QDialog,
 	public k3d::iunknown
 {
 public:
-	dialog()
+	dialog() :
+		application_widget(*this)
 	{
 		ui.setupUi(this);
 
@@ -79,11 +82,6 @@ public:
 		this->setAttribute(Qt::WA_DeleteOnClose);
 	}
 
-	~dialog()
-	{
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-	}
-
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<dialog> factory(
@@ -98,6 +96,7 @@ k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 	}
 
 	Ui::QTUIAboutDialog ui;
+	k3d::qtui::application_widget application_widget;
 };
 
 } // namespace about

@@ -24,6 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "scene.h"
+
 #include <k3dsdk/qtui/document_window.h>
 #include <ui_main_window.h>
 
@@ -39,8 +41,6 @@ namespace module
 namespace qtui
 {
 
-class scene;
-
 //////////////////////////////////////////////////////////////////////////
 // main_window
 	
@@ -52,7 +52,6 @@ class main_window :
 public:
 	main_window(k3d::idocument& Document);
 	main_window(const k3d::filesystem::path& DocumentPath, k3d::idocument& Document);
-	~main_window();
 
 private Q_SLOTS:
 	void on_file_new_activated();
@@ -64,7 +63,7 @@ private:
 	void initialize(k3d::idocument& Document);
 
 	void on_edit_mode(k3d::iplugin_factory* const Mode);
-	void on_advanced_dialog(k3d::iplugin_factory* const Dialog);
+	void on_advanced_dialog(k3d::iplugin_factory* const Widget);
 
 	Ui::main_window ui;
 	boost::scoped_ptr<scene> m_scene;

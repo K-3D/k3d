@@ -22,7 +22,6 @@
 */
 
 #include "main_window.h"
-#include "scene.h"
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
@@ -57,20 +56,13 @@ namespace qtui
 	
 main_window::main_window(k3d::idocument& Document)
 {
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 	initialize(Document);
 }
 
 main_window::main_window(const k3d::filesystem::path& DocumentPath, k3d::idocument& Document)
 {
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 	initialize(Document);
 	setWindowTitle(("K-3D - " + DocumentPath.leaf().raw()).c_str());
-}
-
-main_window::~main_window()
-{
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void main_window::on_file_new_activated()
@@ -153,12 +145,11 @@ void main_window::on_edit_mode(k3d::iplugin_factory* const Mode)
 	m_scene->set_active_mode(Mode ? k3d::plugin::create<k3d::qtui::mode>(*Mode) : static_cast<k3d::qtui::mode*>(0));
 }
 
-void main_window::on_advanced_dialog(k3d::iplugin_factory* const Dialog)
+void main_window::on_advanced_dialog(k3d::iplugin_factory* const Widget)
 {
-	QDialog* const dialog = Dialog ? k3d::plugin::create<QDialog>(*Dialog) : static_cast<QDialog*>(0);
-	return_if_fail(dialog);
-
-	dialog->show();
+	QWidget* const widget = Widget ? k3d::plugin::create<QWidget>(*Widget) : static_cast<QWidget*>(0);
+	return_if_fail(widget);
+	widget->show();
 }
 
 } // namespace qtui

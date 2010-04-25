@@ -1,6 +1,3 @@
-#ifndef K3DSDK_QTUI_APPLICATION_DIALOG_H
-#define K3DSDK_QTUI_APPLICATION_DIALOG_H
-
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -24,7 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <QDialog>
+#include <k3dsdk/qtui/modal_text_editor.h>
 
 namespace k3d
 {
@@ -33,27 +30,17 @@ namespace qtui
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// application_dialog
+// modal_text_editor
 
-/// Provides a standard base-class for dialogs that should be closed automatically if the application is closed.
-class application_dialog :
-	public QDialog
+modal_text_editor::modal_text_editor()
 {
-	Q_OBJECT;
+}
 
-	typedef QDialog base;
-
-public:
-	application_dialog(QWidget* Parent = 0, Qt::WindowFlags Flags = 0);
-
-private Q_SLOTS:
-	/// Called when the application is about to close.
-	void application_closing();
-};
+modal_text_editor::~modal_text_editor()
+{
+}
 
 } // namespace qtui
 
 } // namespace k3d
-
-#endif // !K3DSDK_QTUI_APPLICATION_DIALOG_H
 

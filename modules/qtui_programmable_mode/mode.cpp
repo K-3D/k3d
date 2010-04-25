@@ -23,6 +23,8 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
+#include <k3dsdk/plugin.h>
+#include <k3dsdk/qtui/modal_text_editor.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/types.h>
 
@@ -72,13 +74,12 @@ void mode::on_load()
 
 void mode::on_edit()
 {
-	k3d::bool_t ok = false;
-	const QString new_program = QInputDialog::getText(0, tr("Edit program"), tr("Program:"), QLineEdit::Normal, program, &ok);
-	if(!ok)
+	boost::scoped_ptr<k3d::qtui::modal_text_editor> editor(k3d::plugin::create<k3d::qtui::modal_text_editor>("QTUITextEditor"));
+	return_if_fail(editor);
+
+	if(!editor->modal_edit(tr("Edit Mode Script"), program))
 		return;
 
-	program = new_program;
-	
 	QTimer::singleShot(0, this, SLOT(on_reload()));
 }
 

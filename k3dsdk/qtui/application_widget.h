@@ -1,3 +1,6 @@
+#ifndef K3DSDK_QTUI_APPLICATION_WIDGET_H
+#define K3DSDK_QTUI_APPLICATION_WIDGET_H
+
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -21,8 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/qtui/application.h>
-#include <k3dsdk/qtui/application_dialog.h>
+#include <QObject>
 
 namespace k3d
 {
@@ -31,20 +33,30 @@ namespace qtui
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// application_dialog
+// application_widget
 
-application_dialog::application_dialog(QWidget* Parent, Qt::WindowFlags Flags) :
-	base(Parent, Flags)
+/// Provides a standard base-class for dialogs that should be closed automatically if the application is closed.
+class application_widget :
+	public QObject
 {
-	connect(&application::instance(), SIGNAL(closing()), this, SLOT(application_closing()));
-}
+	Q_OBJECT;
 
-void application_dialog::application_closing()
-{
-	close();
-}
+	typedef QObject base;
+
+public:
+	application_widget(QWidget& owner);
+
+private Q_SLOTS:
+	/// Called when the application is about to close.
+	void application_closing();
+
+private:
+	QWidget& owner;
+};
 
 } // namespace qtui
 
 } // namespace k3d
+
+#endif // !K3DSDK_QTUI_APPLICATION_WIDGET_H
 

@@ -9,7 +9,7 @@ LIST(SORT SOURCES)
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
 	action.h
 	application.h
-	application_dialog.h
+	application_widget.h
 	document_window.h
 	)
 
