@@ -29,14 +29,17 @@
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/types.h>
 
+#include <QFileDialog>
 #include <QGraphicsScene>
-#include <QInputDialog>
 #include <QMenu>
 #include <QTimer>
 #include <QToolButton>
 
 #include <boost/assign/list_of.hpp>
 #include <boost/scoped_ptr.hpp>
+
+#include <fstream>
+#include <sstream>
 
 namespace module
 {
@@ -74,12 +77,19 @@ void mode::on_script_changed()
 	if(!scene)
 		return;
 
-	on_reload();
+	QTimer::singleShot(0, this, SLOT(on_reload()));
 }
 
 void mode::on_load()
 {
-	k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+	const QString file_path = QFileDialog::getOpenFileName(0, tr("Load Mode Script"), "", tr("Mode Scripts (*.js)"));
+	if(file_path.isEmpty())
+		return;
+
+	std::ifstream file(file_path.toAscii().data());
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	k3d::property::set_internal_value(script, buffer.str());
 }
 
 void mode::on_edit()
@@ -91,7 +101,7 @@ void mode::on_edit()
 	if(!editor->modal_edit(tr("Edit Mode Script"), program))
 		return;
 
-	k3d::property::set_internal_value(script, program.toAscii().data());
+	k3d::property::set_internal_value(script, program.toStdString());
 	QTimer::singleShot(0, this, SLOT(on_reload()));
 }
 
@@ -136,7 +146,7 @@ void mode::on_scene_rect_changed(const QRectF& Rect)
 		return;
 
 	const QRectF proxy_rect = edit_menu_proxy->geometry();
-	edit_menu_proxy->setPos(Rect.right() - proxy_rect.width() - 20, Rect.bottom() - proxy_rect.height() - 20);
+	edit_menu_proxy->setPos(Rect.right() - proxy_rect.width() - 20, Rect.top() + 20);
 }
 
 k3d::iplugin_factory& mode::get_factory()
