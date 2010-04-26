@@ -58,7 +58,6 @@ class window :
 
 public:
 	window();
-	~window();
 
 	k3d::bool_t modal_edit(const QString& Label, QString& Text);
 

@@ -81,11 +81,6 @@ window::window() :
 	connect(ui.modal_controls, SIGNAL(rejected()), this, SLOT(modal_reject()));
 }
 
-window::~window()
-{
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-}
-
 k3d::bool_t window::modal_edit(const QString& Label, QString& Text)
 {
 	QEventLoop event_loop;
