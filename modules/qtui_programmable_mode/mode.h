@@ -17,8 +17,10 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <k3dsdk/iunknown.h>
+#include <k3dsdk/data.h>
+#include <k3dsdk/property_collection.h>
 #include <k3dsdk/qtui/mode.h>
+#include <k3dsdk/types.h>
 
 #include <QGraphicsProxyWidget>
 #include <QScriptEngine>
@@ -44,7 +46,7 @@ namespace programmable
 class mode :
 	public QObject,
 	public k3d::qtui::mode,
-	public k3d::iunknown
+	public k3d::property_collection
 {
 	Q_OBJECT
 
@@ -58,6 +60,7 @@ public:
 	static k3d::iplugin_factory& get_factory();
 
 private Q_SLOTS:
+	void on_script_changed();
 	void on_load();
 	void on_edit();
 	void on_save();
@@ -66,7 +69,7 @@ private Q_SLOTS:
 
 private:
 	QGraphicsScene* scene;
-	QString program;
+	k3d_data(k3d::string_t, k3d::data::immutable_name, change_signal, no_undo, local_storage, no_constraint, script_property, no_serialization) script;
 	boost::scoped_ptr<QScriptEngine> script_engine;
 	boost::scoped_ptr<QGraphicsProxyWidget> edit_menu_proxy;
 };

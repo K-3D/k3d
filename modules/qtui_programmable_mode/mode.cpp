@@ -24,6 +24,7 @@
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/plugin.h>
+#include <k3dsdk/property.h>
 #include <k3dsdk/qtui/modal_text_editor.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/types.h>
@@ -51,8 +52,9 @@ namespace programmable
 
 mode::mode() :
 	scene(0),
-	program(k3d::resource::get_string("/QTUIProgrammableMode/default_script.js").c_str())
+	script(init_owner(*this) + init_name("script") + init_label(_("Script")) + init_description(_("Script source code")) + init_value<k3d::string_t>(""))
 {
+	script.changed_signal().connect(sigc::hide(sigc::mem_fun(*this, &mode::on_script_changed)));
 }
 
 void mode::enable(QGraphicsScene& Scene)
@@ -67,6 +69,14 @@ void mode::enable(QGraphicsScene& Scene)
 	on_reload();
 }
 
+void mode::on_script_changed()
+{
+	if(!scene)
+		return;
+
+	on_reload();
+}
+
 void mode::on_load()
 {
 	k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
@@ -77,9 +87,11 @@ void mode::on_edit()
 	boost::scoped_ptr<k3d::qtui::modal_text_editor> editor(k3d::plugin::create<k3d::qtui::modal_text_editor>("QTUITextEditor"));
 	return_if_fail(editor);
 
+	QString program = script.pipeline_value().c_str();
 	if(!editor->modal_edit(tr("Edit Mode Script"), program))
 		return;
 
+	k3d::property::set_internal_value(script, program.toAscii().data());
 	QTimer::singleShot(0, this, SLOT(on_reload()));
 }
 
@@ -90,7 +102,7 @@ void mode::on_save()
 
 void mode::on_reload()
 {
-	k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+	return_if_fail(scene);
 
 	QToolButton* const edit_menu_button = new QToolButton();
 	edit_menu_button->setText("Edit");
@@ -111,7 +123,7 @@ void mode::on_reload()
 	script_engine->importExtension("qt.core");
 	script_engine->importExtension("qt.gui");
 	script_engine->globalObject().setProperty("scene", script_engine->newQObject(scene));
-	QScriptValue result = script_engine->evaluate(program);
+	QScriptValue result = script_engine->evaluate(script.pipeline_value().c_str());
 	if(result.isError())
 		k3d::log() << error << result.toString().toAscii().data() << std::endl;
 
@@ -132,7 +144,7 @@ k3d::iplugin_factory& mode::get_factory()
 	static k3d::application_plugin_factory<mode> factory(
 		k3d::uuid(0xccadd74f, 0xf44ad6e9, 0x12eeefa4, 0xde50723a),
 		"QTUIProgrammableMode",
-		_("Provides an edit-mode with programmable behavior, intended mainly as a development and debugging tool."),
+		_("Provides an edit-mode with programmable behavior."),
 		"QTUI Mode",
 		k3d::iplugin_factory::EXPERIMENTAL,
 		boost::assign::map_list_of("qtui:component-type", "mode"));
