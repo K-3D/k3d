@@ -102,7 +102,6 @@ void mode::on_edit()
 		return;
 
 	k3d::property::set_internal_value(script, program.toStdString());
-	QTimer::singleShot(0, this, SLOT(on_reload()));
 }
 
 void mode::on_save()
