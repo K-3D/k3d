@@ -10,7 +10,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 	action.h
 	application.h
 	application_widget.h
-	document_window.h
+	document_widget.h
 	)
 
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS)

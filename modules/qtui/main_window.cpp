@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -54,12 +54,14 @@ namespace qtui
 //////////////////////////////////////////////////////////////////////////
 // main_window
 	
-main_window::main_window(k3d::idocument& Document)
+main_window::main_window(k3d::idocument& Document) :
+	document_widget(*this, Document)
 {
 	initialize(Document);
 }
 
-main_window::main_window(const k3d::filesystem::path& DocumentPath, k3d::idocument& Document)
+main_window::main_window(const k3d::filesystem::path& DocumentPath, k3d::idocument& Document) :
+	document_widget(*this, Document)
 {
 	initialize(Document);
 	setWindowTitle(("K-3D - " + DocumentPath.leaf().raw()).c_str());

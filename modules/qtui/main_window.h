@@ -25,11 +25,12 @@
 */
 
 #include "scene.h"
+#include "ui_main_window.h"
 
-#include <k3dsdk/qtui/document_window.h>
-#include <ui_main_window.h>
-
+#include <k3dsdk/qtui/document_widget.h>
 #include <boost/scoped_ptr.hpp>
+
+#include <QMainWindow>
 
 namespace k3d { class idocument; }
 namespace k3d { class iplugin_factory; }
@@ -45,9 +46,9 @@ namespace qtui
 // main_window
 	
 class main_window :
-	public k3d::qtui::document_window
+	public QMainWindow
 {
-	Q_OBJECT
+	Q_OBJECT;
 
 public:
 	main_window(k3d::idocument& Document);
@@ -66,6 +67,7 @@ private:
 	void on_advanced_dialog(k3d::iplugin_factory* const Widget);
 
 	Ui::main_window ui;
+	k3d::qtui::document_widget document_widget;
 	boost::scoped_ptr<scene> m_scene;
 };
 	

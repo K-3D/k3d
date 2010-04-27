@@ -1,5 +1,5 @@
-#ifndef K3DSDK_QTUI_DOCUMENT_WINDOW_H
-#define K3DSDK_QTUI_DOCUMENT_WINDOW_H
+#ifndef K3DSDK_QTUI_FILE_DIALOG_H
+#define K3DSDK_QTUI_FILE_DIALOG_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -24,7 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <QMainWindow>
+#include <QFileDialog>
+#include <k3dsdk/path.h>
 
 namespace k3d
 {
@@ -33,27 +34,18 @@ namespace qtui
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// document_window
+// file_dialog
 
-/// Provides a standard base-class for windows that should be closed automatically if the application is closed.
-class document_window :
-	public QMainWindow
+class file_dialog
 {
-	Q_OBJECT;
-
-	typedef QMainWindow base;
-
 public:
-	document_window(QWidget* Parent = 0, Qt::WindowFlags Flags = 0);
-
-private Q_SLOTS:
-	/// Called when the application is about to close.
-	void application_closing();
+	static const filesystem::path get_open_filename(QWidget* parent = 0, const QString& caption = QString(), const QString& type = QString(), const QString& filter = QString(), QString* selectedFilter = 0, QFileDialog::Options options = 0);
+	static const filesystem::path get_save_filename(QWidget* parent = 0, const QString& caption = QString(), const QString& type = QString(), const QString& filter = QString(), QString* selectedFilter = 0, QFileDialog::Options options = 0);
 };
 
 } // namespace qtui
 
 } // namespace k3d
 
-#endif // !K3DSDK_QTUI_DOCUMENT_WINDOW_H
+#endif // !K3DSDK_QTUI_FILE_DIALOG_H
 

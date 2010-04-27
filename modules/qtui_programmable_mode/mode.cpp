@@ -21,15 +21,16 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/fstream.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/property.h>
+#include <k3dsdk/qtui/file_dialog.h>
 #include <k3dsdk/qtui/modal_text_editor.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/types.h>
 
-#include <QFileDialog>
 #include <QGraphicsScene>
 #include <QMenu>
 #include <QTimer>
@@ -38,7 +39,6 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include <fstream>
 #include <sstream>
 
 namespace module
@@ -82,13 +82,13 @@ void mode::on_script_changed()
 
 void mode::on_load()
 {
-	const QString file_path = QFileDialog::getOpenFileName(0, tr("Load Mode Script"), "", tr("Mode Scripts (*.js)"));
-	if(file_path.isEmpty())
+	const k3d::filesystem::path path = k3d::qtui::file_dialog::get_open_filename(0, tr("Load Mode Script"), "qtui_mode_script", tr("Mode Scripts (*.js)"));
+	if(path.empty())
 		return;
 
-	std::ifstream file(file_path.toAscii().data());
+	k3d::filesystem::ifstream stream(path);
 	std::stringstream buffer;
-	buffer << file.rdbuf();
+	buffer << stream.rdbuf();
 	k3d::property::set_internal_value(script, buffer.str());
 }
 
@@ -107,7 +107,12 @@ void mode::on_edit()
 
 void mode::on_save()
 {
-	k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
+	const k3d::filesystem::path path = k3d::qtui::file_dialog::get_save_filename(0, tr("Save Mode Script"), "qtui_mode_script", tr("Mode Scripts (*.js)"));
+	if(path.empty())
+		return;
+
+	k3d::filesystem::ofstream stream(path);
+	stream << script.internal_value();
 }
 
 void mode::on_reload()
@@ -132,6 +137,8 @@ void mode::on_reload()
 	script_engine->importExtension("qt");
 	script_engine->importExtension("qt.core");
 	script_engine->importExtension("qt.gui");
+	script_engine->importExtension("qt.phonon");
+	script_engine->importExtension("qt.svg");
 	script_engine->globalObject().setProperty("scene", script_engine->newQObject(scene));
 	QScriptValue result = script_engine->evaluate(script.pipeline_value().c_str());
 	if(result.isError())

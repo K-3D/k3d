@@ -1,6 +1,3 @@
-#ifndef K3DSDK_QTUI_APPLICATION_WIDGET_H
-#define K3DSDK_QTUI_APPLICATION_WIDGET_H
-
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -24,7 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <QObject>
+#include <k3dsdk/qtui/application.h>
+#include <k3dsdk/qtui/document_widget.h>
+
+#include <QWidget>
 
 namespace k3d
 {
@@ -33,30 +33,20 @@ namespace qtui
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// application_widget
+// document_widget
 
-/// Provides a mixin-class for widgets that should be closed automatically if the application is closed.
-class application_widget :
-	public QObject
+document_widget::document_widget(QWidget& Owner, idocument& Document) :
+	owner(Owner)
 {
-	Q_OBJECT;
+	connect(&application::instance(), SIGNAL(closing()), this, SLOT(application_closing()));
+}
 
-	typedef QObject base;
-
-public:
-	application_widget(QWidget& Owner);
-
-private Q_SLOTS:
-	/// Called when the application is about to close.
-	void application_closing();
-
-private:
-	QWidget& owner;
-};
+void document_widget::application_closing()
+{
+	owner.close();
+}
 
 } // namespace qtui
 
 } // namespace k3d
-
-#endif // !K3DSDK_QTUI_APPLICATION_WIDGET_H
 
