@@ -29,10 +29,12 @@
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/node.h>
+#include <k3dsdk/options.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/qtui/action.h>
 #include <k3dsdk/qtui/application.h>
 #include <k3dsdk/qtui/document.h>
+#include <k3dsdk/qtui/file_dialog.h>
 #include <k3dsdk/share.h>
 
 #include <QAction>
@@ -87,11 +89,9 @@ void main_window::on_file_open_activated()
 		return;
 	}
 
-	const QString filepath = QFileDialog::getOpenFileName(this, _("Choose a file to open:"), "/home", _("K-3D Documents (*.k3d)"));
-	if(filepath.isEmpty())
+	const k3d::filesystem::path document_path = k3d::qtui::file_dialog::get_open_filename(this, tr("Choose a file to open:"), k3d::options::path::documents(), tr("K-3D Documents (*.k3d)"));
+	if(document_path.empty())
 		return;
-
-	const k3d::filesystem::path document_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(filepath.toAscii().data()));
 
 	k3d::idocument* const document = k3d::application().create_document();
 	return_if_fail(document);

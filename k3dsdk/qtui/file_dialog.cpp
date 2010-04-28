@@ -33,22 +33,22 @@ namespace qtui
 /////////////////////////////////////////////////////////////////////////////
 // file_dialog
 
-const k3d::filesystem::path file_dialog::get_open_filename(QWidget* parent, const QString& caption, const QString& type, const QString& filter, QString* selectedFilter, QFileDialog::Options options)
+const k3d::filesystem::path file_dialog::get_open_filename(QWidget* parent, const QString& caption, const k3d::string_t& type, const QString& filter, QString* selectedFilter, QFileDialog::Options options)
 {
-	const k3d::filesystem::path default_path = k3d::options::get_path(type.toStdString());
+	const k3d::filesystem::path default_path = k3d::options::get_path(type);
 	const k3d::filesystem::path result = k3d::filesystem::native_path(k3d::ustring::from_utf8(QFileDialog::getOpenFileName(parent, caption, default_path.native_filesystem_string().c_str(), filter, selectedFilter, options).toStdString()));
 	if(!result.empty())
-		k3d::options::set_path(type.toStdString(), result);
+		k3d::options::set_path(type, result);
 
 	return result;
 }
 
-const k3d::filesystem::path file_dialog::get_save_filename(QWidget* parent, const QString& caption, const QString& type, const QString& filter, QString* selectedFilter, QFileDialog::Options options)
+const k3d::filesystem::path file_dialog::get_save_filename(QWidget* parent, const QString& caption, const k3d::string_t& type, const QString& filter, QString* selectedFilter, QFileDialog::Options options)
 {
-	const k3d::filesystem::path default_path = k3d::options::get_path(type.toStdString());
+	const k3d::filesystem::path default_path = k3d::options::get_path(type);
 	const k3d::filesystem::path result = k3d::filesystem::native_path(k3d::ustring::from_utf8(QFileDialog::getSaveFileName(parent, caption, default_path.native_filesystem_string().c_str(), filter, selectedFilter, options).toStdString()));
 	if(!result.empty())
-		k3d::options::set_path(type.toStdString(), result);
+		k3d::options::set_path(type, result);
 
 	return result;
 }

@@ -39,8 +39,8 @@ namespace qtui
 class file_dialog
 {
 public:
-	static const filesystem::path get_open_filename(QWidget* parent = 0, const QString& caption = QString(), const QString& type = QString(), const QString& filter = QString(), QString* selectedFilter = 0, QFileDialog::Options options = 0);
-	static const filesystem::path get_save_filename(QWidget* parent = 0, const QString& caption = QString(), const QString& type = QString(), const QString& filter = QString(), QString* selectedFilter = 0, QFileDialog::Options options = 0);
+	static const filesystem::path get_open_filename(QWidget* parent = 0, const QString& caption = QString(), const k3d::string_t& type = k3d::string_t(), const QString& filter = QString(), QString* selectedFilter = 0, QFileDialog::Options options = 0);
+	static const filesystem::path get_save_filename(QWidget* parent = 0, const QString& caption = QString(), const k3d::string_t& type = k3d::string_t(), const QString& filter = QString(), QString* selectedFilter = 0, QFileDialog::Options options = 0);
 };
 
 } // namespace qtui
