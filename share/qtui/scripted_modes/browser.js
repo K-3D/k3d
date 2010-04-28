@@ -4,6 +4,7 @@
 // qtui:component-type="mode"
 
 browser = new QWebView();
+browser.setWindowOpacity(0.7);
 browser.load(new QUrl("http://www.k-3d.org"));
 proxy = scene.addWidget(browser);
 proxy.setGeometry(50, 50, 600, 400);
