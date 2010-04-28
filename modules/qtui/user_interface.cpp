@@ -21,6 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "config.h"
 #include "main_window.h"
 #include "user_interface.h"
 
@@ -94,6 +95,8 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 	}
 
 	m_application.reset(new QApplication(argc, argv));
+	m_application->addLibraryPath(K3D_EXTRA_QT_PLUGINS);
+	k3d::log() << info << "Loading Qt plugins from " << m_application->libraryPaths().join(", ").toAscii().data() << std::endl;
 	
 	if(show_splash)
 	{

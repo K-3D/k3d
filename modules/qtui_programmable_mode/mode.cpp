@@ -138,12 +138,18 @@ void mode::on_reload()
 	edit_menu_proxy = scene->addWidget(edit_menu_button);
 
 	script_engine.reset(new QScriptEngine());
+
+//	k3d::log() << debug << "Available extensions: " << script_engine->availableExtensions().join(", ").toAscii().data() << std::endl;
+
 	script_engine->importExtension("qt");
 	script_engine->importExtension("qt.core");
 	script_engine->importExtension("qt.gui");
 	script_engine->importExtension("qt.phonon");
 	script_engine->importExtension("qt.webkit");
 	script_engine->importExtension("qt.svg");
+
+//	k3d::log() << debug << "Imported extensions: " << script_engine->importedExtensions().join(", ").toAscii().data() << std::endl;
+
 	script_engine->globalObject().setProperty("scene", script_engine->newQObject(scene));
 	QScriptValue result = script_engine->evaluate(script.pipeline_value().c_str());
 	if(result.isError())
