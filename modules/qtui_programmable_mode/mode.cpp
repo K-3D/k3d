@@ -142,6 +142,7 @@ void mode::on_reload()
 	script_engine->importExtension("qt.core");
 	script_engine->importExtension("qt.gui");
 	script_engine->importExtension("qt.phonon");
+	script_engine->importExtension("qt.webkit");
 	script_engine->importExtension("qt.svg");
 	script_engine->globalObject().setProperty("scene", script_engine->newQObject(scene));
 	QScriptValue result = script_engine->evaluate(script.pipeline_value().c_str());
