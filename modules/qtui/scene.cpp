@@ -39,6 +39,8 @@
 #include <boost/scoped_ptr.hpp>
 #include <iomanip>
 
+#include <QGraphicsItem>
+
 namespace module
 {
 
@@ -98,6 +100,11 @@ void scene::drawBackground(QPainter *painter, const QRectF &rect)
 void scene::set_active_mode(k3d::qtui::mode* const Mode)
 {
 	m_active_mode.reset(Mode);
+
+	QList<QGraphicsItem*> all_items = items();
+	for(int i = 0; i != all_items.size(); ++i)
+		delete all_items[i];
+
 	if(m_active_mode)
 		m_active_mode->enable(*this);
 }

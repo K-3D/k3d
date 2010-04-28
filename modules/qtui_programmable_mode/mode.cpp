@@ -55,7 +55,8 @@ namespace programmable
 
 mode::mode() :
 	scene(0),
-	script(init_owner(*this) + init_name("script") + init_label(_("Script")) + init_description(_("Script source code")) + init_value<k3d::string_t>(""))
+	script(init_owner(*this) + init_name("script") + init_label(_("Script")) + init_description(_("Script source code")) + init_value<k3d::string_t>("")),
+	edit_menu_proxy(0)
 {
 	script.changed_signal().connect(sigc::hide(sigc::mem_fun(*this, &mode::on_script_changed)));
 }
@@ -118,6 +119,10 @@ void mode::on_reload()
 {
 	return_if_fail(scene);
 
+	QList<QGraphicsItem*> all_items = scene->items();
+	for(int i = 0; i != all_items.size(); ++i)
+		delete all_items[i];
+
 	QToolButton* const edit_menu_button = new QToolButton();
 	edit_menu_button->setText("Edit");
 	edit_menu_button->setPopupMode(QToolButton::MenuButtonPopup);
@@ -130,7 +135,7 @@ void mode::on_reload()
 
 	edit_menu_button->setMenu(edit_menu);
 
-	edit_menu_proxy.reset(scene->addWidget(edit_menu_button));
+	edit_menu_proxy = scene->addWidget(edit_menu_button);
 
 	script_engine.reset(new QScriptEngine());
 	script_engine->importExtension("qt");

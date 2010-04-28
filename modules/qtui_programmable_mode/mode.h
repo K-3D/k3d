@@ -71,7 +71,7 @@ private:
 	QGraphicsScene* scene;
 	k3d_data(k3d::string_t, k3d::data::immutable_name, change_signal, no_undo, local_storage, no_constraint, script_property, no_serialization) script;
 	boost::scoped_ptr<QScriptEngine> script_engine;
-	boost::scoped_ptr<QGraphicsProxyWidget> edit_menu_proxy;
+	QGraphicsProxyWidget* edit_menu_proxy;
 };
 
 } // namespace programmable
