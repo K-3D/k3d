@@ -42,95 +42,6 @@ namespace module
 namespace selection
 {
 
-namespace detail
-{
-
-void select_connected_faces(k3d::mesh::bools_t& TaggedEdges, k3d::mesh::selection_t& FaceSelections, k3d::mesh::indices_t& EdgeFaces, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::indices_t& AdjacentEdges, const k3d::uint_t Edge)
-{
-	if(TaggedEdges[Edge])
-		return;
-
-	TaggedEdges[Edge] = true;
-	FaceSelections[EdgeFaces[Edge]] = 1.0;
-	select_connected_faces(TaggedEdges, FaceSelections, EdgeFaces, ClockwiseEdges, AdjacentEdges, AdjacentEdges[Edge]);
-	select_connected_faces(TaggedEdges, FaceSelections, EdgeFaces, ClockwiseEdges, AdjacentEdges, ClockwiseEdges[Edge]);
-}
-
-void select_connected_edges(k3d::mesh::bools_t& TaggedEdges, k3d::mesh::selection_t& EdgeSelections, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::indices_t& AdjacentEdges, const k3d::uint_t Edge)
-{
-	if(TaggedEdges[Edge])
-		return;
-
-	TaggedEdges[Edge] = true;
-	EdgeSelections[Edge] = 1.0;
-	select_connected_edges(TaggedEdges, EdgeSelections, ClockwiseEdges, AdjacentEdges, AdjacentEdges[Edge]);
-	select_connected_edges(TaggedEdges, EdgeSelections, ClockwiseEdges, AdjacentEdges, ClockwiseEdges[Edge]);
-}
-
-void select_connected_points(k3d::mesh::bools_t& TaggedEdges, k3d::mesh::selection_t& PointSelections, k3d::mesh::indices_t& EdgePoints, const k3d::mesh::indices_t& ClockwiseEdges, const k3d::mesh::indices_t& AdjacentEdges, const k3d::uint_t Edge)
-{
-	if(TaggedEdges[Edge])
-		return;
-
-	TaggedEdges[Edge] = true;
-	PointSelections[EdgePoints[Edge]] = 1.0;
-	select_connected_faces(TaggedEdges, PointSelections, EdgePoints, ClockwiseEdges, AdjacentEdges, AdjacentEdges[Edge]);
-	select_connected_faces(TaggedEdges, PointSelections, EdgePoints, ClockwiseEdges, AdjacentEdges, ClockwiseEdges[Edge]);
-}
-
-void select_connected_components(k3d::polyhedron::primitive& Polyhedron, k3d::mesh::selection_t& PointSelection)
-{
-	k3d::mesh::bools_t boundary_edges;
-	k3d::mesh::indices_t adjacent_edges;
-	k3d::polyhedron::create_edge_adjacency_lookup(Polyhedron.vertex_points, Polyhedron.clockwise_edges, boundary_edges, adjacent_edges);
-
-	const k3d::uint_t face_count = Polyhedron.face_first_loops.size();
-	const k3d::uint_t edge_count = Polyhedron.clockwise_edges.size();
-
-	// Find out what edges are directly connected to a selected component
-	k3d::mesh::indices_t face_selected_edges;
-	k3d::mesh::indices_t edge_selected_edges;
-	k3d::mesh::indices_t point_selected_edges;
-	k3d::mesh::indices_t edge_faces(edge_count);
-	for(k3d::uint_t face = 0; face != face_count; ++face)
-	{
-		const k3d::uint_t loop_begin = Polyhedron.face_first_loops[face];
-		const k3d::uint_t loop_end = loop_begin + Polyhedron.face_loop_counts[face];
-		for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
-		{
-			const k3d::uint_t first_edge = Polyhedron.loop_first_edges[loop];
-			for(k3d::uint_t edge = first_edge; ;)
-			{
-				if(Polyhedron.face_selections[face])
-					face_selected_edges.push_back(edge);
-				if(PointSelection[Polyhedron.vertex_points[edge]])
-					point_selected_edges.push_back(edge);
-				if(Polyhedron.edge_selections[edge])
-					edge_selected_edges.push_back(edge);
-
-				edge_faces[edge] = face; // There is an SDK function for this, but we're here now, so...
-
-				edge = Polyhedron.clockwise_edges[edge];
-				if(edge == first_edge)
-					break;
-			}
-		}
-	}
-
-	//  For all of these edges, select all of the components of the same type that are connected
-	k3d::mesh::bools_t tagged_edges(edge_count, false);
-	for(k3d::uint_t i = 0; i != face_selected_edges.size(); ++i)
-		select_connected_faces(tagged_edges, Polyhedron.face_selections, edge_faces, Polyhedron.clockwise_edges, adjacent_edges, face_selected_edges[i]);
-	tagged_edges.assign(edge_count, false);
-	for(k3d::uint_t i = 0; i != edge_selected_edges.size(); ++i)
-		select_connected_edges(tagged_edges, Polyhedron.edge_selections, Polyhedron.clockwise_edges, adjacent_edges, edge_selected_edges[i]);
-	tagged_edges.assign(edge_count, false);
-	for(k3d::uint_t i = 0; i != point_selected_edges.size(); ++i)
-		select_connected_points(tagged_edges, PointSelection, Polyhedron.vertex_points, Polyhedron.clockwise_edges, adjacent_edges, point_selected_edges[i]);
-}
-
-} // namespace detail
-
 /////////////////////////////////////////////////////////////////////////////
 // select_connected_components
 
@@ -141,10 +52,23 @@ class select_connected_components :
 
 public:
 	select_connected_components(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
-		base(Factory, Document)
+		base(Factory, Document),
+		m_select_faces(init_owner(*this) + init_name("select_faces") + init_label(_("Select Faces")) + init_description(_("Select connected faces")) + init_value(true)),
+		m_select_edges(init_owner(*this) + init_name("select_edges") + init_label(_("Select Edges")) + init_description(_("Select connected edges")) + init_value(true)),
+		m_select_vertices(init_owner(*this) + init_name("select_vertices") + init_label(_("Select Vertices")) + init_description(_("Select connected vertices")) + init_value(true)),
+		m_select_points(init_owner(*this) + init_name("select_points") + init_label(_("Select Points")) + init_description(_("Select connected points")) + init_value(true))
 	{
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+
+		m_select_faces.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_select_edges.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_select_vertices.changed_signal().connect(k3d::hint::converter<
+			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_select_points.changed_signal().connect(k3d::hint::converter<
+					k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
 	void on_update_selection(const k3d::mesh& Input, k3d::mesh& Output)
@@ -153,13 +77,61 @@ public:
 		Output = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output); // Merges the current document selection with the mesh
 
+		const k3d::bool_t select_faces = m_select_faces.pipeline_value();
+		const k3d::bool_t select_edges = m_select_edges.pipeline_value();
+		const k3d::bool_t select_vertices = m_select_vertices.pipeline_value();
+		const k3d::bool_t select_points = m_select_points.pipeline_value();
+
+		k3d::mesh::selection_t& output_point_selection = Output.point_selection.writable();
+
 		for(k3d::uint_t i = 0; i != Input.primitives.size(); ++i)
 		{
-			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron(k3d::polyhedron::validate(Output, Output.primitives[i]));
-			if(!output_polyhedron)
+			boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron(k3d::polyhedron::validate(Output, Output.primitives[i]));
+			if(!polyhedron)
 				continue;
 
-			detail::select_connected_components(*output_polyhedron, Output.point_selection.writable());
+			const k3d::uint_t face_begin = 0;
+			const k3d::uint_t face_end = polyhedron->face_selections.size();
+			k3d::mesh::selection_t input_selected_faces(face_end - face_begin, 0.0);
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
+			{
+				if(polyhedron->face_selections[face])
+				{
+					input_selected_faces[face] = 1.;
+					continue;
+				}
+				const k3d::uint_t loop_begin = polyhedron->face_first_loops[face];
+				const k3d::uint_t loop_end = loop_begin + polyhedron->face_loop_counts[face];
+				for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+				{
+					const k3d::uint_t first_edge = polyhedron->loop_first_edges[loop];
+					for(k3d::uint_t edge = first_edge; ;)
+					{
+						if(polyhedron->edge_selections[edge] || polyhedron->vertex_selections[edge] || output_point_selection[polyhedron->vertex_points[edge]])
+						{
+							input_selected_faces[face] = 1.;
+							break;
+						}
+						edge = polyhedron->clockwise_edges[edge];
+						if(edge == first_edge)
+							break;
+					}
+				}
+			}
+
+			k3d::log() << debug << "input selection count: " << std::count(input_selected_faces.begin(), input_selected_faces.end(), 1.) << std::endl;
+
+			k3d::mesh::selection_t output_selection(face_end - face_begin, 0.0);
+			connected_faces_selector selector(*polyhedron, output_selection);
+			for(k3d::uint_t face = face_begin; face != face_end; ++face)
+			{
+				if(input_selected_faces[face])
+					selector.select_connected_faces(face);
+			}
+
+			if(select_faces)
+				polyhedron->face_selections.assign(output_selection.begin(), output_selection.end());
+			add_selections(output_selection, select_edges, select_vertices, select_points, *polyhedron, output_point_selection);
 		}
 	}
 
@@ -176,6 +148,81 @@ public:
 
 		return factory;
 	}
+
+private:
+	/// Recurse through faces, selecting all connected faces
+	struct connected_faces_selector
+	{
+		const k3d::polyhedron::const_primitive& m_polyhedron;
+		k3d::mesh::selection_t& m_output_selection;
+		k3d::mesh::bools_t m_boundary_edges;
+		k3d::mesh::indices_t m_adjacent_edges;
+		k3d::mesh::indices_t m_edge_faces;
+		connected_faces_selector(const k3d::polyhedron::const_primitive& Polyhedron, k3d::mesh::selection_t& OutputFaceSelection) : m_polyhedron(Polyhedron), m_output_selection(OutputFaceSelection)
+		{
+			k3d::polyhedron::create_edge_adjacency_lookup(m_polyhedron.vertex_points, m_polyhedron.clockwise_edges, m_boundary_edges, m_adjacent_edges);
+			k3d::polyhedron::create_edge_face_lookup(m_polyhedron, m_edge_faces);
+		}
+
+		void select_connected_faces(const k3d::uint_t Face)
+		{
+			if(m_output_selection[Face])
+				return;
+			m_output_selection[Face] = 1.0;
+			const k3d::uint_t loop_begin = m_polyhedron.face_first_loops[Face];
+			const k3d::uint_t loop_end = m_polyhedron.face_loop_counts[Face] + loop_begin;
+			for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+			{
+				const k3d::uint_t first_edge = m_polyhedron.loop_first_edges[loop];
+				for(k3d::uint_t edge = first_edge; ;)
+				{
+					if(!m_boundary_edges[edge])
+					{
+						const k3d::uint_t companion_face = m_edge_faces[m_adjacent_edges[edge]];
+						if(!m_output_selection[companion_face])
+							select_connected_faces(companion_face);
+					}
+
+					edge = m_polyhedron.clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
+				}
+			}
+		}
+	};
+
+	void add_selections(const k3d::mesh::selection_t FaceSelection, const k3d::bool_t SelectEdges, const k3d::bool_t SelectVertices, const k3d::bool_t SelectPoints, k3d::polyhedron::primitive& Polyhedron, k3d::mesh::selection_t& PointSelection)
+	{
+		const k3d::uint_t face_begin = 0;
+		const k3d::uint_t face_end = Polyhedron.face_selections.size();
+		for(k3d::uint_t face = face_begin; face != face_end; ++face)
+		{
+			if(!FaceSelection[face])
+				continue;
+
+			const k3d::uint_t loop_begin = Polyhedron.face_first_loops[face];
+			const k3d::uint_t loop_end = loop_begin + Polyhedron.face_loop_counts[face];
+			for(k3d::uint_t loop = loop_begin; loop != loop_end; ++loop)
+			{
+				const k3d::uint_t first_edge = Polyhedron.loop_first_edges[loop];
+				for(k3d::uint_t edge = first_edge; ;)
+				{
+					Polyhedron.edge_selections[edge] = SelectEdges ? 1.0 : 0.0;
+					Polyhedron.vertex_selections[edge] = SelectVertices ? 1.0 : 0.0;
+					PointSelection[Polyhedron.vertex_points[edge]] = SelectPoints ? 1.0 : 0.0;
+
+					edge = Polyhedron.clockwise_edges[edge];
+					if(edge == first_edge)
+						break;
+				}
+			}
+		}
+	}
+
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_select_faces;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_select_edges;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_select_vertices;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_select_points;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -1026,6 +1026,11 @@ K3D_TEST(mesh.modifier.ScalePoints
 	REQUIRES K3D_BUILD_DEFORMATION_MODULE
 	LABELS mesh modifier)
 
+K3D_TEST(mesh.modifier.SelectConnectedComponents 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SelectConnectedComponents.py
+	REQUIRES K3D_BUILD_SELECTION_MODULE
+	LABELS mesh modifier)
+
 K3D_TEST(mesh.modifier.SelectCube 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SelectCube.py
 	REQUIRES K3D_BUILD_SELECTION_MODULE
