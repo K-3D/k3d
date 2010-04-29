@@ -87,19 +87,6 @@ private:
 	k3d::inode_property* const m_node_property;
 };
 
-struct sort_by_name
-{
-	bool operator()(k3d::iplugin_factory* LHS, k3d::iplugin_factory* RHS)
-	{
-		return LHS->name() < RHS->name();
-	}
-
-	bool operator()(k3d::inode* LHS, k3d::inode* RHS)
-	{
-		return LHS->name() < RHS->name();
-	}
-};
-
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
@@ -178,7 +165,7 @@ void control::on_choose()
 		// Insert choices for creating new nodes ...
 		const k3d::plugin::factory::collection_t unsorted_factories = k3d::plugin::factory::lookup();
 		std::vector<k3d::iplugin_factory*> sorted_factories(unsorted_factories.begin(), unsorted_factories.end());
-		std::sort(sorted_factories.begin(), sorted_factories.end(), detail::sort_by_name());
+		std::sort(sorted_factories.begin(), sorted_factories.end(), k3d::sort_by_name());
 		for(std::vector<k3d::iplugin_factory*>::const_iterator factory = sorted_factories.begin(); factory != sorted_factories.end(); ++factory)
 		{
 			// Filter choices ...
@@ -195,7 +182,7 @@ void control::on_choose()
 
 		// Insert choices for selecting existing nodes ...
 		k3d::inode_collection::nodes_t sorted_nodes = m_data->document().document().nodes().collection();
-		std::sort(sorted_nodes.begin(), sorted_nodes.end(), detail::sort_by_name());
+		std::sort(sorted_nodes.begin(), sorted_nodes.end(), k3d::sort_by_name());
 		for(k3d::inode_collection::nodes_t::const_iterator handle = sorted_nodes.begin(); handle != sorted_nodes.end(); ++handle)
 		{
 			k3d::inode* const node = *handle;
