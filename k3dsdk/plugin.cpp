@@ -23,6 +23,7 @@
 
 #include <k3dsdk/iapplication_plugin_factory.h>
 #include <k3dsdk/idocument_plugin_factory.h>
+#include <k3dsdk/inode.h>
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/iplugin_factory_collection.h>
 #include <k3dsdk/log.h>
@@ -35,6 +36,19 @@
 
 namespace k3d
 {
+
+///////////////////////////////////////////////////////////////////////////////////
+// sort_by_name
+
+bool_t sort_by_name::operator()(iplugin_factory* LHS, iplugin_factory* RHS)
+{
+	return LHS->name() < RHS->name();
+}
+
+bool_t sort_by_name::operator()(inode* LHS, inode* RHS)
+{
+	return LHS->name() < RHS->name();
+}
 
 namespace plugin
 {
