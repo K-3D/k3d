@@ -12,6 +12,7 @@ IF(WIN32 AND K3D_COMPILER_GCC)
 ENDIF(WIN32 AND K3D_COMPILER_GCC)
 
 CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-i18n-config.h.in ${k3dsdk_BINARY_DIR}/k3d-i18n-config.h)
+CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-ngui-config.h.in ${k3dsdk_BINARY_DIR}/k3d-ngui-config.h)
 CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-parallel-config.h.in ${k3dsdk_BINARY_DIR}/k3d-parallel-config.h)
 CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-path-config.h.in ${k3dsdk_BINARY_DIR}/k3d-path-config.h)
 CONFIGURE_FILE(${k3dsdk_SOURCE_DIR}/k3d-platform-config.h.in ${k3dsdk_BINARY_DIR}/k3d-platform-config.h)
@@ -103,6 +104,7 @@ INSTALL(TARGETS k3dsdk
 INSTALL(FILES ${HEADERS} DESTINATION include/k3d/k3dsdk)
 
 INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-i18n-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
+INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-ngui-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
 INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-parallel-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
 INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-path-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
 INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-platform-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)

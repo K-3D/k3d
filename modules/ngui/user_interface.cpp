@@ -182,6 +182,9 @@ public:
 	user_interface() :
 		m_show_learning_menu(options::nag("show_learning_menu"))
 	{
+		// This ensures that we can use ATK for testing, even when the user hasn't enabled desktop accessibility.
+		k3d::system::setenv("GTK_MODULES", "gail");
+
 		k3d::command_tree().add(*this, "ui", 0);
 
 		/// Redirect glib-based logging to our own standard logging mechanism
