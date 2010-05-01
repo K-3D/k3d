@@ -60,7 +60,7 @@ public:
 	void message(const k3d::string_t& Message);
 	void warning_message(const k3d::string_t& Message);
 	void error_message(const k3d::string_t& Message);
-	unsigned int query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options);
+	k3d::uint_t query_message(const k3d::string_t& Message, const k3d::uint_t DefaultOption, const std::vector<k3d::string_t>& Options);
 	void nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage);
 	bool get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result);
 	bool show(iunknown& Object);

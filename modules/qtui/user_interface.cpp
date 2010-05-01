@@ -162,7 +162,7 @@ void user_interface::error_message(const k3d::string_t& Message)
 	QMessageBox::critical(0, _("Error"), Message.c_str());
 }
 
-unsigned int user_interface::query_message(const k3d::string_t& Message, const unsigned int DefaultOption, const std::vector<k3d::string_t>& Options)
+k3d::uint_t user_interface::query_message(const k3d::string_t& Message, const k3d::uint_t DefaultOption, const std::vector<k3d::string_t>& Options)
 {
 	assert_not_implemented();
 	return 0;
