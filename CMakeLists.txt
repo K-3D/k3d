@@ -208,7 +208,6 @@ ENDIF(K3D_ENABLE_TESTING)
 # Find required external packages
 K3D_CHECK("K-3D" REQUIRES K3D_GLIBMM_FOUND RESOURCE "glibmm" URL "http://gtkmm.org")
 K3D_CHECK("K-3D" REQUIRES K3D_OPENGL_FOUND RESOURCE "OpenGL" URL "http://opengl.org")
-K3D_CHECK("K-3D" REQUIRES K3D_OPENGL_GLU_FOUND RESOURCE "OpenGL GLU" URL "http://opengl.org")
 K3D_CHECK("K-3D" REQUIRES K3D_SIGC_FOUND RESOURCE "libsigc++" URL "http://libsigc.sourceforge.net")
 K3D_CHECK("K-3D" REQUIRES K3D_XML_FOUND RESOURCE "XML parser" URL "http://xmlsoft.org")
 K3D_CHECK("K-3D" REQUIRES K3D_ZLIB_FOUND RESOURCE "zlib" URL "http://www.zlib.net")

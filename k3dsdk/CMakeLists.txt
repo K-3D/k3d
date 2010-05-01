@@ -58,8 +58,7 @@ TARGET_LINK_LIBRARIES(k3dsdk
 	${K3D_SIGC_LIBS}
 	${K3D_XML_LIB}
 	${K3D_ZLIB_LIBS}
-	${K3D_OPENGL_GL_LIBRARY}
-	${K3D_OPENGL_GLU_LIBRARY}
+	${K3D_OPENGL_LIBRARIES}
 	k3dsdk-half
 	k3dsdk-sgi-tesselator
 	k3dsdk-glew
