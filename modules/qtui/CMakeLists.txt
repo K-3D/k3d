@@ -1,4 +1,3 @@
-SET(K3D_EXTRA_QT_PLUGINS "" CACHE PATH "List of semicolon-delimited Qt plugin directories.")
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES viewport.h scene.h main_window.h)

@@ -31,3 +31,39 @@ INSTALL(TARGETS k3dsdk-qtui
 	ARCHIVE DESTINATION ${K3D_LIBDIR}
 	)
 
+INCLUDE(ExternalProject)
+FIND_PROGRAM(GIT_COMMAND git)
+
+ExternalProject_Add(qtscriptgenerator
+	DOWNLOAD_COMMAND git clone git://gitorious.org/qt-labs/qtscriptgenerator.git
+	UPDATE_COMMAND ""
+	CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>/generator ${QT_QMAKE_EXECUTABLE}
+	BUILD_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>/generator make
+	BUILD_IN_SOURCE 1
+	INSTALL_COMMAND ""
+	)
+
+STRING(REPLACE ";" ":" GENERATOR_INCLUDE_PATHS "${QT_INCLUDES}")
+
+ExternalProject_Add_Step(qtscriptgenerator generate-bindings
+	DEPENDEES build
+	WORKING_DIRECTORY "<SOURCE_DIR>/generator"
+	COMMAND <SOURCE_DIR>/generator/generator --include-paths=${GENERATOR_INCLUDE_PATHS}
+	)
+
+ExternalProject_Add_Step(qtscriptgenerator configure-bindings
+	DEPENDEES generate-bindings
+	WORKING_DIRECTORY "<SOURCE_DIR>/qtbindings"
+	COMMAND ${QT_QMAKE_EXECUTABLE}
+	)
+
+ExternalProject_Add_Step(qtscriptgenerator build-bindings
+	DEPENDEES configure-bindings
+	WORKING_DIRECTORY "<SOURCE_DIR>/qtbindings"
+	COMMAND make
+	DEPENDERS install
+	)
+
+ExternalProject_Get_Property(qtscriptgenerator SOURCE_DIR)
+SET(K3D_EXTRA_QT_PLUGINS "${SOURCE_DIR}/plugins" CACHE PATH "List of semicolon-delimited Qt plugin directories.")
+
