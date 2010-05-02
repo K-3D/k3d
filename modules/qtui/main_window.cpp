@@ -121,6 +121,12 @@ void main_window::on_help_about_activated()
 void main_window::initialize(k3d::idocument& Document)
 {
 	ui.setupUi(this);
+	ui.file_new->setIcon(QIcon::fromTheme("document-new"));
+	ui.file_open->setIcon(QIcon::fromTheme("document-open"));
+	ui.file_close->setIcon(QIcon::fromTheme("window-close"));
+	ui.file_quit->setIcon(QIcon::fromTheme("application-exit"));
+	ui.help_about->setIcon(QIcon::fromTheme("help-about"));
+	
 	statusBar()->setVisible(false);
 	setAttribute(Qt::WA_DeleteOnClose);
 

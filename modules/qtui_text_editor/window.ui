@@ -81,6 +81,9 @@
    <property name="shortcut">
     <string>Ctrl+N</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="file_open">
    <property name="text">
@@ -88,6 +91,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="file_save">
@@ -97,15 +103,27 @@
    <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="file_revert">
    <property name="text">
     <string>Revert</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="file_close">
    <property name="text">
     <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="edit_undo">
@@ -115,6 +133,12 @@
    <property name="text">
     <string>Undo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="edit_redo">
    <property name="enabled">
@@ -123,15 +147,27 @@
    <property name="text">
     <string>Redo</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Z</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="file_ok">
    <property name="text">
     <string>OK</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="file_cancel">
    <property name="text">
     <string>Cancel</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
  </widget>

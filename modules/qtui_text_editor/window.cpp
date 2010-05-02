@@ -61,6 +61,14 @@ window::window() :
 	application_widget(*this)
 {
 	ui.setupUi(this);
+	ui.file_new->setIcon(QIcon::fromTheme("document-new"));
+	ui.file_open->setIcon(QIcon::fromTheme("document-open"));
+	ui.file_save->setIcon(QIcon::fromTheme("document-save"));
+	ui.file_revert->setIcon(QIcon::fromTheme("document-revert"));
+	ui.file_close->setIcon(QIcon::fromTheme("window-close"));
+	ui.edit_undo->setIcon(QIcon::fromTheme("edit-undo"));
+	ui.edit_redo->setIcon(QIcon::fromTheme("edit-redo"));
+
 	cursor_position = new QLabel();
 	statusBar()->addPermanentWidget(cursor_position);
 

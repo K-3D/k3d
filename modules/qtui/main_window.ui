@@ -53,8 +53,8 @@
      <string>File</string>
     </property>
     <addaction name="file_new"/>
-    <addaction name="file_close"/>
     <addaction name="file_open"/>
+    <addaction name="file_close"/>
     <addaction name="separator"/>
     <addaction name="file_quit"/>
    </widget>
@@ -91,6 +91,9 @@
    <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="file_quit">
    <property name="text">
@@ -98,6 +101,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="file_new">
@@ -107,6 +113,9 @@
    <property name="shortcut">
     <string>Ctrl+N</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="file_close">
    <property name="text">
@@ -115,10 +124,16 @@
    <property name="shortcut">
     <string>Ctrl+W</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="help_about">
    <property name="text">
     <string>About K-3D</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
  </widget>
