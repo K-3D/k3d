@@ -32,10 +32,13 @@
 #include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument_importer.h>
+#include <k3dsdk/iscripted_action.h>
+#include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/qtui/document.h>
+#include <k3dsdk/qtui/nag_message_dialog.h>
 #include <k3dsdk/share.h>
 
 #include <QAction>
@@ -59,6 +62,24 @@ namespace qtui
 
 /////////////////////////////////////////////////////////////////////////////
 // user_interface
+
+user_interface::~user_interface()
+{
+	for(std::vector<k3d::iunknown*>::iterator plugin = m_auto_start_plugins.begin(); plugin != m_auto_start_plugins.end(); ++plugin)
+	{
+		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(*plugin))
+		{
+			k3d::iscript_engine::context context;
+			context["command"] = k3d::string_t("shutdown");
+			scripted_action->execute(context);
+		}
+	}
+
+	for(std::vector<k3d::iunknown*>::iterator plugin = m_auto_start_plugins.begin(); plugin != m_auto_start_plugins.end(); ++plugin)
+		delete *plugin;
+
+	m_auto_start_plugins.clear();
+}
 
 void user_interface::get_command_line_arguments(boost::program_options::options_description& Description)
 {
@@ -125,6 +146,28 @@ void user_interface::display_user_interface()
 	window->show();
 
 	m_splash_box.reset();
+
+	// Setup auto-start plugins ...
+	const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup("qtui:application-start", "true");
+	for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
+	{
+		k3d::log() << info << "Creating plugin [" << (**factory).name() << "] via qtui:application-start" << std::endl;
+
+		k3d::iunknown* const plugin = k3d::plugin::create(**factory);
+		if(!plugin)
+		{
+			k3d::log() << error << "Error creating plugin [" << (**factory).name() << "] via qtui:application-start" << std::endl;
+			continue;
+		}
+		m_auto_start_plugins.push_back(plugin);
+
+		if(k3d::iscripted_action* const scripted_action = dynamic_cast<k3d::iscripted_action*>(plugin))
+		{
+			k3d::iscript_engine::context context;
+			context["command"] = k3d::string_t("startup");
+			scripted_action->execute(context);
+		}
+	}
 }
 
 const k3d::ievent_loop::arguments_t user_interface::parse_runtime_arguments(const arguments_t& Arguments, bool& Quit, bool& Error)
@@ -170,7 +213,7 @@ k3d::uint_t user_interface::query_message(const k3d::string_t& Message, const k3
 
 void user_interface::nag_message(const k3d::string_t& Type, const k3d::ustring& Message, const k3d::ustring& SecondaryMessage)
 {
-	assert_not_implemented();
+	k3d::qtui::nag_message_dialog::nag(Type, Message, SecondaryMessage);
 }
 
 bool user_interface::get_file_path(const k3d::ipath_property::mode_t Mode, const k3d::string_t& Type, const k3d::string_t& Prompt, const k3d::filesystem::path& OldPath, k3d::filesystem::path& Result)

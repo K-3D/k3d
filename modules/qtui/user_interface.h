@@ -31,6 +31,8 @@
 #include <QMainWindow>
 #include <QSplashScreen>
 
+#include <boost/scoped_ptr.hpp>
+
 namespace k3d { class iplugin_factory; }
 
 namespace module
@@ -48,6 +50,8 @@ class user_interface :
 	public k3d::iuser_interface
 {
 public:
+	~user_interface();
+
 	void get_command_line_arguments(boost::program_options::options_description& Description);
 	const arguments_t parse_startup_arguments(const arguments_t& Arguments, bool& Quit, bool& Error);
 	void startup_message_handler(const k3d::string_t& Message);
@@ -72,8 +76,10 @@ public:
 	static k3d::iplugin_factory& get_factory();
 
 private:
-	std::auto_ptr<QApplication> m_application;
-	std::auto_ptr<QSplashScreen> m_splash_box;
+	boost::scoped_ptr<QApplication> m_application;
+	boost::scoped_ptr<QSplashScreen> m_splash_box;
+	/// Keeps track of auto-start plugins
+	std::vector<k3d::iunknown*> m_auto_start_plugins;
 };
 
 } // namespace qtui
