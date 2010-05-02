@@ -26,6 +26,7 @@
 #include "user_interface.h"
 
 #include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
@@ -116,7 +117,13 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 	}
 
 	m_application.reset(new QApplication(argc, argv));
+	m_application->setApplicationName("K-3D");
+	m_application->setApplicationVersion(K3D_VERSION);
+	m_application->setOrganizationDomain("k-3d.org");
+	m_application->setOrganizationName("k-3d.org");
+	m_application->setWindowIcon(QIcon(":/QTUI/window_icon.png"));
 	m_application->addLibraryPath(K3D_EXTRA_QT_PLUGINS);
+
 	k3d::log() << info << "Loading Qt plugins from " << m_application->libraryPaths().join(", ").toAscii().data() << std::endl;
 	
 	if(show_splash)
