@@ -4,6 +4,9 @@
 // qtui:component-type="mode"
 
 button = new QPushButton("Hello, World!");
+button.setIconSize(new QSize(64, 64));
+button.icon = QIcon.fromTheme("call-start");
+// button.icon = new QIcon("/home/tshead/src/k3d/share/ngui/scalable/LuxRenderEngine.svg");
 button.clicked.connect(function() { print("Hello, World!"); });
 proxy = scene.addWidget(button);
 proxy.setGeometry(20, 20, 50, 30);
