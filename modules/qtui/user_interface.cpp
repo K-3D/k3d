@@ -121,6 +121,11 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 	m_application->setApplicationVersion(K3D_VERSION);
 	m_application->setOrganizationDomain("k-3d.org");
 	m_application->setOrganizationName("k-3d.org");
+
+	QFile stylesheet(":/QTUI/stylesheet.css");
+	stylesheet.open(QIODevice::ReadOnly);
+	m_application->setStyleSheet(stylesheet.readAll());
+
 	m_application->setWindowIcon(QIcon(":/QTUI/window_icon.png"));
 	m_application->addLibraryPath(K3D_EXTRA_QT_PLUGINS);
 
@@ -128,8 +133,7 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 	
 	if(show_splash)
 	{
-		QPixmap pixmap((k3d::share_path() / k3d::filesystem::generic_path("qtui/splash.png")).native_filesystem_string().c_str());
-		m_splash_box.reset(new QSplashScreen(pixmap));
+		m_splash_box.reset(new QSplashScreen(QPixmap(":/QTUI/splash.png")));
 		m_splash_box->show();
 	}
 

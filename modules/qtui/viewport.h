@@ -38,7 +38,7 @@ namespace qtui
 class viewport :
 	public QGraphicsView
 {
-	Q_OBJECT
+	Q_OBJECT;
 
 public:
 	viewport(QWidget* parent = 0);

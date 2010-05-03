@@ -52,7 +52,7 @@ class window :
 	public k3d::qtui::modal_text_editor,
 	public k3d::iunknown
 {
-	Q_OBJECT
+	Q_OBJECT;
 
 	typedef QMainWindow base;
 

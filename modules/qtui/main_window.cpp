@@ -140,14 +140,14 @@ void main_window::initialize(k3d::idocument& Document)
 	std::vector<k3d::iplugin_factory*> modes = k3d::plugin::factory::lookup("qtui:component-type", "mode");
 	std::sort(modes.begin(), modes.end(), k3d::sort_by_name());
 	for(int i = 0; i != modes.size(); ++i)
-		mode_menu->addAction(new k3d::qtui::action(modes[i]->name().c_str(), mode_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_edit_mode), modes[i])));
+		mode_menu->addAction(k3d::qtui::action::create(*modes[i], mode_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_edit_mode), modes[i])));
 
 	// Setup manual access to dialogs ...
 	QMenu* const dialog_menu = ui.menuAdvanced->addMenu(tr("Dialogs"));
 	std::vector<k3d::iplugin_factory*> dialogs = k3d::plugin::factory::lookup("qtui:component-type", "dialog");
 	std::sort(dialogs.begin(), dialogs.end(), k3d::sort_by_name());
 	for(int i = 0; i != dialogs.size(); ++i)
-		dialog_menu->addAction(new k3d::qtui::action(dialogs[i]->name().c_str(), dialog_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_advanced_dialog), dialogs[i])));
+		dialog_menu->addAction(k3d::qtui::action::create(*dialogs[i], dialog_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_advanced_dialog), dialogs[i])));
 }
 
 void main_window::on_edit_mode(k3d::iplugin_factory* const Mode)

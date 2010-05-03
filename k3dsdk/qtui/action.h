@@ -30,6 +30,8 @@
 namespace k3d
 {
 
+class iplugin_factory;
+
 namespace qtui
 {
 
@@ -47,6 +49,9 @@ public:
 	action(QObject* Parent, const sigc::slot<void>& Slot);
 	action(const QString& Text, QObject* Parent, const sigc::slot<void>& Slot);
 	action(const QIcon& Icon, const QString& Text, QObject* Parent, const sigc::slot<void>& Slot);
+
+	/// Creates a standarized action based on a K-3D plugin type
+	static action* create(iplugin_factory& Factory, QObject* Parent, const sigc::slot<void>& Slot);
 
 private Q_SLOTS:
 	void initialize(const sigc::slot<void>& Slot);

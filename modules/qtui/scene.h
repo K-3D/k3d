@@ -47,7 +47,7 @@ namespace qtui
 class scene :
 	public QGraphicsScene
 {
-	Q_OBJECT
+	Q_OBJECT;
 
 public:
 	scene(k3d::idocument& Document);

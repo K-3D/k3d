@@ -26,10 +26,18 @@
 
 #include <k3dsdk/convert.h>
 #include <k3dsdk/ustring.h>
+#include <k3dsdk/types.h>
 #include <QString>
 
 namespace k3d
 {
+
+/// Specialization of k3d::convert that converts k3d::string_t to QString.
+template<>
+inline QString convert(const string_t& From)
+{
+	return QString(From.c_str());
+}
 
 /// Specialization of k3d::convert that converts k3d::ustring to QString.
 template<>

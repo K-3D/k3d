@@ -21,7 +21,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/qtui/action.h>
+#include <k3dsdk/qtui/convert.h>
+#include <k3dsdk/share.h>
 
 namespace k3d
 {
@@ -48,6 +51,29 @@ action::action(const QIcon& Icon, const QString& Text, QObject* Parent, const si
 	base(Icon, Text, Parent)
 {
 	initialize(Slot);
+}
+
+action* action::create(iplugin_factory& Factory, QObject* Parent, const sigc::slot<void>& Slot)
+{
+	action* const result = new action(Parent, Slot);
+
+	switch(Factory.quality())
+	{
+	case k3d::iplugin_factory::EXPERIMENTAL:
+		result->setText(QString("%1 (Experimental)").arg(k3d::convert<QString>(Factory.name())));
+		break;
+	case k3d::iplugin_factory::DEPRECATED:
+		result->setText(QString("%1 (Deprecated)").arg(k3d::convert<QString>(Factory.name())));
+		break;
+	case k3d::iplugin_factory::STABLE:
+		result->setText(k3d::convert<QString>(Factory.name()));
+		break;
+	}
+	result->setToolTip(k3d::convert<QString>(Factory.short_description()));
+	result->setIcon(QIcon((k3d::share_path() / k3d::filesystem::generic_path("qtui/icons/" + Factory.name() + ".svg")).native_filesystem_string().c_str()));
+	result->setIconVisibleInMenu(true);
+
+	return result;
 }
 
 void action::initialize(const sigc::slot<void>& Slot)

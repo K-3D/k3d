@@ -48,7 +48,7 @@ class mode :
 	public k3d::qtui::mode,
 	public k3d::property_collection
 {
-	Q_OBJECT
+	Q_OBJECT;
 
 	typedef k3d::qtui::mode base;
 
