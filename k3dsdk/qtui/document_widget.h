@@ -48,12 +48,15 @@ class document_widget :
 public:
 	document_widget(QWidget& Owner, idocument& Document);
 
+	idocument& document();
+
 private Q_SLOTS:
 	/// Called when the application is about to close.
 	void application_closing();
 
 private:
 	QWidget& owner;
+	idocument& owning_document;
 };
 
 } // namespace qtui

@@ -58,6 +58,9 @@ private Q_SLOTS:
 	void on_file_new_activated();
 	void on_file_open_activated();
 	void on_file_quit_activated();
+	void on_script_play_activated();
+	void on_help_file_bug_report_activated();
+	void on_help_k3d_online_activated();
 	void on_help_about_activated();
 
 private:

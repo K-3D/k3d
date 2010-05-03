@@ -38,7 +38,9 @@
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/plugin.h>
+#include <k3dsdk/qtui/convert.h>
 #include <k3dsdk/qtui/document.h>
+#include <k3dsdk/qtui/message.h>
 #include <k3dsdk/qtui/nag_message_dialog.h>
 #include <k3dsdk/share.h>
 
@@ -227,17 +229,17 @@ void user_interface::open_uri(const k3d::string_t& URI)
 
 void user_interface::message(const k3d::string_t& Message)
 {
-	QMessageBox::information(0, _("Information"), Message.c_str());
+	k3d::qtui::message(k3d::convert<QString>(Message), "");
 }
 
 void user_interface::warning_message(const k3d::string_t& Message)
 {
-	QMessageBox::warning(0, _("Warning"), Message.c_str());
+	k3d::qtui::warning_message(k3d::convert<QString>(Message), "");
 }
 
 void user_interface::error_message(const k3d::string_t& Message)
 {
-	QMessageBox::critical(0, _("Error"), Message.c_str());
+	k3d::qtui::error_message(k3d::convert<QString>(Message), "");
 }
 
 k3d::uint_t user_interface::query_message(const k3d::string_t& Message, const k3d::uint_t DefaultOption, const std::vector<k3d::string_t>& Options)

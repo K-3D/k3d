@@ -1,3 +1,6 @@
+#ifndef K3DSDK_QTUI_MESSAGE_H
+#define K3DSDK_QTUI_MESSAGE_H
+
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -21,10 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/qtui/application.h>
-#include <k3dsdk/qtui/document_widget.h>
-
-#include <QWidget>
+class QString;
 
 namespace k3d
 {
@@ -32,27 +32,21 @@ namespace k3d
 namespace qtui
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// document_widget
+/// Displays an informational message in a modal dialog box
+void message(const QString& Message, const QString& SecondaryMessage);
+/// Displays a warning message in a modal dialog box
+void warning_message(const QString& Message, const QString& SecondaryMessage);
+/// Displays an error message in a modal dialog box
+void error_message(const QString& Message, const QString& SecondaryMessage);
 
-document_widget::document_widget(QWidget& Owner, idocument& Document) :
-	owner(Owner),
-	owning_document(Document)
-{
-	connect(&application::instance(), SIGNAL(closing()), this, SLOT(application_closing()));
-}
-
-idocument& document_widget::document()
-{
-	return owning_document;
-}
-
-void document_widget::application_closing()
-{
-	owner.close();
-}
+/*
+/// Warns the user before creating an experimental or deprecated plugin, and gives them a chance to cancel.  Returns true iff the user decided to cancel.
+bool_t cancel_plugin(iplugin_factory& Factory);
+*/
 
 } // namespace qtui
 
 } // namespace k3d
+
+#endif // !K3DSDK_QTUI_MESSAGE_H
 

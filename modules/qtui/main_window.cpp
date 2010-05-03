@@ -26,8 +26,10 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application.h>
 #include <k3dsdk/classes.h>
+#include <k3dsdk/gzstream.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument_importer.h>
+#include <k3dsdk/iscript_engine.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/options.h>
 #include <k3dsdk/plugin.h>
@@ -35,6 +37,8 @@
 #include <k3dsdk/qtui/application.h>
 #include <k3dsdk/qtui/document.h>
 #include <k3dsdk/qtui/file_dialog.h>
+#include <k3dsdk/qtui/script.h>
+#include <k3dsdk/qtui/uri.h>
 #include <k3dsdk/share.h>
 
 #include <QAction>
@@ -109,6 +113,28 @@ void main_window::on_file_open_activated()
 void main_window::on_file_quit_activated()
 {
 	k3d::qtui::application::instance().close();
+}
+
+void main_window::on_script_play_activated()
+{
+	const k3d::filesystem::path script_path = k3d::qtui::file_dialog::get_open_filename(this, tr("Play Script:"), k3d::options::path::scripts());
+	if(script_path.empty())
+		return;
+
+	k3d::filesystem::igzstream stream(script_path);
+	k3d::iscript_engine::context context;
+	context["document"] = &document_widget.document();
+	k3d::qtui::script::execute(stream, script_path.native_utf8_string().raw(), context);
+}
+
+void main_window::on_help_k3d_online_activated()
+{
+	k3d::qtui::uri::open("http://www.k-3d.org");
+}
+
+void main_window::on_help_file_bug_report_activated()
+{
+	k3d::qtui::uri::open("http://www.k-3d.org/wiki/Reporting_Bugs");
 }
 
 void main_window::on_help_about_activated()

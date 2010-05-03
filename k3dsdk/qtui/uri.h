@@ -1,3 +1,6 @@
+#ifndef K3DSDK_QTUI_URI_H
+#define K3DSDK_QTUI_URI_H
+
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -21,10 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/qtui/application.h>
-#include <k3dsdk/qtui/document_widget.h>
-
-#include <QWidget>
+#include <k3dsdk/types.h>
 
 namespace k3d
 {
@@ -32,27 +32,17 @@ namespace k3d
 namespace qtui
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// document_widget
-
-document_widget::document_widget(QWidget& Owner, idocument& Document) :
-	owner(Owner),
-	owning_document(Document)
+namespace uri
 {
-	connect(&application::instance(), SIGNAL(closing()), this, SLOT(application_closing()));
-}
 
-idocument& document_widget::document()
-{
-	return owning_document;
-}
+/// Asynchronously displays a URI in the user's choice of application, displays an error message otherwise
+void open(const string_t& URI);
 
-void document_widget::application_closing()
-{
-	owner.close();
-}
+} // namespace uri
 
 } // namespace qtui
 
 } // namespace k3d
+
+#endif // !K3DSDK_QTUI_URI_H
 

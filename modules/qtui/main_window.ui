@@ -67,6 +67,9 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="help_k3d_online"/>
+    <addaction name="help_file_bug_report"/>
+    <addaction name="separator"/>
     <addaction name="help_about"/>
    </widget>
    <widget class="QMenu" name="menuAdvanced">
@@ -74,8 +77,15 @@
      <string>Advanced</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuScripting">
+    <property name="title">
+     <string>Scripting</string>
+    </property>
+    <addaction name="script_play"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuScripting"/>
    <addaction name="menuAdvanced"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -134,6 +144,21 @@
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="script_play">
+   <property name="text">
+    <string>Play</string>
+   </property>
+  </action>
+  <action name="help_k3d_online">
+   <property name="text">
+    <string>K-3D Online</string>
+   </property>
+  </action>
+  <action name="help_file_bug_report">
+   <property name="text">
+    <string>File Bug Report</string>
    </property>
   </action>
  </widget>

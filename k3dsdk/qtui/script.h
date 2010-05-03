@@ -1,3 +1,6 @@
+#ifndef K3DSDK_QTUI_SCRIPT_H
+#define K3DSDK_QTUI_SCRIPT_H
+
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -21,10 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/qtui/application.h>
-#include <k3dsdk/qtui/document_widget.h>
-
-#include <QWidget>
+#include <k3dsdk/scripting.h>
 
 namespace k3d
 {
@@ -32,27 +32,21 @@ namespace k3d
 namespace qtui
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// document_widget
-
-document_widget::document_widget(QWidget& Owner, idocument& Document) :
-	owner(Owner),
-	owning_document(Document)
+namespace script
 {
-	connect(&application::instance(), SIGNAL(closing()), this, SLOT(application_closing()));
-}
 
-idocument& document_widget::document()
-{
-	return owning_document;
-}
+/// Executes a script using a specific language and providing user feedback for errors
+bool_t execute(const k3d::script::code& Script, const string_t& ScriptName, k3d::iscript_engine::context& Context, const k3d::script::language& Language);
+/// Executes a script, attempting to automatically recognize the language and providing user feedback for errors
+bool_t execute(const k3d::script::code& Script, const string_t& ScriptName, k3d::iscript_engine::context& Context);
+/// Executes a script, attempting to automatically recognize the language and providing user feedback for errors
+bool_t execute(const k3d::filesystem::path& Script, k3d::iscript_engine::context& Context);
 
-void document_widget::application_closing()
-{
-	owner.close();
-}
+} // namespace script
 
 } // namespace qtui
 
 } // namespace k3d
+
+#endif // !K3DSDK_QTUI_SCRIPT_H
 
