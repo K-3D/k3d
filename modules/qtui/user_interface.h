@@ -49,7 +49,8 @@ class user_interface :
 	public k3d::ievent_loop,
 	public k3d::iuser_interface
 {
-public:
+public:	
+	user_interface();
 	~user_interface();
 
 	void get_command_line_arguments(boost::program_options::options_description& Description);

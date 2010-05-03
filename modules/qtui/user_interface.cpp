@@ -64,6 +64,30 @@ namespace qtui
 /////////////////////////////////////////////////////////////////////////////
 // user_interface
 
+void qt_message_output(QtMsgType Type, const char* Message)
+{
+	switch(Type)
+	{
+	case QtDebugMsg:
+		k3d::log() << debug << Message << std::endl;
+		break;
+	case QtWarningMsg:
+		k3d::log() << warning << Message << std::endl;
+		break;
+	case QtCriticalMsg:
+		k3d::log() << error << Message << std::endl;
+		break;
+	case QtFatalMsg:
+		k3d::log() << critical << Message << std::endl;
+		abort();
+	}
+}
+
+user_interface::user_interface()
+{
+	qInstallMsgHandler(qt_message_output);
+}
+
 user_interface::~user_interface()
 {
 	for(std::vector<k3d::iunknown*>::iterator plugin = m_auto_start_plugins.begin(); plugin != m_auto_start_plugins.end(); ++plugin)
