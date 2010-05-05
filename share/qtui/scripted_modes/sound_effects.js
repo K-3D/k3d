@@ -17,9 +17,9 @@ function addSoundButton(text, sound)
 }
 
 layout = new QGraphicsLinearLayout(Qt.Vertical);
-layout.addItem(addSoundButton("Harp", "/home/tshead/src/k3d/share/qtui/sounds/harp.wav"));
-layout.addItem(addSoundButton("Are You Sure?", "/home/tshead/src/k3d/share/qtui/sounds/areyousure.wav"));
-layout.addItem(addSoundButton("You Cannot!", "/home/tshead/src/k3d/share/qtui/sounds/youcannot.wav"));
+layout.addItem(addSoundButton("Harp", k3d.share_path + "/qtui/sounds/harp.wav"));
+layout.addItem(addSoundButton("Are You Sure?", k3d.share_path + "/qtui/sounds/areyousure.wav"));
+layout.addItem(addSoundButton("You Cannot!", k3d.share_path + "/qtui/sounds/youcannot.wav"));
 
 form = new QGraphicsWidget();
 form.setLayout(layout);

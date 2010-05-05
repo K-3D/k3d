@@ -22,7 +22,8 @@
 */
 
 #include <k3dsdk/log.h>
-#include <k3dsdk/qtui_script/k3d.h>
+#include <k3dsdk/qtui/script/engine.h>
+#include <k3dsdk/qtui/script/global_proxy.h>
 
 #include <QScriptEngine>
 #include <QStringList>
@@ -54,7 +55,7 @@ QScriptEngine* engine()
 
 //	::k3d::log() << debug << "Imported extensions: " << script_engine->importedExtensions().join(", ").toAscii().data() << std::endl;
 
-	script_engine->globalObject().setProperty("k3d", script_engine->newQObject(new ::k3d::qtui::script::k3d(), QScriptEngine::ScriptOwnership));
+	script_engine->globalObject().setProperty("k3d", script_engine->newQObject(new script::global_proxy(), QScriptEngine::ScriptOwnership));
 
 	return script_engine;
 }

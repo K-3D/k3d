@@ -28,7 +28,7 @@
 #include <k3dsdk/property.h>
 #include <k3dsdk/qtui/file_dialog.h>
 #include <k3dsdk/qtui/modal_text_editor.h>
-#include <k3dsdk/qtui_script/engine.h>
+#include <k3dsdk/qtui/script/engine.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/types.h>
 

@@ -1,3 +1,6 @@
+#ifndef K3DSDK_QTUI_SCRIPT_GLOBAL_PROXY_H
+#define K3DSDK_QTUI_SCRIPT_GLOBAL_PROXY_H
+
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -21,8 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/log.h>
-#include <k3dsdk/qtui_script/k3d.h>
+#include <QObject>
 
 namespace k3d
 {
@@ -36,20 +38,26 @@ namespace script
 /////////////////////////////////////////////////////////////////////////////
 // k3d
 
-k3d::k3d(QObject* Parent) :
-	base(Parent)
+/// Wrapper class for the global K-3D scripting object
+class global_proxy :
+	public QObject
 {
-	setObjectName("k3d");
-}
+	Q_OBJECT;
 
-void k3d::foo()
-{
-	log() << debug << __PRETTY_FUNCTION__ << std::endl;
-}
+  Q_PROPERTY(QString share_path READ share_path);
+
+public Q_SLOTS:
+	void foo();
+
+private:
+  const QString share_path() const;
+};
 
 } // namespace script
 
 } // namespace qtui
 
 } // namespace k3d
+
+#endif // !K3DSDK_QTUI_SCRIPT_GLOBAL_PROXY_H
 
