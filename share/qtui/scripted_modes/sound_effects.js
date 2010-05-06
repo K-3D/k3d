@@ -8,7 +8,7 @@ function addSoundButton(text, sound)
 	button = new QPushButton(text);
 	button.clicked.connect(function()
 	{
-		print(sound);
+		k3d.log.debug(sound);
 		player = Phonon.createPlayer(Phonon.MusicCategory, new MediaSource(sound));
 		player.play();
 	});

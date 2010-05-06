@@ -24,6 +24,7 @@
 #include <k3dsdk/log.h>
 #include <k3dsdk/qtui/convert.h>
 #include <k3dsdk/qtui/script/global_proxy.h>
+#include <k3dsdk/qtui/script/log_proxy.h>
 #include <k3dsdk/share.h>
 
 namespace k3d
@@ -38,14 +39,15 @@ namespace script
 /////////////////////////////////////////////////////////////////////////////
 // global_proxy
 
-void global_proxy::foo()
+global_proxy::global_proxy()
 {
-	log() << debug << __PRETTY_FUNCTION__ << std::endl;
+	setObjectName("k3d");
+	new log_proxy(this);
 }
 
 const QString global_proxy::share_path() const
 {
-  return k3d::convert<QString>(k3d::share_path().native_utf8_string());
+	return k3d::convert<QString>(k3d::share_path().native_utf8_string());
 }
 
 } // namespace script

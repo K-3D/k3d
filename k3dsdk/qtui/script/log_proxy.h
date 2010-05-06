@@ -1,5 +1,5 @@
-#ifndef K3DSDK_QTUI_SCRIPT_GLOBAL_PROXY_H
-#define K3DSDK_QTUI_SCRIPT_GLOBAL_PROXY_H
+#ifndef K3DSDK_QTUI_SCRIPT_LOG_PROXY_H
+#define K3DSDK_QTUI_SCRIPT_LOG_PROXY_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -36,20 +36,23 @@ namespace script
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// global_proxy
+// log_proxy
 
-/// Wrapper class for the global K-3D scripting object
-class global_proxy :
+/// Wrapper class for the K-3D log scripting proxy object
+class log_proxy :
 	public QObject
 {
 	Q_OBJECT;
-	Q_PROPERTY(QString share_path READ share_path);
 
 public:
-	global_proxy();
+	log_proxy(QObject* Parent);
 
-private:
-	const QString share_path() const;
+public Q_SLOTS:
+	void critical(const QString& Message);
+	void debug(const QString& Message);
+	void error(const QString& Message);
+	void info(const QString& Message);
+	void warning(const QString& Message);
 };
 
 } // namespace script
@@ -58,5 +61,5 @@ private:
 
 } // namespace k3d
 
-#endif // !K3DSDK_QTUI_SCRIPT_GLOBAL_PROXY_H
+#endif // !K3DSDK_QTUI_SCRIPT_LOG_PROXY_H
 

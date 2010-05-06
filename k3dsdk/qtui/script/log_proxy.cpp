@@ -1,6 +1,3 @@
-#ifndef K3DSDK_QTUI_SCRIPT_GLOBAL_PROXY_H
-#define K3DSDK_QTUI_SCRIPT_GLOBAL_PROXY_H
-
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -24,7 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <QObject>
+#include <k3dsdk/log.h>
+#include <k3dsdk/qtui/convert.h>
+#include <k3dsdk/qtui/script/log_proxy.h>
 
 namespace k3d
 {
@@ -36,27 +35,42 @@ namespace script
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// global_proxy
+// log_proxy
 
-/// Wrapper class for the global K-3D scripting object
-class global_proxy :
-	public QObject
+log_proxy::log_proxy(QObject* Parent) :
+	QObject(Parent)
 {
-	Q_OBJECT;
-	Q_PROPERTY(QString share_path READ share_path);
+	setObjectName("log");
+}
 
-public:
-	global_proxy();
+void log_proxy::critical(const QString& Message)
+{
+	k3d::log() << k3d::critical << Message.toAscii().data() << std::endl;
+}
 
-private:
-	const QString share_path() const;
-};
+void log_proxy::debug(const QString& Message)
+{
+	k3d::log() << k3d::debug << Message.toAscii().data() << std::endl;
+}
+
+void log_proxy::error(const QString& Message)
+{
+	k3d::log() << k3d::error << Message.toAscii().data() << std::endl;
+}
+
+void log_proxy::info(const QString& Message)
+{
+	k3d::log() << k3d::info << Message.toAscii().data() << std::endl;
+}
+
+void log_proxy::warning(const QString& Message)
+{
+	k3d::log() << k3d::warning << Message.toAscii().data() << std::endl;
+}
 
 } // namespace script
 
 } // namespace qtui
 
 } // namespace k3d
-
-#endif // !K3DSDK_QTUI_SCRIPT_GLOBAL_PROXY_H
 
