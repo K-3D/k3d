@@ -215,8 +215,18 @@ widget::~widget()
 void widget::print_string(const QString& String)
 {
 	appendHtml(String);
+	scroll_to_end();
+}
+
+void widget::scroll_to_end()
+{
 	horizontalScrollBar()->setValue(horizontalScrollBar()->minimum());
 	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+void widget::showEvent(QShowEvent* event)
+{
+	scroll_to_end();
 }
 
 /*

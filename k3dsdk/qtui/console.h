@@ -53,6 +53,9 @@ public:
 public Q_SLOTS:
 	/// Writes the supplied text to the console.
 	void print_string(const QString& String);
+
+	/// Scrolls the console to the end of its output.
+	void scroll_to_end();
 /*
 	/// Set the completion key
 	void set_completion_key(const uint_t KeySym);
@@ -63,6 +66,8 @@ public Q_SLOTS:
 	/// Connects a slot to a signal that will be emitted when the "completion request" key (see set_completion_key) is pressed
 	sigc::connection connect_complete_key_pressed_signal(const sigc::slot<void, const string_t&>& Slot);
 */
+private:
+	void showEvent(QShowEvent* event);
 };
 
 } // namespace console
