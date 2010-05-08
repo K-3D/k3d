@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2006, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,7 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/log.h>
 #include <k3dsdk/qtui/console.h>
+
 #include <boost/algorithm/string.hpp>
 
 #include <QScrollBar>
@@ -35,187 +37,48 @@ namespace qtui
 namespace console
 {
 
-/*
 /////////////////////////////////////////////////////////////////////////////
 // widget::implementation
 
 class widget::implementation
 {
 public:
-	implementation() :
-		command_index(0), completion_key(GDK_VoidSymbol)
-	{
-		buffer = Gtk::TextBuffer::create();
-
-		read_only = Gtk::TextTag::create("read-only");
-		read_only->property_editable() = false;
-		buffer->get_tag_table()->add(read_only);
-
-		begin_input = Gtk::TextMark::create("begin-input");
-		buffer->add_mark(begin_input, buffer->end());
-
-		view.set_buffer(buffer);
-		view.set_editable(false);
-		view.set_cursor_visible(false);
-		view.set_wrap_mode(Gtk::WRAP_WORD);
-		view.signal_key_press_event().connect(sigc::mem_fun(*this, &implementation::on_key_press_event), false);
-
-		scrolled_window.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
-		scrolled_window.add(view);
-	}
-
-	bool on_key_press_event(GdkEventKey* event)
-	{
-		if(event->keyval == GDK_Return)
-		{
-			const k3d::string_t input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
-
-			buffer->insert(buffer->end(), "\n");
-			buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
-			buffer->move_mark(begin_input, buffer->end());
-
-			if(!input.empty() && (command_history.empty() || input != command_history.back()))
-				command_history.push_back(input);
-			command_index = command_history.size();
-			command_signal.emit(input);
-			view.scroll_to(buffer->get_insert());
-
-			return true;
-		}
-		else if(event->keyval == completion_key)
-		{
-			const k3d::string_t input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
-			complete_key_pressed_signal.emit(input);
-
-			return true;
-		}
-		else if(event->keyval == GDK_Left)
-		{
-			return buffer->get_iter_at_mark(buffer->get_insert()) <= buffer->get_iter_at_mark(begin_input);
-		}
-		else if(event->keyval == GDK_Up)
-		{
-			if(command_index)
-			{
-				if(command_index == command_history.size())
-					command_buffer = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
-
-				command_index -= 1;
-				buffer->erase(buffer->get_iter_at_mark(begin_input), buffer->end());
-				buffer->insert(buffer->end(), command_history[command_index]);
-			}
-
-			buffer->place_cursor(buffer->end());
-			return true;
-		}
-		else if(event->keyval == GDK_Down)
-		{
-			if(command_index < command_history.size())
-			{
-				command_index += 1;
-				buffer->erase(buffer->get_iter_at_mark(begin_input), buffer->end());
-				buffer->insert(buffer->end(),
-					command_index < command_history.size()
-					? command_history[command_index]
-					: command_buffer);
-			}
-
-			buffer->place_cursor(buffer->end());
-			return true;
-		}
-		else if(event->keyval == GDK_Home)
-		{
-			buffer->place_cursor(buffer->get_iter_at_mark(begin_input));
-			return true;
-		}
-		else if(event->keyval == GDK_v && (event->state & GDK_CONTROL_MASK))
-		{
-			const k3d::string_t input = Gtk::Clipboard::get()->wait_for_text();
-			
-			std::vector<k3d::string_t> lines;
-			boost::split(lines, input, boost::is_any_of("\n"));
-
-			for(k3d::uint_t i = 0; i != lines.size(); ++i)
-			{
-				buffer->insert(buffer->end(), lines[i]);
-				
-				if(i+1 < lines.size())
-				{
-					buffer->insert(buffer->end(), "\n");
-					buffer->apply_tag(read_only, buffer->get_iter_at_mark(begin_input), buffer->end());
-					buffer->move_mark(begin_input, buffer->end());
-
-					if(!lines[i].empty() && (command_history.empty() || lines[i] != command_history.back()))
-						command_history.push_back(lines[i]);
-					command_index = command_history.size();
-					command_signal.emit(lines[i]);
-				}
-			}
-
-			return true;
-		}
-		else if(event->keyval != GDK_Control_L && event->keyval != GDK_Control_R)
-		{
-			return false;
-		}
-
-		return false;
-	}
-
-	void print_string(const string_t& String, const bool_t Editable)
-	{
-		if(current_format)
-		{
-			if(!buffer->get_tag_table()->lookup(current_format->property_name().get_value()))
-				buffer->get_tag_table()->add(current_format);
-
-			buffer->insert_with_tag(buffer->end(), String, current_format);
-		}
-		else
-		{
-			buffer->insert(buffer->end(), String);
-		}
-
-		if(!Editable)
-			buffer->apply_tag(read_only, buffer->begin(), buffer->end());
-		view.scroll_to(buffer->get_insert());
-	}
-
-	std::vector<string_t> command_history;
-	std::vector<string_t>::size_type command_index;
-	string_t command_buffer;
-	sigc::signal<void, const string_t&> command_signal;
-	sigc::signal<void, const string_t&> complete_key_pressed_signal;
-
-	Glib::RefPtr<Gtk::TextBuffer> buffer;
-	Glib::RefPtr<Gtk::TextTag> current_format;
-	Glib::RefPtr<Gtk::TextTag> read_only;
-	Glib::RefPtr<Gtk::TextMark> begin_input;
-
-	Gtk::TextView view;
-	Gtk::ScrolledWindow scrolled_window;
-	guint completion_key;
+	std::vector<QString> history;
+	size_t history_index;
+	QString command;
+	int edit_begin;
+	int edit_end;
 };
-*/
 
 /////////////////////////////////////////////////////////////////////////////
 // widget
 
 widget::widget(QWidget* Parent) :
-	base(Parent)/*,
-	m_implementation(new implementation()) */
+	base(Parent),
+	internal(new implementation())
 {
+	internal->history_index = 0;
+	internal->edit_begin = 0;
+	internal->edit_end = 0;
+
+	QObject::connect(this, SIGNAL(textChanged()), this, SLOT(on_text_changed()));
 }
 
 widget::~widget()
 {
-//	delete m_implementation;
+	delete internal;
 }
 
-void widget::print_string(const QString& String)
+void widget::print_text(const QString& String)
 {
-	appendHtml(String);
-	scroll_to_end();
+	appendPlainText(String);
+	print();
+}
+
+void widget::print_html(const QString& HTML)
+{
+	appendHtml(HTML);
+	print();
 }
 
 void widget::scroll_to_end()
@@ -224,27 +87,122 @@ void widget::scroll_to_end()
 	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 
-void widget::showEvent(QShowEvent* event)
+void widget::on_text_changed()
+{
+	QTextCursor cursor(document());
+	cursor.movePosition(QTextCursor::End);
+
+	internal->edit_end = cursor.position();
+	internal->edit_begin = std::min(internal->edit_begin, internal->edit_end);
+}
+
+void widget::print()
+{
+	QTextCursor cursor(document());
+	cursor.movePosition(QTextCursor::End);
+
+	internal->edit_end = cursor.position();
+	internal->edit_begin = cursor.position();
+
+	scroll_to_end();
+}
+
+void widget::showEvent(QShowEvent* Event)
 {
 	scroll_to_end();
 }
 
-/*
-void widget::set_completion_key(const uint_t KeySym)
+void widget::keyPressEvent(QKeyEvent* Event)
 {
-	m_implementation->completion_key = KeySym;
-}
+	QTextCursor cursor = textCursor();
+	if(cursor.anchor() < internal->edit_begin || cursor.position() < internal->edit_begin)
+	{
+		cursor.movePosition(QTextCursor::End);
+		setTextCursor(cursor);
+		return;
+	}
+	else
+	{
+		switch(Event->key())
+		{
+			case Qt::Key_Enter:
+			case Qt::Key_Return:
+			{
+				const QString command = toPlainText().mid(internal->edit_begin, internal->edit_end - internal->edit_begin);
 
-sigc::connection widget::connect_command_signal(const sigc::slot<void, const string_t&>& Slot)
-{
-	return m_implementation->command_signal.connect(Slot);
-}
+				if(!command.isEmpty() && (internal->history.empty() || command != internal->history.back()))
+					internal->history.push_back(command);
+				internal->history_index = internal->history.size();
 
-sigc::connection widget::connect_complete_key_pressed_signal(const sigc::slot<void, const string_t&>& Slot)
-{
-	return m_implementation->complete_key_pressed_signal.connect(Slot);
+				Q_EMIT execute(command);
+				return;
+			}
+
+			case Qt::Key_Backspace:
+			case Qt::Key_Left:
+			{
+				if(cursor.position() > internal->edit_begin)
+					base::keyPressEvent(Event);
+				return;
+			}
+
+			case Qt::Key_Up:
+			{
+				if(internal->history_index)
+				{
+					if(internal->history_index == internal->history.size())
+						internal->command = toPlainText().mid(internal->edit_begin, internal->edit_end - internal->edit_begin);
+
+					internal->history_index -= 1;
+
+					cursor.setPosition(internal->edit_begin);
+					cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, internal->edit_end - internal->edit_begin);
+					cursor.insertText(internal->history[internal->history_index]);
+
+					cursor.movePosition(QTextCursor::End);
+					setTextCursor(cursor);
+				}
+
+				return;
+			}
+
+			case Qt::Key_Down:
+			{
+				if(internal->history_index < internal->history.size())
+				{
+					internal->history_index += 1;
+
+					cursor.setPosition(internal->edit_begin);
+					cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, internal->edit_end - internal->edit_begin);
+					cursor.insertText(internal->history_index < internal->history.size()
+						? internal->history[internal->history_index]
+						: internal->command);
+
+					cursor.movePosition(QTextCursor::End);
+					setTextCursor(cursor);
+				}
+
+				return;
+			}
+
+			case Qt::Key_Home:
+			{
+				cursor.setPosition(internal->edit_begin);
+				setTextCursor(cursor);
+				return;
+			}
+
+			case Qt::Key_End:
+			{
+				cursor.setPosition(internal->edit_end);
+				setTextCursor(cursor);
+				return;
+			}
+		}
+	}
+
+	base::keyPressEvent(Event);
 }
-*/
 
 } // namespace console
 

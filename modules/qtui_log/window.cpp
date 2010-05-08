@@ -104,7 +104,7 @@ void window::on_log_message(const time_t Timestamp, const k3d::log_level_t Level
 
 	buffer += "</span>";
 
-	ui.console->print_string(buffer);
+	ui.console->print_html(buffer);
 }
 
 k3d::iplugin_factory& window::get_factory()

@@ -50,24 +50,36 @@ public:
 	widget(QWidget* Parent = 0);
 	~widget();
 
+Q_SIGNALS:
+	/// Signal that will be emitted whenever the user enters a command to be executed.
+	void execute(const QString& Command);
+
 public Q_SLOTS:
 	/// Writes the supplied text to the console.
-	void print_string(const QString& String);
-
+	void print_text(const QString& String);
+	/// Writes the supplied HTML to the console.
+	void print_html(const QString& HTML);
 	/// Scrolls the console to the end of its output.
 	void scroll_to_end();
+
 /*
 	/// Set the completion key
 	void set_completion_key(const uint_t KeySym);
 
-	/// Connects a slot to a signal that will be emitted whenever the user enters a command.
-	sigc::connection connect_command_signal(const sigc::slot<void, const string_t&>& Slot);
-
 	/// Connects a slot to a signal that will be emitted when the "completion request" key (see set_completion_key) is pressed
 	sigc::connection connect_complete_key_pressed_signal(const sigc::slot<void, const string_t&>& Slot);
 */
+
+private Q_SLOTS:
+	void on_text_changed();
+
 private:
-	void showEvent(QShowEvent* event);
+	void print();
+	void showEvent(QShowEvent* Event);
+	void keyPressEvent(QKeyEvent* Event);
+
+	class implementation;
+	implementation* const internal;
 };
 
 } // namespace console
