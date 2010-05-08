@@ -212,11 +212,11 @@ private:
 				}
 				if(!polyhedron.get())
 					return;
-				return_if_fail(k3d::polyhedron::is_solid(*polyhedron));
+
 				const k3d::uint_t input_face_count = polyhedron->face_selections.size();
 				for(k3d::uint_t face = 0; face != input_face_count; ++face)
 				{
-						polyhedron->face_selections[face] = polyhedron->face_loop_counts[face] > 1 ? 1.0 : 0.0;
+					polyhedron->face_selections[face] = polyhedron->face_loop_counts[face] > 1 ? 1.0 : 0.0;
 				}
 				
 				// We triangulate the holes
