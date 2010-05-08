@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES(${K3D_CGAL_INCLUDE_DIR})
 LINK_DIRECTORIES(${K3D_BOOST_LIB_DIR})
 
-SET_SOURCE_FILES_PROPERTIES(cgal_boolean_nodes.cpp conversion.cpp module.cpp 
+SET_SOURCE_FILES_PROPERTIES(boolean.cpp module.cpp 
     PROPERTIES COMPILE_FLAGS "-frounding-math")
 
 K3D_BUILD_MODULE(k3d-cgal)
