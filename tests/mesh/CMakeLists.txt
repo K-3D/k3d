@@ -1036,6 +1036,11 @@ K3D_TEST(mesh.modifier.SelectCube
 	REQUIRES K3D_BUILD_SELECTION_MODULE
 	LABELS mesh modifier)
 
+K3D_TEST(mesh.modifier.SelectedFacesToPolyhedron 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SelectedFacesToPolyhedron.py
+	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
+	LABELS mesh modifier)
+
 K3D_TEST(mesh.modifier.SelectNSided 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SelectNSided.py
 	REQUIRES K3D_BUILD_SELECTION_MODULE
