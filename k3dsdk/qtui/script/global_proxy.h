@@ -26,6 +26,9 @@
 
 #include <QObject>
 
+class QScriptEngine;
+class QScriptValue;
+
 namespace k3d
 {
 
@@ -46,9 +49,10 @@ class global_proxy :
 	Q_PROPERTY(QString share_path READ share_path);
 
 public:
-	global_proxy();
+	static void setup(QScriptEngine* Engine, QScriptValue Namespace);
 
 private:
+	global_proxy();
 	const QString share_path() const;
 };
 

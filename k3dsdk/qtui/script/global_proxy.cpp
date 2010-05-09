@@ -23,9 +23,12 @@
 
 #include <k3dsdk/log.h>
 #include <k3dsdk/qtui/convert.h>
+#include <k3dsdk/qtui/script/color_proxy.h>
 #include <k3dsdk/qtui/script/global_proxy.h>
 #include <k3dsdk/qtui/script/log_proxy.h>
 #include <k3dsdk/share.h>
+
+#include <QScriptEngine>
 
 namespace k3d
 {
@@ -39,10 +42,18 @@ namespace script
 /////////////////////////////////////////////////////////////////////////////
 // global_proxy
 
+void global_proxy::setup(QScriptEngine* Engine, QScriptValue Namespace)
+{
+	QScriptValue result = Engine->newQObject(new global_proxy(), QScriptEngine::ScriptOwnership);
+	Engine->globalObject().setProperty("k3d", result);
+
+	log::setup(Engine, result);
+	color::setup(Engine, result);
+}
+
 global_proxy::global_proxy()
 {
 	setObjectName("k3d");
-	new log_proxy(this);
 }
 
 const QString global_proxy::share_path() const

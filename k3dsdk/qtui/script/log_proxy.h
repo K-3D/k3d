@@ -26,6 +26,9 @@
 
 #include <QObject>
 
+class QScriptEngine;
+class QScriptValue;
+
 namespace k3d
 {
 
@@ -35,17 +38,17 @@ namespace qtui
 namespace script
 {
 
+namespace log
+{
+
 /////////////////////////////////////////////////////////////////////////////
-// log_proxy
+// proxy
 
 /// Wrapper class for the K-3D log scripting proxy object
-class log_proxy :
+class proxy :
 	public QObject
 {
 	Q_OBJECT;
-
-public:
-	log_proxy(QObject* Parent);
 
 public Q_SLOTS:
 	void critical(const QString& Message);
@@ -53,7 +56,15 @@ public Q_SLOTS:
 	void error(const QString& Message);
 	void info(const QString& Message);
 	void warning(const QString& Message);
+
+private:
+	proxy(QObject* Parent);
+	friend void setup(QScriptEngine*, QScriptValue);
 };
+
+void setup(QScriptEngine* Engine, QScriptValue Namespace);
+
+} // namespace log
 
 } // namespace script
 

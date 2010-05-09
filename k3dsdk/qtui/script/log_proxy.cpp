@@ -25,6 +25,8 @@
 #include <k3dsdk/qtui/convert.h>
 #include <k3dsdk/qtui/script/log_proxy.h>
 
+#include <QScriptValue>
+
 namespace k3d
 {
 
@@ -34,39 +36,52 @@ namespace qtui
 namespace script
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// log_proxy
+namespace log
+{
 
-log_proxy::log_proxy(QObject* Parent) :
+/////////////////////////////////////////////////////////////////////////////
+// proxy
+
+proxy::proxy(QObject* Parent) :
 	QObject(Parent)
 {
 	setObjectName("log");
 }
 
-void log_proxy::critical(const QString& Message)
+void proxy::critical(const QString& Message)
 {
 	k3d::log() << k3d::critical << Message.toAscii().data() << std::endl;
 }
 
-void log_proxy::debug(const QString& Message)
+void proxy::debug(const QString& Message)
 {
 	k3d::log() << k3d::debug << Message.toAscii().data() << std::endl;
 }
 
-void log_proxy::error(const QString& Message)
+void proxy::error(const QString& Message)
 {
 	k3d::log() << k3d::error << Message.toAscii().data() << std::endl;
 }
 
-void log_proxy::info(const QString& Message)
+void proxy::info(const QString& Message)
 {
 	k3d::log() << k3d::info << Message.toAscii().data() << std::endl;
 }
 
-void log_proxy::warning(const QString& Message)
+void proxy::warning(const QString& Message)
 {
 	k3d::log() << k3d::warning << Message.toAscii().data() << std::endl;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// setup
+
+void setup(QScriptEngine* Engine, QScriptValue Namespace)
+{
+	proxy* const result = new proxy(Namespace.toQObject());
+}
+
+} // namespace log
 
 } // namespace script
 
