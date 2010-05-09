@@ -98,11 +98,7 @@ void shell::prompt()
 
 QScriptValue shell::print(QScriptContext* Context, QScriptEngine* Engine)
 {
-	QScriptValue argument = Context->argument(0);
-	if(!argument.isString())
-		return Context->throwError(QScriptContext::TypeError, "print(): expected string argument");
-
-	qobject_cast<shell*>(Context->callee().data().toQObject())->ui.console->print_html("<span style='color: #00f'>" + argument.toString() + "</span>");
+	qobject_cast<shell*>(Context->callee().data().toQObject())->ui.console->print_html("<span style='color: #00f'>" + Context->argument(0).toString() + "</span>");
 	return QScriptValue();
 }
 
