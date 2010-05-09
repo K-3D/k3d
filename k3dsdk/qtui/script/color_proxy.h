@@ -24,9 +24,6 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <QObject>
-#include <QScriptable>
-
 class QScriptEngine;
 class QScriptValue;
 

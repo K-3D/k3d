@@ -21,15 +21,13 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/log.h>
-#include <k3dsdk/qtui/convert.h>
-#include <k3dsdk/qtui/script/color_proxy.h>
+#include <k3dsdk/qtui/console.h>
 #include <k3dsdk/qtui/script/console_proxy.h>
-#include <k3dsdk/qtui/script/global_proxy.h>
-#include <k3dsdk/qtui/script/log_proxy.h>
-#include <k3dsdk/share.h>
 
 #include <QScriptEngine>
+#include <QScriptValue>
+
+class QScriptContext;
 
 namespace k3d
 {
@@ -40,28 +38,23 @@ namespace qtui
 namespace script
 {
 
+namespace console
+{
+
+static QScriptValue constructor(QScriptContext* Context, QScriptEngine* Engine)
+{
+	return Engine->newQObject(new k3d::qtui::console::widget(), QScriptEngine::ScriptOwnership);
+}
+
 /////////////////////////////////////////////////////////////////////////////
-// global_proxy
+// setup
 
-void global_proxy::setup(QScriptEngine* Engine, QScriptValue Namespace)
+void setup(QScriptEngine* Engine, QScriptValue Namespace)
 {
-	QScriptValue result = Engine->newQObject(new global_proxy(), QScriptEngine::ScriptOwnership);
-	Engine->globalObject().setProperty("k3d", result);
-
-	color::setup(Engine, result);
-	console::setup(Engine, result);
-	log::setup(Engine, result);
+	Namespace.setProperty("console", Engine->newFunction(console::constructor));
 }
 
-global_proxy::global_proxy()
-{
-	setObjectName("k3d");
-}
-
-const QString global_proxy::share_path() const
-{
-	return k3d::convert<QString>(k3d::share_path().native_utf8_string());
-}
+} // namespace console
 
 } // namespace script
 
