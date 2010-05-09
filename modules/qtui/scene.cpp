@@ -60,6 +60,9 @@ scene::scene(k3d::idocument& Document) :
 	m_camera.set_value(m_cameras.size() ? m_cameras[0] : 0);
 	m_gl_engine.set_value(m_render_engines.size() ? m_render_engines[0] : 0);
 
+	if(m_gl_engine.internal_value())
+		m_gl_engine.internal_value()->redraw_request_signal().connect(sigc::mem_fun(*this, &scene::on_redraw_pipeline));
+
 	set_active_mode(k3d::plugin::create<k3d::qtui::mode>("QTUIDefaultMode"));
 
 	update();
@@ -118,6 +121,11 @@ void scene::on_camera_changed(int Index)
 void scene::on_render_engine_changed(int Index)
 {
 	m_gl_engine.set_value(m_render_engines[Index]);
+	update();
+}
+
+void scene::on_redraw_pipeline(k3d::gl::irender_viewport::redraw_type_t RedrawType)
+{
 	update();
 }
 
