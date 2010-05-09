@@ -87,7 +87,7 @@ static QScriptValue blue(QScriptContext* Context, QScriptEngine* Engine)
 static QScriptValue toString(QScriptContext* Context, QScriptEngine* Engine)
 {
 	const k3d::color value = qscriptvalue_cast<k3d::color>(Context->thisObject());
-	return QString("{red:%1, green:%2, blue:%3}").arg(value.red).arg(value.green).arg(value.blue);
+	return QString("{%1,%2,%3}").arg(value.red).arg(value.green).arg(value.blue);
 }
 
 static QScriptValue constructor(QScriptContext* Context, QScriptEngine* Engine)
@@ -105,8 +105,7 @@ static QScriptValue constructor(QScriptContext* Context, QScriptEngine* Engine)
 			result = Engine->toScriptValue(k3d::color(Context->argument(0).toNumber(), Context->argument(1).toNumber(), Context->argument(2).toNumber()));
 			break;
 		default:
-			result = Context->throwError(QScriptContext::TypeError, "0, 1, or 3 numeric arguments required.");
-			break;
+			return Context->throwError(QScriptContext::TypeError, "0, 1, or 3 numeric arguments required.");
 	}
 
 	result.setPrototype(Context->callee().property("prototype"));
@@ -123,10 +122,20 @@ void setup(QScriptEngine* Engine, QScriptValue Namespace)
 	prototype.setProperty("green", Engine->newFunction(green), QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
 	prototype.setProperty("blue", Engine->newFunction(blue), QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
 	prototype.setProperty("toString", Engine->newFunction(toString));
-
+	
 	Engine->setDefaultPrototype(qMetaTypeId<k3d::color>(), prototype);
 
-	Namespace.setProperty("color", Engine->newFunction(constructor, prototype));
+	QScriptValue constructor = Engine->newFunction(color::constructor, prototype);
+	constructor.setProperty("black", Engine->toScriptValue(k3d::color(0, 0, 0)));
+	constructor.setProperty("white", Engine->toScriptValue(k3d::color(1, 1, 1)));
+	constructor.setProperty("red", Engine->toScriptValue(k3d::color(1, 0, 0)));
+	constructor.setProperty("yellow", Engine->toScriptValue(k3d::color(1, 1, 0)));
+	constructor.setProperty("green", Engine->toScriptValue(k3d::color(0, 1, 0)));
+	constructor.setProperty("cyan", Engine->toScriptValue(k3d::color(0, 1, 1)));
+	constructor.setProperty("blue", Engine->toScriptValue(k3d::color(0, 0, 1)));
+	constructor.setProperty("purple", Engine->toScriptValue(k3d::color(1, 0, 1)));
+
+	Namespace.setProperty("color", constructor);
 }
 
 } // namespace color
