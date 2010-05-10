@@ -142,7 +142,10 @@ void mode::on_reload()
 	script_engine->globalObject().setProperty("scene", script_engine->newQObject(scene));
 	QScriptValue result = script_engine->evaluate(script.pipeline_value().c_str());
 	if(result.isError())
-		k3d::log() << error << result.toString().toAscii().data() << std::endl;
+	{
+		k3d::log() << error << result.toString().toAscii().data();
+		k3d::log() << " at line " << result.property("lineNumber").toString().toAscii().data() << std::endl;
+	}
 
 	on_scene_rect_changed(scene->sceneRect());
 }
