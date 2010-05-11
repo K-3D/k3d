@@ -139,6 +139,7 @@ void mode::on_reload()
 	edit_menu_proxy = scene->addWidget(edit_menu_button);
 
 	script_engine.reset(k3d::qtui::script::engine());
+	script_engine->globalObject().setProperty("mode", script_engine->newQObject(this));
 	script_engine->globalObject().setProperty("scene", script_engine->newQObject(scene));
 	QScriptValue result = script_engine->evaluate(script.pipeline_value().c_str());
 	if(result.isError())

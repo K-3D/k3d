@@ -59,6 +59,7 @@ public:
 	void set_active_mode(k3d::qtui::mode* const Mode);
 
 private Q_SLOTS:
+	void on_mode_closed();
 	void on_camera_changed(int Index);
 	void on_render_engine_changed(int Index);
 	
@@ -77,6 +78,7 @@ private:
 	std::vector<k3d::icamera*> m_cameras;
 	std::vector<k3d::gl::irender_viewport*> m_render_engines;
 	boost::scoped_ptr<k3d::qtui::mode> m_active_mode;
+	boost::scoped_ptr<k3d::qtui::mode> m_next_mode;
 };
 
 } // namespace qtui

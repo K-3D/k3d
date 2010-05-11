@@ -24,6 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <QObject>
+
 class QGraphicsScene;
 
 namespace k3d
@@ -37,12 +39,29 @@ namespace qtui
 
 /// Abstract base class for Modes - objects that control user-interaction by
 /// combining rendering, interaction, and business logic in one place.
-class mode
+class mode :
+	public QObject
 {
+	Q_OBJECT;
 public:
 	virtual ~mode();
 
 	virtual void enable(QGraphicsScene& scene) = 0;
+
+	void disable();
+
+Q_SIGNALS:
+	/// Emitted to request that the mode be closed.
+	void close_requested();
+	/// Emitted to indicate that the mode has been closed.
+	void closed();
+
+public Q_SLOTS:
+	void disable_auto_close();
+	/// Requests that the mode be closed.
+	void request_close();
+	/// Closes the mode.
+	void close();
 
 protected:
 	mode();

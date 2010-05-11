@@ -102,14 +102,31 @@ void scene::drawBackground(QPainter *painter, const QRectF &rect)
 
 void scene::set_active_mode(k3d::qtui::mode* const Mode)
 {
-	m_active_mode.reset(Mode);
+	m_next_mode.reset(Mode);
+
+	if(m_active_mode)
+	{
+		m_active_mode->request_close();
+	}
+	else
+	{
+		on_mode_closed();
+	}
+}
+
+void scene::on_mode_closed()
+{
+	m_active_mode.swap(m_next_mode);
 
 	QList<QGraphicsItem*> all_items = items();
 	for(int i = 0; i != all_items.size(); ++i)
 		delete all_items[i];
 
 	if(m_active_mode)
+	{
+		QObject::connect(m_active_mode.get(), SIGNAL(closed()), this, SLOT(on_mode_closed()));
 		m_active_mode->enable(*this);
+	}
 }
 
 void scene::on_camera_changed(int Index)

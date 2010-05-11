@@ -44,7 +44,6 @@ namespace programmable
 
 /// Provides a programmable edit mode, mainly intended for development.
 class mode :
-	public QObject,
 	public k3d::qtui::mode,
 	public k3d::property_collection
 {

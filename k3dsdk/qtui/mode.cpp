@@ -21,6 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/log.h>
 #include <k3dsdk/qtui/mode.h>
 
 namespace k3d
@@ -34,10 +35,26 @@ namespace qtui
 
 mode::mode()
 {
+	QObject::connect(this, SIGNAL(close_requested()), this, SLOT(close()));
 }
 
 mode::~mode()
 {
+}
+
+void mode::disable_auto_close()
+{
+	QObject::disconnect(this, SIGNAL(close_requested()), this, SLOT(close()));
+}
+
+void mode::request_close()
+{
+	Q_EMIT close_requested();
+}
+
+void mode::close()
+{
+	Q_EMIT closed();
 }
 
 } // namespace qtui
