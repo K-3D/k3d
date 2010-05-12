@@ -69,7 +69,7 @@ state.hidden.assignProperty(proxy.console, "geometry", new QRect(20, -100, 500, 
 
 state.finished.assignProperty(proxy.instructions, "geometry", new QRect(20, 1000, 300, 50));
 state.finished.assignProperty(proxy.console, "geometry", new QRect(20, -100, 500, 100));
-state.finished.propertiesAssigned.connect(mode.close);
+state.finished.propertiesAssigned.connect(function() { scene.set_active_mode("QTUIBrowserMode"); });
 
 // Setup transitions between states ...
 var transition = new Object();
@@ -88,8 +88,9 @@ transition.show = new QKeyEventTransition(scene.views()[0], QEvent.KeyPress, Qt.
 transition.show.targetState = state.visible;
 state.hidden.addTransition(transition.show);
 
-mode.disable_auto_close();
-transition.finish = state.running.addTransition(mode, "close_requested()", state.finished);
+transition.finish = new QKeyEventTransition(scene.views()[0], QEvent.KeyPress, Qt.Key_F1);
+transition.finish.targetState = state.finished;
+state.running.addTransition(transition.finish);
 
 // Setup animated transitions ...
 var animation = new Object();

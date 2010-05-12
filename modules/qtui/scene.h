@@ -58,8 +58,11 @@ public:
 
 	void set_active_mode(k3d::qtui::mode* const Mode);
 
+public Q_SLOTS:
+	void set_active_mode(const QString& Mode);
+
 private Q_SLOTS:
-	void on_mode_closed();
+	void on_set_active_mode();
 	void on_camera_changed(int Index);
 	void on_render_engine_changed(int Index);
 	

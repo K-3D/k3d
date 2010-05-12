@@ -48,21 +48,6 @@ public:
 
 	virtual void enable(QGraphicsScene& scene) = 0;
 
-	void disable();
-
-Q_SIGNALS:
-	/// Emitted to request that the mode be closed.
-	void close_requested();
-	/// Emitted to indicate that the mode has been closed.
-	void closed();
-
-public Q_SLOTS:
-	void disable_auto_close();
-	/// Requests that the mode be closed.
-	void request_close();
-	/// Closes the mode.
-	void close();
-
 protected:
 	mode();
 };
