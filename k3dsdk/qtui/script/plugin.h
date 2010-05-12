@@ -1,3 +1,6 @@
+#ifndef K3DSDK_QTUI_SCRIPT_PLUGIN_H
+#define K3DSDK_QTUI_SCRIPT_PLUGIN_H
+
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -21,13 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/qtui/console.h>
-#include <k3dsdk/qtui/script/console_proxy.h>
-
-#include <QScriptEngine>
-#include <QScriptValue>
-
-class QScriptContext;
+class QScriptEngine;
+class QScriptValue;
 
 namespace k3d
 {
@@ -38,27 +36,18 @@ namespace qtui
 namespace script
 {
 
-namespace console
+namespace plugin
 {
 
-static QScriptValue constructor(QScriptContext* Context, QScriptEngine* Engine)
-{
-	return Engine->newQObject(new k3d::qtui::console::widget(), QScriptEngine::ScriptOwnership);
-}
+void setup(QScriptEngine* Engine, QScriptValue Namespace);
 
-/////////////////////////////////////////////////////////////////////////////
-// setup
-
-void setup(QScriptEngine* Engine, QScriptValue Namespace)
-{
-	Namespace.setProperty("console", Engine->newFunction(console::constructor));
-}
-
-} // namespace console
+} // namespace plugin
 
 } // namespace script
 
 } // namespace qtui
 
 } // namespace k3d
+
+#endif // !K3DSDK_QTUI_SCRIPT_PLUGIN_H
 

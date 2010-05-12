@@ -1,3 +1,6 @@
+#ifndef K3DSDK_QTUI_SCRIPT_COLOR_H
+#define K3DSDK_QTUI_SCRIPT_COLOR_H
+
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -21,12 +24,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/log.h>
-#include <k3dsdk/qtui/script/engine.h>
-#include <k3dsdk/qtui/script/model.h>
-
-#include <QScriptEngine>
-#include <QStringList>
+class QScriptEngine;
+class QScriptValue;
 
 namespace k3d
 {
@@ -37,32 +36,19 @@ namespace qtui
 namespace script
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// engine
-
-QScriptEngine* engine()
+namespace color
 {
-	QScriptEngine* const script_engine = new QScriptEngine();
 
-//	::k3d::log() << debug << "Available extensions: " << script_engine->availableExtensions().join(", ").toAscii().data() << std::endl;
+void setup(QScriptEngine* Engine, QScriptValue Namespace);
 
-	script_engine->importExtension("qt");
-	script_engine->importExtension("qt.core");
-	script_engine->importExtension("qt.gui");
-	script_engine->importExtension("qt.phonon");
-	script_engine->importExtension("qt.webkit");
-	script_engine->importExtension("qt.svg");
-
-//	::k3d::log() << debug << "Imported extensions: " << script_engine->importedExtensions().join(", ").toAscii().data() << std::endl;
-
-	model::setup(script_engine, script_engine->globalObject());
-
-	return script_engine;
-}
+} // namespace color
 
 } // namespace script
 
 } // namespace qtui
 
 } // namespace k3d
+
+
+#endif // !K3DSDK_QTUI_SCRIPT_COLOR_H
 

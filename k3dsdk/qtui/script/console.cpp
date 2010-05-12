@@ -21,12 +21,13 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/log.h>
-#include <k3dsdk/qtui/script/engine.h>
-#include <k3dsdk/qtui/script/model.h>
+#include <k3dsdk/qtui/console.h>
+#include <k3dsdk/qtui/script/console.h>
 
 #include <QScriptEngine>
-#include <QStringList>
+#include <QScriptValue>
+
+class QScriptContext;
 
 namespace k3d
 {
@@ -37,28 +38,23 @@ namespace qtui
 namespace script
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// engine
-
-QScriptEngine* engine()
+namespace console
 {
-	QScriptEngine* const script_engine = new QScriptEngine();
 
-//	::k3d::log() << debug << "Available extensions: " << script_engine->availableExtensions().join(", ").toAscii().data() << std::endl;
-
-	script_engine->importExtension("qt");
-	script_engine->importExtension("qt.core");
-	script_engine->importExtension("qt.gui");
-	script_engine->importExtension("qt.phonon");
-	script_engine->importExtension("qt.webkit");
-	script_engine->importExtension("qt.svg");
-
-//	::k3d::log() << debug << "Imported extensions: " << script_engine->importedExtensions().join(", ").toAscii().data() << std::endl;
-
-	model::setup(script_engine, script_engine->globalObject());
-
-	return script_engine;
+static QScriptValue constructor(QScriptContext* Context, QScriptEngine* Engine)
+{
+	return Engine->newQObject(new k3d::qtui::console::widget(), QScriptEngine::ScriptOwnership);
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// setup
+
+void setup(QScriptEngine* Engine, QScriptValue Namespace)
+{
+	Namespace.setProperty("console", Engine->newFunction(console::constructor));
+}
+
+} // namespace console
 
 } // namespace script
 

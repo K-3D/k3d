@@ -1,6 +1,3 @@
-#ifndef K3DSDK_QTUI_SCRIPT_LOG_PROXY_H
-#define K3DSDK_QTUI_SCRIPT_LOG_PROXY_H
-
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -24,10 +21,17 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <QObject>
+#include <k3dsdk/log.h>
+#include <k3dsdk/qtui/convert.h>
+#include <k3dsdk/qtui/script/color.h>
+#include <k3dsdk/qtui/script/console.h>
+#include <k3dsdk/qtui/script/iunknown.h>
+#include <k3dsdk/qtui/script/log.h>
+#include <k3dsdk/qtui/script/model.h>
+#include <k3dsdk/qtui/script/plugin.h>
+#include <k3dsdk/share.h>
 
-class QScriptEngine;
-class QScriptValue;
+#include <QScriptEngine>
 
 namespace k3d
 {
@@ -38,39 +42,33 @@ namespace qtui
 namespace script
 {
 
-namespace log
+namespace model
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// proxy
-
-/// Wrapper class for the K-3D log scripting proxy object
-class proxy :
-	public QObject
+static QScriptValue share_path(QScriptContext* Context, QScriptEngine* Engine)
 {
-	Q_OBJECT;
+	return Engine->toScriptValue(k3d::convert<QString>(k3d::share_path().native_utf8_string()));
+}
 
-public Q_SLOTS:
-	void critical(const QString& Message);
-	void debug(const QString& Message);
-	void error(const QString& Message);
-	void info(const QString& Message);
-	void warning(const QString& Message);
+void setup(QScriptEngine* Engine, QScriptValue Namespace)
+{
+	QScriptValue proxy = Engine->newObject();
+	proxy.setProperty("share_path", Engine->newFunction(share_path), QScriptValue::PropertyGetter);
 
-private:
-	proxy(QObject* Parent);
-	friend void setup(QScriptEngine*, QScriptValue);
-};
+	color::setup(Engine, proxy);
+	console::setup(Engine, proxy);
+	iunknown::setup(Engine, proxy);
+	log::setup(Engine, proxy);
+	plugin::setup(Engine, proxy);
 
-void setup(QScriptEngine* Engine, QScriptValue Namespace);
+	Namespace.setProperty("k3d", proxy);
+}
 
-} // namespace log
+} // namespace model
 
 } // namespace script
 
 } // namespace qtui
 
 } // namespace k3d
-
-#endif // !K3DSDK_QTUI_SCRIPT_LOG_PROXY_H
 

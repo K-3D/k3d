@@ -22,10 +22,17 @@
 */
 
 #include <k3dsdk/log.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/qtui/convert.h>
-#include <k3dsdk/qtui/script/log_proxy.h>
+#include <k3dsdk/qtui/script/plugin.h>
 
+#include <QMetaType>
+#include <QScriptContext>
+#include <QScriptEngine>
 #include <QScriptValue>
+#include <QStringList>
+
+Q_DECLARE_METATYPE(k3d::iunknown*);
 
 namespace k3d
 {
@@ -36,41 +43,28 @@ namespace qtui
 namespace script
 {
 
-namespace log
+namespace plugin
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// proxy
-
-proxy::proxy(QObject* Parent) :
-	QObject(Parent)
+namespace factory
 {
-	setObjectName("log");
+
+static QScriptValue lookup(QScriptContext* Context, QScriptEngine* Engine)
+{
+	return Engine->toScriptValue(QStringList() << "a" << "b");
 }
 
-void proxy::critical(const QString& Message)
-{
-	k3d::log() << k3d::critical << Message.toAscii().data() << std::endl;
-}
+} // namespace factory
 
-void proxy::debug(const QString& Message)
+static QScriptValue create(QScriptContext* Context, QScriptEngine* Engine)
 {
-	k3d::log() << k3d::debug << Message.toAscii().data() << std::endl;
-}
+	switch(Context->argumentCount())
+	{
+		case 1:
+			return Engine->toScriptValue(k3d::plugin::create(Context->argument(0).toString().toAscii().data()));
+	}
 
-void proxy::error(const QString& Message)
-{
-	k3d::log() << k3d::error << Message.toAscii().data() << std::endl;
-}
-
-void proxy::info(const QString& Message)
-{
-	k3d::log() << k3d::info << Message.toAscii().data() << std::endl;
-}
-
-void proxy::warning(const QString& Message)
-{
-	k3d::log() << k3d::warning << Message.toAscii().data() << std::endl;
+	return QScriptValue();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -78,10 +72,17 @@ void proxy::warning(const QString& Message)
 
 void setup(QScriptEngine* Engine, QScriptValue Namespace)
 {
-	proxy* const result = new proxy(Namespace.toQObject());
+	QScriptValue factory = Engine->newObject();
+	factory.setProperty("lookup", Engine->newFunction(factory::lookup));
+	
+	QScriptValue plugin = Engine->newObject();
+	plugin.setProperty("factory", factory);
+	plugin.setProperty("create", Engine->newFunction(create));
+
+	Namespace.setProperty("plugin", plugin);
 }
 
-} // namespace log
+} // namespace plugin
 
 } // namespace script
 

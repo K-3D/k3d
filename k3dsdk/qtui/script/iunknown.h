@@ -1,5 +1,5 @@
-#ifndef K3DSDK_QTUI_SCRIPT_COLOR_PROXY_H
-#define K3DSDK_QTUI_SCRIPT_COLOR_PROXY_H
+#ifndef K3DSDK_QTUI_SCRIPT_IUNKNOWN_H
+#define K3DSDK_QTUI_SCRIPT_IUNKNOWN_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -36,12 +36,12 @@ namespace qtui
 namespace script
 {
 
-namespace color
+namespace iunknown
 {
 
 void setup(QScriptEngine* Engine, QScriptValue Namespace);
 
-} // namespace color
+} // namespace iunknown
 
 } // namespace script
 
@@ -50,5 +50,5 @@ void setup(QScriptEngine* Engine, QScriptValue Namespace);
 } // namespace k3d
 
 
-#endif // !K3DSDK_QTUI_SCRIPT_COLOR_PROXY_H
+#endif // !K3DSDK_QTUI_SCRIPT_IUNKNOWN_H
 
