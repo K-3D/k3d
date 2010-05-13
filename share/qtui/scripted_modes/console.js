@@ -41,12 +41,12 @@ widget.console.setWindowOpacity(0.7);
 proxy.console = scene.addWidget(widget.console);
 prompt();
 
-widget.instructions = new QLabel("Use F2 to toggle the console.");
+widget.instructions = new QLabel("Use F1 for browse mode,\nF2 to toggle the console.");
 widget.instructions.alignment = Qt.AlignCenter;
 widget.instructions.styleSheet = "QLabel { color: blue;  background: #f5f5dc; }";
 widget.instructions.setWindowOpacity(0.7);
 proxy.instructions = scene.addWidget(widget.instructions);
-proxy.instructions.geometry = new QRect(20, -100, 300, 50);
+proxy.instructions.geometry = new QRect();
 
 widget.command = new QLabel();
 widget.command.alignment = Qt.AlignCenter;
@@ -110,8 +110,13 @@ animation.command.setKeyValueAt(0.5, 1);
 animation.command.endValue = 0;
 animation.command.easingCurve = new QEasingCurve(QEasingCurve.OutInQuint);
 
-machine.addDefaultAnimation(animation.instructions);
-machine.addDefaultAnimation(animation.console);
+transition.show_instructions.addAnimation(animation.instructions);
+transition.first_show.addAnimation(animation.instructions);
+transition.first_show.addAnimation(animation.console);
+transition.show.addAnimation(animation.console);
+transition.hide.addAnimation(animation.console);
+transition.finish.addAnimation(animation.instructions);
+transition.finish.addAnimation(animation.console);
 
 // Finish setting-up the state machine ...
 machine.start();
