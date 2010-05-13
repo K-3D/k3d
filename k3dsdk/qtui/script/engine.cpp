@@ -49,9 +49,14 @@ QScriptEngine* engine()
 	script_engine->importExtension("qt");
 	script_engine->importExtension("qt.core");
 	script_engine->importExtension("qt.gui");
+	script_engine->importExtension("qt.network");
+	script_engine->importExtension("qt.opengl");
 	script_engine->importExtension("qt.phonon");
-	script_engine->importExtension("qt.webkit");
+	script_engine->importExtension("qt.sql");
 	script_engine->importExtension("qt.svg");
+	script_engine->importExtension("qt.webkit");
+	script_engine->importExtension("qt.xml");
+	script_engine->importExtension("qt.xmlpatterns");
 
 //	::k3d::log() << debug << "Imported extensions: " << script_engine->importedExtensions().join(", ").toAscii().data() << std::endl;
 
