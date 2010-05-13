@@ -54,6 +54,7 @@ void populate_new_document(idocument& Document)
 	k3d::inode* const multi_painter = k3d::plugin::create<k3d::inode>("OpenGLMultiPainter", Document, "GL Default Painter");
 	return_if_fail(multi_painter);
 
+/*
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "points", "Points", "", k3d::plugin::create<k3d::gl::imesh_painter>("VirtualOpenGLPointPainter", Document, "GL Point Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "edges", "Edges", "", k3d::plugin::create<k3d::gl::imesh_painter>("VirtualOpenGLEdgePainter", Document, "GL Edge Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "faces", "Faces", "", k3d::plugin::create<k3d::gl::imesh_painter>("VirtualOpenGLFacePainter", Document, "GL Face Painter"));
@@ -80,6 +81,7 @@ void populate_new_document(idocument& Document)
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "spheres", "Spheres", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLSpherePainter", Document, "GL Sphere Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "teapots", "Teapots", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLTeapotPainter", Document, "GL Teapot Painter"));
 	k3d::property::create<k3d::gl::imesh_painter*>(*multi_painter, "tori", "Tori", "", k3d::plugin::create<k3d::gl::imesh_painter>("OpenGLTorusPainter", Document, "GL Torus Painter"));
+*/
 
 	k3d::property::set_internal_value(*gl_engine, "node_selection", dynamic_cast<k3d::inode*>(node_selection));
 	return_if_fail(k3d::plugin::factory::lookup("Camera"));
