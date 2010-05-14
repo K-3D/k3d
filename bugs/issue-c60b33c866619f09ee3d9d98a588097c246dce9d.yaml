@@ -1,0 +1,19 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Test for libuuid as part of the build.
+desc: Currently, we assume that libuuid is available on all platforms except Win32.  Clearly this is naive :)  Add proper CMake testing for libuuid, or switch to using the uuid support in Boost (requires Boost 1.42).
+type: :bugfix
+component: K-3D
+release: 0.8.1.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-05-14 04:30:13.142803 Z
+references: []
+
+id: c60b33c866619f09ee3d9d98a588097c246dce9d
+log_events: 
+- - 2010-05-14 04:30:16.262745 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 
