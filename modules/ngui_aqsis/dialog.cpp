@@ -54,7 +54,7 @@ class dialog :
 public:
 	dialog()
 	{
-		Gtk::Label* const label = new Gtk::Label(_("Logging SpaceNavigator events to stderr ...\nClose window to cancel logging."));
+		Gtk::Label* const label = new Gtk::Label(_("Rendering using in-process Aqsis ...\nClose window to cancel rendering."));
 		add(*Gtk::manage(label));
 
 		set_border_width(10);
