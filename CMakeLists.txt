@@ -58,6 +58,8 @@ INCLUDE(K3DFindTIFF)
 INCLUDE(K3DFindXML)
 INCLUDE(K3DFindZlib)
 
+FIND_PACKAGE(Aqsis NO_MODULE QUIET)
+
 # Setup platform-specific defaults ...
 IF(WIN32 AND MSVC)
 	SET(K3D_ENABLE_SYMBOL_VISIBILITY_DEFAULT ON)
@@ -111,7 +113,7 @@ OPTION(K3D_BUILD_MESH_INSTANCE_MODULE "Build the mesh-instance plugin module" ON
 OPTION(K3D_BUILD_MESH_MODULE "Build the mesh plugin module" ON)
 OPTION(K3D_BUILD_NGUI_ABOUT_MODULE "Build the user interface 'about' dialog plugin module" ON)
 OPTION(K3D_BUILD_NGUI_ANIMATION_TIMELINE_PANEL_MODULE "Build the experimental animation timeline panel plugin module" ON)
-OPTION(K3D_BUILD_NGUI_AQSIS_MODULE "Build the embedded Aqsis render engine module" ON)
+OPTION(K3D_BUILD_NGUI_AQSIS_MODULE "Build the embedded Aqsis render engine module" ${Aqsis_FOUND})
 OPTION(K3D_BUILD_NGUI_ASSIGN_HOTKEYS_MODULE "Build the user interface 'assign hotkeys' plugin module" ON)
 OPTION(K3D_BUILD_NGUI_ATK_EVENT_RECORDER_MODULE "Build the user interface ATK 'event recorder' plugin module" OFF)
 OPTION(K3D_BUILD_NGUI_KNOT_VECTOR_CONTROL_MODULE "Build the custom knot-vector property control plugin module" ON)
