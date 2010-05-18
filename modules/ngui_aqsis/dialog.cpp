@@ -31,6 +31,8 @@
 
 #include <gtkmm/label.h>
 
+#include <aqsis/ri/ri.h>
+
 #include <boost/scoped_ptr.hpp>
 #include <boost/assign/list_of.hpp>
 
@@ -61,6 +63,25 @@ public:
 
 		set_role("aqsis");
 		show_all();
+
+		static RtFloat fov = 45, intensity = 0.5;
+		static RtFloat Ka = 0.5, Kd = 0.8, Ks = 0.2;
+		static RtPoint from = {0,0,1}, to = {0,10,0};
+		RiBegin (RI_NULL);
+		RiFormat (512, 512, 1);
+		RiPixelSamples (2, 2);
+		RiFrameBegin (1);
+		RiDisplay ("test1.tiff", "framebuffer", "rgb", RI_NULL);
+		RiProjection ("perspective", "fov", &fov, RI_NULL);
+		RiRotate(-116.344, 0, 0, 1);
+		RiRotate(-47.9689, 1, 0, 0);
+		RiRotate(-123.69, 0, 1, 0);
+		RiTranslate(15, -20, -10);
+		RiWorldBegin ();
+		RiSphere (5, -5, 5, 360, RI_NULL);
+		RiWorldEnd ();
+		RiFrameEnd ();
+		RiEnd ();
 	}
 
 	static k3d::iplugin_factory& get_factory()
