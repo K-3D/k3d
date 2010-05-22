@@ -17,7 +17,7 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <ui_dialog.h>
+#include "dialog.h"
 
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
@@ -27,15 +27,12 @@
 #include <k3dsdk/qtui/application_widget.h>
 #include <k3dsdk/signal_system.h>
 
-#include <QDialog>
-
 #include <boost/assign/list_of.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <sstream>
 
-#include <aqsis/ri/ri.h>
 #include <aqsis/math/region.h>
 #include <libs/core/ddmanager/iddmanager.h>
-#include <libs/core/renderer.h>
 
 namespace module
 {
@@ -47,165 +44,55 @@ namespace aqsis
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// display_manager
-
-/// Custom Aqsis display manager that forwards display data using signals
-class display_manager : public Aqsis::IqDDManager
-{
-public:
-	sigc::signal<void, int, int> open_display;
-	sigc::signal<void, const Aqsis::CqRegion&, const Aqsis::IqChannelBuffer*> display_bucket;
-
-private:
-	TqInt Initialise()
-	{
-		return 0;
-	}
-
-	TqInt Shutdown()
-	{
-		return 0;
-	}
-
-	TqInt AddDisplay(const TqChar* name, const TqChar* type, const TqChar* mode, TqInt modeID, TqInt dataOffset, TqInt dataSize, std::map<std::string, void*> mapOfArguments)
-	{
-		k3d::log() << debug << __PRETTY_FUNCTION__ << " " << name << " " << type << " " << mode << std::endl;
-		return 0;
-	}
-
-	TqInt ClearDisplays()
-	{
-		return 0;
-	}
-
-	TqInt OpenDisplays(TqInt width, TqInt height)
-	{
-		open_display.emit(width, height);
-		return 0;
-	}
-
-	TqInt CloseDisplays()
-	{
-		return 0;
-	}
-
-	TqInt DisplayBucket(const Aqsis::CqRegion& DRegion, const Aqsis::IqChannelBuffer* pBuffer)
-	{
-		display_bucket(DRegion, pBuffer);
-		return 0;
-	}
-
-	bool fDisplayNeeds(const TqChar* var)
-	{
-		if(std::string(var) == "rgb")
-			return true;
-		if(std::string(var) == "Ci")
-			return true;
-		return false;
-	}
-
-	TqInt Uses()
-	{
-		return 0;
-	}
-
-	TqInt numDisplayRequests()
-	{
-		return 0;
-	}
-
-	boost::shared_ptr<Aqsis::IqDisplayRequest> displayRequest(TqInt index)
-	{
-		return boost::shared_ptr<Aqsis::IqDisplayRequest>();
-	}
-};
-
-/////////////////////////////////////////////////////////////////////////////
 // dialog
 
-/// Displays output from the embedded Aqsis render engine
-class dialog :
-	public QDialog,
-	public k3d::iunknown
+dialog::dialog() :
+	application_widget(*this)
 {
-public:
-	dialog() :
-		application_widget(*this)
+	ui.setupUi(this);
+	this->setAttribute(Qt::WA_DeleteOnClose);
+
+	render_engine.reset(new module::qtui::aqsis::thread());
+	QObject::connect(render_engine.get(), SIGNAL(open_display(int, int)), this, SLOT(on_open_display(int, int)), Qt::BlockingQueuedConnection);
+	QObject::connect(render_engine.get(), SIGNAL(display_bucket(const QRect&, const Aqsis::IqChannelBuffer*)), this, SLOT(on_display_bucket(const QRect&, const Aqsis::IqChannelBuffer*)), Qt::BlockingQueuedConnection);
+	render_engine->start();
+}
+
+void dialog::on_open_display(int Width, int Height)
+{
+	image = QImage(Width, Height, QImage::Format_RGB32);
+	image.fill(QColor(128, 128, 128).rgba());
+	ui.image->setPixmap(QPixmap::fromImage(image));
+}
+
+void dialog::on_display_bucket(const QRect& Region, const Aqsis::IqChannelBuffer* Buffer)
+{
+	const int index = Buffer->getChannelIndex("rgb");
+
+	for(int y = 0; y != Buffer->height(); ++y)
 	{
-		ui.setupUi(this);
-		this->setAttribute(Qt::WA_DeleteOnClose);
-
-		render_test();
-	}
-
-	void render_test()
-	{
-		static RtFloat fov = 45, intensity = 0.5;
-		static RtFloat Ka = 0.5, Kd = 0.8, Ks = 0.2;
-		static RtPoint from = {0,0,1}, to = {0,10,0};
-		RiBegin(RI_NULL);
-
-		display_manager* const manager = new display_manager();
-		manager->open_display.connect(sigc::mem_fun(*this, &dialog::on_open_display));
-		manager->display_bucket.connect(sigc::mem_fun(*this, &dialog::on_display_bucket));
-		Aqsis::QGetRenderContext()->SetDisplayManager(manager);
-
-		RiFormat(512, 512, 1);
-		RiPixelSamples(2, 2);
-		RiFrameBegin(1);
-		RiDisplay("test1.tiff", "framebuffer", "rgb", RI_NULL);
-		RiProjection("perspective", "fov", &fov, RI_NULL);
-		RiRotate(-116.344, 0, 0, 1);
-		RiRotate(-47.9689, 1, 0, 0);
-		RiRotate(-123.69, 0, 1, 0);
-		RiTranslate(15, -20, -10);
-		RiWorldBegin();
-		RiSphere(5, -5, 5, 360, RI_NULL);
-		RiWorldEnd();
-		RiFrameEnd();
-		RiEnd();
-	}
-
-	void on_open_display(int Width, int Height)
-	{
-		image = QImage(Width, Height, QImage::Format_RGB32);
-		image.fill(QColor("yellow").rgba());
-		ui.image->setPixmap(QPixmap::fromImage(image));
-	}
-
-	void on_display_bucket(const Aqsis::CqRegion& Region, const Aqsis::IqChannelBuffer* Buffer)
-	{
-		const int index = Buffer->getChannelIndex("rgb");
-
-		for(int y = 0; y != Buffer->height(); ++y)
+		for(int x = 0; x != Buffer->width(); ++x)
 		{
-			for(int x = 0; x != Buffer->width(); ++x)
-			{
-				Aqsis::IqChannelBuffer::TqConstChannelPtr values = (*Buffer)(x, y, index);
-				image.setPixel(x + Region.xMin(), y + Region.yMin(), QColor::fromRgbF(values[0], values[1], values[2]).rgb());
-			}
+			Aqsis::IqChannelBuffer::TqConstChannelPtr values = (*Buffer)(x, y, index);
+			image.setPixel(x + Region.left(), y + Region.top(), QColor::fromRgbF(values[0], values[1], values[2]).rgb());
 		}
-
-		ui.image->setPixmap(QPixmap::fromImage(image));
 	}
 
-	static k3d::iplugin_factory& get_factory()
-	{
-		static k3d::application_plugin_factory<dialog> factory(
-			k3d::uuid(0xa467cfdd, 0x2545d997, 0x07ecf8a2, 0x042455fb),
-			"QTUIAqsisDialog",
-			_("Displays output from an embedded Aqsis RenderMan engine."),
-			"QTUI Dialog",
-			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("qtui:component-type", "dialog"));
+	ui.image->setPixmap(QPixmap::fromImage(image));
+}
 
-		return factory;
-	}
+k3d::iplugin_factory& dialog::get_factory()
+{
+	static k3d::application_plugin_factory<dialog> factory(
+		k3d::uuid(0xa467cfdd, 0x2545d997, 0x07ecf8a2, 0x042455fb),
+		"QTUIAqsisDialog",
+		_("Displays output from an embedded Aqsis RenderMan engine."),
+		"QTUI Dialog",
+		k3d::iplugin_factory::EXPERIMENTAL,
+		boost::assign::map_list_of("qtui:component-type", "dialog"));
 
-	Ui::QTUIAqsisDialog ui;
-	k3d::qtui::application_widget application_widget;
-	QImage image;
-};
+	return factory;
+}
 
 } // namespace aqsis
 
