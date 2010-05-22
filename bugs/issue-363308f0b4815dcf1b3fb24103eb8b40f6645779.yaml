@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Add filtering to the Node List Panel.
+desc: Like it says, much of the content in the Node List Panel is overkill for the casual user.  Need to add some reasonable filtering capabilities, i.e. show "common" nodes, nodes in specific categories (lights, materials, etc), nodes of a specific type, name matching, etc.
+type: :feature
+component: K-3D
+release: 0.8.1.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-05-22 00:43:21.654820 Z
+references: []
+
+id: 363308f0b4815dcf1b3fb24103eb8b40f6645779
+log_events: 
+- - 2010-05-22 00:43:22.270780 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-05-22 00:44:06.238848 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - edited title, description
+  - ""
+claimer: 

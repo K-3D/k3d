@@ -1,5 +1,5 @@
 --- !ditz.rubyforge.org,2008-03-06/issue 
-title: "5  Python Script: bug on Document.delete_node() "
+title: "Python Script: bug on Document.delete_node()"
 desc: "Steps:\n\n\
   1- Select a node (A) property on connect it to another's node property\n\
   (B).\n\
@@ -16,7 +16,7 @@ desc: "Steps:\n\n\
   Joaqu\xC3\xADn"
 type: :bugfix
 component: K-3D
-release: 1.0.0.0
+release: 0.8.1.0
 reporter: Beverly L. Shead <bshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -37,3 +37,12 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 1.0.0.0 from 0.8.0.0
   - ""
+- - 2010-05-22 00:36:19.846768 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.1.0 from 1.0.0.0
+  - ""
+- - 2010-05-22 00:44:32.070902 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - edited title
+  - ""
+claimer: 
