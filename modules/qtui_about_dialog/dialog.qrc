@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="QTUIAboutDialog">
+    <file>about.png</file>
+  </qresource>
+</RCC>

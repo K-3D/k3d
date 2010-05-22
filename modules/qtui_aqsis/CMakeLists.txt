@@ -1,4 +1,7 @@
+QT4_WRAP_UI(UI_BUILT_SOURCES dialog.ui)
+
 INCLUDE_DIRECTORIES(
+	${CMAKE_CURRENT_BINARY_DIR}
 	${Aqsis_INCLUDE_DIRECTORIES}
 	${Aqsis_SOURCE_DIR}
 	${Aqsis_SOURCE_DIR}/libs/core
@@ -8,6 +11,6 @@ INCLUDE_DIRECTORIES(
 	${Aqsis_SOURCE_DIR}/libs/core/raytrace
 	)
 
-K3D_BUILD_NGUI_MODULE(k3d-ngui-aqsis)
-K3D_CREATE_MODULE_PROXY(k3d-ngui-aqsis)
-TARGET_LINK_LIBRARIES(k3d-ngui-aqsis aqsis_core)
+K3D_BUILD_QTUI_MODULE(k3d-qtui-aqsis EXTRA_SOURCES ${UI_BUILT_SOURCES})
+K3D_CREATE_MODULE_PROXY(k3d-qtui-aqsis)
+TARGET_LINK_LIBRARIES(k3d-qtui-aqsis aqsis_core)

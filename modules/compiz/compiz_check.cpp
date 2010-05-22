@@ -99,7 +99,7 @@ public:
 				_("Warns users that the Compiz window manager may interfere with OpenGL rendering in K-3D"),
 				"Desktop",
 				k3d::iplugin_factory::STABLE,
-				boost::assign::map_list_of("ngui:application-start", "true"));
+				boost::assign::map_list_of("ngui:application-start", "true")("qtui:application-start", "true"));
 
 		return factory;
 	}

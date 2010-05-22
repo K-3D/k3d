@@ -17,44 +17,39 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/** \file
-	\author Tim Shead (tshead@k-3d.com)
-*/
+#include <ui_dialog.h>
 
 #include <k3d-i18n-config.h>
+#include <k3d-version-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/basic_math.h>
-#include <k3dsdk/bitmap.h>
-#include <k3dsdk/iuser_interface.h>
+#include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
-#include <k3dsdk/ngui/application_window.h>
-#include <k3dsdk/result.h>
-#include <k3dsdk/user_interface.h>
+#include <k3dsdk/qtui/application_widget.h>
+#include <k3dsdk/signal_system.h>
 
-#include <gtkmm/box.h>
-#include <gtkmm/image.h>
-#include <gtkmm/label.h>
+#include <QDialog>
+
+#include <boost/assign/list_of.hpp>
+#include <sstream>
 
 #include <aqsis/ri/ri.h>
 #include <aqsis/math/region.h>
-
 #include <libs/core/ddmanager/iddmanager.h>
 #include <libs/core/renderer.h>
-
-#include <boost/scoped_ptr.hpp>
-#include <boost/assign/list_of.hpp>
-
-using namespace k3d::ngui;
 
 namespace module
 {
 
-namespace ngui
+namespace qtui
 {
 
 namespace aqsis
 {
 
+/////////////////////////////////////////////////////////////////////////////
+// display_manager
+
+/// Custom Aqsis display manager that forwards display data using signals
 class display_manager : public Aqsis::IqDDManager
 {
 public:
@@ -125,29 +120,26 @@ private:
 	}
 };
 
+/////////////////////////////////////////////////////////////////////////////
+// dialog
+
+/// Displays output from the embedded Aqsis render engine
 class dialog :
-	public application_window,
+	public QDialog,
 	public k3d::iunknown
 {
-	typedef application_window base;
-
 public:
-	dialog()
+	dialog() :
+		application_widget(*this)
 	{
-		Gtk::Label* const label = new Gtk::Label(_("Rendering using in-process Aqsis ...\nClose window to cancel rendering."));
-		image_widget = new Gtk::Image();
+		ui.setupUi(this);
+		this->setAttribute(Qt::WA_DeleteOnClose);
 
-		Gtk::VBox* const box = new Gtk::VBox();
-		box->pack_start(*manage(label), Gtk::PACK_SHRINK);
-		box->pack_start(*manage(image_widget), Gtk::PACK_EXPAND_WIDGET);
+		render_test();
+	}
 
-		add(*Gtk::manage(box));
-
-		set_border_width(10);
-
-		set_role("aqsis");
-		show_all();
-
+	void render_test()
+	{
 		static RtFloat fov = 45, intensity = 0.5;
 		static RtFloat Ka = 0.5, Kd = 0.8, Ks = 0.2;
 		static RtPoint from = {0,0,1}, to = {0,10,0};
@@ -176,61 +168,52 @@ public:
 
 	void on_open_display(int Width, int Height)
 	{
-		image.recreate(Width, Height);
-
-		image_widget->set(Gdk::Pixbuf::create_from_data(reinterpret_cast<const guint8*>(&const_view(image)[0]),
-			Gdk::COLORSPACE_RGB,
-			false,
-			8,
-			image.width(),
-			image.height(),
-			image.width() * 3));
+		image = QImage(Width, Height, QImage::Format_RGB32);
+		image.fill(QColor("yellow").rgba());
+		ui.image->setPixmap(QPixmap::fromImage(image));
 	}
 
 	void on_display_bucket(const Aqsis::CqRegion& Region, const Aqsis::IqChannelBuffer* Buffer)
 	{
 		const int index = Buffer->getChannelIndex("rgb");
 
-		const image_t::view_t& writable_image = view(image);
 		for(int y = 0; y != Buffer->height(); ++y)
 		{
 			for(int x = 0; x != Buffer->width(); ++x)
 			{
 				Aqsis::IqChannelBuffer::TqConstChannelPtr values = (*Buffer)(x, y, index);
-				double red = k3d::clamp(255.0 * values[0], 0.0, 255.0);
-				double green = k3d::clamp(255.0 * values[1], 0.0, 255.0);
-				double blue = k3d::clamp(255.0 * values[2], 0.0, 255.0);
-				*writable_image.at(x + Region.xMin(), y + Region.yMin()) = boost::gil::rgb8_pixel_t(red, green, blue);
+				image.setPixel(x + Region.xMin(), y + Region.yMin(), QColor::fromRgbF(values[0], values[1], values[2]).rgb());
 			}
 		}
+
+		ui.image->setPixmap(QPixmap::fromImage(image));
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
 		static k3d::application_plugin_factory<dialog> factory(
 			k3d::uuid(0xa467cfdd, 0x2545d997, 0x07ecf8a2, 0x042455fb),
-			"NGUIAqsis",
-			_("Provides an embedded Aqsis RenderMan render engine."),
-			"NGUI Dialog",
+			"QTUIAqsisDialog",
+			_("Displays output from an embedded Aqsis RenderMan engine."),
+			"QTUI Dialog",
 			k3d::iplugin_factory::EXPERIMENTAL,
-			boost::assign::map_list_of("ngui:component-type", "dialog")
-			);
+			boost::assign::map_list_of("qtui:component-type", "dialog"));
 
 		return factory;
 	}
 
-	typedef boost::gil::rgb8_image_t image_t;
-	image_t image;
-	Gtk::Image* image_widget;
+	Ui::QTUIAqsisDialog ui;
+	k3d::qtui::application_widget application_widget;
+	QImage image;
 };
 
 } // namespace aqsis
 
-} // namespace ngui
+} // namespace qtui
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::ngui::aqsis::dialog::get_factory());
+	Registry.register_factory(module::qtui::aqsis::dialog::get_factory());
 K3D_MODULE_END
 

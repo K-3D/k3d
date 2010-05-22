@@ -27,6 +27,7 @@ SET(SKIP_FILES
 	"^modules/polyhedron_sources/poly_grid.cpp$"
 	"^modules/python/engine.cpp$"
 	"^modules/pyui/user_interface.cpp$"
+	"^modules/qtui/user_interface.cpp$"
 	"^modules/renderman_painters/scripted_painter.cpp$"
 	"^renderframe/main.cpp$"
 	"^tests/code/CMakeLists.txt$"
