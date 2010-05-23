@@ -27,6 +27,7 @@
 #include <k3dsdk/qtui/script/console.h>
 #include <k3dsdk/qtui/script/iunknown.h>
 #include <k3dsdk/qtui/script/log.h>
+#include <k3dsdk/qtui/script/matrix4.h>
 #include <k3dsdk/qtui/script/model.h>
 #include <k3dsdk/qtui/script/plugin.h>
 #include <k3dsdk/share.h>
@@ -59,6 +60,7 @@ void setup(QScriptEngine* Engine, QScriptValue Namespace)
 	console::setup(Engine, proxy);
 	iunknown::setup(Engine, proxy);
 	log::setup(Engine, proxy);
+	matrix4::setup(Engine, proxy);
 	plugin::setup(Engine, proxy);
 
 	Namespace.setProperty("k3d", proxy);
