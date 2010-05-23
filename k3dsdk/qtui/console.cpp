@@ -135,6 +135,9 @@ void widget::keyPressEvent(QKeyEvent* Event)
 				internal->history_index = internal->history.size();
 
 				Q_EMIT execute(command);
+
+				cursor.movePosition(QTextCursor::End);
+				setTextCursor(cursor);
 				return;
 			}
 
