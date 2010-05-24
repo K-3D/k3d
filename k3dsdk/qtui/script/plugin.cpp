@@ -49,9 +49,25 @@ namespace plugin
 namespace factory
 {
 
+static QScriptValue convert(QScriptEngine* Engine, const k3d::plugin::factory::collection_t& Factories)
+{
+	QScriptValue result = Engine->newArray();
+
+	for(k3d::uint_t i = 0; i != Factories.size(); ++i)
+		result.setProperty(i, Engine->toScriptValue(static_cast<k3d::iunknown*>(Factories[i])));
+
+	return result;
+}
+
 static QScriptValue lookup(QScriptContext* Context, QScriptEngine* Engine)
 {
-	return Engine->toScriptValue(QStringList() << "a" << "b");
+	switch(Context->argumentCount())
+	{
+		case 0:
+			return convert(Engine, k3d::plugin::factory::lookup());
+		case 2:
+			return convert(Engine, k3d::plugin::factory::lookup(Context->argument(0).toString().toAscii().data(), Context->argument(1).toString().toAscii().data()));
+	}
 }
 
 } // namespace factory

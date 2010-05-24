@@ -21,8 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/iunknown.h>
-
 #include <k3dsdk/log.h>
 #include <k3dsdk/qtui/convert.h>
 #include <k3dsdk/qtui/script/iunknown.h>
@@ -30,6 +30,8 @@
 #include <QMetaType>
 #include <QScriptEngine>
 #include <QScriptValue>
+
+#include <cassert>
 
 class QScriptContext;
 
@@ -48,84 +50,28 @@ namespace script
 namespace iunknown
 {
 
+static QScriptValue plugin_factory_name(QScriptContext* Context, QScriptEngine* Engine)
+{
+	k3d::iplugin_factory* const factory = dynamic_cast<k3d::iplugin_factory*>(qscriptvalue_cast<k3d::iunknown*>(Context->thisObject()));
+	return k3d::convert<QString>(factory->name());
+}
+
 static QScriptValue toScriptValue(QScriptEngine* Engine, const piunknown& Value)
 {
-	QScriptValue object = Engine->newObject();
-	object.setProperty("data", Engine->newVariant(QVariant::fromValue(Value)));
-	return object;
+	QScriptValue result = Engine->newVariant(QVariant::fromValue(Value));
+
+	if(k3d::iplugin_factory* const factory = dynamic_cast<k3d::iplugin_factory*>(Value))
+	{
+		result.setProperty("name", Engine->newFunction(plugin_factory_name), QScriptValue::PropertyGetter);
+	}
+
+	return result;
 }
 
 static void fromScriptValue(const QScriptValue& Object, piunknown& Value)
 {
-k3d::log() << debug << __PRETTY_FUNCTION__ << std::endl;
-	Value = 0;
+	Value = qvariant_cast<k3d::iunknown*>(Object.toVariant());
 }
-
-/*
-static QScriptValue red(QScriptContext* Context, QScriptEngine* Engine)
-{
-	switch(Context->argumentCount())
-	{
-		case 0:
-			return qscriptvalue_cast<k3d::iunknown*>(Context->thisObject())->red;
-		case 1:
-			qscriptvalue_cast<k3d::iunknown*>(Context->thisObject())->red = Context->argument(0).toNumber();
-	}
-	return QScriptValue();
-}
-
-static QScriptValue green(QScriptContext* Context, QScriptEngine* Engine)
-{
-	switch(Context->argumentCount())
-	{
-		case 0:
-			return qscriptvalue_cast<k3d::iunknown*>(Context->thisObject())->green;
-		case 1:
-			qscriptvalue_cast<k3d::iunknown*>(Context->thisObject())->green = Context->argument(0).toNumber();
-	}
-	return QScriptValue();
-}
-
-static QScriptValue blue(QScriptContext* Context, QScriptEngine* Engine)
-{
-	switch(Context->argumentCount())
-	{
-		case 0:
-			return qscriptvalue_cast<k3d::iunknown*>(Context->thisObject())->blue;
-		case 1:
-			qscriptvalue_cast<k3d::iunknown*>(Context->thisObject())->blue = Context->argument(0).toNumber();
-	}
-	return QScriptValue();
-}
-
-static QScriptValue toString(QScriptContext* Context, QScriptEngine* Engine)
-{
-	const k3d::iunknown* const value = qscriptvalue_cast<k3d::iunknown*>(Context->thisObject());
-	return QString("k3d::iunknown object");
-}
-
-static QScriptValue constructor(QScriptContext* Context, QScriptEngine* Engine)
-{
-	QScriptValue result;
-	switch(Context->argumentCount())
-	{
-		case 0:
-			result = Engine->toScriptValue(k3d::iunknown(0, 0, 0));
-			break;
-		case 1:
-			result = Engine->toScriptValue(k3d::iunknown(Context->argument(0).toNumber(), Context->argument(0).toNumber(), Context->argument(0).toNumber()));
-			break;
-		case 3:
-			result = Engine->toScriptValue(k3d::iunknown(Context->argument(0).toNumber(), Context->argument(1).toNumber(), Context->argument(2).toNumber()));
-			break;
-		default:
-			return Context->throwError(QScriptContext::TypeError, "0, 1, or 3 numeric arguments required.");
-	}
-
-	result.setPrototype(Context->callee().property("prototype"));
-	return result;
-}
-*/
 
 /////////////////////////////////////////////////////////////////////////////
 // setup
@@ -133,27 +79,6 @@ static QScriptValue constructor(QScriptContext* Context, QScriptEngine* Engine)
 void setup(QScriptEngine* Engine, QScriptValue Namespace)
 {
 	qScriptRegisterMetaType(Engine, toScriptValue, fromScriptValue);
-/*
-	QScriptValue prototype = Engine->newObject();
-
-	prototype.setProperty("red", Engine->newFunction(red), QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
-	prototype.setProperty("green", Engine->newFunction(green), QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
-	prototype.setProperty("blue", Engine->newFunction(blue), QScriptValue::PropertyGetter | QScriptValue::PropertySetter);
-	prototype.setProperty("toString", Engine->newFunction(toString));
-	
-	Engine->setDefaultPrototype(qMetaTypeId<k3d::iunknown*>(), prototype);
-
-	QScriptValue constructor = Engine->newFunction(iunknown::constructor, prototype);
-	constructor.setProperty("black", Engine->toScriptValue(k3d::iunknown(0, 0, 0)));
-	constructor.setProperty("white", Engine->toScriptValue(k3d::iunknown(1, 1, 1)));
-	constructor.setProperty("red", Engine->toScriptValue(k3d::iunknown(1, 0, 0)));
-	constructor.setProperty("yellow", Engine->toScriptValue(k3d::iunknown(1, 1, 0)));
-	constructor.setProperty("green", Engine->toScriptValue(k3d::iunknown(0, 1, 0)));
-	constructor.setProperty("cyan", Engine->toScriptValue(k3d::iunknown(0, 1, 1)));
-	constructor.setProperty("blue", Engine->toScriptValue(k3d::iunknown(0, 0, 1)));
-	constructor.setProperty("purple", Engine->toScriptValue(k3d::iunknown(1, 0, 1)));
-	Namespace.setProperty("iunknown", constructor);
-*/
 }
 
 } // namespace iunknown
