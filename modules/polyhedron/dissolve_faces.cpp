@@ -212,6 +212,12 @@ public:
 					}
 				}
 
+				if(unsorted_edges.empty())
+				{
+					k3d::log() << error << "Can't dissolve all faces in a solid shape" << std::endl;
+					continue;
+				}
+
 				// Sort the edges into order so they form a continuous loop around the combined faces ...
 				adjacency_edges sorted_edges;
 				sorted_edges.push_back(unsorted_edges.back());
