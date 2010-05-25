@@ -98,6 +98,10 @@ public:
 		select_all->signal_activate().connect(sigc::bind(sigc::mem_fun(*this, &control::on_select_all), Property));
 		m_menu->items().push_back(*manage(select_all));
 
+		Gtk::MenuItem* const select_none = new Gtk::MenuItem(_("Select None"));
+		select_none->signal_activate().connect(sigc::bind(sigc::mem_fun(*this, &control::on_select_none), Property));
+		m_menu->items().push_back(*manage(select_none));
+
 		m_menu->show_all();
 		m_menu->popup(1, gtk_get_current_event_time());
 	}
@@ -132,6 +136,11 @@ public:
 	void on_select_all(k3d::iproperty* const Property)
 	{
 		k3d::property::set_internal_value(*Property, k3d::geometry::selection::create(1.0));
+	}
+
+	void on_select_none(k3d::iproperty* const Property)
+	{
+		k3d::property::set_internal_value(*Property, k3d::geometry::selection::create(0.0));
 	}
 
 	static k3d::iplugin_factory& get_factory()

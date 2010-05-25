@@ -41,6 +41,7 @@ extern k3d::iplugin_factory& mesh_selection_factory();
 extern k3d::iplugin_factory& node_selection_factory();
 extern k3d::iplugin_factory& select_bicubic_patch_by_number_factory();
 extern k3d::iplugin_factory& select_bilinear_patch_by_number_factory();
+extern k3d::iplugin_factory& select_boundary_edges_factory();
 extern k3d::iplugin_factory& select_clockwise_factory();
 extern k3d::iplugin_factory& select_companion_factory();
 extern k3d::iplugin_factory& select_connected_components_factory();
@@ -73,6 +74,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::selection::node_selection_factory());
 	Registry.register_factory(module::selection::select_bicubic_patch_by_number_factory());
 	Registry.register_factory(module::selection::select_bilinear_patch_by_number_factory());
+	Registry.register_factory(module::selection::select_boundary_edges_factory());
 	Registry.register_factory(module::selection::select_clockwise_factory());
 	Registry.register_factory(module::selection::select_companion_factory());
 	Registry.register_factory(module::selection::select_connected_components_factory());
