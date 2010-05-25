@@ -46,6 +46,7 @@ extern k3d::iplugin_factory& select_companion_factory();
 extern k3d::iplugin_factory& select_connected_components_factory();
 extern k3d::iplugin_factory& select_cube_factory();
 extern k3d::iplugin_factory& select_cubic_curve_by_number_factory();
+extern k3d::iplugin_factory& select_degenerate_faces_factory();
 extern k3d::iplugin_factory& select_edge_by_number_factory();
 extern k3d::iplugin_factory& select_edgeloops_factory();
 extern k3d::iplugin_factory& select_edgerings_factory();
@@ -77,6 +78,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::selection::select_connected_components_factory());
 	Registry.register_factory(module::selection::select_cube_factory());
 	Registry.register_factory(module::selection::select_cubic_curve_by_number_factory());
+	Registry.register_factory(module::selection::select_degenerate_faces_factory());
 	Registry.register_factory(module::selection::select_edge_by_number_factory());
 	Registry.register_factory(module::selection::select_edgeloops_factory());
 	Registry.register_factory(module::selection::select_edgerings_factory());
