@@ -49,7 +49,15 @@ K3D_TEST(mesh.selection.GrowSelection
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE K3D_BUILD_SELECTION_MODULE
 	LABELS mesh modifier selection)
 
+K3D_TEST(mesh.selection.SelectBoundaryEdges 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.selection.SelectBoundaryEdges.py
+	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE K3D_BUILD_SELECTION_MODULE
+	LABELS mesh modifier selection)
 
+K3D_TEST(mesh.selection.SelectDegenerateFaces 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.selection.SelectDegenerateFaces.py
+	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE K3D_BUILD_SELECTION_MODULE
+	LABELS mesh modifier selection)
 
 
 
@@ -1045,6 +1053,11 @@ K3D_TEST(mesh.modifier.SelectNSided
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SelectNSided.py
 	REQUIRES K3D_BUILD_SELECTION_MODULE
 	LABELS mesh modifier polyhedron UniformPolyhedron SelectNSided)
+
+K3D_TEST(mesh.modifier.SetColor 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SetColor.py
+	REQUIRES K3D_BUILD_MESH_ATTRIBUTES_MODULE
+	LABELS mesh modifier)
 
 K3D_TEST(mesh.modifier.ShearPoints 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.ShearPoints.py
