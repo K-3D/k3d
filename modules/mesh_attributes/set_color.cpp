@@ -88,7 +88,7 @@ public:
 				// Look for the selection array in a structure
 				for(k3d::mesh::named_arrays_t::const_iterator array = s->second.begin(); array != s->second.end(); ++array)
 				{
-					if(array->second->get_metadata_value(k3d::metadata::key::role()) == k3d::metadata::value::selection_role())
+					if(array->second.get() && array->second->get_metadata_value(k3d::metadata::key::role()) == k3d::metadata::value::selection_role())
 					{
 						const k3d::mesh::selection_t* selections = dynamic_cast<const k3d::mesh::selection_t*>(array->second.get());
 						if(selections)
