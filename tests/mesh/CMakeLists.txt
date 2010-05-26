@@ -126,6 +126,11 @@ K3D_TEST(mesh.source.STLMeshReader
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.STLMeshReader.py
 	REQUIRES K3D_BUILD_STL_IO_MODULE
 	LABELS mesh source reader STLMeshReader)
+	
+K3D_TEST(mesh.source.STLMeshReader.binary
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.STLMeshReader.binary.py
+	REQUIRES K3D_BUILD_STL_IO_MODULE
+	LABELS mesh source reader STLMeshReader)
 
 K3D_TEST(mesh.source.SVGMeshReader
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.SVGMeshReader.py
@@ -1236,6 +1241,11 @@ K3D_TEST(mesh.sink.PLYMeshWriter
 
 K3D_TEST(mesh.sink.STLMeshWriter
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.STLMeshWriter.py
+	REQUIRES K3D_BUILD_STL_IO_MODULE
+	LABELS mesh sink STLMeshWriter)
+	
+K3D_TEST(mesh.sink.STLMeshWriter.binary
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.STLMeshWriter.binary.py
 	REQUIRES K3D_BUILD_STL_IO_MODULE
 	LABELS mesh sink STLMeshWriter)
 

@@ -30,9 +30,12 @@
 #include <k3dsdk/node.h>
 #include <k3dsdk/polyhedron.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <set>
+
+#include "binary_stl.h"
 
 namespace module
 {
@@ -45,6 +48,35 @@ namespace io
 
 namespace detail
 {
+
+/// True if the supplied file is an ASCII STL file
+k3d::bool_t is_ascii(std::istream& Stream)
+{
+	char buffer[80];
+	Stream.read(buffer, 80);
+	Stream.seekg(0, std::ios::beg);
+	return (boost::algorithm::starts_with(buffer, "solid"));
+}
+
+/// Adds a point without introducing duplicates
+k3d::uint_t add_point(k3d::mesh::points_t& Points, const k3d::point3& Point, const k3d::double_t Threshold)
+{
+	k3d::uint_t point_index = Points.size();
+	for(k3d::uint_t point = 0; point != Points.size(); ++point)
+	{
+		const k3d::double_t len2 = (Points[point] - Point).length2();
+		if(len2 < Threshold)
+		{
+			point_index = point;
+			break;
+		}
+	}
+	if(point_index == Points.size())
+	{
+		Points.push_back(Point);
+	}
+	return point_index;
+}
 
 /// Extracts the STL topology information, merging points that are less than threshold apart
 void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::mesh::counts_t& VertexCounts, k3d::mesh::indices_t& VertexIndices, k3d::mesh::normals_t& Normals, const k3d::double_t Threshold = 1e-12)
@@ -81,21 +113,8 @@ void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::me
 			line_stream >> y;
 			line_stream >> z;
 			k3d::point3 new_point(x, y, z);
-			k3d::uint_t point_index = Points.size();
-			for(k3d::uint_t point = 0; point != Points.size(); ++point)
-			{
-				const k3d::double_t len2 = (Points[point] - new_point).length2();
-				if(len2 < threshold)
-				{
-					point_index = point;
-					break;
-				}
-			}
-			if(point_index == Points.size())
-			{
-				Points.push_back(new_point);
-			}
-			face_points.push_back(point_index);
+
+			face_points.push_back(detail::add_point(Points, new_point, threshold));
 			if(face_points.size() == 3)
 			{
 				std::stringstream face_id_stream;
@@ -165,6 +184,17 @@ void adjust_orientation(const k3d::mesh::points_t Points, k3d::mesh::indices_t& 
 	}
 }
 
+/// 2-byte integer value to a K-3D color
+k3d::color convert_color(const k3d::uint16_t Color)
+{
+	const k3d::uint16_t blue = Color >> 11;
+	const k3d::uint16_t green = (Color - (blue << 11)) >> 6;
+	const k3d::uint16_t red = (Color - (blue << 11) - (green << 6)) >> 1;
+	const k3d::uint16_t use_color = (Color - (blue << 11) - (green << 6) - (red << 1));
+	const k3d::color result = use_color ? k3d::color(static_cast<k3d::double_t>(red)/31., static_cast<k3d::double_t>(green)/31., static_cast<k3d::double_t>(blue)/31.) : k3d::color(0.8, 0.8, 0.8);
+	return result;
+}
+
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
@@ -179,7 +209,8 @@ public:
 	mesh_reader(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
 		m_threshold(init_owner(*this) + init_name("threshold") + init_label(_("Threshold")) + init_description(_("Controls the sensitivity for deciding when two edges are collinear.")) + init_value(1e-8) + init_step_increment(1e-8) + init_units(typeid(k3d::measurement::scalar))),
-		m_store_normals(init_owner(*this) + init_name("store_normals") + init_label(_("Store Normals")) + init_description(_("If true, the normals from the STL file are read into a face attribute array")) + init_value(false))
+		m_store_normals(init_owner(*this) + init_name("store_normals") + init_label(_("Store Normals")) + init_description(_("If true, the normals from the STL file are read into a face attribute array")) + init_value(false)),
+		m_color_array(init_owner(*this) + init_name("color_array") + init_label(_("Color Array")) + init_description(_("Name of the array containing face colors (for binary, colored STL only)")) + init_value(std::string("Cs")))
 	{
 		m_threshold.changed_signal().connect(k3d::hint::converter<
 						k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_reload_mesh_slot()));
@@ -205,11 +236,36 @@ public:
 		
 		try
 		{
-			detail::get_stl_topology(file, points, vertex_counts, vertex_indices, face_normals, m_threshold.pipeline_value());
-			detail::adjust_orientation(points, vertex_indices, face_normals);
-			k3d::polyhedron::primitive* polyhedron = k3d::polyhedron::create(Output, points, vertex_counts, vertex_indices, static_cast<k3d::imaterial*>(0));
-			if(m_store_normals.pipeline_value())
-				polyhedron->face_attributes.create("N", new k3d::mesh::normals_t(face_normals));
+			if(detail::is_ascii(file))
+			{
+				detail::get_stl_topology(file, points, vertex_counts, vertex_indices, face_normals, m_threshold.pipeline_value());
+				detail::adjust_orientation(points, vertex_indices, face_normals);
+				k3d::polyhedron::primitive* polyhedron = k3d::polyhedron::create(Output, points, vertex_counts, vertex_indices, static_cast<k3d::imaterial*>(0));
+				if(m_store_normals.pipeline_value())
+					polyhedron->face_attributes.create("N", new k3d::mesh::normals_t(face_normals));
+			}
+			else
+			{
+				const k3d::double_t threshold = m_threshold.pipeline_value();
+				k3d::mesh::colors_t face_colors;
+				binary_stl stl;
+				stl.read(file);
+				const k3d::uint_t nfacets = stl.facets.size();
+				for(k3d::uint_t f = 0; f != nfacets; ++f)
+				{
+					vertex_counts.push_back(3);
+					k3d::point3 p0(stl.facets[f].v0[0], stl.facets[f].v0[1], stl.facets[f].v0[2]);
+					k3d::point3 p1(stl.facets[f].v1[0], stl.facets[f].v1[1], stl.facets[f].v1[2]);
+					k3d::point3 p2(stl.facets[f].v2[0], stl.facets[f].v2[1], stl.facets[f].v2[2]);
+					vertex_indices.push_back(detail::add_point(points, p0, threshold));
+					vertex_indices.push_back(detail::add_point(points, p1, threshold));
+					vertex_indices.push_back(detail::add_point(points, p2, threshold));
+					face_normals.push_back(k3d::normal3(stl.facets[f].normal[0], stl.facets[f].normal[1], stl.facets[f].normal[2]));
+					face_colors.push_back(detail::convert_color(stl.facets[f].color));
+				}
+				k3d::polyhedron::primitive* polyhedron = k3d::polyhedron::create(Output, points, vertex_counts, vertex_indices, static_cast<k3d::imaterial*>(0));
+				polyhedron->face_attributes.create(m_color_array.pipeline_value(), new k3d::mesh::colors_t(face_colors));
+			}
 		}
 		catch(std::runtime_error& E)
 		{
@@ -233,6 +289,7 @@ public:
 private:
 	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_threshold;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_store_normals;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color_array;
 };
 
 k3d::iplugin_factory& mesh_reader_factory()

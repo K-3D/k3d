@@ -23,7 +23,6 @@
 */
 
 #include <k3d-i18n-config.h>
-#include <k3d-version-config.h>
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/ihint.h>
@@ -36,6 +35,8 @@
 
 #include <set>
 
+#include "binary_stl.h"
+
 namespace module
 {
 
@@ -47,41 +48,6 @@ namespace io
 
 namespace detail
 {
-
-/// Binary encapsulation of a single facet
-struct facet
-{
-	k3d::float_t normal[3];
-	k3d::float_t v0[3];
-	k3d::float_t v1[3];
-	k3d::float_t v2[3];
-	k3d::uint16_t color;
-};
-
-/// Encapsulates the STL binary data format
-struct binary_stl
-{
-	binary_stl()
-	{
-		k3d::string_t headstr =  k3d::string_t("K-3D ") + k3d::string_t(K3D_VERSION) + k3d::string_t(" STL writer");
-		for(k3d::uint_t i = 0 ; i != headstr.size(); ++i)
-			header[i] = headstr[i];
-	}
-	/// Header containing file comment
-	char header[80];
-	std::vector<facet> facets;
-
-	void write(std::ostream& Output)
-	{
-		Output.write(header, 80);
-		const k3d::int32_t nfacets = facets.size();
-		Output.write(reinterpret_cast<const char*>(&nfacets), sizeof(k3d::int32_t));
-		for(k3d::uint_t triangle = 0; triangle != nfacets; ++triangle)
-		{
-			Output.write(reinterpret_cast<char*>(&facets[triangle]), 50);
-		}
-	}
-};
 
 /// Convert the given color to a 2-byte sized integer
 k3d::uint16_t convert_color(const k3d::color& Color)
@@ -235,32 +201,32 @@ private:
 			}
 			else
 			{
-				detail::binary_stl stl;
+				binary_stl stl;
 				for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
 				{
-					detail::facet facet;
+					facet fct;
 
 					const k3d::point3 a = triangle_points[triangle_indices[(3 * triangle) + 0]];
 					const k3d::point3 b = triangle_points[triangle_indices[(3 * triangle) + 1]];
 					const k3d::point3 c = triangle_points[triangle_indices[(3 * triangle) + 2]];
-					facet.v0[0] = a[0];
-					facet.v0[1] = a[1];
-					facet.v0[2] = a[2];
-					facet.v1[0] = b[0];
-					facet.v1[1] = b[1];
-					facet.v1[2] = b[2];
-					facet.v2[0] = c[0];
-					facet.v2[1] = c[1];
-					facet.v2[2] = c[2];
+					fct.v0[0] = a[0];
+					fct.v0[1] = a[1];
+					fct.v0[2] = a[2];
+					fct.v1[0] = b[0];
+					fct.v1[1] = b[1];
+					fct.v1[2] = b[2];
+					fct.v2[0] = c[0];
+					fct.v2[1] = c[1];
+					fct.v2[2] = c[2];
 
 					const k3d::normal3 n = k3d::normalize(k3d::polyhedron::normal(a, b, c));
-					facet.normal[0] = n[0];
-					facet.normal[1] = n[1];
-					facet.normal[2] = n[2];
+					fct.normal[0] = n[0];
+					fct.normal[1] = n[1];
+					fct.normal[2] = n[2];
 
-					facet.color = detail::convert_color(triangle_colors[triangle]);
+					fct.color = detail::convert_color(triangle_colors[triangle]);
 
-					stl.facets.push_back(facet);
+					stl.facets.push_back(fct);
 				}
 				stl.write(Output);
 			}
