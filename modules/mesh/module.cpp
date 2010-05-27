@@ -33,6 +33,7 @@ extern k3d::iplugin_factory& array_1d_factory();
 extern k3d::iplugin_factory& array_2d_factory();
 extern k3d::iplugin_factory& array_3d_factory();
 extern k3d::iplugin_factory& merge_mesh_factory();
+extern k3d::iplugin_factory& points_centroid_factory();
 extern k3d::iplugin_factory& weld_points_factory();
 
 } // namespace mesh
@@ -44,6 +45,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::mesh::array_2d_factory());
 	Registry.register_factory(module::mesh::array_3d_factory());
 	Registry.register_factory(module::mesh::merge_mesh_factory());
+	Registry.register_factory(module::mesh::points_centroid_factory());
 	Registry.register_factory(module::mesh::weld_points_factory());
 K3D_MODULE_END
 
