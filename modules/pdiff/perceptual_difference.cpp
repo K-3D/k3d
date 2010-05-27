@@ -185,10 +185,10 @@ public:
 		const k3d::bitmap::view_t::iterator end = destination.end();
 		for(k3d::bitmap::view_t::iterator pixel = begin; pixel != end; ++pixel, ++i)
 		{
-			get_color(*pixel, boost::gil::red_t()) = boost::gil::channel_convert<boost::gil::bits16f>(Source.Get_Red(i));
-			get_color(*pixel, boost::gil::green_t()) = boost::gil::channel_convert<boost::gil::bits16f>(Source.Get_Green(i));
-			get_color(*pixel, boost::gil::blue_t()) = boost::gil::channel_convert<boost::gil::bits16f>(Source.Get_Blue(i));
-			get_color(*pixel, boost::gil::alpha_t()) = boost::gil::channel_convert<boost::gil::bits16f>(Source.Get_Alpha(i));
+			get_color(*pixel, boost::gil::red_t()) = boost::gil::channel_convert<half>(Source.Get_Red(i));
+			get_color(*pixel, boost::gil::green_t()) = boost::gil::channel_convert<half>(Source.Get_Green(i));
+			get_color(*pixel, boost::gil::blue_t()) = boost::gil::channel_convert<half>(Source.Get_Blue(i));
+			get_color(*pixel, boost::gil::alpha_t()) = boost::gil::channel_convert<half>(Source.Get_Alpha(i));
 		}
 	
 	}

@@ -23,8 +23,8 @@
 #include <vector>
 #include <memory>
 #include <boost/array.hpp>
-#include "../../gil_config.hpp"
-#include "../../utilities.hpp"
+#include <boost/gil/gil_config.hpp>
+#include <boost/gil/utilities.hpp>
 
 namespace boost { namespace gil {
 
