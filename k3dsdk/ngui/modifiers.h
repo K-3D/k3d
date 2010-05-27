@@ -55,6 +55,8 @@ typedef std::vector<k3d::iplugin_factory*> factories_t;
 const factories_t& transform_modifiers();
 /// Returns a collection of mesh modifier plugin factories, sorted by name
 const factories_t& mesh_modifiers();
+/// Returns a collection of mesh sink plugin factories that are NOT mesh sources. Sorted by name
+const factories_t& mesh_sinks();
 
 /// Modify transformation 
 k3d::inode* modify_transformation(k3d::idocument& Document, k3d::inode& Object, k3d::iplugin_factory* Modifier);
