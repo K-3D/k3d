@@ -4,7 +4,7 @@ import k3d
 import testing
 
 setup = testing.setup_mesh_modifier_test("PolyGrid", "CatmullClark")
-#testing.add_point_attributes_test(setup, True, False, False)
+testing.add_point_attributes_test(setup, True, False, False)
 
 setup.source.u_segments = 4
 setup.source.v_segments = 2
