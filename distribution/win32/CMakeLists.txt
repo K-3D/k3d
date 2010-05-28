@@ -14,7 +14,6 @@ K3D_CHECK_INSTALLED_PYTHON_DEPENDENCY(K3D_INSTALL_PYOPENGL)
 FIND_PROGRAM(K3D_MINGW_GCC mingw32-gcc.exe
 	C:/mingw/bin
 	DOC "Path to the MinGW GCC command")
-MARK_AS_ADVANCED(K3D_MINGW_GCC)
 
 GET_FILENAME_COMPONENT(K3D_MINGW_PATH ${K3D_MINGW_GCC} PATH)
 INSTALL(FILES ${K3D_MINGW_PATH}/mingwm10.dll DESTINATION bin)
@@ -23,7 +22,6 @@ IF(K3D_INSTALL_AQSIS)
 	FIND_PROGRAM(K3D_AQSIS_COMMAND aqsis.exe
 		DOC "Path to an installed aqsis.exe."
 		)
-	MARK_AS_ADVANCED(K3D_AQSIS_COMMAND)
 
 	IF(NOT K3D_AQSIS_COMMAND)
 		MESSAGE(SEND_ERROR "Could not locate aqsis.exe.")
@@ -100,7 +98,6 @@ IF(K3D_INSTALL_GTKMM)
 
 	# This is an ugly hack, we should be able to detect this automatically, but I'm feeling lazy ...
 	SET(K3D_GTK_DIR "c:/gtk" CACHE PATH "Root directory containing GTK/gtkmm")
-	MARK_AS_ADVANCED(K3D_GTK_DIR)
 
 	INSTALL(DIRECTORY ${K3D_GTK_DIR}/bin/ DESTINATION bin
 		USE_SOURCE_PERMISSIONS
@@ -153,7 +150,6 @@ IF(K3D_INSTALL_PYTHON)
 		PATHS "c:/python26"
 		DOC "Path to an installed python.exe."
 		)
-	MARK_AS_ADVANCED(K3D_PYTHON_COMMAND)
 	
 	IF(NOT K3D_PYTHON_COMMAND)
 		MESSAGE(SEND_ERROR "Could not locate python.exe.")
@@ -162,7 +158,6 @@ IF(K3D_INSTALL_PYTHON)
 	FIND_PROGRAM(K3D_PYTHON_LIBRARY python26.dll
 		DOC "Path to the installed python26.dll"
 		)
-	MARK_AS_ADVANCED(K3D_PYTHON_LIBRARY)
 
 	IF(NOT K3D_PYTHON_LIBRARY)
 		MESSAGE(SEND_ERROR "Could not locate python26.dll.")

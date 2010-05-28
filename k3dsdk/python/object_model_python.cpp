@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -21,11 +21,14 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
-#include <k3d-python-config.h>
+#include <k3d-ngui-config.h>
+
+#ifdef K3D_BUILD_NGUI_MODULE
+#include <k3dsdk/python/atk_python.h>
+#endif // K3D_BUILD_NGUI_MODULE
 
 #include <k3dsdk/python/angle_axis_python.h>
 #include <k3dsdk/python/any_python.h>
-#include <k3dsdk/python/atk_python.h>
 #include <k3dsdk/python/table_python.h>
 #include <k3dsdk/python/bezier_triangle_patch_python.h>
 #include <k3dsdk/python/bicubic_patch_python.h>

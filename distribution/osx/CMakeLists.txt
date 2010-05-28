@@ -25,7 +25,6 @@ INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake")
 
 # This is an ugly hack, we should be able to detect this automatically, but I'm feeling lazy ...
 SET(K3D_MACPORTS_DIR "/opt/local" CACHE PATH "Root directory containing installed MacPorts packages")
-MARK_AS_ADVANCED(K3D_MACPORTS_DIR)
 
 INSTALL(
 	PROGRAMS
