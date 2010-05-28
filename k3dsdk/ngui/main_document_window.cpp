@@ -96,8 +96,6 @@
 #include <k3dsdk/xml.h>
 #include <k3d-version-config.h>
 
-#include <boost/regex.hpp>
-
 #include <gdkmm/cursor.h>
 #include <gtkmm/accelmap.h>
 #include <gtkmm/box.h>

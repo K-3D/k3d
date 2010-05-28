@@ -2,7 +2,7 @@ K3D_TEST(platform.configuration PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/platfo
 
 INCLUDE_DIRECTORIES(${k3d_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${k3d_BINARY_DIR}/k3dsdk)
-INCLUDE_DIRECTORIES(${K3D_BOOST_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 
 ADD_EXECUTABLE(test-platform-types platform_types.cpp)
 K3D_TEST(platform.types TARGET test-platform-types LABELS platform)
