@@ -149,6 +149,7 @@ private:
 	void on_write_mesh(const k3d::mesh& Input, const k3d::filesystem::path& OutputPath, std::ostream& Output)
 	{
 		const k3d::bool_t ascii = m_ascii.pipeline_value();
+		binary_stl stl;
 		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input, **primitive));
@@ -201,7 +202,6 @@ private:
 			}
 			else
 			{
-				binary_stl stl;
 				for(k3d::uint_t triangle = triangle_begin; triangle != triangle_end; ++triangle)
 				{
 					facet fct;
@@ -228,9 +228,10 @@ private:
 
 					stl.facets.push_back(fct);
 				}
-				stl.write(Output);
 			}
 		}
+		if(!ascii)
+			stl.write(Output);
 	}
 
 private:
