@@ -22,18 +22,18 @@
 */
 
 #include <k3dsdk/python/any_python.h>
-#include <k3dsdk/python/icommand_node_python.h>
 #include <k3dsdk/python/idocument_exporter_python.h>
 #include <k3dsdk/python/idocument_importer_python.h>
 #include <k3dsdk/python/ifile_change_notifier_python.h>
 #include <k3dsdk/python/ikeyframer_python.h>
 #include <k3dsdk/python/imesh_storage_python.h>
+#include <k3dsdk/python/imeta_object_python.h>
 #include <k3dsdk/python/imetadata_python.h>
 #include <k3dsdk/python/inode_python.h>
 #include <k3dsdk/python/inode_selection_python.h>
 #include <k3dsdk/python/iplugin_factory_python.h>
-#include <k3dsdk/python/iproperty_python.h>
 #include <k3dsdk/python/iproperty_collection_python.h>
+#include <k3dsdk/python/iproperty_python.h>
 #include <k3dsdk/python/irender_camera_frame_python.h>
 #include <k3dsdk/python/irender_camera_preview_python.h>
 #include <k3dsdk/python/isnappable_python.h>
@@ -65,7 +65,7 @@ object wrap_unknown(iunknown& Unknown)
 {
 	object result = object(iunknown_wrapper(Unknown));
 
-	define_methods_icommand_node(Unknown, result);
+	define_methods_imeta_object(Unknown, result);
 	define_methods_idocument_exporter(Unknown, result);
 	define_methods_idocument_importer(Unknown, result);
 	define_methods_ifile_change_notifier(Unknown, result);

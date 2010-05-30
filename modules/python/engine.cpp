@@ -28,7 +28,6 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/command_node.h>
 #include <k3dsdk/file_helpers.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/iscript_engine.h>

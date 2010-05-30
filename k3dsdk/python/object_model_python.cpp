@@ -95,8 +95,6 @@
 #include <k3dsdk/application.h>
 #include <k3dsdk/batch_mode.h>
 #include <k3dsdk/classes.h>
-#include <k3dsdk/command_node.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/geometric_operations.h>
 #include <k3dsdk/iapplication.h>
@@ -129,17 +127,6 @@ namespace python
 
 ////////////////////////////////////////////////////////////////////////////////////
 // k3d module helpers
-
-const list module_command_nodes()
-{
-	list nodes;
-
-	k3d::icommand_tree::nodes_t children = k3d::command_tree().children(0);
-	for(k3d::icommand_tree::nodes_t::iterator child = children.begin(); child != children.end(); ++child)
-		nodes.append(wrap_unknown(*child));
-
-	return nodes;
-}
 
 object module_create_plugin(const string_t& Type)
 {
@@ -272,11 +259,6 @@ void module_close_document(idocument_wrapper& Document)
 	k3d::application().close_document(Document.wrapped());
 }
 
-object module_get_command_node(const string_t& Path)
-{
-	return wrap_unknown(k3d::command_node::lookup(Path));
-}
-
 object module_open_document(const k3d::filesystem::path& Path)
 {
 	boost::scoped_ptr<k3d::idocument_importer> importer(k3d::plugin::create<k3d::idocument_importer>(k3d::classes::DocumentImporter()));
@@ -387,16 +369,12 @@ BOOST_PYTHON_MODULE(k3d)
 		"Checks to see whether the current script is running from within the given node type.");
 	def("close_document", module_close_document,
 		"Closes an open document.");
-	def("command_nodes", module_command_nodes,
-		"Returns the root(s) of the command node hierarchy.");
 	def("create_plugin", module_create_plugin,
 		"Creates an application plugin instance by name (fails if there is no application plugin factory with the given name).");
 	def("documents", module_documents,
 		"Returns a list containing all open documents.");
 	def("exit", module_exit,
 		"Request program exit (may be overridden by user input).");
-	def("get_command_node", module_get_command_node,
-		"Returns a command node by path.");
 	def("identity3", k3d::identity3,
 		"Returns a L{matrix4} containing a three-dimensional identity matrix.");
 	def("intersect_lines", k3d::intersect_lines,

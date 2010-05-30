@@ -39,13 +39,10 @@
 
 #include <k3dsdk/application.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/command_node.h>
-#include <k3dsdk/command_tree.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/data.h>
 #include <k3dsdk/iapplication.h>
-#include <k3dsdk/icommand_tree.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/ifile_change_notifier.h>
 #include <k3dsdk/iscript_engine.h>
@@ -171,21 +168,16 @@ void setup_default_hotkeys()
 // user_interface
 
 class user_interface :
-	public k3d::command_node,
 	public k3d::iuser_interface,
 	public k3d::ievent_loop,
 	public sigc::trackable
 {
-	typedef k3d::command_node base;
-
 public:
 	user_interface() :
 		m_show_learning_menu(options::nag("show_learning_menu"))
 	{
 		// This ensures that we can use ATK for testing, even when the user hasn't enabled desktop accessibility.
 		k3d::system::setenv("GTK_MODULES", "gail");
-
-		k3d::command_tree().add(*this, "ui", 0);
 
 		/// Redirect glib-based logging to our own standard logging mechanism
 		g_log_set_handler("", static_cast<GLogLevelFlags>(G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL | G_LOG_FLAG_RECURSION), log_handler, 0);
@@ -480,7 +472,7 @@ public:
 		const unsigned int interval = static_cast<unsigned int>(1000.0 / FrameRate);
 		return Glib::signal_timeout().connect(sigc::bind_return(Slot, true), interval);
 	}
-	
+
 	k3d::uint_t watch_path(const k3d::filesystem::path& Path, const sigc::slot<void>& Slot)
 	{
 		return get_file_notification()->watch_path(Path, Slot);
@@ -488,11 +480,6 @@ public:
 	void unwatch_path(const k3d::uint_t WatchID)
 	{
 		get_file_notification()->unwatch_path(WatchID);
-	}
-
-	k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
-	{
-		return base::execute_command(Command, Arguments);
 	}
 
 	k3d::iplugin_factory& factory()

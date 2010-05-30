@@ -2,7 +2,7 @@ K3D_COMPILE_RESOURCE(RESOURCES action_script.py "/module/scripting/action_script
 K3D_COMPILE_RESOURCE(RESOURCES bitmap_modifier_script.py "/module/scripting/bitmap_modifier_script.py")
 K3D_COMPILE_RESOURCE(RESOURCES bitmap_source_script.py "/module/scripting/bitmap_source_script.py")
 K3D_COMPILE_RESOURCE(RESOURCES color_source_script.py "/module/scripting/color_source_script.py")
-K3D_COMPILE_RESOURCE(RESOURCES command_node_script.py "/module/scripting/command_node_script.py")
+K3D_COMPILE_RESOURCE(RESOURCES meta_object_script.py "/module/scripting/meta_object_script.py")
 K3D_COMPILE_RESOURCE(RESOURCES double_source_script.py "/module/scripting/double_source_script.py")
 K3D_COMPILE_RESOURCE(RESOURCES int32_source_script.py "/module/scripting/int32_source_script.py")
 K3D_COMPILE_RESOURCE(RESOURCES matrix_modifier_script.py "/module/scripting/matrix_modifier_script.py")

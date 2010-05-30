@@ -26,7 +26,6 @@
 #include <k3dsdk/python/iunknown_python.h>
 
 #include <k3dsdk/classes.h>
-#include <k3dsdk/command_node.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/idocument_exporter.h>
 #include <k3dsdk/ipipeline.h>

@@ -34,7 +34,7 @@ class iunknown;
 namespace python
 {
 
-void define_methods_icommand_node(iunknown& Interface, boost::python::object& Instance);
+void define_methods_imeta_object(iunknown& Interface, boost::python::object& Instance);
 
 } // namespace python
 

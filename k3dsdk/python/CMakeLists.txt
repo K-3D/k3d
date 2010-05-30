@@ -85,8 +85,6 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-mesh k3dsdk-python-const-arrays)
 ADD_LIBRARY(k3dsdk-python-interfaces SHARED
 	any_python.cpp
 	any_python.h
-	icommand_node_python.cpp
-	icommand_node_python.h
 	idocument_exporter_python.cpp
 	idocument_exporter_python.h
 	idocument_importer_python.cpp
@@ -99,6 +97,8 @@ ADD_LIBRARY(k3dsdk-python-interfaces SHARED
 	ikeyframer_python.h
 	imesh_storage_python.cpp
 	imesh_storage_python.h
+	imeta_object_python.cpp
+	imeta_object_python.h
 	imetadata_python.cpp
 	imetadata_python.h
 	inode_python.cpp

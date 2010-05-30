@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2008, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -23,7 +23,7 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/icommand_node.h>
+#include <k3dsdk/imeta_object.h>
 #include <k3dsdk/property_collection.h>
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/scripted_plugin.h>
@@ -35,35 +35,34 @@ namespace scripting
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// command_node_script
+// meta_object_script
 
-class command_node_script :
+class meta_object_script :
 	public k3d::scripted_plugin<k3d::property_collection>,
-	public k3d::icommand_node
+	public k3d::imeta_object
 {
 public:
-	command_node_script()
+	meta_object_script()
 	{
-		set_script(k3d::resource::get_string("/module/scripting/command_node_script.py"));
+		set_script(k3d::resource::get_string("/module/scripting/meta_object_script.py"));
 	}
 
-	k3d::icommand_node::result execute_command(const k3d::string_t& Command, const k3d::string_t& Arguments)
+	virtual const boost::any execute(const k3d::string_t& Command, const std::vector<boost::any>& Arguments)
 	{
 		k3d::iscript_engine::context context;
 		context["command"] = Command;
-		context["arguments"] = Arguments;
-		
+//		context["arguments"] = Arguments;
 		execute_script(context);
 
-		return RESULT_CONTINUE;
+		return boost::any();
 	}
 
 	static k3d::iplugin_factory& get_factory()
 	{
-		static k3d::application_plugin_factory<command_node_script > factory(
+		static k3d::application_plugin_factory<meta_object_script > factory(
 			k3d::uuid(0xb754daf5, 0x3a401b87, 0xdd144ba2, 0x00395dde),
-			"CommandNodeScript",
-			_("Script node that executes a script in response to command-node commands"),
+			"MetaObjectScript",
+			_("Scripted node that acts as a meta-object (provides dynamic runtime execution of arbitrary commands)."),
 			"Script",
 			k3d::iplugin_factory::STABLE);
 
@@ -72,11 +71,11 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// command_node_script_factory
+// meta_object_script_factory
 
-k3d::iplugin_factory& command_node_script_factory()
+k3d::iplugin_factory& meta_object_script_factory()
 {
-	return command_node_script::get_factory();
+	return meta_object_script::get_factory();
 }
 
 } // namespace scripting
