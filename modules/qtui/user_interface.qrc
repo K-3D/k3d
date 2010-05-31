@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="QTUI">
+    <file>splash.png</file>
+    <file>stylesheet.css</file>
+    <file>window_icon.png</file>
+  </qresource>
+</RCC>

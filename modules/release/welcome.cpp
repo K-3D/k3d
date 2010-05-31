@@ -64,7 +64,7 @@ public:
 				_("Welcomes users running K-3D for the first time."),
 				"Desktop",
 				k3d::iplugin_factory::STABLE,
-				boost::assign::map_list_of("ngui:application-start", "true"));
+				boost::assign::map_list_of("ngui:application-start", "true")("qtui:application-start", "true"));
 
 		return factory;
 	}

@@ -158,7 +158,7 @@ void register_plugins(const k3d::filesystem::path& Path, k3d::iplugin_registry& 
 {
 	k3d::log() << info << "Loading scripts from " << Path.native_console_string() << std::endl;
 
-	boost::regex metadata_expression("((k3d|ngui):[^=]*)=\"([^\"]*)\"");
+	boost::regex metadata_expression("((k3d|ngui|qtui):[^=]*)=\"([^\"]*)\"");
 
 	// There are very few SDK functions that can be safely called at this point in execution, but k3d::share_path() happens to be one of them ...
 	for(k3d::filesystem::directory_iterator script_path(Path); script_path != k3d::filesystem::directory_iterator(); ++script_path)
@@ -258,6 +258,7 @@ void register_plugins(const k3d::filesystem::path& Path, k3d::iplugin_registry& 
 void register_plugins(k3d::iplugin_registry& Registry)
 {
 	register_plugins(k3d::share_path() / k3d::filesystem::generic_path("scripts/scripted_plugins"), Registry);
+	register_plugins(k3d::share_path() / k3d::filesystem::generic_path("qtui/scripted_modes"), Registry);
 	register_plugins(k3d::system::get_home_directory() / k3d::filesystem::generic_path(".k3d/scripted_plugins"), Registry);
 }
 
