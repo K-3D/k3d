@@ -19,17 +19,11 @@
 
 #include "thread.h"
 
+#include <k3dsdk/imeta_object.h>
 #include <k3dsdk/log.h>
+#include <k3dsdk/result.h>
 #include <k3dsdk/signal_system.h>
-
 #include <vector>
-
-#include <aqsis/ri/ri.h>
-#include <aqsis/math/region.h>
-#include <libs/core/ddmanager/iddmanager.h>
-#include <libs/core/renderer.h>
-
-#include <QRect>
 
 namespace module
 {
@@ -41,118 +35,37 @@ namespace aqsis
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// display_manager
-
-/// Custom Aqsis display manager that forwards display data using signals
-class display_manager : public Aqsis::IqDDManager
-{
-public:
-	sigc::signal<void, int, int> open_display;
-	sigc::signal<void, const Aqsis::CqRegion&, const Aqsis::IqChannelBuffer*> display_bucket;
-
-private:
-	TqInt Initialise()
-	{
-		return 0;
-	}
-
-	TqInt Shutdown()
-	{
-		return 0;
-	}
-
-	TqInt AddDisplay(const TqChar* name, const TqChar* type, const TqChar* mode, TqInt modeID, TqInt dataOffset, TqInt dataSize, std::map<std::string, void*> mapOfArguments)
-	{
-		k3d::log() << debug << __PRETTY_FUNCTION__ << " " << name << " " << type << " " << mode << std::endl;
-		return 0;
-	}
-
-	TqInt ClearDisplays()
-	{
-		return 0;
-	}
-
-	TqInt OpenDisplays(TqInt width, TqInt height)
-	{
-		open_display.emit(width, height);
-		return 0;
-	}
-
-	TqInt CloseDisplays()
-	{
-		return 0;
-	}
-
-	TqInt DisplayBucket(const Aqsis::CqRegion& DRegion, const Aqsis::IqChannelBuffer* pBuffer)
-	{
-		display_bucket(DRegion, pBuffer);
-		return 0;
-	}
-
-	bool fDisplayNeeds(const TqChar* var)
-	{
-		if(std::string(var) == "rgb")
-			return true;
-		if(std::string(var) == "Ci")
-			return true;
-		return false;
-	}
-
-	TqInt Uses()
-	{
-		return 0;
-	}
-
-	TqInt numDisplayRequests()
-	{
-		return 0;
-	}
-
-	boost::shared_ptr<Aqsis::IqDisplayRequest> displayRequest(TqInt index)
-	{
-		return boost::shared_ptr<Aqsis::IqDisplayRequest>();
-	}
-};
-
-/////////////////////////////////////////////////////////////////////////////
 // thread
+
+thread::thread(k3d::istreaming_bitmap_source* Source) :
+	source(Source)
+{
+}
 
 void thread::run()
 {
-	static RtFloat fov = 45, intensity = 0.5;
-	static RtFloat Ka = 0.5, Kd = 0.8, Ks = 0.2;
-	static RtPoint from = {0,0,1}, to = {0,10,0};
-	RiBegin(RI_NULL);
+	source->connect_bitmap_start_signal(sigc::mem_fun(*this, &thread::on_bitmap_start));
+	source->connect_bitmap_bucket_signal(sigc::mem_fun(*this, &thread::on_bitmap_bucket));
+	source->connect_bitmap_finish_signal(sigc::mem_fun(*this, &thread::on_bitmap_finish));
 
-	display_manager* const manager = new display_manager();
-	manager->open_display.connect(sigc::mem_fun(*this, &thread::on_open_display));
-	manager->display_bucket.connect(sigc::mem_fun(*this, &thread::on_display_bucket));
-	Aqsis::QGetRenderContext()->SetDisplayManager(manager);
-
-	RiFormat(512, 512, 1);
-	RiPixelSamples(2, 2);
-	RiFrameBegin(1);
-	RiDisplay("test1.tiff", "framebuffer", "rgb", RI_NULL);
-	RiProjection("perspective", "fov", &fov, RI_NULL);
-	RiRotate(-116.344, 0, 0, 1);
-	RiRotate(-47.9689, 1, 0, 0);
-	RiRotate(-123.69, 0, 1, 0);
-	RiTranslate(15, -20, -10);
-	RiWorldBegin();
-	RiSphere(5, -5, 5, 360, RI_NULL);
-	RiWorldEnd();
-	RiFrameEnd();
-	RiEnd();
+	k3d::imeta_object* const meta_object = dynamic_cast<k3d::imeta_object*>(source);
+	return_if_fail(meta_object);
+	meta_object->execute("render");
 }
 
-void thread::on_open_display(int Width, int Height)
+void thread::on_bitmap_start(k3d::istreaming_bitmap_source::coordinate Width, k3d::istreaming_bitmap_source::coordinate Height)
 {
-	Q_EMIT open_display(Width, Height);
+	Q_EMIT bitmap_start(Width, Height);
 }
 
-void thread::on_display_bucket(const Aqsis::CqRegion& Region, const Aqsis::IqChannelBuffer* Buffer)
+void thread::on_bitmap_bucket(k3d::istreaming_bitmap_source::coordinate XOffset, k3d::istreaming_bitmap_source::coordinate YOffset, const k3d::istreaming_bitmap_source::bucket& Bucket)
 {
-	Q_EMIT display_bucket(QRect(Region.xMin(), Region.yMin(), Region.width(), Region.height()), Buffer);
+	Q_EMIT bitmap_bucket(XOffset, YOffset, &Bucket);
+}
+
+void thread::on_bitmap_finish()
+{
+	Q_EMIT bitmap_finish();
 }
 
 } // namespace aqsis

@@ -20,23 +20,31 @@
 #include <k3d-i18n-config.h>
 #include <k3d-version-config.h>
 #include <k3dsdk/application_plugin_factory.h>
+#include <k3dsdk/imeta_object.h>
 #include <k3dsdk/istreaming_bitmap_source.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
+#include <k3dsdk/result.h>
 #include <k3dsdk/signal_system.h>
 
 #include <boost/assign/list_of.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <sstream>
 
+#include <aqsis/ri/ri.h>
 #include <aqsis/math/region.h>
 #include <libs/core/ddmanager/iddmanager.h>
+#include <libs/core/renderer.h>
 
 namespace module
 {
 
 namespace aqsis
 {
+
+typedef sigc::signal<void, k3d::istreaming_bitmap_source::coordinate, k3d::istreaming_bitmap_source::coordinate> bitmap_start_signal_t;
+typedef sigc::signal<void, k3d::istreaming_bitmap_source::coordinate, k3d::istreaming_bitmap_source::coordinate, const k3d::istreaming_bitmap_source::bucket&> bitmap_bucket_signal_t;
+typedef sigc::signal<void> bitmap_finish_signal_t;
 
 /////////////////////////////////////////////////////////////////////////////
 // display_manager
@@ -45,8 +53,12 @@ namespace aqsis
 class display_manager : public Aqsis::IqDDManager
 {
 public:
-	sigc::signal<void, int, int> open_display;
-	sigc::signal<void, const Aqsis::CqRegion&, const Aqsis::IqChannelBuffer*> display_bucket;
+	display_manager(bitmap_start_signal_t& BitmapStartSignal, bitmap_bucket_signal_t& BitmapBucketSignal, bitmap_finish_signal_t BitmapFinishSignal) :
+		bitmap_start_signal(BitmapStartSignal),
+		bitmap_bucket_signal(BitmapBucketSignal),
+		bitmap_finish_signal(BitmapFinishSignal)
+	{
+	}
 
 private:
 	TqInt Initialise()
@@ -61,7 +73,6 @@ private:
 
 	TqInt AddDisplay(const TqChar* name, const TqChar* type, const TqChar* mode, TqInt modeID, TqInt dataOffset, TqInt dataSize, std::map<std::string, void*> mapOfArguments)
 	{
-		k3d::log() << debug << __PRETTY_FUNCTION__ << " " << name << " " << type << " " << mode << std::endl;
 		return 0;
 	}
 
@@ -72,18 +83,33 @@ private:
 
 	TqInt OpenDisplays(TqInt width, TqInt height)
 	{
-		open_display.emit(width, height);
+		bitmap_start_signal.emit(width, height);
 		return 0;
 	}
 
 	TqInt CloseDisplays()
 	{
+		bitmap_finish_signal.emit();
 		return 0;
 	}
 
-	TqInt DisplayBucket(const Aqsis::CqRegion& DRegion, const Aqsis::IqChannelBuffer* pBuffer)
+	TqInt DisplayBucket(const Aqsis::CqRegion& Region, const Aqsis::IqChannelBuffer* Buffer)
 	{
-		display_bucket(DRegion, pBuffer);
+		bitmap.recreate(Buffer->width(), Buffer->height());
+		k3d::istreaming_bitmap_source::bitmap::view_t bucket = view(bitmap);
+
+		const int index = Buffer->getChannelIndex("rgb");
+		for(int y = 0; y != Buffer->height(); ++y)
+		{
+			for(int x = 0; x != Buffer->width(); ++x)
+			{
+				Aqsis::IqChannelBuffer::TqConstChannelPtr values = (*Buffer)(x, y, index);
+				*bucket.at(x, y) = k3d::istreaming_bitmap_source::pixel(values[0], values[1], values[2], 1.0);
+//				image.setPixel(x + Region.left(), y + Region.top(), QColor::fromRgbF(values[0], values[1], values[2]).rgb());
+			}
+		}
+
+		bitmap_bucket_signal.emit(Region.xMin(), Region.yMin(), bucket);
 		return 0;
 	}
 
@@ -110,21 +136,28 @@ private:
 	{
 		return boost::shared_ptr<Aqsis::IqDisplayRequest>();
 	}
+
+	bitmap_start_signal_t& bitmap_start_signal;
+	bitmap_bucket_signal_t& bitmap_bucket_signal;
+	bitmap_finish_signal_t& bitmap_finish_signal;
+
+	k3d::istreaming_bitmap_source::bitmap bitmap;
 };
 
 /////////////////////////////////////////////////////////////////////////////
 // engine
 
 class engine :
-	public k3d::istreaming_bitmap_source
+	public k3d::istreaming_bitmap_source,
+	public k3d::imeta_object
 {
 public:
-	virtual sigc::connection connect_bitmap_start_signal(const sigc::slot<void, dimension, dimension>& Slot)
+	virtual sigc::connection connect_bitmap_start_signal(const sigc::slot<void, coordinate, coordinate>& Slot)
 	{
 		return bitmap_start_signal.connect(Slot);
 	}
 
-	virtual sigc::connection connect_bitmap_bucket_signal(const sigc::slot<void, const bucket&>& Slot)
+	virtual sigc::connection connect_bitmap_bucket_signal(const sigc::slot<void, coordinate, coordinate, const bucket&>& Slot)
 	{
 		return bitmap_bucket_signal.connect(Slot);
 	}
@@ -132,6 +165,36 @@ public:
 	virtual sigc::connection connect_bitmap_finish_signal(const sigc::slot<void>& Slot)
 	{
 		return bitmap_finish_signal.connect(Slot);
+	}
+
+	virtual const boost::any execute(const k3d::string_t& Command, const std::vector<boost::any>& Arguments)
+	{
+		return_val_if_fail(Command == "render", boost::any());
+
+		static RtFloat fov = 45, intensity = 0.5;
+		static RtFloat Ka = 0.5, Kd = 0.8, Ks = 0.2;
+		static RtPoint from = {0,0,1}, to = {0,10,0};
+		RiBegin(RI_NULL);
+
+		display_manager* const manager = new display_manager(bitmap_start_signal, bitmap_bucket_signal, bitmap_finish_signal);
+		Aqsis::QGetRenderContext()->SetDisplayManager(manager);
+
+		RiFormat(512, 512, 1);
+		RiPixelSamples(2, 2);
+		RiFrameBegin(1);
+		RiDisplay("test1.tiff", "framebuffer", "rgb", RI_NULL);
+		RiProjection("perspective", "fov", &fov, RI_NULL);
+		RiRotate(-116.344, 0, 0, 1);
+		RiRotate(-47.9689, 1, 0, 0);
+		RiRotate(-123.69, 0, 1, 0);
+		RiTranslate(15, -20, -10);
+		RiWorldBegin();
+		RiSphere(5, -5, 5, 360, RI_NULL);
+		RiWorldEnd();
+		RiFrameEnd();
+		RiEnd();
+
+		return boost::any();
 	}
 
 	static k3d::iplugin_factory& get_factory()
@@ -147,9 +210,9 @@ public:
 	}
 
 private:
-	sigc::signal<void, dimension, dimension> bitmap_start_signal;
-	sigc::signal<void, const bucket&> bitmap_bucket_signal;
-	sigc::signal<void> bitmap_finish_signal;
+	bitmap_start_signal_t bitmap_start_signal;
+	bitmap_bucket_signal_t bitmap_bucket_signal;
+	bitmap_finish_signal_t bitmap_finish_signal;
 };
 
 } // namespace aqsis

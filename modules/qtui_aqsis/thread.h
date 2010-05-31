@@ -22,10 +22,7 @@
 
 #include <QThread>
 
-namespace Aqsis { class CqRegion; }
-namespace Aqsis { class IqChannelBuffer; }
-
-class QRect;
+#include <k3dsdk/istreaming_bitmap_source.h>
 
 namespace module
 {
@@ -41,14 +38,22 @@ class thread :
 {
 	Q_OBJECT;
 
+public:
+	thread(k3d::istreaming_bitmap_source* Source);
+
 Q_SIGNALS:
-	void open_display(int Width, int Height);
-	void display_bucket(const QRect& Region, const Aqsis::IqChannelBuffer* Buffer);
+	void bitmap_start(int Width, int Height);
+	void bitmap_bucket(int XOffset, int YOffset, const k3d::istreaming_bitmap_source::bucket* Bucket);
+	void bitmap_finish();
 
 private:
 	virtual void run();
-	void on_open_display(int Width, int Height);
-	void on_display_bucket(const Aqsis::CqRegion& Region, const Aqsis::IqChannelBuffer* Buffer);
+
+	void on_bitmap_start(k3d::istreaming_bitmap_source::coordinate Width, k3d::istreaming_bitmap_source::coordinate Height);
+	void on_bitmap_bucket(k3d::istreaming_bitmap_source::coordinate XOffset, k3d::istreaming_bitmap_source::coordinate YOffset, const k3d::istreaming_bitmap_source::bucket& Bucket);
+	void on_bitmap_finish();
+
+	k3d::istreaming_bitmap_source* const source;
 };
 
 } // namespace aqsis

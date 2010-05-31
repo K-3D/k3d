@@ -56,15 +56,16 @@ public:
 	dialog();
 
 public Q_SLOTS:
-	void on_open_display(int Width, int Height);
-	void on_display_bucket(const QRect& Region, const Aqsis::IqChannelBuffer* Buffer);
+	void on_bitmap_start(int Width, int Height);
+	void on_bitmap_bucket(int XOffset, int YOffset, const k3d::istreaming_bitmap_source::bucket* Bucket);
+	void on_bitmap_finish();
 
 	static k3d::iplugin_factory& get_factory();
 
 private:
 	Ui::QTUIAqsisDialog ui;
 	k3d::qtui::application_widget application_widget;
-	QImage image;
+	QPixmap image;
 	boost::scoped_ptr<module::qtui::aqsis::thread> render_engine;
 };
 

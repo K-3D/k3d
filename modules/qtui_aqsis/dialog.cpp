@@ -24,6 +24,7 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
+#include <k3dsdk/plugin.h>
 #include <k3dsdk/qtui/application_widget.h>
 #include <k3dsdk/signal_system.h>
 
@@ -33,6 +34,8 @@
 
 #include <aqsis/math/region.h>
 #include <libs/core/ddmanager/iddmanager.h>
+
+#include <QPainter>
 
 namespace module
 {
@@ -52,33 +55,40 @@ dialog::dialog() :
 	ui.setupUi(this);
 	this->setAttribute(Qt::WA_DeleteOnClose);
 
-	render_engine.reset(new module::qtui::aqsis::thread());
-	QObject::connect(render_engine.get(), SIGNAL(open_display(int, int)), this, SLOT(on_open_display(int, int)), Qt::BlockingQueuedConnection);
-	QObject::connect(render_engine.get(), SIGNAL(display_bucket(const QRect&, const Aqsis::IqChannelBuffer*)), this, SLOT(on_display_bucket(const QRect&, const Aqsis::IqChannelBuffer*)), Qt::BlockingQueuedConnection);
+	render_engine.reset(new module::qtui::aqsis::thread(k3d::plugin::create<k3d::istreaming_bitmap_source>("EmbeddedAqsisRenderManEngine")));
+	QObject::connect(render_engine.get(), SIGNAL(bitmap_start(int, int)), this, SLOT(on_bitmap_start(int, int)), Qt::BlockingQueuedConnection);
+	QObject::connect(render_engine.get(), SIGNAL(bitmap_bucket(int, int, const k3d::istreaming_bitmap_source::bucket*)), this, SLOT(on_bitmap_bucket(int, int, const k3d::istreaming_bitmap_source::bucket*)), Qt::BlockingQueuedConnection);
+	QObject::connect(render_engine.get(), SIGNAL(bitmap_finish()), this, SLOT(on_bitmap_finish()), Qt::BlockingQueuedConnection);
 	render_engine->start();
 }
 
-void dialog::on_open_display(int Width, int Height)
+void dialog::on_bitmap_start(int Width, int Height)
 {
-	image = QImage(Width, Height, QImage::Format_RGB32);
-	image.fill(QColor(128, 128, 128).rgba());
-	ui.image->setPixmap(QPixmap::fromImage(image));
+	image = QPixmap(Width, Height);
+	image.fill(QColor(128, 128, 128));
+	ui.image->setPixmap(image);
 }
 
-void dialog::on_display_bucket(const QRect& Region, const Aqsis::IqChannelBuffer* Buffer)
+void dialog::on_bitmap_bucket(int XOffset, int YOffset, const k3d::istreaming_bitmap_source::bucket* Bucket)
 {
-	const int index = Buffer->getChannelIndex("rgb");
-
-	for(int y = 0; y != Buffer->height(); ++y)
+	QPainter painter(&image);
+	for(int y = 0; y != Bucket->height(); ++y)
 	{
-		for(int x = 0; x != Buffer->width(); ++x)
+		for(int x = 0; x != Bucket->width(); ++x)
 		{
-			Aqsis::IqChannelBuffer::TqConstChannelPtr values = (*Buffer)(x, y, index);
-			image.setPixel(x + Region.left(), y + Region.top(), QColor::fromRgbF(values[0], values[1], values[2]).rgb());
+			double red = get_color(*Bucket->at(x, y), boost::gil::red_t());
+			double green = get_color(*Bucket->at(x, y), boost::gil::green_t());
+			double blue = get_color(*Bucket->at(x, y), boost::gil::blue_t());
+			painter.setPen(QColor::fromRgbF(red, green, blue));
+			painter.drawPoint(x + XOffset, y + YOffset);
 		}
 	}
 
-	ui.image->setPixmap(QPixmap::fromImage(image));
+	ui.image->setPixmap(image);
+}
+
+void dialog::on_bitmap_finish()
+{
 }
 
 k3d::iplugin_factory& dialog::get_factory()

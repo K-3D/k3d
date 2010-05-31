@@ -46,12 +46,12 @@ public:
 	/// Defines a standard bitmap as half-precision floating-point RGBA
 	typedef bitmap::const_view_t bucket;
 	/// Define storage for a pixel coordinate
-	typedef bitmap::coord_t dimension;
+	typedef bitmap::coord_t coordinate;
 
 	/// Connects a slot that will be called when streaming begins
-	virtual sigc::connection connect_bitmap_start_signal(const sigc::slot<void, dimension, dimension>& Slot) = 0;
+	virtual sigc::connection connect_bitmap_start_signal(const sigc::slot<void, coordinate, coordinate>& Slot) = 0;
 	/// Connects a slot that will be called when streaming begins
-	virtual sigc::connection connect_bitmap_bucket_signal(const sigc::slot<void, const bucket&>& Slot) = 0;
+	virtual sigc::connection connect_bitmap_bucket_signal(const sigc::slot<void, coordinate, coordinate, const bucket&>& Slot) = 0;
 	/// Connects a slot that will be called when streaming finishes
 	virtual sigc::connection connect_bitmap_finish_signal(const sigc::slot<void>& Slot) = 0;
 
