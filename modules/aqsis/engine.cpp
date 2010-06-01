@@ -170,30 +170,42 @@ public:
 
 	virtual const boost::any execute(const k3d::string_t& Command, const std::vector<boost::any>& Arguments)
 	{
-		return_val_if_fail(Command == "render", boost::any());
+		if(Command == "render")
+		{
+			static RtFloat fov = 45, intensity = 0.5;
+			static RtFloat Ka = 0.5, Kd = 0.8, Ks = 0.2;
+			static RtPoint from = {0,0,1}, to = {0,10,0};
+			RiBegin(RI_NULL);
 
-		static RtFloat fov = 45, intensity = 0.5;
-		static RtFloat Ka = 0.5, Kd = 0.8, Ks = 0.2;
-		static RtPoint from = {0,0,1}, to = {0,10,0};
-		RiBegin(RI_NULL);
+			display_manager* const manager = new display_manager(bitmap_start_signal, bitmap_bucket_signal, bitmap_finish_signal);
+			Aqsis::QGetRenderContext()->SetDisplayManager(manager);
 
-		display_manager* const manager = new display_manager(bitmap_start_signal, bitmap_bucket_signal, bitmap_finish_signal);
-		Aqsis::QGetRenderContext()->SetDisplayManager(manager);
+			RiFormat(512, 512, 1);
+			RiPixelSamples(2, 2);
+			RiFrameBegin(1);
+			RiDisplay("test1.tiff", "framebuffer", "rgba", RI_NULL);
+			RiProjection("perspective", "fov", &fov, RI_NULL);
+			RiRotate(-116.344, 0, 0, 1);
+			RiRotate(-47.9689, 1, 0, 0);
+			RiRotate(-123.69, 0, 1, 0);
+			RiTranslate(15, -20, -10);
+			RiWorldBegin();
+			RiSphere(5, -5, 5, 360, RI_NULL);
+			RiWorldEnd();
+			RiFrameEnd();
+			RiEnd();
 
-		RiFormat(512, 512, 1);
-		RiPixelSamples(2, 2);
-		RiFrameBegin(1);
-		RiDisplay("test1.tiff", "framebuffer", "rgba", RI_NULL);
-		RiProjection("perspective", "fov", &fov, RI_NULL);
-		RiRotate(-116.344, 0, 0, 1);
-		RiRotate(-47.9689, 1, 0, 0);
-		RiRotate(-123.69, 0, 1, 0);
-		RiTranslate(15, -20, -10);
-		RiWorldBegin();
-		RiSphere(5, -5, 5, 360, RI_NULL);
-		RiWorldEnd();
-		RiFrameEnd();
-		RiEnd();
+			return true;
+		}
+		else if(Command == "cancel")
+		{
+			Aqsis::QGetRenderContext()->Quit();
+			return true;
+		}
+		else
+		{
+			k3d::log() << error << "Unknown command: " << Command << std::endl;
+		}
 
 		return boost::any();
 	}

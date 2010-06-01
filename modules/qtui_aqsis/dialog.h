@@ -27,7 +27,7 @@
 
 #include <ui_dialog.h>
 
-#include <QDialog>
+#include <QMainWindow>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -47,7 +47,7 @@ namespace aqsis
 
 /// Displays output from an embedded Aqsis render engine
 class dialog :
-	public QDialog,
+	public QMainWindow,
 	public k3d::iunknown
 {
 	Q_OBJECT;
@@ -58,6 +58,7 @@ public:
 	static k3d::iplugin_factory& get_factory();
 
 public Q_SLOTS:
+	void on_cancel_render_clicked();
 	void on_bitmap_start(int Width, int Height);
 	void on_bitmap_bucket(int XOffset, int YOffset, const k3d::istreaming_bitmap_source::bucket* Bucket);
 	void on_bitmap_finish();

@@ -38,8 +38,14 @@ namespace aqsis
 // thread
 
 thread::thread(k3d::istreaming_bitmap_source* Source) :
-	source(Source)
+	source(Source),
+	cancelled(false)
 {
+}
+
+void thread::cancel()
+{
+	cancelled = true;
 }
 
 void thread::run()
@@ -53,19 +59,32 @@ void thread::run()
 	meta_object->execute("render");
 }
 
+void thread::process_cancellation()
+{
+	if(!cancelled)
+		return;
+
+	k3d::imeta_object* const meta_object = dynamic_cast<k3d::imeta_object*>(source);
+	return_if_fail(meta_object);
+	meta_object->execute("cancel");
+}
+
 void thread::on_bitmap_start(k3d::istreaming_bitmap_source::coordinate Width, k3d::istreaming_bitmap_source::coordinate Height)
 {
 	Q_EMIT bitmap_start(Width, Height);
+	process_cancellation();
 }
 
 void thread::on_bitmap_bucket(k3d::istreaming_bitmap_source::coordinate XOffset, k3d::istreaming_bitmap_source::coordinate YOffset, const k3d::istreaming_bitmap_source::bucket& Bucket)
 {
 	Q_EMIT bitmap_bucket(XOffset, YOffset, &Bucket);
+	process_cancellation();
 }
 
 void thread::on_bitmap_finish()
 {
 	Q_EMIT bitmap_finish();
+	process_cancellation();
 }
 
 } // namespace aqsis

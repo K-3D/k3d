@@ -40,6 +40,7 @@ class thread :
 
 public:
 	thread(k3d::istreaming_bitmap_source* Source);
+	void cancel();
 
 Q_SIGNALS:
 	void bitmap_start(int Width, int Height);
@@ -49,11 +50,14 @@ Q_SIGNALS:
 private:
 	virtual void run();
 
+	void process_cancellation();
+
 	void on_bitmap_start(k3d::istreaming_bitmap_source::coordinate Width, k3d::istreaming_bitmap_source::coordinate Height);
 	void on_bitmap_bucket(k3d::istreaming_bitmap_source::coordinate XOffset, k3d::istreaming_bitmap_source::coordinate YOffset, const k3d::istreaming_bitmap_source::bucket& Bucket);
 	void on_bitmap_finish();
 
 	k3d::istreaming_bitmap_source* const source;
+	bool cancelled;
 };
 
 } // namespace aqsis

@@ -59,6 +59,11 @@ dialog::dialog() :
 	render_engine->start();
 }
 
+void dialog::on_cancel_render_clicked()
+{
+	render_engine->cancel();
+}
+
 void dialog::on_bitmap_start(int Width, int Height)
 {
 	image = QPixmap(Width, Height);
