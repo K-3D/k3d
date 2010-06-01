@@ -104,8 +104,7 @@ private:
 			for(int x = 0; x != Buffer->width(); ++x)
 			{
 				Aqsis::IqChannelBuffer::TqConstChannelPtr values = (*Buffer)(x, y, index);
-				*bucket.at(x, y) = k3d::istreaming_bitmap_source::pixel(values[0], values[1], values[2], 1.0);
-//				image.setPixel(x + Region.left(), y + Region.top(), QColor::fromRgbF(values[0], values[1], values[2]).rgb());
+				*bucket.at(x, y) = k3d::istreaming_bitmap_source::pixel(values[0], values[1], values[2], values[3]);
 			}
 		}
 
@@ -115,9 +114,11 @@ private:
 
 	bool fDisplayNeeds(const TqChar* var)
 	{
-		if(std::string(var) == "rgb")
+		if(std::string(var) == "rgba")
 			return true;
 		if(std::string(var) == "Ci")
+			return true;
+		if(std::string(var) == "Oi")
 			return true;
 		return false;
 	}
@@ -182,7 +183,7 @@ public:
 		RiFormat(512, 512, 1);
 		RiPixelSamples(2, 2);
 		RiFrameBegin(1);
-		RiDisplay("test1.tiff", "framebuffer", "rgb", RI_NULL);
+		RiDisplay("test1.tiff", "framebuffer", "rgba", RI_NULL);
 		RiProjection("perspective", "fov", &fov, RI_NULL);
 		RiRotate(-116.344, 0, 0, 1);
 		RiRotate(-47.9689, 1, 0, 0);

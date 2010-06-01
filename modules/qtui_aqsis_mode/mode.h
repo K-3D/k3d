@@ -1,5 +1,5 @@
-#ifndef MODULES_QTUI_AQSIS_DIALOG_H
-#define MODULES_QTUI_AQSIS_DIALOG_H
+#ifndef MODULES_QTUI_AQSIS_MODE_MODE_H
+#define MODULES_QTUI_AQSIS_MODE_MODE_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -22,16 +22,14 @@
 
 #include "thread.h"
 
-#include <k3dsdk/iunknown.h>
-#include <k3dsdk/qtui/application_widget.h>
-
-#include <ui_dialog.h>
-
-#include <QDialog>
+#include <k3dsdk/module.h>
+#include <k3dsdk/qtui/mode.h>
 
 #include <boost/scoped_ptr.hpp>
 
-namespace k3d { class iplugin_factory; }
+#include <QImage>
+
+class QGraphicsPixmapItem;
 
 namespace module
 {
@@ -43,17 +41,21 @@ namespace aqsis
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// dialog
+// mode
 
-/// Displays output from an embedded Aqsis render engine
-class dialog :
-	public QDialog,
+/// Sets-up a default mode for use when no other mode is in-effect.
+class mode :
+	public k3d::qtui::mode,
 	public k3d::iunknown
 {
 	Q_OBJECT;
 
+	typedef k3d::qtui::mode base;
+
 public:
-	dialog();
+	mode();
+
+	void enable(QGraphicsScene& Scene);
 
 	static k3d::iplugin_factory& get_factory();
 
@@ -63,9 +65,8 @@ public Q_SLOTS:
 	void on_bitmap_finish();
 
 private:
-	Ui::QTUIAqsisDialog ui;
-	k3d::qtui::application_widget application_widget;
-	QPixmap image;
+	QImage image;
+	QGraphicsPixmapItem* pixmap_item;
 	boost::scoped_ptr<module::qtui::aqsis::thread> render_engine;
 };
 
@@ -75,4 +76,4 @@ private:
 
 } // namespace module
 
-#endif // !MODULES_QTUI_AQSIS_DIALOG_H
+#endif // !MODULES_QTUI_AQSIS_MODE_MODE_H

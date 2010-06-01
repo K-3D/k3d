@@ -1,0 +1,5 @@
+QT4_WRAP_CPP(MOC_BUILT_SOURCES mode.h thread.h)
+
+K3D_BUILD_QTUI_MODULE(k3d-qtui-aqsis-mode EXTRA_SOURCES ${MOC_BUILT_SOURCES})
+K3D_CREATE_MODULE_PROXY(k3d-qtui-aqsis-mode)
+

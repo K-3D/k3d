@@ -17,21 +17,18 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "dialog.h"
+#include "mode.h"
 
 #include <k3d-i18n-config.h>
-#include <k3d-version-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/plugin.h>
-#include <k3dsdk/qtui/application_widget.h>
-#include <k3dsdk/signal_system.h>
 
 #include <boost/assign/list_of.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <sstream>
 
+#include <QGraphicsPixmapItem>
+#include <QGraphicsScene>
 #include <QPainter>
 
 namespace module
@@ -44,13 +41,17 @@ namespace aqsis
 {
 
 /////////////////////////////////////////////////////////////////////////////
-// dialog
+// mode
 
-dialog::dialog() :
-	application_widget(*this)
+mode::mode() :
+	pixmap_item(0)
 {
-	ui.setupUi(this);
-	this->setAttribute(Qt::WA_DeleteOnClose);
+}
+
+void mode::enable(QGraphicsScene& Scene)
+{
+	pixmap_item = new QGraphicsPixmapItem();
+	Scene.addItem(pixmap_item);
 
 	render_engine.reset(new module::qtui::aqsis::thread(k3d::plugin::create<k3d::istreaming_bitmap_source>("EmbeddedAqsisRenderManEngine")));
 	QObject::connect(render_engine.get(), SIGNAL(bitmap_start(int, int)), this, SLOT(on_bitmap_start(int, int)), Qt::BlockingQueuedConnection);
@@ -59,16 +60,28 @@ dialog::dialog() :
 	render_engine->start();
 }
 
-void dialog::on_bitmap_start(int Width, int Height)
+k3d::iplugin_factory& mode::get_factory()
 {
-	image = QPixmap(Width, Height);
-	image.fill(QColor(128, 128, 128));
-	ui.image->setPixmap(image);
+	static k3d::application_plugin_factory<mode> factory(
+		k3d::uuid(0x119ce863, 0x55493089, 0x49eb2f87, 0xb9a59431),
+		"QTUIAqsisMode",
+		_("Provides an edit mode that automatically previews using the Aqsis render engine."),
+		"QTUI Mode",
+		k3d::iplugin_factory::EXPERIMENTAL,
+		boost::assign::map_list_of("qtui:component-type", "mode"));
+
+	return factory;
 }
 
-void dialog::on_bitmap_bucket(int XOffset, int YOffset, const k3d::istreaming_bitmap_source::bucket* Bucket)
+void mode::on_bitmap_start(int Width, int Height)
 {
-	QPainter painter(&image);
+	image = QImage(Width, Height, QImage::Format_ARGB32);
+	image.fill(QColor(255, 255, 255, 64).rgba());
+	pixmap_item->setPixmap(QPixmap::fromImage(image));
+}
+
+void mode::on_bitmap_bucket(int XOffset, int YOffset, const k3d::istreaming_bitmap_source::bucket* Bucket)
+{
 	for(int y = 0; y != Bucket->height(); ++y)
 	{
 		for(int x = 0; x != Bucket->width(); ++x)
@@ -76,29 +89,16 @@ void dialog::on_bitmap_bucket(int XOffset, int YOffset, const k3d::istreaming_bi
 			double red = get_color(*Bucket->at(x, y), boost::gil::red_t());
 			double green = get_color(*Bucket->at(x, y), boost::gil::green_t());
 			double blue = get_color(*Bucket->at(x, y), boost::gil::blue_t());
-			painter.setPen(QColor::fromRgbF(red, green, blue));
-			painter.drawPoint(x + XOffset, y + YOffset);
+			double alpha = get_color(*Bucket->at(x, y), boost::gil::alpha_t());
+			image.setPixel(x + XOffset, y + YOffset, QColor::fromRgbF(red, green, blue, alpha).rgba());
 		}
 	}
 
-	ui.image->setPixmap(image);
+	pixmap_item->setPixmap(QPixmap::fromImage(image));
 }
 
-void dialog::on_bitmap_finish()
+void mode::on_bitmap_finish()
 {
-}
-
-k3d::iplugin_factory& dialog::get_factory()
-{
-	static k3d::application_plugin_factory<dialog> factory(
-		k3d::uuid(0xa467cfdd, 0x2545d997, 0x07ecf8a2, 0x042455fb),
-		"QTUIAqsisDialog",
-		_("Displays output from an embedded Aqsis RenderMan engine."),
-		"QTUI Dialog",
-		k3d::iplugin_factory::EXPERIMENTAL,
-		boost::assign::map_list_of("qtui:component-type", "dialog"));
-
-	return factory;
 }
 
 } // namespace aqsis
@@ -108,6 +108,6 @@ k3d::iplugin_factory& dialog::get_factory()
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::qtui::aqsis::dialog::get_factory());
+	Registry.register_factory(module::qtui::aqsis::mode::get_factory());
 K3D_MODULE_END
 

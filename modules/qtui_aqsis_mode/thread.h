@@ -1,5 +1,5 @@
-#ifndef MODULES_QTUI_AQSIS_DIALOG_H
-#define MODULES_QTUI_AQSIS_DIALOG_H
+#ifndef MODULES_QTUI_AQSIS_THREAD_H
+#define MODULES_QTUI_AQSIS_THREAD_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -20,18 +20,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "thread.h"
+#include <QThread>
 
-#include <k3dsdk/iunknown.h>
-#include <k3dsdk/qtui/application_widget.h>
-
-#include <ui_dialog.h>
-
-#include <QDialog>
-
-#include <boost/scoped_ptr.hpp>
-
-namespace k3d { class iplugin_factory; }
+#include <k3dsdk/istreaming_bitmap_source.h>
 
 namespace module
 {
@@ -42,31 +33,27 @@ namespace qtui
 namespace aqsis
 {
 
-/////////////////////////////////////////////////////////////////////////////
-// dialog
-
-/// Displays output from an embedded Aqsis render engine
-class dialog :
-	public QDialog,
-	public k3d::iunknown
+class thread :
+	public QThread
 {
 	Q_OBJECT;
 
 public:
-	dialog();
+	thread(k3d::istreaming_bitmap_source* Source);
 
-	static k3d::iplugin_factory& get_factory();
-
-public Q_SLOTS:
-	void on_bitmap_start(int Width, int Height);
-	void on_bitmap_bucket(int XOffset, int YOffset, const k3d::istreaming_bitmap_source::bucket* Bucket);
-	void on_bitmap_finish();
+Q_SIGNALS:
+	void bitmap_start(int Width, int Height);
+	void bitmap_bucket(int XOffset, int YOffset, const k3d::istreaming_bitmap_source::bucket* Bucket);
+	void bitmap_finish();
 
 private:
-	Ui::QTUIAqsisDialog ui;
-	k3d::qtui::application_widget application_widget;
-	QPixmap image;
-	boost::scoped_ptr<module::qtui::aqsis::thread> render_engine;
+	virtual void run();
+
+	void on_bitmap_start(k3d::istreaming_bitmap_source::coordinate Width, k3d::istreaming_bitmap_source::coordinate Height);
+	void on_bitmap_bucket(k3d::istreaming_bitmap_source::coordinate XOffset, k3d::istreaming_bitmap_source::coordinate YOffset, const k3d::istreaming_bitmap_source::bucket& Bucket);
+	void on_bitmap_finish();
+
+	k3d::istreaming_bitmap_source* const source;
 };
 
 } // namespace aqsis
@@ -75,4 +62,4 @@ private:
 
 } // namespace module
 
-#endif // !MODULES_QTUI_AQSIS_DIALOG_H
+#endif // !MODULES_QTUI_AQSIS_THREAD_H
