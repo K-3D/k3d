@@ -24,7 +24,6 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/gl/api.h>
 #include <k3dsdk/gl/context_factory.h>
-#include <k3dsdk/gl.h>
 #include <k3dsdk/gl/offscreen_context_factory.h>
 #include <k3dsdk/gl/offscreen_context.h>
 #include <k3dsdk/log.h>
@@ -72,9 +71,9 @@ void window::on_render_offscreen_clicked()
 		k3d::log() << std::endl;
 
 		const k3d::gl::api& gl = context->begin();
-		gl.ClearColor(1.0, 0.5, 0.25, 0.125);
-		gl.Clear(gl.COLOR_BUFFER_BIT);
-		gl.Flush();
+		gl.glClearColor(1.0, 0.5, 0.25, 0.125);
+		gl.glClear(gl.GL_COLOR_BUFFER_BIT);
+		gl.glFlush();
 		context->end();
 
 		k3d::log() << debug;

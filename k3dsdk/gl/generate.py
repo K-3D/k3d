@@ -216,7 +216,7 @@ public:
 """)
 
 for name in sorted(enums.keys()):
-	stream.write("\t\t" + name + " = " + enums[name] + ",\n")
+	stream.write("\t\tGL_" + name + " = " + enums[name] + ",\n")
 
 stream.write("""
 	};
@@ -227,7 +227,7 @@ stream.write("""
 """)
 
 for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])):
-	stream.write("\t\tFunctor(\"gl" + function["name"] + "\", " + function["name"] + ");\n")
+	stream.write("\t\tFunctor(\"gl" + function["name"] + "\", gl" + function["name"] + ");\n")
 
 stream.write("""\t}\n\n""")
 
@@ -235,7 +235,7 @@ for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])
 
 	stream.write("\t")
 	stream.write(return_type(function))
-	stream.write(" (*" + function["name"] + ")")
+	stream.write(" (*gl" + function["name"] + ")")
 	stream.write("(")
 
 	for p in range(len(function["parameters"])):
@@ -289,7 +289,7 @@ for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])
 
 	stream.write("static ")
 	stream.write(full_return_type(function))
-	stream.write(" fallback" + function["name"])
+	stream.write(" fallback_gl" + function["name"])
 	stream.write("(")
 
 	for p in range(len(function["parameters"])):
@@ -319,7 +319,7 @@ for function in sorted(functions, lambda lhs, rhs: cmp(lhs["name"], rhs["name"])
 		stream.write("\n\t")
 		index = True
 
-	stream.write("" + function["name"] + "(fallback" + function["name"] + ")")
+	stream.write("gl" + function["name"] + "(fallback_gl" + function["name"] + ")")
 
 stream.write("""
 {
