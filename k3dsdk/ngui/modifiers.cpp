@@ -56,19 +56,6 @@ namespace k3d
 namespace ngui
 {
 
-namespace detail
-{
-
-struct sort_by_name
-{
-	bool operator()(iplugin_factory* LHS, iplugin_factory* RHS)
-	{
-		return LHS->name() < RHS->name();
-	}
-};
-
-} // namespace detail
-
 const factories_t& mesh_modifiers()
 {
 	static factories_t modifiers;
@@ -81,10 +68,24 @@ const factories_t& mesh_modifiers()
 		std::set_intersection(data_source_modifiers.begin(), data_source_modifiers.end(), data_sink_modifiers.begin(), data_sink_modifiers.end(), std::inserter(modifiers, modifiers.end()));
 		modifiers.insert(modifiers.end(), multi_sink_modifiers.begin(), multi_sink_modifiers.end());
 		modifiers.insert(modifiers.end(), scripted_modifiers.begin(), scripted_modifiers.end());
-		std::sort(modifiers.begin(), modifiers.end(), detail::sort_by_name());
+		std::sort(modifiers.begin(), modifiers.end(), k3d::sort_by_name());
 	}
 
 	return modifiers;
+}
+
+const factories_t& mesh_sinks()
+{
+	static factories_t sinks;
+	if(sinks.empty())
+	{
+		const plugin::factory::collection_t data_source_modifiers = plugin::factory::lookup<imesh_source>();
+		const plugin::factory::collection_t data_sink_modifiers = plugin::factory::lookup<imesh_sink>();
+		std::set_difference(data_sink_modifiers.begin(), data_sink_modifiers.end(), data_source_modifiers.begin(), data_source_modifiers.end(), std::inserter(sinks, sinks.end()));
+		std::sort(sinks.begin(), sinks.end(), k3d::sort_by_name());
+	}
+
+	return sinks;
 }
 
 const factories_t& transform_modifiers()
@@ -95,7 +96,7 @@ const factories_t& transform_modifiers()
 		const plugin::factory::collection_t data_source_modifiers = plugin::factory::lookup<imatrix_source>();
 		const plugin::factory::collection_t data_sink_modifiers = plugin::factory::lookup<imatrix_sink>();
 		std::set_intersection(data_source_modifiers.begin(), data_source_modifiers.end(), data_sink_modifiers.begin(), data_sink_modifiers.end(), std::inserter(modifiers, modifiers.end()));
-		std::sort(modifiers.begin(), modifiers.end(), detail::sort_by_name());
+		std::sort(modifiers.begin(), modifiers.end(), k3d::sort_by_name());
 	}
 
 	return modifiers;
@@ -171,12 +172,12 @@ inode* modify_mesh(document_state& DocumentState, inode& Node, iplugin_factory* 
 		imesh_sink* const modifier_sink = dynamic_cast<imesh_sink*>(modifier);
 		return_val_if_fail(modifier_sink, 0);
 		imesh_source* const modifier_source = dynamic_cast<imesh_source*>(modifier);
-		return_val_if_fail(modifier_source, 0);
 
 		// Insert the modifier into the pipeline ...
 		ipipeline::dependencies_t dependencies;
 		dependencies.insert(std::make_pair(&modifier_sink->mesh_sink_input(), upstream_output));
-		dependencies.insert(std::make_pair(&downstream_input, &modifier_source->mesh_source_output()));
+		if(modifier_source)
+			dependencies.insert(std::make_pair(&downstream_input, &modifier_source->mesh_source_output()));
 		document.pipeline().set_dependencies(dependencies);
 
 		// If the modifier is a mesh selection sink, set its selection state ...

@@ -212,6 +212,23 @@ public:
 			items().push_back(Gtk::Menu_Helpers::MenuElem(_("Transform Modifier"), *manage(m_transform_modifiers)));
 		}
 
+		// Mesh sinks menu
+		const factories_t& mesh_sink_factories = mesh_sinks();
+		if(!mesh_sink_factories.empty())
+		{
+			m_mesh_sinks = new Gtk::Menu();
+
+			for(factories_t::const_iterator sink = mesh_sink_factories.begin(); sink != mesh_sink_factories.end(); ++sink)
+			{
+				k3d::iplugin_factory& factory = **sink;
+
+				m_mesh_sinks->items().push_back(*Gtk::manage(
+					create_menu_item(factory) <<
+					connect_menu_item(sigc::bind(sigc::mem_fun(*this, &node_context_menu::on_modify_meshes), &factory)))); // the modify mesh code also applies to sinks, after only very minor modification
+			}
+			items().push_back(Gtk::Menu_Helpers::MenuElem(_("Mesh Sink"), *manage(m_mesh_sinks)));
+		}
+
 		// Viewport visibility ...
 		items().push_back(Gtk::Menu_Helpers::SeparatorElem());
 
@@ -263,6 +280,7 @@ public:
 
 		const bool display_mesh_modifiers = (selected_mesh_counter > 0);
 		m_mesh_modifiers->set_sensitive(display_mesh_modifiers);
+		m_mesh_sinks->set_sensitive(display_mesh_modifiers);
 
 		const bool display_transform_modifiers = (selected_transform_counter > 0);
 		m_transform_modifiers->set_sensitive(display_transform_modifiers);
@@ -652,6 +670,7 @@ private:
 	Gtk::MenuItem* m_animate_transformation;
 	Gtk::Menu* m_mesh_modifiers;
 	Gtk::Menu* m_transform_modifiers;
+	Gtk::Menu* m_mesh_sinks;
 
 	document_state& m_document_state;
 	viewport::control* m_viewport;

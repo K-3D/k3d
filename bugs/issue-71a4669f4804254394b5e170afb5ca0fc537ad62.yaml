@@ -3,7 +3,7 @@ title: Hint Refactoring
 desc: Complete the action items documented in http://www.k-3d.org/wiki/Hint_Refactoring - in particular, update all pipeline components to implement hint-mapping when updating their state in response to property changed signals.
 type: :task
 component: K-3D
-release: 1.0.0.0
+release: 0.8.1.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
 status: :unstarted
 disposition: 
@@ -20,3 +20,8 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - assigned to release 1.0.0.0 from 0.8.0.0
   - ""
+- - 2010-05-22 00:34:48.558807 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - assigned to release 0.8.1.0 from 1.0.0.0
+  - ""
+claimer: 

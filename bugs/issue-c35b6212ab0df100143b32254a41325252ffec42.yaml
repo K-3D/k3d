@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Cleanup RenderMan shaders
+desc: "We have lots of shaders that are: redundant, weird, broken, won't build.  Fix the ones that we should keep, and get rid of the ones we shouldn't."
+type: :bugfix
+component: K-3D
+release: 0.8.0.1
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-04-16 04:44:03.593225 Z
+references: []
+
+id: c35b6212ab0df100143b32254a41325252ffec42
+log_events: 
+- - 2010-04-16 04:44:04.177148 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-04-17 21:17:15.809169 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - ""
+claimer: 

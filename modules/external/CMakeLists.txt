@@ -1,28 +1,26 @@
 PROJECT(k3d-external)
 
-SET(K3D_EXTERNAL_MODULES "" CACHE STRING
-	"Semicolon-separated list of external modules that will be included in the build.  Each module \"foo\" must provide a \"foo.cmake\" file.")
+SET(K3D_EXTERNAL_MODULES "" CACHE STRING "Semicolon-separated list of external modules that will be included in the build.")
 
-FOREACH(module ${K3D_EXTERNAL_MODULES})
-	OPTION(K3D_BUILD_${module} "Build external ${module} module" ON)
+FOREACH(MODULE ${K3D_EXTERNAL_MODULES})
+	OPTION(K3D_BUILD_${MODULE} "Build external ${MODULE} module" ON)
 
-	IF(K3D_BUILD_${module})
-		FIND_PATH(${module}_EXTERNAL_SOURCE_DIR
-			${module}.cmake
-			DOC "Path to the ${module}.cmake file."
+	IF(K3D_BUILD_${MODULE})
+		FIND_PATH(${MODULE}_EXTERNAL_SOURCE_DIR
+			CMakeLists.txt
+			DOC "Path to the ${MODULE} directory."
 			)
 
-		SET(MODULE_DIRECTORY ${${module}_EXTERNAL_SOURCE_DIR})
+		SET(MODULE_DIRECTORY ${${MODULE}_EXTERNAL_SOURCE_DIR})
 
-		IF(EXISTS ${MODULE_DIRECTORY})
-			ADD_SUBDIRECTORY(${MODULE_DIRECTORY} "${CMAKE_CURRENT_BINARY_DIR}/${module}")
+		IF(NOT EXISTS ${MODULE_DIRECTORY})
+			MESSAGE(SEND_ERROR "You must specify an existing \"${MODULE}\" source directory using ${MODULE}_EXTERNAL_SOURCE_DIR.")
+		ELSEIF(NOT EXISTS ${MODULE_DIRECTORY}/CMakeLists.txt)
+			MESSAGE(SEND_ERROR "The \"${MODULE}\" source directory \"${MODULE_DIRECTORY}\" must contain a CMakeLists.txt file.")
+		ELSE()
+			ADD_SUBDIRECTORY(${MODULE_DIRECTORY} "${CMAKE_CURRENT_BINARY_DIR}/${MODULE}")
 			SET(K3D_PLUGINS ${K3D_PLUGINS} PARENT_SCOPE)
-		ELSE(EXISTS ${MODULE_DIRECTORY})
-			MESSAGE(SEND_ERROR "The \"${module}\" module source directory \"${MODULE_DIRECTORY}\" does not exist.
-				Specify a different directory using ${module}_EXTERNAL_SOURCE_DIR")
-		ENDIF(EXISTS ${MODULE_DIRECTORY})
-
-	ENDIF(K3D_BUILD_${module})
-
-ENDFOREACH(module)
+		ENDIF()
+	ENDIF()
+ENDFOREACH()
 

@@ -75,7 +75,7 @@ public:
 					_("Disables Desktop Composition on Vista"),
 					"Desktop",
 					k3d::iplugin_factory::STABLE,
-					boost::assign::map_list_of("ngui:application-start", "true"));
+					boost::assign::map_list_of("ngui:application-start", "true")("qtui:application-start", "true"));
 
 			return factory;
 		}

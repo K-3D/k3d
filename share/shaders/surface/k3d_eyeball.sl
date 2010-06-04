@@ -40,6 +40,7 @@
  * last modified  8 Jan 95 by Michael B. Johnson (wave)
  */
 
+#include "k3d_filterwidth.h"
 #include "k3d_noises.h" 
 #include "k3d_rmannotes.h"
 
@@ -70,7 +71,7 @@ k3d_eyeball (float Ka = .75, Kd = 0.75, Ks = 0.4, roughness = 0.1;
   float twidth, cutoff;
 
   /* Calculate an appropriate filter width for antialiasing */
-  twidth = max (abs(Du(t)*du) + abs(Dv(t)*dv), MINFILTERWIDTH);
+  twidth = filterwidth(t);
   PO = transform ("object", P) + index;
 
   /* Figure out where we are in the eyeball.  Use the following variables:

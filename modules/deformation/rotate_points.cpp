@@ -48,17 +48,24 @@ public:
 		base(Factory, Document),
 		m_x(init_owner(*this) + init_name("x") + init_label(_("X")) + init_description(_("X rotation angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
 		m_y(init_owner(*this) + init_name("y") + init_label(_("Y")) + init_description(_("Y rotation angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
-		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z rotation angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle)))
+		m_z(init_owner(*this) + init_name("z") + init_label(_("Z")) + init_description(_("Z rotation angle")) + init_value(0.0) + init_step_increment(k3d::radians(1.0)) + init_units(typeid(k3d::measurement::angle))),
+		m_origin(init_owner(*this) + init_name("origin") + init_label(_("Origin")) + init_description(_("Origin of the rotation.")) + init_value(k3d::point3(0, 0, 0)))
 	{
 		m_mesh_selection.changed_signal().connect(make_update_mesh_slot());
 		m_x.changed_signal().connect(make_update_mesh_slot());
 		m_y.changed_signal().connect(make_update_mesh_slot());
 		m_z.changed_signal().connect(make_update_mesh_slot());
+		m_origin.changed_signal().connect(make_update_mesh_slot());
 	}
 
 	void on_deform_mesh(const k3d::mesh::points_t& InputPoints, const k3d::mesh::selection_t& PointSelection, k3d::mesh::points_t& OutputPoints)
 	{
-		const k3d::matrix4 transformation = k3d::rotate3(k3d::point3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value()));
+		const k3d::matrix4 rotation = k3d::rotate3(k3d::point3(m_x.pipeline_value(), m_y.pipeline_value(), m_z.pipeline_value()));
+		const k3d::vector3 translation_vector = k3d::to_vector(m_origin.pipeline_value());
+		const k3d::matrix4 pre_translation = k3d::translate3(-translation_vector);
+		const k3d::matrix4 post_translation = k3d::translate3(translation_vector);
+
+		const k3d::matrix4 transformation = post_translation * rotation * pre_translation;
 
 		k3d::parallel::parallel_for(
 			k3d::parallel::blocked_range<k3d::uint_t>(0, OutputPoints.size(), k3d::parallel::grain_size()),
@@ -80,9 +87,10 @@ public:
 	}
 
 private:
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y;
-	k3d_data(double, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_x;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_y;
+	k3d_data(k3d::double_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, measurement_property, with_serialization) m_z;
+	k3d_data(k3d::point3, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_origin;
 };
 
 /////////////////////////////////////////////////////////////////////////////

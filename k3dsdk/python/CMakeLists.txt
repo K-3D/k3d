@@ -1,17 +1,12 @@
 PROJECT(k3dsdk-python)
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/k3d-python-config.h.in ${CMAKE_CURRENT_BINARY_DIR}/k3d-python-config.h)
-
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${k3d_SOURCE_DIR})
-INCLUDE_DIRECTORIES(${k3dsdk_SOURCE_DIR}/gil)
 INCLUDE_DIRECTORIES(${k3dsdk_BINARY_DIR})
-INCLUDE_DIRECTORIES(${K3D_BOOST_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${K3D_GLIBMM_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${K3D_SIGC_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${K3D_PYTHON_INCLUDE_DIRS})
 
-LINK_DIRECTORIES(${K3D_BOOST_LIB_DIRS})
 LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 
 ADD_LIBRARY(k3dsdk-python-arrays SHARED
@@ -19,18 +14,22 @@ ADD_LIBRARY(k3dsdk-python-arrays SHARED
 	typed_array_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python-arrays)
-TARGET_LINK_LIBRARIES(k3dsdk-python-arrays k3dsdk)
-TARGET_LINK_LIBRARIES(k3dsdk-python-arrays ${K3D_BOOST_PYTHON_LIBS})
-TARGET_LINK_LIBRARIES(k3dsdk-python-arrays ${K3D_PYTHON_LIBS})
+TARGET_LINK_LIBRARIES(k3dsdk-python-arrays
+	k3dsdk
+	${K3D_PYTHON_LIBS}
+	${Boost_PYTHON_LIBRARY}
+	)
 
 ADD_LIBRARY(k3dsdk-python-const-arrays SHARED
 	const_typed_array_python.cpp
 	const_typed_array_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python-const-arrays)
-TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays k3dsdk)
-TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays ${K3D_BOOST_PYTHON_LIBS})
-TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays ${K3D_PYTHON_LIBS})
+TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays
+	k3dsdk
+	${K3D_PYTHON_LIBS}
+	${Boost_PYTHON_LIBRARY}
+	)
 
 ADD_LIBRARY(k3dsdk-python-values SHARED
 	angle_axis_python.cpp
@@ -69,9 +68,11 @@ ADD_LIBRARY(k3dsdk-python-values SHARED
 	vector4_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python-values)
-TARGET_LINK_LIBRARIES(k3dsdk-python-values k3dsdk)
-TARGET_LINK_LIBRARIES(k3dsdk-python-values ${K3D_BOOST_PYTHON_LIBS})
-TARGET_LINK_LIBRARIES(k3dsdk-python-values ${K3D_PYTHON_LIBS})
+TARGET_LINK_LIBRARIES(k3dsdk-python-values
+	k3dsdk
+	${K3D_PYTHON_LIBS}
+	${Boost_PYTHON_LIBRARY}
+	)
 
 ADD_LIBRARY(k3dsdk-python-mesh SHARED
 	mesh_python.cpp
@@ -84,8 +85,6 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-mesh k3dsdk-python-const-arrays)
 ADD_LIBRARY(k3dsdk-python-interfaces SHARED
 	any_python.cpp
 	any_python.h
-	icommand_node_python.cpp
-	icommand_node_python.h
 	offscreen_context_factory_gl_python.cpp
 	offscreen_context_factory_gl_python.h
 	idocument_exporter_python.cpp
@@ -100,6 +99,8 @@ ADD_LIBRARY(k3dsdk-python-interfaces SHARED
 	ikeyframer_python.h
 	imesh_storage_python.cpp
 	imesh_storage_python.h
+	imeta_object_python.cpp
+	imeta_object_python.h
 	imetadata_python.cpp
 	imetadata_python.h
 	inode_python.cpp
@@ -221,45 +222,48 @@ ADD_LIBRARY(k3dsdk-python SHARED
 	script_python.h
 	)
 K3D_GENERATE_DEF_FILE(k3dsdk-python)
-TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-primitives)
+TARGET_LINK_LIBRARIES(k3dsdk-python
+	k3dsdk-python-primitives
+	${Boost_PYTHON_LIBRARY}
+	)
 
 INSTALL(TARGETS k3dsdk-python-arrays
-	RUNTIME DESTINATION bin 
+	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION ${K3D_LIBDIR}
 	ARCHIVE DESTINATION ${K3D_LIBDIR})
 
 INSTALL(TARGETS k3dsdk-python-const-arrays
-	RUNTIME DESTINATION bin 
+	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION ${K3D_LIBDIR}
 	ARCHIVE DESTINATION ${K3D_LIBDIR})
 
 INSTALL(TARGETS k3dsdk-python-values
-	RUNTIME DESTINATION bin 
+	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION ${K3D_LIBDIR}
 	ARCHIVE DESTINATION ${K3D_LIBDIR})
 
 INSTALL(TARGETS k3dsdk-python-mesh
-	RUNTIME DESTINATION bin 
+	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION ${K3D_LIBDIR}
 	ARCHIVE DESTINATION ${K3D_LIBDIR})
 
 INSTALL(TARGETS k3dsdk-python-interfaces
-	RUNTIME DESTINATION bin 
+	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION ${K3D_LIBDIR}
 	ARCHIVE DESTINATION ${K3D_LIBDIR})
 
 INSTALL(TARGETS k3dsdk-python-b
-	RUNTIME DESTINATION bin 
+	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION ${K3D_LIBDIR}
 	ARCHIVE DESTINATION ${K3D_LIBDIR})
 
 INSTALL(TARGETS k3dsdk-python-primitives
-	RUNTIME DESTINATION bin 
+	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION ${K3D_LIBDIR}
 	ARCHIVE DESTINATION ${K3D_LIBDIR})
 
 INSTALL(TARGETS k3dsdk-python
-	RUNTIME DESTINATION bin 
+	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION ${K3D_LIBDIR}
 	ARCHIVE DESTINATION ${K3D_LIBDIR})
 
@@ -271,10 +275,12 @@ IF(K3D_BUILD_NGUI_MODULE)
 		atk_python.h
 		)
 	K3D_GENERATE_DEF_FILE(k3dsdk-python-atk)
-	TARGET_LINK_LIBRARIES(k3dsdk-python-atk k3dsdk)
-	TARGET_LINK_LIBRARIES(k3dsdk-python-atk ${K3D_BOOST_PYTHON_LIBS})
-	TARGET_LINK_LIBRARIES(k3dsdk-python-atk ${K3D_PYTHON_LIBS})
-	TARGET_LINK_LIBRARIES(k3dsdk-python-atk ${K3D_GTKMM_LIBS})
+	TARGET_LINK_LIBRARIES(k3dsdk-python-atk
+		k3dsdk
+		${Boost_PYTHON_LIBRARY}
+		${K3D_PYTHON_LIBS}
+		${K3D_GTKMM_LIBS}
+		)
 
 	TARGET_LINK_LIBRARIES(k3dsdk-python k3dsdk-python-atk)
 

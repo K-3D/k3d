@@ -42,6 +42,7 @@
 #include <k3dsdk/triangulator.h>
 #include <k3dsdk/user_property_changed_signal.h>
 
+#include <boost/mpl/vector.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <carve/csg.hpp>
@@ -100,6 +101,42 @@ void merge_collinear_edges(const k3d::mesh::points_t& Points, k3d::polyhedron::p
 
 	k3d::euler::kill_edge_and_vertex(Polyhedron, redundant_edges, boundary_edges, companions, Points.size());
 }
+
+/// Types supported for interpolation
+typedef boost::mpl::vector<k3d::color, k3d::double_t, k3d::texture3, k3d::int32_t, k3d::uint_t> interpolation_types;
+
+/// Stores attribute values at a single index
+struct table_value
+{
+
+	typedef std::map<k3d::string_t, boost::any> values_t;
+	values_t values;
+
+private:
+	/// Extracts single values from a table, and puts them into the supplied map
+	struct value_extractor
+	{
+		value_extractor(values_t& Values, const k3d::table& Table, const k3d::uint_t Index) : m_values(Values), m_table(Table), m_idx(Index) {}
+
+		template<typename T> void operator()(T v)
+		{
+			typedef k3d::typed_array<T> array_t;
+			for(k3d::table::const_iterator it = m_table.begin(); it != m_table.end(); ++it)
+			{
+				const k3d::string_t& array_name = it->first;
+				if(const array_t* array = dynamic_cast<const array_t*>(it->second))
+				{
+
+				}
+			}
+		}
+
+	private:
+		values_t& m_values;
+		const k3d::table& m_table;
+		const k3d::uint_t m_idx;
+	};
+};
 	
 } // namespace detail
 
@@ -212,11 +249,11 @@ private:
 				}
 				if(!polyhedron.get())
 					return;
-				return_if_fail(k3d::polyhedron::is_solid(*polyhedron));
+
 				const k3d::uint_t input_face_count = polyhedron->face_selections.size();
 				for(k3d::uint_t face = 0; face != input_face_count; ++face)
 				{
-						polyhedron->face_selections[face] = polyhedron->face_loop_counts[face] > 1 ? 1.0 : 0.0;
+					polyhedron->face_selections[face] = polyhedron->face_loop_counts[face] > 1 ? 1.0 : 0.0;
 				}
 				
 				// We triangulate the holes

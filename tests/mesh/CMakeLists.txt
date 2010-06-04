@@ -49,7 +49,15 @@ K3D_TEST(mesh.selection.GrowSelection
 	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE K3D_BUILD_SELECTION_MODULE
 	LABELS mesh modifier selection)
 
+K3D_TEST(mesh.selection.SelectBoundaryEdges 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.selection.SelectBoundaryEdges.py
+	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE K3D_BUILD_SELECTION_MODULE
+	LABELS mesh modifier selection)
 
+K3D_TEST(mesh.selection.SelectDegenerateFaces 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.selection.SelectDegenerateFaces.py
+	REQUIRES K3D_BUILD_POLYHEDRON_SOURCES_MODULE K3D_BUILD_SELECTION_MODULE
+	LABELS mesh modifier selection)
 
 
 
@@ -116,6 +124,11 @@ K3D_TEST(mesh.source.PLYMeshReader
 
 K3D_TEST(mesh.source.STLMeshReader
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.STLMeshReader.py
+	REQUIRES K3D_BUILD_STL_IO_MODULE
+	LABELS mesh source reader STLMeshReader)
+	
+K3D_TEST(mesh.source.STLMeshReader.binary
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.STLMeshReader.binary.py
 	REQUIRES K3D_BUILD_STL_IO_MODULE
 	LABELS mesh source reader STLMeshReader)
 
@@ -1026,15 +1039,30 @@ K3D_TEST(mesh.modifier.ScalePoints
 	REQUIRES K3D_BUILD_DEFORMATION_MODULE
 	LABELS mesh modifier)
 
+K3D_TEST(mesh.modifier.SelectConnectedComponents 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SelectConnectedComponents.py
+	REQUIRES K3D_BUILD_SELECTION_MODULE
+	LABELS mesh modifier)
+
 K3D_TEST(mesh.modifier.SelectCube 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SelectCube.py
 	REQUIRES K3D_BUILD_SELECTION_MODULE
+	LABELS mesh modifier)
+
+K3D_TEST(mesh.modifier.SelectedFacesToPolyhedron 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SelectedFacesToPolyhedron.py
+	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
 	LABELS mesh modifier)
 
 K3D_TEST(mesh.modifier.SelectNSided 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SelectNSided.py
 	REQUIRES K3D_BUILD_SELECTION_MODULE
 	LABELS mesh modifier polyhedron UniformPolyhedron SelectNSided)
+
+K3D_TEST(mesh.modifier.SetColor 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SetColor.py
+	REQUIRES K3D_BUILD_MESH_ATTRIBUTES_MODULE
+	LABELS mesh modifier)
 
 K3D_TEST(mesh.modifier.ShearPoints 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.ShearPoints.py
@@ -1206,6 +1234,11 @@ K3D_TEST(mesh.sink.OBJMeshWriter
 	REQUIRES K3D_BUILD_OBJ_IO_MODULE
 	LABELS mesh sink OBJMeshWriter)
 
+K3D_TEST(mesh.sink.PointsCentroid
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.PointsCentroid.py
+	REQUIRES K3D_BUILD_MESH_MODULE K3D_BUILD_POLYHEDRON_SOURCES_MODULE 
+	LABELS mesh sink STLMeshWriter)
+
 K3D_TEST(mesh.sink.PLYMeshWriter
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.PLYMeshWriter.py
 	REQUIRES K3D_BUILD_PLY_IO_MODULE
@@ -1213,6 +1246,11 @@ K3D_TEST(mesh.sink.PLYMeshWriter
 
 K3D_TEST(mesh.sink.STLMeshWriter
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.STLMeshWriter.py
+	REQUIRES K3D_BUILD_STL_IO_MODULE
+	LABELS mesh sink STLMeshWriter)
+	
+K3D_TEST(mesh.sink.STLMeshWriter.binary
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.STLMeshWriter.binary.py
 	REQUIRES K3D_BUILD_STL_IO_MODULE
 	LABELS mesh sink STLMeshWriter)
 

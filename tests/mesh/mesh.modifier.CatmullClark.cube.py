@@ -4,7 +4,7 @@ import k3d
 import testing
 
 setup = testing.setup_mesh_modifier_test("PolyCube", "CatmullClark")
-#testing.add_point_attributes_test(setup, True, False, False)
+testing.add_point_attributes_test(setup, True, False, False)
 
 setup.modifier.mesh_selection = k3d.geometry.selection.create(1)
 

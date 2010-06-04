@@ -42,7 +42,7 @@ k3d_star(
     if (a >= 0.5)
         a = 1 - a;
     d1 = r*(cos(a), sin(a),0) - p0;
-    in_out = step(0, zcomp(d0^d1));
+    in_out = filterstep(0, zcomp(d0^d1));
     Ct = mix(Cs, starcolor, in_out);
     
     /* diffuse ("matte") shading model */

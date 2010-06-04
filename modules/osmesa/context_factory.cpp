@@ -128,7 +128,7 @@ public:
 		{
 			if(!module)
 			{
-				module = dlopen("libOSMesa.so", RTLD_LAZY | RTLD_LOCAL);
+				module = dlopen("/opt/local/lib/libOSMesa.dylib", RTLD_LAZY | RTLD_LOCAL);
 				if(!module.get())
 					throw std::runtime_error(dlerror());
 			}
@@ -153,7 +153,7 @@ public:
 				api = k3d::gl::api();
 				api.get().load(api_loader(module.get()));
 			}
-		
+
 			const OSMesaContext osmesa_context = osmesa_create_context.get()(OSMESA_RGBA, NULL);
 			if(!osmesa_context)
 				throw std::runtime_error("Error creating OSMesa context.");

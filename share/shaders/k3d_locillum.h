@@ -84,7 +84,7 @@ color
 LocIllumWardAnisotropic (normal N;  vector V;
                          vector xdir;  float xroughness, yroughness;)
 {
-    float sqr (float x) { return x*x; }
+    float square (float x) { return x*x; }
 
     float cos_theta_r = clamp (N.V, 0.0001, 1);
     vector X = xdir / xroughness;
@@ -102,7 +102,7 @@ LocIllumWardAnisotropic (normal N;  vector V;
 	    float cos_theta_i = LN . N;
 	    if (cos_theta_i > 0.0) {
 		vector H = normalize (V + LN);
-		float rho = exp (-2 * (sqr(X.H) + sqr(Y.H)) / (1 + H.N))
+		float rho = exp (-2 * (square(X.H) + square(Y.H)) / (1 + H.N))
 		    / sqrt (cos_theta_i * cos_theta_r);
 		C += Cl * ((1-nonspec) * cos_theta_i * rho);
 	    }

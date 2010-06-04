@@ -55,6 +55,9 @@ const object any_to_python(const boost::any& Value)
 {
 	const std::type_info& type = Value.type();
 
+	if(Value.empty())
+		return object();
+
 	if(type == typeid(k3d::bool_t))
 		return object(boost::any_cast<k3d::bool_t>(Value));
 

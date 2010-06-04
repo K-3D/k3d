@@ -9,7 +9,7 @@
 #ifndef GIL_AFFINE_HPP
 #define GIL_AFFINE_HPP
 
-#include "../../utilities.hpp"     // point2
+#include <boost/gil/utilities.hpp>     // point2
 
 ////////////////////////////////////////////////////////////////////////////////////////
 /// \file               

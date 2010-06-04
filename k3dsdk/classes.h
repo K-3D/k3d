@@ -94,7 +94,6 @@ inline const uuid DocumentImporter() { return uuid(0xf02e8dac, 0xa57d4d76, 0xa61
 inline const uuid AqsisDisplacementShaderLayer() { return uuid(0x1802dce3, 0x71004329, 0x80cbdf0e, 0xbc7f142c); }
 inline const uuid AqsisSurfaceShaderLayer() { return uuid(0x261e244e, 0xd82947ba, 0x9e56a9af, 0x03d4cc0f); }
 inline const uuid MultiMaterial() { return uuid(0x00000001, 0x00000002, 0x00000003, 0x00000004); }
-inline const uuid OpenGLMaterial() { return uuid(0x00000001, 0x00000002, 0x00000003, 0x00000005); }
 //@}
 
 /** \name Inactive class IDs for plugins that have been removed */

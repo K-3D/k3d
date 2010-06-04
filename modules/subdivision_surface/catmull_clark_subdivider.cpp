@@ -53,7 +53,7 @@ class catmull_clark_subdivider :
 public:
 	catmull_clark_subdivider(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		m_level(init_owner(*this) + init_name("level") + init_label(_("Level")) + init_description(_("Subdivision level")) + init_constraint(constraint::minimum<k3d::int32_t>(1)) + init_value(1) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
+		m_level(init_owner(*this) + init_name("level") + init_label(_("Level")) + init_description(_("Subdivision level")) + init_constraint(constraint::minimum<k3d::int32_t>(0)) + init_value(1) + init_step_increment(1) + init_units(typeid(k3d::measurement::scalar)))
 	{
 		m_mesh_selection.changed_signal().connect(make_reset_mesh_slot());
 		m_level.changed_signal().connect(make_reset_mesh_slot());
@@ -62,6 +62,12 @@ public:
 	void on_create_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
 		m_subdividers.clear();
+		if(m_level.pipeline_value() == 0)
+		{
+			Output = Input;
+			k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), Output);
+		}
+
 		k3d::mesh mesh_merged_selection = Input;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), mesh_merged_selection);
 		const k3d::uint_t level = m_level.pipeline_value();
@@ -78,6 +84,8 @@ public:
 
 	void on_update_mesh(const k3d::mesh& Input, k3d::mesh& Output)
 	{
+		if(m_level.pipeline_value() == 0)
+			return;
 		k3d::mesh mesh_merged_selection = Input;
 		Output = mesh_merged_selection;
 		k3d::geometry::selection::merge(m_mesh_selection.pipeline_value(), mesh_merged_selection);

@@ -6,10 +6,13 @@
  * RenderMan (R) is a registered trademark of Pixar.
  */
 
-surface k3d_matte(float Ka = 1;
-		  float Kd = 1;)
+surface k3d_matte(
+	float Ka = 1;
+	float Kd = 1;
+	)
 {
-  normal Nf = faceforward(normalize(N), I);
-  Oi = Os;
-  Ci = Os * Cs * (Ka * ambient() + Kd * diffuse(Nf));
+	normal Nf = faceforward(normalize(N), I);
+	Oi = Os;
+	Ci = Os * Cs * (Ka * ambient() + Kd * diffuse(Nf));
 }
+

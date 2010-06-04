@@ -214,7 +214,7 @@ private:
 				m_color_array = Polyhedron.vertex_attributes.lookup<k3d::mesh::colors_t>(ArrayName);
 			else if(m_array_type == "point")
 				m_color_array = PointData.lookup<k3d::mesh::colors_t>(ArrayName);
-			assert_not_reached();
+			//assert_not_reached();
 		}
 		
 		const k3d::color operator()(const k3d::uint_t Face, const k3d::uint_t Edge)
@@ -229,7 +229,7 @@ private:
 				return m_color_array->at(Edge);
 			else if(m_array_type == "point")
 				return m_color_array->at(m_vertex_points[Edge]);
-			assert_not_reached();
+			//assert_not_reached();
 		}
 		
 	private:

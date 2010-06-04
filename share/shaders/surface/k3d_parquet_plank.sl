@@ -27,6 +27,8 @@
  * AUTHOR: Larry Gritz, email: lg@bmrt.org
  *
  */
+
+#include "k3d_filterwidth.h"
 #include "k3d_noises.h"
 #include "k3d_rmannotes.h"
 
@@ -60,10 +62,10 @@ surface k3d_parquet_plank(float Ka = 1, Kd = 0.75, Ks = .15, roughness = .025;
 
   /* Determine how wide in s-t space one pixel projects to */
   swidth =
-    (max(abs(Du(s) * du) + abs(Dv(s) * dv), MINFILTERWIDTH) / PGWIDTH) *
+    (max(abs(Du(s) * du) + abs(Dv(s) * dv), MINFILTWIDTH) / PGWIDTH) *
     txtscale;
   twidth =
-    (max(abs(Du(t) * du) + abs(Dv(t) * dv), MINFILTERWIDTH) / PGHEIGHT) *
+    (max(abs(Du(t) * du) + abs(Dv(t) * dv), MINFILTWIDTH) / PGHEIGHT) *
     txtscale;
   fwidth = max(swidth, twidth);
 

@@ -21,9 +21,9 @@
 #include <iterator>
 #include <algorithm>
 #include <numeric>
-#include "../../gil_config.hpp"
-#include "../../pixel_iterator.hpp"
-#include "../../metafunctions.hpp"
+#include <boost/gil/gil_config.hpp>
+#include <boost/gil/pixel_iterator.hpp>
+#include <boost/gil/metafunctions.hpp>
 
 namespace boost { namespace gil {
 

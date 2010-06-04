@@ -24,7 +24,6 @@ IF(WIN32)
 ELSE(WIN32)
 	SET(K3D_SOURCEFORGE_USERNAME "$ENV{USER}" CACHE STRING "SourceForge user account name, for uploading distribution files.")
 ENDIF(WIN32)
-MARK_AS_ADVANCED(K3D_SOURCEFORGE_USERNAME)
 
 # Setup default packaging parameters (deprecated) ...
 SET(CPACK_PACKAGE_DESCRIPTION "K-3D free-as-in-freedom modeling, animation and rendering system")

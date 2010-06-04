@@ -37,7 +37,6 @@
 namespace k3d
 {
 
-class icommand_node;
 class iplugin_factory;
 
 /// Abstract interface implemented by objects that can execute scripts written in a specific scripting language

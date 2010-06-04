@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Eliminate libuuid dependency.
+desc: It would be nice if we could switch to using the uuid support in Boost to eliminate our dependency on libuuid (requires Boost 1.42).  This assumes that Boost 1.42-or-better is widely available (i.e. on Ubuntu).
+type: :bugfix
+component: K-3D
+release: 0.8.1.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-05-14 04:30:13.142803 Z
+references: []
+
+id: c60b33c866619f09ee3d9d98a588097c246dce9d
+log_events: 
+- - 2010-05-14 04:30:16.262745 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-05-22 00:33:06.414879 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - edited title, description
+  - ""
+claimer: 

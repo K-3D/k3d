@@ -89,12 +89,6 @@ public:
 
 	void on_update()
 	{
-/*
-		if(m_tool)
-			m_label.set_text(k3d::string_cast(boost::format(_("%1% Properties")) % k3d::command_tree().name(*m_tool)));
-		else
-			m_label.set_text("");
-*/
 		m_object_properties.set_properties(m_tool ? m_tool->properties() : 0);
 		m_object_properties.get_widget().get_accessible()->set_name(m_tool ? m_tool->tool_type() : "");
 

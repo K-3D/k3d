@@ -42,7 +42,13 @@
 #ifndef __tess_h_
 #define __tess_h_
 
+#include <k3d-platform-config.h>
+#ifdef K3D_API_DARWIN
+#include <OpenGL/glu.h>
+#else // K3D_API_DARWIN
 #include <GL/glu.h>
+#endif // !K3D_API_DARWIN
+
 #include <setjmp.h>
 #include "mesh.h"
 #include "dict.h"

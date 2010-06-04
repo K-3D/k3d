@@ -34,10 +34,18 @@
 namespace k3d
 {
 
+class inode;
 class iplugin_factory;
 class uuid;
 
 namespace mime { class type; }
+
+/// Convenience functor for sorting factory collections and nodes alphabetically by name.
+struct sort_by_name
+{
+	bool_t operator()(iplugin_factory* LHS, iplugin_factory* RHS);
+	bool_t operator()(inode* LHS, inode* RHS);
+};
 
 namespace plugin
 {

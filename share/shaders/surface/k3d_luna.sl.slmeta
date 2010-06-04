@@ -3,8 +3,8 @@
 		<shader type="surface" name="k3d_luna">
 			<description>Surface shader for Earth's moon</description>
 			<authors>F. Kenton Musgrave, Larry Gritz</authors>
-			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".5"/>
-			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Ka" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="1"/>
+			<argument name="Kd" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="0.5"/>
 			<argument name="lacunarity" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="2"/>
 			<argument name="octaves" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value="8"/>
 			<argument name="H" storage_class="uniform" type="float" extended_type="float" array_count="1" space="" output="false" default_value=".3"/>

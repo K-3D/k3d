@@ -30,7 +30,6 @@ namespace osmesa
 {
 
 extern k3d::iplugin_factory& context_factory_factory();
-extern k3d::iplugin_factory& test_dialog_factory();
 
 } // namespace osmesa
 
@@ -38,6 +37,5 @@ extern k3d::iplugin_factory& test_dialog_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::osmesa::context_factory_factory());
-	Registry.register_factory(module::osmesa::test_dialog_factory());
 K3D_MODULE_END
 

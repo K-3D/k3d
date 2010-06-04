@@ -96,8 +96,6 @@
 #include <k3dsdk/xml.h>
 #include <k3d-version-config.h>
 
-#include <boost/regex.hpp>
-
 #include <gdkmm/cursor.h>
 #include <gtkmm/accelmap.h>
 #include <gtkmm/box.h>
@@ -150,17 +148,6 @@ struct select
 	}
 private:
 	idocument& document;
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// sort_by_name
-
-struct sort_by_name
-{
-	bool operator()(k3d::iplugin_factory* LHS, k3d::iplugin_factory* RHS)
-	{
-		return LHS->name() < RHS->name();
-	}
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -886,7 +873,7 @@ private:
 		menu->set_accel_group(get_accel_group());
 
 		// Group plugin types by their categories ...
-		typedef std::set<k3d::iplugin_factory*, detail::sort_by_name> sorted_factories_t;
+		typedef std::set<k3d::iplugin_factory*, k3d::sort_by_name> sorted_factories_t;
 		typedef std::map<std::string, sorted_factories_t> grouped_factories_t;
 		grouped_factories_t grouped_factories;
 
@@ -1108,7 +1095,7 @@ private:
 		if(!dialogs.empty())
 		{
 			std::vector<k3d::iplugin_factory*> sorted_dialogs(dialogs.begin(), dialogs.end());
-			std::sort(sorted_dialogs.begin(), sorted_dialogs.end(), detail::sort_by_name());
+			std::sort(sorted_dialogs.begin(), sorted_dialogs.end(), k3d::sort_by_name());
 
 			Gtk::Menu* const dialogs_menu = new Gtk::Menu();
 			menu->items().push_back(Gtk::Menu_Helpers::MenuElem(_("Dialogs"), *manage(dialogs_menu)));
