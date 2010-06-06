@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   id="svg1"
+   sodipodi:version="0.32"
+   inkscape:version="0.37"
+   width="24pt"
+   height="24pt"
+   sodipodi:docbase="/home/tshead/k3d/share/ngui/scalable"
+   sodipodi:docname="render_frame.svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs
+     id="defs3">
+    <linearGradient
+       id="linearGradient609">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0.00000000"
+         id="stop610" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="1.00000000"
+         id="stop611" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient609"
+       id="radialGradient612"
+       cx="0.39062503"
+       cy="0.30468747"
+       r="0.30508786"
+       fx="0.39062503"
+       fy="0.30468747" />
+    <radialGradient
+       xlink:href="#linearGradient609"
+       id="radialGradient615"
+       cx="0.21875000"
+       cy="0.12500000"
+       r="0.54418981"
+       fx="0.21875000"
+       fy="0.12500000" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.1666667"
+     inkscape:cx="12"
+     inkscape:cy="12"
+     inkscape:window-width="640"
+     inkscape:window-height="500"
+     inkscape:window-x="242"
+     inkscape:window-y="94" />
+  <path
+     style="font-size:12;font-weight:bold;fill:#ff0000;stroke:none;stroke-width:0.375;font-family:Luxi Sans;stroke-dasharray:none;fill-opacity:1;"
+     d="M 28.04499 26.254877 C 27.07782 26.725736 26.187006 26.942077 25.20711 26.942077 C 22.967348 26.942077 21.847468 25.758566 21.847468 23.391545 C 21.847468 21.049976 22.916445 19.866466 25.028947 19.866466 C 25.868858 19.866466 26.73422 20.044629 27.968635 20.464584 L 27.968635 18.962926 C 26.899657 18.721133 25.945213 18.6066 24.914414 18.6066 C 21.554771 18.6066 19.811321 20.248243 19.811321 23.429723 C 19.811321 26.560299 21.567497 28.265572 24.774429 28.265572 C 26.059747 28.265572 27.090546 28.074683 28.04499 27.667454 L 28.04499 26.254877 z M 11.895799 28.036506 L 18.933232 28.036506 L 18.933232 26.725736 L 13.804687 26.725736 L 13.804687 23.900582 L 17.953336 23.900582 L 17.953336 22.666168 L 13.804687 22.666168 L 13.804687 20.095532 L 18.640536 20.095532 L 18.640536 18.835666 L 11.895799 18.835666 L 11.895799 28.036506 z M 2.7076853 28.036506 L 4.5147658 28.036506 L 4.5147658 24.269634 L 6.0164242 24.269634 L 8.5997861 28.036506 L 10.750466 28.036506 L 7.7344236 23.735145 C 8.9942896 23.124301 9.5287782 22.34802 9.5287782 21.113606 C 9.5287782 19.599221 8.5870602 18.835666 6.7163501 18.835666 L 2.7076853 18.835666 L 2.7076853 28.036506 z M 4.5147658 23.009768 L 4.5147658 20.095532 L 5.7491799 20.095532 C 7.0090463 20.095532 7.6071645 20.502762 7.6071645 21.368124 C 7.6071645 22.437101 6.8817871 23.009768 5.5201133 23.009768 L 4.5147658 23.009768 z "
+     id="path613" />
+  <path
+     sodipodi:type="arc"
+     style="font-size:12;fill:url(#radialGradient612);fill-rule:evenodd;stroke:#000000;stroke-width:0.330891;stroke-opacity:1;stroke-dasharray:none;"
+     id="path575"
+     sodipodi:cx="10.79670334"
+     sodipodi:cy="11.53846169"
+     sodipodi:rx="4.03846169"
+     sodipodi:ry="4.03846169"
+     d="M 14.835165 11.538462 A 4.038462 4.038462 0 1 0 6.758242,11.538462 A 4.03846 4.03846 0 1 0 14.8352 11.5385 L 10.796703 11.538462 z"
+     transform="matrix(1.775510,0.000000,0.000000,1.775510,-10.09697,-11.02512)" />
+  <rect
+     style="font-size:12;fill:url(#radialGradient615);fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:0.547723;"
+     id="rect614"
+     width="3.95604420"
+     height="13.84615421"
+     x="18.25549354"
+     y="2.45604396" />
+  <rect
+     style="font-size:12;fill:url(#radialGradient615);fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:0.547723;"
+     id="rect616"
+     width="3.95604372"
+     height="13.84615421"
+     x="24.35439357"
+     y="2.45604396" />
+</svg>
