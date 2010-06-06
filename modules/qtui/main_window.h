@@ -44,7 +44,7 @@ namespace qtui
 
 //////////////////////////////////////////////////////////////////////////
 // main_window
-	
+
 class main_window :
 	public QMainWindow
 {
@@ -67,13 +67,14 @@ private:
 	void initialize(k3d::idocument& Document);
 
 	void on_edit_mode(k3d::iplugin_factory* const Mode);
-	void on_advanced_dialog(k3d::iplugin_factory* const Widget);
+	void on_advanced_create(k3d::iplugin_factory* const Factory);
+	void on_advanced_window(k3d::iplugin_factory* const Window);
 
 	Ui::main_window ui;
 	k3d::qtui::document_widget document_widget;
 	boost::scoped_ptr<scene> m_scene;
 };
-	
+
 } // namespace qtui
 
 } // namespace module
