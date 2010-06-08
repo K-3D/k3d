@@ -24,35 +24,32 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <boost/cstdint.hpp>
+#include <k3dsdk/types.h>
+#include <boost/uuid/uuid.hpp>
 #include <iosfwd>
 
 namespace k3d
 {
 
 /// Identifier used to uniquely identify plugin modules and plugin objects
-class uuid
+class uuid :
+	public boost::uuids::uuid
 {
 public:
 	uuid();
-	uuid(const boost::uint32_t Data1, const boost::uint32_t Data2, const boost::uint32_t Data3, const boost::uint32_t Data4);
+	explicit uuid(const boost::uuids::uuid&);
+	uuid(const uint32_t Data1, const uint32_t Data2, const uint32_t Data3, const uint32_t Data4);
+
+	operator boost::uuids::uuid();
+	operator boost::uuids::uuid() const;
 
 	/// Creates a NULL (all zeros) uuid
 	static const uuid null();
 	/// Creates a unique uuid based on the current system time and a high-quality pseudo-random number generators
 	static const uuid random();
 
-	friend bool operator<(const uuid& LHS, const uuid& RHS);
-	friend bool operator==(const uuid& LHS, const uuid& RHS);
-	friend bool operator!=(const uuid& LHS, const uuid& RHS);
-
 	friend std::ostream& operator<<(std::ostream& Stream, const uuid& Value);
 	friend std::istream& operator>>(std::istream& Stream, uuid& Value);
-
-	boost::uint32_t data1;
-	boost::uint32_t data2;
-	boost::uint32_t data3;
-	boost::uint32_t data4;
 };
 
 } // namespace k3d

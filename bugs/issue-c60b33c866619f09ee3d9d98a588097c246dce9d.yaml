@@ -5,8 +5,8 @@ type: :bugfix
 component: K-3D
 release: 0.8.1.0
 reporter: Timothy M. Shead <tshead@k-3d.com>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2010-05-14 04:30:13.142803 Z
 references: []
 
@@ -20,4 +20,8 @@ log_events:
   - Timothy M. Shead <tshead@k-3d.com>
   - edited title, description
   - ""
+- - 2010-06-08 04:50:30.243459 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - Updated our Boost dependency to 1.42, which provides UUID functionality, and provided our own fallback implementation of the Boost 1.43 boost::uuids::random_generator.
 claimer: 

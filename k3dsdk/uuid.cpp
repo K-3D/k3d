@@ -1,5 +1,5 @@
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -18,92 +18,63 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 /** \file
-		\author Tim Shead (tshead@k-3d.com)
+	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3d-platform-config.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/system.h>
 #include <k3dsdk/uuid.h>
 
-#ifdef K3D_API_WIN32
-	#include <k3dsdk/win32.h>
-#else // K3D_API_WIN32
-	#include <uuid/uuid.h>
-#endif // !K3D_API_WIN32
+#include <boost/uuid/nil_generator.hpp>
+#include <boost/uuid/random_generator.hpp>
 
 #include <iomanip>
 #include <iostream>
-
-#include <cstring>
 
 namespace k3d
 {
 
 uuid::uuid() :
-	data1(0),
-	data2(0),
-	data3(0),
-	data4(0)
+	boost::uuids::uuid(boost::uuids::nil_generator()())
 {
 }
 
-uuid::uuid(const boost::uint32_t Data1, const boost::uint32_t Data2, const boost::uint32_t Data3, const boost::uint32_t Data4) :
-	data1(Data1),
-	data2(Data2),
-	data3(Data3),
-	data4(Data4)
+uuid::uuid(const boost::uuids::uuid& Other) :
+	boost::uuids::uuid(Other)
 {
+}
+
+uuid::uuid(const uint32_t Data1, const uint32_t Data2, const uint32_t Data3, const uint32_t Data4)
+{
+	data[0] = Data1 >> 24 & 0xff;
+	data[1] = Data1 >> 16 & 0xff;
+	data[2] = Data1 >> 8 & 0xff;
+	data[3] = Data1 >> 0 & 0xff;
+
+	data[4] = Data2 >> 24 & 0xff;
+	data[5] = Data2 >> 16 & 0xff;
+	data[6] = Data2 >> 8 & 0xff;
+	data[7] = Data2 >> 0 & 0xff;
+
+	data[8] = Data3 >> 24 & 0xff;
+	data[9] = Data3 >> 16 & 0xff;
+	data[10] = Data3 >> 8 & 0xff;
+	data[11] = Data3 >> 0 & 0xff;
+
+	data[12] = Data4 >> 24 & 0xff;
+	data[13] = Data4 >> 16 & 0xff;
+	data[14] = Data4 >> 8 & 0xff;
+	data[15] = Data4 >> 0 & 0xff;
 }
 
 const uuid uuid::null()
 {
-	return uuid(0, 0, 0, 0);
+	return uuid(boost::uuids::nil_generator()());
 }
 
 const uuid uuid::random()
 {
-	uuid result;
-
-#ifdef K3D_API_WIN32
-	CoCreateGuid(reinterpret_cast<UUID*>(&result));
-#else // K3D_API_WIN32
-	uuid_t temp;
-	uuid_generate(temp);
-	memcpy(&result, temp, sizeof(result));
-#endif // !K3D_API_WIN32
-
-	return result;
-}
-
-bool operator<(const uuid& LHS, const uuid& RHS)
-{
-	if(LHS.data1 == RHS.data1)
-	{
-		if(LHS.data2 == RHS.data2)
-		{
-			if(LHS.data3 == RHS.data3)
-			{
-				return LHS.data4 < RHS.data4;
-			}
-			else
-				return LHS.data3 < RHS.data3;
-		}
-		else
-			return LHS.data2 < RHS.data2;
-	}
-
-	return LHS.data1 < RHS.data1;
-}
-
-bool operator==(const uuid& LHS, const uuid& RHS)
-{
-	return (LHS.data1 == RHS.data1) && (LHS.data2 == RHS.data2) && (LHS.data3 == RHS.data3) && (LHS.data4 == RHS.data4);
-}
-
-bool operator!=(const uuid& LHS, const uuid& RHS)
-{
-	return !(LHS == RHS);
+	return uuid(boost::uuids::random_generator()());
 }
 
 std::ostream& operator<<(std::ostream& Stream, const k3d::uuid& Value)
@@ -114,7 +85,13 @@ std::ostream& operator<<(std::ostream& Stream, const k3d::uuid& Value)
 	const char oldfill(Stream.fill());
 	Stream.fill('0');
 
-	Stream << std::hex << std::setw(8) << Value.data1 << " " << std::setw(8) << Value.data2 << " " << std::setw(8) << Value.data3 << " " << std::setw(8) << Value.data4;
+	Stream << std::hex;
+	for(int i = 0; i != Value.size(); ++i)
+	{
+		if(i && (0 == i % 4))
+			Stream << " ";
+		Stream << std::setw(2) << static_cast<uint32_t>(Value.data[i]);
+	}
 
 	Stream.fill(oldfill);
 	Stream.flags(oldflags);
@@ -126,9 +103,11 @@ std::istream& operator>>(std::istream& Stream, k3d::uuid& Value)
 {
 	std::istream::fmtflags oldflags(Stream.flags());
 
-	Stream >> std::hex >> Value.data1 >> Value.data2 >> Value.data3 >> Value.data4;
-
+	uint32_t data1, data2, data3, data4;
+	Stream >> std::hex >> data1 >> data2 >> data3 >> data4;
 	Stream.flags(oldflags);
+
+	Value = k3d::uuid(data1, data2, data3, data4);
 
 	return Stream;
 }

@@ -36,40 +36,18 @@ namespace python
 
 unsigned long uuid_getitem(const k3d::uuid& LHS, const int Item)
 {
-	switch(Item)
-	{
-		case 0:
-			return LHS.data1;
-		case 1:
-			return LHS.data2;
-		case 2:
-			return LHS.data3;
-		case 3:
-			return LHS.data4;
-	}
+	if(Item < 0 || Item > 15)
+		throw std::out_of_range("index out of range");
 
-	throw std::out_of_range("index out of range");
+	return LHS.data[Item];
 }
 
 void uuid_setitem(k3d::uuid& LHS, const int Item, unsigned long Value)
 {
-	switch(Item)
-	{
-		case 0:
-			LHS.data1 = Value;
-			return;
-		case 1:
-			LHS.data2 = Value;
-			return;
-		case 2:
-			LHS.data3 = Value;
-			return;
-		case 3:
-			LHS.data4 = Value;
-			return;
-	}
+	if(Item < 0 || Item > 15)
+		throw std::out_of_range("index out of range");
 
-	throw std::out_of_range("index out of range");
+	LHS.data[Item] = Value;
 }
 
 void define_class_uuid()
@@ -81,7 +59,7 @@ void define_class_uuid()
 			"Returns a null (all zeros) identifier.").staticmethod("null")
 		.def("random", &k3d::uuid::random,
 			"Returns a randomly-generated identifier.").staticmethod("random")
-		.def("__len__", &utility::constant_len_len<k3d::uuid, 4>)
+		.def("__len__", &utility::constant_len_len<k3d::uuid, 16>)
 		.def("__getitem__", uuid_getitem)
 		.def("__setitem__", uuid_setitem)
 		.def(self < self)

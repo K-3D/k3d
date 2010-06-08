@@ -65,7 +65,10 @@ K3D_TEST(sdk.document-upgrade TARGET test-document-upgrade LABELS sdk)
 ADD_EXECUTABLE(test-pipeline-data pipeline_data.cpp)
 K3D_TEST(sdk.pipeline-data TARGET test-pipeline-data LABELS sdk)
 
-IF(UNIX) 
+ADD_EXECUTABLE(test-uuid uuid.cpp)
+K3D_TEST(sdk.uuid TARGET test-uuid LABELS sdk)
+
+IF(UNIX)
 	ADD_LIBRARY(shared-dynamic-cast SHARED shared_dynamic_cast_library.cpp)
 	GET_TARGET_PROPERTY(SHARED_DYNAMIC_CAST_LIBRARY shared-dynamic-cast LOCATION)
 	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/shared_dynamic_cast_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/shared_dynamic_cast_config.h)

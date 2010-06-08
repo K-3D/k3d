@@ -13,7 +13,16 @@ int main(int argc, char* argv[])
 
 	const k3d::uuid result = k3d::uuid::random();
 
-	std::cout << std::hex << std::setfill('0') << "0x" << std::setw(8) << result.data1 << ", 0x" << std::setw(8) << result.data2 << ", 0x" << std::setw(8) << result.data3 << ", 0x" << std::setw(8) << result.data4 << std::endl;
+	std::cout << std::hex << std::setfill('0');
+	for(int i = 0; i != result.size(); ++i)
+	{
+		if(i && (0 == i % 4))
+			std::cout << ", ";
+		if(0 == i % 4)
+			std::cout << "0x";
+		std::cout << std::setw(2) << static_cast<k3d::uint32_t>(result.data[i]);
+	}
+	std::cout << std::endl;
 
 	return 0;
 }
