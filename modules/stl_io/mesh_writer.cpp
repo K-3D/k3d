@@ -49,13 +49,22 @@ namespace io
 namespace detail
 {
 
-/// Convert the given color to a 2-byte sized integer
-k3d::uint16_t convert_color(const k3d::color& Color)
+/// Convert the given color to a 2-byte sized integer. VisCAM/SolidView format.
+k3d::uint16_t convert_color_viscam(const k3d::color& Color)
 {
 	const k3d::uint16_t red = static_cast<k3d::uint16_t>(Color.red*31);
 	const k3d::uint16_t green = static_cast<k3d::uint16_t>(Color.green*31);
 	const k3d::uint16_t blue = static_cast<k3d::uint16_t>(Color.blue*31);
-	return (blue << 11) + (green << 6) + (red << 1) + 1;
+	return (blue << 11) + (green << 6) + (red << 1) + 1; // last bit should be 1
+}
+
+/// Convert the given color to a 2-byte sized integer. Magics format.
+k3d::uint16_t convert_color_magics(const k3d::color& Color)
+{
+	const k3d::uint16_t red = static_cast<k3d::uint16_t>(Color.red*31);
+	const k3d::uint16_t green = static_cast<k3d::uint16_t>(Color.green*31);
+	const k3d::uint16_t blue = static_cast<k3d::uint16_t>(Color.blue*31);
+	return (red << 11) + (green << 6) + (blue << 1); // last bit should be 0
 }
 
 } // namespace detail
@@ -74,7 +83,7 @@ public:
 		m_group_solids(init_owner(*this) + init_name("group_solids") + init_label(_("Group Solids")) + init_description(_("Group solids using a per-face array.")) + init_value(false)),
 		m_group_array(init_owner(*this) + init_name("group_array") + init_label(_("Group Array")) + init_description(_("Name of a per-face array containing solid labels (as used in OpenFOAM).")) + init_value(std::string("solids"))),
 		m_color_array(init_owner(*this) + init_name("color_array") + init_label(_("Color Array")) + init_description(_("Name of the array containing face colors (for binary, colored STL only)")) + init_value(std::string("Cs"))),
-		m_ascii(init_owner(*this) + init_name("ascii") + init_label(_("Ascii")) + init_description(_("True if the Ascii STL format should be used.")) + init_value(true))
+		m_file_type(init_owner(*this) + init_name("file_type") + init_label(_("File Type")) + init_description(_("STL file type")) + init_value(ASCII) + init_enumeration(type_values()))
 	{
 		m_group_solids.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_write_file_slot()));
@@ -82,7 +91,7 @@ public:
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_write_file_slot()));
 		m_color_array.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_write_file_slot()));
-		m_ascii.changed_signal().connect(k3d::hint::converter<
+		m_file_type.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_write_file_slot()));
 	}
 
@@ -148,8 +157,10 @@ private:
 
 	void on_write_mesh(const k3d::mesh& Input, const k3d::filesystem::path& OutputPath, std::ostream& Output)
 	{
-		const k3d::bool_t ascii = m_ascii.pipeline_value();
-		binary_stl stl;
+		stl_t type = m_file_type.pipeline_value();
+		const k3d::bool_t ascii = (type == ASCII);
+		k3d::color base_color(0.8,0.8,0.8); // TODO: look this up from material
+		binary_stl stl = (type == MAGICS) ? binary_stl(base_color, base_color, base_color, base_color) : binary_stl();
 		for(k3d::mesh::primitives_t::const_iterator primitive = Input.primitives.begin(); primitive != Input.primitives.end(); ++primitive)
 		{
 			boost::scoped_ptr<k3d::polyhedron::const_primitive> polyhedron(k3d::polyhedron::validate(Input, **primitive));
@@ -224,7 +235,7 @@ private:
 					fct.normal[1] = n[1];
 					fct.normal[2] = n[2];
 
-					fct.color = detail::convert_color(triangle_colors[triangle]);
+					fct.color = type == VISCAM ? detail::convert_color_viscam(triangle_colors[triangle]) : detail::convert_color_magics(triangle_colors[triangle]);
 
 					stl.facets.push_back(fct);
 				}
@@ -235,10 +246,66 @@ private:
 	}
 
 private:
+
+	/// Enumerates supported STL types
+	typedef enum
+	{
+		ASCII,
+		VISCAM,
+		MAGICS
+	} stl_t;
+
+	friend std::ostream& operator << (std::ostream& Stream, const stl_t& Value)
+	{
+		switch(Value)
+		{
+			case ASCII:
+				Stream << "ascii";
+				break;
+			case VISCAM:
+				Stream << "viscam";
+				break;
+			case MAGICS:
+				Stream << "magics";
+				break;
+		}
+		return Stream;
+	}
+
+	friend std::istream& operator >> (std::istream& Stream, stl_t& Value)
+	{
+		std::string text;
+		Stream >> text;
+
+		if(text == "ascii")
+			Value = ASCII;
+		else if(text == "viscam")
+			Value = VISCAM;
+		else if(text == "magics")
+			Value = MAGICS;
+		else
+			k3d::log() << error << k3d_file_reference << ": unknown enumeration [" << text << "]" << std::endl;
+
+		return Stream;
+	}
+
+	static const k3d::ienumeration_property::enumeration_values_t& type_values()
+	{
+		static k3d::ienumeration_property::enumeration_values_t values;
+		if(values.empty())
+		{
+			values.push_back(k3d::ienumeration_property::enumeration_value_t("ASCII", "ascii", "ASCII file format"));
+			values.push_back(k3d::ienumeration_property::enumeration_value_t("VisCAM/SolidView", "viscam", "Binary STL, VisCAM/SolidView color encoding"));
+			values.push_back(k3d::ienumeration_property::enumeration_value_t("Magics", "magics", "Binary STL, Materialise Magics color encoding"));
+		}
+
+		return values;
+	}
+
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_group_solids;
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_group_array;
 	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_color_array;
-	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_ascii;
+	k3d_data(stl_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, enumeration_property, with_serialization) m_file_type;
 };
 
 k3d::iplugin_factory& mesh_writer_factory()

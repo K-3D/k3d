@@ -127,8 +127,13 @@ K3D_TEST(mesh.source.STLMeshReader
 	REQUIRES K3D_BUILD_STL_IO_MODULE
 	LABELS mesh source reader STLMeshReader)
 	
-K3D_TEST(mesh.source.STLMeshReader.binary
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.STLMeshReader.binary.py
+K3D_TEST(mesh.source.STLMeshReader.viscam
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.STLMeshReader.viscam.py
+	REQUIRES K3D_BUILD_STL_IO_MODULE
+	LABELS mesh source reader STLMeshReader)
+	
+K3D_TEST(mesh.source.STLMeshReader.magics
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.source.STLMeshReader.magics.py
 	REQUIRES K3D_BUILD_STL_IO_MODULE
 	LABELS mesh source reader STLMeshReader)
 
@@ -1237,7 +1242,7 @@ K3D_TEST(mesh.sink.OBJMeshWriter
 K3D_TEST(mesh.sink.PointsCentroid
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.PointsCentroid.py
 	REQUIRES K3D_BUILD_MESH_MODULE K3D_BUILD_POLYHEDRON_SOURCES_MODULE 
-	LABELS mesh sink STLMeshWriter)
+	LABELS mesh sink)
 
 K3D_TEST(mesh.sink.PLYMeshWriter
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.PLYMeshWriter.py
@@ -1249,8 +1254,12 @@ K3D_TEST(mesh.sink.STLMeshWriter
 	REQUIRES K3D_BUILD_STL_IO_MODULE
 	LABELS mesh sink STLMeshWriter)
 	
-K3D_TEST(mesh.sink.STLMeshWriter.binary
-	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.STLMeshWriter.binary.py
+K3D_TEST(mesh.sink.STLMeshWriter.viscam
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.STLMeshWriter.viscam.py
 	REQUIRES K3D_BUILD_STL_IO_MODULE
 	LABELS mesh sink STLMeshWriter)
 
+K3D_TEST(mesh.sink.STLMeshWriter.magics
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.STLMeshWriter.magics.py
+	REQUIRES K3D_BUILD_STL_IO_MODULE
+	LABELS mesh sink STLMeshWriter)
