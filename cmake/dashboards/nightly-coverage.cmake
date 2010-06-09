@@ -10,14 +10,10 @@ CMAKE_BUILD_TYPE:STRING=Debug
 K3D_BUILD_GLX_MODULE:BOOL=OFF
 K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE:BOOL=OFF
 K3D_ENABLE_TESTING:BOOL=ON
+$ENV{K3D_EXTRA_INITIAL_CACHE}
 
 ")
 
-#SET(CTEST_ENVIRONMENT
-#  "CFLAGS=-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
-#  "CXXFLAGS=-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
-#  "LDFLAGS=-fprofile-arcs -ftest-coverage"
-#)
 SET(CTEST_ENVIRONMENT
   "CFLAGS=-g -O0 -fprofile-arcs -ftest-coverage"
   "CXXFLAGS=-g -O0 -fprofile-arcs -ftest-coverage"

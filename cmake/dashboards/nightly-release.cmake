@@ -15,14 +15,9 @@ K3D_BUILD_QSLIM_MODULE:BOOL=OFF
 K3D_BUILD_VIRTUAL_OFFSCREEN_MODULE:BOOL=OFF
 K3D_ENABLE_DISTRIBUTION:BOOL=ON
 K3D_ENABLE_TESTING:BOOL=ON
+$ENV{K3D_EXTRA_INITIAL_CACHE}
 
 ")
-
-# Uncomment this to enable ruthless compiler warnings
-#SET(CTEST_ENVIRONMENT
-#  "CFLAGS=-g -O0 -Wall -W"
-#  "CXXFLAGS=-g -O0 -Wall -W"
-#)
 
 # Allow the caller to override test variables ... note that the caller MUST specify CTEST_BINARY_DIRECTORY at-a-minimum.
 SET(VARIABLE)
