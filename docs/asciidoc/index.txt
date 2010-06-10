@@ -1,0 +1,7 @@
+= Seven Degrees of Freedom =
+Timothy M. Shead <tshead@k-3d.com>
+June, 2010
+
+:leveloffset: 1
+
+include::pipeline.txt[]

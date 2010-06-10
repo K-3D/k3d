@@ -1,3 +1,4 @@
+ADD_SUBDIRECTORY(asciidoc)
 ADD_SUBDIRECTORY(coding_style)
 ADD_SUBDIRECTORY(doxygen)
 ADD_SUBDIRECTORY(epydoc)
