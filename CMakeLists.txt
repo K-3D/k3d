@@ -137,7 +137,6 @@ OPTION(K3D_BUILD_NGUI_MATERIAL_MANAGER_PANEL_MODULE "Build the user interface ma
 OPTION(K3D_BUILD_NGUI_MESH_CONTROL_MODULE "Build the mesh property control plugin module" ON)
 OPTION(K3D_BUILD_NGUI_MODULE "Build the standard graphical user interface plugin module" ON)
 OPTION(K3D_BUILD_NGUI_MORPH_POINTS_PAGE_MODULE "Build the MorphPoints custom property page module" ON)
-OPTION(K3D_BUILD_NGUI_NODE_HISTORY_PANEL_MODULE "Build the user interface node history panel plugin module" ON)
 OPTION(K3D_BUILD_NGUI_NODE_LIST_PANEL_MODULE "Build the user interface node list panel plugin module" ON)
 OPTION(K3D_BUILD_NGUI_NODE_PROPERTIES_PANEL_MODULE "Build the user interface node properties panel plugin module" ON)
 OPTION(K3D_BUILD_NGUI_OPENGL_DIALOG_MODULE "Build the user interface OpenGL information dialog plugin module" ON)

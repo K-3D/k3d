@@ -368,7 +368,7 @@ public:
 
 		// Node history below node list
 		panel_frame::control* const panel_frame5 = split_panel(*panel_frame2, *Gtk::manage(new Gtk::VPaned), -1);
-		panel_frame5->mount_panel("NGUINodeHistoryPanel");
+		panel_frame5->mount_panel("NGUIPipelinePanel");
 		// Node properties below node history
 		panel_frame::control* const panel_frame6 = split_panel(*panel_frame5, *Gtk::manage(new Gtk::VPaned), -1);
 		panel_frame6->mount_panel("NGUINodePropertiesPanel");
