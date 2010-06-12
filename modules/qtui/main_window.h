@@ -68,6 +68,7 @@ private:
 
 	void on_edit_mode(k3d::iplugin_factory* const Mode);
 	void on_advanced_create(k3d::iplugin_factory* const Factory);
+	void on_advanced_panel(k3d::iplugin_factory* const Panel);
 	void on_advanced_window(k3d::iplugin_factory* const Window);
 
 	Ui::main_window ui;

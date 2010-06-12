@@ -39,12 +39,14 @@
 #include <k3dsdk/qtui/convert.h>
 #include <k3dsdk/qtui/document.h>
 #include <k3dsdk/qtui/file_dialog.h>
+#include <k3dsdk/qtui/panel.h>
 #include <k3dsdk/qtui/script.h>
 #include <k3dsdk/qtui/uri.h>
 #include <k3dsdk/share.h>
 
 #include <QAction>
 #include <QDialog>
+#include <QDockWidget>
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -206,7 +208,14 @@ void main_window::initialize(k3d::idocument& Document)
 		}
 	}
 
-	// Setup manual access to window ...
+	// Setup manual access to panel plugins ...
+	QMenu* const panel_menu = ui.menuAdvanced->addMenu(tr("Panels"));
+	std::vector<k3d::iplugin_factory*> panels = k3d::plugin::factory::lookup("qtui:component-type", "panel");
+	std::sort(panels.begin(), panels.end(), k3d::sort_by_name());
+	for(int i = 0; i != panels.size(); ++i)
+		panel_menu->addAction(k3d::qtui::action::create(*panels[i], panel_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_advanced_panel), panels[i])));
+
+	// Setup manual access to window plugins ...
 	QMenu* const window_menu = ui.menuAdvanced->addMenu(tr("Windows"));
 	std::vector<k3d::iplugin_factory*> dialogs = k3d::plugin::factory::lookup("qtui:component-type", "window");
 	std::sort(dialogs.begin(), dialogs.end(), k3d::sort_by_name());
@@ -233,6 +242,21 @@ void main_window::on_advanced_create(k3d::iplugin_factory* const Factory)
 //		return;
 
 	create_node(document_widget.document(), *Factory);
+}
+
+void main_window::on_advanced_panel(k3d::iplugin_factory* const Panel)
+{
+	k3d::qtui::panel* const panel = Panel ? k3d::plugin::create<k3d::qtui::panel>(*Panel) : static_cast<k3d::qtui::panel*>(0);
+	return_if_fail(panel);
+	panel->initialize(document_widget.document());
+
+	QWidget* const widget = dynamic_cast<QWidget*>(panel);
+	return_if_fail(widget);
+
+	QDockWidget* const dock = new QDockWidget(k3d::convert<QString>(Panel->name()));
+	dock->setWidget(widget);
+
+	addDockWidget(Qt::LeftDockWidgetArea, dock);
 }
 
 void main_window::on_advanced_window(k3d::iplugin_factory* const Window)
