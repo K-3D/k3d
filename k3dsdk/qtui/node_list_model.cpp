@@ -22,8 +22,12 @@
 */
 
 #include <k3dsdk/inode.h>
+#include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/qtui/convert.h>
+#include <k3dsdk/qtui/icon_factory.h>
 #include <k3dsdk/qtui/node_list_model.h>
+
+#include <QIcon>
 
 namespace k3d
 {
@@ -45,18 +49,24 @@ node_list_model::~node_list_model()
 
 void node_list_model::add_nodes(const std::vector<inode*>& Nodes)
 {
+	beginResetModel();
+
 	for(uint_t i = 0; i != Nodes.size(); ++i)
 		nodes.erase(std::remove(nodes.begin(), nodes.end(), Nodes[i]), nodes.end());
 	nodes.insert(nodes.end(), Nodes.begin(), Nodes.end());
 	nodes.erase(std::remove(nodes.begin(), nodes.end(), static_cast<inode*>(0)), nodes.end());
-	reset();
+
+	endResetModel();
 }
 
 void node_list_model::remove_nodes(const std::vector<inode*>& Nodes)
 {
+	beginResetModel();
+
 	for(uint_t i = 0; i != Nodes.size(); ++i)
 		nodes.erase(std::remove(nodes.begin(), nodes.end(), Nodes[i]), nodes.end());
-	reset();
+
+	endResetModel();
 }
 
 int node_list_model::rowCount(const QModelIndex& parent) const
@@ -68,11 +78,20 @@ QVariant node_list_model::data(const QModelIndex& index, int role) const
 {
 	if(index.isValid() && index.row() < nodes.size())
 	{
+		inode& node = *nodes[index.row()];
 		switch(role)
 		{
 			case Qt::DisplayRole:
 			{
-				return convert<QString>(nodes[index.row()]->name());
+				return convert<QString>(node.name());
+			}
+			case Qt::DecorationRole:
+			{
+				return icon_factory::create(node);
+			}
+			case Qt::ToolTipRole:
+			{
+				return QString(tr("%1 node \"%2\"")).arg(convert<QString>(node.factory().name())).arg(convert<QString>(node.name()));
 			}
 			default:
 			{

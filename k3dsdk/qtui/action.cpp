@@ -24,7 +24,7 @@
 #include <k3dsdk/iplugin_factory.h>
 #include <k3dsdk/qtui/action.h>
 #include <k3dsdk/qtui/convert.h>
-#include <k3dsdk/share.h>
+#include <k3dsdk/qtui/icon_factory.h>
 
 namespace k3d
 {
@@ -70,7 +70,7 @@ action* action::create(iplugin_factory& Factory, QObject* Parent, const sigc::sl
 		break;
 	}
 	result->setToolTip(k3d::convert<QString>(Factory.short_description()));
-	result->setIcon(QIcon((k3d::share_path() / k3d::filesystem::generic_path("qtui/icons/" + Factory.name() + ".svg")).native_filesystem_string().c_str()));
+	result->setIcon(icon_factory::create(Factory));
 	result->setIconVisibleInMenu(true);
 
 	return result;
