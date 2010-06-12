@@ -115,7 +115,7 @@ k3d::iplugin_factory& window::get_factory()
 		_("Displays the contents of the K-3D log"),
 		"QTUI",
 		k3d::iplugin_factory::EXPERIMENTAL,
-		boost::assign::map_list_of("qtui:component-type", "dialog")
+		boost::assign::map_list_of("qtui:component-type", "window")
 		);
 
 	return factory;

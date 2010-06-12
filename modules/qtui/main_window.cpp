@@ -206,9 +206,9 @@ void main_window::initialize(k3d::idocument& Document)
 		}
 	}
 
-	// Setup manual access to dialogs ...
+	// Setup manual access to window ...
 	QMenu* const window_menu = ui.menuAdvanced->addMenu(tr("Windows"));
-	std::vector<k3d::iplugin_factory*> dialogs = k3d::plugin::factory::lookup("qtui:component-type", "dialog");
+	std::vector<k3d::iplugin_factory*> dialogs = k3d::plugin::factory::lookup("qtui:component-type", "window");
 	std::sort(dialogs.begin(), dialogs.end(), k3d::sort_by_name());
 	for(int i = 0; i != dialogs.size(); ++i)
 		window_menu->addAction(k3d::qtui::action::create(*dialogs[i], window_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_advanced_window), dialogs[i])));

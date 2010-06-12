@@ -369,7 +369,7 @@ k3d::iplugin_factory& window::get_factory()
 		_("Provides a general-purpose editor for editing source-code, text, scripts, and shaders."),
 		"QTUI",
 		k3d::iplugin_factory::EXPERIMENTAL,
-		boost::assign::map_list_of("qtui:component-type", "dialog")
+		boost::assign::map_list_of("qtui:component-type", "window")
 		);
 
 	return factory;

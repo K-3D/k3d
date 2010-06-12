@@ -94,7 +94,7 @@ k3d::iplugin_factory& window::get_factory()
 		_("Used to test OpenGL development."),
 		"QTUI Dialog",
 		k3d::iplugin_factory::EXPERIMENTAL,
-		boost::assign::map_list_of("qtui:component-type", "dialog"));
+		boost::assign::map_list_of("qtui:component-type", "window"));
 
 	return factory;
 }

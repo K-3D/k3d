@@ -67,7 +67,7 @@ k3d::iplugin_factory& shell::get_factory()
 		_("Provides an interactive JavaScript shell."),
 		"QTUI",
 		k3d::iplugin_factory::EXPERIMENTAL,
-		boost::assign::map_list_of("qtui:component-type", "dialog")
+		boost::assign::map_list_of("qtui:component-type", "window")
 		);
 
 	return factory;
