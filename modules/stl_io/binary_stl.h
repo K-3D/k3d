@@ -46,6 +46,12 @@ struct facet
 	k3d::float_t v1[3];
 	k3d::float_t v2[3];
 	k3d::uint16_t color;
+
+	/// Sort using colors, to support the Hexpress mesher from Numeca
+	bool operator<(const facet& b) const
+	{
+		return color < b.color;
+	}
 };
 
 /// Encapsulates the STL binary data format
@@ -106,6 +112,17 @@ struct binary_stl
 		}
 	}
 };
+
+/// Switches the order of the two bytes that make up N
+inline k3d::uint16_t switch_bytes(k3d::uint16_t N)
+{
+	// switch byte order
+	k3d::uint8_t* result_array = reinterpret_cast<k3d::uint8_t*>(&N);
+	k3d::uint8_t a = result_array[0];
+	result_array[0] = result_array[1];
+	result_array[1] = a;
+	return N;
+}
 
 } // namespace io
 

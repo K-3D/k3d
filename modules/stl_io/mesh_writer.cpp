@@ -55,7 +55,8 @@ k3d::uint16_t convert_color_viscam(const k3d::color& Color)
 	const k3d::uint16_t red = static_cast<k3d::uint16_t>(Color.red*31);
 	const k3d::uint16_t green = static_cast<k3d::uint16_t>(Color.green*31);
 	const k3d::uint16_t blue = static_cast<k3d::uint16_t>(Color.blue*31);
-	return (blue << 11) + (green << 6) + (red << 1) + 1; // last bit should be 1
+	return switch_bytes((blue << 11) + (green << 6) + (red << 1) + 1); // last bit should be 1
+
 }
 
 /// Convert the given color to a 2-byte sized integer. Magics format.
@@ -64,7 +65,7 @@ k3d::uint16_t convert_color_magics(const k3d::color& Color)
 	const k3d::uint16_t red = static_cast<k3d::uint16_t>(Color.red*31);
 	const k3d::uint16_t green = static_cast<k3d::uint16_t>(Color.green*31);
 	const k3d::uint16_t blue = static_cast<k3d::uint16_t>(Color.blue*31);
-	return (red << 11) + (green << 6) + (blue << 1); // last bit should be 0
+	return switch_bytes((red << 11) + (green << 6) + (blue << 1)); // last bit should be 0
 }
 
 } // namespace detail
@@ -241,6 +242,7 @@ private:
 				}
 			}
 		}
+		std::sort(stl.facets.begin(), stl.facets.end());
 		if(!ascii)
 			stl.write(Output);
 	}

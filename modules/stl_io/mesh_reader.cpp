@@ -187,10 +187,11 @@ void adjust_orientation(const k3d::mesh::points_t Points, k3d::mesh::indices_t& 
 /// 2-byte integer value to a K-3D color
 k3d::color convert_color_viscam(const k3d::uint16_t Color, const k3d::color& BaseColor)
 {
-	const k3d::uint16_t blue = Color >> 11;
-	const k3d::uint16_t green = (Color - (blue << 11)) >> 6;
-	const k3d::uint16_t red = (Color - (blue << 11) - (green << 6)) >> 1;
-	const k3d::uint16_t use_color = (Color - (blue << 11) - (green << 6) - (red << 1));
+	k3d::uint16_t color = switch_bytes(Color);
+	const k3d::uint16_t blue = color >> 11;
+	const k3d::uint16_t green = (color - (blue << 11)) >> 6;
+	const k3d::uint16_t red = (color - (blue << 11) - (green << 6)) >> 1;
+	const k3d::uint16_t use_color = (color - (blue << 11) - (green << 6) - (red << 1));
 	const k3d::color result = use_color ? k3d::color(static_cast<k3d::double_t>(red)/31., static_cast<k3d::double_t>(green)/31., static_cast<k3d::double_t>(blue)/31.) : BaseColor;
 	return result;
 }
@@ -198,10 +199,11 @@ k3d::color convert_color_viscam(const k3d::uint16_t Color, const k3d::color& Bas
 /// 2-byte integer value to a K-3D color
 k3d::color convert_color_magics(const k3d::uint16_t Color, const k3d::color& BaseColor)
 {
-	const k3d::uint16_t red = Color >> 11;
-	const k3d::uint16_t green = (Color - (red << 11)) >> 6;
-	const k3d::uint16_t blue = (Color - (red << 11) - (green << 6)) >> 1;
-	const k3d::uint16_t use_color = (Color - (red << 11) - (green << 6) - (blue << 1));
+	k3d::uint16_t color = switch_bytes(Color);
+	const k3d::uint16_t red = color >> 11;
+	const k3d::uint16_t green = (color - (red << 11)) >> 6;
+	const k3d::uint16_t blue = (color - (red << 11) - (green << 6)) >> 1;
+	const k3d::uint16_t use_color = (color - (red << 11) - (green << 6) - (blue << 1));
 	const k3d::color result = !use_color ? k3d::color(static_cast<k3d::double_t>(red)/31., static_cast<k3d::double_t>(green)/31., static_cast<k3d::double_t>(blue)/31.) : BaseColor;
 	return result;
 }
