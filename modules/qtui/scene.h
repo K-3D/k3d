@@ -53,7 +53,7 @@ class scene :
 
 public:
 	scene(k3d::idocument& Document);
- 
+
 	virtual void drawBackground(QPainter *painter, const QRectF &rect);
 
 	void set_active_mode(k3d::qtui::mode* const Mode);
@@ -65,11 +65,12 @@ private Q_SLOTS:
 	void on_set_active_mode();
 	void on_camera_changed(int Index);
 	void on_render_engine_changed(int Index);
-	
+
 private:
 	/// Called when the pipeline needs to be rendered.
 	void on_redraw_pipeline(k3d::gl::irender_viewport::redraw_type_t RedrawType);
- 
+
+	k3d::idocument& m_document;
 	/// Stores the document camera for drawing
 	k3d_data(k3d::icamera*, no_name, change_signal, no_undo, node_storage, no_constraint, no_property, no_serialization) m_camera;
 	/// Stores the document OpenGL render engine for drawing

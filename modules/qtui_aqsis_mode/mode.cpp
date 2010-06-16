@@ -48,7 +48,7 @@ mode::mode() :
 {
 }
 
-void mode::enable(QGraphicsScene& Scene)
+void mode::enable(k3d::idocument& Document, QGraphicsScene& Scene)
 {
 	pixmap_item = new QGraphicsPixmapItem();
 	Scene.addItem(pixmap_item);

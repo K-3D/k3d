@@ -55,7 +55,7 @@ class mode :
 public:
 	mode();
 
-	void enable(QGraphicsScene& Scene);
+	void enable(k3d::idocument& Document, QGraphicsScene& Scene);
 
 	static k3d::iplugin_factory& get_factory();
 

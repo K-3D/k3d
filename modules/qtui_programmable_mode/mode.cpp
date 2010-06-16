@@ -34,6 +34,7 @@
 
 #include <QGraphicsScene>
 #include <QMenu>
+#include <QMetaType>
 #include <QTimer>
 #include <QToolButton>
 
@@ -41,6 +42,8 @@
 #include <boost/scoped_ptr.hpp>
 
 #include <sstream>
+
+Q_DECLARE_METATYPE(k3d::iunknown*);
 
 namespace module
 {
@@ -55,6 +58,7 @@ namespace programmable
 // mode
 
 mode::mode() :
+	document(0),
 	scene(0),
 	script(init_owner(*this) + init_name("script") + init_label(_("Script")) + init_description(_("Script source code")) + init_value<k3d::string_t>("")),
 	edit_menu_proxy(0)
@@ -62,11 +66,12 @@ mode::mode() :
 	script.changed_signal().connect(sigc::hide(sigc::mem_fun(*this, &mode::on_script_changed)));
 }
 
-void mode::enable(QGraphicsScene& Scene)
+void mode::enable(k3d::idocument& Document, QGraphicsScene& Scene)
 {
 	if(scene)
 		disconnect(scene, 0, this, 0);
 
+	document = &Document;
 	scene = &Scene;
 
 	connect(scene, SIGNAL(sceneRectChanged(const QRectF&)), this, SLOT(on_scene_rect_changed(const QRectF&)));
@@ -141,6 +146,7 @@ void mode::on_reload()
 	script_engine.reset(k3d::qtui::script::engine());
 	script_engine->globalObject().setProperty("mode", script_engine->newQObject(this));
 	script_engine->globalObject().setProperty("scene", script_engine->newQObject(scene));
+	script_engine->globalObject().setProperty("document", script_engine->toScriptValue(static_cast<k3d::iunknown*>(document)));
 	QScriptValue result = script_engine->evaluate(script.pipeline_value().c_str());
 	if(result.isError())
 	{
