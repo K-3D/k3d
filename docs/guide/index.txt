@@ -4,4 +4,5 @@ June, 2010
 
 :leveloffset: 1
 
-include::pipeline.txt[]
+include::@CMAKE_CURRENT_SOURCE_DIR@/pipeline.txt[]
+include::@CMAKE_CURRENT_BINARY_DIR@/plugins.txt[]
