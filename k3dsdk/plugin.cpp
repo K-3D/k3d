@@ -61,7 +61,7 @@ iunknown* create_application_plugin(const k3d::string_t& Plugin)
 	iplugin_factory* const plugin_factory = plugin::factory::lookup(Plugin);
 	if(!plugin_factory)
 	{
-		log() << error << "No plugin factory named: " << Plugin << std::endl;
+		log() << error << "No plugin factory [" << Plugin << "]" << std::endl;
 	}
 	else
 	{
@@ -81,14 +81,14 @@ iunknown* create_application_plugin(iplugin_factory& Factory)
 		}
 		else
 		{
-			log() << error << "Error creating application plugin: " << Factory.name() << std::endl;
+			log() << error << "Couldn't create application plugin [" << Factory.name() << "]" << std::endl;
 		}
 	}
 	else
 	{
-		log() << error << "Not an application plugin factory: " << Factory.name() << std::endl;
+		log() << error << "Not an application plugin factory [" << Factory.name() << "]" << std::endl;
 	}
-	
+
 	return 0;
 }
 
@@ -100,7 +100,7 @@ iunknown* create_application_plugin(const uuid& ClassID)
 	}
 	else
 	{
-		log() << error << "No plugin factory: " << ClassID << std::endl;
+		log() << error << "No plugin factory [" << ClassID << "]" << std::endl;
 	}
 
 	return 0;
@@ -111,7 +111,7 @@ inode* create_document_plugin(const k3d::string_t& Plugin, idocument& Document, 
 	k3d::iplugin_factory* const plugin_factory = plugin::factory::lookup(Plugin);
 	if(!plugin_factory)
 	{
-		log() << error << "No plugin factory named: " << Plugin << std::endl;
+		log() << error << "No plugin factory [" << Plugin << "]" << std::endl;
 	}
 	else
 	{
@@ -131,14 +131,14 @@ inode* create_document_plugin(iplugin_factory& Factory, idocument& Document, con
 		}
 		else
 		{
-			log() << error << "Error creating document plugin: " << Factory.name() << std::endl;
+			log() << error << "Couldn't create document plugin [" << Factory.name() << "]" << std::endl;
 		}
 	}
 	else
 	{
-		log() << error << "Not a document plugin factory: " << Factory.name() << std::endl;
+		log() << error << "Not a document plugin factory [" << Factory.name() << "]" << std::endl;
 	}
-	
+
 	return 0;
 }
 
@@ -150,12 +150,12 @@ inode* create_document_plugin(const uuid& ClassID, idocument& Document, const k3
 	}
 	else
 	{
-		log() << error << "No plugin factory: " << ClassID << std::endl;
+		log() << error << "No plugin factory [" << ClassID << "]" << std::endl;
 	}
 
 	return 0;
 }
-	
+
 } // namespace detail
 
 namespace factory
@@ -195,7 +195,7 @@ iplugin_factory* lookup(const k3d::string_t& Name)
 		case 1:
 			return *results.begin();
 		default:
-			k3d::log() << error << "multiple plugin factories with name [" << Name << "]" << std::endl;
+			k3d::log() << error << "Multiple plugin factories with name [" << Name << "]" << std::endl;
 			return 0;
 	}
 }
