@@ -47,6 +47,7 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 
 	print """Creating reference documentation for """ + plugin.name() + """ ..."""
 
+	reference.write("""\n[[""" + plugin.name() + """]]\n""")
 	reference.write("""\n== """ + plugin.name() + """ ==\n""")
 
 	plugin_quality = ""

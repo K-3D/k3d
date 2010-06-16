@@ -49,7 +49,7 @@ PolyGrid -> ScalePoints -> MeshInstance
 
 ------------------------------------
 
-In this example, the <<PolyGrid>> plugin acts as a source, producing geometric data (in this case, a regular polygon grid).  The <<ScalePoints>> plugin acts as a modifier, applying a scaling transformation to any geometry that passes through it.  Finally, the <<MeshInstance>> plugin is a consumer of data, rendering geometric input to the screen as a 2D image.
+In this example, the <<PolyGrid,PolyGrid>> plugin acts as a source, producing geometric data (in this case, a regular polygon grid).  The <<ScalePoints,ScalePoints>> plugin acts as a modifier, applying a scaling transformation to any geometry that passes through it.  Finally, the <<MeshInstance,MeshInstance>> plugin is a consumer of data, rendering geometric input to the screen as a 2D image.
 
 Of course, the pipeline can grow to be as complex as needed ... for example, a pipeline can contain multiple modifiers:
 
@@ -69,7 +69,7 @@ PolyGrid -> ScalePoints -> RotatePoints ->MeshInstance
 
 ------------------------------------
 
-Here, a second modifier - <<RotatePoints>> - is added to the pipeline, further altering data after it is modified by <<ScalePoints>>.  As you might imagine, you are free to chain-together modifiers in any number and combination desired.
+Here, a second modifier - <<RotatePoints,RotatePoints>> - is added to the pipeline, further altering data after it is modified by <<ScalePoints,ScalePoints>>.  As you might imagine, you are free to chain-together modifiers in any number and combination desired.
 
 == Fan-Out ==
 
@@ -92,7 +92,7 @@ ScalePoints -> MeshInstance2
 
 ------------------------------------
 
-In this case, the fan-out sends the scaled polygon data to two separate <<MeshInstance>> nodes.  That means that the scene will contain two identical copies of the scaled data.
+In this case, the fan-out sends the scaled polygon data to two separate <<MeshInstance,MeshInstance>> nodes.  That means that the scene will contain two identical copies of the scaled data.
 
 Note that there is no requirement that you fan-out to a data sink - the pipeline can be arbitrarily complex after the fan-out as-well-as before it:
 
@@ -114,7 +114,7 @@ ScalePoints -> RotatePoints -> MeshInstance2
 
 ------------------------------------
 
-In this case, the output of the <<ScalePoints>> node splits into two separate ``branches'' of the pipeline, but is further modified by <<RotatePoints>> in the second branch.  Again, the pipeline could become arbitrarily complex, including further branches and modifiers.
+In this case, the output of the <<ScalePoints,ScalePoints>> node splits into two separate ``branches'' of the pipeline, but is further modified by <<RotatePoints,RotatePoints>> in the second branch.  Again, the pipeline could become arbitrarily complex, including further branches and modifiers.
 
 == Fan-In ==
 
@@ -138,7 +138,7 @@ PolySphere -> MergeMesh
 
 ------------------------------------
 
-In this case, the output of a second source - <<PolySphere>> - is merged with the output of <<PolyGrid>> before their combined data is modified by <<ScalePoints>> and displayed by the <<MeshInstance>>.
+In this case, the output of a second source - <<PolySphere,PolySphere>> - is merged with the output of <<PolyGrid,PolyGrid>> before their combined data is modified by <<ScalePoints,ScalePoints>> and displayed by the <<MeshInstance,MeshInstance>>.
 
 == Properties ==
 
@@ -175,7 +175,7 @@ The only limitation on property connections is that properties can only be conne
 
 == Property Roles ==
 
-With our more detailed understanding of how properties are connected, we can adopt a more nuanced view of how the pipeline functions.  For example, we could connect the ``radius'' properties of two <<PolySphere>> sources:
+With our more detailed understanding of how properties are connected, we can adopt a more nuanced view of how the pipeline functions.  For example, we could connect the ``radius'' properties of two <<PolySphere,PolySphere>> sources:
 
 ["graphviz", "pipeline10.png"]
 ------------------------------------
@@ -192,7 +192,7 @@ PolySphere1 -> PolySphere2 [ label="radius > radius"]
 
 ------------------------------------
 
-Here, the primary function of the <<PolySphere>> nodes as mesh sources is unchanged, and we would likely connect their mesh outputs to other sink objects, but we have also introduced a ``constraint'' that the radius property of PolySphere2 will always ``follow'' the radius property of PolySphere1.
+Here, the primary function of the <<PolySphere,PolySphere>> nodes as mesh sources is unchanged, and we would likely connect their mesh outputs to other sink objects, but we have also introduced a ``constraint'' that the radius property of PolySphere2 will always ``follow'' the radius property of PolySphere1.
 
 == Guidelines ==
 
