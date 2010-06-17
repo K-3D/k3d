@@ -1,8 +1,19 @@
-= Seven Degrees of Freedom =
+Seven Degrees of Freedom
+========================
 Timothy M. Shead <tshead@k-3d.com>
 June, 2010
 
-:leveloffset: 1
+K-3D Users' Guide
+=================
 
+:leveloffset: 1
 include::@CMAKE_CURRENT_SOURCE_DIR@/pipeline.txt[]
+:leveloffset: 0
+
+K-3D Developers' Guide
+======================
+
+:leveloffset: 1
 include::@CMAKE_CURRENT_BINARY_DIR@/plugins.txt[]
+:leveloffset: 0
+

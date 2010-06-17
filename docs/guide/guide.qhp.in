@@ -11,11 +11,8 @@
 		<filterAttribute>@K3D_VERSION@</filterAttribute>
 		<toc>
 			<section title="K-3D Guide" ref="html/index.chunked/index.html">
-<!--
-				<section title="Chapter 1" ref="doc.html#chapter1"/>
-				<section title="Chapter 2" ref="doc.html#chapter2"/>
-				<section title="Chapter 3" ref="doc.html#chapter3"/>
--->
+				<section title="K-3D Users' Guide" ref="html/index.chunked/pt01.html"/>
+				<section title="K-3D Developers' Guide" ref="html/index.chunked/pt02.html"/>
 			</section>
 		</toc>
 		<keywords>
