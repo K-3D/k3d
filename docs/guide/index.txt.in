@@ -17,3 +17,7 @@ K-3D Developers' Guide
 include::@CMAKE_CURRENT_BINARY_DIR@/plugins.txt[]
 :leveloffset: 0
 
+[index]
+Index
+-----
+

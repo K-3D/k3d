@@ -2,7 +2,11 @@
 
 == Overview ==
 
-The fundamental organizing structure of K-3D is the 'Visualization Pipeline' K-3D user documents are made up of 'Nodes'  When you use a plugin, you are usually adding a new node to the document.  Each node created is a new instance of a specific plugin type.  We represent nodes diagrammatically as boxes, and label them based on either the node's type or its purpose:
+The fundamental organizing structure of K-3D is the 'Visualization Pipeline': K-3D user documents are made up of 'Nodes'.  When you use a plugin, you are usually adding a new node to the document.  Each node created is a new instance of a specific plugin type.  We represent nodes diagrammatically as boxes, and label them based on either the node's type or its purpose:
+
+(((Visualization Pipeline)))
+(((Pipeline)))
+(((Nodes)))
 
 ["graphviz", "pipeline2.png"]
 ------------------------------------
@@ -17,6 +21,10 @@ A [label="Node"]
 ------------------------------------
 
 Although there are exceptions, most nodes can be categorized as 'Sources' 'Modifiers' or 'Sinks' of data.  Sources create data, modifiers process data, and sinks consume data.  Thus, data ``flows'' from sources, is altered by modifiers, and terminates at sinks.  We can represent this flow using arrows:
+
+(((Sources)))
+(((Modifiers)))
+(((Sinks)))
 
 ["graphviz", "pipeline3.png"]
 ------------------------------------
