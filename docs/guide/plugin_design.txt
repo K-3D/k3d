@@ -1,0 +1,106 @@
+= Plugins =
+
+== Overview ==
+
+K-3D is designed around an extensive and flexible system of plugins, shared
+library components that are dynamically loaded at runtime.  The K-3D
+application is little more than a "container" that knows how to load plugins at
+startup and manage their interactions.  All of the real functionality in K-3D -
+from pipeline sources, modifiers, and sinks to the user interface - is provided
+by plugins.  The plugin mechanism simplifies both building and distribution of
+the program - developers can easily disable plugins that they can't compile or
+don't want, and distributors can ship binary plugins to users, secure in the
+knowledge that plugins with missing dependencies will be quietly ignored at
+runtime.  This article presents an overview for developers of how the plugin
+system works.
+
+== Modules ==
+
+(((Plugin,Module)))
+
+The first level of organization in the plugin system is 'Modules', which are
+shared libraries (DLLs on Win32) that can be loaded into the application
+working set at runtime.  Each module includes zero-to-many plugins, and is
+loaded by the K-3D application at startup (this is a simplification - see <<On
+Demand Modules>> for more details on how modules are loaded).  Every K-3D
+module contains a known entry-point function that is called when the module is
+first loaded by the application.
+
+== Plugin Factories ==
+
+(((Plugin,Factory)))
+
+When its entry-point function is called, a module ``registers'' zero-to-many
+plugin factories with the application.  A 'Plugin Factory' is a C++ class that
+performs two tasks - it provides metadata that describes a plugin type, and it
+is used to create instances of that plugin type.  Each plugin factory must
+implement the 'k3d::iplugin_factory' interface, which is used to retrieve
+plugin metadata (unique identifier, human-readable name, human-readable
+description, etc), and either the 'k3d::iapplication_plugin_factory' or
+'k3d::idocument_plugin_factory' interfaces, which are used to instantiate
+plugins.
+
+Following is a list of plugin metadata provided via 'k3d::iplugin_factory':
+
+* factory_id - Universally-unique identifier for the factory.
+* name - Human-readable plugin name, displayed in the user interface and used to instantiate plugins from scripts.
+* short_description - Short human-readable description of what the plugin does, displayed in the application user interface and in automatically-generated documentation.
+* categories - Arbitrary list of human-readable categories that are used to group plugins in the user interface.
+* quality - Special enumerated value that describes a plugin as "Stable", "Experimental", or "Deprecated" in the user interface.  See <<Plugin Status>> for details.
+* interfaces - Provides a list of interfaces supported by the plugin type.  Used in special circumstances by code that needs to determine the capabilities of a plugin before instantiating it.
+* metadata - Provides a collection of arbitrary name-value pairs that can be set by a plugin author and used by the user interface or other layers.
+
+== Plugins ==
+
+(((Plugin)))
+
+'Plugins' are also C++ classes, and fall into two categories: 'Document
+Plugins' and 'Application Plugins'.
+
+Document plugins are the type users are most aware of - a document plugin is
+linked with a specific user document at the time of its creation, saving and
+restoring its state along with the containing document.  Pipeline components -
+sources, modifiers, sinks - are all document plugins, as are render model
+components - cameras, render engines, lights, materials, etc.  It is not
+possible to create a document plugin without a valid open document.
+
+(((Plugin,Document)))
+
+Application plugins, in contrast, are not associated with any document, and do
+not save or restore any state.  These plugins are usually created "behind the
+scenes" to perform a specific task, then destroyed, without any user
+intervention.  Thus, application plugins often take on the role of strategy
+objects (as-in Strategy Design Pattern).  Examples of application plugins
+include user interface plugins, scripting engines, and file format importers
+and exporters.
+
+(((Plugin,Application)))
+
+As you might expect, there are two types of plugin factory corresponding to the
+two types of plugin - the 'k3d::iapplication_plugin_factory' and
+'k3d::idocument_plugin_factory' interfaces are used to instantiate application
+plugins and document plugins, respectively.
+
+== Interfaces ==
+
+(((Plugin,Interface)))
+ 
+Because plugins play an endless number of different roles in K-3D, a
+sophisticated mechanism is needed to determine the capabilities and purpose of
+an individual plugin after it is created.  K-3D defines formal 'Interface'
+classes that correspond to capabilities, plugin classes ``Implement''
+interfaces by deriving from them, and callers ``Query'' a plugin instance for
+its capabilities using 'dynamic_cast'.  See
+http://www.ddj.com/dept/cpp/184401608[Contract Programming and RTTI] for a
+discussion of this technique.
+
+== Instantiating Plugins ==
+
+There are many possible ways to instantiate plugins, but it is highly
+recommended that you use the 'k3d::plugin::create()' convenience functions
+provided in 'k3dsdk/plugins.h'.  This will eliminate repetitive code and subtle
+errors.  Overloaded and templated versions of k3d::plugin::create() are
+provided to handle the creation of application and document plugins and
+automatically query new plugins for particular interfaces (a very common
+use-case).
+

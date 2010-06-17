@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QtHelpProject version="1.0">
-	<namespace>org.k-3d.K-3D.@K3D_VERSION@</namespace>
+	<namespace>org.k-3d</namespace>
 	<virtualFolder>doc</virtualFolder>
+<!--
 	<customFilter name="K-3D @K3D_VERSION@">
 		<filterAttribute>K-3D</filterAttribute>
 		<filterAttribute>@K3D_VERSION@</filterAttribute>
 	</customFilter>
+-->
 	<filterSection>
+<!--
 		<filterAttribute>K-3D</filterAttribute>
 		<filterAttribute>@K3D_VERSION@</filterAttribute>
+-->
 		<toc>
-			<section title="K-3D Guide" ref="html/index.chunked/index.html">
+			<section title="K-3D" ref="html/index.chunked/index.html">
 				<section title="K-3D Users' Guide" ref="html/index.chunked/pt01.html"/>
 				<section title="K-3D Developers' Guide" ref="html/index.chunked/pt02.html"/>
 			</section>

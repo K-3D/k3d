@@ -39,7 +39,9 @@ for plugin in k3d.plugin.factory.lookup():
 print """Generating plugin reference documentation ..."""
 reference = file("@CMAKE_CURRENT_BINARY_DIR@/plugins.txt", "w")
 reference.write("""// Machine-generated file, do not edit by hand!\n\n\n""")
-reference.write("""= Plugin Reference Documentation =\n""")
+reference.write("""[appendix]\n""")
+reference.write("""Plugin Reference Documentation\n""")
+reference.write("""==============================\n""")
 
 for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 	if plugin.metadata().has_key("k3d:disable-documentation"):
