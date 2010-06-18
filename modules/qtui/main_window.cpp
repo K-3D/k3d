@@ -21,6 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "config.h"
 #include "main_window.h"
 
 #include <k3d-i18n-config.h>
@@ -50,6 +51,7 @@
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QProcess>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -131,6 +133,31 @@ void main_window::on_script_play_activated()
 	k3d::iscript_engine::context context;
 	context["document"] = &document_widget.document();
 	k3d::qtui::script::execute(stream, script_path.native_utf8_string().raw(), context);
+}
+
+void main_window::on_help_k3d_guide_activated()
+{
+	if(!m_assistant)
+	{
+k3d::log() << debug << K3D_GUIDE_BINARY_DIR << std::endl;
+
+		m_assistant = new QProcess();
+		m_assistant->setWorkingDirectory(K3D_GUIDE_BINARY_DIR "/qt");
+		m_assistant->start("assistant", QStringList() << "-collectionFile" << "guide.qhc" << "-enableRemoteControl");
+		if(!m_assistant->waitForStarted())
+		{
+			delete m_assistant;
+			m_assistant = 0;
+			return;
+		}
+
+		QObject::connect(m_assistant, SIGNAL(finished(int, QProcess::ExitStatus)), m_assistant, SLOT(deleteLater()));
+	}
+
+	QByteArray command;
+	command.append("setSource qthelp://org.k-3d/doc/qt/index.chunked/index.html");
+	command.append('\0');
+	m_assistant->write(command);
 }
 
 void main_window::on_help_k3d_online_activated()

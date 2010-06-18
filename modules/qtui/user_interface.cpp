@@ -111,7 +111,7 @@ user_interface::~user_interface()
 void user_interface::get_command_line_arguments(boost::program_options::options_description& Description)
 {
 	Description.add_options()
-		("--no-splash", "Disables the startup splash screen.")
+		("no-splash", "Disables the startup splash screen.")
 		;
 }
 
