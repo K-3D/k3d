@@ -37,7 +37,7 @@ for plugin in k3d.plugin.factory.lookup():
 
 # Create reference documentation for all plugins ...
 print """Generating plugin reference documentation ..."""
-reference = file("@CMAKE_CURRENT_BINARY_DIR@/plugins.txt", "w")
+reference = file("@CONTENT_BINARY_DIR@/plugins.txt", "w")
 reference.write("""// Machine-generated file, do not edit by hand!\n\n\n""")
 reference.write("""[appendix]\n""")
 reference.write("""Plugin Reference Documentation\n""")

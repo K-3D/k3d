@@ -2,34 +2,19 @@
 <QtHelpProject version="1.0">
 	<namespace>org.k-3d</namespace>
 	<virtualFolder>doc</virtualFolder>
-<!--
-	<customFilter name="K-3D @K3D_VERSION@">
-		<filterAttribute>K-3D</filterAttribute>
-		<filterAttribute>@K3D_VERSION@</filterAttribute>
-	</customFilter>
--->
 	<filterSection>
-<!--
-		<filterAttribute>K-3D</filterAttribute>
-		<filterAttribute>@K3D_VERSION@</filterAttribute>
--->
 		<toc>
-			<section title="K-3D" ref="html/index.chunked/index.html">
-				<section title="K-3D Users' Guide" ref="html/index.chunked/pt01.html"/>
-				<section title="K-3D Developers' Guide" ref="html/index.chunked/pt02.html"/>
+			<section title="K-3D" ref="qt/index.chunked/index.html">
+<!--
+				<section title="K-3D Users' Guide" ref="qt/index.chunked/pt01.html"/>
+				<section title="K-3D Developers' Guide" ref="qt/index.chunked/pt02.html"/>
+-->
 			</section>
 		</toc>
-		<keywords>
-<!--
-			<keyword name="foo" id="MyApplication::foo" ref="doc.html#foo"/>
-			<keyword name="bar" ref="doc.html#bar"/>
-			<keyword id="MyApplication::foobar" ref="doc.html#foobar"/>
--->
-		</keywords>
 		<files>
-			<file>html/index.chunked/*.html</file>
-			<file>html/index.chunked/*.css</file>
-			<file>html/index.chunked/*.png</file>
+			<file>qt/index.chunked/*.html</file>
+			<file>qt/index.chunked/*.css</file>
+			<file>qt/index.chunked/*.png</file>
 		</files>
 	</filterSection>
 </QtHelpProject>
