@@ -139,8 +139,6 @@ void main_window::on_help_k3d_guide_activated()
 {
 	if(!m_assistant)
 	{
-k3d::log() << debug << K3D_GUIDE_BINARY_DIR << std::endl;
-
 		m_assistant = new QProcess();
 		m_assistant->setWorkingDirectory(K3D_GUIDE_BINARY_DIR "/qt");
 		m_assistant->start("assistant", QStringList() << "-collectionFile" << "guide.qhc" << "-enableRemoteControl");
@@ -153,11 +151,6 @@ k3d::log() << debug << K3D_GUIDE_BINARY_DIR << std::endl;
 
 		QObject::connect(m_assistant, SIGNAL(finished(int, QProcess::ExitStatus)), m_assistant, SLOT(deleteLater()));
 	}
-
-	QByteArray command;
-	command.append("setSource qthelp://org.k-3d/doc/qt/index.chunked/index.html");
-	command.append('\0');
-	m_assistant->write(command);
 }
 
 void main_window::on_help_k3d_online_activated()
