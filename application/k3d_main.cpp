@@ -372,6 +372,7 @@ void check_dependencies(k3d::bool_t& Quit, k3d::bool_t& Error)
 	k3d::log() << warning "xml parser: unknown" << std::endl;
 #endif
 
+	k3d::log() << info << "executable: " << k3d::system::executable_path().native_console_string() << std::endl;
 	k3d::log() << info << "options file: " << g_options_path.native_console_string() << std::endl;
 	k3d::log() << info << "plugin path(s): " << g_plugin_paths << std::endl;
 	k3d::log() << info << "shader cache path: " << g_shader_cache_path.native_console_string() << std::endl;
@@ -650,7 +651,7 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 	// Append extra options from the environment ...
 	std::istringstream buffer(k3d::system::getenv("K3D_EXTRA_OPTIONS"));
 	std::copy(std::istream_iterator<k3d::string_t>(buffer), std::istream_iterator<k3d::string_t>(), std::back_inserter(raw_arguments));
-	
+
 	try
 	{
 		k3d::bool_t quit = false;

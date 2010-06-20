@@ -22,10 +22,14 @@
 */
 
 #include "k3d_main.h"
+
+#include <k3dsdk/system.h>
 #include <k3dsdk/win32.h>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	k3d::system::initialize_executable_path(__argc, __argv);
+
 	std::vector<k3d::string_t> arguments(__argv, __argv + __argc);
 	if(arguments.size())
 		arguments.erase(arguments.begin());

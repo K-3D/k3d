@@ -40,7 +40,8 @@
 #include <sys/stat.h>
 
 // Define some platform-specific odds-and-ends
-#ifdef K3D_API_WIN32
+#if defined K3D_API_WIN32
+
 	#define SEARCHPATH_SEPARATOR_STRING ";"
 	#define DEFAULT_TEMP_DIRECTORY "c:\\"
 	#define DEFAULT_HOME_DIRECTORY "c:\\"
@@ -59,11 +60,56 @@
 
 #endif // !K3D_API_WIN32
 
+#if defined K3D_API_DARWIN
+
+	#include <mach-o/dyld.h>
+
+#endif // K3D_API_DARWIN
+
 namespace k3d
 {
 
 namespace system
 {
+
+static filesystem::path g_executable_path;
+
+void initialize_executable_path(int argc, char* argv[])
+{
+#if defined K3D_API_WIN32
+
+	string_t buffer(256, '\0');
+	GetModuleFileName(0, const_cast<char*>(buffer.data()), buffer.size());
+	buffer.resize(strlen(buffer.c_str()));
+	g_executable_path = filesystem::native_path(ustring::from_utf8(buffer));
+
+#elif defined K3D_API_DARWIN
+
+	string_t buffer;
+	uint32_t buffer_size = 0;
+	_NSGetExecutablePath(const_cast<char*>(buffer.data()), &buffer_size);
+	buffer.resize(buffer_size);
+	_NSGetExecutablePath(const_cast<char*>(buffer.data()), &buffer_size);
+	g_executable_path = filesystem::native_path(ustring::from_utf8(buffer));
+
+#else
+	// Linux ...
+	if(exists(filesystem::native_path("/proc/self/exe")))
+		g_executable_path = filesystem::path();
+
+	// BSD ...
+	if(exists(filesystem::native_path("/proc/curproc/file")))
+		g_executable_path = filesystem::path();
+#endif
+}
+
+const filesystem::path executable_path()
+{
+	if(g_executable_path.empty())
+		log() << warning << "Uninitialized executable path ... did you forget to call initialize_executable_path(...) at startup?" << std::endl;
+
+	return g_executable_path;
+}
 
 const string_t getenv(const string_t& Variable)
 {

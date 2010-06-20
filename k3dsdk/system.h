@@ -36,6 +36,11 @@ namespace k3d
 namespace system
 {
 
+/// Used to initialize the current executable path.  Should be called once as soon as possible at startup, before the cwd can be altered.
+void initialize_executable_path(int argc, char* argv[]);
+/// Returns the absolute path of the current executable, or an empty path
+const filesystem::path executable_path();
+
 /// Safely returns an environment variable (returns empty string if the variable doesn't exist)
 const string_t getenv(const string_t& Variable);
 /// Safely sets an environment variable using separate name and value strings

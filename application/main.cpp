@@ -22,9 +22,12 @@
 */
 
 #include "k3d_main.h"
+#include <k3dsdk/system.h>
 
 int main(int argc, char* argv[])
 {
+	k3d::system::initialize_executable_path(argc, argv);
+
 	std::vector<k3d::string_t> arguments(argv, argv + argc);
 	if(arguments.size())
 		arguments.erase(arguments.begin());
