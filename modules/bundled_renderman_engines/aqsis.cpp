@@ -61,11 +61,11 @@ public:
 
 	k3d::bool_t installed()
 	{
-		const k3d::filesystem::path aqsis = k3d::system::install_path() / k3d::filesystem::generic_path(k3d::system::executable_name("bin/aqsis"));
+		const k3d::filesystem::path aqsis = k3d::system::executable_path().branch_path() / k3d::filesystem::generic_path(k3d::system::executable_name("aqsis"));
 		if(!k3d::filesystem::exists(aqsis))
 			return false;
 
-		const k3d::filesystem::path aqsl = k3d::system::install_path() / k3d::filesystem::generic_path(k3d::system::executable_name("bin/aqsl"));
+		const k3d::filesystem::path aqsl = k3d::system::executable_path().branch_path() / k3d::filesystem::generic_path(k3d::system::executable_name("aqsl"));
 		if(!k3d::filesystem::exists(aqsl))
 			return false;
 
@@ -74,7 +74,7 @@ public:
 
 	k3d::bool_t compile_shader(const k3d::filesystem::path& Shader)
 	{
-		const k3d::filesystem::path aqsl = k3d::system::install_path() / k3d::filesystem::generic_path("bin/aqsl");
+		const k3d::filesystem::path aqsl = k3d::system::executable_path().branch_path() / k3d::filesystem::generic_path("aqsl");
 
 		const k3d::filesystem::path shader_source_path = Shader;
 		const k3d::filesystem::path shader_binary_path = k3d::shader_cache_path() / k3d::filesystem::generic_path(k3d::filesystem::replace_extension(Shader, ".slx").leaf());
@@ -98,10 +98,10 @@ public:
 
 	k3d::bool_t render(k3d::inetwork_render_frame& Frame, const k3d::filesystem::path& RIB)
 	{
-		const k3d::filesystem::path aqsis = k3d::system::install_path() / k3d::filesystem::generic_path("bin/aqsis");
-		const k3d::filesystem::path displays = k3d::system::install_path() / k3d::filesystem::generic_path("bin");
-		const k3d::filesystem::path procedurals = k3d::system::install_path() / k3d::filesystem::generic_path("bin");
-		const k3d::filesystem::path plugins = k3d::system::install_path() / k3d::filesystem::generic_path("bin");
+		const k3d::filesystem::path aqsis = k3d::system::executable_path().branch_path() / k3d::filesystem::generic_path("aqsis");
+		const k3d::filesystem::path displays = k3d::system::executable_path().branch_path();
+		const k3d::filesystem::path procedurals = k3d::system::executable_path().branch_path();
+		const k3d::filesystem::path plugins = k3d::system::executable_path().branch_path();
 		const k3d::filesystem::path shaders = k3d::shader_cache_path();
 
 		k3d::inetwork_render_frame::environment environment;

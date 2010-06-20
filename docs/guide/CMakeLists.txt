@@ -23,12 +23,11 @@ LIST(APPEND GUIDE_CONTENT ${CONTENT_BINARY_DIR}/index-docinfo.xml)
 LIST(APPEND GUIDE_CONTENT ${CONTENT_BINARY_DIR}/plugins.txt)
 LIST(SORT GUIDE_CONTENT)
 
-SET(K3D_NUI_BINARY ${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-nui.module)
 ADD_CUSTOM_COMMAND(
 	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/plugins.py
 	WORKING_DIRECTORY ${CONTENT_BINARY_DIR}
 	COMMAND
-		${k3d_BINARY_DIR}/bin/k3d --log-level=debug --color --plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins --share=${k3d_SOURCE_DIR}/share --script-file=${CMAKE_CURRENT_BINARY_DIR}/plugins.py --ui=${K3D_NUI_BINARY}
+		${k3d_BINARY_DIR}/bin/k3d --log-level=debug --color --share=${k3d_SOURCE_DIR}/share --script-file=${CMAKE_CURRENT_BINARY_DIR}/plugins.py --ui=nui
 	OUTPUT ${CONTENT_BINARY_DIR}/plugins.txt
 	)
 
