@@ -57,6 +57,7 @@
 	#define DEFAULT_HOME_DIRECTORY "/"
 
 	#include <time.h>
+	#include <unistd.h>
 
 #endif // !K3D_API_WIN32
 
@@ -82,6 +83,7 @@ void initialize_executable_path(int argc, char* argv[])
 	GetModuleFileName(0, const_cast<char*>(buffer.data()), buffer.size());
 	buffer.resize(strlen(buffer.c_str()));
 	g_executable_path = filesystem::native_path(ustring::from_utf8(buffer));
+	return;
 
 #elif defined K3D_API_DARWIN
 
@@ -91,15 +93,26 @@ void initialize_executable_path(int argc, char* argv[])
 	buffer.resize(buffer_size);
 	_NSGetExecutablePath(const_cast<char*>(buffer.data()), &buffer_size);
 	g_executable_path = filesystem::native_path(ustring::from_utf8(buffer));
+	return;
 
 #else
 	// Linux ...
-	if(exists(filesystem::native_path("/proc/self/exe")))
-		g_executable_path = filesystem::path();
+	if(exists(filesystem::native_path(ustring::from_utf8("/proc/self/exe"))))
+	{
+		string_t buffer(256, '\0');
+		readlink("/proc/self/exe", const_cast<char*>(buffer.data()), buffer.size());
+		g_executable_path = filesystem::native_path(ustring::from_utf8(buffer));
+		return;
+	}
 
 	// BSD ...
-	if(exists(filesystem::native_path("/proc/curproc/file")))
-		g_executable_path = filesystem::path();
+	if(exists(filesystem::native_path(ustring::from_utf8("/proc/curproc/file"))))
+	{
+		string_t buffer(256, '\0');
+		readlink("/proc/curproc/file", const_cast<char*>(buffer.data()), buffer.size());
+		g_executable_path = filesystem::native_path(ustring::from_utf8(buffer));
+		return;
+	}
 #endif
 }
 
