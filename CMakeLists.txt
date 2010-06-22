@@ -7,6 +7,7 @@ CMAKE_POLICY(SET CMP0003 OLD)
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 INCLUDE(K3DOutOfSourceBuild) # Disallow in-source builds
+INCLUDE(K3DCompileResource)
 INCLUDE(K3DGenerateDEF) # Convenience macro for linking Win32 DLLs using MSVC
 INCLUDE(K3DDependencies)
 INCLUDE(K3DWordSize) # Detect 32/64 bit platform
