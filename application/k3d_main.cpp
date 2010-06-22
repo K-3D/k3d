@@ -570,9 +570,6 @@ void check_unused_arguments(const arguments_t& Arguments, k3d::bool_t& Quit, k3d
 	k3d::log() << warning << "The following unknown command-line arguments will be ignored: " << std::endl;
 	for(arguments_t::const_iterator argument = Arguments.begin(); argument != Arguments.end(); ++argument)
 	    k3d::log() << warning << "name: " << argument->string_key << " value: " << argument->value[0] << std::endl;
-
-	Quit = true;
-	Error = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
