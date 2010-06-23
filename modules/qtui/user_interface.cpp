@@ -161,6 +161,7 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 	{
 		m_splash_box.reset(new QSplashScreen(QPixmap(":/QTUI/splash.png")));
 		m_splash_box->show();
+    m_application->processEvents();
 	}
 
 	return unused;
@@ -169,7 +170,10 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 void user_interface::startup_message_handler(const k3d::string_t& Message)
 {
 	if(m_splash_box.get())
+  {
 		m_splash_box->showMessage(Message.c_str());
+    m_application->processEvents();
+  }
 }
 
 void user_interface::display_user_interface()
