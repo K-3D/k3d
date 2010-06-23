@@ -5,7 +5,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>English</string>
 		<key>CFBundleExecutable</key>
-		<string>k3d</string>
+		<string>K-3D</string>
 		<key>CFBundleGetInfoString</key>
 		<string>@K3D_VERSION@, @K3D_COPYRIGHT@</string>
 		<key>CFBundleIconFile</key>
