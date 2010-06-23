@@ -21,6 +21,8 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <config.h>
+
 #include <k3d-i18n-config.h>
 #include <k3d-platform-config.h>
 #include <k3d-version-config.h>
@@ -162,7 +164,12 @@ void set_default_options(k3d::bool_t& Quit, k3d::bool_t& Error)
 	g_default_qtui_path = executable_dir / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-qtui.module");
 	g_default_shader_cache_path = data_path / k3d::filesystem::generic_path("shadercache");
 	g_default_share_path = executable_dir / k3d::filesystem::generic_path("../share/k3d");
+
+#ifdef K3D_ENABLE_OSX_BUNDLE
+	g_default_user_interface_path = g_default_qtui_path;
+#else
 	g_default_user_interface_path = g_default_ngui_path;
+#endif
 
 	// Setup path options based on the defaults ...
 	g_options_path = g_default_options_path;
