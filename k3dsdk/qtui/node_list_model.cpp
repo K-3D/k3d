@@ -26,6 +26,7 @@
 #include <k3dsdk/qtui/convert.h>
 #include <k3dsdk/qtui/icon_factory.h>
 #include <k3dsdk/qtui/node_list_model.h>
+#include <k3dsdk/result.h>
 
 #include <QIcon>
 
@@ -69,17 +70,26 @@ void node_list_model::remove_nodes(const std::vector<inode*>& Nodes)
 	endResetModel();
 }
 
-int node_list_model::rowCount(const QModelIndex& parent) const
+inode* node_list_model::node(const QModelIndex& Index)
+{
+	if(Index.isValid() && Index.row() < nodes.size())
+		return nodes[Index.row()];
+
+  assert_not_reached();
+  return 0;
+}
+
+int node_list_model::rowCount(const QModelIndex& Parent) const
 {
 	return nodes.size();
 }
 
-QVariant node_list_model::data(const QModelIndex& index, int role) const
+QVariant node_list_model::data(const QModelIndex& Index, int Role) const
 {
-	if(index.isValid() && index.row() < nodes.size())
+	if(Index.isValid() && Index.row() < nodes.size())
 	{
-		inode& node = *nodes[index.row()];
-		switch(role)
+		inode& node = *nodes[Index.row()];
+		switch(Role)
 		{
 			case Qt::DisplayRole:
 			{
