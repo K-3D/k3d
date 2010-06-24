@@ -42,6 +42,7 @@ class property_widget_factory :
 	public QObject
 {
 	Q_OBJECT;
+
 public:
 	QWidget* create(idocument& Document, iproperty& Property);
 };

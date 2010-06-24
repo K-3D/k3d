@@ -15,6 +15,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 	mode.h
 	nag_message_dialog.h
 	node_list_model.h
+  property_widget_factory.h
 	)
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
