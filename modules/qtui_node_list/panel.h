@@ -62,6 +62,7 @@ public:
 	static k3d::iplugin_factory& get_factory();
 
 public Q_SLOTS:
+  void on_selection_changed(const QModelIndex& Current, const QModelIndex& Previous);
 
 private:
 	Ui::QTUINodeListPanel ui;
