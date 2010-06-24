@@ -83,6 +83,7 @@ void panel::on_view_node_properties(k3d::inode* const Node, k3d::iunknown* const
       property_label->setToolTip(k3d::convert<QString>(property->property_description()));
 
       QWidget* const property_widget = property_widget_factory.create(*document, *property);
+      property_widget->setToolTip(k3d::convert<QString>(property->property_description()));
 
       layout->addRow(property_label, property_widget);
     }

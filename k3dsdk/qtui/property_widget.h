@@ -31,6 +31,7 @@ namespace k3d
 
 class idocument;
 class iproperty;
+class istate_recorder;
 
 namespace qtui
 {
@@ -43,7 +44,7 @@ public:
 	virtual ~property_widget() {}
 
 	/// Called once at startup to initialize the widget (this is necessary because plugins can't take constructor arguments).
-	virtual void initialize(idocument& Document, iproperty& Property) = 0;
+	virtual void initialize(idocument& Document, iproperty& Property, istate_recorder* StateRecorder) = 0;
 
 protected:
 	property_widget() {}

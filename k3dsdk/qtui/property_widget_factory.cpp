@@ -163,7 +163,7 @@ QWidget* property_widget_factory::create(idocument& Document, iproperty& Propert
 					{
 						if(result = dynamic_cast<QWidget*>(widget))
 						{
-							widget->initialize(Document, Property);
+							widget->initialize(Document, Property, &Document.state_recorder());
 						}
 						else
 						{
@@ -198,7 +198,7 @@ QWidget* property_widget_factory::create(idocument& Document, iproperty& Propert
 				{
 					if(result = dynamic_cast<QWidget*>(widget))
 					{
-						widget->initialize(Document, Property);
+						widget->initialize(Document, Property, &Document.state_recorder());
 					}
 					else
 					{
@@ -321,6 +321,7 @@ QWidget* property_widget_factory::create(idocument& Document, iproperty& Propert
 */
 	if(!result)
 	{
+    result = new QWidget();
 		log() << warning << "Couldn't create widget for property [" << property_name << "] with type [" << k3d::type_string(property_type) << "]" << std::endl;
 	}
 
