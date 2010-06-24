@@ -21,6 +21,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include <k3dsdk/qtui/property_widget.h>
+#include <k3dsdk/signal_system.h>
 #include <QCheckBox>
 
 namespace k3d { class iplugin_factory; }
@@ -62,6 +63,8 @@ private:
   k3d::iproperty* property;
   k3d::iwritable_property* writable_property;
   k3d::istate_recorder* state_recorder;
+
+  sigc::connection change_connection;
 };
 
 } // namespace boolean
