@@ -237,10 +237,10 @@ void main_window::initialize(k3d::idocument& Document)
 
 	// Setup manual access to window plugins ...
 	QMenu* const window_menu = ui.menuAdvanced->addMenu(tr("Windows"));
-	std::vector<k3d::iplugin_factory*> dialogs = k3d::plugin::factory::lookup("qtui:component-type", "window");
-	std::sort(dialogs.begin(), dialogs.end(), k3d::sort_by_name());
-	for(int i = 0; i != dialogs.size(); ++i)
-		window_menu->addAction(k3d::qtui::action::create(*dialogs[i], window_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_advanced_window), dialogs[i])));
+	std::vector<k3d::iplugin_factory*> windows = k3d::plugin::factory::lookup("qtui:component-type", "window");
+	std::sort(windows.begin(), windows.end(), k3d::sort_by_name());
+	for(int i = 0; i != windows.size(); ++i)
+		window_menu->addAction(k3d::qtui::action::create(*windows[i], window_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_advanced_window), windows[i])));
 }
 
 void main_window::on_edit_mode(k3d::iplugin_factory* const Mode)
