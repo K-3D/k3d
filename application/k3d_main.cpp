@@ -683,7 +683,20 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 			("version", "Prints program version information and exits.")
 			;
 
-		arguments_t arguments = boost::program_options::command_line_parser(raw_arguments).options(description).allow_unregistered().run().options;
+		arguments_t arguments = boost::program_options::command_line_parser(raw_arguments)
+			.options(description)
+			.allow_unregistered()
+			.style(
+				boost::program_options::command_line_style::allow_long
+				| boost::program_options::command_line_style::allow_short
+				| boost::program_options::command_line_style::allow_dash_for_short
+				| boost::program_options::command_line_style::long_allow_adjacent
+				| boost::program_options::command_line_style::long_allow_next
+				| boost::program_options::command_line_style::short_allow_adjacent
+				| boost::program_options::command_line_style::short_allow_next
+				)
+			.run()
+			.options;
 
 		// Handle arguments that cause an immediate exit ...
 		for(arguments_t::const_iterator argument = arguments.begin(); argument != arguments.end(); ++argument)
