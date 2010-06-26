@@ -71,6 +71,13 @@ inline string_t convert(const QString& From)
 	return From.toAscii().data();
 }
 
+/// Specialization of k3d::convert that converts QString to k3d::ustring.
+template<>
+inline ustring convert(const QString& From)
+{
+	return ustring::from_utf8(From.toUtf8().data());
+}
+
 } // namespace k3d
 
 #endif // !K3DSDK_QTUI_CONVERT_H

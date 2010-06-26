@@ -45,61 +45,65 @@ namespace boolean
 // widget
 
 widget::widget() :
-  property(0),
-  writable_property(0),
-  state_recorder(0)
+	property(0),
+	writable_property(0),
+	state_recorder(0)
 {
 }
 
 void widget::initialize(k3d::idocument& Document, k3d::iproperty& Property, k3d::istate_recorder* StateRecorder)
 {
-  property = 0;
-  writable_property = 0;
-  state_recorder = 0;
-  change_connection.disconnect();
-  setEnabled(false);
+	property = 0;
+	writable_property = 0;
+	state_recorder = 0;
+	change_connection.disconnect();
+	setEnabled(false);
 
-  return_if_fail(Property.property_type() == typeid(k3d::bool_t));
+	return_if_fail(Property.property_type() == typeid(k3d::bool_t));
 
-  property = &Property;
-  writable_property = dynamic_cast<k3d::iwritable_property*>(&Property);
-  state_recorder = StateRecorder;
-  change_connection = property->property_changed_signal().connect(sigc::hide(sigc::mem_fun(*this, &widget::on_property_changed)));
-  setEnabled(writable_property);
-  
-  on_property_changed();
-  QObject::connect(this, SIGNAL(clicked(bool)), this, SLOT(on_clicked(bool)));
+	property = &Property;
+	writable_property = dynamic_cast<k3d::iwritable_property*>(&Property);
+	state_recorder = StateRecorder;
+	change_connection = property->property_changed_signal().connect(sigc::hide(sigc::mem_fun(*this, &widget::on_property_changed)));
+	setEnabled(writable_property);
+
+	on_property_changed();
+	QObject::connect(this, SIGNAL(clicked(bool)), this, SLOT(on_clicked(bool)));
 }
 
 void widget::on_clicked(bool Checked)
 {
-  return_if_fail(writable_property);
+	return_if_fail(writable_property);
 
-  if(state_recorder)
-    state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
+	const k3d::bool_t new_value = Checked;
+	if(new_value == boost::any_cast<k3d::bool_t>(property->property_internal_value()))
+		return;
 
-  writable_property->property_set_value(Checked);
+	if(state_recorder)
+		state_recorder->start_recording(k3d::create_state_change_set(K3D_CHANGE_SET_CONTEXT), K3D_CHANGE_SET_CONTEXT);
 
-  if(state_recorder)
-    state_recorder->commit_change_set(state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), Checked ? property->property_label() + " \"On\"" : property->property_label() + " \"Off\"", K3D_CHANGE_SET_CONTEXT);
+	writable_property->property_set_value(new_value);
+
+	if(state_recorder)
+		state_recorder->commit_change_set(state_recorder->stop_recording(K3D_CHANGE_SET_CONTEXT), Checked ? property->property_label() + " \"On\"" : property->property_label() + " \"Off\"", K3D_CHANGE_SET_CONTEXT);
 }
 
 void widget::on_property_changed()
 {
-  setChecked(boost::any_cast<k3d::bool_t>(property->property_internal_value()));
+	setChecked(boost::any_cast<k3d::bool_t>(property->property_internal_value()));
 }
 
 k3d::iplugin_factory& widget::get_factory()
 {
-  static k3d::application_plugin_factory<widget> factory(
-    k3d::uuid(0x4b5f1aab, 0x948840f9, 0x8dcf2996, 0x2ad15be9),
-    "QTUIBooleanWidget",
-    _("Provides a custom property widget for k3d::bool_t properties."),
-    "QTUI Widget",
-    k3d::iplugin_factory::EXPERIMENTAL,
-    boost::assign::map_list_of("qtui:component-type", "property-widget")("qtui:property-type", "k3d::bool_t"));
+	static k3d::application_plugin_factory<widget> factory(
+		k3d::uuid(0x4b5f1aab, 0x948840f9, 0x8dcf2996, 0x2ad15be9),
+		"QTUIBooleanWidget",
+		_("Provides a custom property widget for k3d::bool_t properties."),
+		"QTUI Widget",
+		k3d::iplugin_factory::EXPERIMENTAL,
+		boost::assign::map_list_of("qtui:component-type", "property-widget")("qtui:property-type", "k3d::bool_t"));
 
-  return factory;
+	return factory;
 }
 
 } // namespace boolean
