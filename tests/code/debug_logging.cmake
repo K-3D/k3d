@@ -9,6 +9,8 @@ SET(SKIP_FILES
 	"^modules/cuda/.*$"
 	"^modules/development/.*$"
 	"^modules/ngui/user_interface.cpp$"
+	"^modules/qtui_opengl/window.cpp$"
+	"^modules/qtui/user_interface.cpp$"
 	)
 
 FILE(GLOB_RECURSE SOURCE_FILES "*")

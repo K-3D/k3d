@@ -61,8 +61,6 @@ public:
 				{
 					const k3d::normal3 normal = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, *Output.points, polyhedron->loop_first_edges[polyhedron->face_first_loops[face]]);
 					polyhedron->face_selections[face] = normal.length2() ? 0.0 : 1.0;
-					if(!normal.length2())
-						k3d::log() << debug << "found degenerate face: " << face << std::endl;
 				}
 			}
 		}

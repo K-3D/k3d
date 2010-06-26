@@ -119,8 +119,6 @@ public:
 				}
 			}
 
-			k3d::log() << debug << "input selection count: " << std::count(input_selected_faces.begin(), input_selected_faces.end(), 1.) << std::endl;
-
 			k3d::mesh::selection_t output_selection(face_end - face_begin, 0.0);
 			connected_faces_selector selector(*polyhedron, output_selection);
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
