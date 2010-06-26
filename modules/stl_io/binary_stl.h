@@ -92,4 +92,4 @@ struct binary_stl
 } // namespace module
 
 
-#endif /* MODULES_STL_IO_BINARY_STL_H */
+#endif // !MODULES_STL_IO_BINARY_STL_H

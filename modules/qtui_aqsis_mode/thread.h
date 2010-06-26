@@ -1,5 +1,5 @@
-#ifndef MODULES_QTUI_AQSIS_THREAD_H
-#define MODULES_QTUI_AQSIS_THREAD_H
+#ifndef MODULES_QTUI_AQSIS_MODE_THREAD_H
+#define MODULES_QTUI_AQSIS_MODE_THREAD_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -62,4 +62,4 @@ private:
 
 } // namespace module
 
-#endif // !MODULES_QTUI_AQSIS_THREAD_H
+#endif // !MODULES_QTUI_AQSIS_MODE_THREAD_H

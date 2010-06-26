@@ -1,5 +1,5 @@
-#ifndef K3DSDK_OPENGL_OFFSCREEN_CONTEXT_H
-#define K3DSDK_OPENGL_OFFSCREEN_CONTEXT_H
+#ifndef K3DSDK_GL_OFFSCREEN_CONTEXT_H
+#define K3DSDK_GL_OFFSCREEN_CONTEXT_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -56,5 +56,5 @@ protected:
 
 } // namespace k3d
 
-#endif // !K3DSDK_OPENGL_OFFSCREEN_CONTEXT_H
+#endif // !K3DSDK_GL_OFFSCREEN_CONTEXT_H
 

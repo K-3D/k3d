@@ -1,3 +1,6 @@
+#ifndef MODULES_QTUI_PROGRAMMABLE_MODE_MODE_H
+#define MODULES_QTUI_PROGRAMMABLE_MODE_MODE_H
+
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -80,3 +83,4 @@ private:
 
 } // namespace module
 
+#endif // !MODULES_QTUI_PROGRAMMABLE_MODE_MODE_H

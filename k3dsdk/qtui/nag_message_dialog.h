@@ -1,5 +1,5 @@
-#ifndef K3DSDK_QTUI_NAG_MESSAGE_H
-#define K3DSDK_QTUI_NAG_MESSAGE_H
+#ifndef K3DSDK_QTUI_NAG_MESSAGE_DIALOG_H
+#define K3DSDK_QTUI_NAG_MESSAGE_DIALOG_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -61,5 +61,5 @@ private:
 
 } // namespace k3d
 
-#endif // !K3DSDK_QTUI_NAG_MESSAGE_H
+#endif // !K3DSDK_QTUI_NAG_MESSAGE_DIALOG_H
 

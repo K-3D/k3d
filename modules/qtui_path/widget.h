@@ -1,5 +1,5 @@
-#ifndef MODULES_QTUI_COLOR_WIDGET_H
-#define MODULES_QTUI_COLOR_WIDGET_H
+#ifndef MODULES_QTUI_PATH_WIDGET_H
+#define MODULES_QTUI_PATH_WIDGET_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -79,4 +79,4 @@ private:
 
 } // namespace module
 
-#endif // !MODULES_QTUI_COLOR_WIDGET_H
+#endif // !MODULES_QTUI_PATH_WIDGET_H

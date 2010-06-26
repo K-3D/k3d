@@ -1,5 +1,5 @@
-#ifndef MODULES_QTUI_NODE_LIST_PANEL_H
-#define MODULES_QTUI_NODE_LIST_PANEL_H
+#ifndef MODULES_QTUI_NODE_PROPERTIES_PANEL_H
+#define MODULES_QTUI_NODE_PROPERTIES_PANEL_H
 
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
@@ -79,5 +79,5 @@ private:
 
 } // namespace module
 
-#endif // !MODULES_QTUI_NODE_LIST_PANEL_H
+#endif // !MODULES_QTUI_NODE_PROPERTIES_PANEL_H
 
