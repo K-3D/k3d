@@ -25,8 +25,8 @@
 #include <k3dsdk/xml.h>
 #include <k3dsdk/xpath.h>
 
-#include <boost/spirit.hpp>
-using namespace boost::spirit;
+#include <boost/spirit/include/classic.hpp>
+using namespace boost::spirit::classic;
 
 namespace k3d
 {
@@ -178,7 +178,7 @@ struct match_attribute_value
 };
 
 class grammar :
-	public boost::spirit::grammar<grammar>
+	public boost::spirit::classic::grammar<grammar>
 {
 public:
 	grammar(match_context& Context) :

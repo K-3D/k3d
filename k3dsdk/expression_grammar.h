@@ -20,7 +20,9 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include <boost/spirit/core.hpp>
+#include <boost/spirit/include/classic_core.hpp>
+using namespace boost::spirit::classic;
+
 #include <cmath>
 #include <functional>
 #include <iostream>
@@ -33,8 +35,6 @@ namespace k3d
 
 namespace expression
 {
-
-using namespace boost::spirit;
 
 /// Defines a stack for holding intermediate values during parsing
 typedef std::stack<double> stack_t;
