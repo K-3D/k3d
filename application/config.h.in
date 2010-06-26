@@ -25,6 +25,7 @@
 */
 
 #cmakedefine K3D_ENABLE_OSX_BUNDLE
+#define K3D_LIBDIR "@K3D_LIBDIR@"
 
 #endif // !APPLICATION_CONFIG_H
 
