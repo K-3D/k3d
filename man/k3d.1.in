@@ -1,4 +1,4 @@
-.TH k3d 1 "2007" "K-3D Version @VERSION@"
+.TH k3d 1 "June 2010" "K-3D Version @K3D_VERSION@"
 .SH NAME
 k3d \- 3D modeling and animation system
 
@@ -192,11 +192,11 @@ Written by Timothy M. Shead <tshead@k-3d.com>, and many others.
 Report bugs to <k3d-development@lists.sourceforge.net>
 
 .SH COPYRIGHT
-@COPYRIGHT@
+@K3D_COPYRIGHT@
 .br
-This software is licensed under the GNU General Public License; see the source for copying conditions.  
+This software is licensed under the terms of the GNU General Public License; see the source for copying conditions.  
 There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 .SH SEE ALSO
-The full documentation for K-3D is maintained as an online wiki at http://www.k-3d.org/wiki
+The K\-3D Home Page: http://www.k\-3d.org
 
