@@ -14,7 +14,7 @@ INCLUDE_DIRECTORIES(${K3D_PYTHON_INCLUDE_DIRS})
 LINK_DIRECTORIES(${K3D_BOOST_LIB_DIRS})
 LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 
-ADD_LIBRARY(k3dsdk-python-arrays SHARED
+K3D_ADD_LIBRARY(k3dsdk-python-arrays SHARED
 	typed_array_python.cpp
 	typed_array_python.h
 	)
@@ -23,7 +23,7 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-arrays k3dsdk)
 TARGET_LINK_LIBRARIES(k3dsdk-python-arrays ${K3D_BOOST_PYTHON_LIBS})
 TARGET_LINK_LIBRARIES(k3dsdk-python-arrays ${K3D_PYTHON_LIBS})
 
-ADD_LIBRARY(k3dsdk-python-const-arrays SHARED
+K3D_ADD_LIBRARY(k3dsdk-python-const-arrays SHARED
 	const_typed_array_python.cpp
 	const_typed_array_python.h
 	)
@@ -32,7 +32,7 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays k3dsdk)
 TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays ${K3D_BOOST_PYTHON_LIBS})
 TARGET_LINK_LIBRARIES(k3dsdk-python-const-arrays ${K3D_PYTHON_LIBS})
 
-ADD_LIBRARY(k3dsdk-python-values SHARED
+K3D_ADD_LIBRARY(k3dsdk-python-values SHARED
 	angle_axis_python.cpp
 	angle_axis_python.h
 	bitmap_python.cpp
@@ -73,7 +73,7 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-values k3dsdk)
 TARGET_LINK_LIBRARIES(k3dsdk-python-values ${K3D_BOOST_PYTHON_LIBS})
 TARGET_LINK_LIBRARIES(k3dsdk-python-values ${K3D_PYTHON_LIBS})
 
-ADD_LIBRARY(k3dsdk-python-mesh SHARED
+K3D_ADD_LIBRARY(k3dsdk-python-mesh SHARED
 	mesh_python.cpp
 	mesh_python.h
 	)
@@ -81,7 +81,7 @@ K3D_GENERATE_DEF_FILE(k3dsdk-python-mesh)
 TARGET_LINK_LIBRARIES(k3dsdk-python-mesh k3dsdk-python-arrays)
 TARGET_LINK_LIBRARIES(k3dsdk-python-mesh k3dsdk-python-const-arrays)
 
-ADD_LIBRARY(k3dsdk-python-interfaces SHARED
+K3D_ADD_LIBRARY(k3dsdk-python-interfaces SHARED
 	any_python.cpp
 	any_python.h
 	icommand_node_python.cpp
@@ -125,7 +125,7 @@ K3D_GENERATE_DEF_FILE(k3dsdk-python-interfaces)
 TARGET_LINK_LIBRARIES(k3dsdk-python-interfaces k3dsdk-python-mesh)
 TARGET_LINK_LIBRARIES(k3dsdk-python-interfaces k3dsdk-python-values)
 
-ADD_LIBRARY(k3dsdk-python-b SHARED
+K3D_ADD_LIBRARY(k3dsdk-python-b SHARED
 	table_python.cpp
 	table_python.h
 	const_table_python.cpp
@@ -166,7 +166,7 @@ TARGET_LINK_LIBRARIES(k3dsdk-python-b k3dsdk-python-const-arrays)
 TARGET_LINK_LIBRARIES(k3dsdk-python-b k3dsdk-python-interfaces)
 TARGET_LINK_LIBRARIES(k3dsdk-python-b k3dsdk-resource)
 
-ADD_LIBRARY(k3dsdk-python-primitives SHARED
+K3D_ADD_LIBRARY(k3dsdk-python-primitives SHARED
 	bezier_triangle_patch_python.cpp
 	bezier_triangle_patch_python.h
 	bicubic_patch_python.cpp
@@ -207,7 +207,7 @@ ADD_LIBRARY(k3dsdk-python-primitives SHARED
 K3D_GENERATE_DEF_FILE(k3dsdk-python-primitives)
 TARGET_LINK_LIBRARIES(k3dsdk-python-primitives k3dsdk-python-b)
 
-ADD_LIBRARY(k3dsdk-python SHARED
+K3D_ADD_LIBRARY(k3dsdk-python SHARED
 	difference_python.cpp
 	difference_python.h
 	instance_wrapper_python.h
@@ -264,7 +264,7 @@ INSTALL(TARGETS k3dsdk-python
 IF(K3D_BUILD_NGUI_MODULE)
 	INCLUDE_DIRECTORIES(${K3D_GTKMM_INCLUDE_DIRS})
 
-	ADD_LIBRARY(k3dsdk-python-atk SHARED
+	K3D_ADD_LIBRARY(k3dsdk-python-atk SHARED
 		atk_python.cpp
 		atk_python.h
 		)
