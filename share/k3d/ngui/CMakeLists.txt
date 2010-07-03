@@ -1,0 +1,6 @@
+K3D_ADD_SHARE_FILES(*.k3d k3d/ngui)
+
+ADD_SUBDIRECTORY(pixmap)
+ADD_SUBDIRECTORY(rasterized)
+ADD_SUBDIRECTORY(scalable)
+
