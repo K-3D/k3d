@@ -106,7 +106,7 @@ public:
 			k3d::classes::DocumentExporter(),
 			"K3DDocumentExporter",
 			_("K-3D Native ( .k3d )"),
-			"");
+			"DocumentExporter");
 
 		return factory;
 	}
