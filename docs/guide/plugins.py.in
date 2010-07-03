@@ -43,6 +43,27 @@ reference.write("""[appendix]\n""")
 reference.write("""Plugin Reference Documentation\n""")
 reference.write("""==============================\n""")
 
+# Create an article for each plugin category ...
+for category in sorted(categories.keys()):
+	if len(categories[category]) == 0:
+		continue
+
+	print """Creating plugin category documentation for """ + category + """ ..."""
+
+	reference.write("""\n[[""" + category + """Plugins]]\n""")
+	reference.write("""\n== """ + category + """ Plugins ==\n""")
+
+	for plugin in sorted(categories[category], plugin_sort):
+		reference.write("""\n""")
+
+#		if os.path.exists("@share_SOURCE_DIR@/ngui/rasterized/" + plugin.name() + ".png"):
+#			article.write("""<td>[[Image:""" + plugin.name() + """.png]]</td>""")
+#		else:
+#			article.write("""<td>&nbsp;</td>""")
+		reference.write("""<<""" + plugin.name() + """,""" + plugin.name() + """>>:: """ + plugin.short_description() + """\n""")
+
+	reference.write("""\n""")
+
 for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 	if plugin.metadata().has_key("k3d:disable-documentation"):
 		continue
@@ -70,10 +91,10 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 	reference.write(plugin_quality + "\n")
 
 	reference.write("""\n.Categories\n""")
-	reference.write("""All Plugins""")
-	reference.write(""", """ + plugin_quality + " Plugins""")
+	reference.write("""<<AllPlugins,All Plugins>>""")
+	reference.write(""", <<""" + plugin_quality + "Plugins,""" + plugin_quality + """ Plugins>>""")
 	for category in plugin.categories():
-		reference.write(""", """ + category + " Plugins""")
+		reference.write(""", <<""" + category + "Plugins,""" + category + """ Plugins>>""")
 	reference.write("""\n""")
 
 	if plugin.is_document_plugin():
@@ -113,50 +134,6 @@ for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 		reference.write("""|=========================================================\n""")
 
 reference.write("""// Machine-generated file, do not edit by hand!\n\n\n""")
-
-## Create an article listing every plugin category ...
-#print """Creating plugin categories article ..."""
-#article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/categories/Plugin Categories", "w")
-#article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
-#
-#article.write("""<table border="1" cellpadding="5" cellspacing="0">\n""")
-#article.write("""<tr><th>Plugin Categories</th></tr>\n""")
-#
-#for category in sorted(categories.keys()):
-#	article.write("""<tr><td>[[""" + category + " Plugins]]</td></tr>\n""")
-#
-#article.write("""<table>\n""")
-#
-#article.write("""<!-- Machine-generated file, do not edit by hand! -->\n""")
-#
-## Create an article for each plugin category ...
-#for category in sorted(categories.keys()):
-#	print """Creating plugin category article """ + category + """ ..."""
-#	article = file("@CMAKE_CURRENT_BINARY_DIR@/wikitext/categories/" + category + " Plugins", "w")
-#	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
-#
-#	article.write("""<table border="0" cellpadding="5" cellspacing="0">\n""")
-#	article.write("""<tr><td><b>Category:</b></td><td>""" + category + """</td></tr>\n""")
-#	article.write("""<tr><td><b>Plugins:</b></td><td>""" + str(len(categories[category])) + """</td></tr>\n""")
-#	article.write("""</table>\n""")
-#
-#	article.write("""<table border="1" cellpadding="5" cellspacing="0">\n""")
-#	article.write("""<tr><th>Icon</th><th>Plugin</th><th>Description</th></tr>\n""")
-#
-#	for plugin in sorted(categories[category], plugin_sort):
-#		article.write("""<tr>""")
-#
-#		if os.path.exists("@share_SOURCE_DIR@/ngui/rasterized/" + plugin.name() + ".png"):
-#			article.write("""<td>[[Image:""" + plugin.name() + """.png]]</td>""")
-#		else:
-#			article.write("""<td>&nbsp;</td>""")
-#	
-#		article.write("""<td>[[""" + plugin.name() + """]]</td><td>""" + plugin.short_description() + """</td></tr>\n""")
-#
-#	article.write("""</table>\n""")
-#
-#	article.write("<!-- Machine-generated file, do not edit by hand! -->\n")
-#
 
 k3d.close_document(doc)
 
