@@ -1,2 +1,2 @@
-INSTALL_GLOB(*.glsl share/k3d/shaders/glsl)
+K3D_SHARE_INSTALL(*.glsl shaders/glsl)
 

@@ -154,15 +154,15 @@ void set_default_options(k3d::bool_t& Quit, k3d::bool_t& Error)
 {
 	// Setup default paths based on the location of the executable ...
 	const k3d::filesystem::path executable_dir = k3d::system::executable_path().branch_path();
-	const k3d::filesystem::path data_path = k3d::system::get_home_directory() / k3d::filesystem::generic_path(".k3d");
+	const k3d::filesystem::path user_dir = k3d::system::get_home_directory() / k3d::filesystem::generic_path(".k3d");
 
 	g_default_ngui_path = executable_dir / k3d::filesystem::generic_path("../" K3D_LIBDIR "/k3d/plugins/k3d-ngui.module");
 	g_default_nui_path = executable_dir / k3d::filesystem::generic_path("../" K3D_LIBDIR "/k3d/plugins/k3d-nui.module");
-	g_default_options_path = data_path / k3d::filesystem::generic_path("options.k3d");
+	g_default_options_path = user_dir / k3d::filesystem::generic_path("options.k3d");
 	g_default_plugin_paths = (executable_dir / k3d::filesystem::generic_path("../" K3D_LIBDIR "/k3d/plugins")).native_filesystem_string();
 	g_default_pyui_path = executable_dir / k3d::filesystem::generic_path("../" K3D_LIBDIR "/k3d/plugins/k3d-pyui.module");
 	g_default_qtui_path = executable_dir / k3d::filesystem::generic_path("../" K3D_LIBDIR "/k3d/plugins/k3d-qtui.module");
-	g_default_shader_cache_path = data_path / k3d::filesystem::generic_path("shadercache");
+	g_default_shader_cache_path = user_dir / k3d::filesystem::generic_path("shadercache");
 	g_default_share_path = executable_dir / k3d::filesystem::generic_path("../share/k3d");
 
 #ifdef K3D_ENABLE_OSX_BUNDLE
@@ -198,10 +198,8 @@ void set_default_options(k3d::bool_t& Quit, k3d::bool_t& Error)
 		g_user_interface_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::system::getenv("K3D_USER_INTERFACE_PATH")));
 
 #ifdef K3D_API_WIN32
-
 	// Add the executable directory to PATH
 	k3d::system::setenv("PATH", executable_dir.native_filesystem_string() + ";" + k3d::system::getenv("PATH"));
-
 #endif // K3D_API_WIN32
 }
 

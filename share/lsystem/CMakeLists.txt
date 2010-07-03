@@ -1,2 +1,2 @@
-INSTALL_GLOB(*.ls share/k3d/lsystem)
+K3D_SHARE_INSTALL(*.ls lsystem)
 

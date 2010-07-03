@@ -1,3 +1,3 @@
-INSTALL_GLOB(*.sl share/k3d/shaders/displacement)
-INSTALL_GLOB(*.slmeta share/k3d/shaders/displacement)
+K3D_SHARE_INSTALL(*.sl shaders/displacement)
+K3D_SHARE_INSTALL(*.slmeta shaders/displacement)
 

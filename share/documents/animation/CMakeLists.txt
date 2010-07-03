@@ -1,2 +1,2 @@
-INSTALL_GLOB(*.k3d share/k3d/documents/animation)
+K3D_SHARE_INSTALL(*.k3d documents/animation)
 

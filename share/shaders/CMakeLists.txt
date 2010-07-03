@@ -1,4 +1,4 @@
-INSTALL_GLOB(*.h share/k3d/shaders)
+K3D_SHARE_INSTALL(*.h shaders)
 
 ADD_SUBDIRECTORY(displacement)
 ADD_SUBDIRECTORY(glsl)

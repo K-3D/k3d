@@ -40,7 +40,6 @@ FUNCTION(K3D_TEST TEST_NAME)
 		ADD_TEST(${TEST_NAME}
 			${k3d_BINARY_DIR}/bin/k3d
 			--log-level=debug
-			--share=${k3d_SOURCE_DIR}/share
 			${TEST_UI}
 			--setenv "PYTHONPATH=${tests_SOURCE_DIR}"
 			--setenv "K3D_TEST_SOURCE_PATH=${tests_SOURCE_DIR}"
@@ -62,7 +61,6 @@ FUNCTION(K3D_TEST TEST_NAME)
 		ADD_TEST(${TEST_NAME}
 			${k3d_BINARY_DIR}/bin/k3d
 			--log-level=debug
-			--share=${k3d_SOURCE_DIR}/share
 			${TEST_UI}
 			--setenv "PYTHONPATH=${tests_SOURCE_DIR}"
 			--setenv "K3D_TEST_SOURCE_PATH=${tests_SOURCE_DIR}"

@@ -1,2 +1,2 @@
-INSTALL_GLOB(*.png share/k3d/ngui/rasterized)
+K3D_SHARE_INSTALL(*.png ngui/rasterized)
 

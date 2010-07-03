@@ -1,3 +1,3 @@
-INSTALL_GLOB(*.py share/k3d/scripts/shell)
-INSTALL_GLOB(*.k3d share/k3d/scripts/shell)
+K3D_SHARE_INSTALL(*.py scripts/shell)
+K3D_SHARE_INSTALL(*.k3d scripts/shell)
 

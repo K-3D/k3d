@@ -1,2 +1,2 @@
-INSTALL_GLOB(*.ttf share/k3d/fonts)
+K3D_SHARE_INSTALL(*.ttf fonts)
 

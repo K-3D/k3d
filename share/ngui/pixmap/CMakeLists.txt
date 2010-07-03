@@ -1,3 +1,3 @@
-INSTALL_GLOB(*.png share/k3d/ngui/pixmap)
-INSTALL_GLOB(*.xpm share/k3d/ngui/pixmap)
+K3D_SHARE_INSTALL(*.png ngui/pixmap)
+K3D_SHARE_INSTALL(*.xpm ngui/pixmap)
 

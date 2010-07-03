@@ -1,2 +1,2 @@
-INSTALL_GLOB(*.obj share/k3d/geometry)
+K3D_SHARE_INSTALL(*.obj geometry)
 

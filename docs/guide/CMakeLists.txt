@@ -27,7 +27,7 @@ ADD_CUSTOM_COMMAND(
 	DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/plugins.py
 	WORKING_DIRECTORY ${CONTENT_BINARY_DIR}
 	COMMAND
-		${k3d_BINARY_DIR}/bin/k3d --log-level=debug --color --share=${k3d_SOURCE_DIR}/share --script-file=${CMAKE_CURRENT_BINARY_DIR}/plugins.py --ui=nui
+		${k3d_BINARY_DIR}/bin/k3d --log-level=debug --color --script-file=${CMAKE_CURRENT_BINARY_DIR}/plugins.py --ui=nui
 	OUTPUT ${CONTENT_BINARY_DIR}/plugins.txt
 	)
 

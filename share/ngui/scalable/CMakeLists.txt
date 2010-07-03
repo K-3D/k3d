@@ -1,4 +1,4 @@
-INSTALL_GLOB(*.svg share/k3d/ngui/scalable)
+K3D_SHARE_INSTALL(*.svg ngui/scalable)
 
 FIND_PROGRAM(RSVG_COMMAND rsvg)
 

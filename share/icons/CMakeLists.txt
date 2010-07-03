@@ -1,3 +1,3 @@
-INSTALL_GLOB(*.ico share/k3d/icons)
-INSTALL_GLOB(*.png share/k3d/icons)
+K3D_SHARE_INSTALL(*.ico icons)
+K3D_SHARE_INSTALL(*.png icons)
 

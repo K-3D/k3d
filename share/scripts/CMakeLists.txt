@@ -1,4 +1,4 @@
-INSTALL_GLOB(*.py share/k3d/scripts)
+K3D_SHARE_INSTALL(*.py scripts)
 
 ADD_SUBDIRECTORY(animation)
 ADD_SUBDIRECTORY(MeshModifierScript)

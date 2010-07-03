@@ -1,3 +1,3 @@
-INSTALL_GLOB(*.sl share/k3d/shaders/imager)
-INSTALL_GLOB(*.slmeta share/k3d/shaders/imager)
+K3D_SHARE_INSTALL(*.sl shaders/imager)
+K3D_SHARE_INSTALL(*.slmeta shaders/imager)
 

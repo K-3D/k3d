@@ -1,2 +1,2 @@
-INSTALL_GLOB(*.png share/k3d/textures)
+K3D_SHARE_INSTALL(*.png textures)
 
