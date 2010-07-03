@@ -102,7 +102,7 @@ OPTION(K3D_BUILD_FOO_MODULE "Build the foo plugin module" ON)
 * In the 'k3d/module/CMakeLists.txt' file, add your module to the build:
 
 ------------------------------------------------
-K3D_CONDITIONAL_BUILD(K3D_BUILD_FOO_MODULE foo)
+K3D_ADD_SUBDIRECTORY(foo REQUIRES K3D_BUILD_FOO_MODULE)
 ------------------------------------------------
 
 * If your plugin has a dependency on a third-party library "libfoo", you will need to create a special CMake file that will test to see if the libfoo is installed, and where its header files and link libraries are located:

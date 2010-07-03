@@ -1,7 +1,5 @@
 PROJECT(guide)
 
-FIND_PROGRAM(ASCIIDOC_COMMAND asciidoc)
-FIND_PROGRAM(A2X_COMMAND a2x)
 FIND_PROGRAM(QHELPGENERATOR_COMMAND NAMES qhelpgenerator qhelpgenerator-mac)
 FIND_PROGRAM(QCOLLECTIONGENERATOR_COMMAND NAMES qcollectiongenerator qcollectiongenerator-mac)
 
