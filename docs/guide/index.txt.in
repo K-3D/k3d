@@ -18,6 +18,12 @@ K-3D Developers' Guide
 include::@CONTENT_SOURCE_DIR@/plugin_design.txt[]
 include::@CONTENT_SOURCE_DIR@/on_demand_modules.txt[]
 include::@CONTENT_SOURCE_DIR@/building_plugins.txt[]
+:leveloffset: 0
+
+K-3D Reference Manual
+=====================
+
+:leveloffset: 1
 include::@CONTENT_BINARY_DIR@/plugins.txt[]
 :leveloffset: 0
 

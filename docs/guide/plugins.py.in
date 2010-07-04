@@ -39,11 +39,12 @@ for plugin in k3d.plugin.factory.lookup():
 print """Generating plugin reference documentation ..."""
 reference = file("@CONTENT_BINARY_DIR@/plugins.txt", "w")
 reference.write("""// Machine-generated file, do not edit by hand!\n\n\n""")
-reference.write("""[appendix]\n""")
-reference.write("""Plugin Reference Documentation\n""")
-reference.write("""==============================\n""")
 
 # Create an article for each plugin category ...
+reference.write("""[appendix]\n""")
+reference.write("""Plugin Categories\n""")
+reference.write("""=================\n""")
+
 for category in sorted(categories.keys()):
 	if len(categories[category]) == 0:
 		continue
@@ -63,6 +64,11 @@ for category in sorted(categories.keys()):
 		reference.write("""<<""" + plugin.name() + """,""" + plugin.name() + """>>:: """ + plugin.short_description() + """\n""")
 
 	reference.write("""\n""")
+
+# Create an article for each plugin ...
+reference.write("""[appendix]\n""")
+reference.write("""Plugin Reference\n""")
+reference.write("""================\n""")
 
 for plugin in sorted(k3d.plugin.factory.lookup(), plugin_sort):
 	if plugin.metadata().has_key("k3d:disable-documentation"):
