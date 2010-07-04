@@ -1,0 +1,19 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Add information on materials to the Guide.
+desc: Like it says - there are a lot of support requests around material management.
+type: :feature
+component: K-3D
+release: 0.8.1.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-07-04 19:13:56.370134 Z
+references: []
+
+id: 726036fd940e69af892483f4fb81ced5076343c0
+log_events: 
+- - 2010-07-04 19:13:57.177396 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 

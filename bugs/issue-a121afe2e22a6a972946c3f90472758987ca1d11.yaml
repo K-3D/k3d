@@ -1,0 +1,19 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Add LuxRender usage to the Guide.
+desc: Like it says - there seems to be a fair amount of confusion on how to use LuxRender.
+type: :feature
+component: K-3D
+release: 0.8.1.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-07-04 19:14:39.467840 Z
+references: []
+
+id: a121afe2e22a6a972946c3f90472758987ca1d11
+log_events: 
+- - 2010-07-04 19:14:40.115653 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 

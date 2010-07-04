@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Make the K-3D guide readable from the NGUI.
+desc: |-
+  Users should be able to open the K-3D guide from the NGUI, i.e. it should be distributed with the app and openable, either via HTML or PDF or both.
+  
+  Notes: we could use GtkHtml, or open the guide in the user's browser.
+type: :feature
+component: K-3D
+release: 0.8.1.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-07-04 19:13:18.774227 Z
+references: []
+
+id: 41f14db348415ee631409034dafa0d42d0deddea
+log_events: 
+- - 2010-07-04 19:13:19.629998 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 
