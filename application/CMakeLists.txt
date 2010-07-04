@@ -72,8 +72,8 @@ IF(APPLE AND K3D_ENABLE_OSX_BUNDLE)
     OUTPUT ${K3D_BUNDLE_DIRECTORY}/Resources
     )
   ADD_CUSTOM_COMMAND(
-    DEPENDS ${K3D_BUNDLE_DIRECTORY}/Resources ${share_SOURCE_DIR}/icons/k3d.icns
-    COMMAND ${CMAKE_COMMAND} -E copy ${share_SOURCE_DIR}/icons/k3d.icns ${K3D_BUNDLE_DIRECTORY}/Resources/K-3D.icns
+    DEPENDS ${K3D_BUNDLE_DIRECTORY}/Resources ${share_SOURCE_DIR}/k3d/icons/k3d.icns
+    COMMAND ${CMAKE_COMMAND} -E copy ${share_SOURCE_DIR}/k3d/icons/k3d.icns ${K3D_BUNDLE_DIRECTORY}/Resources/K-3D.icns
     OUTPUT ${K3D_BUNDLE_DIRECTORY}/Resources/K-3D.icns
     )
   ADD_CUSTOM_TARGET(bundle ALL
