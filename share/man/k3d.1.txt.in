@@ -1,0 +1,168 @@
+K-3D(1)
+=======
+
+NAME
+----
+k3d - 3D modeling and animation system.
+
+SYNOPSIS
+--------
+*k3d* ['OPTIONS']
+
+DESCRIPTION
+-----------
+K-3D is the free (as in freedom) 3D modeling, animation, and rendering system
+for systems including GNU/Linux, Mac OSX, Windows, and others. K-3D features a
+robust, object-oriented plugin architecture and is capable of producing
+motion-picture-quality output when paired with a RenderMan Interface compliant
+render engine such as Aqsis.
+
+OPTIONS
+-------
+
+*--add-path*='PATH'::
+Prepends a filesystem path to the PATH environment variable.
+
+*--batch*::
+Enables batch (no user intervention) mode.
+
+*--color*::
+Color-codes log messages based on their priority.  Requires an ANSI
+color-capable terminal.
+
+*--disable-gl-extension*='EXTENSION'::
+Disables the given OpenGL extension (whether it is supported by the
+underlyinghardware or not).
+
+*--enable-gl-extension*='EXTENSION'::
+Enables the given OpenGL extension (whether it is supported by the underlying
+hardware or not).
+
+*--exit*::
+Exits the program after startup (useful when running scripts in batch mode).
+
+*-h, --help*::
+Prints this help information and exits.
+
+*--list-gl-extensions*::
+List available OpenGL extensions and exit.
+
+*--locale*='PATH'::
+Overrides the path for loading locales.
+
+*--log-level*='LEVEL'::
+Specifies the minimal message priority to display: 'warning', 'information'
+or 'debug'.  Defaults to 'warning'.
+
+*--options*='PATH'::
+Overrides the filepath for storing user options (this overrides the default
+and the K3D_OPTIONS_PATH environment variable).
+
+*--plugins*='PATHS'::
+Overrides the path(s) for loading plugin libraries (this overrides the
+default and the K3D_PLUGIN_PATHS environment variable).  Multiple
+colon-delimited paths are allowed.  Use "&" as a synonym for the default
+paths.
+
+*--no-color*::
+Disable color-coding of log messages based on their priority.
+
+*-e, --script*='SCRIPT'::
+Executes the given script text after startup.
+
+*-f, --script-file*='PATH'::
+Executes the given script file after startup (use - for stdin).
+
+*--setenv*='ARG'::
+Set an environment variable using name=value syntax.
+
+*--shadercache*='PATH'::
+Overrides the path where compiled shaders will be cached (this overrides the
+default and the K3D_SHADER_CACHE_PATH environment variable).
+
+*--share*='PATH'::
+Overrides the path for loading shared data files (this overrides the default
+and the K3D_SHARE_PATH environment variable).
+
+*--show-process*::
+Prints the process name next to log messages.
+
+*--show-timestamps*::
+Prints timestamps next to log messages.
+
+*--syslog*::
+Logs messages to syslog.
+
+*-u, --ui*='ARG'::
+Specifies the user interface to use at startup: 'nui', 'ngui', 'qtui',
+'pyui', or the path to a user interface plugin (this overrides the default
+and the K3D_USER_INTERFACE_PATH environment variable).
+
+*-H, --user-interface-help*::
+Prints additional command line options based on the the current choice of
+user interface, and exits.
+
+*--version*::
+Prints program version information and exits.
+
+ENVIRONMENT VARIABLES
+---------------------
+
+*K3D_EXTRA_OPTIONS*::
+Provides additional options that are appended to the command-line at startup.
+Note that unlike other K-3D environment variables, options specified via
+K3D_EXTRA_OPTIONS will override options specified on the command line.
+Typically used to pass command-line arguments when running the program from
+the build tree. 
+
+*K3D_OPTIONS_PATH*::
+Overrides the path for storing user options (this overrides the default, but
+can be overridden by the --options option).
+
+*K3D_PLUGIN_PATHS*::
+Overrides the path(s) for loading plugin libraries (this overrides the
+default, but can be overridden by the --plugins option).  Multiple
+colon-delimited paths are allowed.  Use "&" as a synonym for the default
+paths.
+
+*K3D_SHADER_CACHE_PATH*::
+Overrides the path where compiled shaders are cached (this overrides the
+default, but can be overridden by the --shadercache option).
+
+*K3D_SHARE_PATH*::
+Overrides the path for loading shared data files (this overrides the default,
+but can be overridden by the --share option).
+
+*K3D_USER_INTERFACE_PATH*::
+Overrides the path to the user interface plugin (this overrides the default,
+but can be overridden by the --ui option).
+
+
+EXIT STATUS
+-----------
+
+*0*::
+    Success
+
+*Non-zero*::
+    Failure (syntax or usage error; configuration error; runtime
+    failure; unexpected error).
+
+BUGS
+----
+See the K-3D tracker at http://developer.k-3d.org/tracker and report bugs to <k3d-development@lists.sourceforge.net>
+
+AUTHORS
+-------
+K-3D by Timothy M. Shead <tshead@k-3d.com>, and many others.
+
+RESOURCES
+---------
+K-3D home page: http://www.k-3d.org
+
+COPYING
+-------
+@K3D_COPYRIGHT@  This software is licensed under the terms of the GNU General
+Public License; see the source for copying conditions.  There is NO warranty;
+not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

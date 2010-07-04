@@ -1,0 +1,65 @@
+K-3D(1)
+=======
+
+NAME
+----
+k3d-renderjob - Part of a simple system for queueing K-3D render jobs on the local host
+
+SYNOPSIS
+--------
+*k3d-renderjob* ['OPTIONS'] ['DIRECTORY' ...]
+
+DESCRIPTION
+-----------
+
+Extracted from http://www.k-3d.org/wiki/Network_Rendering
+
+Currently, K-3D implements a simple system for queueing rendering jobs on the
+local host. When the user initiates a job (such as rendering a preview image,
+rendering a final frame, or rendering an animation), a job directory is created
+(usually in /tmp, although this can be configured). The job directory contains
+a lock file, a control file named control.k3d, and one-to-many numbered frame
+directories. The name of the lock file changes to flag the sta.IP tus of the
+job as "ready", "running", "complete", or "error". The control.k3d file is
+currently unused.  Each frame directory contains a lock file, a control file
+named control.k3d and zero-to-many frame resources. The name of the lock file
+changes to flag the status of the frame as "ready", "running", "complete", or
+"error". The control.k3d file is an XML file that encodes a set of operations
+that must be completed successfully to change the status of the frame from
+"ready" to "complete". Three types of operation are allowed: a "render"
+operation that executes a pre-configured render command using a fixed set of
+command-line arguments, a "copy" operation that copies a file from one
+filesystem location to another; and a "view" operation that displays a bitmap
+image using the user's choice of image viewer. The frame resources are inputs
+to the render engine, such as RIB files, texture images, shaders, etc. 
+
+The k3d-renderjob executable is run with the path to a job directory as an
+argument. k3d-renderjob updates the job lock file, iterating over each frame
+directory, spawning an instance of k3d-renderframe for each frame (one at a
+time). k3d-renderframe is run with the path to a frame directory as an
+argument, updating the frame lock file, reading the control file, and executing
+the operations that it specifies. 
+
+OPTIONS
+-------
+
+*-h, --help*::
+Prints this help information and exits.
+
+*--version*::
+Prints program version information and exits.
+
+AUTHORS
+-------
+K-3D by Timothy M. Shead <tshead@k-3d.com>, and many others.  This manpage written by Manuel A. Fernandez Montecelo <manuel.montezelo@gmail.com>
+
+RESOURCES
+---------
+K-3D home page: http://www.k-3d.org
+
+COPYING
+-------
+@K3D_COPYRIGHT@  This software is licensed under the terms of the GNU General
+Public License; see the source for copying conditions.  There is NO warranty;
+not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

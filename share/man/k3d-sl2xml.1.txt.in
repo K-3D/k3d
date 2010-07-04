@@ -1,0 +1,41 @@
+K-3D(1)
+=======
+
+NAME
+----
+k3d-sl2xml - Parses a RenderMan shader to create a shader meta file used by the K-3D user interface.
+
+SYNOPSIS
+--------
+*k3d-sl2xml* ['OPTIONS']
+
+DESCRIPTION
+-----------
+
+*-h, --help*::
+Prints this help information and exits.
+
+*--version*::
+Prints program version information and exits.
+
+Note: input on stdin *must* be *preprocessed* RenderMan Shading Language source code.
+We recommend you run k3d-sl2xml with:
+
+--------------------------------------------------------
+gcc -E -P -x c <file> | k3d-sl2xml
+--------------------------------------------------------
+
+AUTHORS
+-------
+K-3D by Timothy M. Shead <tshead@k-3d.com>, and many others.  This manpage written by Manuel A. Fernandez Montecelo <manuel.montezelo@gmail.com>
+
+RESOURCES
+---------
+K-3D home page: http://www.k-3d.org
+
+COPYING
+-------
+@K3D_COPYRIGHT@  This software is licensed under the terms of the GNU General
+Public License; see the source for copying conditions.  There is NO warranty;
+not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
