@@ -31,10 +31,13 @@
 #include <boost/scoped_ptr.hpp>
 
 #include <QMainWindow>
+#include <QPointer>
 
 namespace k3d { class idocument; }
 namespace k3d { class iplugin_factory; }
 namespace k3d { namespace filesystem { class path; } }
+
+class QProcess;
 
 namespace module
 {
@@ -59,8 +62,9 @@ private Q_SLOTS:
 	void on_file_open_activated();
 	void on_file_quit_activated();
 	void on_script_play_activated();
-	void on_help_file_bug_report_activated();
+	void on_help_k3d_guide_activated();
 	void on_help_k3d_online_activated();
+	void on_help_file_bug_report_activated();
 	void on_help_about_activated();
 
 private:
@@ -74,6 +78,8 @@ private:
 	Ui::main_window ui;
 	k3d::qtui::document_widget document_widget;
 	boost::scoped_ptr<scene> m_scene;
+
+	QPointer<QProcess> m_assistant;
 };
 
 } // namespace qtui

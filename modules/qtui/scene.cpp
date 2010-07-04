@@ -52,6 +52,7 @@ namespace qtui
 // scene
 
 scene::scene(k3d::idocument& Document) :
+	m_document(Document),
 	m_camera(init_value<k3d::icamera*>(0)),
 	m_gl_engine(init_value<k3d::gl::irender_viewport*>(0))
 {
@@ -122,7 +123,7 @@ void scene::on_set_active_mode()
 		delete all_items[i];
 
 	if(m_active_mode)
-		m_active_mode->enable(*this);
+		m_active_mode->enable(m_document, *this);
 }
 
 void scene::on_camera_changed(int Index)

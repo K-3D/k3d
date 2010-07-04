@@ -36,6 +36,11 @@ namespace k3d
 namespace system
 {
 
+/// Used to initialize the current executable path.  Should be called once as soon as possible at startup, before the cwd can be altered.
+void initialize_executable_path(int argc, char* argv[]);
+/// Returns the absolute path of the current executable, or an empty path
+const filesystem::path executable_path();
+
 /// Safely returns an environment variable (returns empty string if the variable doesn't exist)
 const string_t getenv(const string_t& Variable);
 /// Safely sets an environment variable using separate name and value strings
@@ -49,8 +54,6 @@ const filesystem::path get_home_directory();
 const filesystem::path get_temp_directory();
 /// Returns a unique temporary file path
 const filesystem::path generate_temp_file();
-/// Returns the installation path.  On Posix systems this is the equivalent of CMAKE_INSTALL_PREFIX.  On Win32 and OSX it is the parent of the directory that contains the K-3D binary
-const filesystem::path install_path();
 
 /// Returns the path to a binary executable by searching the contents of the PATH environment variable, or an empty path
 const k3d::filesystem::path find_executable(const string_t& Executable);

@@ -24,9 +24,12 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/color.h>
 #include <k3dsdk/convert.h>
 #include <k3dsdk/ustring.h>
 #include <k3dsdk/types.h>
+
+#include <QColor>
 #include <QString>
 
 namespace k3d
@@ -44,6 +47,35 @@ template<>
 inline QString convert(const ustring& From)
 {
 	return QString::fromUtf8(From.utf8_str().c_str());
+}
+
+/// Specialization of k3d::convert that converts k3d::color to QColor.
+template<>
+inline QColor convert(const color& From)
+{
+	return QColor::fromRgbF(From.red, From.green, From.blue, 1.0);
+}
+
+/// Specialization of k3d::convert that converts QColor to k3d::color.
+template<>
+inline color convert(const QColor& From)
+{
+	return color(From.redF(), From.greenF(), From.blueF());
+}
+
+/// Specialization of k3d::convert that converts QString to k3d::string_t.
+/** \deprecated This is a potentially lossy conversion, since we're going from Unicode to ASCII. */
+template<>
+inline string_t convert(const QString& From)
+{
+	return From.toAscii().data();
+}
+
+/// Specialization of k3d::convert that converts QString to k3d::ustring.
+template<>
+inline ustring convert(const QString& From)
+{
+	return ustring::from_utf8(From.toUtf8().data());
 }
 
 } // namespace k3d

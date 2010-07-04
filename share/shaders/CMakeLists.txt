@@ -1,9 +1,0 @@
-INSTALL_GLOB(*.h share/k3d/shaders)
-
-ADD_SUBDIRECTORY(displacement)
-ADD_SUBDIRECTORY(glsl)
-ADD_SUBDIRECTORY(imager)
-ADD_SUBDIRECTORY(light)
-ADD_SUBDIRECTORY(surface)
-ADD_SUBDIRECTORY(volume)
-

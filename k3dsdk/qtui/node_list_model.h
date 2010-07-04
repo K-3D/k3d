@@ -55,9 +55,11 @@ public:
 	void add_nodes(const std::vector<inode*>& Nodes);
 	/// Removes nodes from the model
 	void remove_nodes(const std::vector<inode*>& Nodes);
+  /// Maps from an index to a node (could return NULL)
+  inode* node(const QModelIndex& Index);
 
-	virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
-	virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+	virtual int rowCount(const QModelIndex& Parent = QModelIndex()) const;
+	virtual QVariant data(const QModelIndex& Index, int role = Qt::DisplayRole) const;
 
 private:
 	std::vector<inode*> nodes;

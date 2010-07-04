@@ -207,7 +207,7 @@ public:
 			k3d::classes::DocumentImporter(),
 			"K3DDocumentImporter",
 			_("K-3D Native ( .k3d )"),
-			"",
+			"DocumentImporter",
 			k3d::iplugin_factory::STABLE,
 			boost::assign::map_list_of("k3d:mime-types", "application/x-k3d"));
 

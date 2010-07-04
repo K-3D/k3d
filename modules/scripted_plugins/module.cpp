@@ -66,7 +66,11 @@ public:
 		if(!delegate_factory)
 			delegate_factory = dynamic_cast<k3d::iapplication_plugin_factory*>(k3d::plugin::factory::lookup(delegate_factory_name));
 
-		return_val_if_fail(delegate_factory, 0);
+		if(!delegate_factory)
+		{
+			k3d::log() << error << "Couldn't locate delegate factory [" << delegate_factory_name << "]" << std::endl;
+			return 0;
+		}
 
 		k3d::iunknown* const plugin = delegate_factory->create_plugin();
 		return_val_if_fail(plugin, 0);
@@ -122,7 +126,11 @@ public:
 		if(!delegate_factory)
 			delegate_factory = dynamic_cast<k3d::idocument_plugin_factory*>(k3d::plugin::factory::lookup(delegate_factory_name));
 
-		return_val_if_fail(delegate_factory, 0);
+		if(!delegate_factory)
+		{
+			k3d::log() << error << "Couldn't locate delegate factory [" << delegate_factory_name << "]" << std::endl;
+			return 0;
+		}
 
 		k3d::inode* const node = delegate_factory->create_plugin(*dynamic_cast<k3d::iplugin_factory*>(delegate_factory), Document);
 		return_val_if_fail(node, 0);

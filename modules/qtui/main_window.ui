@@ -67,6 +67,8 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="help_k3d_guide"/>
+    <addaction name="separator"/>
     <addaction name="help_k3d_online"/>
     <addaction name="help_file_bug_report"/>
     <addaction name="separator"/>
@@ -159,6 +161,11 @@
   <action name="help_file_bug_report">
    <property name="text">
     <string>File Bug Report</string>
+   </property>
+  </action>
+  <action name="help_k3d_guide">
+   <property name="text">
+    <string>K-3D Guide</string>
    </property>
   </action>
  </widget>

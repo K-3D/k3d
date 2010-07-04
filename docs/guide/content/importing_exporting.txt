@@ -1,0 +1,73 @@
+= Importing and Exporting Data =
+
+== Overview ==
+
+Users often wish to load and save data (usually-but-not-necessarily mesh data)
+using file formats specific to other applications.  This is commonly referred
+to as "importing" and "exporting" data.   K-3D provides four types of plugins
+related to the task:
+
+* Importers
+* Exporters
+* Readers
+* Writers
+
+Importers and Exporters work to load and save entire documents (or subsets of
+documents) in a single pass.  As an example, when you save a K-3D document
+using K-3D's native .k3d file format, you are using the <<K3DDocumentExporter,K3DDocumentExporter>>
+plugin.  When you reload the document from disk, you are using the
+<<K3DDocumentImporter,K3DDocumentImporter>> plugin.
+
+Readers and Writers are individual nodes that become part of a document and the
+[[Visualization Pipeline]].  A Reader is a data source, and a Writer is a data
+sink.  Once a Reader or Writer is created and hooked into the pipeline, you can
+modify its properties (such as pointing it to a different data file) and the
+pipeline will automatically update with the new data.
+
+Note the dualities among the different plugin types.  An Importer ''creates''
+nodes based on the contents of an external file, while a Reader ''is-a'' node
+that reads data from an external file.  An exporter ''copies'' nodes to an
+external file, whereas a Writer ''is-a'' node that writes data to an external
+file.  Stated differently: an Importer copies data from an external file into
+your document, so that the data becomes part of the document and is stored and
+loaded along with the rest of its contents.  A Reader "references" data in an
+external file, loading it into memory when needed, but the data remains
+external to the document.
+
+Understanding the distinctions among the external file plugin types is
+important because there may be more than one type implemented for a given file
+format.  In this case, you will have to choose the correct plugin for your
+needs.  As an example, file format "foo" might eventually have both "FooReader"
+and "FooDocumentImporter" plugins.
+
+== Usage ==
+
+=== Importers ===
+
+* Select the ''File > Import'' menu item.
+* A file dialog will appear allowing you to choose a file to be imported.
+* The file dialog will also contain a dropdown list of available Importers.
+* You may explicitly choose the Importer you want to use, or you may use automatic detection, which will attempt to choose the correct Importer for the file you selected.
+
+=== Exporters ===
+
+* Select the ''File > Export'' menu item.
+* A file dialog will appear allowing you to choose a file to be exported.
+* The file dialog will also contain a dropdown list of available Exporters.
+* You may explicitly choose the Exporter you want to use, or you may use automatic detection, which will attempt to choose the correct Exporter for the file you selected.
+
+=== Readers ===
+
+* Use the ''Create'' menu to create a Reader node.
+* Check the Reader's properties in the [[Node Properties Panel]].
+* Choose a filename that will become the Reader's input.
+* See [[Managing External Files]] for details on how paths to external files are stored.
+
+=== Writers ===
+
+* Use the ''Create'' menu to create a Writer node.
+* Check the Writer's properties in the [[Node Properties Panel]].
+* Choose a filename where the Writer will save its output.
+* You must manually make a connection from the [[Visualization Pipeline]] into the Writer's input.
+* See [[Managing External Files]] for details on how paths to external files are stored.
+

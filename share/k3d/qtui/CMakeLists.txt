@@ -1,0 +1,3 @@
+ADD_SUBDIRECTORY(icons)
+ADD_SUBDIRECTORY(scripted_modes)
+ADD_SUBDIRECTORY(sounds)

@@ -21,6 +21,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include "config.h"
 #include "main_window.h"
 
 #include <k3d-i18n-config.h>
@@ -50,6 +51,7 @@
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QProcess>
 
 #include <boost/scoped_ptr.hpp>
 
@@ -131,6 +133,24 @@ void main_window::on_script_play_activated()
 	k3d::iscript_engine::context context;
 	context["document"] = &document_widget.document();
 	k3d::qtui::script::execute(stream, script_path.native_utf8_string().raw(), context);
+}
+
+void main_window::on_help_k3d_guide_activated()
+{
+	if(!m_assistant)
+	{
+		m_assistant = new QProcess();
+		m_assistant->setWorkingDirectory(K3D_GUIDE_BINARY_DIR "/qt");
+		m_assistant->start(K3D_ASSISTANT_COMMAND, QStringList() << "-collectionFile" << "guide.qhc" << "-enableRemoteControl");
+		if(!m_assistant->waitForStarted())
+		{
+			delete m_assistant;
+			m_assistant = 0;
+			return;
+		}
+
+		QObject::connect(m_assistant, SIGNAL(finished(int, QProcess::ExitStatus)), m_assistant, SLOT(deleteLater()));
+	}
 }
 
 void main_window::on_help_k3d_online_activated()
@@ -217,10 +237,10 @@ void main_window::initialize(k3d::idocument& Document)
 
 	// Setup manual access to window plugins ...
 	QMenu* const window_menu = ui.menuAdvanced->addMenu(tr("Windows"));
-	std::vector<k3d::iplugin_factory*> dialogs = k3d::plugin::factory::lookup("qtui:component-type", "window");
-	std::sort(dialogs.begin(), dialogs.end(), k3d::sort_by_name());
-	for(int i = 0; i != dialogs.size(); ++i)
-		window_menu->addAction(k3d::qtui::action::create(*dialogs[i], window_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_advanced_window), dialogs[i])));
+	std::vector<k3d::iplugin_factory*> windows = k3d::plugin::factory::lookup("qtui:component-type", "window");
+	std::sort(windows.begin(), windows.end(), k3d::sort_by_name());
+	for(int i = 0; i != windows.size(); ++i)
+		window_menu->addAction(k3d::qtui::action::create(*windows[i], window_menu, sigc::bind(sigc::mem_fun(*this, &main_window::on_advanced_window), windows[i])));
 }
 
 void main_window::on_edit_mode(k3d::iplugin_factory* const Mode)

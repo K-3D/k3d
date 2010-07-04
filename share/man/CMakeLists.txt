@@ -1,0 +1,14 @@
+CONFIGURE_FILE(k3d.1.in k3d.1)
+CONFIGURE_FILE(k3d-renderframe.1.in k3d-renderframe.1)
+CONFIGURE_FILE(k3d-renderjob.1.in k3d-renderjob.1)
+CONFIGURE_FILE(k3d-sl2xml.1.in k3d-sl2xml.1)
+CONFIGURE_FILE(k3d-uuidgen.1.in k3d-uuidgen.1)
+
+K3D_ADD_SHARE_FILES(${CMAKE_CURRENT_BINARY_DIR}/*.1 man/man1)
+
+#INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/k3d.1 DESTINATION share/man/man1)
+#INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/k3d-renderframe.1 DESTINATION share/man/man1)
+#INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/k3d-renderjob.1 DESTINATION share/man/man1)
+#INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/k3d-sl2xml.1 DESTINATION share/man/man1)
+#INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/k3d-uuidgen.1 DESTINATION share/man/man1)
+

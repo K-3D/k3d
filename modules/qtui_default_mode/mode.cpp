@@ -49,7 +49,7 @@ public:
 	{
 	}
 
-	void enable(QGraphicsScene& Scene)
+	void enable(k3d::idocument& Document, QGraphicsScene& Scene)
 	{
 	}
 

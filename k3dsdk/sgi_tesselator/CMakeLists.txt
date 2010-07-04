@@ -37,7 +37,7 @@ SET_SOURCE_FILES_PROPERTIES(
 	PROPERTIES COMPILE_FLAGS -w
 	)
 
-ADD_LIBRARY(k3dsdk-sgi-tesselator SHARED ${SOURCES})
+K3D_ADD_LIBRARY(k3dsdk-sgi-tesselator SHARED ${SOURCES})
 K3D_GENERATE_DEF_FILE(k3dsdk-sgi-tesselator)
 
 INSTALL(TARGETS k3dsdk-sgi-tesselator

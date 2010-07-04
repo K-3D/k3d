@@ -1,0 +1,121 @@
+= Building Plugins =
+
+== Out-of-Source Plugins ==
+
+A K-3D plugin module is simply a shared library (DLL) that is automatically loaded by K-3D runtime.  Although you could create your own private makefiles or IDE project files to build a plugin module, K-3D provides an innovative way to integrate out-of-source plugins into the K-3D build, instead.  By incorporating your module into K-3D's build you save time and effort, and your binary module can be automatically packaged and installed along with the rest of K-3D, making it easy to create your own "custom" K-3D distribution to share with colleagues.
+
+To make it happen, create a directory to hold your plugin module sources, and add a 'CMakeLists.txt' file:
+
+------------------------------------------------
+K3D_BUILD_MODULE(sample-module)
+K3D_CREATE_MODULE_PROXY(sample-module)
+------------------------------------------------
+
+For many plugins, no further configuration is required ... create the plugin sources in your new directory, and you're ready to include your module in the K-3D build.  To do so, cd into your K-3D build directory and run cmake:
+
+------------------------------------------------
+$ cd ~/k3d-build
+$ make edit_cache
+------------------------------------------------
+
+Using the cmake UI, add 'sample_module' to the K3D_EXTERNAL_MODULES variable, and configure.  CMake will display a harmless error that we will correct in the next step:
+
+------------------------------------------------
+CMake Error: The "sample_module" module source directory "sample_module_EXTERNAL_SOURCE_DIR-NOTFOUND" does not exist.
+Specify a different directory using sample_module_EXTERNAL_SOURCE_DIR
+------------------------------------------------
+
+You will see that two new cmake variables have been created:
+
+* K3D_BUILD_sample_module - Enables / disables compilation of your module.
+* sample_module_EXTERNAL_SOURCE_DIR - Points to the directory containing your module.
+
+K3D_BUILD_sample_module will already be "ON" by default, but you must specify the path to your module sources in sample_module_EXTERNAL_SOURCE_DIR.  Once you've set the path, configure; generate; and you'll be ready to build K-3D, including your new module:
+
+------------------------------------------------
+$ make
+------------------------------------------------
+
+You will see your module built along with the rest of K-3D:
+
+------------------------------------------------
+...
+[100%] Built target k3d-yafray-proxy
+[100%] Building CXX object modules/external/sample_module/CMakeFiles/sample-module.dir/module.cpp.o
+Linking CXX shared library ../../../lib/k3d/plugins/sample-module.module
+[100%] Built target sample-module
+[100%] Generating ../../../lib/k3d/plugins/sample-module.module.proxy
+Loading plugin module /home/tshead/build/k3d/lib/k3d/plugins/sample-module.module
+Loading plugin SamplePlugin
+[100%] Built target sample-module-proxy
+------------------------------------------------
+
+Note that your module binary will be located alongside the rest of the standard K-3D plugins:
+
+------------------------------------------------
+$ ls lib/k3d/plugins/
+...
+sample-module.module
+sample-module.module.proxy
+------------------------------------------------
+
+Now, run K-3D and see that the module is successfully loaded:
+
+------------------------------------------------
+$ make run
+------------------------------------------------
+
+In the console output, you will see:
+
+------------------------------------------------
+INFO: Proxying plugin module /home/user/k3d-build/lib/k3d/plugins/sample-module.module
+------------------------------------------------
+
+which indicates that your new module was successfully loaded.  Even though your plugin sources are outside the K-3D source tree, in all other respects your plugin will be built and treated as a "normal" K-3D plugin.
+
+If your plugin has external dependencies, you will provide additional logic in your plugin's 'CMakeLists.txt' file to locate header file paths and link libraries, for example:
+
+------------------------------------------------
+FIND_PATH(FOO_HEADERS foo.h)
+FIND_LIBRARY(FOO_LIBRARY foo)
+
+INCLUDE_DIRECTORIES(${FOO_HEADERS})
+K3D_BUILD_MODULE(sample-module)
+K3D_CREATE_MODULE_PROXY(sample-module)
+TARGET_LINK_LIBRARIES(sample-module ${FOO_LIBRARY})
+------------------------------------------------
+
+See 'k3d/docs/sample_module' for a working example of an out-of-source plugin.
+
+== Within-Source Plugins ==
+
+If you're a member of the K-3D development team creating a plugin that will become part of the "official" K-3D sources, creating an in-source plugin "foo" is the same as creating an out-of-source plugin, with just a few extra steps.
+
+* Create a plugin module directory 'k3d/modules/foo'.
+* Add a 'k3d/modules/foo/CMakeLists.txt' and source code to your new directory.
+* In the top-level 'k3d/CMakeLists.txt', add a CMake variable that will control whether your plugin module will be built:
+
+------------------------------------------------
+OPTION(K3D_BUILD_FOO_MODULE "Build the foo plugin module" ON)
+------------------------------------------------
+
+* In the 'k3d/module/CMakeLists.txt' file, add your module to the build:
+
+------------------------------------------------
+K3D_ADD_SUBDIRECTORY(foo REQUIRES K3D_BUILD_FOO_MODULE)
+------------------------------------------------
+
+* If your plugin has a dependency on a third-party library "libfoo", you will need to create a special CMake file that will test to see if the libfoo is installed, and where its header files and link libraries are located:
+** Create a "K3DFindFoo.cmake" file in the 'k3d/cmake/modules' directory.  Use the other files in the directory as a guide.
+** Add 'INCLUDE(K3DFindFoo)' to the top-level 'k3d/CMakeLists.txt'.  Test whether libfoo is found before using it.
+
+And you're done!
+
+== Alternatives ==
+
+Of-course, it is completely practical to build K-3D plugin modules using any development environment that suits you, including autotools, Eclipse, XCode, MSVC, etc.  In these cases you will want to study the CMake files included in the K-3D sources to see how plugin modules are normally built, along with their header-file and link dependencies.  In particular, you will need to become familiar with the K3D_BUILD_MODULE, K3D_BUILD_NGUI_MODULE, and K3D_CREATE_MODULE_PROXY CMake macros in 'k3d/modules/CMakeLists.txt'.
+
+Note that the binary name for a K-3D plugin module "foo" will always be "foo.module", regardless of platform (i.e. there is no ".so", ".dylib", or ".dll" extension).
+
+When creating plugin modules in this fashion you will have to provide your own mechanism to install your modules to the directory from which K-3D loads plugins.
+

@@ -156,8 +156,8 @@ if function:
 # Generate the K-3D OpenGL API header ...
 stream = open("api.h", "w")
 
-stream.write("""#ifndef K3DSDK_OPENGL_API_H
-#define K3DSDK_OPENGL_API_H
+stream.write("""#ifndef K3DSDK_GL_API_H
+#define K3DSDK_GL_API_H
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -257,7 +257,7 @@ stream.write("""};
 
 } // namespace k3d
 
-#endif // !K3DSDK_OPENGL_API_H
+#endif // !K3DSDK_GL_API_H
 """)
 
 

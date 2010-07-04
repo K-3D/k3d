@@ -1,5 +1,5 @@
-#ifndef K3DSDK_OPENGL_API_H
-#define K3DSDK_OPENGL_API_H
+#ifndef K3DSDK_GL_API_H
+#define K3DSDK_GL_API_H
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -7797,4 +7797,4 @@ public:
 
 } // namespace k3d
 
-#endif // !K3DSDK_OPENGL_API_H
+#endif // !K3DSDK_GL_API_H

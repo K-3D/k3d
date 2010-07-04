@@ -44,8 +44,6 @@ QScriptEngine* engine()
 {
 	QScriptEngine* const script_engine = new QScriptEngine();
 
-//	::k3d::log() << debug << "Available extensions: " << script_engine->availableExtensions().join(", ").toAscii().data() << std::endl;
-
 	script_engine->importExtension("qt");
 	script_engine->importExtension("qt.core");
 	script_engine->importExtension("qt.gui");
@@ -57,8 +55,6 @@ QScriptEngine* engine()
 	script_engine->importExtension("qt.webkit");
 	script_engine->importExtension("qt.xml");
 	script_engine->importExtension("qt.xmlpatterns");
-
-//	::k3d::log() << debug << "Imported extensions: " << script_engine->importedExtensions().join(", ").toAscii().data() << std::endl;
 
 	model::setup(script_engine, script_engine->globalObject());
 

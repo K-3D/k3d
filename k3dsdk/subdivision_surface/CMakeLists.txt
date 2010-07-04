@@ -10,7 +10,7 @@ INCLUDE_DIRECTORIES(${K3D_GLIBMM_INCLUDE_DIRS})
 
 LINK_DIRECTORIES(${K3D_SIGC_LIB_DIRS})
 
-ADD_LIBRARY(k3dsdk-subdivision-surface SHARED ${HEADERS} ${SOURCES})
+K3D_ADD_LIBRARY(k3dsdk-subdivision-surface SHARED ${HEADERS} ${SOURCES})
 K3D_GENERATE_DEF_FILE(k3dsdk-subdivision-surface)
 TARGET_LINK_LIBRARIES(k3dsdk-subdivision-surface k3dsdk)
 

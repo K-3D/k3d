@@ -77,7 +77,31 @@ static QScriptValue create(QScriptContext* Context, QScriptEngine* Engine)
 	switch(Context->argumentCount())
 	{
 		case 1:
+		{
 			return Engine->toScriptValue(k3d::plugin::create(Context->argument(0).toString().toAscii().data()));
+		}
+		case 2:
+		{
+			const k3d::string_t plugin_name = k3d::convert<k3d::string_t>(Context->argument(0).toString());
+
+			k3d::idocument* const document = dynamic_cast<k3d::idocument*>(qscriptvalue_cast<k3d::iunknown*>(Context->argument(1)));
+			if(!document)
+				return Context->throwError(QScriptContext::TypeError, "Second argument must be a K-3D document.");
+
+			return Engine->toScriptValue(k3d::plugin::create(plugin_name, *document, ""));
+		}
+		case 3:
+		{
+			const k3d::string_t plugin_name = k3d::convert<k3d::string_t>(Context->argument(0).toString());
+
+			k3d::idocument* const document = dynamic_cast<k3d::idocument*>(qscriptvalue_cast<k3d::iunknown*>(Context->argument(1)));
+			if(!document)
+				return Context->throwError(QScriptContext::TypeError, "Second argument must be a K-3D document.");
+
+			const k3d::string_t node_name = k3d::convert<k3d::string_t>(Context->argument(2).toString());
+
+			return Engine->toScriptValue(k3d::plugin::create(plugin_name, *document, node_name));
+		}
 	}
 
 	return QScriptValue();
@@ -90,7 +114,7 @@ void setup(QScriptEngine* Engine, QScriptValue Namespace)
 {
 	QScriptValue factory = Engine->newObject();
 	factory.setProperty("lookup", Engine->newFunction(factory::lookup));
-	
+
 	QScriptValue plugin = Engine->newObject();
 	plugin.setProperty("factory", factory);
 	plugin.setProperty("create", Engine->newFunction(create));

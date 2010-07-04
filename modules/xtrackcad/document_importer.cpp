@@ -425,7 +425,7 @@ public:
 			k3d::uuid(0x3a086a52, 0x8d422391, 0x10c482a0, 0x1eafc053),
 			"XTrackCADDocumentImporter",
 			_("XTrackCAD Tracks File ( .xtc )"),
-			"",
+			"DocumentImporter",
 			k3d::iplugin_factory::EXPERIMENTAL,
 			boost::assign::map_list_of("k3d:mime-types", "application/x-xtrackcad"));
 

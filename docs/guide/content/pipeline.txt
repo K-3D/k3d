@@ -1,0 +1,220 @@
+= Pipeline Basics =
+
+== Overview ==
+
+The fundamental organizing structure of K-3D is the 'Visualization Pipeline': K-3D user documents are made up of 'Nodes'.  When you use a plugin, you are usually adding a new node to the document.  Each node created is a new instance of a specific plugin type.  We represent nodes diagrammatically as boxes, and label them based on either the node's type or its purpose:
+
+(((Visualization Pipeline)))
+(((Pipeline)))
+(((Nodes)))
+
+["graphviz", "pipeline2.png"]
+------------------------------------
+
+digraph
+{
+graph [rankdir="LR"]
+node [shape="box",fontname="Helvetica"]
+A [label="Node"]
+}
+
+------------------------------------
+
+Although there are exceptions, most nodes can be categorized as 'Sources' 'Modifiers' or 'Sinks' of data.  Sources create data, modifiers process data, and sinks consume data.  Thus, data ``flows'' from sources, is altered by modifiers, and terminates at sinks.  We can represent this flow using arrows:
+
+(((Sources)))
+(((Modifiers)))
+(((Sinks)))
+
+["graphviz", "pipeline3.png"]
+------------------------------------
+
+digraph
+{
+graph [rankdir="LR"]
+node [shape="box",fontname="Helvetica"]
+Source -> Modifier -> Sink
+}
+
+------------------------------------
+
+This is where the term 'Pipeline' originates - connections between nodes act as ``pipes'' and data flows through them like water.  Though it may not be obvious to the casual observer, all K-3D operations are performed using the pipeline, with human interaction converted into pipeline manipulations by the user interface layer.
+
+As a concrete example, here is a typical example of a ``real'' pipeline:
+
+["graphviz", "pipeline4.png"]
+------------------------------------
+
+digraph
+{
+graph [rankdir="LR"]
+node [shape="box",fontname="Helvetica"]
+PolyGrid [URL="http://www.k-3d.org/wiki/PolyGrid"]
+ScalePoints [URL="http://www.k-3d.org/wiki/ScalePoints"]
+MeshInstance [URL="http://www.k-3d.org/wiki/MeshInstance"]
+PolyGrid -> ScalePoints -> MeshInstance
+}
+
+------------------------------------
+
+In this example, the <<PolyGrid,PolyGrid>> plugin acts as a source, producing geometric data (in this case, a regular polygon grid).  The <<ScalePoints,ScalePoints>> plugin acts as a modifier, applying a scaling transformation to any geometry that passes through it.  Finally, the <<MeshInstance,MeshInstance>> plugin is a consumer of data, rendering geometric input to the screen as a 2D image.
+
+Of course, the pipeline can grow to be as complex as needed ... for example, a pipeline can contain multiple modifiers:
+
+["graphviz", "pipeline5.png"]
+------------------------------------
+
+digraph
+{
+graph [rankdir="LR"]
+node [shape="box",fontname="Helvetica"]
+PolyGrid [URL="http://www.k-3d.org/wiki/PolyGrid"]
+RotatePoints [URL="http://www.k-3d.org/wiki/RotatePoints"]
+ScalePoints [URL="http://www.k-3d.org/wiki/ScalePoints"]
+MeshInstance [URL="http://www.k-3d.org/wiki/MeshInstance"]
+PolyGrid -> ScalePoints -> RotatePoints ->MeshInstance
+}
+
+------------------------------------
+
+Here, a second modifier - <<RotatePoints,RotatePoints>> - is added to the pipeline, further altering data after it is modified by <<ScalePoints,ScalePoints>>.  As you might imagine, you are free to chain-together modifiers in any number and combination desired.
+
+== Fan-Out ==
+
+The flexibility of the pipeline doesn't end there, however.  Pipelines can ``fan-out'', sending data to multiple destinations:
+
+["graphviz", "pipeline6.png"]
+------------------------------------
+
+digraph
+{
+graph [rankdir="LR"]
+node [shape="box",fontname="Helvetica"]
+PolyGrid [URL="http://www.k-3d.org/wiki/PolyGrid"]
+ScalePoints [URL="http://www.k-3d.org/wiki/ScalePoints"]
+MeshInstance1 [URL="http://www.k-3d.org/wiki/MeshInstance"]
+MeshInstance2 [URL="http://www.k-3d.org/wiki/MeshInstance"]
+PolyGrid -> ScalePoints -> MeshInstance1
+ScalePoints -> MeshInstance2
+}
+
+------------------------------------
+
+In this case, the fan-out sends the scaled polygon data to two separate <<MeshInstance,MeshInstance>> nodes.  That means that the scene will contain two identical copies of the scaled data.
+
+Note that there is no requirement that you fan-out to a data sink - the pipeline can be arbitrarily complex after the fan-out as-well-as before it:
+
+["graphviz", "pipeline7.png"]
+------------------------------------
+
+digraph
+{
+graph [rankdir="LR"]
+node [shape="box",fontname="Helvetica"]
+PolyGrid [URL="http://www.k-3d.org/wiki/PolyGrid"]
+RotatePoints [URL="http://www.k-3d.org/wiki/RotatePoints"]
+ScalePoints [URL="http://www.k-3d.org/wiki/ScalePoints"]
+MeshInstance1 [URL="http://www.k-3d.org/wiki/MeshInstance"]
+MeshInstance2 [URL="http://www.k-3d.org/wiki/MeshInstance"]
+PolyGrid -> ScalePoints -> MeshInstance1
+ScalePoints -> RotatePoints -> MeshInstance2
+}
+
+------------------------------------
+
+In this case, the output of the <<ScalePoints,ScalePoints>> node splits into two separate ``branches'' of the pipeline, but is further modified by <<RotatePoints,RotatePoints>> in the second branch.  Again, the pipeline could become arbitrarily complex, including further branches and modifiers.
+
+== Fan-In ==
+
+This is not the end of the story however, as pipelines can also ``fan-in'', merging two-or-more pipeline branches into a single branch:
+
+["graphviz", "pipeline8.png"]
+------------------------------------
+
+digraph
+{
+graph [rankdir="LR"]
+node [shape="box",fontname="Helvetica"]
+PolyGrid [URL="http://www.k-3d.org/wiki/PolyGrid"]
+PolySphere [URL="http://www.k-3d.org/wiki/PolySphere"]
+MergeMesh [URL="http://www.k-3d.org/wiki/MergeMesh"]
+ScalePoints [URL="http://www.k-3d.org/wiki/ScalePoints"]
+MeshInstance [URL="http://www.k-3d.org/wiki/MeshInstance"]
+PolyGrid -> MergeMesh -> ScalePoints -> MeshInstance
+PolySphere -> MergeMesh
+}
+
+------------------------------------
+
+In this case, the output of a second source - <<PolySphere,PolySphere>> - is merged with the output of <<PolyGrid,PolyGrid>> before their combined data is modified by <<ScalePoints,ScalePoints>> and displayed by the <<MeshInstance,MeshInstance>>.
+
+== Properties ==
+
+Next, we look at nodes in greater detail.  The vast majority of nodes contain 'Properties' which are the user-modifiable values that control a node's behavior.  Properties are displayed to the user in the <<Node Properties Panel>>, which lists a node's properties and provides controls for altering their values.
+
+Properties can be connected to one another, and *those connections are what form the pipeline* - when you connect property ``A'' to property ``B'', changes to the value of property ``A'' are mirrored by property ``B'', as if the user had changed property ``B'' manually.
+
+Now that we can see that connections among nodes are made via properties, we can provide additional detail in our diagrams by labeling properties that are connected:
+
+["graphviz", "pipeline9.png"]
+------------------------------------
+
+digraph
+{
+graph [rankdir="LR"]
+node [shape="box",fontname="Helvetica"]
+edge [fontname="Helvetica",fontsize=10]
+PolyGrid [URL="http://www.k-3d.org/wiki/PolyGrid"]
+MeshInstance [URL="http://www.k-3d.org/wiki/MeshInstance"]
+PolyGrid -> MeshInstance [ label="output_mesh > input_mesh" ]
+}
+
+------------------------------------
+
+Note that we often leave-out details of which properties are connected, so long as the meaning of the diagram is unambiguous.
+
+== Property Types ==
+
+Note that K-3D properties are 'strongly typed' - that is to say that every property stores a specific type of data: a string, an integer number, a floating-point number, a boolean value, a bitmap image, geometry, etc.  The controls that are displayed by the user interface vary based on the property type.
+
+Although the preceeding examples have focused on the flow of geometric data, there is nothing preventing other property types from being interconnected - in other words, any data type can move through the pipeline, so long as there are nodes that provide inputs and/or outputs for that type.  K-3D includes a number of image processing nodes that work with bitmap image data in the same way that other nodes work with geometric mesh data.  Strings, matrices, vectors, scalars, colors, etc. - all can flow through the visualization pipeline, affecting and being-affected-by the nodes they flow through.
+
+The only limitation on property connections is that properties can only be connected to properties that share the same type - i.e. geometry properties can only be connected to other geometry properties, string properties can only be connected to string properties, etc.
+
+== Property Roles ==
+
+With our more detailed understanding of how properties are connected, we can adopt a more nuanced view of how the pipeline functions.  For example, we could connect the ``radius'' properties of two <<PolySphere,PolySphere>> sources:
+
+["graphviz", "pipeline10.png"]
+------------------------------------
+
+digraph
+{
+graph [rankdir="TB"]
+node [shape="box",fontname="Helvetica"]
+edge [fontname="Helvetica",fontsize=10]
+PolySphere1 [URL="http://www.k-3d.org/wiki/PolySphere"]
+PolySphere2 [URL="http://www.k-3d.org/wiki/PolySphere"]
+PolySphere1 -> PolySphere2 [ label="radius > radius"]
+}
+
+------------------------------------
+
+Here, the primary function of the <<PolySphere,PolySphere>> nodes as mesh sources is unchanged, and we would likely connect their mesh outputs to other sink objects, but we have also introduced a ``constraint'' that the radius property of PolySphere2 will always ``follow'' the radius property of PolySphere1.
+
+== Guidelines ==
+
+The flexibility of the pipeline architecture exerts a strong influence on how components are designed and deployed in K-3D.  In particular, the pipeline places a strong premium on creating small, generic components instead of large, specialized components.  If a process can be broken-down into smaller steps, it should be - this makes it possible to substitute different components for individual steps in the process.  In this way users often come-up with surprising new ways of combining components to achieve interesting effects, something we wish to encourage.
+
+In general, you should not be concerned about the user complexity of ``hooking up'' a pipeline composed of simple components - if a particular combination of components becomes ubiquitous, we will add logic to K-3D's user interface layer to simplify creating it.  Many complex pipeline-manipulation operations are "hidden" from users by the UI layer, but we always want to provide "power" users with the flexibility to setup the pipeline themselves.
+
+== Property Loops ==
+
+In K-3D 0.4, the Visualization Pipeline was called the 'Directed Acyclic Graph' or 'DAG', because it did not allow for circular dependencies among properties.  This limitation was removed in K-3D 0.5, leading to use of the term 'Directed Graph' or 'DG'.  See <<Visualization Pipeline Loops>> for a discussion on how loops in the pipeline behave.
+
+
+== References ==
+
+* See <<Pipeline Execution>> for a more in-depth discussion of how pipeline computation is controlled.
+* http://en.wikipedia.org/wiki/Pipeline_%28software%29 - A generic description of software pipelines.
+

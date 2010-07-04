@@ -24,7 +24,6 @@
 
 #include <errno.h>
 #include <k3dsdk/path.h>
-#include <k3d-path-config.h>
 #include <k3d-platform-config.h>
 #include <k3dsdk/result.h>
 #include <k3dsdk/string_modifiers.h>
@@ -40,7 +39,8 @@
 #include <sys/stat.h>
 
 // Define some platform-specific odds-and-ends
-#ifdef K3D_API_WIN32
+#if defined K3D_API_WIN32
+
 	#define SEARCHPATH_SEPARATOR_STRING ";"
 	#define DEFAULT_TEMP_DIRECTORY "c:\\"
 	#define DEFAULT_HOME_DIRECTORY "c:\\"
@@ -56,14 +56,72 @@
 	#define DEFAULT_HOME_DIRECTORY "/"
 
 	#include <time.h>
+	#include <unistd.h>
 
 #endif // !K3D_API_WIN32
+
+#if defined K3D_API_DARWIN
+
+	#include <mach-o/dyld.h>
+
+#endif // K3D_API_DARWIN
 
 namespace k3d
 {
 
 namespace system
 {
+
+static filesystem::path g_executable_path;
+
+void initialize_executable_path(int argc, char* argv[])
+{
+#if defined K3D_API_WIN32
+
+	string_t buffer(256, '\0');
+	GetModuleFileName(0, const_cast<char*>(buffer.data()), buffer.size());
+	buffer.resize(strlen(buffer.c_str()));
+	g_executable_path = filesystem::native_path(ustring::from_utf8(buffer));
+	return;
+
+#elif defined K3D_API_DARWIN
+
+	string_t buffer;
+	uint32_t buffer_size = 0;
+	_NSGetExecutablePath(const_cast<char*>(buffer.data()), &buffer_size);
+	buffer.resize(buffer_size);
+	_NSGetExecutablePath(const_cast<char*>(buffer.data()), &buffer_size);
+	g_executable_path = filesystem::native_path(ustring::from_utf8(buffer));
+	return;
+
+#else
+	// Linux ...
+	if(exists(filesystem::native_path(ustring::from_utf8("/proc/self/exe"))))
+	{
+		string_t buffer(256, '\0');
+		readlink("/proc/self/exe", const_cast<char*>(buffer.data()), buffer.size());
+		g_executable_path = filesystem::native_path(ustring::from_utf8(buffer));
+		return;
+	}
+
+	// BSD ...
+	if(exists(filesystem::native_path(ustring::from_utf8("/proc/curproc/file"))))
+	{
+		string_t buffer(256, '\0');
+		readlink("/proc/curproc/file", const_cast<char*>(buffer.data()), buffer.size());
+		g_executable_path = filesystem::native_path(ustring::from_utf8(buffer));
+		return;
+	}
+#endif
+}
+
+const filesystem::path executable_path()
+{
+	if(g_executable_path.empty())
+		log() << warning << "Uninitialized executable path ... did you forget to call initialize_executable_path(...) at startup?" << std::endl;
+
+	return g_executable_path;
+}
 
 const string_t getenv(const string_t& Variable)
 {
@@ -154,27 +212,6 @@ const filesystem::path get_temp_directory()
 	}
 
 	return temp_directory;
-}
-
-const filesystem::path install_path()
-{
-	static filesystem::path install_path;
-	if(install_path.empty())
-	{
-		install_path = filesystem::native_path(ustring::from_utf8(K3D_INSTALL_PREFIX));
-
-#ifdef K3D_API_WIN32
-		// Get the path where this module is executing ...
-		k3d::string_t executable(1024, '\0');
-		GetModuleFileName(0, const_cast<char*>(executable.data()), executable.size());
-		executable.resize(strlen(executable.c_str()));
-		install_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(executable)).branch_path().branch_path();
-#endif // K3D_API_WIN32
-
-		log() << info << "install path: " << install_path.native_console_string() << std::endl;
-	}
-
-	return install_path;
 }
 
 const filesystem::path find_executable(const string_t& Executable)

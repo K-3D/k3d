@@ -10,12 +10,12 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the GNU
 // General Public License for more details.
 //
 // You should have received a copy of the GNU General Public
 // License along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA	02111-1307	USA
 
 /** \file
 	\author Tim Shead (tshead@k-3d.com)
@@ -111,7 +111,7 @@ user_interface::~user_interface()
 void user_interface::get_command_line_arguments(boost::program_options::options_description& Description)
 {
 	Description.add_options()
-		("--no-splash", "Disables the startup splash screen.")
+		("no-splash", "Disables the startup splash screen.")
 		;
 }
 
@@ -161,6 +161,7 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 	{
 		m_splash_box.reset(new QSplashScreen(QPixmap(":/QTUI/splash.png")));
 		m_splash_box->show();
+		m_application->processEvents();
 	}
 
 	return unused;
@@ -169,7 +170,10 @@ const k3d::ievent_loop::arguments_t user_interface::parse_startup_arguments(cons
 void user_interface::startup_message_handler(const k3d::string_t& Message)
 {
 	if(m_splash_box.get())
+	{
 		m_splash_box->showMessage(Message.c_str());
+		m_application->processEvents();
+	}
 }
 
 void user_interface::display_user_interface()

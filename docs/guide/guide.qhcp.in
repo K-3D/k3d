@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<QHelpCollectionProject version="1.0">
+	<assistant>
+		<title>K-3D Help</title>
+		<homePage>qthelp://org.k-3d/doc/qt/index.chunked/index.html</homePage>
+		<startPage>qthelp://org.k-3d/doc/qt/index.chunked/index.html</startPage>
+		<applicationIcon>qt/k3d.png</applicationIcon>
+		<enableFilterFunctionality>false</enableFilterFunctionality>
+		<enableDocumentationManager>false</enableDocumentationManager>
+		<enableAddressBar visible="false">false</enableAddressBar>
+		<cacheDirectory>k-3d.org/K-3D</cacheDirectory>
+		<aboutMenuText>
+			<text>About K-3D</text>
+		</aboutMenuText>
+		<aboutDialog>
+			<file>qt/about.txt</file>
+			<icon>qt/k3d.png</icon>
+		</aboutDialog>
+	</assistant>
+	<docFiles>
+		<register>
+			<file>qt/guide.qch</file>
+		</register>
+	</docFiles>
+</QHelpCollectionProject>

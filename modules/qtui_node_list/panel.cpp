@@ -27,8 +27,11 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/inode_collection.h>
+#include <k3dsdk/inode.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
+#include <k3dsdk/qtui/focus.h>
+#include <k3dsdk/result.h>
 
 #include <boost/assign/list_of.hpp>
 
@@ -56,6 +59,15 @@ void panel::initialize(k3d::idocument& Document)
 
 	Document.nodes().add_nodes_signal().connect(sigc::mem_fun(model, &k3d::qtui::node_list_model::add_nodes));
 	Document.nodes().remove_nodes_signal().connect(sigc::mem_fun(model, &k3d::qtui::node_list_model::remove_nodes));
+
+  QObject::connect(ui.list->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(on_selection_changed(const QModelIndex&, const QModelIndex&)));
+}
+
+void panel::on_selection_changed(const QModelIndex& Current, const QModelIndex& Previous)
+{
+  k3d::inode* const node = model.node(Current);
+  return_if_fail(node);
+	k3d::qtui::focus::mediator(*document).set_focus(*node, *this);
 }
 
 k3d::iplugin_factory& panel::get_factory()

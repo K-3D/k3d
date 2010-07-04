@@ -31,6 +31,8 @@ class QGraphicsScene;
 namespace k3d
 {
 
+class idocument;
+
 namespace qtui
 {
 
@@ -46,7 +48,7 @@ class mode :
 public:
 	virtual ~mode();
 
-	virtual void enable(QGraphicsScene& scene) = 0;
+	virtual void enable(idocument& Document, QGraphicsScene& Scene) = 0;
 
 protected:
 	mode();

@@ -131,4 +131,4 @@ inline k3d::uint16_t switch_bytes(k3d::uint16_t N)
 } // namespace module
 
 
-#endif /* MODULES_STL_IO_BINARY_STL_H */
+#endif // !MODULES_STL_IO_BINARY_STL_H

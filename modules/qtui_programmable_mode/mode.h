@@ -1,3 +1,6 @@
+#ifndef MODULES_QTUI_PROGRAMMABLE_MODE_MODE_H
+#define MODULES_QTUI_PROGRAMMABLE_MODE_MODE_H
+
 // K-3D
 // Copyright (c) 1995-2010, Timothy M. Shead
 //
@@ -54,7 +57,7 @@ class mode :
 public:
 	mode();
 
-	void enable(QGraphicsScene& Scene);
+	void enable(k3d::idocument& Document, QGraphicsScene& Scene);
 
 	static k3d::iplugin_factory& get_factory();
 
@@ -67,6 +70,7 @@ private Q_SLOTS:
 	void on_scene_rect_changed(const QRectF& Rect);
 
 private:
+	k3d::idocument* document;
 	QGraphicsScene* scene;
 	k3d_data(k3d::string_t, k3d::data::immutable_name, change_signal, no_undo, local_storage, no_constraint, script_property, no_serialization) script;
 	boost::scoped_ptr<QScriptEngine> script_engine;
@@ -79,3 +83,4 @@ private:
 
 } // namespace module
 
+#endif // !MODULES_QTUI_PROGRAMMABLE_MODE_MODE_H

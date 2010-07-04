@@ -1,0 +1,27 @@
+Seven Degrees of Freedom
+========================
+Timothy M. Shead <tshead@k-3d.com>
+June, 2010
+
+K-3D Users' Guide
+=================
+
+:leveloffset: 1
+include::@CONTENT_SOURCE_DIR@/pipeline.txt[]
+include::@CONTENT_SOURCE_DIR@/importing_exporting.txt[]
+:leveloffset: 0
+
+K-3D Developers' Guide
+======================
+
+:leveloffset: 1
+include::@CONTENT_SOURCE_DIR@/plugin_design.txt[]
+include::@CONTENT_SOURCE_DIR@/on_demand_modules.txt[]
+include::@CONTENT_SOURCE_DIR@/building_plugins.txt[]
+include::@CONTENT_BINARY_DIR@/plugins.txt[]
+:leveloffset: 0
+
+[index]
+Index
+-----
+

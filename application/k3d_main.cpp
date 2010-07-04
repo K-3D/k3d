@@ -21,8 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <config.h>
+
 #include <k3d-i18n-config.h>
-#include <k3d-path-config.h>
 #include <k3d-platform-config.h>
 #include <k3d-version-config.h>
 
@@ -151,48 +152,33 @@ k3d::bool_t exit_request_handler()
 /// Sets-up default user options for various platforms
 void set_default_options(k3d::bool_t& Quit, k3d::bool_t& Error)
 {
-	const k3d::filesystem::path data_path = k3d::system::get_home_directory() / k3d::filesystem::generic_path(".k3d");
+	// Setup default paths based on the location of the executable ...
+	const k3d::filesystem::path executable_dir = k3d::system::executable_path().branch_path();
+	const k3d::filesystem::path user_dir = k3d::system::get_home_directory() / k3d::filesystem::generic_path(".k3d");
 
-	g_default_options_path = data_path / k3d::filesystem::generic_path("options.k3d");
-	g_default_shader_cache_path = data_path / k3d::filesystem::generic_path("shadercache");
+	g_default_ngui_path = executable_dir / k3d::filesystem::generic_path("../" K3D_LIBDIR "/k3d/plugins/k3d-ngui.module");
+	g_default_nui_path = executable_dir / k3d::filesystem::generic_path("../" K3D_LIBDIR "/k3d/plugins/k3d-nui.module");
+	g_default_options_path = user_dir / k3d::filesystem::generic_path("options.k3d");
+	g_default_plugin_paths = (executable_dir / k3d::filesystem::generic_path("../" K3D_LIBDIR "/k3d/plugins")).native_filesystem_string();
+	g_default_pyui_path = executable_dir / k3d::filesystem::generic_path("../" K3D_LIBDIR "/k3d/plugins/k3d-pyui.module");
+	g_default_qtui_path = executable_dir / k3d::filesystem::generic_path("../" K3D_LIBDIR "/k3d/plugins/k3d-qtui.module");
+	g_default_shader_cache_path = user_dir / k3d::filesystem::generic_path("shadercache");
+	g_default_share_path = executable_dir / k3d::filesystem::generic_path("../share/k3d");
 
-#ifdef K3D_API_WIN32
-
-	// Get the path where this module is executing ...
-	k3d::string_t executable(256, '\0');
-	GetModuleFileName(0, const_cast<char*>(executable.data()), executable.size());
-	executable.resize(strlen(executable.c_str()));
-	const k3d::filesystem::path executable_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(executable)).branch_path();
-
-	g_default_ngui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-ngui.module");
-	g_default_nui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-nui.module");
-	g_default_plugin_paths = (executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins")).native_filesystem_string();
-	g_default_pyui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-pyui.module");
-	g_default_qtui_path = executable_path / k3d::filesystem::generic_path("../lib/k3d/plugins/k3d-qtui.module");
-	g_default_share_path = executable_path / k3d::filesystem::generic_path("../share/k3d");
+#ifdef K3D_ENABLE_OSX_BUNDLE
 	g_default_user_interface_path = g_default_qtui_path;
+#else
+	g_default_user_interface_path = g_default_ngui_path;
+#endif
 
-	// Add the executable path to PATH
-	k3d::system::setenv("PATH", executable_path.native_filesystem_string() + ";" + k3d::system::getenv("PATH"));
-
-#else // K3D_API_WIN32
-
-	g_default_ngui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins/k3d-ngui.module");
-	g_default_nui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins/k3d-nui.module");
-	g_default_plugin_paths = (k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins")).native_filesystem_string();
-	g_default_pyui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins/k3d-pyui.module");
-	g_default_qtui_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGLIBDIR)) / k3d::filesystem::generic_path("plugins/k3d-qtui.module");
-	g_default_share_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(K3D_PKGDATADIR));
-	g_default_user_interface_path = g_default_qtui_path;
-
-#endif // !K3D_API_WIN32
-
+	// Setup path options based on the defaults ...
 	g_options_path = g_default_options_path;
 	g_plugin_paths = g_default_plugin_paths;
 	g_shader_cache_path = g_default_shader_cache_path;
 	g_share_path = g_default_share_path;
 	g_user_interface_path = g_default_user_interface_path;
 
+	// Optionally override paths using environment variables ...
 	if(!k3d::system::getenv("K3D_LOCALE_PATH").empty())
 		g_override_locale_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::system::getenv("K3D_LOCALE_PATH")));
 
@@ -210,6 +196,11 @@ void set_default_options(k3d::bool_t& Quit, k3d::bool_t& Error)
 
 	if(!k3d::system::getenv("K3D_USER_INTERFACE_PATH").empty())
 		g_user_interface_path = k3d::filesystem::native_path(k3d::ustring::from_utf8(k3d::system::getenv("K3D_USER_INTERFACE_PATH")));
+
+#ifdef K3D_API_WIN32
+	// Add the executable directory to PATH
+	k3d::system::setenv("PATH", executable_dir.native_filesystem_string() + ";" + k3d::system::getenv("PATH"));
+#endif // K3D_API_WIN32
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -372,6 +363,7 @@ void check_dependencies(k3d::bool_t& Quit, k3d::bool_t& Error)
 	k3d::log() << warning "xml parser: unknown" << std::endl;
 #endif
 
+	k3d::log() << info << "executable: " << k3d::system::executable_path().native_console_string() << std::endl;
 	k3d::log() << info << "options file: " << g_options_path.native_console_string() << std::endl;
 	k3d::log() << info << "plugin path(s): " << g_plugin_paths << std::endl;
 	k3d::log() << info << "shader cache path: " << g_shader_cache_path.native_console_string() << std::endl;
@@ -583,9 +575,6 @@ void check_unused_arguments(const arguments_t& Arguments, k3d::bool_t& Quit, k3d
 	k3d::log() << warning << "The following unknown command-line arguments will be ignored: " << std::endl;
 	for(arguments_t::const_iterator argument = Arguments.begin(); argument != Arguments.end(); ++argument)
 	    k3d::log() << warning << "name: " << argument->string_key << " value: " << argument->value[0] << std::endl;
-
-	Quit = true;
-	Error = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -650,7 +639,7 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 	// Append extra options from the environment ...
 	std::istringstream buffer(k3d::system::getenv("K3D_EXTRA_OPTIONS"));
 	std::copy(std::istream_iterator<k3d::string_t>(buffer), std::istream_iterator<k3d::string_t>(), std::back_inserter(raw_arguments));
-	
+
 	try
 	{
 		k3d::bool_t quit = false;
@@ -692,7 +681,20 @@ int k3d_main(std::vector<k3d::string_t> raw_arguments)
 			("version", "Prints program version information and exits.")
 			;
 
-		arguments_t arguments = boost::program_options::command_line_parser(raw_arguments).options(description).allow_unregistered().run().options;
+		arguments_t arguments = boost::program_options::command_line_parser(raw_arguments)
+			.options(description)
+			.allow_unregistered()
+			.style(
+				boost::program_options::command_line_style::allow_long
+				| boost::program_options::command_line_style::allow_short
+				| boost::program_options::command_line_style::allow_dash_for_short
+				| boost::program_options::command_line_style::long_allow_adjacent
+				| boost::program_options::command_line_style::long_allow_next
+				| boost::program_options::command_line_style::short_allow_adjacent
+				| boost::program_options::command_line_style::short_allow_next
+				)
+			.run()
+			.options;
 
 		// Handle arguments that cause an immediate exit ...
 		for(arguments_t::const_iterator argument = arguments.begin(); argument != arguments.end(); ++argument)

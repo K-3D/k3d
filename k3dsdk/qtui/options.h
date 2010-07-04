@@ -1,5 +1,5 @@
-#ifndef K3DSDK_NGUI_OPTIONS_H
-#define K3DSDK_NGUI_OPTIONS_H
+#ifndef K3DSDK_QTUI_OPTIONS_H
+#define K3DSDK_QTUI_OPTIONS_H
 
 // K-3D
 // Copyright (c) 1995-2004, Timothy M. Shead
@@ -46,5 +46,5 @@ void enable_nag(const string_t& Type, const bool_t Enabled);
 
 } // namespace k3d
 
-#endif // !K3DSDK_NGUI_OPTIONS_H
+#endif // !K3DSDK_QTUI_OPTIONS_H
 

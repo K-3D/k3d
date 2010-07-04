@@ -29,19 +29,17 @@ FUNCTION(K3D_TEST TEST_NAME)
 	ELSEIF(TEST_PYTHON_SCRIPT)
 		ADD_TEST(${TEST_NAME} "${PYTHON_EXECUTABLE}" "${TEST_PYTHON_SCRIPT}")
 	ELSEIF(TEST_K3D_PYTHON_SCRIPT)
-		SET(TEST_UI --ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-nui.module)
+		SET(TEST_UI --ui=nui)
 		IF(TEST_NGUI)
 			IF(NOT K3D_BUILD_NGUI_MODULE)
 				RETURN()
 			ENDIF()
-			SET(TEST_UI --ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-ngui.module --batch --no-custom-layouts --no-splash)
+			SET(TEST_UI --ui=ngui --batch --no-custom-layouts --no-splash)
 		ENDIF()
 
 		ADD_TEST(${TEST_NAME}
 			${k3d_BINARY_DIR}/bin/k3d
 			--log-level=debug
-			--plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins
-			--share=${k3d_SOURCE_DIR}/share
 			${TEST_UI}
 			--setenv "PYTHONPATH=${tests_SOURCE_DIR}"
 			--setenv "K3D_TEST_SOURCE_PATH=${tests_SOURCE_DIR}"
@@ -52,19 +50,17 @@ FUNCTION(K3D_TEST TEST_NAME)
 			--exit
 			)
 	ELSEIF(TEST_K3D_PYTHON_COMMAND_SCRIPT)
-		SET(TEST_UI --ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-nui.module)
+		SET(TEST_UI --ui=nui)
 		IF(TEST_NGUI)
 			IF(NOT K3D_BUILD_NGUI_MODULE)
 				RETURN()
 			ENDIF()
-			SET(TEST_UI --ui=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins/k3d-ngui.module --batch --no-custom-layouts --no-splash)
+			SET(TEST_UI --ui=ngui --batch --no-custom-layouts --no-splash)
 		ENDIF()
 
 		ADD_TEST(${TEST_NAME}
 			${k3d_BINARY_DIR}/bin/k3d
 			--log-level=debug
-			--plugins=${k3d_BINARY_DIR}/${K3D_LIBDIR}/k3d/plugins
-			--share=${k3d_SOURCE_DIR}/share
 			${TEST_UI}
 			--setenv "PYTHONPATH=${tests_SOURCE_DIR}"
 			--setenv "K3D_TEST_SOURCE_PATH=${tests_SOURCE_DIR}"
