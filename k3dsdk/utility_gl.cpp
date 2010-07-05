@@ -23,7 +23,7 @@
 
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/bounding_box3.h>
-#include <k3dsdk/extension_gl.h>
+//#include <k3dsdk/gl/extension.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/inode.h>
@@ -195,7 +195,7 @@ void tex_image_2d(const bitmap& Source)
 		width += 1;
 		width /= 2;
 	}
-	
+
 	if(height & (height - 1))
 	{
 		height |= (height >> 1);
@@ -208,12 +208,15 @@ void tex_image_2d(const bitmap& Source)
 	}
 
 	boost::gil::rgba8_image_t target(0, 0);
+	assert_not_implemented();
+/*
 	if(extension::query("GL_ARB_texture_non_power_of_two") || (width == Source.width() && height == Source.height()))
 	{
 		target.recreate(Source.width(), Source.height());
 		boost::gil::copy_and_convert_pixels(boost::gil::const_view(Source), boost::gil::view(target));
 	}
 	else
+*/
 	{
 		target.recreate(width, height);
 		boost::gil::resize_view(boost::gil::color_converted_view<boost::gil::rgba8_pixel_t>(boost::gil::const_view(Source)), boost::gil::view(target), boost::gil::bilinear_sampler());

@@ -21,8 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <k3dsdk/extension_gl.h>
 #include <k3dsdk/gl.h>
+#include <k3dsdk/gl/context.h>
+#include <k3dsdk/gl/extension.h>
 #include <k3dsdk/result.h>
 
 #include <boost/tokenizer.hpp>
@@ -38,89 +39,78 @@ namespace gl
 namespace extension
 {
 
-namespace detail
-{
-
-/// Returns the set of available extensions reported by OpenGL
-std::set<k3d::string_t>& extensions()
-{
-	static std::set<k3d::string_t> results;
-	static bool initialized = false;
-
-	if(!initialized)
-	{
-		const char* const extension_c_string = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
-		if(!extension_c_string)
-		{
-			k3d::log() << warning << "GL extension query executed before context creation" << std::endl;
-			return results;
-		}
-		const k3d::string_t extension_string = extension_c_string;
-
-		boost::char_separator<char> separator(" ");
-		boost::tokenizer<boost::char_separator<char> > tokenizer(extension_string, separator);
-		std::copy(tokenizer.begin(), tokenizer.end(), std::inserter(results, results.end()));
-
-		initialized = true;
-	}
-
-	return results;
-}
-
 /// Returns the set of explicitly-disabled extensions
-std::set<k3d::string_t>& disabled()
+static std::set<string_t>& disabled()
 {
-	static std::set<k3d::string_t> results;
-	static bool initialized = false;
-
-	if(!initialized)
-	{
-		// We are temporarily disabling VBOs by default, to simplify
-		// troubleshooting during the transition to generic polyhedron
-		// primitives - TMS
-		//results.insert("GL_ARB_vertex_buffer_object");
-
-		initialized = true;
-	}
-
+	static std::set<string_t> results;
 	return results;
 }
 
 /// Returns the set of explicitly-enabled extensions
-std::set<k3d::string_t>& enabled()
+static std::set<string_t>& enabled()
 {
-	static std::set<k3d::string_t> results;
+	static std::set<string_t> results;
 	return results;
 }
 
-} // namespace detail
-
-const std::set<k3d::string_t> list()
+/// Returns the set of available extensions reported by OpenGL
+static std::set<string_t>& extensions()
 {
-	return detail::extensions();
+	static std::set<string_t> results;
+	static bool initialized = false;
+
+	if(!context::current())
+	{
+		log() << error << "Cannot retrieve OpenGL extensions without a current OpenGL context." << std::endl;
+		return results;
+	}
+
+	if(!initialized)
+	{
+		initialized = true;
+
+		const char* const extension_c_string = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+		if(!extension_c_string)
+		{
+			log() << warning << "GL extension query executed before context creation" << std::endl;
+			return results;
+		}
+		const string_t extension_string = extension_c_string;
+
+		boost::char_separator<char> separator(" ");
+		boost::tokenizer<boost::char_separator<char> > tokenizer(extension_string, separator);
+		std::copy(tokenizer.begin(), tokenizer.end(), std::inserter(results, results.end()));
+	}
+
+	return results;
 }
 
-void disable(const k3d::string_t& Extension)
+const std::set<string_t> list()
 {
-	detail::enabled().erase(Extension);
-	detail::disabled().insert(Extension);
+	return extensions();
 }
 
-void enable(const k3d::string_t& Extension)
+void disable(const string_t& Extension)
 {
-	detail::disabled().erase(Extension);
-	detail::enabled().insert(Extension);
+	enabled().erase(Extension);
+	disabled().insert(Extension);
 }
 
-bool_t query(const k3d::string_t& Extension)
+void enable(const string_t& Extension)
 {
-	if(detail::disabled().count(Extension))
+	disabled().erase(Extension);
+	enabled().insert(Extension);
+}
+
+bool_t query(const string_t& Extension)
+{
+	if(disabled().count(Extension))
 		return false;
-	
-	if(detail::enabled().count(Extension))
+
+	if(enabled().count(Extension))
 		return true;
 
-	return detail::extensions().count(Extension) ? true : false;
+	return extensions().count(Extension) ? true : false;
 }
 
 bool_t query_vbo()

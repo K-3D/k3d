@@ -68,13 +68,13 @@ public:
 		osmesa_destroy_context(osmesa_context);
 	}
 
-	const k3d::gl::api& begin()
+	const k3d::gl::api& on_begin()
 	{
 		osmesa_make_current(osmesa_context, &buffer[0], GL_UNSIGNED_BYTE, width, height);
 		return api;
 	}
 
-	void end()
+	void on_end()
 	{
 	}
 

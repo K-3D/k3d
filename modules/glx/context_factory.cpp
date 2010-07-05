@@ -63,7 +63,7 @@ public:
 //		glXDestroyWindow(x_display, x_drawable);
 	}
 
-	const k3d::gl::api& begin()
+	const k3d::gl::api& on_begin()
 	{
 		try
 		{
@@ -77,7 +77,7 @@ public:
 		return api;
 	}
 
-	void end()
+	void on_end()
 	{
 		glXSwapBuffers(x_display, x_drawable);
 	}

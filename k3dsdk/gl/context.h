@@ -43,15 +43,25 @@ public:
 
 	/// Activates this context for drawing in the calling thread, returning an
 	/// OpenGL drawing api for rendering using this context.
-	virtual const api& begin() = 0;
+	const api& begin();
+
+	/// Returns the currently-active context, if any, or NULL.
+	static context* current();
 
 	/// If the context is double-buffered, swaps the front and back buffers.  Otherwise, a no-op.
-	virtual void end() = 0;
+	void end();
 
 protected:
 	context() {}
 	context(const context&) {}
 	context& operator=(const context&) { return *this; }
+
+	/// Concrete implementations should activate this context for drawing in the calling thread, returning an
+	/// OpenGL drawing api for rendering.
+	virtual const api& on_begin() = 0;
+
+	/// If the context is double-buffered, concrete implementations should swap the front and back buffers.  Otherwise, a no-op.
+	virtual void on_end() = 0;
 };
 
 } // namespace gl

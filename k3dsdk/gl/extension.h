@@ -1,8 +1,8 @@
-#ifndef K3DSDK_EXTENSION_GL_H
-#define K3DSDK_EXTENSION_GL_H
+#ifndef K3DSDK_GL_EXTENSION_H
+#define K3DSDK_GL_EXTENSION_H
 
 // K-3D
-// Copyright (c) 1995-2007, Timothy M. Shead
+// Copyright (c) 1995-2010, Timothy M. Shead
 //
 // Contact: tshead@k-3d.com
 //
@@ -40,6 +40,7 @@ namespace extension
 void disable(const k3d::string_t& Extension);
 /// "Enables" an OpenGL extension, so that query() will always return true (regardless of the underlying hardware)
 void enable(const k3d::string_t& Extension);
+
 /// Returns the list of OpenGL extensions supported by underlying hardware
 const std::set<k3d::string_t> list();
 
@@ -55,5 +56,5 @@ bool_t query_vbo();
 
 } // namespace k3d
 
-#endif // !K3DSDK_EXTENSION_GL_H
+#endif // !K3DSDK_GL_EXTENSION_H
 

@@ -28,7 +28,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/array.h>
 #include <k3dsdk/document_plugin_factory.h>
-#include <k3dsdk/extension_gl.h>
+#include <k3dsdk/gl/extension.h>
 #include <k3dsdk/gl.h>
 #include <k3dsdk/hints.h>
 #include <k3dsdk/imesh_painter_gl.h>
