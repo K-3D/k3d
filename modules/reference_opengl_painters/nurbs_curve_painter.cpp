@@ -68,18 +68,27 @@ class nurbs_curve_painter :
 public:
 	nurbs_curve_painter(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
-		nurbs_renderer(gluNewNurbsRenderer())
+		nurbs_renderer(0)
 	{
-		// Important!  We load our own matrices for efficiency (saves round-trips to the server) and to prevent problems with selection
-		gluNurbsProperty(nurbs_renderer, GLU_AUTO_LOAD_MATRIX, GL_FALSE);
-		gluNurbsProperty(nurbs_renderer, GLU_CULLING, GL_FALSE);
-		gluNurbsCallback(nurbs_renderer, GLU_ERROR, GLU_NURBS_CALLBACK(on_nurbs_error));
 	}
 
 	~nurbs_curve_painter()
 	{
 		if(nurbs_renderer)
                         gluDeleteNurbsRenderer(nurbs_renderer);
+	}
+
+	void initialize()
+	{
+		if(nurbs_renderer)
+			return;
+
+		nurbs_renderer = gluNewNurbsRenderer();
+
+		// Important!  We load our own matrices for efficiency (saves round-trips to the server) and to prevent problems with selection
+		gluNurbsProperty(nurbs_renderer, GLU_AUTO_LOAD_MATRIX, GL_FALSE);
+		gluNurbsProperty(nurbs_renderer, GLU_CULLING, GL_FALSE);
+		gluNurbsCallback(nurbs_renderer, GLU_ERROR, GLU_NURBS_CALLBACK(on_nurbs_error));
 	}
 
 	void on_paint_mesh(const k3d::mesh& Mesh, const k3d::gl::painter_render_state& RenderState, k3d::iproperty::changed_signal_t& ChangedSignal)
@@ -89,6 +98,8 @@ public:
 			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(Mesh, **primitive));
 			if(!nurbs_curve)
 				continue;
+
+			initialize();
 
 			const k3d::mesh::points_t& points = *Mesh.points;
 
@@ -147,6 +158,8 @@ public:
 			boost::scoped_ptr<k3d::nurbs_curve::const_primitive> nurbs_curve(k3d::nurbs_curve::validate(Mesh, **primitive));
 			if(!nurbs_curve)
 				continue;
+
+			initialize();
 
 			const k3d::mesh::points_t& points = *Mesh.points;
 
@@ -211,7 +224,7 @@ public:
 	}
 
 private:
-	GLUnurbsObj* const nurbs_renderer;
+	GLUnurbsObj* nurbs_renderer;
 };
 
 /////////////////////////////////////////////////////////////////////////////
