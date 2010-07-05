@@ -57,10 +57,15 @@ ADD_CUSTOM_TARGET(docs-guide-docbook
 	)
 
 # Setup generation of an HTML version of the guide ...
-ADD_CUSTOM_TARGET(docs-guide-html
+ADD_CUSTOM_COMMAND(
 	DEPENDS ${DOCBOOK_BINARY_DIR}/guide.xml
 	COMMAND ${CMAKE_COMMAND} -E copy_directory ${DOCBOOK_BINARY_DIR} ${HTML_BINARY_DIR}
 	COMMAND ${A2X_COMMAND} -v --format chunked ${HTML_BINARY_DIR}/guide.xml
+	OUTPUT ${HTML_BINARY_DIR}/guide.chunked/index.html
+	)
+
+ADD_CUSTOM_TARGET(docs-guide-html
+	DEPENDS ${HTML_BINARY_DIR}/guide.chunked/index.html
 	)
 
 # Setup generation of a PDF version of the guide ...
