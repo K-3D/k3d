@@ -140,7 +140,7 @@ void main_window::on_help_k3d_guide_activated()
 	if(!m_assistant)
 	{
 		m_assistant = new QProcess();
-		m_assistant->setWorkingDirectory(K3D_GUIDE_BINARY_DIR "/qt");
+		m_assistant->setWorkingDirectory(k3d::convert<QString>((k3d::share_path() / k3d::filesystem::generic_path("guide")).native_filesystem_string()));
 		m_assistant->start(K3D_ASSISTANT_COMMAND, QStringList() << "-collectionFile" << "guide.qhc" << "-enableRemoteControl");
 		if(!m_assistant->waitForStarted())
 		{
