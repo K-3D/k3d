@@ -46,17 +46,45 @@ struct facet
 	k3d::float_t v1[3];
 	k3d::float_t v2[3];
 	k3d::uint16_t color;
+
+	/// Sort using colors, to support the Hexpress mesher from Numeca
+	bool operator<(const facet& b) const
+	{
+		return color < b.color;
+	}
 };
 
 /// Encapsulates the STL binary data format
 struct binary_stl
 {
+	/// Default constructor, write K-3D version info into the header
 	binary_stl()
 	{
 		k3d::string_t headstr =  k3d::string_t("K-3D ") + k3d::string_t(K3D_VERSION) + k3d::string_t(" STL writer");
 		for(k3d::uint_t i = 0 ; i != headstr.size(); ++i)
 			header[i] = headstr[i];
 	}
+
+	/// Magics format constructor, writes material info into the header
+	binary_stl(const k3d::color& Color, const k3d::color& Diffuse, const k3d::color& Specular, const k3d::color& Ambient)
+	{
+		const k3d::uint8_t color[] = {Color.red*255, Color.green*255, Color.blue*255, 0};
+		const k3d::uint8_t diffuse[] = {Diffuse.red*255, Diffuse.green*255, Diffuse.blue*255, 0};
+		const k3d::uint8_t specular[] = {Specular.red*255, Specular.green*255, Specular.blue*255, 0};
+		const k3d::uint8_t ambient[] = {Ambient.red*255, Ambient.green*255, Ambient.blue*255, 0};
+		const k3d::string_t color_str(reinterpret_cast<const char*>(color));
+		const k3d::string_t diffuse_str(reinterpret_cast<const char*>(diffuse));
+		const k3d::string_t specular_str(reinterpret_cast<const char*>(specular));
+		const k3d::string_t ambient_str(reinterpret_cast<const char*>(ambient));
+		k3d::string_t headstr =  k3d::string_t("K-3D ") + k3d::string_t(K3D_VERSION) + k3d::string_t(" STL writer COLOR=")
+															+ color_str
+															+ ",MATERIAL="
+															+ diffuse_str
+															+ specular_str
+															+ ambient_str;
+		std::copy(headstr.begin(), headstr.end(), header);
+	}
+
 	/// Header containing file comment
 	char header[80];
 	std::vector<facet> facets;
@@ -84,6 +112,17 @@ struct binary_stl
 		}
 	}
 };
+
+/// Switches the order of the two bytes that make up N
+inline k3d::uint16_t switch_bytes(k3d::uint16_t N)
+{
+	// switch byte order
+	k3d::uint8_t* result_array = reinterpret_cast<k3d::uint8_t*>(&N);
+	k3d::uint8_t a = result_array[0];
+	result_array[0] = result_array[1];
+	result_array[1] = a;
+	return N;
+}
 
 } // namespace io
 

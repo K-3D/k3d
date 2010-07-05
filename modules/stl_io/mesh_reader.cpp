@@ -185,13 +185,26 @@ void adjust_orientation(const k3d::mesh::points_t Points, k3d::mesh::indices_t& 
 }
 
 /// 2-byte integer value to a K-3D color
-k3d::color convert_color(const k3d::uint16_t Color)
+k3d::color convert_color_viscam(const k3d::uint16_t Color, const k3d::color& BaseColor)
 {
-	const k3d::uint16_t blue = Color >> 11;
-	const k3d::uint16_t green = (Color - (blue << 11)) >> 6;
-	const k3d::uint16_t red = (Color - (blue << 11) - (green << 6)) >> 1;
-	const k3d::uint16_t use_color = (Color - (blue << 11) - (green << 6) - (red << 1));
-	const k3d::color result = use_color ? k3d::color(static_cast<k3d::double_t>(red)/31., static_cast<k3d::double_t>(green)/31., static_cast<k3d::double_t>(blue)/31.) : k3d::color(0.8, 0.8, 0.8);
+	k3d::uint16_t color = switch_bytes(Color);
+	const k3d::uint16_t blue = color >> 11;
+	const k3d::uint16_t green = (color - (blue << 11)) >> 6;
+	const k3d::uint16_t red = (color - (blue << 11) - (green << 6)) >> 1;
+	const k3d::uint16_t use_color = (color - (blue << 11) - (green << 6) - (red << 1));
+	const k3d::color result = use_color ? k3d::color(static_cast<k3d::double_t>(red)/31., static_cast<k3d::double_t>(green)/31., static_cast<k3d::double_t>(blue)/31.) : BaseColor;
+	return result;
+}
+
+/// 2-byte integer value to a K-3D color
+k3d::color convert_color_magics(const k3d::uint16_t Color, const k3d::color& BaseColor)
+{
+	k3d::uint16_t color = switch_bytes(Color);
+	const k3d::uint16_t red = color >> 11;
+	const k3d::uint16_t green = (color - (red << 11)) >> 6;
+	const k3d::uint16_t blue = (color - (red << 11) - (green << 6)) >> 1;
+	const k3d::uint16_t use_color = (color - (red << 11) - (green << 6) - (blue << 1));
+	const k3d::color result = !use_color ? k3d::color(static_cast<k3d::double_t>(red)/31., static_cast<k3d::double_t>(green)/31., static_cast<k3d::double_t>(blue)/31.) : BaseColor;
 	return result;
 }
 
@@ -250,6 +263,19 @@ public:
 				k3d::mesh::colors_t face_colors;
 				binary_stl stl;
 				stl.read(file);
+				k3d::color base_color(0.8, 0.8, 0.8);
+				k3d::bool_t is_magics = false;
+				if(boost::algorithm::contains(stl.header, "COLOR="))
+				{
+					k3d::uint8_t* color = reinterpret_cast<k3d::uint8_t*>(boost::algorithm::find_first(stl.header, "COLOR=").end());
+					base_color = k3d::color(static_cast<k3d::double_t>(color[0]/255.), static_cast<k3d::double_t>(color[1]/255.), static_cast<k3d::double_t>(color[2]/255.));
+					is_magics = true;
+				} else if(boost::algorithm::contains(stl.header, "MATERIAL="))
+				{
+					k3d::uint8_t* color = reinterpret_cast<k3d::uint8_t*>(boost::algorithm::find_first(stl.header, "MATERIAL=").end());
+					base_color = k3d::color(static_cast<k3d::double_t>(color[0]/255.), static_cast<k3d::double_t>(color[1]/255.), static_cast<k3d::double_t>(color[2]/255.));
+					is_magics = true;
+				}
 				const k3d::uint_t nfacets = stl.facets.size();
 				for(k3d::uint_t f = 0; f != nfacets; ++f)
 				{
@@ -261,7 +287,7 @@ public:
 					vertex_indices.push_back(detail::add_point(points, p1, threshold));
 					vertex_indices.push_back(detail::add_point(points, p2, threshold));
 					face_normals.push_back(k3d::normal3(stl.facets[f].normal[0], stl.facets[f].normal[1], stl.facets[f].normal[2]));
-					face_colors.push_back(detail::convert_color(stl.facets[f].color));
+					face_colors.push_back(is_magics ? detail::convert_color_magics(stl.facets[f].color, base_color) : detail::convert_color_viscam(stl.facets[f].color, base_color));
 				}
 				k3d::polyhedron::primitive* polyhedron = k3d::polyhedron::create(Output, points, vertex_counts, vertex_indices, static_cast<k3d::imaterial*>(0));
 				polyhedron->face_attributes.create(m_color_array.pipeline_value(), new k3d::mesh::colors_t(face_colors));
