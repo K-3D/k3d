@@ -10,6 +10,9 @@ FILE(MAKE_DIRECTORY ${CONTENT_BINARY_DIR})
 SET(DOCBOOK_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/docbook)
 FILE(MAKE_DIRECTORY ${DOCBOOK_BINARY_DIR})
 
+SET(CHUNKED_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/chunked)
+FILE(MAKE_DIRECTORY ${CHUNKED_BINARY_DIR})
+
 SET(HTML_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/html)
 FILE(MAKE_DIRECTORY ${HTML_BINARY_DIR})
 
@@ -45,7 +48,6 @@ ADD_CUSTOM_COMMAND(
 	OUTPUT ${CONTENT_BINARY_DIR}/plugins.txt
 	)
 
-# Setup generation of a DocBook version of the guide ...
 ADD_CUSTOM_COMMAND(
 	DEPENDS ${GUIDE_CONTENT}
 	COMMAND ${ASCIIDOC_COMMAND} --attribute docinfo --doctype book --backend docbook --out-file ${DOCBOOK_BINARY_DIR}/guide.xml ${CONTENT_BINARY_DIR}/guide.txt
@@ -56,35 +58,51 @@ ADD_CUSTOM_TARGET(docs-guide-docbook
 	DEPENDS ${DOCBOOK_BINARY_DIR}/guide.xml
 	)
 
-# Setup generation of an HTML version of the guide ...
 ADD_CUSTOM_COMMAND(
 	DEPENDS ${DOCBOOK_BINARY_DIR}/guide.xml
-	COMMAND ${CMAKE_COMMAND} -E copy_directory ${DOCBOOK_BINARY_DIR} ${HTML_BINARY_DIR}
-	COMMAND ${A2X_COMMAND} -v --format chunked ${HTML_BINARY_DIR}/guide.xml
-	OUTPUT ${HTML_BINARY_DIR}/guide.chunked/index.html
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${DOCBOOK_BINARY_DIR} ${CHUNKED_BINARY_DIR}
+	COMMAND ${A2X_COMMAND} -v --format chunked ${CHUNKED_BINARY_DIR}/guide.xml
+	OUTPUT ${CHUNKED_BINARY_DIR}/guide.chunked/index.html
 	)
 
+# Setup optional generation of a standalone HTML version of the guide ...
 ADD_CUSTOM_TARGET(docs-guide-html
-	DEPENDS ${HTML_BINARY_DIR}/guide.chunked/index.html
+	DEPENDS ${CHUNKED_BINARY_DIR}/guide.chunked/index.html
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CHUNKED_BINARY_DIR}/guide.chunked ${K3D_SHARE_OUTPUT_DIRECTORY}/k3d/guide/html
 	)
 
-# Setup generation of a PDF version of the guide ...
+# Setup optional generation of a standalone PDF version of the guide ...
 ADD_CUSTOM_TARGET(docs-guide-pdf
 	DEPENDS ${DOCBOOK_BINARY_DIR}/guide.xml
 	COMMAND ${CMAKE_COMMAND} -E copy_directory ${DOCBOOK_BINARY_DIR} ${PDF_BINARY_DIR}
 	COMMAND ${A2X_COMMAND} -v --format pdf ${PDF_BINARY_DIR}/guide.xml
 	)
 
-# Setup generation of a Qt Assistant version of the guide ...
+# Setup generation of an HTML version of the guide for use with the NGUI ...
+IF(K3D_BUILD_NGUI_MODULE)
+	ADD_CUSTOM_COMMAND(
+		DEPENDS ${CHUNKED_BINARY_DIR}/guide.chunked/index.html
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CHUNKED_BINARY_DIR}/guide.chunked ${K3D_SHARE_OUTPUT_DIRECTORY}/k3d/guide/html
+		OUTPUT ${K3D_SHARE_OUTPUT_DIRECTORY}/k3d/guide/html/index.html
+		)
+
+	ADD_CUSTOM_TARGET(docs-guide-ngui ALL
+		DEPENDS ${K3D_SHARE_OUTPUT_DIRECTORY}/k3d/guide/html/index.html
+		)
+
+	INSTALL(DIRECTORY ${K3D_SHARE_OUTPUT_DIRECTORY}/k3d/guide/html DESTINATION share/k3d/guide)
+ENDIF()
+
+# Setup generation of a Qt Assistant version of the guide for use with the QTUI ...
 IF(K3D_BUILD_QTUI_MODULE)
 	FIND_PROGRAM(QHELPGENERATOR_COMMAND NAMES qhelpgenerator qhelpgenerator-mac)
 	FIND_PROGRAM(QCOLLECTIONGENERATOR_COMMAND NAMES qcollectiongenerator qcollectiongenerator-mac)
 
 	ADD_CUSTOM_COMMAND(
 		DEPENDS
-			${HTML_BINARY_DIR}/guide.chunked/index.html
+			${CHUNKED_BINARY_DIR}/guide.chunked/index.html
 			${QT_BINARY_DIR}/guide.qhp
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${HTML_BINARY_DIR}/guide.chunked ${QT_BINARY_DIR}
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CHUNKED_BINARY_DIR}/guide.chunked ${QT_BINARY_DIR}
 		COMMAND ${QHELPGENERATOR_COMMAND} ${QT_BINARY_DIR}/guide.qhp -o ${QT_BINARY_DIR}/guide.qch
 		OUTPUT ${QT_BINARY_DIR}/guide.qch
 		)
@@ -111,7 +129,7 @@ IF(K3D_BUILD_QTUI_MODULE)
 		OUTPUT ${K3D_SHARE_OUTPUT_DIRECTORY}/k3d/guide/guide.qhc
 		)
 
-	ADD_CUSTOM_TARGET(docs-guide-qt ALL
+	ADD_CUSTOM_TARGET(docs-guide-qtui ALL
 		DEPENDS ${K3D_SHARE_OUTPUT_DIRECTORY}/k3d/guide/guide.qch
 		DEPENDS ${K3D_SHARE_OUTPUT_DIRECTORY}/k3d/guide/guide.qhc
 		)

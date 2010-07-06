@@ -1143,9 +1143,9 @@ private:
 		menu->items().push_back(*Gtk::manage(
 			new Gtk::ImageMenuItem(
 				*Gtk::manage(new Gtk::Image(Gtk::Stock::HELP, Gtk::ICON_SIZE_MENU)),
-				_("_Manual"), true)
-			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_manual))
-			<< set_accelerator_path("<k3d-document>/actions/help/manual", get_accel_group())));
+				_("_K-3D Guide"), true)
+			<< connect_menu_item(sigc::mem_fun(*this, &main_document_window::on_help_guide))
+			<< set_accelerator_path("<k3d-document>/actions/help/guide", get_accel_group())));
 
 		menu->items().push_back(*Gtk::manage(
 			new Gtk::MenuItem(_("_Release Notes"), true)
@@ -2330,9 +2330,9 @@ private:
 		window->set_transient_for(*this);
 	}
 
-	void on_help_manual()
+	void on_help_guide()
 	{
-		k3d::ngui::uri::open("http://www.k-3d.org/wiki/User_Documentation");
+		k3d::ngui::uri::open("file://" + (k3d::share_path() / k3d::filesystem::generic_path("/guide/html/index.html")).native_filesystem_string());
 	}
 
 	void on_help_online()
