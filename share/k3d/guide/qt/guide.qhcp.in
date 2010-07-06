@@ -2,9 +2,9 @@
 <QHelpCollectionProject version="1.0">
 	<assistant>
 		<title>K-3D Help</title>
-		<homePage>qthelp://org.k-3d/doc/qt/index.chunked/index.html</homePage>
-		<startPage>qthelp://org.k-3d/doc/qt/index.chunked/index.html</startPage>
-		<applicationIcon>qt/k3d.png</applicationIcon>
+		<homePage>qthelp://org.k-3d/doc/index.html</homePage>
+		<startPage>qthelp://org.k-3d/doc/index.html</startPage>
+		<applicationIcon>k3d.png</applicationIcon>
 		<enableFilterFunctionality>false</enableFilterFunctionality>
 		<enableDocumentationManager>false</enableDocumentationManager>
 		<enableAddressBar visible="false">false</enableAddressBar>
@@ -13,13 +13,13 @@
 			<text>About K-3D</text>
 		</aboutMenuText>
 		<aboutDialog>
-			<file>qt/about.txt</file>
-			<icon>qt/k3d.png</icon>
+			<file>about.txt</file>
+			<icon>k3d.png</icon>
 		</aboutDialog>
 	</assistant>
 	<docFiles>
 		<register>
-			<file>qt/guide.qch</file>
+			<file>guide.qch</file>
 		</register>
 	</docFiles>
 </QHelpCollectionProject>
