@@ -25,6 +25,18 @@ K-3D Reference Manual
 
 :leveloffset: 1
 include::@CONTENT_BINARY_DIR@/plugins.txt[]
+
+[appendix]
+K-3D Commands
+=============
+:leveloffset: 2
+include::@man_BINARY_DIR@/k3d.1.txt[]
+include::@man_BINARY_DIR@/k3d-renderframe.1.txt[]
+include::@man_BINARY_DIR@/k3d-renderjob.1.txt[]
+include::@man_BINARY_DIR@/k3d-sl2xml.1.txt[]
+include::@man_BINARY_DIR@/k3d-uuidgen.1.txt[]
+:leveloffset: 1
+
 :leveloffset: 0
 
 [index]
