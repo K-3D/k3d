@@ -1,3 +1,5 @@
+PROJECT(man)
+
 CONFIGURE_FILE(k3d.1.txt.in k3d.1.txt)
 CONFIGURE_FILE(k3d-renderframe.1.txt.in k3d-renderframe.1.txt)
 CONFIGURE_FILE(k3d-renderjob.1.txt.in k3d-renderjob.1.txt)
