@@ -9,6 +9,8 @@ K-3D Users' Guide
 :leveloffset: 1
 include::@CONTENT_SOURCE_DIR@/pipeline.txt[]
 include::@CONTENT_SOURCE_DIR@/importing_exporting.txt[]
+include::@CONTENT_SOURCE_DIR@/render_models.txt[]
+include::@CONTENT_SOURCE_DIR@/luxrender.txt[]
 :leveloffset: 0
 
 K-3D Developers' Guide

@@ -1,0 +1,40 @@
+= LuxRender =
+
+The experimental new <<LuxRenderPlugins>>
+allow K-3D scenes to be rendered using http://www.luxrender.net LuxRender - ``a
+new, open-source, free software rendering system for physically correct,
+unbiased image synthesis.''
+
+== Usage ==
+
+As with all render engines, the key to using LuxRender in a K-3D scene is to:
+
+* Assign LuxRender materials to your geometry.
+* Use LuxRender lights to light the scene.
+* Use <<LuxRenderEngine>> to render the scene.
+
+For example:
+
+* Start a new K-3D scene.
+* Add a <<LuxRenderSunLight>> and <<LuxRenderSkyLight>> to provide physically-based lighting.
+* Create some new geometry for the scene, such as a small <<PolyCube>> sitting on top of a large, flat <<PolyCube>>.
+* Create a new <<LuxRenderEngine>>.
+* Choose Render > Frame from the menus, and pick the <<LuxRenderEngine>> when prompted.  Supply an output image, and wait for the render to complete.
+
+== Caveats ==
+
+<<LuxRenderEngine>> renders images by executing the "luxconsole" command (note:
+lower-case).  This should work out-of-the-box on GNU/Linux and Windows.  On
+MacOSX, the luxconsole executable is distributed in an application bundle which
+the user could put anywhere.  In this case, you will either have to adjust your
+PATH to point to the interior of the bundle, or create a shell script wrapper
+to start the render engine, something along the lines of:
+
+--------------------------------------------------------
+#!/bin/sh
+cd /Applications/LuxRender.app/Contents/MacOS
+./luxrender $*
+--------------------------------------------------------
+
+... and ensure that the wrapper script can be found on your PATH.
+

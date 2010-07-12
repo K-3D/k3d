@@ -1,0 +1,50 @@
+= Render Models =
+
+== Overview ==
+
+A render engine is an object that can save a representation of a K-3D document to a file, or a series of files that represent the document over a range of time (an animation). Most often a render engine converts the 3D scene to a 2D bitmap image using the properties of a physical camera (position, orientation, viewing frustum, etc).  Examples include [[RenderManEngine]] and [[YafrayEngine]], but this is not set in stone - the [[GraphVizEngine]] is a render engine that saves graphs of the nodes and edges in a document's [[Visualization Pipeline]] to help understand their (otherwise completely non-visual) relationships.
+
+== Lights and Materials ==
+
+Unlike the majority of 3D software, K-3D makes a clean distinction between the editing system and the back-end render system used to create output images.  Users are able to pick-and-choose render engines for the job-at-hand, and developers can integrate K-3D with a wide variety of rendering technologies.  This affects the user interface in that K-3D does not have one-size-fits-all Material or Light nodes, because the features of different render engines vary widely.
+
+== Plugins ==
+
+See <<RenderEnginePlugins>>, <<MaterialPlugins>>, and <<LightPlugins>> for related K-3D plugins.
+
+== Overview ==
+
+In K-3D we use the term "render model" to describe the components that must work-together to produce a rendered image.  Current render models normally include:
+
+* A <<Camera>> node that describes an observer within a scene.
+* A set of "Light" nodes that provide illumination to the scene.
+* A set of "Material" nodes that control the visible attributes of rendered objects.
+* A "Render Engine" node that coordinates among the other components to produce the final output image(s).
+
+Note that, unlike other 3D applications, K-3D is designed to be "render model agnostic" - it supports multiple models and does not "prefer" any one model over the others.  This differs from applications such as Blender or Maya that have built-in render models and use "export" operations for everything else.  Currently, K-3D supports three main render models:
+
+* [[OpenGL]] - used to draw realtime previews and designed around the needs of editing and illustration over final rendering (this could change).
+* [[RenderMan]] - the film-industry standard for high-quality rendering.
+* [[Yafray]] - a fantastic free-as-in-freedom renderer with strong global illumination features.
+
+... of course, artists, researchers and developers can use K-3D's plugin system to introduce new render models as-needed.  Candidates for alternate render models would include other rendering APIs such as POVRAY, or game-engines such as Ogre.
+
+An important characteristic of render models is the strong coupling amongst their components - virtually all current render models require strong coordination among lights, materials, and the render engine to produce an output image.  The capabilities of these components vary widely from model-to-model, which is why K-3D provides "matched sets" of components for each render model.  For example:
+
+* The [[RenderMan]] model includes [[RenderManEngine]], [[RenderManMaterial]], and [[RenderManLight]].
+* The [[Yafray]] model includes [[YafrayEngine]], [[YafrayMaterial]], and eight different Yafray lights - see [[Yafray Plugins]].
+* The [[OpenGL]] model is a little different: there is an [[OpenGLEngine]], but [[OpenGLMaterial]] is currently ignored, and there is no "OpenGLLight".
+
+A key observation is that there is very little commonality between components from the different render models - [[RenderManEngine]] provides a different set of options than [[YafrayEngine]].  [[RenderManMaterial]] is completely programmable through shaders while [[YafrayMaterial]] provides a limited pipeline for combining preset shading functions.  [[RenderManLight]] is similarly programmable via shaders while Yafray provides multiple light types, including global illumination capabilities not found in RenderMan.
+
+It is because these render models are so different that K-3D makes no attempt to provide "generic" render model components.  There is no such thing as a "generic light" in K-3D - there are RenderMan lights, and there are Yafray lights, but the two do not interact.  If you create a scene intended for rendering via Yafray, you will need to populate your scene with Yafray lights and materials.  Similarly, a scene intended for RenderMan will need to contain RenderMan lights and materials.
+
+Of-course, you are free to create a scene that contains multiple render engines of different types, but a Yafray light won't show up in images rendered using [[RenderManEngine]] and a [[RenderManLight]] won't show up in images rendered with [[YafrayEngine]].
+
+Similarly, your scene will need to contain materials appropriate for the render model in-use.  Because you can only assign one material to a geometric primitives at-a-time, a special material node - [[MultiMaterial]] - acts as a "container" of materials so you can add multiple render-model-specific materials to your scene.
+
+Note that the OpenGL render model is special, because it serves the needs of <b>editing</b>, where trying to maximize realism is actually counterproductive - you don't want to have to squint while selecting geometry just because you happen to be setting-up a low-key scene.  As alluded to above, there are no OpenGL light source, and all normal OpenGL lighting is via a "headlight" - a distant light source that always shines in the direction the [[Camera]] is pointing - so you can always see what you're looking at.
+
+You have the option of allowing other light sources to contribute to the OpenGL scene, but this is necessarily a low-fidelity simulation, as the OpenGL shading model is the simplest of any that we support.  There simply isn't any realistic way to "translate" a RenderMan light shader or a Yafray Hemilight (for example) into something that fits the OpenGL model.
+
+
