@@ -48,6 +48,20 @@ inline const matrix4 matrix(GLdouble* GLMatrix)
 	return transpose(result);
 }
 
+/// Converts an OpenGL matrix into a standard K-3D matrix
+inline const matrix4 matrix(const GLfloat GLMatrix[16])
+{
+	matrix4 result;
+	for(uint_t i = 0; i != 4; ++i)
+	{
+		for(uint_t j = 0; j != 4; ++j)
+		{
+			result[i][j] = static_cast<double_t>(GLMatrix[j*4+i]);
+		}
+	}
+	return result;
+}
+
 /// Pushes a matrix onto the OpenGL matrix stack
 inline void push_matrix(const matrix4& Matrix)
 {

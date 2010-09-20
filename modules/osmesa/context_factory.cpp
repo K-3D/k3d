@@ -34,6 +34,11 @@
 #include <iterator>
 #include <stdexcept>
 
+// Needed when NVIDIA OpenGL is installed, since OSMesa needs this defined
+#ifndef GLAPIENTRY
+#define GLAPIENTRY
+#endif
+
 #include <GL/osmesa.h>
 
 #include <dlfcn.h>

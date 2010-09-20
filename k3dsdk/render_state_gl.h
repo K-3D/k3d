@@ -24,7 +24,10 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/algebra.h>
 #include <k3dsdk/gl.h>
+#include <k3dsdk/point3.h>
+#include <k3dsdk/types.h>
 
 namespace k3d
 {
@@ -49,44 +52,48 @@ public:
 	icamera& camera;
 
 	/// Set to true iff the OpenGL viewing frustum used for drawing is orthographic
-	bool orthographic;
+	bool_t orthographic;
 	
-	bool draw_two_sided;
+	bool_t draw_two_sided;
 	
 	//@{
 	/** Stores the OpenGL viewing frustum used for drawing (perspective or orthographic).
 	 * Note: these are the actual values passed to glFrustum() or glOrtho() to fill the
 	 * render window, in general they will be different from the viewing frustum defined
 	 * by the camera for rendering. */
-	double gl_window_frustum_left;
-	double gl_window_frustum_right;
-	double gl_window_frustum_top;
-	double gl_window_frustum_bottom;
-	double gl_window_frustum_near;
-	double gl_window_frustum_far;
+	double_t gl_window_frustum_left;
+	double_t gl_window_frustum_right;
+	double_t gl_window_frustum_top;
+	double_t gl_window_frustum_bottom;
+	double_t gl_window_frustum_near;
+	double_t gl_window_frustum_far;
 	//@}
 	
 	//@{
 	/** Stores an imaginary OpenGL viewing frustum that represents the viewing frustum
 	 * defined by the camera for rendering.  Note that the values may not be the same
 	 * as those returned by the camera object.  */
-	double gl_camera_frustum_left;
-	double gl_camera_frustum_right;
-	double gl_camera_frustum_top;
-	double gl_camera_frustum_bottom;
-	double gl_camera_frustum_near;
-	double gl_camera_frustum_far;
+	double_t gl_camera_frustum_left;
+	double_t gl_camera_frustum_right;
+	double_t gl_camera_frustum_top;
+	double_t gl_camera_frustum_bottom;
+	double_t gl_camera_frustum_near;
+	double_t gl_camera_frustum_far;
 	//@}
 
 	/// Stores the current OpenGL projection matrix
-	float gl_projection_matrix[16];
+	GLfloat gl_projection_matrix[16];
+	
 	/// Stores the current OpenGL viewport
 	GLint gl_viewport[4];
 	
 	/// Stores the selection state of the calling node
-	double node_selection;
+	double_t node_selection;
 	/// Stores the selection state of the parent of the calling node
-	double parent_selection;
+	double_t parent_selection;
+	
+	/// Projects a point in world coordinates into screen space, returning the 2D widget coordinates and Z-buffer depth
+	const point3 project(const point3& WorldCoords) const;
 };
 
 } // namespace gl

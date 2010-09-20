@@ -111,6 +111,9 @@ public:
 
 	void operator()(k3d::gl::irenderable* const Renderable)
 	{
+		k3d::inode* node = dynamic_cast<k3d::inode*>(Renderable);
+		if(node)
+			k3d::log() << debug << "Rendering node " << node->name() << std::endl;
 		if(m_node_selection)
 		{
 			m_state.node_selection = m_node_selection->selection_weight(*dynamic_cast<k3d::inode*>(Renderable));
