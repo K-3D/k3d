@@ -34,6 +34,7 @@ namespace k3d
 {
 
 class bounding_box3;
+class icamera;
 class idocument;
 class plane;
 
@@ -140,6 +141,12 @@ void draw(const bounding_box3& Box);
 void draw_bounding_box(const bounding_box3& Box);
 /// Passes a k3d::bitmap to glTexImage2D(), handling non-power-of-two sizes and translations between image formats
 void tex_image_2d(const bitmap& Bitmap);
+
+/// Projects a point in world coordinates into screen space, returning the 2D widget coordinates and Z-buffer depth
+const point3 project(const point3& WorldCoords);
+
+/// Calculates the settings for a projection for the given camera
+void calculate_projection(k3d::icamera& Camera, const uint_t PixelWidth, const uint_t PixelHeight, k3d::rectangle& WindowRect, k3d::rectangle& CameraRect, double& Near, double& Far, bool& Orthographic);
 
 } // namespace gl
 

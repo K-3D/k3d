@@ -91,9 +91,6 @@ public:
 	double_t node_selection;
 	/// Stores the selection state of the parent of the calling node
 	double_t parent_selection;
-	
-	/// Projects a point in world coordinates into screen space, returning the 2D widget coordinates and Z-buffer depth
-	const point3 project(const point3& WorldCoords) const;
 };
 
 } // namespace gl

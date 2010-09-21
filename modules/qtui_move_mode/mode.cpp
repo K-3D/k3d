@@ -22,7 +22,9 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/fstream.h>
+#include <k3dsdk/gl.h>
 #include <k3dsdk/imatrix_sink.h>
+#include <k3dsdk/imatrix_source.h>
 #include <k3dsdk/irenderable_gl.h>
 #include <k3dsdk/log.h>
 #include <k3dsdk/module.h>
@@ -36,6 +38,7 @@
 #include <k3dsdk/resource/resource.h>
 #include <k3dsdk/selection_state_gl.h>
 #include <k3dsdk/types.h>
+#include <k3dsdk/utility_gl.h>
 
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
@@ -62,46 +65,34 @@ namespace move
 
 namespace detail
 {
-
-typedef std::vector<GLuint> selection_buffer_t;
-	
-	// based on the NGUI viewport::select function
-k3d::int32_t select(k3d::gl::irender_viewport& Engine, k3d::icamera& Camera, selection_buffer_t& Buffer, const k3d::gl::selection_state& SelectState, const k3d::uint_t Width, const k3d::uint_t Height, const k3d::rectangle& Region)
+/// Adapted from render_engine.cpp
+/// TODO: Do we need some convention on what light is used for the 3D scene and the UI modes?
+/// We use LIGHT1 here.
+void gl_setup_headlight()
 {
-	// Set our selection buffer to a sensible minimum size ...
-	if(Buffer.size() < 8096)
-		Buffer.resize(8096);
-	
-	k3d::log() << debug << "rendering selection in window of " << Width << " x " << Height << " with rect around " << Region.center() << std::endl;
+	// Setup lights ...
+	glEnable(GL_LIGHTING);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_FALSE);
 
-	// Set an (arbitrary) upper-limit on how large we let the buffer grow ...
-	while(Buffer.size() < 10000000)
-	{
-		glSelectBuffer(Buffer.size(), &Buffer[0]);
-		glRenderMode(GL_SELECT);
-		glInitNames();
+	// Make sure all lights are turned off initially ...
+	GLint maxlights = 0;
+	glGetIntegerv(GL_MAX_LIGHTS, &maxlights);
+	for(GLint i = 0; i < maxlights; ++i)
+		glDisable(GLenum(GL_LIGHT0 + i));
 
-		GLdouble view_matrix[16];
-		GLdouble projection_matrix[16];
-		GLint viewport[4];
-		
-		Engine.render_viewport_selection(SelectState, Camera, Width, Height, k3d::rectangle::normalize(Region), view_matrix, projection_matrix, viewport);
-		
-		const GLint hits = glRenderMode(GL_RENDER);
-		glFlush();
+	// Setup the headlight ...
+	glEnable(GL_LIGHT1);
 
-		// If we got a positive number of hits, we're done ...
-		if(hits >= 0)
-			return hits;
+	// Setup color ...
+	const GLfloat color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glLightfv(GL_LIGHT1, GL_AMBIENT, color);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, color);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, color);
 
-		// A negative number means there was buffer overflow, so try again ...
-		Buffer.resize(Buffer.size() * 2);
-	}
-
-	// Ran out of buffer space!
-	k3d::log() << error << "Ran out of selection-buffer space" << std::endl;
-
-	return 0;
+	// Setup light direction ...
+	const GLfloat position[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
+	glLightfv(GL_LIGHT1, GL_POSITION, position);
 }
 
 }
@@ -123,12 +114,11 @@ void mode::enable(k3d::idocument& Document, QGraphicsScene& Scene)
 	m_document = &Document;
 	m_scene = &Scene;
 	
-	std::vector<k3d::gl::irender_viewport*> gl_engines = k3d::node::lookup<k3d::gl::irender_viewport>(Document);
-	return_if_fail(gl_engines.size());
-	m_gl_engine = gl_engines.front();
+	
 	
 	std::vector<k3d::icamera*> cameras = k3d::node::lookup<k3d::icamera>(Document);
 	return_if_fail(cameras.size());
+	m_move_manipulators.set_camera(cameras.front());
 	m_camera = cameras.front();
 
 	connect(m_scene, SIGNAL(sceneRectChanged(const QRectF&)), this, SLOT(on_scene_rect_changed(const QRectF&)));
@@ -146,9 +136,6 @@ void mode::on_reload()
 	
 	setAcceptedMouseButtons(Qt::LeftButton);
 	m_scene->addItem(this);
-	
-	// Add the manipulator plugin
-	m_manipulators = k3d::plugin::create<k3d::imatrix_sink>("MoveManipulators", *m_document, "MoveManipulators");
 	
 	on_scene_rect_changed(m_scene->sceneRect());
 }
@@ -190,34 +177,61 @@ QRectF mode::boundingRect() const
 
 void mode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
+	k3d::gl::store_attributes attributes;
+	
+	// Setup the projection
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	
+	k3d::rectangle window_rect, cam_rect;
+	k3d::double_t near, far;
+	k3d::bool_t ortho;
+	k3d::gl::calculate_projection(*m_camera, m_rect.width(), m_rect.height(), window_rect, cam_rect, near, far, ortho);
+	if(ortho)
+	{
+		const k3d::matrix4 transform_matrix = k3d::property::pipeline_value<k3d::matrix4>(m_camera->transformation().matrix_source_output());
+		const k3d::point3 world_position = transform_matrix * k3d::point3(0, 0, 0);
+		const k3d::point3 world_target = boost::any_cast<k3d::point3>(m_camera->world_target().property_internal_value());
+		const double distance = k3d::distance(world_position, world_target);
+		const double window_aspect = (window_rect.x2 - window_rect.x1) / (window_rect.y1 - window_rect.y2);
+		const double window_tan_fov = (window_rect.y1 - window_rect.y2) * 0.5 / near;
+		const double window_size = distance * window_tan_fov;
+		glOrtho(-window_size * window_aspect, window_size * window_aspect, -window_size, window_size, near, far);
+	}
+	else
+	{
+		glFrustum(window_rect.x1, window_rect.x2, window_rect.y2, window_rect.y1, near, far);
+	}
+	
+	// Setup the light
+	detail::gl_setup_headlight();
+	
+	// Setup modelview matrix
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	const k3d::matrix4 transform_matrix = k3d::property::pipeline_value<k3d::matrix4>(m_camera->transformation().matrix_source_output());
+	const k3d::angle_axis orientation(k3d::euler_angles(transform_matrix, k3d::euler_angles::ZXYstatic));
+	const k3d::point3 position(k3d::position(transform_matrix));
+
+	glScaled(1.0, 1.0, -1.0);
+	glRotated(-k3d::degrees(orientation.angle), orientation.axis[0], orientation.axis[1], orientation.axis[2]);
+	glTranslated(-position[0], -position[1], -position[2]);
+	
+	// Draw the manipulators
+	m_move_manipulators.draw(move_manipulators::NO);
+	
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 }
 
 void mode::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-	k3d::rectangle rect(k3d::point2(event->pos().x(), event->pos().y()), 300., 300.);
-	render_selection(rect);
 	QGraphicsItem::mousePressEvent(event);
-}
-
-void mode::render_selection(const k3d::rectangle& Region)
-{
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	
-	std::vector<GLuint> buffer;
-	k3d::gl::selection_state state;
-	state.select_component.insert(k3d::selection::USER1);
-	const k3d::int32_t hits = detail::select(*m_gl_engine, *m_camera, buffer, state, static_cast<k3d::uint_t>(boundingRect().width()), static_cast<k3d::uint_t>(boundingRect().height()), Region);
-	k3d::log() << debug << "got " << hits << " hits" << std::endl;
-	
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
 }
 
 

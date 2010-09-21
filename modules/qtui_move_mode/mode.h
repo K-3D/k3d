@@ -32,6 +32,8 @@
 
 #include <boost/scoped_ptr.hpp>
 
+#include "move_manipulators.h"
+
 namespace k3d
 { 
 
@@ -86,11 +88,9 @@ private:
 	k3d::idocument* m_document;
 	QGraphicsScene* m_scene;
 	QRectF m_rect;
-	
-	// cache some required document-related data
-	k3d::imatrix_sink* m_manipulators;
-	k3d::gl::irender_viewport* m_gl_engine;
 	k3d::icamera* m_camera;
+	
+	move_manipulators m_move_manipulators;
 };
 
 } // namespace move

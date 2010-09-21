@@ -33,7 +33,6 @@ namespace move
 {
 
 extern k3d::iplugin_factory& mode_factory();
-extern k3d::iplugin_factory& move_manipulators_factory();
 
 } // namespace move
 
@@ -43,6 +42,5 @@ extern k3d::iplugin_factory& move_manipulators_factory();
 
 K3D_MODULE_START(Registry)
 	Registry.register_factory(module::qtui::move::mode_factory());
-	Registry.register_factory(module::qtui::move::move_manipulators_factory());
 K3D_MODULE_END
 

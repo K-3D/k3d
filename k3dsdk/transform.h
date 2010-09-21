@@ -29,6 +29,7 @@
 namespace k3d
 {
 
+class inode;
 class iunknown;
 class point3;
 
