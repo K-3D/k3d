@@ -49,6 +49,7 @@ ADD_CUSTOM_TARGET(developer-html
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/k3d.png" "${developer_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/developer/developer.css" "${developer_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/developer/logo.png" "${developer_OUTPUT_DIR}"
+	COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/developer/k3d_universal_storage.pdf" "${developer_OUTPUT_DIR}"
 	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" ${MAKO_COMMAND} "dashboard.html" > "${developer_OUTPUT_DIR}/dashboard.html"
 	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" ${MAKO_COMMAND} "dashboard-index.html" > "${developer_OUTPUT_DIR}/dashboard-index.html"
 	COMMAND "${CMAKE_COMMAND}" -E chdir "${CMAKE_CURRENT_SOURCE_DIR}/developer" ${MAKO_COMMAND} "index.html" > "${developer_OUTPUT_DIR}/index.html"
