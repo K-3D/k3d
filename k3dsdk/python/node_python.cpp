@@ -98,15 +98,11 @@ void define_namespace_node()
 		.staticmethod("lookup_one")
 
 		.def("show", node::show_one,
-			"Returns the set of all nodes in the given document.")
-//		.def("show", node::show_many,
-//			"Returns the set of nodes in a document that match a specific factory ID.")
+			"Makes a node visible by adding it to every render engine in the document.")
 		.staticmethod("show")
 
 		.def("hide", node::hide_one,
-			"Returns the set of nodes in a document that match the given node name.")
-//		.def("hide", node::hide_many,
-//			"Returns the set of nodes in a document that match the given metadata name and value.")
+			"Hides a node by removing it from every render engine in the document.")
 		.staticmethod("hide")
 		;
 }
