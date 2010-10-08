@@ -115,12 +115,6 @@ public:
 	void set_document(k3d::idocument* Document)
 	{
 		document = Document;
-		if(document)
-		{
-			k3d::iscript_engine::context context;
-			context["document"] = document;
-			engine->execute(get_factory().name(), "", context);
-		}
 	}
 
 	void on_command(const k3d::string_t& Command)
@@ -137,6 +131,9 @@ public:
 		k3d::iscript_engine::context context;
 		context["__incomplete"] = false;
 		context["__close"] = false;
+
+		if(document)
+			context["document"] = document;
 
 		engine->execute(get_factory().name(), console_command.str(), context, &stdout_slot, &stderr_slot);
 
