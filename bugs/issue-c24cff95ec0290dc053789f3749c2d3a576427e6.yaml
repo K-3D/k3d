@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Owning document not visible in the NGUIPythonShellDialog context.
+desc: Although the Python interactive shell is tied to a specific document, the document isn't visible in the shell context.
+type: :bugfix
+component: K-3D
+release: 0.8.1.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-10-08 02:41:07.619195 Z
+references: []
+
+id: c24cff95ec0290dc053789f3749c2d3a576427e6
+log_events: 
+- - 2010-10-08 02:41:08.316141 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-10-08 02:41:58.032158 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - Not much to say - it's fixed :)
+claimer: 

@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Segfault using autocompletion in the NGUIPythonShellDialog
+desc: Entering "context.__class__;." then hitting "tab" in the shell caused a segfault.
+type: :bugfix
+component: K-3D
+release: 0.8.1.0
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :closed
+disposition: :fixed
+creation_time: 2010-10-08 02:39:58.782010 Z
+references: []
+
+id: e7f06c793e88c43060dc24a5e7b645e87f5c3372
+log_events: 
+- - 2010-10-08 02:40:01.091118 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+- - 2010-10-08 02:41:40.339124 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - closed with disposition fixed
+  - Reimplemented autocompletion using the rlcompleter module that is part of the official Python distribution.
+claimer: 
