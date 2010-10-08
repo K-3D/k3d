@@ -170,6 +170,16 @@ const object any_to_python(const boost::any& Value)
 		return results;
 	}
 
+	if(type == typeid(std::vector<boost::any>))
+	{
+		std::vector<boost::any> value = boost::any_cast<std::vector<boost::any> >(Value);
+		boost::python::list results;
+		for(k3d::uint_t i = 0; i != value.size(); ++i)
+			results.append(any_to_python(value[i]));
+
+		return results;
+	}
+
 	if(type == typeid(k3d::typed_array<k3d::double_t>))
 	{
 		k3d::typed_array<k3d::double_t> nodes = boost::any_cast<k3d::typed_array<k3d::double_t> >(Value);
@@ -248,6 +258,18 @@ const boost::any python_to_any(const object& Value)
 		extract<iunknown_wrapper> value(Value);
 		if(value.check())
 			return boost::any(value().wrapped_ptr());
+	}
+
+	{
+		extract<boost::python::list> value(Value);
+		if(value.check())
+		{
+			std::vector<boost::any> results;
+			boost::python::list list = value();
+			for(int i = 0; i != boost::python::len(list); ++i)
+				results.push_back(python_to_any(list[i]));
+			return results;
+		}
 	}
 
 	throw std::invalid_argument("can't convert unrecognized python value");

@@ -176,47 +176,6 @@ public:
 		return false;
 	}
 
-	const completions_t complete(const k3d::string_t& Command)
-	{
-		completions_t tokens_equal_token;
-		boost::split(tokens_equal_token, Command, boost::is_any_of("= "));
-		completions_t tokens, completions;
-		boost::split(tokens, tokens_equal_token.back(), boost::is_any_of("."));
-		if(tokens.size() == 1)
-		{
-			const boost::python::list locals_keys = m_local_dict.keys();
-			append_completions(locals_keys, tokens[0], completions);
-		}
-		else if(tokens.size() > 1)
-		{
-			if(!m_local_dict.has_key(tokens[0]))
-				return completions;
-			boost::python::object obj = m_local_dict[tokens[0]];
-			for(k3d::uint_t i = 1; i != (tokens.size() - 1); ++i)
-			{
-				obj = boost::python::getattr(obj, tokens[i].c_str());
-				if(!obj.ptr())
-					return completions;
-			}
-			PyObject* dir = PyObject_Dir(obj.ptr());
-			return_val_if_fail(PyList_Check(dir), completions);
-			const boost::python::list candidates = boost::python::extract<boost::python::list>(dir);
-			append_completions(candidates, tokens[tokens.size() - 1], completions);
-		}
-		return completions;
-	}
-
-private:
-	void append_completions(const boost::python::list& Candidates, const k3d::string_t& ToComplete, completions_t& Completions)
-	{
-		for(k3d::uint_t i = 0; i != boost::python::len(Candidates); ++i)
-		{
-			const k3d::string_t completion_candidate = boost::python::extract<k3d::string_t>(Candidates[i]);
-			if(boost::algorithm::starts_with(completion_candidate, ToComplete))
-				Completions.push_back(completion_candidate);
-		}
-	}
-
 	initialize_python m_initialize_python;
 	boost::python::dict m_local_dict;
 };

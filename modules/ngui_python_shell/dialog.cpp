@@ -30,6 +30,7 @@
 #include <k3dsdk/ngui/application_window.h>
 #include <k3dsdk/ngui/console.h>
 #include <k3dsdk/plugin.h>
+#include <k3dsdk/resource/resource.h>
 #include <k3dsdk/result.h>
 
 #include <gtkmm/texttag.h>
@@ -49,22 +50,6 @@ namespace ngui
 
 namespace python_shell
 {
-
-namespace detail
-{
-
-/// Extracts the command's base, before completion
-const k3d::string_t base(const k3d::string_t Command)
-{
-	const k3d::uint_t last_separator = Command.find_last_of(".= ");
-	if(last_separator != k3d::string_t::npos)
-	{
-		return Command.substr(0, last_separator + 1);
-	}
-	return "";
-}
-
-} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // dialog
@@ -166,19 +151,28 @@ public:
 
 	void on_complete_key_pressed(const k3d::string_t& Command)
 	{
-		const k3d::iscript_engine::completions_t completions = engine->complete(Command);
-		k3d::string_t completions_string(completions.size() ? "\n" : "");
-		for(k3d::uint_t i = 0; i != completions.size(); ++i)
-			completions_string += "  " + completions[i];
-		print_completion(completions_string + "\n");
-		print_prompt(">>> ");
-		console->set_current_format(no_tag);
-		k3d::string_t completed = Command;
-		if(completions.size() == 1)
+		k3d::iscript_engine::context context;
+		context["command"] = Command;
+		engine->execute(get_factory().name(), k3d::resource::get_string("/module/ngui_python_shell/completion.py"), context);
+
+		try
 		{
-				completed = detail::base(Command) + completions[0];
+			console->print_string("\n", false);
+
+			std::vector<boost::any> matches = boost::any_cast<std::vector<boost::any> >(context["matches"]);
+			for(k3d::uint_t i = 0; i != matches.size(); ++i)
+				print_completion(boost::any_cast<k3d::string_t>(matches[i]) + "\n");
+
+			k3d::string_t completion = matches.size() == 1 ? boost::any_cast<k3d::string_t>(matches[0]) : Command;
+
+			print_prompt(">>> ");
+			console->set_current_format(no_tag);
+			console->print_string(completion, true);
 		}
-		console->print_string(completed, true);
+		catch(std::exception& e)
+		{
+			k3d::log() << error << e.what() << std::endl;
+		}
 	}
 
 	void print_prompt(const k3d::string_t& Output)

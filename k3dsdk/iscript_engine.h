@@ -70,8 +70,6 @@ public:
 
 	/// Defines a slot that can be called to redirect script output.
 	typedef sigc::slot<void, const string_t&> output_t;
-	/// Defines a list of possible command completions
-	typedef std::vector<string_t> completions_t;
 
 	/**	\brief Executes a script
 		\param ScriptName A human readable identifier for the script, which should be used in error messages, etc.
@@ -88,10 +86,6 @@ public:
 		\note Cancellation may be asynchronous, i.e. scripts may still be running when the call returns, and may continue to run for an indefinite period before shutting down, if at all.
 	*/
 	virtual bool_t halt() = 0;
-
-	/// Lists the possible completions for the given command
-	virtual const completions_t complete(const string_t& Command) = 0;
-
 
 protected:
 	iscript_engine() {}
