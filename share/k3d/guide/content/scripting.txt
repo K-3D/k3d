@@ -1,0 +1,183 @@
+= Scripting =
+
+== Overview ==
+
+Simple user-created scripts can be used to extend K-3D at runtime in an amazing variety of ways:
+
+* Scripts can be run from the command-line to peform ``batch'' processing.
+* Scripts can be run from within the graphical user interface to automate repetitive tasks.
+* Special scripted plugins can be used to provide scripted data sources, data modifiers, and data sinks that function as part of the <<VisualizationPipeline,Visualization Pipeline>>.
+* Scripts can be integrated with K-3D's plugin system so that they are indistinguishable from compiled C++ plugins within the user interface.
+* Scripts can be run automatically when K-3D starts and when it shuts-down.
+* Scripts can be run automatically when a document is created and when it closed.
+* Scripts are used for most of the regression tests in the K-3D Quality Dashboard.
+
+== Scripting Languages ==
+
+In K-3D, scripting engines are another type of plugin, so K-3D is capable of using any scripting language for which a plugin has been written.  Currently there is one scripting engine plugin included with K-3D:
+
+* <<Python>> - The preferred script engine for all new development, combining the power and flexibility of the Python language and libraries with K-3D.
+
+== Using Scripts ==
+
+=== At the Command-Line ===
+
+You can run scripts from the command-line when starting K-3D, using the '--script' option:
+
+--------------------------------
+$ k3d --script=my_script.py
+--------------------------------
+
+When running scripts in this fashion you will often want to exit the program once the script has completed.  To do so, use the '--exit' option:
+
+--------------------------------
+ $ k3d --script=my_script.py --exit
+--------------------------------
+
+It is also typical to run K-3D as a strictly command-line application in this case, so you can perform batch processing on a headless server.  Because user interfaces are a type of plugin in K-3D, it's easy to substitute the <<NUI, Null User Interface>> plugin, which will consume fewer resources, startup faster, and avoid ``flashing'' windows as the program quickly runs and exits:
+
+--------------------------------
+ $ k3d --script-my_script.py --ui=none --exit
+--------------------------------
+
+You can use the '--script' option multiple times, to run more-than-one script in-order:
+
+--------------------------------
+ $ k3d --script=first_script.py --script=second_script.py  --ui=none --exit
+--------------------------------
+
+Use a dash (``-'') as the script name to read the script source from stdin, allowing you to dynamically-generate scripts and pipe them into K-3D:
+
+--------------------------------
+ $ script_generator | k3d --script=-  --ui=none --exit
+--------------------------------
+
+You can combine scripting with the other command-line options such as '--open', which you could use to open a K-3D file before running the script.  For example you might create a ``template'' scene for rendering, then run a script that modifies the template, renders, then exits:
+
+--------------------------------
+ $ k3d --open=template_scene.k3d --script=modify_template.py  --ui=none --exit
+--------------------------------
+
+See <<k3d-man,Command Line Options>> for other useful options you can use with scripting.
+
+=== From the User Interface ===
+
+To run a script from K-3D user interface, choose 'Scripting > Play' - you will be prompted for the filename of the script to be run.
+
+=== Scripted Nodes ===
+
+K-3D provides a wide variety of scripted nodes that allow scripts to become data sources, data modifiers, and data consumers within the <<VisualizationPipeline,Visualization Pipeline>>.  To use these nodes, you simply create an instance of the node and modify its ``Script'' property to implement the desired behavior.  The node's inputs and outputs can be connected with the rest of the <<VisualizationPipeline,Visualization Pipeline>> in the normal way, and your script will be executed whenever the node needs to refresh its outputs.  See <<ScriptPlugins>> for a list of scripted node types.
+
+=== Plugin Scripts ===
+
+Scripts can be loaded by K-3D at startup and integrated into the plugin system so that - from the perspective of the end user - they are indistinguishable from ``normal'' C++ document plugins.  To do this, script authors simply embed a few lines of plugin-related metadata into their script, and place the script in a known-location where it will be loaded by K-3D at startup.
+
+The required plugin metadata is composed of name-value pairs that follow the syntax of an XML attribute and are embedded into the script source using whichever comment syntax is appropriate to the scripting language.  See <<Plugin Metadata>> for a detailed description of allowed metadata.  As an example, the following lines define the beginning of a script that will appear as ``MyCoffeeMugMeshSource'' in the 'Create > Scripts' menu, and will be executed by a <<MeshSourceScript>> plugin when selected by the user.
+
+-----------------------------------------
+#python
+
+# k3d:plugin-class="document"
+# k3d:plugin-type="MeshSourceScript"
+# k3d:plugin-name="MyCoffeeMugMeshSource"
+# k3d:plugin-description="Creates a polygonal mesh shaped like a coffee mug"
+
+...
+-----------------------------------------
+
+Once the metadata is in place, the script can be put in one of two locations, and it will be automatically loaded when K-3D starts:
+
+* 'k3d/share/scripts/scripted_plugins'
+* '~/.k3d/scripted_plugins'
+
+Once loaded, the script will appear in the 'Create > Scripts' menu as a normal item that the user can click to create.
+
+=== ``Action'' Scripts ===
+
+In addition to scripted document plugins that are created by the user and become part of a document, you can create "action" scripts that simply run and exit when selected.  The following complete example will appear in the 'Scripting > Actions' menu and creates a <<QuadricCone>> when run:
+
+-----------------------------------------
+#python         
+
+# k3d:plugin-class="application"
+# k3d:plugin-type="ActionScript"
+# k3d:plugin-name="Create Cone"
+# ngui:action=""
+        
+import k3d
+
+# Create a cone primitive source
+cone = k3d.plugin.create("QuadricCone", context.document)
+cone.height = 1
+cone.radius = 0.5
+# Create a mesh instance that will place the cone primitive into the scene
+mesh_instance = k3d.plugin.create("MeshInstance", context.document)
+# Specify OpenGL and RenderMan painters for rendering the cone primitive
+mesh_instance.gl_painter = k3d.node.lookup_one(context.document, "GL Default Painter")
+mesh_instance.ri_painter = k3d.node.lookup_one(context.document, "RenderMan Default Painter")
+# Connect the cone source to the mesh instance
+k3d.property.connect(context.document, cone.get_property("output_mesh"), mesh_instance.get_property("input_mesh"))
+# Ensure that the mesh instance will be visible for every render engine in the scene
+k3d.node.show(context.document, mesh_instance) 
+-----------------------------------------
+
+=== Auto-Start Scripts ===
+
+You can also designate plugin scripts as ``auto-start'' scripts that will be automatically-run in response to certain events.  Currently there are several categories of event, which are described in greater detail under <<PluginMetadata>>:
+
+* k3d:application-start
+* k3d:document-start
+* ngui:application-start
+* ngui:document-start
+
+Here is an example of an auto-start plugin that writes to a log file when the program is run:
+
+-----------------------------------------
+#python
+
+# k3d:plugin-class="application"
+# k3d:plugin-type="ActionScript"
+# k3d:plugin-name="ApplicationLog"
+# k3d:application-start=""
+
+from datetime import datetime
+
+log = open("k3d.usage_log", "a")
+
+if context.command == "startup":
+        log.write("K-3D started at " + str(datetime.now()) + "\n")
+elif context.command == "shutdown":
+        log.write("K-3D closed at " + str(datetime.now()) + "\n")
+-----------------------------------------
+
+Similarly, here is an example that displays time spent working with a document whenever the document is closed (but only if the normal graphical user interface is in use):
+
+-----------------------------------------
+#python
+
+# k3d:plugin-class="application"
+# k3d:plugin-type="ActionScript"
+# k3d:plugin-name="DisplayBillingTime"
+# ngui:document-start=""
+
+import k3d
+from datetime import datetime
+
+if context.command == "startup":
+        start_time = datetime.now()
+elif context.command == "shutdown":
+        elapsed = datetime.now() - start_time
+        k3d.ui().message("You worked on this document for " + str(elapsed.days) + " days, " + str(elapsed.seconds) + " seconds")
+-----------------------------------------
+
+== Sample Scripts ==
+
+A variety of sample scripts are included with K-3D in the share directory:
+
+* k3d/share/scripts - Contains scripts that can be run ``standalone'' from the graphical user interface using the 'Scripting > Play' menu item.
+* k3d/share/scripts/MeshModifierScript - Contains scripts designed for use with the <<MeshModifierScript>> plugin.
+* k3d/share/scripts/MeshSourceScript - Contains scripts designed for use with the <<MeshSourceScript>> plugin.
+* k3d/share/scripts/RenderManScript - Contains scripts designed for use with the <<RenderManScript>> plugin, which can ``inject'' custom RenderMan API calls into a rendered scene under script control.
+* k3d/share/scripts/MeshPainterScript - Contains scripts designed for use with the <<MeshPainterScript>> plugin, which can draw in the viewport under script control.
+* k3d/share/scripts/RenderEngineScript - Contains scripts designed for use with the <<RenderEngineScript>> plugin, which can integrate with external render engines under script control.
+* k3d/share/scripts/scripted_plugins - Contains scripts that are automatically integrated into the rest of the user interface as if they were ``normal'' C++ plugins.

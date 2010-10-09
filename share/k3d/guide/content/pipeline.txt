@@ -1,4 +1,6 @@
-= Pipeline Basics =
+[[VisualizationPipeline]]
+Pipeline Basics
+===============
 
 == Overview ==
 
