@@ -1,0 +1,91 @@
+[[PipelineHints]]
+= Pipeline Hints =
+
+== Overview ==
+
+Whenever the value of a node property changes, a ``change'' signal is emitted.  This signal is used for two main purposes:
+
+* Notify the user interface that the property value has changed, so the UI can be updated - see http://en.wikipedia.org/wiki/Model_view_controller.
+
+* Notify downstream nodes that one of their inputs has changed.  The downstream node will reset its internal state so that it gets re-calculated the next time it is accessed, and emits its own change signal(s).  This process cascades down the pipeline until every node affected (directly or indirectly) by the original change has been notified.
+
+Originally, change signals in K-3D were empty notifications that a change occurred without providing any additional data:
+
+------------------------------------------------------
+sigc::signal<void> foo_changed_signal;
+------------------------------------------------------
+
+These notifications had correspondingly-simple signal handlers:
+
+------------------------------------------------------
+void on_foo_changed()
+{
+  // Deal with the change here ...
+}
+------------------------------------------------------
+
+Although trivial to understand and implement, this approach missed-out on a key optimization - for certain complex data types, downstream nodes may be able to significantly reduce their computational costs if they have additional information about 'what exactly' changed.
+
+As an example, a bitmap modifier cannot alter its input bitmap - it must make a copy of its input, then change the copy.  If the input bitmap changes, a naive modifier starts over from scratch, deleting the old copy, creating a new copy, then reapplying its changes.  Depending on what changed in the input bitmap, this can lead to unnecessary, time-wasting heap allocations.  If the 'dimensions' of the input bitmap changed, then reallocation is required, but if the dimensions of the input bitmap 'didn't' change (e.g. only pixel values changed), then most modifiers don't need to reallocate anything - they could simply reapply their changes, 'if only they knew for certain that the dimensions didn't change'.
+
+In a nutshell, whenever a property changes, we want upstream nodes to be able to pass ``hints'' to downstream nodes to provide more information about what changed.
+
+== Requirements ==
+
+Because the visualization pipeline carries many different types of data, and because the set of potential changes that could apply to a given type is large, a flexible hinting mechanism is necessary:
+
+* A hint can be a simple identifier that classifies the nature of a change, e.g: ``bitmap pixels changed'', ``bitmap dimensions changed'', ``selection changed'', etc.
+* Or, a hint can include arbitrary amounts of metadata describing the change to varying levels of detail, e.g: a hint can provide bounding-box data, ranges of indices that changed, etc.
+* Finally, a hint can be NULL, meaning ``no hint'' ... the receiver cannot infer anything about the nature of a change, and must ``assume the worst''.
+* The hinting system must allow for any combination of ``smart'' nodes (nodes that alter their behavior based on hints), and ``dumb'' nodes (nodes that ignore hints).
+* Nodes must be able to implement sensible ``fallback'' behavior that produces correct results if they receive no hint, or a hint that they don't recognize.
+* Nodes must be able to ``translate'' hints as they travel down the pipeline, e.g. a node that receives a ``color changed'' hint as an input may need to produce a ``bitmap pixels changed'' hint as an output, depending on how the node works.
+
+== Design ==
+
+To support our requirements, change signals are actually implemented as follows:
+
+------------------------------------------------------
+sigc::signal<void, k3d::ihint*> bitmap_changed_signal;
+------------------------------------------------------
+
+With corresponding signal handlers:
+
+------------------------------------------------------
+void on_bitmap_changed(k3d::ihint* Hint)
+{
+  if(dynamic_cast<k3d::hint::bitmap_pixels_changed*>(Hint))
+  {
+    // We know that only pixel values changed,
+    // so we can perform efficient computation here.
+  }
+  else
+  {
+    // We didn't get a hint, or we got a hint that we don't
+    // recognize, so we don't know what changed and have to
+    // start-over from scratch, "assuming the worst".
+  }
+}
+------------------------------------------------------
+
+Now, whenever emitting a change signal, the emitter can provide a hint object:
+
+------------------------------------------------------
+m_output_property.changed_signal().emit(k3d::hint::bitmap_pixels_changed::instance());
+------------------------------------------------------
+
+or not:
+
+------------------------------------------------------
+m_output_property.changed_signal().emit(0);
+------------------------------------------------------
+
+== Hint Lifetimes ==
+
+An important subtlety about the lifetime of hints: hints are created by the 'emitter' of a signal, but the emitter has no way of knowing (nor should it care) how many observers will ``see'' the hint, nor what they will do with the information it contains.  For this reason, observers of a hint cannot store any pointers or references to it - they 'must' assume that the hint object will go out-of-scope as soon as the signal emission returns.  If a hint observer needs to retain any of the data associated with a hint, it must make a copy of that data before returning.
+
+== Further Reading ==
+
+Plugin developers will need to understand <<Hint Mapping,Hint Mapping>> for details on how hints travel between node inputs and outputs.  For one significant use of the hinting mechanism, see <<Painter Cache,Painter Cache>>.
+
+

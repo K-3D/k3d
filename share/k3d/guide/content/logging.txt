@@ -1,0 +1,34 @@
+[[logging]]
+= Logging =
+
+All error, information, and debugging messages must be logged to the k3d::log() stream using the K-3D logging interface, without exception - 'printf()' and other mechanisms for logging must not be used.  This ensures that log messages can be displayed and controlled by end-users via the mechanisms that K-3D provides for that purpose.  You should also specify the log level of every message, using the iostream-compatible manipulators defined in 'k3dsdk/log.h':
+
+-------------------------
+#include <k3dsdk/log.h>
+ 
+k3d::log() << debug << "This is an internal debugging message" << std::endl;
+k3d::log() << info << "This is an informational message" << std::endl;
+k3d::log() << warning << "Recoverable unexpected input or behavior has occurred" << std::endl;
+k3d::log() << error << "Current operation cannot complete due to unexpected input or behavior" << std::endl;
+k3d::log() << critical << "Application will shut down due to an unrecoverable condition" << std::endl;
+-------------------------
+
+Each message should be written to a single line of output, and you should terminate messages with std::endl instead of ``\n'' to ensure that they are flushed immediately.
+
+By default, K-3D normally outputs warning messages and above.  To print information and debug messages too, use the '--log-level debug' command-line option.  For developers, the 'make run' target sets 'log-level debug' by default.
+
+Users can customize log output using a variety of runtime arguments.  See 'k3dsdk/log_control.h' and 'k3dsdk/log.cpp' for details on how we tailor console output.
+
+You are strongly encouraged to use the macros defined in <k3dsdk/result.h> to test for preconditions and other runtime problems in your code.  Note that these are not ``debug'' macros ... they are always compiled into every build, so you may use them with expressions that have side effects:
+
+-------------------------
+#include <k3dsdk/result.h>
+ 
+assert_not_implemented(); // This code hasn't been implemented yet
+assert_not_reached(); // This code should never be executed.
+assert_warning(Expression); // Generates a warning message if Expression evaluates false.
+return_if_fail(Expression); // Generates an error message and returns from the enclosing function if Expression evaluates false.
+return_val_if_fail(Expression, Val); // Generates an error message and returns Val from the enclosing function if Expression evaluates false.
+-------------------------
+
+
