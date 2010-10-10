@@ -1,0 +1,63 @@
+[[Time]]
+= Time =
+
+== Definitions ==
+
+Time is defined in K-3D as a continuously-varying quantity represented using signed double-precision floating-point numbers (k3d::double_t).  Time is measured in seconds.  There is no ``epoch'' per-se, but by default most animations start at time = 0.0.
+
+== Time Sources ==
+
+By default, a newly-created K-3D document contains an instance of the <<TimeSource,TimeSource>> plugin.  <<TimeSource,TimeSource>> provides storage for several time-related parameters:
+
+* A ``time'' property that stores the ``current'' document time (in seconds).
+* A ``start_time'' property that stores the start-time for document animation (in seconds).
+* An ``end_time'' property that stores the end-time for document animation (in seconds).
+* A ``frame_rate'' property that stores the rate at which the range [start_time, end_time) will be sampled (frames-per-second).
+
+Time-varying behavior is introduced into a document by connecting the <<TimeSource,TimeSource>> ``time'' property to input properties on other nodes using the <<Visualization Pipeline,Visualization Pipeline>>.  Since ``time'' is a k3d::double_t, it can be connected directly to any other k3d::double_t property.  For example, the following pipeline connects the radius of a <<Sphere,Sphere>> to the current time:
+
+["graphviz", "edf08405-7911-4218-876e-646503ba5f08.png"]
+------------------------------------------------------------------
+digraph
+{
+graph [ rankdir="LR" ranksep="1.5" ]
+node [ shape="box",fontname="Helvetica"]
+edge [fontname="Helvetica",fontsize=10]
+TimeSource -> Sphere [ taillabel="time" headlabel="radius" labelangle="15" labeldistance="3" ]
+}
+------------------------------------------------------------------
+
+In this scenario, the radius of the sphere will always be equal to the current time.  If an animation is rendered from time t = 0 to t = 4, the radius of the sphere will smoothly change from 0 to 4 over the course of the animation.
+
+Of course, you may add nodes to the pipeline to manipulate the time value prior to use.  For example, you might want the <<Sphere,Sphere>> radius to change at a different rate than time:
+
+["graphviz", "2318eb76-ed7b-4b40-ac6a-5876a287c349.png"]
+------------------------------------------------------------------
+digraph
+{
+graph [ rankdir="LR" ]
+node [ shape="box",fontname="Helvetica"]
+edge [fontname="Helvetica",fontsize=10]
+TimeSource -> ScalarMultiply [ label="time" ]
+ScalarMultiply -> Sphere [ label="fast time" ]
+}
+------------------------------------------------------------------
+
+Here, the <<ScalarMultiply,ScalarMultiply>> node applies a scaling factor to the current time value before it's used by the <<Sphere,Sphere>>.  Many other plugins are available to manipulate scalars - for example you might combine <<ScalarAdd,ScalarAdd>> to offset time, <<ScalarModulo,ScalarModulo>> and <<ScalarSine,ScalarSine>> to provide repetitive behavior, and <<ScalarSourceScript,ScalarSourceScript>> for fully-generic scripted behavior.
+
+=== Notes ===
+
+* Although it's possible to add more-than-one <<TimeSource,TimeSource>> to a document, the graphical user interface will only manipulate one of them.
+* The start_time, end_time, and frame_rate properties will likely be moved out of <<TimeSource,TimeSource>> at some point, since it is reasonable to want to render multiple animations from a single document (e.g: to render the animation at different frame rates for different target media).
+
+== Realtime Sources ==
+
+K-3D also provides the <<RealtimeSource,RealtimeSource>> node, which also provides a ``time'' property as output.  Unlike <<TimeSource,TimeSource>>, <<RealtimeSource,RealtimeSource>> represents a time value that stores the number of seconds since the Unix epoch, and is always changing.  This source could form the basis for a simple game.  Note that <<RealtimeSource,RealtimeSource>> also has a ``frame rate'' property, which controls how often its ``time'' property is updated.
+
+== User Interface ==
+
+The standard K-3D user interface provides the <<Timeline Panel,Timeline Panel>> for manipulating the current time within a document.
+
+== Sampling Issues ==
+
+Unlike games or simulations, K-3D is a content-creation tool, which has a significant impact on how time behaves.  Using the controls provided by the <<Timeline Panel,Timeline Panel>>, users can pause, rewind, skip-ahead, and even ``scrub'' time back-and-forth in arbitrary ways.  An object that takes time as an input cannot assume that time will monotonically increase.  Even when rendering an animation, there is no guarantee that frames will be rendered in any particular order, nor that the time delta between frames will be constant - for example, when rendering a scene with motion-blur it is typical to set the current time to the beginning and end of each frame, and possibly to multiple times within each frame, if temporal sub-sampling is enabled.  These sub-samples may not be evenly spaced.  When rendering the effects of physical shutters on cameras, time-samples may be further offset.

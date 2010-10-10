@@ -12,17 +12,20 @@ include::@CONTENT_SOURCE_DIR@/importing_exporting.txt[]
 include::@CONTENT_SOURCE_DIR@/scripting.txt[]
 include::@CONTENT_SOURCE_DIR@/render_models.txt[]
 include::@CONTENT_SOURCE_DIR@/luxrender.txt[]
+include::@CONTENT_SOURCE_DIR@/time.txt[]
 :leveloffset: 0
 
 K-3D Developers' Guide
 ======================
 
 :leveloffset: 1
+include::@CONTENT_SOURCE_DIR@/debugging.txt[]
+include::@CONTENT_SOURCE_DIR@/logging.txt[]
 include::@CONTENT_SOURCE_DIR@/plugin_design.txt[]
 include::@CONTENT_SOURCE_DIR@/on_demand_modules.txt[]
 include::@CONTENT_SOURCE_DIR@/building_plugins.txt[]
-include::@CONTENT_SOURCE_DIR@/logging.txt[]
 include::@CONTENT_SOURCE_DIR@/pipeline_hints.txt[]
+include::@CONTENT_SOURCE_DIR@/resources.txt[]
 :leveloffset: 0
 
 K-3D Reference Manual

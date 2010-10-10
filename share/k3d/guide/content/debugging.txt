@@ -1,0 +1,15 @@
+[[Debugging]]
+= Debugging =
+
+== Overview ==
+
+* Build K-3D with 'CMAKE_BUILD_TYPE' set to 'Debug'.
+* If you have a consistent way of crashing K-3D, start K-3D from the build dir using 'make run-gdb/fast'
+* At the gdb prompt, type 'run'
+* Do what is needed to provoke the crash
+* Switch back to the terminal where you started K-3D, and type 'bt'
+* You should now get a trace, showing the files and lines of source code that led to the crash
+
+== Exceptions ==
+
+Debugging thrown exceptions can be tricky, because the backtrace at the point where an exception is 'caught' often provides little information on where the exception was 'thrown'.  To get around this, you simply run K-3D in the debugger, and set a ``catchpoint'' (a kind of specialized breakpoint) that will stop execution whenever 'any' exception is thrown.  See the gdb documentation at http://sourceware.org/gdb/current/onlinedocs/gdb/Set-Catchpoints.html#Set-Catchpoints for details.

@@ -1,0 +1,49 @@
+[[BinaryResources]]
+= Binary Resources =
+
+== Overview ==
+
+Under certain circumstances you may wish to store binary files within an executable.  This can be useful in several circumstances:
+
+* To simplify distribution by putting all resources into a single file.
+* Eliminates any chance of ``misplaced'' files.
+* If an executable always relies on the same set of inputs to function.
+* May provide performance benefits by eliminating filesystem latency.
+** Be careful on this one - you may cause performance 'problems' if your binary becomes significantly larger.
+
+For example, scripted plugins such as <<BitmapSourceScript,BitmapSourceScript>> need a ``default'' script when they are first instantiated.  These ``default'' scripts could be ``embedded'' in the plugin source code as multiline strings, but the necessary escaping makes authoring and modification difficult.  Ideally, programmers should be able to edit such resources as external files, using tools specific to the filetype, then ``embed'' the files in an executable directly without manual modification, and access them at runtime.  The K-3D resource mechanism provides just such functionality.
+
+== Design ==
+
+* A special executable - the 'k3d-resource-compiler' - converts each binary resource file into C++ source code.
+* At compile time, the C++ resource code is compiled and linked along with the rest of the project.
+* At program startup, the C++ resource code is executed, and each resource is ``registered'' with a central repository of resources.  Each resource is identified by a unique key, which is a string.
+* Code that needs to use a resource retrieves it using its string identifier.
+
+Resource identifiers are hierarchical, using notation similar to a Posix filesystem: e.g. ``/foo/bar.py'' to represent a text file containing Python source code.  Because resources are registered with a central repository, this hierarchical ``filesystem'' should be used to avoid name clashes.  For example, every resource used in a shared library ``foo'' might receive a common prefix ``/foo'' to avoid clashes with other libraries.  Note that the identifier need not follow the layout of a physical filesystem or incorporate the name of the original resource file - it is simply a ``handle'' that will be used by code that needs to access the resource.  Similarly, file extensions have no meaning to the resource system, but are encouraged to improve code clarity.
+
+== Usage ==
+
+* At configure-time, programmers use the K3D_COMPILE_RESOURCE macro to identify each external resource to be embedded in a binary.  The macro takes three arguments: an output variable, the name of the external resource file, and the runtime resource identifier.  The macro output will be a list of C++ resource files that should be added to the executable or library build:
+
+------------------------------------------------------
+K3D_COMPILE_RESOURCE(RESOURCES bar.py "/foo/bar.py")
+K3D_COMPILE_RESOURCE(RESOURCES baz.py "/foo/baz.py")
+...
+ADD_EXECUTABLE(foobar ${HEADERS} ${SOURCES} ${RESOURCES})
+------------------------------------------------------
+
+* At compile-time, the 'k3d-resource-compiler' executable will be invoked for each binary resource file, converting it into C++ source code located in the build directory.
+* The resources will be compiled and linked along with ``normal'' code.
+* At runtime, programmers can retrieve resources using their identifiers.  For example:
+
+------------------------------------------------------
+#include <k3dsdk/resource/resource.h>
+
+std::string = k3d::resource::get_string("/foo/bar.py");
+------------------------------------------------------
+
+== TODO ==
+
+* Currently, there is only one way to retrieve a resource - using 'k3d::resource::get_string()' - which assumes that the resource can be safely represented as a string (so far, this is true for all our use-cases).  Provide stream-based functionality for retrieving binary resources.
+* Provide functionality for iterating over the set of available resources.
