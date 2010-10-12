@@ -21,9 +21,9 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3d-platform-config.h>
 #include <k3dsdk/algebra.h>
 #include <k3dsdk/bounding_box3.h>
-//#include <k3dsdk/gl/extension.h>
 #include <k3dsdk/idocument.h>
 #include <k3dsdk/imaterial.h>
 #include <k3dsdk/inode.h>
@@ -219,7 +219,11 @@ void tex_image_2d(const bitmap& Source)
 */
 	{
 		target.recreate(width, height);
+#ifdef K3D_API_DARWIN
+    assert_not_implemented();
+#else
 		boost::gil::resize_view(boost::gil::color_converted_view<boost::gil::rgba8_pixel_t>(boost::gil::const_view(Source)), boost::gil::view(target), boost::gil::bilinear_sampler());
+#endif
 	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

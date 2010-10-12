@@ -129,6 +129,9 @@ void control::data_changed(k3d::ihint*)
 	k3d::bitmap* const data = m_data->value();
 	if(data && data->width() && data->height())
 	{
+#ifdef K3D_API_DARWIN
+    assert_not_implemented();
+#else
 		boost::gil::resize_view(
 			boost::gil::color_converted_view<boost::gil::rgb8_pixel_t>(boost::gil::const_view(*data), extract_rgb()),
 			image,
@@ -138,6 +141,7 @@ void control::data_changed(k3d::ihint*)
 			boost::gil::color_converted_view<boost::gil::rgb8_pixel_t>(boost::gil::const_view(*data), extract_alpha()),
 			alpha,
 			boost::gil::bilinear_sampler());
+#endif
 	}
 	else
 	{
