@@ -1,0 +1,39 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "Crash deleting a node with property connections with undo/redo disabled:"
+desc: |-
+  The following script causes a segfault:
+  
+  #python
+  
+  import k3d
+  doc = context.document
+  
+  camera_name = "Camera Top"
+  camera_pos = (0, 0, 10)
+  camera = k3d.plugin.create("Camera", doc)
+  camera.name = camera_name
+  camera_position = k3d.plugin.create("FrozenMatrix", doc)
+  camera_position.matrix = k3d.translate3(camera_pos)
+  #no crash if the following line is commented out
+  k3d.property.connect(doc, camera_position.get_property("output_matrix"), \
+  camera.get_property("input_matrix"))
+  existing = k3d.node.lookup_one(doc, camera_name)
+  doc.delete_node(existing)
+  
+  The segfault disappears if you a) don't make the property connection, or b) make the deletion undoable.
+type: :bugfix
+component: K-3D
+release: 
+reporter: Timothy M. Shead <tshead@k-3d.com>
+status: :unstarted
+disposition: 
+creation_time: 2010-11-05 04:19:41.731209 Z
+references: []
+
+id: 7f5736e37d226ef0df24d5ff0a103233993c1871
+log_events: 
+- - 2010-11-05 04:19:43.067208 Z
+  - Timothy M. Shead <tshead@k-3d.com>
+  - created
+  - ""
+claimer: 
