@@ -25,19 +25,8 @@
 */
 
 #include <k3dsdk/vectors.h>
-#include <string>
 
-namespace Gtk { class Button; }
-namespace Gtk { class CellRenderer; }
-namespace Gtk { class ComboBox; }
-namespace Gtk { class Entry; }
-namespace Gtk { class MenuItem; }
-namespace Gtk { class TreeIter; }
-namespace Gtk { class TreeView; }
-namespace Gtk { class TreeViewColumn; }
 namespace Gtk { class Widget; }
-
-namespace k3d { class timer; }
 
 namespace k3d
 {
@@ -53,12 +42,8 @@ const k3d::point2 get_pointer();
 	
 /// Instantaneously warps the pointer from its current location to the given screen coordinates
 void warp_pointer(const k3d::point2& Coords);
-/// Instantaneously warps the pointer from its current location to the given screen coordinates, synchronizing with the given timestamp
-void warp_pointer(const k3d::point2& Coords, const double Timestamp, const k3d::timer& Timer);
 /// Instantaneously warps the pointer from its current location to the given widget coordinates
 void warp_pointer(Gtk::Widget& Widget, const k3d::point2& Coords);
-/// Instantaneously warps the pointer from its current location to the given widget coordinates, synchronizing with the given timestamp
-void warp_pointer(Gtk::Widget& Widget, const k3d::point2& Coords, const double Timestamp, const k3d::timer& Timer);
 /// Instantaneously warps the pointer from its current location to the center of a widget
 void warp_pointer(Gtk::Widget& Widget);
 

@@ -33,7 +33,6 @@
 #include <k3dsdk/bezier.h>
 #include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/rectangle.h>
-#include <k3dsdk/system.h>
 #include <k3dsdk/vectors.h>
 
 #include <gtkmm/widget.h>
@@ -135,21 +134,9 @@ void warp_pointer(const k3d::point2& Coords)
 	detail::warp_pointer(Coords);
 }
 
-void warp_pointer(const k3d::point2& Coords, const double Timestamp, const k3d::timer& Timer)
-{
-	handle_pending_events();
-	k3d::system::sleep(Timestamp - Timer.elapsed());
-	detail::warp_pointer(Coords);
-}
-
 void warp_pointer(Gtk::Widget& Widget, const k3d::point2& Coords)
 {
 	detail::warp_pointer(detail::screen_coordinates(Widget) + Coords);
-}
-
-void warp_pointer(Gtk::Widget& Widget, const k3d::point2& Coords, const double Timestamp, const k3d::timer& Timer)
-{
-	warp_pointer(detail::screen_coordinates(Widget) + Coords, Timestamp, Timer);
 }
 
 void warp_pointer(Gtk::Widget& Widget)
