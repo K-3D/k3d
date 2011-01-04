@@ -7,3 +7,5 @@ syntax: regexp
 ^\.project$
 syntax: regexp
 ^\.cproject$
+syntax: regexp
+^.*\.kdev4$
