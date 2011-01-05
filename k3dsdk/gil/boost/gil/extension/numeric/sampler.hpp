@@ -94,7 +94,7 @@ struct bilinear_sampler {};
 template <typename DstP, typename SrcView, typename F>
 bool sample(bilinear_sampler, const SrcView& src, const point2<F>& p, DstP& result) {
     typedef typename SrcView::value_type SrcP;
-    point2<long int> p0(ifloor(p)); // the closest integer coordinate top left from p
+    point2<int> p0(ifloor(p)); // the closest integer coordinate top left from p
     point2<F> frac(p.x-p0.x, p.y-p0.y);
     if (p0.x < 0 || p0.y < 0 || p0.x>=src.width() || p0.y>=src.height()) return false;
 
