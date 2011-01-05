@@ -167,7 +167,8 @@ struct directory_entry
 		reserved1("        "),
 		reserved2("        "),
 		label("        "),
-		entity_subscript(0)
+		entity_subscript(0),
+		index(Index)
 	{
 	}
 	
