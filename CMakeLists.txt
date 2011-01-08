@@ -374,6 +374,7 @@ ADD_SUBDIRECTORY(k3dsdk)
 ADD_SUBDIRECTORY(resource-compiler)
 
 ADD_SUBDIRECTORY(application)
+ADD_SUBDIRECTORY(desktop)
 ADD_SUBDIRECTORY(make-module-proxy)
 ADD_SUBDIRECTORY(renderjob)
 ADD_SUBDIRECTORY(renderframe)
