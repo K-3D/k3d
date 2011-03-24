@@ -67,6 +67,10 @@ public:
 				m_selection_weights.set_value(selection_weights);
 			}
 		}
+		k3d::log() << debug << "--------------------------- begin document selection state --------------------------------" << std::endl;
+    for(selection_t::const_iterator it = selection_weights.begin(); it != selection_weights.end(); ++it)
+      k3d::log() << debug << it->first->name() << std::endl;
+    k3d::log() << debug << "--------------------------- begin document selection state --------------------------------" << std::endl;
 	}
 
 	k3d::double_t selection_weight(k3d::inode& Node)
