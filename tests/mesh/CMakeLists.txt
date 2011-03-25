@@ -1069,6 +1069,11 @@ K3D_TEST(mesh.modifier.SetColor
 	REQUIRES K3D_BUILD_MESH_ATTRIBUTES_MODULE
 	LABELS mesh modifier)
 
+K3D_TEST(mesh.modifier.SetPosition 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.SetPosition.py
+	REQUIRES K3D_BUILD_DEFORMATION_MODULE
+	LABELS mesh modifier)
+
 K3D_TEST(mesh.modifier.ShearPoints 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.ShearPoints.py
 	REQUIRES K3D_BUILD_DEFORMATION_MODULE
@@ -1228,6 +1233,11 @@ K3D_TEST(mesh.modifier.CUDAConversion
 
 
 
+
+K3D_TEST(mesh.sink.IGESMeshWriter
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.IGESMeshWriter.py
+	REQUIRES K3D_BUILD_IGES_IO_MODULE
+	LABELS mesh sink IGESMeshWriter)
 
 K3D_TEST(mesh.sink.K3DMeshWriter
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.K3DMeshWriter.py

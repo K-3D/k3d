@@ -23,7 +23,7 @@ for(var i = 0; i != plugins.length; ++i)
   plugin_names.push(plugins[i].name);
 }
 
-completer = new QCompleter(plugin_names.sort(), edit);
+completer = new QCompleter(plugin_names.sort(), scene);
 completer.completionMode = QCompleter.PopupCompletion;
 completer.caseSensitivity = Qt.CaseInsensitive;
 completer.modelSorting = QCompleter.CaseSensitivelySortedModel;

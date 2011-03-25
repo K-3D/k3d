@@ -73,7 +73,9 @@ public:
       if(!polyhedron)
         continue;
 
-      k3d::mesh::strings_t& string_data = polyhedron->face_attributes.create(array_name, new k3d::mesh::strings_t(polyhedron->face_first_loops.size(), default_value));
+			k3d::mesh::strings_t& string_data = polyhedron->face_attributes.lookup<k3d::mesh::strings_t>(array_name)
+																	 ? *(polyhedron->face_attributes.writable<k3d::mesh::strings_t>(array_name))
+																	 : polyhedron->face_attributes.create(array_name, new k3d::mesh::strings_t(polyhedron->face_first_loops.size(), default_value));
 
       const k3d::uint_t face_begin = 0;
       const k3d::uint_t face_end = face_begin + polyhedron->face_first_loops.size();

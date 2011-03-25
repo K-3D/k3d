@@ -48,6 +48,7 @@
 #include <k3dsdk/render_state_gl.h>
 #include <k3dsdk/selection_state_gl.h>
 #include <k3dsdk/time_source.h>
+#include <k3dsdk/utility_gl.h>
 
 #include <iostream>
 
@@ -374,100 +375,6 @@ public:
 		return factory;
 	}
 
-	void calculate_projection(k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, k3d::rectangle& WindowRect, k3d::rectangle& CameraRect, double& Near, double& Far, bool& Orthographic)
-	{
-		return_if_fail(PixelWidth && PixelHeight);
-
-		if(k3d::iperspective* const perspective = dynamic_cast<k3d::iperspective*>(&Camera.projection()))
-		{
-			Orthographic = false;
-
-			CameraRect.x1 = k3d::property::pipeline_value<double>(perspective->left());
-			CameraRect.x2 = k3d::property::pipeline_value<double>(perspective->right());
-			if(CameraRect.x2 < CameraRect.x1)
-				std::swap(CameraRect.x1, CameraRect.x2);
-
-			CameraRect.y1 = k3d::property::pipeline_value<double>(perspective->top());
-			CameraRect.y2 = k3d::property::pipeline_value<double>(perspective->bottom());
-			if(CameraRect.y1 < CameraRect.y2)
-				std::swap(CameraRect.y1, CameraRect.y2);
-
-			Near = k3d::property::pipeline_value<double>(perspective->near());
-			Far = k3d::property::pipeline_value<double>(perspective->far());
-
-			return_if_fail(CameraRect.x1 != CameraRect.x2 && CameraRect.y1 != CameraRect.y2);
-
-			const double frustum_ratio = (CameraRect.x2 - CameraRect.x1) / (CameraRect.y1 - CameraRect.y2);
-			const double raster_ratio = static_cast<double>(PixelWidth) / static_cast<double>(PixelHeight);
-
-			if(raster_ratio > frustum_ratio)
-			{
-				const double width = 0.5 * raster_ratio * CameraRect.height();
-
-				WindowRect.x1 = ((CameraRect.x1 + CameraRect.x2) * 0.5) - width;
-				WindowRect.x2 = ((CameraRect.x1 + CameraRect.x2) * 0.5) + width;
-				WindowRect.y1 = CameraRect.y1;
-				WindowRect.y2 = CameraRect.y2;
-			}
-			else
-			{
-				const double height = 0.5 * CameraRect.width() / raster_ratio;
-
-				WindowRect.x1 = CameraRect.x1;
-				WindowRect.x2 = CameraRect.x2;
-				WindowRect.y1 = ((CameraRect.y1 + CameraRect.y2) * 0.5) + height;
-				WindowRect.y2 = ((CameraRect.y1 + CameraRect.y2) * 0.5) - height;
-			}
-
-			return;
-		}
-		else if(k3d::iorthographic* const orthographic = dynamic_cast<k3d::iorthographic*>(&Camera.projection()))
-		{
-			Orthographic = true;
-
-			CameraRect.x1 = k3d::property::pipeline_value<double>(orthographic->left());
-			CameraRect.x2 = k3d::property::pipeline_value<double>(orthographic->right());
-			if(CameraRect.x2 < CameraRect.x1)
-				std::swap(CameraRect.x1, CameraRect.x2);
-
-			CameraRect.y1 = k3d::property::pipeline_value<double>(orthographic->top());
-			CameraRect.y2 = k3d::property::pipeline_value<double>(orthographic->bottom());
-			if(CameraRect.y1 < CameraRect.y2)
-				std::swap(CameraRect.y1, CameraRect.y2);
-
-			Near = k3d::property::pipeline_value<double>(orthographic->near());
-			Far = k3d::property::pipeline_value<double>(orthographic->far());
-
-			return_if_fail(CameraRect.x1 != CameraRect.x2 && CameraRect.y1 != CameraRect.y2);
-
-			const double frustum_ratio = (CameraRect.x2 - CameraRect.x1) / (CameraRect.y1 - CameraRect.y2);
-			const double raster_ratio = static_cast<double>(PixelWidth) / static_cast<double>(PixelHeight);
-
-			if(raster_ratio > frustum_ratio)
-			{
-				const double width = 0.5 * raster_ratio * CameraRect.height();
-
-				WindowRect.x1 = ((CameraRect.x1 + CameraRect.x2) * 0.5) - width;
-				WindowRect.x2 = ((CameraRect.x1 + CameraRect.x2) * 0.5) + width;
-				WindowRect.y1 = CameraRect.y1;
-				WindowRect.y2 = CameraRect.y2;
-			}
-			else
-			{
-				const double height = 0.5 * CameraRect.width() / raster_ratio;
-
-				WindowRect.x1 = CameraRect.x1;
-				WindowRect.x2 = CameraRect.x2;
-				WindowRect.y1 = ((CameraRect.y1 + CameraRect.y2) * 0.5) + height;
-				WindowRect.y2 = ((CameraRect.y1 + CameraRect.y2) * 0.5) - height;
-			}
-
-			return;
-		}
-
-		k3d::log() << error << k3d_file_reference << ": unknown projection type" << std::endl;
-	}
-
 	bool get_ndc(k3d::icamera& Camera, const unsigned long PixelWidth, const unsigned long PixelHeight, k3d::rectangle& CameraRect, k3d::rectangle& WindowRect)
 	{
 		return_val_if_fail(PixelWidth && PixelHeight, false);
@@ -475,7 +382,7 @@ public:
 		double near = 0;
 		double far = 0;
 		bool orthographic = false;
-		calculate_projection(Camera, PixelWidth, PixelHeight, WindowRect, CameraRect, near, far, orthographic);
+		k3d::gl::calculate_projection(Camera, PixelWidth, PixelHeight, WindowRect, CameraRect, near, far, orthographic);
 
 		return true;
 	}
@@ -598,7 +505,7 @@ private:
 		double near = 0;
 		double far = 0;
 		bool orthographic = false;
-		calculate_projection(Camera, PixelWidth, PixelHeight, window_rect, camera_rect, near, far, orthographic);
+		k3d::gl::calculate_projection(Camera, PixelWidth, PixelHeight, window_rect, camera_rect, near, far, orthographic);
 
 		if(!Select)
 			detail::gl_draw_2d_widgets(Camera, window_rect, camera_rect, m_draw_frustum.pipeline_value(), m_draw_crop_window.pipeline_value(), m_draw_safe_zone.pipeline_value(), m_draw_aimpoint.pipeline_value(), document());

@@ -29,17 +29,20 @@
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
 #include <k3dsdk/high_res_timer.h>
+#include <k3dsdk/selection_state_gl.h>
 #include <k3dsdk/iapplication.h>
 #include <k3dsdk/idocument_importer.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/node.h>
 #include <k3dsdk/plugin.h>
+#include<k3dsdk/rectangle.h>
 #include <k3dsdk/share.h>
 
 #include <boost/scoped_ptr.hpp>
 #include <iomanip>
 
 #include <QGraphicsItem>
+#include <QGraphicsSceneMouseEvent>
 #include <QTimer>
 
 namespace module
@@ -74,9 +77,9 @@ void scene::drawBackground(QPainter *painter, const QRectF &rect)
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
+	glPushMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
 
 	if(m_gl_engine.internal_value() && m_camera.internal_value())
 	{
@@ -95,10 +98,10 @@ void scene::drawBackground(QPainter *painter, const QRectF &rect)
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
+	glPopMatrix();
 	glPopAttrib();
 }
 
