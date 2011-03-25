@@ -320,12 +320,12 @@ private:
 				deselected_nodes.push_back(get_node(selection->first));
 		}
 
-		if(selected_nodes.size() || deselected_nodes.size())
-		{
-			k3d::record_state_change_set change_set(m_document_state->document(), _("Select nodes"), K3D_CHANGE_SET_CONTEXT);
-			k3d::ngui::selection::state(m_document_state->document()).select_nodes(selected_nodes);
-			k3d::ngui::selection::state(m_document_state->document()).deselect_nodes(deselected_nodes);
-		}
+// 		if(selected_nodes.size() || deselected_nodes.size())
+// 		{
+// 			k3d::record_state_change_set change_set(m_document_state->document(), _("Select nodes"), K3D_CHANGE_SET_CONTEXT);
+// 			k3d::ngui::selection::state(m_document_state->document()).select_nodes(selected_nodes);
+// 			k3d::ngui::selection::state(m_document_state->document()).deselect_nodes(deselected_nodes);
+// 		}
 
 		if(selected_nodes.size() == 1)
 			k3d::ngui::panel::mediator(m_document_state->document()).set_focus(*selected_nodes[0], *this);

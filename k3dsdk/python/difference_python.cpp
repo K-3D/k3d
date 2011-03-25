@@ -85,8 +85,8 @@ static k3d::double_t ulps_min(k3d::difference::accumulator& Self) { return boost
 static k3d::double_t ulps_max(k3d::difference::accumulator& Self) { return boost::accumulators::max(Self.ulps); }
 static k3d::double_t ulps_mean(k3d::difference::accumulator& Self) { return boost::accumulators::mean(Self.ulps); }
 static k3d::double_t ulps_median(k3d::difference::accumulator& Self) { return boost::accumulators::median(Self.ulps); }
-static k3d::double_t ulps_variance(k3d::difference::accumulator& Self) { return boost::accumulators::variance(Self.ulps); }
-static k3d::double_t ulps_standard_deviation(k3d::difference::accumulator& Self) { return std::sqrt(boost::accumulators::variance(Self.ulps)); }
+//static k3d::double_t ulps_variance(k3d::difference::accumulator& Self) { return boost::accumulators::variance(Self.ulps); }
+//static k3d::double_t ulps_standard_deviation(k3d::difference::accumulator& Self) { return std::sqrt(boost::accumulators::variance(Self.ulps)); }
 
 void define_namespace_difference()
 {
@@ -118,8 +118,8 @@ void define_namespace_difference()
 		.def("ulps_max", &ulps_max)
 		.def("ulps_mean", &ulps_mean)
 		.def("ulps_median", &ulps_median)
-		.def("ulps_variance", &ulps_variance)
-		.def("ulps_standard_deviation", &ulps_standard_deviation)
+		//.def("ulps_variance", &ulps_variance)
+		//.def("ulps_standard_deviation", &ulps_standard_deviation)
 		;
 }
 
