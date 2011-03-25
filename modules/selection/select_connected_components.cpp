@@ -35,12 +35,70 @@
 #include <k3dsdk/vectors.h>
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/mpl/for_each.hpp>
 
 namespace module
 {
 
 namespace selection
 {
+
+namespace detail
+{
+	/// Interface for an array wrapper, providing a means to compare data
+struct iarray_wrapper
+{
+	virtual ~iarray_wrapper() {}
+	
+	/// Compare the data values at the two indices
+	virtual k3d::bool_t compare(const k3d::uint_t a, const k3d::uint_t b) const = 0;
+};
+	
+/// Wraps a named array of type T
+template<typename T>
+struct array_wrapper : iarray_wrapper
+{
+	array_wrapper(const k3d::typed_array<T>& Array) : m_array(Array)
+	{
+	}
+	
+	virtual k3d::bool_t compare(const k3d::uint_t a, const k3d::uint_t b) const
+	{
+		return m_array[a] == m_array[b];
+	}
+	
+private:
+	const k3d::typed_array<T>& m_array;
+};
+
+/// MPL functor to wrap an array
+struct wrap_array_ftor
+{
+	wrap_array_ftor(const k3d::array* Array, boost::shared_ptr<iarray_wrapper>& Result) : m_array(Array), m_result(Result)
+	{
+	}
+	
+	template<typename T>
+	void operator()(const T&)
+	{
+		k3d::typed_array<T> const * const arr_ptr = dynamic_cast<k3d::typed_array<T> const *>(m_array);
+		if(arr_ptr)
+			m_result.reset(new array_wrapper<T>(*arr_ptr));
+	}
+	
+private:
+	const k3d::array* m_array;
+	boost::shared_ptr<iarray_wrapper>& m_result;
+};
+
+boost::shared_ptr<iarray_wrapper> wrap_array(const k3d::array* Array)
+{
+	boost::shared_ptr<iarray_wrapper> result;
+	boost::mpl::for_each<k3d::named_array_types>(wrap_array_ftor(Array, result));
+	return result;
+}
+
+} // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
 // select_connected_components
@@ -56,7 +114,9 @@ public:
 		m_select_faces(init_owner(*this) + init_name("select_faces") + init_label(_("Select Faces")) + init_description(_("Select connected faces")) + init_value(true)),
 		m_select_edges(init_owner(*this) + init_name("select_edges") + init_label(_("Select Edges")) + init_description(_("Select connected edges")) + init_value(true)),
 		m_select_vertices(init_owner(*this) + init_name("select_vertices") + init_label(_("Select Vertices")) + init_description(_("Select connected vertices")) + init_value(true)),
-		m_select_points(init_owner(*this) + init_name("select_points") + init_label(_("Select Points")) + init_description(_("Select connected points")) + init_value(true))
+		m_select_points(init_owner(*this) + init_name("select_points") + init_label(_("Select Points")) + init_description(_("Select connected points")) + init_value(true)),
+		m_same_attributes(init_owner(*this) + init_name("same_attributes") + init_label(_("Same Attributes")) + init_description(_("Only selects components where the face attributes in the supplied array are the same")) + init_value(false)),
+		m_array(init_owner(*this) + init_name("array") + init_label(_("Array")) + init_description(_("Specifies the array name for the attributes that must match when growing the selection (if Same Attributes is on)")) + init_value(std::string("Cs")))
 	{
 		m_mesh_selection.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
@@ -68,6 +128,10 @@ public:
 		m_select_vertices.changed_signal().connect(k3d::hint::converter<
 			k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 		m_select_points.changed_signal().connect(k3d::hint::converter<
+					k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_same_attributes.changed_signal().connect(k3d::hint::converter<
+					k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
+		m_array.changed_signal().connect(k3d::hint::converter<
 					k3d::hint::convert<k3d::hint::any, k3d::hint::none> >(make_update_mesh_slot()));
 	}
 
@@ -81,6 +145,8 @@ public:
 		const k3d::bool_t select_edges = m_select_edges.pipeline_value();
 		const k3d::bool_t select_vertices = m_select_vertices.pipeline_value();
 		const k3d::bool_t select_points = m_select_points.pipeline_value();
+		
+		const k3d::string_t array_name = m_array.pipeline_value();
 
 		k3d::mesh::selection_t& output_point_selection = Output.point_selection.writable();
 
@@ -122,7 +188,7 @@ public:
 			k3d::log() << debug << "input selection count: " << std::count(input_selected_faces.begin(), input_selected_faces.end(), 1.) << std::endl;
 
 			k3d::mesh::selection_t output_selection(face_end - face_begin, 0.0);
-			connected_faces_selector selector(*polyhedron, output_selection);
+			connected_faces_selector selector(*polyhedron, output_selection, array_name, m_same_attributes.pipeline_value());
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
 				if(input_selected_faces[face])
@@ -158,10 +224,13 @@ private:
 		k3d::mesh::bools_t m_boundary_edges;
 		k3d::mesh::indices_t m_adjacent_edges;
 		k3d::mesh::indices_t m_edge_faces;
-		connected_faces_selector(const k3d::polyhedron::const_primitive& Polyhedron, k3d::mesh::selection_t& OutputFaceSelection) : m_polyhedron(Polyhedron), m_output_selection(OutputFaceSelection)
+		boost::shared_ptr<detail::iarray_wrapper> m_face_array_wrapper;
+		const k3d::bool_t m_use_attributes;
+		connected_faces_selector(const k3d::polyhedron::const_primitive& Polyhedron, k3d::mesh::selection_t& OutputFaceSelection, const std::string& ArrayName, const k3d::bool_t UseAttributes) : m_polyhedron(Polyhedron), m_output_selection(OutputFaceSelection), m_use_attributes(UseAttributes)
 		{
 			k3d::polyhedron::create_edge_adjacency_lookup(m_polyhedron.vertex_points, m_polyhedron.clockwise_edges, m_boundary_edges, m_adjacent_edges);
 			k3d::polyhedron::create_edge_face_lookup(m_polyhedron, m_edge_faces);
+			m_face_array_wrapper = detail::wrap_array(Polyhedron.face_attributes.lookup(ArrayName));
 		}
 
 		void select_connected_faces(const k3d::uint_t Face)
@@ -179,7 +248,7 @@ private:
 					if(!m_boundary_edges[edge])
 					{
 						const k3d::uint_t companion_face = m_edge_faces[m_adjacent_edges[edge]];
-						if(!m_output_selection[companion_face])
+						if(!m_output_selection[companion_face] && (!m_use_attributes || (m_face_array_wrapper && m_face_array_wrapper->compare(Face, companion_face))))
 							select_connected_faces(companion_face);
 					}
 
@@ -223,6 +292,8 @@ private:
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_select_edges;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_select_vertices;
 	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_select_points;
+	k3d_data(k3d::bool_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_same_attributes;
+	k3d_data(k3d::string_t, immutable_name, change_signal, with_undo, local_storage, no_constraint, writable_property, with_serialization) m_array;
 };
 
 /////////////////////////////////////////////////////////////////////////////
