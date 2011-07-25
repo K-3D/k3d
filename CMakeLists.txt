@@ -60,7 +60,7 @@ INCLUDE(K3DFindXML)
 INCLUDE(K3DFindZlib)
 
 FIND_PACKAGE(Aqsis NO_MODULE QUIET)
-FIND_PACKAGE(Qt4 4.6.2 COMPONENTS QtCore QtGui QtScript QtWebKit)
+FIND_PACKAGE(Qt4 4.6.2 COMPONENTS QtCore QtGui QtScript)
 FIND_PACKAGE(K3DAsciiDoc)
 
 # Setup platform-specific defaults ...

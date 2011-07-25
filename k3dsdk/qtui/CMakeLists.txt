@@ -51,7 +51,7 @@ ExternalProject_Add(qtscriptgenerator
 	DOWNLOAD_COMMAND git clone git://gitorious.org/qt-labs/qtscriptgenerator.git
 	UPDATE_COMMAND ""
 	CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>/generator ${QT_QMAKE_EXECUTABLE}
-	BUILD_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>/generator make
+	BUILD_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>/generator make -j4
 	BUILD_IN_SOURCE 1
 	INSTALL_COMMAND ""
 	)
@@ -67,13 +67,13 @@ ExternalProject_Add_Step(qtscriptgenerator generate-bindings
 ExternalProject_Add_Step(qtscriptgenerator configure-bindings
 	DEPENDEES generate-bindings
 	WORKING_DIRECTORY "<SOURCE_DIR>/qtbindings"
-	COMMAND ${QT_QMAKE_EXECUTABLE}
+	COMMAND ${QT_QMAKE_EXECUTABLE} -after "SUBDIRS-=qtscript_sql qtscript_phonon qtscript_webkit"
 	)
 
 ExternalProject_Add_Step(qtscriptgenerator build-bindings
 	DEPENDEES configure-bindings
 	WORKING_DIRECTORY "<SOURCE_DIR>/qtbindings"
-	COMMAND make
+	COMMAND make -j4
 	DEPENDERS install
 	)
 
