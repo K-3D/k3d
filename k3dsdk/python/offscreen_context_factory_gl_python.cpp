@@ -21,13 +21,14 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/gl/offscreen_context_factory.h>
 #include <k3dsdk/gl/offscreen_context.h>
 #include <k3dsdk/python/iunknown_python.h>
 #include <k3dsdk/python/offscreen_context_factory_gl_python.h>
 #include <k3dsdk/python/utility_python.h>
 
-#include <boost/python.hpp>
 using namespace boost::python;
 
 namespace k3d

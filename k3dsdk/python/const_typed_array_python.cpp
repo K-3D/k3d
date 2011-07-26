@@ -21,6 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/const_typed_array_python.h>
 #include <k3dsdk/python/utility_python.h>
 
@@ -28,8 +30,6 @@
 #include <k3dsdk/named_array_types.h>
 #include <k3dsdk/typed_array.h>
 #include <k3dsdk/uint_t_array.h>
-
-#include <boost/python.hpp>
 
 namespace k3d
 {

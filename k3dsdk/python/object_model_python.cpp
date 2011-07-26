@@ -21,6 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3d-ngui-config.h>
 
 #ifdef K3D_BUILD_NGUI_MODULE
@@ -114,7 +116,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include <boost/python.hpp>
 using namespace boost::python;
 
 #include <boost/scoped_ptr.hpp>

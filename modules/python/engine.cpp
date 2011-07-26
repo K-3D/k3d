@@ -25,6 +25,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/classes.h>
@@ -38,7 +40,6 @@
 #include <k3dsdk/string_modifiers.h>
 
 #include <boost/assign/list_of.hpp>
-#include <boost/python.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/algorithm/string.hpp>
 

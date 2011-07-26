@@ -22,6 +22,8 @@
 	\author Bart Janssens (bart.janssens@lid.kviv.be)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/any_python.h>
 #include <k3dsdk/python/inode_selection_python.h>
 #include <k3dsdk/python/iunknown_python.h>
@@ -30,7 +32,6 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/inode_selection.h>
 
-#include <boost/python.hpp>
 using namespace boost::python;
 
 namespace k3d

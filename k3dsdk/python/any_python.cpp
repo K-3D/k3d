@@ -21,6 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/any_python.h>
 #include <k3dsdk/python/bitmap_python.h>
 #include <k3dsdk/python/const_bitmap_python.h>
@@ -41,7 +43,6 @@
 #include <k3dsdk/type_registry.h>
 #include <k3dsdk/vectors.h>
 
-#include <boost/python.hpp>
 #include <boost/python/detail/api_placeholder.hpp>
 using namespace boost::python;
 

@@ -21,11 +21,12 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/angle_axis_python.h>
 
 #include <k3dsdk/algebra.h>
 
-#include <boost/python.hpp>
 using namespace boost::python;
 
 #include <sstream>

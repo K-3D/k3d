@@ -62,6 +62,11 @@ struct channel_traits<half>
 	}
 };
 
+template <> struct channel_converter_unsigned<bits32f,half> : public std::unary_function<bits32f,bits32f>
+{
+	half operator()(bits32f   x) const { return half(static_cast<float>(x)); }
+};
+
 } // namespace gil
 
 } // namespace boost

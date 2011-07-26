@@ -21,6 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/any_python.h>
 #include <k3dsdk/python/offscreen_context_factory_gl_python.h>
 #include <k3dsdk/python/idocument_exporter_python.h>
@@ -48,7 +50,6 @@
 #include <k3dsdk/property.h>
 #include <k3dsdk/types.h>
 
-#include <boost/python.hpp>
 using namespace boost::python;
 
 namespace k3d

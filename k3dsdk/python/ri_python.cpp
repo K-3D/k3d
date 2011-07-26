@@ -21,11 +21,12 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/ri_python.h>
 
 #include <k3dsdk/ishader_collection_ri.h>
 
-#include <boost/python.hpp>
 using namespace boost::python;
 
 namespace k3d

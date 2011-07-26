@@ -21,11 +21,12 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/const_named_arrays_python.h>
 #include <k3dsdk/python/const_typed_array_python.h>
 #include <k3dsdk/python/utility_python.h>
 
-#include <boost/python.hpp>
 using namespace boost::python;
 
 namespace k3d

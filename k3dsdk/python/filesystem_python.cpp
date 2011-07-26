@@ -17,12 +17,13 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/filesystem_python.h>
 
 #include <k3dsdk/path.h>
 #include <k3dsdk/types.h>
 
-#include <boost/python.hpp>
 #include <boost/python/detail/api_placeholder.hpp>
 using namespace boost::python;
 

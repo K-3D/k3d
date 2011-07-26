@@ -21,6 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/table_python.h>
 #include <k3dsdk/python/const_table_python.h>
 #include <k3dsdk/python/const_typed_array_python.h>
@@ -33,7 +35,6 @@
 #include <k3dsdk/mesh.h>
 #include <k3dsdk/type_registry.h>
 
-#include <boost/python.hpp>
 #include <boost/python/detail/api_placeholder.hpp>
 using namespace boost::python;
 

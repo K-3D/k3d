@@ -221,6 +221,8 @@ OPTION(K3D_BUILD_WINDOWS_MODULE "Build the Windows integration module" ${WIN32})
 OPTION(K3D_BUILD_XTRACKCAD_MODULE "Build the XTrackCAD Model Railroad integration module" ON)
 OPTION(K3D_BUILD_YAFRAY_MODULE "Build the YAFRAY render engine integration module" ON)
 
+OPTION(K3D_BUILD_DOCS "Build the documentation" ON)
+
 OPTION(K3D_ENABLE_OSX_BUNDLE "Package K-3D as an OSX bundle (ignored on other platforms)." OFF)
 OPTION(K3D_ENABLE_DISTRIBUTION "Enable distribution targets." OFF)
 OPTION(K3D_ENABLE_NLS "Build K-3D with native language support" ON)
@@ -390,7 +392,7 @@ K3D_ADD_SUBDIRECTORY(tests REQUIRES K3D_ENABLE_TESTING)
 K3D_ADD_SUBDIRECTORY(po REQUIRES K3D_ENABLE_NLS)
 
 ADD_SUBDIRECTORY(bugs)
-ADD_SUBDIRECTORY(docs)
+K3D_ADD_SUBDIRECTORY(docs REQUIRES K3D_BUILD_DOCS)
 ADD_SUBDIRECTORY(web)
 
 K3D_ADD_SUBDIRECTORY(distribution REQUIRES K3D_ENABLE_DISTRIBUTION)

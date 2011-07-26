@@ -21,13 +21,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/imeta_object.h>
 #include <k3dsdk/python/any_python.h>
 #include <k3dsdk/python/imeta_object_python.h>
 #include <k3dsdk/python/iunknown_python.h>
 #include <k3dsdk/python/utility_python.h>
-
-#include <boost/python.hpp>
 
 namespace k3d
 {

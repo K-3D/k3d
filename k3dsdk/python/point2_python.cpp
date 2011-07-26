@@ -21,12 +21,13 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/point2_python.h>
 #include <k3dsdk/python/utility_python.h>
 
 #include <k3dsdk/vectors.h>
 
-#include <boost/python.hpp>
 #include <boost/python/detail/api_placeholder.hpp>
 using namespace boost::python;
 

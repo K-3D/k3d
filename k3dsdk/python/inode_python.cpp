@@ -21,6 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/idocument_python.h>
 #include <k3dsdk/python/inode_python.h>
 #include <k3dsdk/python/iunknown_python.h>
@@ -29,7 +31,6 @@
 #include <k3dsdk/inode.h>
 #include <k3dsdk/iplugin_factory.h>
 
-#include <boost/python.hpp>
 using namespace boost::python;
 
 namespace k3d 

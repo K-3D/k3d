@@ -17,6 +17,8 @@
 // License along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/atk_python.h>
 #include <k3dsdk/python/utility_python.h>
 
@@ -27,7 +29,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/range_c.hpp>
-#include <boost/python.hpp>
 
 using namespace boost::python;
 

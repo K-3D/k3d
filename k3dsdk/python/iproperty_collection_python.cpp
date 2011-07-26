@@ -21,6 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/any_python.h>
 #include <k3dsdk/python/iproperty_collection_python.h>
 #include <k3dsdk/python/iunknown_python.h>
@@ -35,7 +37,6 @@
 #include <k3dsdk/property_types_ri.h>
 #include <k3dsdk/type_registry.h>
 
-#include <boost/python.hpp>
 using namespace boost::python;
 
 namespace k3d

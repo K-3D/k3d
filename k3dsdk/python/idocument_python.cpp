@@ -21,6 +21,8 @@
 	\author Timothy M. Shead (tshead@k-3d.com)
 */
 
+#include <boost/python.hpp>
+
 #include <k3dsdk/python/idocument_python.h>
 #include <k3dsdk/python/iproperty_python.h>
 #include <k3dsdk/python/iunknown_python.h>
@@ -35,7 +37,6 @@
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/utility_gl.h>
 
-#include <boost/python.hpp>
 using namespace boost::python;
 
 #include <boost/scoped_ptr.hpp>

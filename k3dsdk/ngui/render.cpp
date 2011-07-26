@@ -169,7 +169,7 @@ k3d::icamera* pick_camera(document_state& DocumentState, const std::vector<k3d::
 		row[columns.separator] = false;
 	}
 
-	Gtk::ComboBox combo(model);
+	Gtk::ComboBox combo(model, false);
 
 	combo.pack_start(columns.icon, false);
 
@@ -295,7 +295,7 @@ interface_t* pick_render_engine(document_state& DocumentState, const std::vector
 		row[columns.separator] = false;
 	}
 
-	Gtk::ComboBox combo(model);
+	Gtk::ComboBox combo(model, false);
 
 	combo.pack_start(columns.icon, false);
 
