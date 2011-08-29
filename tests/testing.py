@@ -327,8 +327,6 @@ def require_similar_mesh(document, input_mesh, base_mesh_name, ulps_threshold, c
 	dart_measurement("ulps_max", result.ulps_max())
 	dart_measurement("ulps_mean", result.ulps_mean())
 	dart_measurement("ulps_median", result.ulps_median())
-	dart_measurement("ulps_standard_deviation", result.ulps_standard_deviation())
-	dart_measurement("ulps_variance", result.ulps_variance())
 
 	dart_measurement("ulps_threshold", ulps_threshold)
 
@@ -336,7 +334,11 @@ def require_similar_mesh(document, input_mesh, base_mesh_name, ulps_threshold, c
 		print """<DartMeasurement name="geometry_difference" type="text/html"><![CDATA[\n"""
 		print difflib.HtmlDiff().make_file(str(input_mesh.internal_value()).splitlines(1), str(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry")
 		print """]]></DartMeasurement>\n"""
+		print "writing diff to file", str(difference_path)
 		sys.stdout.flush()
+		difference_file = open(str(difference_path), 'w')
+		difference_file.write(difflib.HtmlDiff().make_file(str(input_mesh.internal_value()).splitlines(1), str(reference.output_mesh).splitlines(1), "Test Geometry", "Reference Geometry"))
+		difference_file.close()
 
 		raise Exception("output mesh differs from reference")
 
