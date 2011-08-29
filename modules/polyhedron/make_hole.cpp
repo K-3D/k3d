@@ -92,10 +92,14 @@ public:
 			const k3d::uint_t face_end = face_begin + polyhedron->face_shells.size();
 			for(k3d::uint_t face = face_begin; face != face_end; ++face)
 			{
+				const k3d::uint_t first_loop = polyhedron->face_first_loops[face];
 				const k3d::uint_t loop_count = polyhedron->face_loop_counts[face];
-				const k3d::uint_t first_edge = input_loop_first_edges[polyhedron->face_first_loops[face]];
+				const k3d::uint_t first_edge = input_loop_first_edges[first_loop];
+				
+				const k3d::mesh::indices_t::const_iterator face_loops_begin = input_loop_first_edges.begin()+first_loop;
+				const k3d::mesh::indices_t::const_iterator face_loops_end = face_loops_begin + loop_count;
 				polyhedron->face_first_loops[face] = polyhedron->loop_first_edges.size();
-				polyhedron->loop_first_edges.insert(polyhedron->loop_first_edges.end(), input_loop_first_edges.begin()+face, input_loop_first_edges.begin()+face+loop_count);
+				polyhedron->loop_first_edges.insert(polyhedron->loop_first_edges.end(), face_loops_begin, face_loops_end);
 				
 				if(!polyhedron->face_selections[face])
 					continue;
