@@ -43,6 +43,7 @@ extern k3d::iplugin_factory& dissolve_faces_factory();
 extern k3d::iplugin_factory& extrude_faces_factory();
 //extern k3d::iplugin_factory& fillet_edges_factory();
 extern k3d::iplugin_factory& flip_orientation_factory();
+extern k3d::iplugin_factory& make_hole_factory();
 extern k3d::iplugin_factory& make_sds_factory();
 extern k3d::iplugin_factory& merge_collinear_edges_factory();
 extern k3d::iplugin_factory& merge_coplanar_faces_factory();
@@ -74,6 +75,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::polyhedron::extrude_faces_factory());
 //	Registry.register_factory(module::polyhedron::fillet_edges_factory());
 	Registry.register_factory(module::polyhedron::flip_orientation_factory());
+	Registry.register_factory(module::polyhedron::make_hole_factory());
 	Registry.register_factory(module::polyhedron::make_sds_factory());
 	Registry.register_factory(module::polyhedron::merge_collinear_edges_factory());
 	Registry.register_factory(module::polyhedron::merge_coplanar_faces_factory());

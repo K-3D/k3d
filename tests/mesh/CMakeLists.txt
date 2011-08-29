@@ -779,6 +779,11 @@ K3D_TEST(mesh.modifier.PolyToBilinear
 	REQUIRES K3D_BUILD_BILINEAR_PATCH_MODULE
 	LABELS mesh modifier PolyToBilinear)
 
+K3D_TEST(mesh.modifier.MakeHole 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.MakeHole.py
+	REQUIRES K3D_BUILD_MESH_MODULE
+	LABELS mesh modifier)
+
 K3D_TEST(mesh.modifier.MergeCollinearEdges 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.MergeCollinearEdges.py
 	REQUIRES K3D_BUILD_MESH_MODULE
