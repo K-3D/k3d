@@ -15,9 +15,10 @@ namespace mechanics
 void PreviewTorus::init(k3d::string_t _node_name, k3d::string_t _meta_nametag, k3d::irender_camera_frame* RenderEngine)
 {
 	k3d::inode* torus 
-    = dynamic_cast<k3d::inode*>(k3d::plugin::create("Torus", 
+    = dynamic_cast<k3d::inode*>(k3d::plugin::create("QuadricTorus", 
                                                     m_document_state->document(), 
                                                      _node_name));
+  return_if_fail(torus);
 	m_doc_node = k3d::ngui::pipeline::instantiate_mesh(m_document_state->document(), *torus);
 	return_if_fail(m_doc_node);
 	k3d::property::set_internal_value(*m_doc_node, "gl_painter", static_cast<k3d::inode*>(0));
