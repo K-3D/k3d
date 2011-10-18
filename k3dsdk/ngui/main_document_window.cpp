@@ -1358,7 +1358,7 @@ private:
 			Gtk::HBox import_box(false, 5);
 			Gtk::Label import_label(_("Choose import plugin:"));
 
-			Gtk::ComboBox import_combo(model, false);
+			Gtk::ComboBox import_combo(Glib::RefPtr<Gtk::TreeModel>::cast_dynamic(model));
 			import_combo.pack_start(columns.icon, false);
 			import_combo.pack_start(columns.label);
 			import_combo.set_active(0);
@@ -1448,7 +1448,7 @@ private:
 			Gtk::HBox export_box(false, 5);
 			Gtk::Label export_label(_("Choose export plugin:"));
 
-			Gtk::ComboBox export_combo(model, false);
+			Gtk::ComboBox export_combo(Glib::RefPtr<Gtk::TreeModel>::cast_dynamic(model));
 			export_combo.pack_start(columns.icon, false);
 			export_combo.pack_start(columns.label);
 			export_combo.set_active(0);
