@@ -46,7 +46,7 @@
 #include <boost/scoped_ptr.hpp>
 
 #include <carve/csg.hpp>
-#include <carve/poly.hpp>
+#include <carve/mesh.hpp>
 
 using namespace carve;
 
@@ -148,8 +148,9 @@ class boolean :
 	public k3d::material_sink<k3d::mesh_source<k3d::node > >
 {
 	typedef k3d::material_sink<k3d::mesh_source<k3d::node > > base;
-	typedef poly::Vertex<3> vertex_t;
-	typedef poly::Face<3> face_t;
+	typedef mesh::MeshSet<3>::vertex_t vertex_t;
+  typedef mesh::MeshSet<3>::face_t face_t;
+  typedef mesh::MeshSet<3>::const_face_iter const_face_iter;
 public:
 	boolean(k3d::iplugin_factory& Factory, k3d::idocument& Document) :
 		base(Factory, Document),
@@ -170,25 +171,6 @@ public:
 		try
 		{
 			do_boolean(Output, *this);
-
-//			boost::scoped_ptr<k3d::polyhedron::primitive> output_polyhedron;
-//			for(k3d::mesh::primitives_t::iterator primitive = Output.primitives.begin(); primitive != Output.primitives.end(); ++primitive)
-//			{
-//				// We only get the first polyhedron
-//				output_polyhedron.reset(k3d::polyhedron::validate(Output, primitive->writable()));
-//				if(output_polyhedron.get())
-//					break;
-//			}
-//			if(Output.points && output_polyhedron.get())
-//			{
-//				document().pipeline_profiler().start_execution(*this, "Simplify output");
-//				detail::merge_coplanar_faces(*Output.points, *output_polyhedron, m_threshold.pipeline_value());
-//				detail::merge_collinear_edges(*Output.points, *output_polyhedron, m_threshold.pipeline_value());
-//				k3d::mesh::bools_t unused_points;
-//				k3d::mesh::lookup_unused_points(Output, unused_points);
-//				k3d::mesh::delete_points(Output, unused_points);
-//				document().pipeline_profiler().finish_execution(*this, "Simplify output");
-//			}
 		}
 		catch (std::exception& E)
 		{
@@ -238,12 +220,12 @@ private:
 				if(!input_mesh)
 					throw std::runtime_error("No mesh found in property " + Property->property_name());
 				// make a copy of the mesh, where we can alter the face selection so everything is selected
-				k3d::mesh mesh_all_faces_selected(*input_mesh);
+				k3d::mesh mesh_hole_faces_selected(*input_mesh);
 				boost::scoped_ptr<k3d::polyhedron::primitive> polyhedron;
-				for(k3d::mesh::primitives_t::iterator primitive = mesh_all_faces_selected.primitives.begin(); primitive != mesh_all_faces_selected.primitives.end(); ++primitive)
+				for(k3d::mesh::primitives_t::iterator primitive = mesh_hole_faces_selected.primitives.begin(); primitive != mesh_hole_faces_selected.primitives.end(); ++primitive)
 				{
 					// We only get the first polyhedron
-					polyhedron.reset(k3d::polyhedron::validate(mesh_all_faces_selected, primitive->writable()));
+					polyhedron.reset(k3d::polyhedron::validate(mesh_hole_faces_selected, primitive->writable()));
 					if(polyhedron.get())
 						break;
 				}
@@ -263,40 +245,42 @@ private:
 				k3d::string_t sequence_string = k3d::string_cast(m_sequence++); 
 				
 				m_node.document().pipeline_profiler().start_execution(m_node, "Triangulate input " + sequence_string);
-				const k3d::mesh::primitive* triangulated_prim = k3d::polyhedron::triangulate(mesh_all_faces_selected, *polyhedron, triangulated_mesh);
+				const k3d::mesh::primitive* triangulated_prim = k3d::polyhedron::triangulate(mesh_hole_faces_selected, *polyhedron, triangulated_mesh);
 				boost::scoped_ptr<k3d::polyhedron::const_primitive> triangulated_polyhedron(k3d::polyhedron::validate(triangulated_mesh, *triangulated_prim));
 				m_node.document().pipeline_profiler().finish_execution(m_node, "Triangulate input " + sequence_string);
 
-				std::vector<vertex_t > vertices;
-				std::vector<face_t > faces;
+				std::vector<vertex_t::vector_t> vertices;
+				std::vector<int> faces;
 				const k3d::uint_t point_count = triangulated_mesh.points->size();
 				vertices.reserve(point_count);
 				for(k3d::uint_t p_idx = 0; p_idx != point_count; ++p_idx)
 				{
 					const k3d::point3& p = triangulated_mesh.points->at(p_idx);
-					vertices.push_back(vertex_t(geom::VECTOR(p[0],p[1],p[2])));
+					vertices.push_back(geom::VECTOR(p[0],p[1],p[2]));
 				}
 				const k3d::uint_t face_count = triangulated_polyhedron->face_first_loops.size();
-				faces.reserve(face_count);
+				faces.reserve(face_count+triangulated_polyhedron->vertex_points.size());
 				for(k3d::uint_t face = 0; face != face_count; ++face)
 				{
 					assert_error(triangulated_polyhedron->face_loop_counts[face] == 1);
 					const k3d::uint_t loop = triangulated_polyhedron->face_first_loops[face];
 					const k3d::uint_t first_edge = triangulated_polyhedron->loop_first_edges[loop];
-					std::vector<const vertex_t *> corners;
+          faces.push_back(0); // Number of points for this face is stored first
+          int& face_num_vertices = faces.back();
 					for(k3d::uint_t edge = first_edge; ;)
 					{
-						corners.push_back(&vertices[triangulated_polyhedron->vertex_points[edge]]);
+            ++face_num_vertices;
+						faces.push_back(triangulated_polyhedron->vertex_points[edge]);
 
 						edge = triangulated_polyhedron->clockwise_edges[edge];
 						if(edge == first_edge)
 							break;
 					}
-					faces.push_back(face_t(corners));
 				}
+				mesh::MeshSet<3>* new_mesh = new mesh::MeshSet<3>(vertices, face_count, faces);
 				if (!m_result)
 				{
-					m_result.reset(new poly::Polyhedron(faces));
+					m_result.reset(new_mesh);
 				}
 				else
 				{
@@ -321,23 +305,28 @@ private:
 							break;
 					}
 					csg::CSG csg;
-					boost::scoped_ptr<poly::Polyhedron> operand(new poly::Polyhedron(faces));
+					boost::scoped_ptr< mesh::MeshSet<3> > operand(new_mesh);
 					m_result.reset(csg.compute(m_result.get(), operand.get(), op));
 					m_node.document().pipeline_profiler().finish_execution(m_node, "Execute boolean operation " + boolean_op);
 				}
 			}
 		}
 
-		poly::Polyhedron& result()
+		const mesh::MeshSet<3>& result()
 		{
 			return *m_result;
 		}
+		
+		void canonicalize()
+    {
+      m_result->canonicalize();
+    }
 
 	private:
 		const boolean::boolean_t m_boolean_type;
 		k3d::inode& m_node;
 		k3d::uint_t m_sequence;
-		boost::scoped_ptr<poly::Polyhedron> m_result;
+		boost::scoped_ptr< mesh::MeshSet<3> > m_result;
 	};
 	
 	/// Executes a boolean operation
@@ -352,7 +341,7 @@ private:
 			functor(*property);
 
 		document().pipeline_profiler().start_execution(*this, "Canonicalize");
-		functor.result().canonicalize();
+		functor.canonicalize();
 		document().pipeline_profiler().finish_execution(*this, "Canonicalize");
 			
 		k3d::mesh::points_t vertices;
@@ -361,24 +350,27 @@ private:
 
 		std::map<const vertex_t*, k3d::uint_t> vertex_map;
 
-		const k3d::uint_t vertex_count = functor.result().vertices.size();
+		const k3d::uint_t vertex_count = functor.result().vertex_storage.size();
 		vertices.reserve(vertex_count);
 		for(k3d::uint_t v_idx = 0; v_idx != vertex_count; ++v_idx)
 		{
-			const vertex_t& v = functor.result().vertices[v_idx];
+			const vertex_t& v = functor.result().vertex_storage[v_idx];
 			vertex_map[&v] = vertices.size();
 			vertices.push_back(k3d::point3(v.v[0], v.v[1], v.v[2]));
 		}
 
-		const k3d::uint_t face_count = functor.result().faces.size();
-		for(k3d::uint_t f_idx = 0; f_idx != face_count; ++f_idx)
+		const const_face_iter faces_begin = functor.result().faceBegin();
+    const const_face_iter faces_end = functor.result().faceEnd();
+		for(const_face_iter face_it = faces_begin; face_it != faces_end; ++face_it)
 		{
-			const face_t& f = functor.result().faces[f_idx];
-			const k3d::uint_t f_v_count = f.vertices.size();
+			const face_t& f = **face_it;
+      std::vector<vertex_t*> face_verts;
+      f.getVertices(face_verts);
+			const k3d::uint_t f_v_count = face_verts.size();
 			vertex_counts.push_back(f_v_count);
 			for(k3d::uint_t v_idx = 0; v_idx != f_v_count; ++v_idx)
 			{
-				vertex_indices.push_back(vertex_map[f.vertices[v_idx]]);
+				vertex_indices.push_back(vertex_map[face_verts[v_idx]]);
 			}
 		}
 		k3d::polyhedron::create(Output, vertices, vertex_counts, vertex_indices, 0);
