@@ -177,8 +177,8 @@ public:
 			static RtPoint from = {0,0,1}, to = {0,10,0};
 			RiBegin(RI_NULL);
 
-			display_manager* const manager = new display_manager(bitmap_start_signal, bitmap_bucket_signal, bitmap_finish_signal);
-			Aqsis::QGetRenderContext()->SetDisplayManager(manager);
+			//display_manager* const manager = new display_manager(bitmap_start_signal, bitmap_bucket_signal, bitmap_finish_signal);
+			//Aqsis::QGetRenderContext()->SetDisplayManager(manager);
 
 			RiFormat(512, 512, 1);
 			RiPixelSamples(2, 2);
