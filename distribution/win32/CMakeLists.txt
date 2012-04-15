@@ -20,6 +20,14 @@ INSTALL(FILES ${K3D_MINGW_PATH}/mingwm10.dll ${K3D_MINGW_PATH}/libstdc++-6.dll $
 
 SET(K3D_QT_DIR "c:/qt" CACHE PATH "Root directory containing Qt")
 
+IF(K3D_EXTRA_INSTALL_ROOT)
+  	INSTALL(DIRECTORY
+		${K3D_EXTRA_INSTALL_ROOT}/bin/
+		DESTINATION bin
+		FILES_MATCHING PATTERN "*.dll"
+	)
+ENDIF()
+
 IF(K3D_INSTALL_AQSIS)
 	FIND_PROGRAM(K3D_AQSIS_COMMAND aqsis.exe
 		DOC "Path to an installed aqsis.exe."
