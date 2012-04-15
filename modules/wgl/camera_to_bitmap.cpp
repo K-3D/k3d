@@ -208,7 +208,7 @@ public:
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
 			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, &view(buffer)[0]);
 
-			boost::gil::copy_pixels(boost::gil::flipped_up_down_view(boost::gil::color_converted_view<boost::gil::rgba16f_pixel_t>(view(buffer))), view(Output));
+			boost::gil::copy_pixels(boost::gil::flipped_up_down_view(boost::gil::color_converted_view<boost::gil::rgba16_pixel_t>(view(buffer))), view(Output));
 
 			voodoo.Cleanup();
 		}

@@ -26,6 +26,9 @@
 #include <k3dsdk/ibitmap_importer.h>
 #include <k3dsdk/path.h>
 
+#define png_infopp_NULL (png_infopp)NULL
+#define int_p_NULL (int*)NULL
+
 #include <boost/assign/list_of.hpp>
 #include <boost/gil/extension/io/png_io.hpp>
 

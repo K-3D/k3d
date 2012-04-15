@@ -401,7 +401,8 @@ control::control(document_state& DocumentState) :
 	return_if_fail(config);
 
 	return_if_fail(
-		gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, m_implementation->m_document_state.gdkgl_share_list(), true, GDK_GL_RGBA_TYPE));
+		//gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, m_implementation->m_document_state.gdkgl_share_list(), true, GDK_GL_RGBA_TYPE));
+		gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, NULL, true, GDK_GL_RGBA_TYPE));
 
 	show_all();
 }

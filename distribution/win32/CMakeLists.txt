@@ -16,7 +16,9 @@ FIND_PROGRAM(K3D_MINGW_GCC mingw32-gcc.exe
 	DOC "Path to the MinGW GCC command")
 
 GET_FILENAME_COMPONENT(K3D_MINGW_PATH ${K3D_MINGW_GCC} PATH)
-INSTALL(FILES ${K3D_MINGW_PATH}/mingwm10.dll DESTINATION bin)
+INSTALL(FILES ${K3D_MINGW_PATH}/mingwm10.dll ${K3D_MINGW_PATH}/libstdc++-6.dll ${K3D_MINGW_PATH}/pthreadGC2.dll DESTINATION bin)
+
+SET(K3D_QT_DIR "c:/qt" CACHE PATH "Root directory containing Qt")
 
 IF(K3D_INSTALL_AQSIS)
 	FIND_PROGRAM(K3D_AQSIS_COMMAND aqsis.exe
@@ -38,7 +40,7 @@ IF(K3D_INSTALL_AQSIS)
 	IF(K3D_AQSIS_VERSION)
 		STRING(REGEX REPLACE " \\(revision.*" "" K3D_AQSIS_VERSION ${K3D_AQSIS_VERSION})
 		STRING(REGEX REPLACE "aqsis version " "" K3D_AQSIS_VERSION ${K3D_AQSIS_VERSION})
-		K3D_CHECK_INSTALLED_VERSION(${K3D_AQSIS_VERSION} "Aqsis" "1.6.0")
+		K3D_CHECK_INSTALLED_VERSION(${K3D_AQSIS_VERSION} "Aqsis" "1.7.0")
 	ELSE(K3D_AQSIS_VERSION)
 		MESSAGE(SEND_ERROR "Error determining Aqsis version.")
 	ENDIF(K3D_AQSIS_VERSION)
@@ -48,23 +50,18 @@ IF(K3D_INSTALL_AQSIS)
 	    USE_SOURCE_PERMISSIONS
 	    PATTERN aqsisrc EXCLUDE
 		)
+	INSTALL(FILES ${K3D_QT_DIR}/bin/QtCore4.dll ${K3D_QT_DIR}/bin/QtGui4.dll DESTINATION bin)
 	# Install generic aqsisrc, omitting paths (those are set at runtime through command line options)
 	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/aqsisrc DESTINATION bin)
-	#install msvcrt, needed since aqsis 1.4
-	FIND_PROGRAM(VCREDIST_X86_2005 vcredist_x86_2005.exe DOC "Path to the Visual Studio C++ 2005 SP1 redistributable")
-	INSTALL(FILES ${VCREDIST_X86_2005} DESTINATION redist)
-	SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS
-		"ExecWait '\\\"$INSTDIR\\\\redist\\\\vcredist_x86_2005.exe\\\"'")
 ENDIF(K3D_INSTALL_AQSIS)
 
 IF(K3D_INSTALL_BOOST)
-	set(aPrevBoostLib "")
-    foreach(aBoostLib ${Boost_LIBRARIES})
-        if(NOT (aBoostLib STREQUAL "debug" OR aBoostLib STREQUAL "optimized" OR aPrevBoostLib STREQUAL "debug"))
-            INSTALL(FILES ${aBoostLib} DESTINATION bin)
-        endif()
-        set(aPrevBoostLib ${aBoostLib})
-    endforeach(aBoostLib)
+	INSTALL(DIRECTORY
+		${Boost_LIBRARY_DIRS}/
+		DESTINATION bin
+		FILES_MATCHING PATTERN "*.dll"
+		PATTERN "*-d-*" EXCLUDE
+	)
 ENDIF(K3D_INSTALL_BOOST)
 
 IF(K3D_BUILD_COLLADA_IO_MODULE)
@@ -85,60 +82,43 @@ IF(K3D_INSTALL_GTKMM)
 	PKG_CHECK_MODULES(GTK gtk+-2.0)
 	PKG_CHECK_MODULES(GTKMM gtkmm-2.4)
 
-	K3D_CHECK_INSTALLED_VERSION(${ATK_VERSION} "atk" "1.24.0")
-	K3D_CHECK_INSTALLED_VERSION(${ATKMM_VERSION} "atkmm" "2.14.3")
-	K3D_CHECK_INSTALLED_VERSION(${CAIRO_VERSION} "cairo" "1.8.6")
-	K3D_CHECK_INSTALLED_VERSION(${CAIROMM_VERSION} "cairomm" "1.8.0")
-	K3D_CHECK_INSTALLED_VERSION(${GDK_VERSION} "gdk" "2.14.7")
-	K3D_CHECK_INSTALLED_VERSION(${GDKGLEXT_VERSION} "gdkglext" "1.2.0")
-	K3D_CHECK_INSTALLED_VERSION(${GDKGLEXTW_VERSION} "gdkglext-win32" "1.2.0")
-	K3D_CHECK_INSTALLED_VERSION(${GDKMM_VERSION} "gdkmm" "2.14.3")
-	K3D_CHECK_INSTALLED_VERSION(${GTK_VERSION} "gtk" "2.14.7")
-	K3D_CHECK_INSTALLED_VERSION(${GTKMM_VERSION} "gtkmm" "2.14.3")
-
 	# This is an ugly hack, we should be able to detect this automatically, but I'm feeling lazy ...
 	SET(K3D_GTK_DIR "c:/gtk" CACHE PATH "Root directory containing GTK/gtkmm")
 
 	INSTALL(DIRECTORY ${K3D_GTK_DIR}/bin/ DESTINATION bin
-		USE_SOURCE_PERMISSIONS
-		PATTERN *.pdb EXCLUDE
-		PATTERN *-config EXCLUDE
-		PATTERN *glade* EXCLUDE
-		PATTERN *xml++* EXCLUDE
-		PATTERN atkmm-1.6d.dll EXCLUDE
-		PATTERN gdkmm-2.4d.dll EXCLUDE
-		PATTERN gettext.sh EXCLUDE
-		PATTERN glib-gettextize EXCLUDE
-		PATTERN glib-mkenums EXCLUDE
-		PATTERN glibmm-2.4d.dll EXCLUDE
-		PATTERN gtkaio.sh EXCLUDE
-		PATTERN gtkautogen EXCLUDE
-		PATTERN gtkconfigure EXCLUDE
-		PATTERN gtkmm-2.4d.dll EXCLUDE
-		PATTERN msg*.exe EXCLUDE
-		PATTERN pangomm-1.4d.dll EXCLUDE
-		PATTERN sigc-2.0d.dll EXCLUDE
+		USE_SOURCE_PERMISSIONS FILES_MATCHING
+		PATTERN libgtk*.dll
+		PATTERN libgdk*.dll
+		PATTERN libpango*.dll
+		PATTERN libatk*.dll
+		PATTERN libcairo*.dll
+		PATTERN libgio*.dll
+		PATTERN libglib*.dll
+		PATTERN libsigc*.dll
+		PATTERN libgmodule*.dll
+		PATTERN libgobject*.dll
+		PATTERN libgthread*.dll
+		PATTERN libexpat*.dll
+		PATTERN libfontconfig*.dll
+		PATTERN libpng*.dll
+		PATTERN libintl*.dll
+		PATTERN libfreetype*.dll
+		PATTERN libzlib*.dll
+		PATTERN libgcc*.dll
+		PATTERN gspawn*
+		PATTERN zlib1.dll
+		PATTERN intl.dll
+		PATTERN freetype6.dll
 		)
 
 	INSTALL(DIRECTORY ${K3D_GTK_DIR}/etc/ DESTINATION etc
-		USE_SOURCE_PERMISSIONS
+		USE_SOURCE_PERMISSIONS FILES_MATCHING
+		PATTERN pango
+		PATTERN gtk*
 		)
 
-	INSTALL(DIRECTORY ${K3D_GTK_DIR}/lib/ DESTINATION ${K3D_LIBDIR}
+	INSTALL(DIRECTORY ${K3D_GTK_DIR}/lib/gtk-2.0 DESTINATION ${K3D_LIBDIR}
 		USE_SOURCE_PERMISSIONS
-		PATTERN *.a EXCLUDE
-		PATTERN *.lib EXCLUDE
-		PATTERN *.pdb EXCLUDE
-		PATTERN *glade* EXCLUDE
-		PATTERN gdkmm-2.4 EXCLUDE
-		PATTERN glib-2.0 EXCLUDE
-		PATTERN glibmm-2.4 EXCLUDE
-		PATTERN gtkglext-1.0 EXCLUDE
-		PATTERN gtkmm-2.4 EXCLUDE
-		PATTERN include EXCLUDE
-		PATTERN libxml++-2.6 EXCLUDE
-		PATTERN pkgconfig EXCLUDE
-		PATTERN sigc++-2.0 EXCLUDE
 		)
 
 	# Override the default gtkrc file with our own
@@ -261,13 +241,6 @@ IF(K3D_INSTALL_PYTHON)
 			PATTERN *.pyo EXCLUDE
 			)
 	ENDIF(K3D_INSTALL_PYOPENGL)
-
-	#Needed for Python 2.6
-	FIND_PROGRAM(VCREDIST_X86_2008 vcredist_x86_2008.exe DOC "Path to the Visual Studio C++ 2008 SP1 redistributable")
-	INSTALL(FILES ${VCREDIST_X86_2008} DESTINATION redist)
-	SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS
-		"${CPACK_NSIS_EXTRA_INSTALL_COMMANDS}
-			ExecWait '\\\"$INSTDIR\\\\redist\\\\vcredist_x86_2008.exe\\\"'")
 
 ENDIF(K3D_INSTALL_PYTHON)
 
