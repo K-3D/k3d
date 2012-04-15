@@ -20,8 +20,10 @@
 #include <k3dsdk/log_control.h>
 #include <k3d-platform-config.h>
 #include <k3dsdk/result.h>
+#include <k3dsdk/system.h>
 
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -151,6 +153,54 @@ void log_cerr(const time_t Timestamp, const log_level_t Level, const std::string
 }
 
 ///////////////////////////////////////////////////////////
+// log_file
+
+void log_file(const time_t Timestamp, const log_level_t Level, const std::string& Message)
+{
+  static std::ofstream logfile((system::get_home_directory() / k3d::filesystem::generic_path(".k3d") / k3d::filesystem::generic_path("k3d.log")).native_filesystem_string().c_str());
+  if(Level > g_log_minimum_level)
+    return;
+
+  if(g_log_show_timestamp)
+  {
+    std::string buffer(256, '\0');
+    buffer.resize(strftime(&buffer[0], buffer.size(), "%m/%d/%Y %H:%M:%S ", localtime(&Timestamp)));
+    logfile << buffer;
+  }
+
+  if(!g_log_tag.empty())
+  {
+    logfile << g_log_tag;
+  }
+
+  if(g_log_show_level)
+  {
+    switch(Level)
+    {
+      case K3D_LOG_LEVEL_CRITICAL:
+        logfile << "CRITICAL: ";
+        break;
+      case K3D_LOG_LEVEL_ERROR:
+        logfile << "ERROR: ";
+        break;
+      case K3D_LOG_LEVEL_WARNING:
+        logfile << "WARNING: ";
+        break;
+      case K3D_LOG_LEVEL_INFO:
+        logfile << "INFO: ";
+        break;
+      case K3D_LOG_LEVEL_DEBUG:
+        logfile << "DEBUG: ";
+        break;
+    }
+  }
+
+  logfile << Message;
+
+  logfile << std::flush;
+}
+
+///////////////////////////////////////////////////////////
 // log_cache
 
 void log_cache(const time_t Timestamp, const log_level_t Level, const std::string& Message)
@@ -221,6 +271,7 @@ public:
 	{
 		connect(sigc::ptr_fun(log_cerr));
 		connect(sigc::ptr_fun(log_cache));
+    connect(sigc::ptr_fun(log_file));
 
 #ifdef K3D_API_WIN32
 		connect(sigc::ptr_fun(log_output_debug_string));
