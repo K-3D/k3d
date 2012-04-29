@@ -292,7 +292,46 @@ bool spawn_sync(const string_t& CommandLine)
 
 	log() << info << "spawn_sync: " << CommandLine << std::endl;
 	log() << info << "PATH=" << getenv("PATH") << std::endl;
+#ifdef K3D_API_WIN32
+	k3d::bool_t status = true;
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
 
+	ZeroMemory( &si, sizeof(si) );
+	si.cb = sizeof(si);
+	ZeroMemory( &pi, sizeof(pi) );
+
+	LPTSTR cmd_line = _strdup(CommandLine.c_str());
+	
+	// Start the child process. 
+	if( !CreateProcess( NULL,   // No module name (use command line)
+		cmd_line,        // Command line
+		NULL,           // Process handle not inheritable
+		NULL,           // Thread handle not inheritable
+		FALSE,          // Set handle inheritance to FALSE
+		0,              // No creation flags
+		NULL,           // Use parent's environment block
+		NULL,           // Use parent's starting directory 
+		&si,            // Pointer to STARTUPINFO structure
+		&pi )           // Pointer to PROCESS_INFORMATION structure
+	) 
+	{
+		log() << error << "Failed to CreateProcess with error: " << GetLastError() << std::endl;
+		status = false;
+	}
+	else
+	{
+		// Wait until child process exits.
+		WaitForSingleObject( pi.hProcess, INFINITE );
+
+		// Close process and thread handles. 
+		CloseHandle( pi.hProcess );
+		CloseHandle( pi.hThread );
+	}
+	
+	free(cmd_line);
+	return status;
+#else // non-win32:
 	try
 	{
 		Glib::spawn_command_line_sync(CommandLine);
@@ -303,6 +342,7 @@ bool spawn_sync(const string_t& CommandLine)
 		log() << error << e.what() << std::endl;
 		return false;
 	}
+#endif
 }
 
 const paths_t decompose_path_list(const string_t Input)

@@ -18,6 +18,9 @@ FIND_PROGRAM(K3D_MINGW_GCC mingw32-gcc.exe
 GET_FILENAME_COMPONENT(K3D_MINGW_PATH ${K3D_MINGW_GCC} PATH)
 INSTALL(FILES ${K3D_MINGW_PATH}/mingwm10.dll ${K3D_MINGW_PATH}/libstdc++-6.dll ${K3D_MINGW_PATH}/pthreadGC2.dll DESTINATION bin)
 
+# manually copy the HTML docs, since actually generating these on mingw is a royal pain
+INSTALL(DIRECTORY ${CMAKE_BINARY_DIR}/share/k3d/guide/html/ DESTINATION share/k3d/guide/html)
+
 SET(K3D_QT_DIR "c:/qt" CACHE PATH "Root directory containing Qt")
 
 IF(K3D_EXTRA_INSTALL_ROOT)
