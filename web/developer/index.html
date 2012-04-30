@@ -25,7 +25,7 @@
 				<a href="http://www.microsoft.com/windows">Microsoft Windows</a>,
 				and other platforms.</p>
 
-				<p>We use <a href="http://mercurial.selenic.com/">Mercurial</a> for source-code management,
+				<p>We use <a href="http://git-scm.com/">Git</a> for source-code management,
 				<a href="http://cmake.org">CMake</a> for our build system, and <a href="http://gtkmm.org">gtkmm</a>
 				for our user interface toolkit.  Required dependencies include <a href="http://boost.org">Boost</a>,
 				<a href="http://opengl.org">OpenGL</a>, and <a href="http://libsigc.sourceforge.net">libsigc++</a>.
@@ -40,7 +40,7 @@
 
 				<p><em>Clone the K-3D sources and build:</em>
 <pre>
-$ hg clone http://k3d.hg.sf.net/hgweb/k3d/k3d
+$ git clone git://github.com/K-3D/k3d.git
 $ mkdir k3d-build
 $ cd k3d-build
 $ cmake ../k3d
@@ -61,24 +61,17 @@ $ cd k3d-build
 $ make install
 </pre>
 				</p>
-				<p><em>Make changes to the K-3D sources:</em>
-<pre>
-$ cd k3d
-$ (edit files)
-$ hg add (new files)
-$ hg rm (files to be deleted)
-$ hg commit -m 'My changes'
-</pre>
+				<p><em>Make changes to the K-3D sources:</em></p>
+				<p>
+				<ol>
+					<li>Create a <a href="http://help.github.com/fork-a-repo/">fork</a> on Github</li>
+					<li><a href="http://book.git-scm.com/3_normal_workflow.html">commit the changes</a></li>
+					<li><a href="http://help.github.com/send-pull-requests/">send a pull request</a></li>
+				</ol>
+				You can also just create a patch, if needed.
 				</p>
 
-				<p><em>Create a patch from the most recent commit:</em>
-<pre>
-$ cd k3d
-$ hg export tip &gt; my.patch
-</pre>
-				</p>
-
-				<p><em>For more on using Mercurial see the <a href="http://mercurial.selenic.com/guide/">guide</a>.</em></p>
+				<p><em>For more on using Git see the <a href="http://book.git-scm.com/">guide</a>.</em></p>
 
 			</div>
 		</div>
