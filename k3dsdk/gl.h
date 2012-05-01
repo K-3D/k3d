@@ -31,29 +31,7 @@
 #endif // !K3D_API_WIN32
 
 #define GLEW_MX // multiple-context glew as per http://glew.sourceforge.net/advanced.html
-#include <k3dsdk/glew/glew.h> // Needed for cross-platform OpenGL > 1.1
-
-// Keep track of current glew context. Viewport is responsible for setting this so glewGetContext works correctly
-class glew_context
-{
-public:
-	/// Singleton implementation
-	static glew_context& instance();
-	
-	/// Set the glew context
-	void set_context(GLEWContext* Context);
-	
-	/// Get the glew context
-	GLEWContext* context();
-private:
-	glew_context() : m_context(0) {}
-
-	static glew_context* m_instance;
-	GLEWContext* m_context;
-};
-
-// Required if GLEW_MX is defined:
-#define glewGetContext() glew_context::instance().context()
+#include <GL/glew.h> // Needed for cross-platform OpenGL > 1.1
 
 #endif // !K3DSDK_GL_H
 

@@ -53,7 +53,6 @@ TARGET_LINK_LIBRARIES(k3dsdk
 	${K3D_OPENGL_LIBRARIES}
 	k3dsdk-half
 	k3dsdk-sgi-tesselator
-	k3dsdk-glew
 	k3dsdk-parallel
 	${Boost_PROGRAM_OPTIONS_LIBRARY}
 	${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
@@ -77,7 +76,7 @@ ADD_SUBDIRECTORY(Half)
 ADD_SUBDIRECTORY(expression)
 ADD_SUBDIRECTORY(ftgl)
 ADD_SUBDIRECTORY(gl)
-ADD_SUBDIRECTORY(glew)
+
 ADD_SUBDIRECTORY(parallel)
 ADD_SUBDIRECTORY(resource)
 ADD_SUBDIRECTORY(sgi_tesselator)

@@ -24,6 +24,7 @@
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
 #include <k3dsdk/gl.h>
+#include <k3dsdk/gl/context.h>
 #include <k3dsdk/iunknown.h>
 #include <k3dsdk/iuser_interface.h>
 #include <k3dsdk/log.h>

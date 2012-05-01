@@ -39,7 +39,9 @@
 #include <k3dsdk/selection.h>
 #include <k3dsdk/signal_system.h>
 
-namespace k3d { namespace gl { class selection_state; } }
+namespace k3d { namespace gl { class selection_state; 
+class context;
+} }
 
 namespace k3d
 {
@@ -108,6 +110,8 @@ public:
 
 	/// Returns the most recent OpenGL viewport parameters
 	void get_gl_viewport(GLdouble ViewMatrix[16], GLdouble ProjectionMatrix[16], GLint Viewport[4]);
+	/// The OpenGL context for this viewport
+	k3d::gl::context& gl_context();
 	/// Projects a point in world coordinates into screen space, returning the 2D widget coordinates
 	const k3d::point2 project(const k3d::point3& WorldCoords);
 

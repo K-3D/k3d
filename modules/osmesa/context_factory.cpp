@@ -23,7 +23,6 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/gl/api.h>
 #include <k3dsdk/gl/offscreen_context_factory.h>
 #include <k3dsdk/gl/offscreen_context.h>
 #include <k3dsdk/module.h>
@@ -57,11 +56,10 @@ class context :
 	public k3d::gl::offscreen_context
 {
 public:
-	context(OSMesaContext Context, OSMesaMakeCurrent MakeCurrent, OSMesaDestroyContext DestroyContext, k3d::gl::api& API, const k3d::uint_t Width, const k3d::uint_t Height) :
+	context(OSMesaContext Context, OSMesaMakeCurrent MakeCurrent, OSMesaDestroyContext DestroyContext, const k3d::uint_t Width, const k3d::uint_t Height) :
 		osmesa_context(Context),
 		osmesa_make_current(MakeCurrent),
 		osmesa_destroy_context(DestroyContext),
-		api(API),
 		width(Width),
 		height(Height),
 		buffer(Width * Height * 4, 0)
@@ -73,10 +71,9 @@ public:
 		osmesa_destroy_context(osmesa_context);
 	}
 
-	const k3d::gl::api& on_begin()
+	void on_begin()
 	{
 		osmesa_make_current(osmesa_context, &buffer[0], GL_UNSIGNED_BYTE, width, height);
-		return api;
 	}
 
 	void on_end()
@@ -96,27 +93,9 @@ public:
 	OSMesaContext osmesa_context;
 	OSMesaMakeCurrent osmesa_make_current;
 	OSMesaDestroyContext osmesa_destroy_context;
-	const k3d::gl::api& api;
 	const k3d::uint_t width;
 	const k3d::uint_t height;
 	std::vector<GLubyte> buffer;
-};
-
-struct api_loader
-{
-	api_loader(void* Module) :
-		module(Module)
-	{
-	}
-
-	template<typename FunctionT>
-	void operator()(const char* Name, FunctionT& Function) const
-	{
-		if(void* function = dlsym(module, Name))
-			Function = FunctionT(function);
-	}
-
-	void* const module;
 };
 
 class context_factory :
@@ -153,17 +132,11 @@ public:
 			if(!osmesa_destroy_context.get())
 				throw std::runtime_error("Missing OSMesaDestroyContext function.");
 
-			if(!api)
-			{
-				api = k3d::gl::api();
-				api.get().load(api_loader(module.get()));
-			}
-
 			const OSMesaContext osmesa_context = osmesa_create_context.get()(OSMESA_RGBA, NULL);
 			if(!osmesa_context)
 				throw std::runtime_error("Error creating OSMesa context.");
 
-			return new context(osmesa_context, osmesa_make_current.get(), osmesa_destroy_context.get(), api.get(), Width, Height);
+			return new context(osmesa_context, osmesa_make_current.get(), osmesa_destroy_context.get(), Width, Height);
 		}
 		catch(std::exception& e)
 		{
@@ -191,14 +164,12 @@ private:
 	static boost::optional<OSMesaCreateContext> osmesa_create_context;
 	static boost::optional<OSMesaMakeCurrent> osmesa_make_current;
 	static boost::optional<OSMesaDestroyContext> osmesa_destroy_context;
-	static boost::optional<k3d::gl::api> api;
 };
 
 boost::optional<void*> context_factory::module;
 boost::optional<OSMesaCreateContext> context_factory::osmesa_create_context;
 boost::optional<OSMesaMakeCurrent> context_factory::osmesa_make_current;
 boost::optional<OSMesaDestroyContext> context_factory::osmesa_destroy_context;
-boost::optional<k3d::gl::api> context_factory::api;
 
 /////////////////////////////////////////////////////////////////////////////
 // context_factory_factory

@@ -22,6 +22,8 @@
 */
 
 #include <k3dsdk/gl/context.h>
+#include <k3dsdk/log.h>
+#include <k3dsdk/log_control.h>
 
 namespace k3d
 {
@@ -35,10 +37,17 @@ static context*& g_current()
 	return storage;
 }
 
-const api& context::begin()
+static GLEWContext*& g_current_glew()
+{
+	static GLEWContext* storage = 0;
+	return storage;
+}
+
+void context::begin()
 {
 	g_current() = this;
-	return on_begin();
+	g_current_glew() = glew_context();
+	on_begin();
 }
 
 context* context::current()
@@ -46,10 +55,34 @@ context* context::current()
 	return g_current();
 }
 
+GLEWContext* context::current_glew_context()
+{
+	return g_current_glew();
+}
+
 void context::end()
 {
 	on_end();
 	g_current() = 0;
+}
+
+GLEWContext* context::glew_context()
+{
+	if(!m_glew_context)
+	{
+		on_begin();
+		m_glew_context.reset(new GLEWContext());
+		g_current_glew() = m_glew_context.get();
+		GLenum err = glewInit(); // needs to be called after context creation
+		if (GLEW_OK != err)
+		{
+			k3d::log() << error << "GLEW init failed: " << glewGetErrorString(err) << std::endl;
+			m_glew_context.reset();
+		}
+		on_end();
+		assert(m_glew_context);
+	}
+	return m_glew_context.get();
 }
 
 } // namespace gl

@@ -38,11 +38,13 @@
 #include <k3dsdk/ngui/document_state.h>
 #include <k3dsdk/ngui/main_document_window.h>
 #include <k3dsdk/ngui/messages.h>
+#include <k3dsdk/ngui/viewport.h>
 #include <k3dsdk/plugin.h>
 #include <k3dsdk/property.h>
 #include <k3dsdk/share.h>
 #include <k3dsdk/transform.h>
 #include <k3dsdk/user_property.h>
+#include <k3dsdk/gl/context.h>
 
 #include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -275,7 +277,17 @@ void create_document()
 
 	document_state* const state = new document_state(*document);
 	create_main_document_window(*state);
-	detail::setup_opengl_document(*document);
+	k3d::ngui::viewport::control* const focus_viewport = state->get_focus_viewport();
+	if(focus_viewport)
+	{
+		focus_viewport->gl_context().begin();
+		detail::setup_opengl_document(*document);
+		focus_viewport->gl_context().end();
+	}
+	else
+	{
+		k3d::log() << debug << "Failed to initialize OpenGL plugins: no active viewport found" << std::endl;
+	}
 }
 
 void open_document(const k3d::filesystem::path& Path)

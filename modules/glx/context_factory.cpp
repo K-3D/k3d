@@ -23,13 +23,13 @@
 
 #include <k3d-i18n-config.h>
 #include <k3dsdk/application_plugin_factory.h>
-#include <k3dsdk/gl/api.h>
 #include <k3dsdk/gl/context_factory.h>
 #include <k3dsdk/gl/context.h>
 #include <k3dsdk/module.h>
 #include <k3dsdk/result.h>
 
 #include <boost/optional.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <iterator>
 #include <stdexcept>
@@ -49,11 +49,10 @@ class context :
 	public k3d::gl::context
 {
 public:
-	context(Display* const XDisplay, const GLXContext XContext, const GLXDrawable XDrawable, k3d::gl::api& API) :
+	context(Display* const XDisplay, const GLXContext XContext, const GLXDrawable XDrawable) :
 		x_display(XDisplay),
 		x_context(XContext),
-		x_drawable(XDrawable),
-		api(API)
+		x_drawable(XDrawable)
 	{
 	}
 
@@ -63,7 +62,7 @@ public:
 //		glXDestroyWindow(x_display, x_drawable);
 	}
 
-	const k3d::gl::api& on_begin()
+	void on_begin()
 	{
 		try
 		{
@@ -74,7 +73,6 @@ public:
 		{
 			k3d::log() << error << e.what() << std::endl;
 		}
-		return api;
 	}
 
 	void on_end()
@@ -85,24 +83,6 @@ public:
 	Display* const x_display;
 	const GLXContext x_context;
 	const GLXDrawable x_drawable;
-	const k3d::gl::api& api;
-};
-
-struct api_loader
-{
-	api_loader(void* Module) :
-		module(Module)
-	{
-	}
-
-	template<typename FunctionT>
-	void operator()(const char* Name, FunctionT& Function) const
-	{
-		if(void* function = dlsym(module, Name))
-			Function = FunctionT(function);
-	}
-
-	void* const module;
 };
 
 class context_factory :
@@ -117,19 +97,6 @@ public:
 	{
 		try
 		{
-			if(!api)
-			{
-				void* const module = dlopen("libGL.so", RTLD_LAZY | RTLD_LOCAL);
-				if(!module)
-					throw std::runtime_error(dlerror());
-
-				api = k3d::gl::api();
-				api.get().load(api_loader(module));
-			}
-
-			if(!api)
-				throw std::runtime_error("Failed to initialize OpenGL library.");
-
 			Display* const x_display = XOpenDisplay(0);
 			if(!x_display)
 				throw std::runtime_error("Error opening X display.");
@@ -148,7 +115,7 @@ public:
 			if(!x_context)
 				throw std::runtime_error("Error creating X context.");
 
-			return new context(x_display, x_context, GLXDrawable(Drawable), api.get());
+			return new context(x_display, x_context, GLXDrawable(Drawable));
 
 /*
 			const int x_attributes[] = { GLX_RENDER_TYPE, GLX_RGBA_BIT, GLX_DOUBLEBUFFER, True, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, None };
@@ -190,12 +157,7 @@ public:
 
 		return factory;
 	}
-
-private:
-	static boost::optional<k3d::gl::api> api;
 };
-
-boost::optional<k3d::gl::api> context_factory::api;
 
 /////////////////////////////////////////////////////////////////////////////
 // context_factory_factory

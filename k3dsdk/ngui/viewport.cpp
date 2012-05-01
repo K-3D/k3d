@@ -30,6 +30,7 @@
 #include <k3dsdk/file_range.h>
 #include <k3dsdk/fstream.h>
 #include <k3dsdk/gl.h>
+#include <k3dsdk/gl/context.h>
 #include <k3dsdk/high_res_timer.h>
 #include <k3dsdk/icamera.h>
 #include <k3dsdk/idocument.h>
@@ -321,6 +322,36 @@ void select_nearest_edge(const k3d::mesh::indices_t& EdgePoints, const k3d::mesh
 	}
 }
 
+/// OpenGL context for use with a GDK viewport
+class context :
+	public k3d::gl::context
+{
+public:
+	context(GtkWidget* Widget) :
+		m_drawable(gtk_widget_get_gl_drawable(Widget)),
+		m_context(gtk_widget_get_gl_context(Widget))
+	{
+		assert(m_drawable);
+		assert(m_context);
+	}
+
+	void on_begin()
+	{
+		if(!gdk_gl_drawable_gl_begin(m_drawable, m_context))
+			k3d::log() << error << "Failed to call gl_begin" << std::endl;
+	}
+
+	void on_end()
+	{
+		if(gdk_gl_drawable_is_double_buffered(m_drawable))
+			gdk_gl_drawable_swap_buffers(m_drawable);
+		gdk_gl_drawable_gl_end(m_drawable);
+	}
+	
+	GdkGLDrawable* const m_drawable;
+	GdkGLContext* const m_context;
+};
+
 } // namespace detail
 
 /////////////////////////////////////////////////////////////////////////////
@@ -337,8 +368,7 @@ public:
 		m_still_engine(init_value<k3d::irender_camera_frame*>(0)),
 		m_animation_engine(init_value<k3d::irender_camera_animation*>(0)),
 		m_font_begin(0),
-		m_font_end(0),
-		m_glew_context(0)
+		m_font_end(0)
 	{
 	}
 
@@ -375,8 +405,8 @@ public:
 	/// Signal that will be emitted whenever this control should grab the panel focus
 	sigc::signal<void> m_panel_grab_signal;
 
-	/// Keep track of glew initialisation
-	GLEWContext* m_glew_context;
+	/// Keep track of gl context
+	boost::scoped_ptr<detail::context> m_gl_context;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -395,15 +425,16 @@ control::control(document_state& DocumentState) :
 
 	signal_expose_event().connect(sigc::hide(sigc::mem_fun(*this, &control::on_redraw)));
 	set_double_buffered(false);
-
-	GdkGLConfig* const config = gdk_gl_config_new_by_mode(
-		static_cast<GdkGLConfigMode>(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
-	return_if_fail(config);
-
-	return_if_fail(
-		//gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, m_implementation->m_document_state.gdkgl_share_list(), true, GDK_GL_RGBA_TYPE));
-		gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, NULL, true, GDK_GL_RGBA_TYPE));
-
+	
+	GdkGLConfig* const config = gdk_gl_config_new_by_mode(static_cast<GdkGLConfigMode>(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
+	assert(config);
+	
+	if(!gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, m_implementation->m_document_state.gdkgl_share_list(), true, GDK_GL_RGBA_TYPE))
+	{
+		k3d::log() << warning << "Disabling OpenGL context sharing, since it appears to be unsupported" << std::endl;
+		gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, NULL, true, GDK_GL_RGBA_TYPE);
+	}
+	
 	show_all();
 }
 
@@ -517,6 +548,11 @@ void control::get_gl_viewport(GLdouble ViewMatrix[16], GLdouble ProjectionMatrix
 	std::copy(m_implementation->m_gl_viewport, m_implementation->m_gl_viewport + 4, Viewport);
 }
 
+gl::context& control::gl_context()
+{
+	return *m_implementation->m_gl_context;
+}
+
 const k3d::point2 control::project(const k3d::point3& WorldCoords)
 {
 	k3d::point2 coords;
@@ -564,13 +600,7 @@ bool control::save_frame(k3d::icamera& Camera, const k3d::filesystem::path& Outp
 	const unsigned long height = get_height();
 	return_val_if_fail(width && height, false);
 
-	GdkGLDrawable* const drawable = gtk_widget_get_gl_drawable(GTK_WIDGET(gobj()));
-	return_val_if_fail(drawable, true);
-
-	GdkGLContext* const context = gtk_widget_get_gl_context(GTK_WIDGET(gobj()));
-	return_val_if_fail(context, true);
-
-	return_val_if_fail(gdk_gl_drawable_gl_begin(drawable, context), true);
+	m_implementation->m_gl_context->begin();
 
 	create_font();
 	glViewport(0, 0, width, height);
@@ -599,10 +629,7 @@ bool control::save_frame(k3d::icamera& Camera, const k3d::filesystem::path& Outp
 	glPixelZoom(1.0, -1.0);
 	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, &image_buffer[0]);
 
-	if(gdk_gl_drawable_is_double_buffered(drawable))
-		gdk_gl_drawable_swap_buffers(drawable);
-
-	gdk_gl_drawable_gl_end(drawable);
+	m_implementation->m_gl_context->end();
 
 	// Save that bad-boy ...
 	k3d::filesystem::ofstream stream(OutputImage);
@@ -660,6 +687,7 @@ void control::create_font()
 	// Initialize font
 	return_if_fail(get_pango_context());
 	const Pango::FontDescription& font_description = get_pango_context()->get_font_description();
+	k3d::log() << debug << "attempting to use font family " << pango_font_description_get_family(font_description.gobj()) << std::endl;
 	return_if_fail(get_pango_context()->get_font_description().gobj());
 	Glib::RefPtr<Pango::Font> font = Glib::wrap(gdk_gl_font_use_pango_font(font_description.gobj(), begin_glyph, end_glyph, m_implementation->m_font_begin));
 
@@ -1320,26 +1348,13 @@ bool control::on_redraw()
 
 	if(!is_realized())
 		return true;
-
-	GdkGLDrawable* const drawable = gtk_widget_get_gl_drawable(GTK_WIDGET(gobj()));
-	return_val_if_fail(drawable, true);
-
-	GdkGLContext* const context = gtk_widget_get_gl_context(GTK_WIDGET(gobj()));
-	return_val_if_fail(context, true);
-
-	return_val_if_fail(gdk_gl_drawable_gl_begin(drawable, context), true);
-
-	if (!m_implementation->m_glew_context)
+	
+	if(!m_implementation->m_gl_context)
 	{
-		m_implementation->m_glew_context = new GLEWContext();
-		glew_context::instance().set_context(m_implementation->m_glew_context);
-		GLenum err = glewInit(); // needs to be called after context creation
-		if (GLEW_OK != err)
-		{
-			k3d::log() << error << "GLEW init failed: " << glewGetErrorString(err) << std::endl;
-			assert_not_reached();
-		}
-
+		m_implementation->m_gl_context.reset(new detail::context(GTK_WIDGET(gobj())));
+	
+		m_implementation->m_gl_context->begin();
+		
 		// Create opengl-start plugins ...
 		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
 		for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
@@ -1365,9 +1380,11 @@ bool control::on_redraw()
 				scripted_action->execute(context);
 			}
 		}
+		
+		m_implementation->m_gl_context->end();
 	}
-
-	glew_context::instance().set_context(m_implementation->m_glew_context);
+	
+	m_implementation->m_gl_context->begin();
 
 	create_font();
 	glViewport(0, 0, width, height);
@@ -1428,11 +1445,8 @@ bool control::on_redraw()
 		glCallLists(buffer.size(), GL_UNSIGNED_BYTE, buffer.data());
 	}
 	glFlush();
-
-	if(gdk_gl_drawable_is_double_buffered(drawable))
-		gdk_gl_drawable_swap_buffers(drawable);
-
-	gdk_gl_drawable_gl_end(drawable);
+	
+	m_implementation->m_gl_context->end();
 
 	return true;
 }
@@ -1468,14 +1482,7 @@ const GLint control::select(const k3d::gl::selection_state& SelectState, const k
 	// Set an (arbitrary) upper-limit on how large we let the buffer grow ...
 	while(m_implementation->m_selection_buffer.size() < 10000000)
 	{
-		// Draw the scene, recording hits ...
-		GdkGLDrawable* const drawable = gtk_widget_get_gl_drawable(GTK_WIDGET(gobj()));
-		return_val_if_fail(drawable, true);
-
-		GdkGLContext* const context = gtk_widget_get_gl_context(GTK_WIDGET(gobj()));
-		return_val_if_fail(context, true);
-
-		return_val_if_fail(gdk_gl_drawable_gl_begin(drawable, context), true);
+		m_implementation->m_gl_context->begin();
 
 		create_font();
 		glViewport(0, 0, width, height);
@@ -1494,7 +1501,7 @@ const GLint control::select(const k3d::gl::selection_state& SelectState, const k
 		const GLint hits = glRenderMode(GL_RENDER);
 		glFlush();
 
-		gdk_gl_drawable_gl_end(drawable);
+		m_implementation->m_gl_context->end();
 
 		// If we got a positive number of hits, we're done ...
 		if(hits >= 0)
