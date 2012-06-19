@@ -27,14 +27,7 @@
 #include <deque>
 #include <map>
 
-// Please ensure that the following headers take the right place
-#include <sys/syscall.h>
 #include <sys/inotify.h>
-
-// Use this if syscalls not defined
-#ifndef __NR_inotify_init
-#include <sys/inotify-syscalls.h>
-#endif // __NR_inotify_init
 
 /// Event struct size
 #define INOTIFY_EVENT_SIZE (sizeof(struct inotify_event))
