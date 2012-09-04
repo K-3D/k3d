@@ -92,7 +92,7 @@ public:
 	{
 		time_t t_lower, t_upper;
 		value_t v_lower, v_upper;
-		get_surrounding_keys(Time, Keyframes, t_lower, t_upper, v_lower, v_upper); 
+		base::get_surrounding_keys(Time, Keyframes, t_lower, t_upper, v_lower, v_upper); 
 		return lerp(t_lower, t_upper, v_lower, v_upper, Time);
 	}
 protected:
@@ -116,7 +116,7 @@ public:
 	{
 		time_t t_lower, t_upper;
 		value_t v_lower, v_upper;
-		get_surrounding_keys(Time, Keyframes, t_lower, t_upper, v_lower, v_upper); 
+		base::get_surrounding_keys(Time, Keyframes, t_lower, t_upper, v_lower, v_upper); 
 		return lerp(t_lower, t_upper, v_lower, v_upper, Time);
 	} 
 protected:

@@ -865,7 +865,7 @@ public:
 
 		try
 		{
-			set_value(boost::lexical_cast<value_t>(*new_value), Hint);
+			name_policy_t::set_value(boost::lexical_cast<value_t>(*new_value), Hint);
 			return true;
 		}
 		catch(...)
@@ -1011,7 +1011,7 @@ public:
 
 		try
 		{
-			set_value(boost::lexical_cast<value_t>(*new_value), Hint);
+			name_policy_t::set_value(boost::lexical_cast<value_t>(*new_value), Hint);
 			return true;
 		}
 		catch(...)
@@ -1146,7 +1146,7 @@ public:
 		if(!new_value)
 			return false;
 
-		set_value(*new_value, Hint);
+		name_policy_t::set_value(*new_value, Hint);
 		return true;
 	}
 
@@ -1671,7 +1671,7 @@ protected:
 	/// This little bit of magic makes it possible for base classes (such as node_storage) to update their own values while observing the correct undo policy
 	void internal_set_value(const value_t& Value, ihint* const Hint)
 	{
-		set_value(Value, Hint);
+		storage_policy_t::set_value(Value, Hint);
 	}
 };
 
