@@ -28,7 +28,10 @@ md2Model::md2Model(const char *f) :
 	fread(&header, 1, sizeof(md2Header), md2file);	
 	
 	if((header.id != 844121161) || (header.version != 8))
+	{
+		fclose(md2file);
 		throw std::runtime_error("Not an MD2 model.");
+	}
 
 	// Extract Skin names
 	skins = new md2Skins[header.numSkins];

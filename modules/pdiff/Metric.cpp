@@ -288,10 +288,10 @@ bool Yee_Compare(CompareArgs &args)
 	if (bLum) delete[] bLum;
 	if (la) delete la;
 	if (lb) delete lb;
-	if (aA) delete aA;
-	if (bA) delete bA;
-	if (aB) delete aB;
-	if (bB) delete bB;
+	if (aA) delete[] aA;
+	if (bA) delete[] bA;
+	if (aB) delete[] aB;
+	if (bB) delete[] bB;
 	
 	if (args.FailedPixels < args.ThresholdPixels) {
 		args.ErrorStr = "Images are perceptually indistinguishable\n";

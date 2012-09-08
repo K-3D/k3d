@@ -8,7 +8,7 @@ echo "INFO: Starting $0"
 
 K3D_BUNDLE="`echo "$0" | sed -e 's/\/Contents\/MacOS\/K-3D//'`"
 K3D_RESOURCES="$K3D_BUNDLE/Contents/Resources"
-K3D_TEMP="/tmp/k3d/$UID"
+K3D_TEMP="/tmp/k3d/$(id -ru)"
 K3D_ETC="$K3D_TEMP/etc"
 K3D_PANGO_RC_FILE="$K3D_ETC/pango/pangorc"
 

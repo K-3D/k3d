@@ -11,22 +11,34 @@ namespace d_Math
 		float *p;
 		int vec_size;
 
-		d_Vecf()
+		d_Vecf() : p(0), vec_size(0)
 		{
-			vec_size = -1;
+		}
+		
+		d_Vecf(const d_Vecf& other) : p(0)
+		{
+			set_size(other.vec_size);
+			for(int i = 0; i != vec_size; ++i)
+				p[i] = other.p[i];
+		}
+		
+		~d_Vecf()
+		{
+			if(p)
+				delete[] p;
 		}
 
 		void set_size(int size)
 		{
-			if(vec_size == -1)
+			if(!p)
 			{
-				p = (float *) malloc (size*sizeof(float));
+				p = new float[size];
 				vec_size = size;
 				return;
 			}
 			else
 			{
-				float *tmp = (float *) malloc (size*sizeof(float));
+				float *tmp = new float[size];
 				int iter=0;
 				if(size > vec_size)
 					iter = vec_size;
@@ -36,6 +48,7 @@ namespace d_Math
 				{
 					tmp[i] = p[i];
 				}
+				delete[] p;
 				p = tmp;
 				vec_size = size;
 			}
@@ -45,6 +58,8 @@ namespace d_Math
 
 		d_Vecf operator = (d_Vecf a) 
 		{
+			if(vec_size != a.vec_size)
+				set_size(a.vec_size);
 			for (int i=0; i<vec_size; i++) 
 			{
 				p[i] = a.p[i];
