@@ -52,10 +52,42 @@ namespace io
 typedef std::stack<k3d::matrix4> transform_stack;
 
 /// Helper function for parse_path to extract a pair (x,y) regardless of the Format i.e. "x,y" or "x y".
-static void get_pair(std::istream& Stream, k3d::double_t& X, k3d::double_t& Y)
+static bool get_pair(std::istream& Stream, k3d::double_t& X, k3d::double_t& Y)
 {
-	char separator;
-	Stream >> X >> separator >> Y;
+	std::streampos pos = Stream.tellg();
+	
+	std::string input;
+	Stream >> input;
+	std::stringstream value_stream(input);
+	
+	bool success = true;
+	if(!(value_stream >> X))
+	{
+		success = false;
+	}
+	if(success && value_stream.eof()) // separator is a space, so we only ate the first number
+	{
+		if(!(Stream >> Y))
+		{
+			success = false;
+		}
+	}
+	else if(success)
+	{
+		char separator;
+		if(!(value_stream >> separator >> Y))
+		{
+			success = false;
+		}
+	}
+
+	if(!success)
+	{
+		Stream.seekg(pos);
+		X = 0;
+		Y = 0;
+	}
+	return success;
 }
 
 /// Tries to find the color of the given element. Returns true if a color was found
@@ -68,7 +100,12 @@ k3d::bool_t get_color(const k3d::xml::element& SVG, k3d::color& Color)
 	{
 		if(boost::algorithm::starts_with(styles[i], "stroke:"))
 		{
-			k3d::string_t stroke = styles[i].substr(8,6);
+			const k3d::string_t stroke = boost::trim_copy(boost::erase_head_copy(styles[i], 7));
+			if(boost::iequals(stroke, "none"))
+			{
+				Color = k3d::color(0., 0., 0.);
+				return true;
+			}
 			std::stringstream stream;
 			k3d::uint32_t red, green, blue;
 			stream << "0x000000" << stroke.substr(0, 2);
@@ -415,11 +452,28 @@ static void parse_path(const k3d::xml::element& SVG, transform_stack& Transforma
 			case 'M':
 			{
 				k3d::double_t x, y = 0;
-				get_pair(data, x, y);
+				if(!get_pair(data, x, y))
+					k3d::log() << error << "Error getting path starting point after M or m" << std::endl;
 				current_point[0] = relative ? current_point[0] + x : x;
 				current_point[1] = relative ? current_point[1] + y : y;
 
 				points.push_back(current_point);
+				
+				while(get_pair(data, x, y))
+				{
+					current_point[0] = relative ? current_point[0] + x : x;
+					current_point[1] = relative ? current_point[1] + y : y;
+
+					points.push_back(current_point);
+
+					orders.push_back(2);
+					control_point_counts.push_back(2);
+					k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
+					control_points.push_back(points.size() - 2);
+					control_points.push_back(points.size() - 1);
+					control_point_weights.push_back(1);
+					control_point_weights.push_back(1);
+				}
 				break;
 			}
 
@@ -430,19 +484,21 @@ static void parse_path(const k3d::xml::element& SVG, transform_stack& Transforma
 			case 'L':
 			{
 				k3d::double_t x, y = 0;
-				get_pair(data, x, y);
-				current_point[0] = relative ? current_point[0] + x : x;
-				current_point[1] = relative ? current_point[1] + y : y;
+				while(get_pair(data, x, y))
+				{
+					current_point[0] = relative ? current_point[0] + x : x;
+					current_point[1] = relative ? current_point[1] + y : y;
 
-				points.push_back(current_point);
+					points.push_back(current_point);
 
-				orders.push_back(2);
-				control_point_counts.push_back(2);
-				k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
-				control_points.push_back(points.size() - 2);
-				control_points.push_back(points.size() - 1);
-				control_point_weights.push_back(1);
-				control_point_weights.push_back(1);
+					orders.push_back(2);
+					control_point_counts.push_back(2);
+					k3d::nurbs_curve::add_open_uniform_knots(2, 2, knots);
+					control_points.push_back(points.size() - 2);
+					control_points.push_back(points.size() - 1);
+					control_point_weights.push_back(1);
+					control_point_weights.push_back(1);
+				}
 
 				break;
 			}
@@ -498,27 +554,31 @@ static void parse_path(const k3d::xml::element& SVG, transform_stack& Transforma
 			}
 			case 'C':
 			{
-				const k3d::point3 first_point = current_point;
-				for(int i = 0; i != 3; ++i)
+				k3d::point3 first_point = current_point;
+				k3d::double_t x, y = 0;
+				k3d::uint_t nb_points_read = 0;
+				while(get_pair(data, x, y))
 				{
-					k3d::double_t x, y = 0;
-					get_pair(data, x, y);
+					++nb_points_read;
 					current_point[0] = relative ? first_point[0] + x : x;
 					current_point[1] = relative ? first_point[1] + y : y;
 
 					points.push_back(current_point);
-
+					
+					if(nb_points_read % 3 == 0)
+					{
+						orders.push_back(4);
+						control_point_counts.push_back(4);
+						k3d::nurbs_curve::add_open_uniform_knots(4, 4, knots);
+						control_points.push_back(points.size() - 4);
+						control_points.push_back(points.size() - 3);
+						control_points.push_back(points.size() - 2);
+						control_points.push_back(points.size() - 1);
+						control_point_weights.insert(control_point_weights.end(), 4, 1);
+						first_point = current_point;
+					}
 				}
-
-				orders.push_back(4);
-				control_point_counts.push_back(4);
-				k3d::nurbs_curve::add_open_uniform_knots(4, 4, knots);
-				control_points.push_back(points.size() - 4);
-				control_points.push_back(points.size() - 3);
-				control_points.push_back(points.size() - 2);
-				control_points.push_back(points.size() - 1);
-				control_point_weights.insert(control_point_weights.end(), 4, 1);
-
+				
 				break;
 			}
 
@@ -863,6 +923,7 @@ public:
 
 	void on_load_mesh(const k3d::filesystem::path& Path, k3d::mesh& Mesh)
 	{
+
 		try
 		{
 			k3d::filesystem::ifstream svg_stream(Path);
