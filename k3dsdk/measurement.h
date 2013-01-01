@@ -29,6 +29,7 @@
 #include <iosfwd>
 #include <map>
 #include <string>
+#include <typeinfo>
 
 namespace k3d
 {

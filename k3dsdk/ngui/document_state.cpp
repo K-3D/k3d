@@ -148,38 +148,29 @@ public:
 		return m_document;
 	}
 
-#if defined K3D_API_DARWIN
-
+#if defined K3D_API_DARWIN || defined K3D_API_WIN32
 	/// Returns a "global" (to the document) gdkgl context that can be used to share display lists
-	GdkGLContext* gdkgl_share_list()
-	{
-		return 0;
-	}
+  GdkGLContext* gdkgl_share_list()
+  {
+    if(!m_gdkgl_share_list)
+    {
+      GdkGLConfig* const config = gdk_gl_config_new_by_mode(
+        static_cast<GdkGLConfigMode>(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
+      return_val_if_fail(config, 0);
 
-#elif defined K3D_API_WIN32
+      Gtk::Window* const window = new Gtk::Window();
+      gtk_widget_set_gl_capability(GTK_WIDGET(window->gobj()), config, 0, true, GDK_GL_RGBA_TYPE);
+      window->show();
+      window->hide();
 
-	/// Returns a "global" (to the document) gdkgl context that can be used to share display lists
-	GdkGLContext* gdkgl_share_list()
-	{
-		if(!m_gdkgl_share_list)
-		{
-			GdkGLConfig* const config = gdk_gl_config_new_by_mode(
-				static_cast<GdkGLConfigMode>(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
-			return_val_if_fail(config, 0);
+      GdkGLContext* const context = gtk_widget_get_gl_context(GTK_WIDGET(window->gobj()));
+      return_val_if_fail(context, 0);
 
-			Gtk::Window* const window = new Gtk::Window();
-			gtk_widget_set_gl_capability(GTK_WIDGET(window->gobj()), config, 0, true, GDK_GL_RGBA_TYPE);
-			window->show();
-			window->hide();
+      m_gdkgl_share_list = context;
+    }
 
-			GdkGLContext* const context = gtk_widget_get_gl_context(GTK_WIDGET(window->gobj()));
-			return_val_if_fail(context, 0);
-
-			m_gdkgl_share_list = context;
-		}
-
-		return m_gdkgl_share_list;
-	}
+    return m_gdkgl_share_list;
+  }
 
 #else // K3D_API_WIN32
 
@@ -192,7 +183,7 @@ public:
 				static_cast<GdkGLConfigMode>(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
 			return_val_if_fail(config, 0);
 
-			GdkPixmap* const pixmap = gdk_pixmap_new(0, 8, 8, gdk_gl_config_get_depth(config));
+      GdkPixmap* const pixmap = gdk_pixmap_new(0, 8, 8, gdk_gl_config_get_depth(config));
 			return_val_if_fail(pixmap, 0);
 
 			GdkGLPixmap* const glpixmap = gdk_pixmap_set_gl_capability(pixmap, config, 0);

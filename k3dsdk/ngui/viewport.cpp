@@ -429,11 +429,11 @@ control::control(document_state& DocumentState) :
 	GdkGLConfig* const config = gdk_gl_config_new_by_mode(static_cast<GdkGLConfigMode>(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
 	assert(config);
 	
-	if(!gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, m_implementation->m_document_state.gdkgl_share_list(), true, GDK_GL_RGBA_TYPE))
-	{
-		k3d::log() << warning << "Disabling OpenGL context sharing, since it appears to be unsupported" << std::endl;
+  if(!gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, m_implementation->m_document_state.gdkgl_share_list(), true, GDK_GL_RGBA_TYPE))
+  {
+    k3d::log() << warning << "Disabling OpenGL context sharing, since it appears to be unsupported" << std::endl;
 		gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, NULL, true, GDK_GL_RGBA_TYPE);
-	}
+  }
 	
 	show_all();
 }
@@ -689,10 +689,10 @@ void control::create_font()
 	const Pango::FontDescription& font_description = get_pango_context()->get_font_description();
 	k3d::log() << debug << "attempting to use font family " << pango_font_description_get_family(font_description.gobj()) << std::endl;
 	return_if_fail(get_pango_context()->get_font_description().gobj());
-	Glib::RefPtr<Pango::Font> font = Glib::wrap(gdk_gl_font_use_pango_font(font_description.gobj(), begin_glyph, end_glyph, m_implementation->m_font_begin));
+  //Glib::RefPtr<Pango::Font> font = Glib::wrap(gdk_gl_font_use_pango_font(font_description.gobj(), begin_glyph, end_glyph, m_implementation->m_font_begin));
 
-	if(font)
-		font->reference();
+//	if(font)
+//		font->reference();
 }
 
 bool control::on_button_press_event(GdkEventButton* Event)
@@ -1342,7 +1342,8 @@ bool control::on_redraw()
 {
 	// If we're minimized, we're done ...
 	const unsigned long width = get_width();
-	const unsigned long height = get_height();
+  const unsigned long height = get_height();
+
 	if(!width || !height)
 		return true;
 

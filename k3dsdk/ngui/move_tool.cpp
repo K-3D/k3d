@@ -136,7 +136,7 @@ private:
 
 public:
 	move_manipulators() :
-		m_quadric(gluNewQuadric()),
+    m_quadric(0),
 		m_current_constraint(&m_screen_xy_constraint),
 		m_screen_xy_constraint(_("Move Screen XY"), load_icon("move_cursor_screen_xy", Gtk::ICON_SIZE_BUTTON), k3d::selection::token(k3d::selection::USER1, 0)),
 		m_x_constraint(_("Move X"), load_icon("move_cursor_x", Gtk::ICON_SIZE_BUTTON), k3d::selection::token(k3d::selection::USER1, 1)),
@@ -150,7 +150,7 @@ public:
 
 	~move_manipulators()
 	{
-		gluDeleteQuadric(m_quadric);
+    gluDeleteQuadric(m_quadric);
 	}
 
 	void activate()
@@ -478,9 +478,9 @@ private:
 		glPushMatrix();
 
 		glEnable(GL_LIGHTING);
-		gluQuadricDrawStyle(m_quadric, GLU_FILL);
-		gluQuadricNormals(m_quadric, GLU_SMOOTH);
-		gluSphere(m_quadric, m_screen_xy_radius, m_screen_xy_slices, m_screen_xy_stacks);
+    gluQuadricDrawStyle(quadric(), GLU_FILL);
+    gluQuadricNormals(quadric(), GLU_SMOOTH);
+    gluSphere(quadric(), m_screen_xy_radius, m_screen_xy_slices, m_screen_xy_stacks);
 
 		glPopMatrix();
 	}
@@ -495,9 +495,9 @@ private:
 		k3d::gl::push_selection_token(Constraint.m_selection_token);
 
 		glDisable(GL_LIGHTING);
-		gluQuadricDrawStyle(m_quadric, GLU_FILL);
-		gluQuadricNormals(m_quadric, GLU_NONE);
-		gluSphere(m_quadric, m_screen_xy_radius, m_screen_xy_slices, m_screen_xy_stacks);
+    gluQuadricDrawStyle(quadric(), GLU_FILL);
+    gluQuadricNormals(quadric(), GLU_NONE);
+    gluSphere(quadric(), m_screen_xy_radius, m_screen_xy_slices, m_screen_xy_stacks);
 
 		k3d::gl::pop_selection_token();
 
@@ -520,9 +520,9 @@ private:
 		k3d::gl::material(GL_FRONT_AND_BACK, GL_DIFFUSE, AxisColor);
 		k3d::gl::material(GL_FRONT_AND_BACK, GL_SPECULAR, k3d::color(0, 0, 0));
 		k3d::gl::material(GL_FRONT_AND_BACK, GL_EMISSION, k3d::color(0, 0, 0));
-		gluQuadricDrawStyle(m_quadric, GLU_FILL);
-		gluQuadricNormals(m_quadric, GLU_SMOOTH);
-		gluCylinder(m_quadric, m_axis_arrow_radius, m_axis_arrow_radius * 0.001, m_axis_arrow_length, m_axis_arrow_slices, 1);
+    gluQuadricDrawStyle(quadric(), GLU_FILL);
+    gluQuadricNormals(quadric(), GLU_SMOOTH);
+    gluCylinder(quadric(), m_axis_arrow_radius, m_axis_arrow_radius * 0.001, m_axis_arrow_length, m_axis_arrow_slices, 1);
 		glPopMatrix();
 
 		glDisable(GL_LIGHTING);
@@ -549,9 +549,9 @@ private:
 		k3d::gl::push_selection_token(Constraint.m_selection_token);
 		glPushMatrix();
 		k3d::gl::push_matrix(k3d::translate3(0, 0, m_axis_end - (0.5 * m_axis_arrow_length)));
-		gluQuadricDrawStyle(m_quadric, GLU_FILL);
-		gluQuadricNormals(m_quadric, GLU_NONE);
-		gluCylinder(m_quadric, m_axis_arrow_radius, m_axis_arrow_radius * 0.001, m_axis_arrow_length, m_axis_arrow_slices, 1);
+    gluQuadricDrawStyle(quadric(), GLU_FILL);
+    gluQuadricNormals(quadric(), GLU_NONE);
+    gluCylinder(quadric(), m_axis_arrow_radius, m_axis_arrow_radius * 0.001, m_axis_arrow_length, m_axis_arrow_slices, 1);
 		glPopMatrix();
 
 		glBegin(GL_LINES);
@@ -596,7 +596,14 @@ private:
 	}
 
 	/// Stores a GLU quadric object for drawing the manipulators
-	GLUquadricObj* const m_quadric;
+  GLUquadricObj* m_quadric;
+  /// Get the quadric object, creating it as needed
+  GLUquadricObj* quadric()
+  {
+    if(!m_quadric)
+      m_quadric = gluNewQuadric();
+    return m_quadric;
+  }
 
 	/// Stores the constraint that was in effect when movement began (if any)
 	constraint* m_current_constraint;

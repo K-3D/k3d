@@ -45,6 +45,7 @@
 	//#include <gdkwin32.h>
 	#undef min
 	#undef max
+#elif defined K3D_API_DARWIN
 
 #else // K3D_API_WIN32
 
@@ -70,6 +71,8 @@ void warp_pointer(const k3d::point2& Offset)
 
 	// Make that pointer jump!
 	SetCursorPos(static_cast<int>(Offset[0]), static_cast<int>(Offset[1]));
+
+#elif defined K3D_API_DARWIN
 
 #else // K3D_API_WIN32
 

@@ -40,9 +40,6 @@ public:
 	explicit uuid(const boost::uuids::uuid&);
 	uuid(const uint32_t Data1, const uint32_t Data2, const uint32_t Data3, const uint32_t Data4);
 
-	operator boost::uuids::uuid();
-	operator boost::uuids::uuid() const;
-
 	/// Creates a NULL (all zeros) uuid
 	static const uuid null();
 	/// Creates a unique uuid based on the current system time and a high-quality pseudo-random number generators
