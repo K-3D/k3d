@@ -58,6 +58,14 @@ INSTALL(
 	)
 
 INSTALL(
+  DIRECTORY
+  	${K3D_MACPORTS_DIR}/lib/gdk-pixbuf-2.0
+  DESTINATION
+  	lib
+  USE_SOURCE_PERMISSIONS
+  )
+
+INSTALL(
 	DIRECTORY
 		${K3D_MACPORTS_DIR}/etc/gtk-2.0
 		${K3D_MACPORTS_DIR}/etc/fonts
