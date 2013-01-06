@@ -351,6 +351,7 @@ public:
 
 	void display_user_interface()
 	{
+    g_type_init();
 		detail::setup_default_hotkeys();
 
 		const k3d::filesystem::path hotkey_path = detail::hotkey_path();

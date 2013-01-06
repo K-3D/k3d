@@ -1,34 +1,26 @@
-INCLUDE(GetPrerequisites)
+include(BundleUtilities)
 
-SET(SKIP_FILES
-	"^/usr/X11.*$"
-	)
+function(gp_item_default_embedded_path_override item default_embedded_path_var)
+  set(${default_embedded_path_var} "@executable_path/../lib" PARENT_SCOPE)
+endfunction(gp_item_default_embedded_path_override)
 
-FOREACH(LOCATION @K3D_BINARY_LOCATIONS@)
-	MESSAGE(STATUS "Installing: ${LOCATION} dependencies")
+set(K3D_BUNDLE_DYLIBS "")
+file(GLOB_RECURSE dylib_list "${CMAKE_INSTALL_PREFIX}/*.so" "${CMAKE_INSTALL_PREFIX}/*.dylib" "${CMAKE_INSTALL_PREFIX}/*.module")
+foreach(lib ${dylib_list})
+  if(NOT IS_SYMLINK ${lib})
+    list(APPEND K3D_BUNDLE_DYLIBS ${lib})
+  endif()
+endforeach()
 
-	# Excludes system dependencies, but finds recursive dependencies  
-	GET_PREREQUISITES(${LOCATION} DEPENDENCIES 1 0 "" "")
+set(DEP_LIB_DIRS "/opt/local/lib")
+message("prefix path: ${CMAKE_PREFIX_PATH}")
+foreach(prefix_path @CMAKE_PREFIX_PATH@)
+  list(APPEND DEP_LIB_DIRS "${prefix_path}/lib" )
+endforeach()
+list(APPEND DEP_LIB_DIRS @BOOST_ROOT@)
 
-	FOREACH(DEPENDENCY ${DEPENDENCIES})
-		GET_FILENAME_COMPONENT(DEPENDENCY_NAME "${DEPENDENCY}" NAME)
-		GET_FILENAME_COMPONENT(DEPENDENCY_ACTUAL "${DEPENDENCY}" REALPATH)
+message("Getting dependencies from ${DEP_LIB_DIRS}")
 
-		SET(INSTALL_FILE 1)
-		FOREACH(SKIP_FILE ${SKIP_FILES})
-			IF(DEPENDENCY_ACTUAL MATCHES "${SKIP_FILE}")
-				SET(INSTALL_FILE 0)
-				BREAK()
-			ENDIF()
-		ENDFOREACH()
-
-		IF(INSTALL_FILE)
-			MESSAGE(STATUS "Copying ${DEPENDENCY_ACTUAL} to ${CMAKE_INSTALL_PREFIX}/lib/${DEPENDENCY_NAME}")
-
-			EXECUTE_PROCESS(
-				COMMAND ${CMAKE_COMMAND} -E copy_if_different "${DEPENDENCY_ACTUAL}" "${CMAKE_INSTALL_PREFIX}/lib/${DEPENDENCY_NAME}"
-				)
-		ENDIF()
-	ENDFOREACH()
-ENDFOREACH()
-
+fixup_bundle(${CMAKE_INSTALL_PREFIX}/bin/k3d "${K3D_BUNDLE_DYLIBS}" "${DEP_LIB_DIRS}")
+verify_bundle_prerequisites(${CMAKE_INSTALL_PREFIX} verify_result verify_info)
+message("Bundle verify returned ${verify_result} with info ${verify_info}")

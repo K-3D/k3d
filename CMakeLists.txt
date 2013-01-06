@@ -5,6 +5,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.1 FATAL_ERROR)
 CMAKE_POLICY(SET CMP0003 OLD)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+SET(CMAKE_INSTALL_NAME_DIR "@exectuable_path/../lib/")
 
 INCLUDE(K3DOutOfSourceBuild) # Disallow in-source builds
 INCLUDE(K3DCompileResource)

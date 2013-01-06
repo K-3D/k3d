@@ -58,7 +58,7 @@ public:
 
 	struct map_point_indices
 	{
-		map_point_indices(const k3d::mesh::indices_t PointMap) :
+		map_point_indices(const k3d::mesh::indices_t& PointMap) :
 			point_map(PointMap)
 		{
 		}

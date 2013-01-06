@@ -8,6 +8,6 @@ ADD_CUSTOM_TARGET(package-binary-bundle
 
 # Upload the binary bundle to SourceForge for use with the FRS
 ADD_CUSTOM_TARGET(upload-binary-bundle
-	rsync -avP -e ssh ${CMAKE_CURRENT_BINARY_DIR}/k3d-setup-${K3D_VERSION}-${CMAKE_SYSTEM_PROCESSOR}.dmg ${K3D_SOURCEFORGE_USERNAME}@frs.sourceforge.net:uploads/
+	rsync -avP -e ssh ${CMAKE_CURRENT_BINARY_DIR}/k3d-setup-${K3D_VERSION}-${K3D_OSX_ARCH}.dmg ${K3D_SOURCEFORGE_USERNAME}@frs.sourceforge.net:uploads/
 	)
 
