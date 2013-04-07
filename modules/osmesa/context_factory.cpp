@@ -38,6 +38,10 @@
 #define GLAPIENTRY
 #endif
 
+#ifndef GLAPI
+#define GLAPI
+#endif
+
 #include <GL/osmesa.h>
 
 #include <dlfcn.h>

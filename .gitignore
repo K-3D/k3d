@@ -1,2 +1,4 @@
 .kdev4
 *.kdev4
+*.pyc
+share/k3d/guide/content/._pipeline.txt
