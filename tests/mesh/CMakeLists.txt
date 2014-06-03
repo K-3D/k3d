@@ -1236,7 +1236,10 @@ K3D_TEST(mesh.modifier.CUDAConversion
 	LABELS mesh modifier cuda)
 
 
-
+K3D_TEST(mesh.sink.GmshGeoMeshWriter
+  K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.sink.GmshGeoMeshWriter.py
+  REQUIRES K3D_BUILD_GMSH_IO_MODULE
+  LABELS mesh sink GmshGeoMeshWriter)
 
 
 K3D_TEST(mesh.sink.IGESMeshWriter

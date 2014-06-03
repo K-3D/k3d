@@ -109,6 +109,7 @@ OPTION(K3D_BUILD_EULER_OPERATIONS_MODULE "Build the module that exposes the Eule
 OPTION(K3D_BUILD_FILE_MAGIC_MODULE "Build the file-identification-magic module" ON)
 OPTION(K3D_BUILD_FREETYPE2_MODULE "Build the freetype2 module" ON)
 OPTION(K3D_BUILD_GLX_MODULE "Build the GLX offscreen rendering module" OFF)
+OPTION(K3D_BUILD_GMSH_IO_MODULE "Build the Gmsh file format module" ON)
 OPTION(K3D_BUILD_GNOME_MODULE "Build the GNOME integration module" ${K3D_GNOME_VFS_FOUND})
 OPTION(K3D_BUILD_GOOGLE_PERFTOOLS_MODULE "Build the Google Perftools profiling module" ${K3D_GOOGLE_PERFTOOLS_FOUND})
 OPTION(K3D_BUILD_GRAPHVIZ_MODULE "Build the GraphViz integration module" ON)
