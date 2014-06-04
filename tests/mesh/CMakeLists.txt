@@ -794,6 +794,11 @@ K3D_TEST(mesh.modifier.MergeCoplanarFaces
 	REQUIRES K3D_BUILD_MESH_MODULE
 	LABELS mesh modifier)
 
+K3D_TEST(mesh.modifier.MergePolyhedra 
+	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.MergePolyhedra.py
+	REQUIRES K3D_BUILD_POLYHEDRON_MODULE
+	LABELS mesh modifier)
+
 K3D_TEST(mesh.modifier.MergeMesh 
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/mesh.modifier.MergeMesh.py
 	REQUIRES K3D_BUILD_MESH_MODULE

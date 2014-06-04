@@ -47,6 +47,7 @@ extern k3d::iplugin_factory& make_hole_factory();
 extern k3d::iplugin_factory& make_sds_factory();
 extern k3d::iplugin_factory& merge_collinear_edges_factory();
 extern k3d::iplugin_factory& merge_coplanar_faces_factory();
+extern k3d::iplugin_factory& merge_polyhedra_factory();
 extern k3d::iplugin_factory& move_first_edge_factory();
 extern k3d::iplugin_factory& sds_corner_factory();
 extern k3d::iplugin_factory& sds_crease_factory();
@@ -79,6 +80,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::polyhedron::make_sds_factory());
 	Registry.register_factory(module::polyhedron::merge_collinear_edges_factory());
 	Registry.register_factory(module::polyhedron::merge_coplanar_faces_factory());
+	Registry.register_factory(module::polyhedron::merge_polyhedra_factory());
 	Registry.register_factory(module::polyhedron::move_first_edge_factory());
 	Registry.register_factory(module::polyhedron::sds_corner_factory());
 	Registry.register_factory(module::polyhedron::sds_crease_factory());

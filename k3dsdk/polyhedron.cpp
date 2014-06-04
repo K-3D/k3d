@@ -306,7 +306,7 @@ const_primitive* validate(const mesh& Mesh, const mesh::primitive& Primitive)
 		{
 			if(face_shells[face] >= shell_types.size())
 			{
-				log() << error << "face shell out-of-bounds for face " << face << std::endl;
+				log() << error << "face shell out-of-bounds for face " << face << ": " << face_shells[face] << " >= " << shell_types.size() << std::endl;
 				return 0;
 			}	
 		}
@@ -417,7 +417,7 @@ primitive* validate(const mesh& Mesh, mesh::primitive& Primitive)
 		{
 			if(face_shells[face] >= shell_types.size())
 			{
-				log() << error << "face shell out-of-bounds for face " << face << std::endl;
+				log() << error << "face shell out-of-bounds for face " << face << ": " << face_shells[face] << " >= " << shell_types.size() << std::endl;
 				return 0;
 			}	
 		}
@@ -1102,7 +1102,7 @@ public:
 			}
 		}
 
-		output_polyhedron->shell_types.push_back(POLYGONS);
+		output_polyhedron->shell_types.assign(input_polyhedron->shell_types.size(), POLYGONS);
 
 		return result;
 	}
