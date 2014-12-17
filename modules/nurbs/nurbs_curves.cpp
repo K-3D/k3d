@@ -549,7 +549,7 @@ void close_curve(k3d::mesh& OutputMesh, k3d::nurbs_curve::primitive& OutputCurve
 		k3d::uint_t first = 0;
 		const k3d::uint_t knots_end = input_curve.knots.size();
 
-		while (input_curve.knots[first] == 0.0 && first < knots_end)
+    while (first < knots_end && input_curve.knots[first] == 0.0)
 		{
 			first++;
 		}
