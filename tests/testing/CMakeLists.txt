@@ -21,5 +21,6 @@ K3D_TEST(testing.detect.python.exception
 
 K3D_TEST(testing.PipelineProfiler
 	K3D_PYTHON_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/PipelineProfiler.py
+	REQUIRES K3D_ENABLE_PROFILING
 	LABELS testing)
 

@@ -74,6 +74,19 @@ inline void test(const bool_t& A, const bool_t& B, accumulator& Result)
 	Result.exact(A == B);
 };
 
+#ifdef _LIBCPP_VERSION
+// For libc++
+inline void test(const std::vector<bool>::reference& A, const std::vector<bool>::reference& B, accumulator& Result)
+{
+  Result.exact(A == B);
+};
+
+inline void test(const std::vector<bool>::const_reference& A, const std::vector<bool>::const_reference& B, accumulator& Result)
+{
+  Result.exact(A == B);
+};
+#endif
+
 /// Specialization of test that tests int8_t
 inline void test(const int8_t& A, const int8_t& B, accumulator& Result)
 {
