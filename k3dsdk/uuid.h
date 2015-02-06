@@ -25,6 +25,7 @@
 */
 
 #include <k3dsdk/types.h>
+#define BOOST_UUID_NO_SIMD // This can be removed again once the Boost 1.56 - 1.57 regression in the SSE2 implementation of operator< is fixed.
 #include <boost/uuid/uuid.hpp>
 #include <iosfwd>
 
