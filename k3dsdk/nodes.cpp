@@ -119,7 +119,7 @@ inode* find_node(inode_collection& Nodes, iproperty& Property)
 const std::string unique_name(inode_collection& Nodes, const std::string& Name)
 {
 	// For each node in the collection ...
-	for(k3d::inode_collection::nodes_t::const_iterator handle = Nodes.collection().begin(); handle != Nodes.collection().end(); handle++)
+	for(k3d::inode_collection::nodes_t::const_iterator handle = Nodes.collection().begin(); handle != Nodes.collection().end(); ++handle)
 	{
 		inode* const node = *handle;
 

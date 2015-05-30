@@ -416,7 +416,7 @@ void Inotify::RemoveAll()
       pW->m_wd = -1;
     }
     pW->m_pInotify = NULL;
-    it++;
+    ++it;
   }
   
   m_watches.clear();
