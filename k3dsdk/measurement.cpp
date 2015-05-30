@@ -44,7 +44,7 @@ bool parse(std::istream& Stream, double&Value, std::string& Units)
 	return parse(buffer, Value, Units);
 }
 
-bool parse(const std::string Buffer, double& Value, std::string& Units)
+bool parse(const std::string& Buffer, double& Value, std::string& Units)
 {
 	std::stack<double> stack;
 	std::string units;
@@ -59,7 +59,7 @@ bool parse(const std::string Buffer, double& Value, std::string& Units)
 	return true;
 }
 
-bool parse(const std::string Buffer, double&Value, const std::type_info* const Units)
+bool parse(const std::string& Buffer, double&Value, const std::type_info* const Units)
 {
 	// Parse the input expression into value and unit-of-measure (it can do mathematical expressions, too, for fun)
 	double value;
@@ -326,7 +326,7 @@ const volume_units_t& volume_units()
 	return units;
 }
 
-const angle& angle_units(const std::string Symbol)
+const angle& angle_units(const std::string& Symbol)
 {
 	angle_units_t::const_iterator unit = angle_units().find(Symbol);
 
@@ -336,7 +336,7 @@ const angle& angle_units(const std::string Symbol)
 	return unit->second;
 }
 
-const area& area_units(const std::string Symbol)
+const area& area_units(const std::string& Symbol)
 {
 	area_units_t::const_iterator unit = area_units().find(Symbol);
 
@@ -346,7 +346,7 @@ const area& area_units(const std::string Symbol)
 	return unit->second;
 }
 
-const distance& distance_units(const std::string Symbol)
+const distance& distance_units(const std::string& Symbol)
 {
 	distance_units_t::const_iterator unit = distance_units().find(Symbol);
 
@@ -356,7 +356,7 @@ const distance& distance_units(const std::string Symbol)
 	return unit->second;
 }
 
-const force& force_units(const std::string Symbol)
+const force& force_units(const std::string& Symbol)
 {
 	force_units_t::const_iterator unit = force_units().find(Symbol);
 
@@ -366,7 +366,7 @@ const force& force_units(const std::string Symbol)
 	return unit->second;
 }
 
-const mass& mass_units(const std::string Symbol)
+const mass& mass_units(const std::string& Symbol)
 {
 	mass_units_t::const_iterator unit = mass_units().find(Symbol);
 
@@ -376,7 +376,7 @@ const mass& mass_units(const std::string Symbol)
 	return unit->second;
 }
 
-const pressure& pressure_units(const std::string Symbol)
+const pressure& pressure_units(const std::string& Symbol)
 {
 	pressure_units_t::const_iterator unit = pressure_units().find(Symbol);
 
@@ -386,7 +386,7 @@ const pressure& pressure_units(const std::string Symbol)
 	return unit->second;
 }
 
-const time& time_units(const std::string Symbol)
+const time& time_units(const std::string& Symbol)
 {
 	time_units_t::const_iterator unit = time_units().find(Symbol);
 
@@ -396,7 +396,7 @@ const time& time_units(const std::string Symbol)
 	return unit->second;
 }
 
-const volume& volume_units(const std::string Symbol)
+const volume& volume_units(const std::string& Symbol)
 {
 	volume_units_t::const_iterator unit = volume_units().find(Symbol);
 

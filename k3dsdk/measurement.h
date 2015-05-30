@@ -322,7 +322,7 @@ bool parse(std::istream& Stream, double&Value, std::string& Units);
 \return true, iff the input expression is completely parsed, false otherwise
 
 */
-bool parse(const std::string Buffer, double&Value, std::string& Units);
+bool parse(const std::string& Buffer, double&Value, std::string& Units);
 
 /**
 
@@ -333,7 +333,7 @@ bool parse(const std::string Buffer, double&Value, std::string& Units);
 \return true, iff the input expression is completely parsed, false otherwise
 
 */
-bool parse(const std::string Buffer, double&Value, const std::type_info* const Units);
+bool parse(const std::string& Buffer, double&Value, const std::type_info* const Units);
 
 /// Defines a collection of units of angular measure, keyed by string (typically name or symbol)
 typedef std::map<std::string, angle> angle_units_t;
@@ -370,21 +370,21 @@ const time_units_t& time_units();
 const volume_units_t& volume_units();
 
 /// Returns a reference to a common unit of angular measure keyed by symbol.  Throws std::exception if the symbol is unknown.
-const angle& angle_units(const std::string Symbol);
+const angle& angle_units(const std::string& Symbol);
 /// Returns a reference to a common unit of area keyed by symbol.  Throws std::exception if the symbol is unknown.
-const area& area_units(const std::string Symbol);
+const area& area_units(const std::string& Symbol);
 /// Returns a reference to a common unit of distance keyed by symbol.  Throws std::exception if the symbol is unknown.
-const distance& distance_units(const std::string Symbol);
+const distance& distance_units(const std::string& Symbol);
 /// Returns a reference to a common unit of force keyed by symbol.  Throws std::exception if the symbol is unknown.
-const force& force_units(const std::string Symbol);
+const force& force_units(const std::string& Symbol);
 /// Returns a reference to a common unit of mass keyed by symbol.  Throws std::exception if the symbol is unknown.
-const mass& mass_units(const std::string Symbol);
+const mass& mass_units(const std::string& Symbol);
 /// Returns a reference to a common unit of pressure keyed by symbol.  Throws std::exception if the symbol is unknown.
-const pressure& pressure_units(const std::string Symbol);
+const pressure& pressure_units(const std::string& Symbol);
 /// Returns a reference to a common unit of time keyed by symbol.  Throws std::exception if the symbol is unknown.
-const time& time_units(const std::string Symbol);
+const time& time_units(const std::string& Symbol);
 /// Returns a reference to a common unit of volume keyed by symbol.  Throws std::exception if the symbol is unknown.
-const volume& volume_units(const std::string Symbol);
+const volume& volume_units(const std::string& Symbol);
 
 } // namespace measurement
 
