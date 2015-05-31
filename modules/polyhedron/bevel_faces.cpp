@@ -180,7 +180,6 @@ bool subdivide_edges(k3d::legacy::face& Face, k3d::legacy::mesh& Mesh, bevel_edg
 		while(subdivided_edge->companion != stop);
 	}
 
-	std::vector<k3d::legacy::point*> new_points;
 	edges_t bevel_edges;
 
 	for(edges_t::reverse_iterator edge_i = face_edges.rbegin(); edge_i != face_edges.rend(); ++edge_i)
