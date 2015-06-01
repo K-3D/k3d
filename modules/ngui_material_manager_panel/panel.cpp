@@ -244,7 +244,7 @@ void Model::buildModel(document_state& DocumentState)
 void Model::clearModel()
 {
   std::list<MaterialGroup*>::iterator groupIter = m_groups.begin();
-  for(; groupIter != m_groups.end(); groupIter++)
+  for(; groupIter != m_groups.end(); ++groupIter)
     delete (*groupIter);      
 
   //Ensure Clean Storage 
@@ -509,7 +509,7 @@ void Implementation::buildTree()
   Gtk::TreeRow first_group_row;
   bool on_first_row = true;
 
-  for(; group_iter !=  m_model->m_groups.end(); group_iter++)
+  for(; group_iter !=  m_model->m_groups.end(); ++group_iter)
     {
       Gtk::TreeRow row = *tree_model->append();
       row[m_columns.m_col_name] = (*group_iter)->name();
@@ -528,7 +528,7 @@ void Implementation::buildTree()
       std::list<MaterialObj*>::const_iterator matobj_iter 
         = (*group_iter)->materialBegin();
 
-      for(; matobj_iter !=  (*group_iter)->materialEnd(); matobj_iter++)
+      for(; matobj_iter !=  (*group_iter)->materialEnd(); ++matobj_iter)
         {
           //Create Row & USe MaterialObj To Fill In The Blanks
           Gtk::TreeModel::Row childrow = *(tree_model->append(row.children()));
