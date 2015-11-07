@@ -140,7 +140,7 @@ public:
 
 	operator bool() const
 	{
-		return storage;
+		return static_cast<bool>(storage);
 	}
 
 	bool operator!() const
@@ -168,4 +168,3 @@ private:
 } // namespace k3d
 
 #endif // !K3DSDK_PIPELINE_DATA_H
-
