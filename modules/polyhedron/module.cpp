@@ -49,6 +49,7 @@ extern k3d::iplugin_factory& merge_collinear_edges_factory();
 extern k3d::iplugin_factory& merge_coplanar_faces_factory();
 extern k3d::iplugin_factory& merge_polyhedra_factory();
 extern k3d::iplugin_factory& move_first_edge_factory();
+extern k3d::iplugin_factory& reshape_face_to_circle_factory();
 extern k3d::iplugin_factory& sds_corner_factory();
 extern k3d::iplugin_factory& sds_crease_factory();
 extern k3d::iplugin_factory& sds_hole_factory();
@@ -82,6 +83,7 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::polyhedron::merge_coplanar_faces_factory());
 	Registry.register_factory(module::polyhedron::merge_polyhedra_factory());
 	Registry.register_factory(module::polyhedron::move_first_edge_factory());
+	Registry.register_factory(module::polyhedron::reshape_face_to_circle_factory());
 	Registry.register_factory(module::polyhedron::sds_corner_factory());
 	Registry.register_factory(module::polyhedron::sds_crease_factory());
 	Registry.register_factory(module::polyhedron::sds_hole_factory());
@@ -90,4 +92,3 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::polyhedron::subdivide_faces_factory());
 	Registry.register_factory(module::polyhedron::triangulate_faces_factory());
 K3D_MODULE_END
-
