@@ -109,15 +109,15 @@ public:
 
 				centroid /= k3d::double_t(npoints);
 				const k3d::double_t angle_step = 2.*k3d::pi() / k3d::double_t(npoints);
-				k3d::point3& first_point = points[polyhedron->vertex_points[first_edge]];
+				const k3d::point3& first_point = points[polyhedron->vertex_points[first_edge]];
 				const k3d::normal3 normal = k3d::polyhedron::normal(polyhedron->vertex_points, polyhedron->clockwise_edges, points, first_edge);
-				first_point = centroid + radius * (first_point - centroid) / (first_point - centroid).length();
+				const k3d::vector3 first_vector = radius * (first_point - centroid) / (first_point - centroid).length();
 				k3d::double_t angle = 0;
 
 				// Move the points
 				for(k3d::uint_t edge = first_edge; ; )
 				{
-					points[polyhedron->vertex_points[edge]] = k3d::rotate3(k3d::angle_axis(angle, k3d::to_vector(normal))) * first_point;
+					points[polyhedron->vertex_points[edge]] = centroid + k3d::rotate3(k3d::angle_axis(angle, k3d::to_vector(normal))) * first_vector;
 					angle += angle_step;
 
 					edge = polyhedron->clockwise_edges[edge];
