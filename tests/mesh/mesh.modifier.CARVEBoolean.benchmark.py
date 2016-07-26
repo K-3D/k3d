@@ -19,6 +19,6 @@ k3d.property.connect(document, torus.get_property("output_mesh"), carve_boolean.
 profiler = k3d.plugin.create("PipelineProfiler", document)
 
 testing.require_valid_mesh(document, carve_boolean.get_property("output_mesh"))
-testing.require_similar_mesh(document, carve_boolean.get_property("output_mesh"), "mesh.modifier.CARVEBoolean.benchmark", 1)
+testing.require_similar_mesh(document, carve_boolean.get_property("output_mesh"), "mesh.modifier.CARVEBoolean.benchmark", 0)
 benchmarking.print_profiler_records(profiler.records)
 print """<DartMeasurement name="Total Boolean Time" type="numeric/float">""" + str(benchmarking.total_profiler_time(profiler.records)) + """</DartMeasurement>"""
