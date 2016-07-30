@@ -5815,7 +5815,7 @@ msgstr "Sterteeng K-3D ..."
 msgid "Starting user interface"
 msgstr "Sterteeng user interffece-a"
 
-msgid "Starts CPU profiling using Google Perftools"
+msgid "Starts CPU profiling using GPerftools"
 msgstr ""
 
 #, fuzzy

@@ -34,21 +34,21 @@
 #include <k3dsdk/types.h>
 #include <k3dsdk/user_interface.h>
 
-#include <google/profiler.h>
+#include <gperftools/profiler.h>
 
 namespace module
 {
 
-namespace google_perftools
+namespace gperftools
 {
 
 // Optional config item to set the profile file directory
 inline const k3d::string_t profile_files() { return "profile_files"; }
 
-class google_perftools : public k3d::iunknown
+class gperftools : public k3d::iunknown
 {
 public:
-	google_perftools()
+	gperftools()
 	{
 		const k3d::string_t prefix = "k3d-profile";
 		const k3d::string_t suffix = "pprof";
@@ -63,26 +63,26 @@ public:
 		while(k3d::filesystem::exists(profile_path / k3d::filesystem::generic_path(profile_name)))
 			profile_name = prefix + "-" + k3d::string_cast(index++) + "." + suffix;
 
-		k3d::log() << info << "google_perftools: saving profile data to file " << (profile_path / k3d::filesystem::generic_path(profile_name)).native_console_string() << std::endl;
+		k3d::log() << info << "gperftools: saving profile data to file " << (profile_path / k3d::filesystem::generic_path(profile_name)).native_console_string() << std::endl;
 
 		ProfilerStart((profile_path / k3d::filesystem::generic_path(profile_name)).native_filesystem_string().c_str());
 	}
-	
-	~google_perftools()
+
+	~gperftools()
 	{
-		k3d::log() << info << "google_perftools: Stopping profiler" << std::endl;
+		k3d::log() << info << "gperftools: Stopping profiler" << std::endl;
 		ProfilerStop();
 	}
-	
+
 	static k3d::iplugin_factory& get_factory()
 	{
 		k3d::iplugin_factory::metadata_t metadata;
 		metadata["k3d:application-start"] = "";
-		static k3d::application_plugin_factory<google_perftools,
+		static k3d::application_plugin_factory<gperftools,
 			k3d::interface_list<k3d::iunknown> > factory(
 				k3d::uuid(0x2b517d24, 0x88462d22, 0x5401a896, 0xdd48c985),
-				"GooglePerftools",
-				_("Starts CPU profiling using Google Perftools"),
+				"GPerftools",
+				_("Starts CPU profiling using GPerftools"),
 				"Development",
 				k3d::iplugin_factory::EXPERIMENTAL,
 				metadata);
@@ -91,11 +91,11 @@ public:
 	}
 };
 
-k3d::iplugin_factory& google_perftools_factory()
+k3d::iplugin_factory& gperftools_factory()
 {
-	return google_perftools::get_factory();
+	return gperftools::get_factory();
 }
 
-} // namespace google_perftools
+} // namespace gperftools
 
 } // namespace module

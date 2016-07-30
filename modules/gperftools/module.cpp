@@ -27,16 +27,16 @@ namespace module
 {
 
 /// Namespace reserved for the glx plugin module, to protect public symbols from name clashes with other modules
-namespace google_perftools
+namespace gperftools
 {
 
-extern k3d::iplugin_factory& google_perftools_factory();
+extern k3d::iplugin_factory& gperftools_factory();
 
-} // namespace google_perftools
+} // namespace gperftools
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::google_perftools::google_perftools_factory());
+	Registry.register_factory(module::gperftools::gperftools_factory());
 K3D_MODULE_END
 
