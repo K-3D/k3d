@@ -347,7 +347,7 @@ public:
 			gdk_gl_drawable_swap_buffers(m_drawable);
 		gdk_gl_drawable_gl_end(m_drawable);
 	}
-	
+
 	GdkGLDrawable* const m_drawable;
 	GdkGLContext* const m_context;
 };
@@ -425,16 +425,16 @@ control::control(document_state& DocumentState) :
 
 	signal_expose_event().connect(sigc::hide(sigc::mem_fun(*this, &control::on_redraw)));
 	set_double_buffered(false);
-	
+
 	GdkGLConfig* const config = gdk_gl_config_new_by_mode(static_cast<GdkGLConfigMode>(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
 	assert(config);
-	
+
   if(!gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, m_implementation->m_document_state.gdkgl_share_list(), true, GDK_GL_RGBA_TYPE))
   {
     k3d::log() << warning << "Disabling OpenGL context sharing, since it appears to be unsupported" << std::endl;
 		gtk_widget_set_gl_capability(GTK_WIDGET(gobj()), config, NULL, true, GDK_GL_RGBA_TYPE);
   }
-	
+
 	show_all();
 }
 
@@ -730,6 +730,12 @@ bool control::on_key_release_event(GdkEventKey* Event)
 {
 	m_implementation->m_document_state.active_tool().input_model().key_release_event(*this, Event);
 	return true;
+}
+
+void control::on_realize()
+{
+	m_implementation->m_gl_context.reset(NULL);
+	Gtk::DrawingArea::on_realize();
 }
 
 k3d::selection::records control::get_node_selectables(const k3d::rectangle& SelectionRegion)
@@ -1349,13 +1355,13 @@ bool control::on_redraw()
 
 	if(!is_realized())
 		return true;
-	
+
 	if(!m_implementation->m_gl_context)
 	{
 		m_implementation->m_gl_context.reset(new detail::context(GTK_WIDGET(gobj())));
-	
+
 		m_implementation->m_gl_context->begin();
-		
+
 		// Create opengl-start plugins ...
 		const k3d::plugin::factory::collection_t factories = k3d::plugin::factory::lookup();
 		for(k3d::plugin::factory::collection_t::const_iterator factory = factories.begin(); factory != factories.end(); ++factory)
@@ -1381,10 +1387,10 @@ bool control::on_redraw()
 				scripted_action->execute(context);
 			}
 		}
-		
+
 		m_implementation->m_gl_context->end();
 	}
-	
+
 	m_implementation->m_gl_context->begin();
 
 	create_font();
@@ -1446,7 +1452,7 @@ bool control::on_redraw()
 		glCallLists(buffer.size(), GL_UNSIGNED_BYTE, buffer.data());
 	}
 	glFlush();
-	
+
 	m_implementation->m_gl_context->end();
 
 	return true;
@@ -1590,4 +1596,3 @@ const k3d::line3 mouse_to_world(viewport::control& Viewport, const k3d::point2& 
 } // namespace ngui
 
 } // namespace k3d
-

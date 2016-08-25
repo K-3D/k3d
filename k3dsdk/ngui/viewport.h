@@ -39,7 +39,7 @@
 #include <k3dsdk/selection.h>
 #include <k3dsdk/signal_system.h>
 
-namespace k3d { namespace gl { class selection_state; 
+namespace k3d { namespace gl { class selection_state;
 class context;
 } }
 
@@ -182,6 +182,8 @@ private:
 	/// Called when a key is released
 	k3d::bool_t on_key_release_event(GdkEventKey* Event);
 
+	void on_realize();
+
 	class implementation;
 	implementation* const m_implementation;
 };
@@ -211,4 +213,3 @@ const k3d::line3 mouse_to_world(viewport::control& Viewport, const k3d::point2& 
 } // namespace k3d
 
 #endif // !K3DSDK_NGUI_VIEWPORT_H
-
