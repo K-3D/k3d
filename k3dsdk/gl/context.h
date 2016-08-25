@@ -27,6 +27,10 @@
 #include <k3dsdk/iunknown.h>
 #include <boost/scoped_ptr.hpp>
 
+#if K3D_GLEW_MAJOR_VERSION > 1
+	struct GLEWContext {};
+#endif
+
 namespace k3d
 {
 
@@ -45,13 +49,13 @@ public:
 
 	/// Returns the currently-active context, if any, or NULL.
 	static context* current();
-	
+
 	/// Returns the currently-active GLEW context, if any, or NULL. Mostly used internally by GLEW
 	static GLEWContext* current_glew_context();
 
 	/// If the context is double-buffered, swaps the front and back buffers.  Otherwise, a no-op.
 	void end();
-	
+
 	/// Return the GLEW context associated with this context, or NULL if there is none
 	GLEWContext* glew_context();
 
@@ -76,4 +80,3 @@ private:
 #define glewGetContext() k3d::gl::context::current_glew_context()
 
 #endif // !K3DSDK_GL_CONTEXT_H
-
