@@ -74,7 +74,7 @@ public:
 	bool write_file(k3d::idocument& Document, const k3d::filesystem::path& Path)
 	{
 		k3d::log() << info << "Writing " << Path.native_console_string() << " using " << get_factory().name() << std::endl;
-		DAE dae;
+		DAE dae(NULL, NULL, "1.4.1");
 		daeElement *root = dae.add(k3d::string_cast<k3d::filesystem::path>(Path));
 
 		daeElement *asset = root->add("asset");
@@ -113,11 +113,11 @@ public:
 				double top = boost::any_cast<double>(k3d::property::get(**node, "top")->property_internal_value());
 				double bottom = boost::any_cast<double>(k3d::property::get(**node, "bottom")->property_internal_value());
 				double aspect_ratio = (right-left)/(top-bottom);
-				
+
 
 				bool ortho = boost::any_cast<bool>(k3d::property::get(**node, "orthographic")->property_internal_value());
 
-				// attributes differ with camera type, some attributes had to be computed manually 
+				// attributes differ with camera type, some attributes had to be computed manually
 				// as K-3D use them in a different way
 				domElement *cam_type;
 				if(ortho)

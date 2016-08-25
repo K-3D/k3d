@@ -68,8 +68,8 @@ public:
 		k3d::log() << info << "Writing .dae file: " << path.native_console_string() << std::endl;
 
 		// The main file where de mesh will be exported
-		DAE dae;
-		//Create root branch of the dae xml tree and create the only library we are 
+		DAE dae(NULL, NULL, "1.4.1");
+		//Create root branch of the dae xml tree and create the only library we are
 		// going to need, library_geometries where we are going to store the mesh
 		daeElement *root = dae.add(path.native_console_string());
 		daeElement *library_geometries = root->add("library_geometries");

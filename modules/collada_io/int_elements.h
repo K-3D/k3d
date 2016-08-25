@@ -50,7 +50,9 @@ namespace collada
 namespace io
 {
 
-// Integrates mesh creation and loading 
+using namespace ColladaDOM141;
+
+// Integrates mesh creation and loading
 // from domGeometry -> FrozenMesh
 class intGeometry
 {
@@ -101,4 +103,3 @@ public:
 }}}
 
 #endif // !MODULES_COLLADA_IO_INT_ELEMENTS_H
-

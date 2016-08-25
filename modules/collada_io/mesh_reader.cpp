@@ -22,6 +22,8 @@
 	\author Barbiero Mattia
 */
 
+#define COLLADA_DOM_SUPPORT141
+
 #include "int_elements.h"
 #include "integration.h"
 #include "collada.h"
@@ -70,9 +72,9 @@ public:
 		Output = k3d::mesh();
 
 		// Instantiate the reference implementation
-		DAE dae;
+		DAE dae(NULL, NULL, "1.4.1");
 
-		domCOLLADA* root = dae.open(Path.native_filesystem_string());
+		domCOLLADA* root = dae.open141(Path.native_filesystem_string());
 		if(!root) {
             		k3d::log() << error << k3d_file_reference << ": error opening [" << Path.native_console_string() << "]" << std::endl;
 			return;
@@ -131,4 +133,3 @@ k3d::iplugin_factory& mesh_reader_factory()
 } // namespace collada
 
 } // namespace module
-

@@ -22,6 +22,8 @@
 		\author Carlos Andres Dominguez Caballero (carlosadc@gmail.com)
 */
 
+#define COLLADA_DOM_SUPPORT141
+
 #include <dae.h>
 #include <dom/domCOLLADA.h>
 #include <dom/domConstants.h>
@@ -232,12 +234,12 @@ public:
 	k3d::bool_t read_file(const k3d::filesystem::path& FilePath, k3d::idocument& Document)
 	{
 		// Instantiate the reference implementation
-		DAE dae;
+		DAE dae(NULL, NULL, "1.4.1");
 		std::vector<collada_obj> collada_objs;
 
 		k3d::log() << info << "Importing .dae file: " << FilePath.native_console_string() << std::endl;
-		domCOLLADA* root = dae.open(k3d::string_cast<k3d::filesystem::path>(FilePath));
-		if(!root) 
+		domCOLLADA* root = dae.open141(k3d::string_cast<k3d::filesystem::path>(FilePath));
+		if(!root)
 		{
             		k3d::log() << error << k3d_file_reference << ": error opening [" << FilePath.native_console_string() << "]" << std::endl;
 			return false;
