@@ -79,17 +79,9 @@ public:
 		if(test_type(".sun", "image/x-sun-raster", File, FileType)) return true;
 		if(test_type(".tif", "image/tiff", File, FileType)) return true;
 		if(test_type(".tiff", "image/tiff", File, FileType)) return true;
-		
+
 		// COLLADA
 		if(test_type(".dae", "application/x-collada", File, FileType)) return true;
-		
-		// OpenCascade types
-		if(test_type(".rle", "application/x-brep", File, FileType)) return true;
-		if(test_type(".brep", "application/x-brep", File, FileType)) return true;
-		if(test_type(".igs", "application/x-iges", File, FileType)) return true;
-		if(test_type(".iges", "application/x-iges", File, FileType)) return true;
-		if(test_type(".step", "application/x-step", File, FileType)) return true;
-		if(test_type(".stp", "application/x-step", File, FileType)) return true;
 
 		// XTrackCAD types
 		if(test_type(".xtc", "application/x-xtrackcad", File, FileType)) return true;
@@ -143,4 +135,3 @@ k3d::iplugin_factory& mime_type_handler_factory()
 } // namespace file
 
 } // namespace module
-

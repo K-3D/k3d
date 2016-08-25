@@ -1,4 +1,4 @@
-# Test to ensure that const_cast isn't abused 
+# Test to ensure that const_cast isn't abused
 
 SET(ERROR_COUNT 0)
 SET(SKIP_FILES
@@ -21,7 +21,6 @@ SET(SKIP_FILES
 	"^modules/ngui_material_manager_panel/MaterialContentPanel.cpp$"
 	"^modules/ngui_material_manager_panel/MaterialGroup.cpp$"
 	"^modules/ngui_material_manager_panel/panel.cpp$"
-	"^modules/opencascade/opencascade_to_k3d.cpp$"
 	"^modules/plot/least_squares_plot.cpp$"
 	"^modules/plot/surface_plot.cpp$"
 	"^modules/polyhedron_sources/poly_grid.cpp$"
@@ -57,6 +56,5 @@ FOREACH(SOURCE_FILE ${SOURCE_FILES})
 ENDFOREACH(SOURCE_FILE)
 
 IF(ERROR_COUNT)
-	MESSAGE(SEND_ERROR "Found ${ERROR_COUNT} files using const_cast, which should almost never be necessary.  Contact the mailing list to discuss exceptions.")	
+	MESSAGE(SEND_ERROR "Found ${ERROR_COUNT} files using const_cast, which should almost never be necessary.  Contact the mailing list to discuss exceptions.")
 ENDIF()
-

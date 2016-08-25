@@ -3801,9 +3801,6 @@ msgstr "Unteetled Ducooment %1%"
 msgid "Open the current script for editing"
 msgstr "Oopee zee coorrent screept fur ideeting"
 
-msgid "OpenCascade ( .step, .iges, .brep )"
-msgstr ""
-
 msgid "OpenEXR (*.exr)"
 msgstr "OopenEXR (*.ixr)"
 
