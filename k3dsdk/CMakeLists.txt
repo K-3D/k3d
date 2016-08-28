@@ -56,6 +56,7 @@ TARGET_LINK_LIBRARIES(k3dsdk
 	k3dsdk-parallel
 	${Boost_PROGRAM_OPTIONS_LIBRARY}
 	${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+	${Boost_SYSTEM_LIBRARY}
   "dl" # for gold linker
 	)
 
@@ -97,4 +98,3 @@ INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-ngui-config.h DESTINATION ${K3D_LIBDIR}/k
 INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-parallel-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
 INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-platform-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
 INSTALL(FILES ${k3dsdk_BINARY_DIR}/k3d-version-config.h DESTINATION ${K3D_LIBDIR}/k3d/include)
-

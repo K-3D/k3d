@@ -241,12 +241,12 @@ OPTION(K3D_ENABLE_SYMBOL_VISIBILITY "Minimize the number of symbols exported fro
 OPTION(K3D_ENABLE_TESTING "Build the K-3D regression test suite." OFF)
 
 # Find Boost - this logic must follow all user-definable options
-SET(K3D_BOOST_COMPONENTS date_time program_options regex unit_test_framework)
+SET(K3D_BOOST_COMPONENTS date_time program_options regex system unit_test_framework)
 IF(K3D_ENABLE_PYTHON)
 	LIST(APPEND K3D_BOOST_COMPONENTS python)
 ENDIF()
 IF(K3D_BUILD_COLLADA_IO_MODULE)
-	LIST(APPEND K3D_BOOST_COMPONENTS filesystem system)
+	LIST(APPEND K3D_BOOST_COMPONENTS filesystem)
 ENDIF()
 IF(K3D_BUILD_CGAL_MODULE)
 	LIST(APPEND K3D_BOOST_COMPONENTS thread)
