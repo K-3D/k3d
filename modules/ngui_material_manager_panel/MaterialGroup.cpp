@@ -14,7 +14,7 @@ void MaterialGroup::clearGroup()
   std::list<MaterialObj*>::iterator materialIter = m_materials.begin();
 
   //Clean Up The List Of material Objects (MaterialObj)
-  for(; materialIter != m_materials.end(); materialIter++)
+  for(; materialIter != m_materials.end(); ++materialIter)
       delete (*materialIter);
    
   //Ensure Clean List Storage 

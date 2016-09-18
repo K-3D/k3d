@@ -62,7 +62,7 @@ CompareArgs::~CompareArgs()
 void CompareArgs::Print_Args()
 {
 	printf("Field of view is %f degrees\n", FieldOfView);
-	printf("Threshold pixels is %d pixels\n", ThresholdPixels);
+	printf("Threshold pixels is %u pixels\n", ThresholdPixels);
 	printf("The Gamma is %f\n", Gamma);
 	printf("The Display's luminance is %f candela per meter squared\n", Luminance);
 }

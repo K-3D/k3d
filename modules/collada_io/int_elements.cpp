@@ -101,7 +101,6 @@ namespace io
 			}
 
 			domSource *source_vertex;
-			domSource *source_normal;
 			domSource *source_texcoord=NULL;
 			daeURI *elementURI;
 
@@ -117,7 +116,6 @@ namespace io
 			}
 
 			domFloat_array *floatArray_vertex;
-			domFloat_array *floatArray_normal;
 			domFloat_array *floatArray_texcoord;
 
 			if(source_vertex)
@@ -236,7 +234,6 @@ namespace io
 			}
 
 			domSource *source_vertex;
-			domSource *source_normal;
 			domSource *source_texcoord=NULL;
 			daeURI *elementURI;
 		
@@ -253,7 +250,6 @@ namespace io
 			}
 	
 			domFloat_array *floatArray_vertex;
-			domFloat_array *floatArray_normal;
 			domFloat_array *floatArray_texcoord;
 		
 			if(source_vertex)

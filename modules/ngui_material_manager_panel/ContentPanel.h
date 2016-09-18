@@ -101,7 +101,7 @@ class ContentPanel
         std::list<PreviewObj*>::iterator geo_iter
           = m_used_geometry.begin();
 
-        for(; geo_iter != m_used_geometry.end(); geo_iter++)
+        for(; geo_iter != m_used_geometry.end(); ++geo_iter)
           delete (*geo_iter);    
       }
 

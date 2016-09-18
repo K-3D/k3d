@@ -96,7 +96,7 @@ void parse_stream(std::istream& Stream, token_collection_t& Output)
 
 	token_t token;
 
-	for(token_t::iterator c = buffer.begin(); c != buffer.end(); c++)
+	for(token_t::iterator c = buffer.begin(); c != buffer.end(); ++c)
 	{
 		if(stringliteral)
 		{

@@ -45,13 +45,13 @@ namespace d_Math
 			return p[i];
 		}
 
-		d_Vec3f operator + (const d_Vec3f v) const
+		d_Vec3f operator + (const d_Vec3f& v) const
 		{
 			d_Vec3f res(p[0]+v[0], p[1]+v[1], p[2]+v[2]);
 			return res;
 		}
 
-		d_Vec3f operator - (const d_Vec3f v) const
+		d_Vec3f operator - (const d_Vec3f& v) const
 		{
 			d_Vec3f res(p[0]-v[0], p[1]-v[1], p[2]-v[2]);
 			return res;
@@ -71,7 +71,7 @@ namespace d_Math
 
 	};
 
-	float len(const d_Vec3f a)
+	float len(const d_Vec3f& a)
 	{
 		return sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
 	}

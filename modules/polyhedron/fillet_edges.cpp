@@ -1199,7 +1199,6 @@ void fill_intersections(intersection_edges_t& IntersectionEdges, k3d::imaterial*
 				Mesh.points.push_back(center_point);
 
 				// Link faces to center
-				std::vector<k3d::legacy::split_edge*> edges;
 				for(unsigned long m = 0; m < border_number; ++m)
 				{
 					return_if_fail(borders[m].vertices.size());

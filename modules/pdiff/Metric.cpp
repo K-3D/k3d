@@ -299,7 +299,7 @@ bool Yee_Compare(CompareArgs &args)
 	}
 	
 	char different[100];
-	sprintf(different, "%d pixels are different\n", args.FailedPixels);
+	sprintf(different, "%u pixels are different\n", args.FailedPixels);
 
 	args.ErrorStr = "Images are visibly different\n";
 	args.ErrorStr += different;
