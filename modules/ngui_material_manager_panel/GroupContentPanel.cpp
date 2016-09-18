@@ -17,93 +17,93 @@ GroupContentPanel::~GroupContentPanel()
 
   //ALL Gtk Hboxes*****************
   std::vector<Gtk::HBox*>::iterator hbox_iter = m_pview_data_conts.begin();
-  for(; hbox_iter != m_pview_data_conts.end(); hbox_iter++)
+  for(; hbox_iter != m_pview_data_conts.end(); ++hbox_iter)
     delete (*hbox_iter);  
 
   hbox_iter = m_label_data_conts.begin();
-  for(; hbox_iter != m_label_data_conts.end(); hbox_iter++)
+  for(; hbox_iter != m_label_data_conts.end(); ++hbox_iter)
     delete (*hbox_iter);  
 
 
   //ALL Gtk Vboxes*****************
   std::vector<Gtk::VBox*>::iterator vbox_iter = m_data_desc_conts.begin();
-  for(; vbox_iter != m_data_desc_conts.end(); vbox_iter++)
+  for(; vbox_iter != m_data_desc_conts.end(); ++vbox_iter)
     delete (*vbox_iter); 
             
   vbox_iter = m_label_conts.begin();
-  for(; vbox_iter != m_label_conts.end(); vbox_iter++)
+  for(; vbox_iter != m_label_conts.end(); ++vbox_iter)
     delete (*vbox_iter); 
 
   vbox_iter = m_data_conts.begin();
-  for(; vbox_iter != m_data_conts.end(); vbox_iter++)
+  for(; vbox_iter != m_data_conts.end(); ++vbox_iter)
     delete (*vbox_iter); 
 
 
   //ALL Gtk Frames*****************
   std::vector<Gtk::Frame*>::iterator frame_iter = m_pview_frames.begin();
-  for(; frame_iter != m_pview_frames.end(); frame_iter++)
+  for(; frame_iter != m_pview_frames.end(); ++frame_iter)
     delete (*frame_iter); 
 
 
   //ALL Gtk Labels*****************
   std::vector<Gtk::Label*>::iterator label_iter = m_name_labels.begin();
-  for(; label_iter != m_name_labels.end(); label_iter++)
+  for(; label_iter != m_name_labels.end(); ++label_iter)
     delete (*label_iter); 
 
   label_iter = m_type_labels.begin();
-  for(; label_iter != m_type_labels.end(); label_iter++)
+  for(; label_iter != m_type_labels.end(); ++label_iter)
     delete (*label_iter); 
 
   label_iter = m_datemod_labels.begin();
-  for(; label_iter != m_datemod_labels.end(); label_iter++)
+  for(; label_iter != m_datemod_labels.end(); ++label_iter)
     delete (*label_iter); 
 
   label_iter = m_artistname_labels.begin();
-  for(; label_iter != m_artistname_labels.end(); label_iter++)
+  for(; label_iter != m_artistname_labels.end(); ++label_iter)
     delete (*label_iter); 
 
   label_iter = m_name_data_labels.begin();
-  for(; label_iter != m_name_data_labels.end(); label_iter++)
+  for(; label_iter != m_name_data_labels.end(); ++label_iter)
     delete (*label_iter); 
 
   label_iter = m_type_data_labels.begin();
-  for(; label_iter != m_type_data_labels.end(); label_iter++)
+  for(; label_iter != m_type_data_labels.end(); ++label_iter)
     delete (*label_iter); 
 
   label_iter = m_datemod_data_labels.begin();
-  for(; label_iter != m_datemod_data_labels.end(); label_iter++)
+  for(; label_iter != m_datemod_data_labels.end(); ++label_iter)
     delete (*label_iter); 
 
   label_iter = m_artistname_data_labels.begin();
-  for(; label_iter != m_artistname_data_labels.end(); label_iter++)
+  for(; label_iter != m_artistname_data_labels.end(); ++label_iter)
     delete (*label_iter); 
 
             
   //ALL Gtk Textviews***************
   std::vector<Gtk::TextView*>::iterator mltxt_iter = m_artistnotes_mltext.begin();
-  for(; mltxt_iter != m_artistnotes_mltext.end(); mltxt_iter++)
+  for(; mltxt_iter != m_artistnotes_mltext.end(); ++mltxt_iter)
     delete (*mltxt_iter); 
 
 
   //ALL Gtk ScrolledWindows*********
   std::vector<Gtk::ScrolledWindow*>::iterator scroll_iter = m_artistnotes_scrollwin.begin();
-  for(; scroll_iter != m_artistnotes_scrollwin.end(); scroll_iter++)
+  for(; scroll_iter != m_artistnotes_scrollwin.end(); ++scroll_iter)
     delete (*scroll_iter); 
 
 
   //ALL Gtk HSeparator**************
   std::vector<Gtk::HSeparator*>::iterator hsep_iter = m_data_notes_seps.begin();
-  for(; hsep_iter != m_data_notes_seps.end(); hsep_iter++)
+  for(; hsep_iter != m_data_notes_seps.end(); ++hsep_iter)
     delete (*hsep_iter); 
 
   hsep_iter = m_materials_seps.begin();
-  for(; hsep_iter != m_materials_seps.end(); hsep_iter++)
+  for(; hsep_iter != m_materials_seps.end(); ++hsep_iter)
     delete (*hsep_iter); 
 
 
   //ALL Gtk VSeparator**************
   std::vector<Gtk::VSeparator*>::iterator vsep_iter = m_label_data_seps.begin();
-  for(; vsep_iter !=  m_label_data_seps.end(); vsep_iter++)
+  for(; vsep_iter !=  m_label_data_seps.end(); ++vsep_iter)
     delete (*vsep_iter); 
 
 
@@ -147,7 +147,7 @@ void GroupContentPanel::buildPanel()
       std::list<MaterialObj*>::const_iterator mat_iter 
         = m_materialgrp->materialBegin();
 
-      for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+      for(; mat_iter != m_materialgrp->materialEnd(); ++mat_iter)
         {
           //Create File Name For Material Preview Image
           k3d::string_t int_str;
@@ -280,7 +280,7 @@ void GroupContentPanel::buildPanel()
           m_materials_cont.pack_start(*t_HBreaker, false, false, 0);
 
           //Increment Filename Tag For Unique Identifier
-          fileName_int++;
+          ++fileName_int;
 
         }//for
 
@@ -318,7 +318,7 @@ void GroupContentPanel::renderPreview()
 
   std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
 
-  for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+  for(; mat_iter != m_materialgrp->materialEnd(); ++mat_iter)
     {
       //Check If Selected Node Is A RenderMan Material
       if((*mat_iter)->isMaterial())
@@ -371,7 +371,7 @@ bool GroupContentPanel::updatePreviewImage()
   //Invoke A Gtk Image Update / Refresh For Each Preview Image
   std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
 
-  for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+  for(; mat_iter != m_materialgrp->materialEnd(); ++mat_iter)
     {
       (const_cast<RenderedImage*>((*mat_iter)->pviewImg()))->queue_resize();
       (const_cast<RenderedImage*>((*mat_iter)->pviewImg()))->queue_draw();
@@ -389,7 +389,7 @@ void GroupContentPanel::renderSinglePreview(k3d::inode *node)
 
    MaterialObj* matching_material = 0;
 
-   for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+   for(; mat_iter != m_materialgrp->materialEnd(); ++mat_iter)
    {
      //Check If MaterialObj's Doc Node Equals Argument Node
      if((*mat_iter)->m_doc_node == node)
@@ -450,7 +450,7 @@ bool GroupContentPanel::findMaterial(const k3d::inode *node)
   //Iterate Through All Of The Stored MaterialObj's.
    std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
 
-   for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+   for(; mat_iter != m_materialgrp->materialEnd(); ++mat_iter)
      {
        if((*mat_iter)->docNode() == node)
          {
@@ -469,7 +469,7 @@ bool GroupContentPanel::findMaterial(const MaterialObj *mat)
   //Iterate Through All Of The Stored MaterialObj's.
   std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
 
-  for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+  for(; mat_iter != m_materialgrp->materialEnd(); ++mat_iter)
      {
        if(*mat_iter == mat)
          {
@@ -488,7 +488,7 @@ void GroupContentPanel::matobjAttachGeo()
   //Iterate Through All Of The Stored MaterialObj's.
   std::list<MaterialObj*>::const_iterator mat_iter = m_materialgrp->materialBegin();
 
-  for(; mat_iter != m_materialgrp->materialEnd(); mat_iter++)
+  for(; mat_iter != m_materialgrp->materialEnd(); ++mat_iter)
     {
       //Get The Doc Node From MaterialObj Ptr
       k3d::inode *mat_node = (*mat_iter)->m_doc_node;

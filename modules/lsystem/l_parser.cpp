@@ -804,7 +804,7 @@ void L_mutate()
 
 					unsigned long random = (unsigned long)(Rnd() * 12.0);
 
-					if(random < 0 || random > 11)
+					if(random > 11)
 						return;
 
 					if(rules[i][j] == mutations[random][0])
@@ -833,7 +833,7 @@ void L_mutate()
 
 					unsigned long random = (unsigned long)(Rnd() * 6.0);
 
-					if(random < 0 || random > 5)
+					if(random > 5)
 						return;
 
 					if(rules[i][j] == mutations[random][0])

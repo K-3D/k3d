@@ -881,15 +881,15 @@ static void localtrig( struct posdata *pdat, struct trigdata *tdat )
     if ( tdat->sd < -900.0 )  /* sd was initialized -999 as flag */
     {
       tdat->sd = 1.0;  /* reflag as having completed calculations */
-      if ( pdat->function | CD_MASK )
+      if ( pdat->function & CD_MASK )
         tdat->cd = cos ( raddeg * pdat->declin );
-      if ( pdat->function | CH_MASK )
+      if ( pdat->function & CH_MASK )
         tdat->ch = cos ( raddeg * pdat->hrang );
-      if ( pdat->function | CL_MASK )
+      if ( pdat->function & CL_MASK )
         tdat->cl = cos ( raddeg * pdat->latitude );
-      if ( pdat->function | SD_MASK )
+      if ( pdat->function & SD_MASK )
         tdat->sd = sin ( raddeg * pdat->declin );
-      if ( pdat->function | SL_MASK )
+      if ( pdat->function & SL_MASK )
         tdat->sl = sin ( raddeg * pdat->latitude );
     }
 }

@@ -785,7 +785,6 @@ static void parse_graphics(const k3d::xml::element& SVG, transform_stack& Transf
 			std::istringstream trans_stream(trans);
 			k3d::double_t x, y;
 			char token;
-			char tmp;
 			while (!trans_stream.eof())
 			{
 				trans_stream >> token;
