@@ -228,7 +228,7 @@ OPTION(K3D_BUILD_WINDOWS_MODULE "Build the Windows integration module" ${WIN32})
 OPTION(K3D_BUILD_XTRACKCAD_MODULE "Build the XTrackCAD Model Railroad integration module" ON)
 OPTION(K3D_BUILD_YAFRAY_MODULE "Build the YAFRAY render engine integration module" ON)
 
-OPTION(K3D_BUILD_DOCS "Build the documentation" ON)
+OPTION(K3D_BUILD_DOCS "Build the documentation" OFF)
 OPTION(K3D_BUILD_GUIDE "Build the html guide" ON)
 
 OPTION(K3D_ENABLE_OSX_BUNDLE "Package K-3D as an OSX bundle (ignored on other platforms)." OFF)
