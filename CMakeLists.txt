@@ -24,7 +24,7 @@ INCLUDE(K3DCompiler) # Detect problematic compilers
 SET(K3D_MAJOR_VERSION 0)
 SET(K3D_MINOR_VERSION 8)
 SET(K3D_RELEASE_VERSION 0)
-SET(K3D_BUILD_VERSION 4)
+SET(K3D_BUILD_VERSION 7)
 SET(K3D_SO_VERSION 1)
 
 SET(K3D_PACKAGE k3d)
@@ -229,7 +229,7 @@ OPTION(K3D_BUILD_XTRACKCAD_MODULE "Build the XTrackCAD Model Railroad integratio
 OPTION(K3D_BUILD_YAFRAY_MODULE "Build the YAFRAY render engine integration module" ON)
 
 OPTION(K3D_BUILD_DOCS "Build the documentation" OFF)
-OPTION(K3D_BUILD_GUIDE "Build the html guide" ON)
+OPTION(K3D_BUILD_GUIDE "Build the html guide" OFF)
 
 OPTION(K3D_ENABLE_OSX_BUNDLE "Package K-3D as an OSX bundle (ignored on other platforms)." OFF)
 OPTION(K3D_ENABLE_DISTRIBUTION "Enable distribution targets." OFF)
