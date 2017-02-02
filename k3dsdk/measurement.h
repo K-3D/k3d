@@ -27,6 +27,7 @@
 
 #include <cassert>
 #include <iosfwd>
+#include <ostream>
 #include <map>
 #include <string>
 #include <typeinfo>
