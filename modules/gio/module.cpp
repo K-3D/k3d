@@ -26,19 +26,19 @@
 namespace module
 {
 
-/// Namespace reserved for the gnome plugin module, to protect public symbols from name clashes with other modules
-namespace gnome
+/// Namespace reserved for the gio plugin module, to protect public symbols from name clashes with other modules
+namespace gio
 {
 
 extern k3d::iplugin_factory& mime_type_handler_factory();
 extern k3d::iplugin_factory& uri_handler_factory();
 
-} // namespace gnome
+} // namespace gio
 
 } // namespace module
 
 K3D_MODULE_START(Registry)
-	Registry.register_factory(module::gnome::mime_type_handler_factory());
-	Registry.register_factory(module::gnome::uri_handler_factory());
+	Registry.register_factory(module::gio::mime_type_handler_factory());
+	Registry.register_factory(module::gio::uri_handler_factory());
 K3D_MODULE_END
 

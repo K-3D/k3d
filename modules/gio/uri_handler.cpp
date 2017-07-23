@@ -29,24 +29,21 @@
 
 #include <iostream>
 
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-mime-handlers.h>
+#include <giomm/appinfo.h>
 
 namespace module
 {
 
-namespace gnome
+namespace gio
 {
 
-/// Uses the Gnome API to open a URI in the user's preferred application
+/// Uses the GIO API to open a URI in the user's preferred application
 class uri_handler :
 	public k3d::iuri_handler
 {
 public:
 	uri_handler()
 	{
-		if(!gnome_vfs_initialized())
-			return_if_fail(gnome_vfs_init());
 	}
 
 	~uri_handler()
@@ -56,20 +53,7 @@ public:
 
 	bool open_uri(const std::string& URI)
 	{
-		const char* const mime_type = gnome_vfs_get_mime_type(URI.c_str());
-		return_val_if_fail(mime_type, false);
-
-		GnomeVFSMimeApplication* const application = gnome_vfs_mime_get_default_application(mime_type);
-		return_val_if_fail(application, false);
-
-		k3d::log() << info << "URI: [" << URI << "] MIME type: [" << mime_type << "] Application: [" << application->name << "] Command: [" << application->command << "]" << std::endl;
-
-		GList* const uris = g_list_append(0, const_cast<char*>(URI.c_str()));
-		const bool result = GNOME_VFS_OK == gnome_vfs_mime_application_launch(application, uris);
-		g_list_free(uris);
-		gnome_vfs_mime_application_free(application);
-		
-		return result;
+		return Gio::AppInfo::launch_default_for_uri(URI);
 	}
 	
 	static k3d::iplugin_factory& get_factory()
@@ -77,8 +61,8 @@ public:
 		static k3d::application_plugin_factory<uri_handler,
 			k3d::interface_list<k3d::iuri_handler> > factory(
 				k3d::uuid(0xac560e92, 0x1d31478b, 0x9139ace8, 0x1bb0ae31),
-				"GnomeURIHandler",
-				_("Opens a URI using the Gnome libraries"),
+				"GioURIHandler",
+				_("Opens a URI using the GIO libraries"),
 				"Desktop",
 				k3d::iplugin_factory::STABLE);
 
@@ -94,8 +78,6 @@ k3d::iplugin_factory& uri_handler_factory()
 	return uri_handler::get_factory();
 }
 
-} // namespace gnome
+} // namespace gio
 
 } // namespace module
-
-
