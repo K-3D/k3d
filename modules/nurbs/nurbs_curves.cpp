@@ -738,7 +738,7 @@ void elevate_curve_degree(curve_arrays& Curve, const k3d::uint_t Elevations)
 					for (int k = power; k >= s; k--)
 					{
 						k3d::double_t weights[] = {alphas[k - s], (1.0 - alphas[k - s])};
-						k3d::uint_t indices[] = {k, k-1};
+						k3d::uint_t indices[] = {static_cast<k3d::uint_t>(k), static_cast<k3d::uint_t>(k-1)};
 						bpts_self_copier.copy(2, indices, weights, k);
 					}
 					next_bpts_bpts_copier.copy(power, save);
@@ -777,7 +777,7 @@ void elevate_curve_degree(curve_arrays& Curve, const k3d::uint_t Elevations)
 						if (i < cind)
 						{
 							double alf = (ub - new_curve.knots[i]) / (ua - new_curve.knots[i]);
-							k3d::uint_t indices[] = {i, i-1};
+							k3d::uint_t indices[] = {static_cast<k3d::uint_t>(i), static_cast<k3d::uint_t>(i-1)};
 							k3d::double_t weights[] = {alf, (1.0 - alf)};
 							new_point_self_copier.copy(2, indices, weights, i);
 						}
@@ -786,13 +786,13 @@ void elevate_curve_degree(curve_arrays& Curve, const k3d::uint_t Elevations)
 							if (j - tr <= kind - power - t + oldr)
 							{
 								double gam = (ub - new_curve.knots[j - tr]) / den;
-								k3d::uint_t indices[] = {kj, kj+1};
+								k3d::uint_t indices[] = {static_cast<k3d::uint_t>(kj), static_cast<k3d::uint_t>(kj+1)};
 								k3d::double_t weights[] = {gam, 1.0-gam};
 								ebpts_self_copier.copy(2, indices, weights, kj);
 							}
 							else
 							{
-								k3d::uint_t indices[] = {kj, kj+1};
+								k3d::uint_t indices[] = {static_cast<k3d::uint_t>(kj), static_cast<k3d::uint_t>(kj+1)};
 								k3d::double_t weights[] = {bet, 1.0-bet};
 								ebpts_self_copier.copy(2, indices, weights, kj);
 							}
@@ -1159,7 +1159,7 @@ void insert_knot(curve_arrays& Curve, const k3d::double_t u, const k3d::uint_t r
 		for (k3d::uint_t i = 0; i <= Curve.order - 1 - j - s; i++)
 		{
 			alpha = (u - Curve.knots[L + i]) / (Curve.knots[i + k + 1] - Curve.knots[L + i]);
-			k3d::uint_t indices[] = {i + 1, i};
+			k3d::uint_t indices[] = {static_cast<k3d::uint_t>(i + 1), static_cast<k3d::uint_t>(i)};
 			k3d::double_t weights[] = {alpha, 1.0 - alpha};
 			tmp_self_copier.copy(2, indices, weights, i);
 		}

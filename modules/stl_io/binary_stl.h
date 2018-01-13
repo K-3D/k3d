@@ -68,10 +68,10 @@ struct binary_stl
 	/// Magics format constructor, writes material info into the header
 	binary_stl(const k3d::color& Color, const k3d::color& Diffuse, const k3d::color& Specular, const k3d::color& Ambient)
 	{
-		const k3d::uint8_t color[] = {Color.red*255, Color.green*255, Color.blue*255, 0};
-		const k3d::uint8_t diffuse[] = {Diffuse.red*255, Diffuse.green*255, Diffuse.blue*255, 0};
-		const k3d::uint8_t specular[] = {Specular.red*255, Specular.green*255, Specular.blue*255, 0};
-		const k3d::uint8_t ambient[] = {Ambient.red*255, Ambient.green*255, Ambient.blue*255, 0};
+		const k3d::uint8_t color[] = {static_cast<k3d::uint8_t>(Color.red*255), static_cast<k3d::uint8_t>(Color.green*255), static_cast<k3d::uint8_t>(Color.blue*255), 0};
+		const k3d::uint8_t diffuse[] = {static_cast<k3d::uint8_t>(Diffuse.red*255), static_cast<k3d::uint8_t>(Diffuse.green*255), static_cast<k3d::uint8_t>(Diffuse.blue*255), 0};
+		const k3d::uint8_t specular[] = {static_cast<k3d::uint8_t>(Specular.red*255), static_cast<k3d::uint8_t>(Specular.green*255), static_cast<k3d::uint8_t>(Specular.blue*255), 0};
+		const k3d::uint8_t ambient[] = {static_cast<k3d::uint8_t>(Ambient.red*255), static_cast<k3d::uint8_t>(Ambient.green*255), static_cast<k3d::uint8_t>(Ambient.blue*255), 0};
 		const k3d::string_t color_str(reinterpret_cast<const char*>(color));
 		const k3d::string_t diffuse_str(reinterpret_cast<const char*>(diffuse));
 		const k3d::string_t specular_str(reinterpret_cast<const char*>(specular));

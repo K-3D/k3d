@@ -104,7 +104,7 @@ inline void color3d(const color& Color)
 /// Passes a k3d::color to glMaterialfv()
 inline void material(GLenum Face, GLenum PName, const color& Color, double Alpha = 1.0)
 {
-	GLfloat color[] = { Color.red, Color.green, Color.blue, Alpha };
+	GLfloat color[] = { static_cast<GLfloat>(Color.red), static_cast<GLfloat>(Color.green), static_cast<GLfloat>(Color.blue), static_cast<GLfloat>(Alpha) };
 	glMaterialfv(Face, PName, color);
 }
 
