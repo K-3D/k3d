@@ -57,7 +57,7 @@ TARGET_LINK_LIBRARIES(k3dsdk
 	${Boost_PROGRAM_OPTIONS_LIBRARY}
 	${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
 	${Boost_SYSTEM_LIBRARY}
-  "dl" # for gold linker
+	${CMAKE_DL_LIBS} # for gold linker
 	)
 
 IF(K3D_ENABLE_NLS)
