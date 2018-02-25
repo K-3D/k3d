@@ -58,30 +58,45 @@ k3d::bool_t is_ascii(std::istream& Stream)
 	return (boost::algorithm::starts_with(buffer, "solid"));
 }
 
-/// Adds a point without introducing duplicates
-k3d::uint_t add_point(k3d::mesh::points_t& Points, const k3d::point3& Point, const k3d::double_t Threshold)
+struct compare_points
 {
-	k3d::uint_t point_index = Points.size();
-	for(k3d::uint_t point = 0; point != Points.size(); ++point)
+	bool operator()(const k3d::point3& A, const k3d::point3& B) const
 	{
-		const k3d::double_t len2 = (Points[point] - Point).length2();
-		if(len2 < Threshold)
+		if (A[0] != B[0])
 		{
-			point_index = point;
-			break;
+			return A[0] < B[0];
 		}
+		if (A[1] != B[1])
+		{
+			return A[1] < B[1];
+		}
+		return A[2] < B[2];
 	}
-	if(point_index == Points.size())
+};
+
+typedef std::map<k3d::point3, k3d::uint_t, compare_points> point_map_t;
+
+void fill_points(const point_map_t& PointMap, k3d::mesh::points_t& Points)
+{
+	Points.resize(PointMap.size());
+	for(point_map_t::const_iterator it = PointMap.begin(); it != PointMap.end(); ++it)
 	{
-		Points.push_back(Point);
+		Points[it->second] = it->first;
 	}
-	return point_index;
+}
+
+/// Adds a point without introducing duplicates
+k3d::uint_t add_point(point_map_t &PointMap, const k3d::point3 &Point)
+{
+	return PointMap.insert(std::make_pair(Point, PointMap.size())).first->second;
 }
 
 /// Extracts the STL topology information, merging points that are less than threshold apart
 void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::mesh::counts_t& VertexCounts, k3d::mesh::indices_t& VertexIndices, k3d::mesh::normals_t& Normals, const k3d::double_t Threshold = 1e-12)
 {
 	const k3d::double_t threshold = Threshold*Threshold;
+
+	detail::point_map_t point_map;
 
 	k3d::string_t line_buffer;
 	k3d::uint_t line_number = 0;
@@ -114,7 +129,7 @@ void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::me
 			line_stream >> z;
 			k3d::point3 new_point(x, y, z);
 
-			face_points.push_back(detail::add_point(Points, new_point, threshold));
+			face_points.push_back(detail::add_point(point_map, new_point));
 			if(face_points.size() == 3)
 			{
 				std::stringstream face_id_stream;
@@ -144,6 +159,7 @@ void get_stl_topology(std::istream& Stream, k3d::mesh::points_t& Points, k3d::me
 			}
 		}
 	}
+	detail::fill_points(point_map, Points);
 }
 
 const k3d::normal3 normal(const k3d::mesh::points_t Points, k3d::mesh::indices_t& VertexIndices, const k3d::uint_t FaceIndex)
@@ -247,6 +263,8 @@ public:
 		k3d::mesh::indices_t vertex_indices;
 		k3d::mesh::normals_t face_normals;
 		
+		detail::point_map_t point_map;
+		
 		try
 		{
 			if(detail::is_ascii(file))
@@ -277,18 +295,23 @@ public:
 					is_magics = true;
 				}
 				const k3d::uint_t nfacets = stl.facets.size();
+				vertex_counts.reserve(nfacets);
+				face_normals.reserve(nfacets);
+				face_colors.reserve(nfacets);
+				vertex_indices.reserve(3*nfacets);
 				for(k3d::uint_t f = 0; f != nfacets; ++f)
 				{
 					vertex_counts.push_back(3);
 					k3d::point3 p0(stl.facets[f].v0[0], stl.facets[f].v0[1], stl.facets[f].v0[2]);
 					k3d::point3 p1(stl.facets[f].v1[0], stl.facets[f].v1[1], stl.facets[f].v1[2]);
 					k3d::point3 p2(stl.facets[f].v2[0], stl.facets[f].v2[1], stl.facets[f].v2[2]);
-					vertex_indices.push_back(detail::add_point(points, p0, threshold));
-					vertex_indices.push_back(detail::add_point(points, p1, threshold));
-					vertex_indices.push_back(detail::add_point(points, p2, threshold));
+					vertex_indices.push_back(detail::add_point(point_map, p0));
+					vertex_indices.push_back(detail::add_point(point_map, p1));
+					vertex_indices.push_back(detail::add_point(point_map, p2));
 					face_normals.push_back(k3d::normal3(stl.facets[f].normal[0], stl.facets[f].normal[1], stl.facets[f].normal[2]));
 					face_colors.push_back(is_magics ? detail::convert_color_magics(stl.facets[f].color, base_color) : detail::convert_color_viscam(stl.facets[f].color, base_color));
 				}
+				detail::fill_points(point_map, points);
 				k3d::polyhedron::primitive* polyhedron = k3d::polyhedron::create(Output, points, vertex_counts, vertex_indices, static_cast<k3d::imaterial*>(0));
 				polyhedron->face_attributes.create(m_color_array.pipeline_value(), new k3d::mesh::colors_t(face_colors));
 			}
