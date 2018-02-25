@@ -61,7 +61,7 @@ public:
 			k3d::interface_list<k3d::imesh_sink> > > factory(
 				k3d::uuid(0x7e34dbd5, 0xbe9847b2, 0xac9f313e, 0xe1dcbb68),
 				"SelectEdgeRings",
-				_("Selects edge rings containing selected egdes"),
+				_("Selects edge rings containing selected edges"),
 				"Selection",
 				k3d::iplugin_factory::STABLE);
 

@@ -71,7 +71,7 @@ public:
 			k3d::interface_list<k3d::imesh_sink> > > factory(
 				k3d::uuid(0x6f42e16a, 0x99804f99, 0xa00528d3, 0x702f015c),
 				"SelectEdgeLoops",
-				_("Selects edge loops containing selected egdes"),
+				_("Selects edge loops containing selected edges"),
 				"Selection",
 				k3d::iplugin_factory::STABLE);
 

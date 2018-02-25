@@ -5426,10 +5426,10 @@ msgstr ""
 msgid "Selects an edge from the input mesh by its index number"
 msgstr "Selects un idge-a frum zee inpoot mesh by its index noomber"
 
-msgid "Selects edge loops containing selected egdes"
+msgid "Selects edge loops containing selected edges"
 msgstr "Selects idge-a luups cunteeening selected igdes"
 
-msgid "Selects edge rings containing selected egdes"
+msgid "Selects edge rings containing selected edges"
 msgstr "Selects idge-a reengs cunteeening selected igdes"
 
 msgid "Selects edges that are on the boundary of the mesh"

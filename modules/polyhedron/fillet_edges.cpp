@@ -1407,7 +1407,7 @@ public:
 			if(!(*polyhedron)->faces.size())
 				continue;
 
-			// Get selected egdes
+			// Get selected edges
 			detail::edge_set_t selected_edges;
 			detail::edge_face_map_t edge_face_map;
 			detail::for_each_edge_face(**polyhedron, detail::get_edges(selected_edges, edge_face_map));
