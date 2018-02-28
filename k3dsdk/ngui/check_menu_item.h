@@ -88,8 +88,8 @@ class control :
 	typedef Gtk::CheckMenuItem base;
 
 public:
-	control(std::auto_ptr<idata_proxy> Data);
-	control(std::auto_ptr<idata_proxy> Data, const Glib::ustring& label, bool mnemonic = false);
+	control(std::unique_ptr<idata_proxy> Data);
+	control(std::unique_ptr<idata_proxy> Data, const Glib::ustring& label, bool mnemonic = false);
 
 	void on_toggled();
 
@@ -100,7 +100,7 @@ private:
 	void update(k3d::ihint*);
 
 	/// Stores a reference to the underlying data object
-	const std::auto_ptr<idata_proxy> m_data;
+	const std::unique_ptr<idata_proxy> m_data;
 };
 
 /// Provides an implementation of k3d::check_menu_item::idata_proxy that supports any data source that supports the value(), set_value(), and changed_signal() concepts
@@ -139,18 +139,18 @@ private:
 
 /// Convenience factory function for creating check_menu_item::idata_proxy objects
 template<typename data_t>
-std::auto_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring())
+std::unique_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring())
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
 }
 
 /// Convenience factory function for creating check_menu_item::idata_proxy objects specialized for use with k3d::iproperty objects
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring());
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring());
 
 /// Convenience factory function for creating empty check_menu_item::idata_proxy objects
-inline std::auto_ptr<idata_proxy> proxy()
+inline std::unique_ptr<idata_proxy> proxy()
 {
-	return std::auto_ptr<idata_proxy>();
+	return std::unique_ptr<idata_proxy>();
 }
 
 } // namespace check_menu_item

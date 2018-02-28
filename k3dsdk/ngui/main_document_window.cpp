@@ -2852,13 +2852,13 @@ private:
 	static unsigned long m_count;
 
 	/// Stores the Edit > Undo menu item
-	std::auto_ptr<Gtk::ImageMenuItem> m_undo_menu_item;
+	std::unique_ptr<Gtk::ImageMenuItem> m_undo_menu_item;
 	/// Stores the Edit > Undo All menu item
-	std::auto_ptr<Gtk::ImageMenuItem> m_undo_all_menu_item;
+	std::unique_ptr<Gtk::ImageMenuItem> m_undo_all_menu_item;
 	/// Stores the Edit > Redo menu item
-	std::auto_ptr<Gtk::ImageMenuItem> m_redo_menu_item;
+	std::unique_ptr<Gtk::ImageMenuItem> m_redo_menu_item;
 	/// Stores the Edit > Redo All menu item
-	std::auto_ptr<Gtk::ImageMenuItem> m_redo_all_menu_item;
+	std::unique_ptr<Gtk::ImageMenuItem> m_redo_all_menu_item;
 	/// Set to true iff current panel was maximized
 	k3d_data(bool, immutable_name, change_signal, no_undo, local_storage, no_constraint, no_property, no_serialization) m_maximize_panel;
 	/// Set to true iff unpinned panels are hidden

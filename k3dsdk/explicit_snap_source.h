@@ -48,8 +48,8 @@ public:
 
 	std::string m_label;
 	k3d::point3 m_position;
-	std::auto_ptr<k3d::vector3> m_look;
-	std::auto_ptr<k3d::vector3> m_up;
+	std::unique_ptr<k3d::vector3> m_look;
+	std::unique_ptr<k3d::vector3> m_up;
 	groups_t m_groups;
 };
 

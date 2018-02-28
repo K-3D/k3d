@@ -55,8 +55,8 @@ namespace property_button
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(std::auto_ptr<property_widget::idata_proxy> Data) :
-	base(Data),
+control::control(std::unique_ptr<property_widget::idata_proxy> Data) :
+	base(std::move(Data)),
 	m_image(new Gtk::Image())
 {
 	set_name("k3d-property-button");

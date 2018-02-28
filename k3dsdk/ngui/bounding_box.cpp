@@ -138,9 +138,9 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(std::auto_ptr<idata_proxy> Data) :
+control::control(std::unique_ptr<idata_proxy> Data) :
 	base(3, 3, false),
-	m_data(Data)
+	m_data(std::move(Data))
 {
 	spin_button::control* const nx = new spin_button::control(new spin_button_model(*m_data, &k3d::bounding_box3::nx), m_data->state_recorder);
 	spin_button::control* const px = new spin_button::control(new spin_button_model(*m_data, &k3d::bounding_box3::px), m_data->state_recorder);
@@ -165,9 +165,9 @@ control::control(std::auto_ptr<idata_proxy> Data) :
 /////////////////////////////////////////////////////////////////////////////
 // proxy
 
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Property, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Property, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
 {
-	return std::auto_ptr<idata_proxy>(new detail::data_proxy(Property, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new detail::data_proxy(Property, StateRecorder, ChangeMessage));
 }
 
 } // namespace bounding_box

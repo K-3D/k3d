@@ -120,9 +120,9 @@ size_t state_change_set::redo_count() const
 /////////////////////////////////////////////////////////////////////////////
 // create_state_change_set
 
-std::auto_ptr<state_change_set> create_state_change_set(const char* const Context)
+std::unique_ptr<state_change_set> create_state_change_set(const char* const Context)
 {
-	return std::auto_ptr<state_change_set>(new state_change_set());
+	return std::unique_ptr<state_change_set>(new state_change_set());
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -139,7 +139,7 @@ void start_state_change_set(idocument& Document, const char* const Context)
 void cancel_state_change_set(idocument& Document, const char* const Context)
 {
 	// Tell the document to stop recording ...
-	const std::auto_ptr<state_change_set> changeset(Document.state_recorder().stop_recording(Context));
+	const std::unique_ptr<state_change_set> changeset(Document.state_recorder().stop_recording(Context));
 
 	// Undo any changes up to this point, and let the leftover data get destroyed ...
 	return_if_fail(changeset.get());

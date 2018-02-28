@@ -98,7 +98,7 @@ public:
 		delete Node;
 	}
 
-	void start_recording(std::auto_ptr<state_change_set> ChangeSet, const char* const Context)
+	void start_recording(std::unique_ptr<state_change_set> ChangeSet, const char* const Context)
 	{
 		if(!ChangeSet.get())
 		{
@@ -109,11 +109,11 @@ public:
 		if(m_current_recording.get())
 		{
 			log() << warning << "Forcing termination of unfinished changeset.  Context: " << m_current_context << std::endl;
-			std::auto_ptr<state_change_set> changeset = stop_recording(Context);
-			commit_change_set(changeset, "Unfinished changeset", Context);
+			std::unique_ptr<state_change_set> changeset = stop_recording(Context);
+			commit_change_set(std::move(changeset), "Unfinished changeset", Context);
 		}
 
-		m_current_recording = ChangeSet;
+		m_current_recording = std::move(ChangeSet);
 		m_current_context = Context;
 	}
 
@@ -122,12 +122,12 @@ public:
 		return m_current_recording.get();
 	}
 
-	std::auto_ptr<state_change_set> stop_recording(const char* const Context)
+	std::unique_ptr<state_change_set> stop_recording(const char* const Context)
 	{
 		if(!m_current_recording.get())
 		{
 			log() << error << "stop_recording() attempt with NULL changeset.  Context: " << Context << std::endl;
-			return m_current_recording;
+			return std::move(m_current_recording);
 		}
 		
 		// Let the world know that recording is finished ...
@@ -137,10 +137,10 @@ public:
 		sigc::signal<void>::slot_list_type slots = m_recording_done_signal.slots();
 		slots.erase(slots.begin(), slots.end());
 
-		return m_current_recording;
+		return std::move(m_current_recording);
 	}
 
-	void commit_change_set(std::auto_ptr<state_change_set> ChangeSet, const std::string& Label, const char* const Context)
+	void commit_change_set(std::unique_ptr<state_change_set> ChangeSet, const std::string& Label, const char* const Context)
 	{
 		if(!ChangeSet.get())
 		{
@@ -229,7 +229,7 @@ public:
 
 private:
 	/// Stores the current change set
-	std::auto_ptr<state_change_set> m_current_recording;
+	std::unique_ptr<state_change_set> m_current_recording;
 	/// Stores the context for the current change set
 	const char* m_current_context;
 	/// Stores the root node(s) (if any)
@@ -546,7 +546,7 @@ documents_t& documents()
 
 idocument* create_document()
 {
-	std::auto_ptr<detail::document_implementation> document(new detail::document_implementation());
+	std::unique_ptr<detail::document_implementation> document(new detail::document_implementation());
 	detail::documents().push_back(document.get());
 	return document.release()->m_document;
 }

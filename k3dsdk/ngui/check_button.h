@@ -90,8 +90,8 @@ class control :
 	typedef Gtk::CheckButton base;
 
 public:
-	control(std::auto_ptr<idata_proxy> Data);
-	control(std::auto_ptr<idata_proxy> Data, const Glib::ustring& label, bool mnemonic = false);
+	control(std::unique_ptr<idata_proxy> Data);
+	control(std::unique_ptr<idata_proxy> Data, const Glib::ustring& label, bool mnemonic = false);
 
 	void on_toggled();
 
@@ -101,7 +101,7 @@ private:
 	/// Called to update the state of the widget when the underlying data source changes
 	void update(k3d::ihint*);
 	/// Storeas a reference to the underlying data object
-	const std::auto_ptr<idata_proxy> m_data;
+	const std::unique_ptr<idata_proxy> m_data;
 };
 
 /// Provides an implementation of k3d::check_button::idata_proxy that supports any data source that supports the value(), set_value(), and changed_signal() concepts
@@ -145,18 +145,18 @@ private:
 
 /// Convenience factory function for creating check_button::idata_proxy objects
 template<typename data_t>
-std::auto_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring())
+std::unique_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring())
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
 }
 
 /// Convenience factory function for creating check_button::idata_proxy objects specialized for use with k3d::iproperty
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring());
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring());
 
 /// Convenience factory function for creating empty check_button::idata_proxy objects
-inline std::auto_ptr<idata_proxy> proxy()
+inline std::unique_ptr<idata_proxy> proxy()
 {
-	return std::auto_ptr<idata_proxy>(0);
+	return std::unique_ptr<idata_proxy>(nullptr);
 }
 
 } // namespace check_button

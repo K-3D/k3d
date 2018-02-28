@@ -120,7 +120,7 @@ class control :
 	typedef Gtk::HBox base;
 
 public:
-	control(std::auto_ptr<idata_proxy> Data, std::auto_ptr<iselection_filter> Filter);
+	control(std::unique_ptr<idata_proxy> Data, std::unique_ptr<iselection_filter> Filter);
 
 private:
 	/// Called when new nodes are added to the document
@@ -144,15 +144,15 @@ private:
 	void reset_menu();
 
 	/// Stores a reference to the underlying data node
-	std::auto_ptr<idata_proxy> m_data;
+	std::unique_ptr<idata_proxy> m_data;
 	/// Stores a filter node for controlling the set of available choices
-	std::auto_ptr<iselection_filter> m_filter;
+	std::unique_ptr<iselection_filter> m_filter;
 
 	Gtk::Label* const m_label;
 	Gtk::Button* const m_menu_button;
 	Gtk::Button* const m_edit_button;
 
-	std::auto_ptr<Gtk::Menu> m_menu;
+	std::unique_ptr<Gtk::Menu> m_menu;
 	std::map<std::string, Gtk::MenuItem*> m_menu_item_create;
 	std::map<std::string, Gtk::MenuItem*> m_menu_item_select;
 };
@@ -246,9 +246,9 @@ private:
 
 /// Convenience factory function for creating node_chooser::idata_proxy objects
 template<typename data_t>
-std::auto_ptr<idata_proxy> proxy(document_state& DocumentState, data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = "")
+std::unique_ptr<idata_proxy> proxy(document_state& DocumentState, data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = "")
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(DocumentState, Data, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new data_proxy<data_t>(DocumentState, Data, StateRecorder, ChangeMessage));
 }
 
 /// Provides an implementation of k3d::node_chooser::iselection_filter that filters based on a specific interface type
@@ -283,13 +283,13 @@ private:
 
 /// Convenience factory function for creating k3d::node_chooser::iselection_filter nodes
 template<typename interface_t>
-std::auto_ptr<iselection_filter> filter(const bool AllowNone)
+std::unique_ptr<iselection_filter> filter(const bool AllowNone)
 {
-	return std::auto_ptr<iselection_filter>(new selection_filter<interface_t>(AllowNone));
+	return std::unique_ptr<iselection_filter>(new selection_filter<interface_t>(AllowNone));
 }
 
 /// Convenience factory function for creating k3d::node_chooser::iselection_filter nodes for use with k3d::iproperty nodes
-std::auto_ptr<iselection_filter> filter(k3d::iproperty& Data);
+std::unique_ptr<iselection_filter> filter(k3d::iproperty& Data);
 
 } // namespace node_chooser
 

@@ -90,7 +90,7 @@ class control :
 	typedef Gtk::ComboBoxEntry base;
 
 public:
-	control(std::auto_ptr<idata_proxy> Data);
+	control(std::unique_ptr<idata_proxy> Data);
 
 	/// Defines a predefined (but not exclusive) list of values that should be available to the user
 	typedef std::vector<std::string> values_t;
@@ -114,7 +114,7 @@ private:
 	void set_new_value();
 
 	/// Stores a proxy for the underlying data source
-	std::auto_ptr<idata_proxy> m_data;
+	std::unique_ptr<idata_proxy> m_data;
 
 	/// Defines a data model for the underlying combo box widget
 	class columns :
@@ -173,13 +173,13 @@ private:
 
 /// Convenience factory function for creating combo_box::idata_proxy objects
 template<typename data_t>
-std::auto_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring())
+std::unique_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring())
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
 }
 
 /// Convenience factory function for creating combo_box::idata_proxy objects for use with k3d::iproperty
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring());
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring());
 
 } // namespace combo_box
 

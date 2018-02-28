@@ -560,9 +560,9 @@ private:
 	/// Set to true iff we should display the tutorial menu at startup
 	k3d::bool_t m_show_learning_menu;
 	/// Stores the main loop
-	std::auto_ptr<Gtk::Main> m_main;
+	std::unique_ptr<Gtk::Main> m_main;
 	/// Stores the (optional) splash screen
-	std::auto_ptr<splash_box> m_splash_box;
+	std::unique_ptr<splash_box> m_splash_box;
 
 	/// Stores (optional) auto-start plugins
 	typedef std::vector<k3d::iunknown*> auto_start_plugins_t;

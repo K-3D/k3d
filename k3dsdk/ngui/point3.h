@@ -92,14 +92,14 @@ class control :
 	typedef Gtk::Table base;
 
 public:
-	control(std::auto_ptr<idata_proxy> Data);
+	control(std::unique_ptr<idata_proxy> Data);
 
 private:
 	/// Called to reset the object point to the origin
 	void on_reset();
 
 	/// Stores a reference to the underlying data object
-	std::auto_ptr<idata_proxy> m_data;
+	std::unique_ptr<idata_proxy> m_data;
 	/// Stores the reset button
 	Gtk::Button* m_reset_button;
 };
@@ -108,7 +108,7 @@ private:
 // proxy
 
 /// Convenience factory function for creating k3d::spin_button::idata_proxy objects, specialized for k3d::iproperty
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring());
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring());
 
 } // namespace point
 

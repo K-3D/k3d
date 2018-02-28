@@ -73,7 +73,7 @@ class control :
 	typedef Gtk::HButtonBox base;
 
 public:
-	control(std::auto_ptr<idata_proxy> Data);
+	control(std::unique_ptr<idata_proxy> Data);
 
 private:
 	/// Called whenever the underlying data changes
@@ -87,7 +87,7 @@ private:
 	/// Displays the alpha channel
 	Gtk::Image* const m_alpha;
 	/// Storeas a reference to the underlying data object
-	std::auto_ptr<idata_proxy> m_data;
+	std::unique_ptr<idata_proxy> m_data;
 };
 
 /// Provides an implementation of bitmap_preview::idata_proxy that supports any data source that supports the value(), set_value(), and changed_signal() concepts
@@ -120,13 +120,13 @@ private:
 
 /// Convenience factory function for creating bitmap_preview::idata_proxy objects
 template<typename data_t>
-std::auto_ptr<idata_proxy> proxy(data_t& Data)
+std::unique_ptr<idata_proxy> proxy(data_t& Data)
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(Data));
+	return std::unique_ptr<idata_proxy>(new data_proxy<data_t>(Data));
 }
 
 /// Specialization of proxy() for use with properties
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data);
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Data);
 
 } // namespace bitmap_preview
 

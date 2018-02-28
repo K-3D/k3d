@@ -334,10 +334,10 @@ public:
   document_state& 				m_document_state;
 	  
   //Model That Stores Data
-  std::auto_ptr<Model> 			m_model;
+  std::unique_ptr<Model> 			m_model;
 
   //The Right Content Pane For The Panel
-  std::auto_ptr<ContentPanel> m_rpane_content;
+  std::unique_ptr<ContentPanel> m_rpane_content;
 
   //Flag To Hold Startup Routine Heads Up
   bool								m_init;
@@ -614,7 +614,7 @@ void Implementation::buildContentPanel(Gtk::TreeModel::Row row, bool m_col_ismg)
     {
       //Delete Object. Create New GroupContentPanel Through Smart Pointer
       m_rpane_content 
-        = std::auto_ptr<ContentPanel>
+        = std::unique_ptr<ContentPanel>
         (new GroupContentPanel(&m_main_hpaned, 
                                row->get_value(m_columns.m_col_mgptr), 
                                &m_document_state));
@@ -627,7 +627,7 @@ void Implementation::buildContentPanel(Gtk::TreeModel::Row row, bool m_col_ismg)
     {
       //Delete Object. Create New MaterialContentPanel Through Smart Pointer
       m_rpane_content 
-        = std::auto_ptr<ContentPanel>
+        = std::unique_ptr<ContentPanel>
         (new MaterialContentPanel(&m_main_hpaned, 
                                   row->get_value(m_columns.m_col_moptr), 
                                   &m_document_state));

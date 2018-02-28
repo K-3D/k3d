@@ -58,8 +58,8 @@ namespace property_widget
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(std::auto_ptr<idata_proxy> Data) :
-	m_data(Data),
+control::control(std::unique_ptr<idata_proxy> Data) :
+	m_data(std::move(Data)),
 	m_show_connected(0),
 	m_disconnect(0)
 {

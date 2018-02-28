@@ -165,9 +165,9 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(std::auto_ptr<idata_proxy> Data) :
+control::control(std::unique_ptr<idata_proxy> Data) :
 	base(3, 3, false),
-	m_data(Data),
+	m_data(std::move(Data)),
 	m_reset_button(0)
 {
 	spin_button::control* const x = new spin_button::control(new spin_button_model(*m_data, 0), m_data->state_recorder);
@@ -208,9 +208,9 @@ void control::on_reset()
 /////////////////////////////////////////////////////////////////////////////
 // proxy
 
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Property, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Property, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
 {
-	return std::auto_ptr<idata_proxy>(new detail::data_proxy(Property, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new detail::data_proxy(Property, StateRecorder, ChangeMessage));
 }
 
 } // namespace point

@@ -106,7 +106,7 @@ class control :
 	typedef Gtk::HBox base;
 
 public:
-	control(std::auto_ptr<idata_proxy> Data);
+	control(std::unique_ptr<idata_proxy> Data);
 
 private:
 	/// Called when the control loses the keyboard focus
@@ -135,7 +135,7 @@ private:
 	/// Stores a toggle button to set if the file should be watched, if the path property is watchable
 	Gtk::ToggleButton* m_toggle_button;
 	/// Stores a reference to the underlying data object
-	std::auto_ptr<idata_proxy> m_data;
+	std::unique_ptr<idata_proxy> m_data;
 	/// Prevent set_value() and on_watch_toggle from being called recursively (a hack)
 	bool m_disable_set_value;
 
@@ -192,13 +192,13 @@ private:
 
 /// Convenience factory function for creating idata_proxy objects
 template<typename data_t>
-std::auto_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring())
+std::unique_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring())
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
 }
 
 /// Convenience factory function for creating idata_proxy objects
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring());
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = Glib::ustring());
 
 } // namespace path_chooser
 

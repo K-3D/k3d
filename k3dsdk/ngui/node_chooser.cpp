@@ -92,10 +92,10 @@ private:
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(std::auto_ptr<idata_proxy> Data, std::auto_ptr<iselection_filter> Filter) :
+control::control(std::unique_ptr<idata_proxy> Data, std::unique_ptr<iselection_filter> Filter) :
 	base(false, 0),
-	m_data(Data),
-	m_filter(Filter),
+	m_data(std::move(Data)),
+	m_filter(std::move(Filter)),
 	m_label(new Gtk::Label()),
 	m_menu_button(new Gtk::Button()),
 	m_edit_button(new Gtk::Button())
@@ -262,9 +262,9 @@ void control::on_edit()
 	panel::mediator(m_data->document().document()).set_focus(*m_data->node());
 }
 
-std::auto_ptr<iselection_filter> filter(k3d::iproperty& Data)
+std::unique_ptr<iselection_filter> filter(k3d::iproperty& Data)
 {
-	return std::auto_ptr<iselection_filter>(new detail::property_filter(Data));
+	return std::unique_ptr<iselection_filter>(new detail::property_filter(Data));
 }
 
 } // namespace node_chooser

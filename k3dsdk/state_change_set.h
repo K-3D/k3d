@@ -75,7 +75,7 @@ private:
 #define K3D_CHANGE_SET_CONTEXT __FILE__ " (" K3D_CHANGE_SET_CONTEXT_STRINGIZE(__LINE__) ")"
 
 /// Factory function for creating standard state change set objects
-std::auto_ptr<state_change_set> create_state_change_set(const char* const Context);
+std::unique_ptr<state_change_set> create_state_change_set(const char* const Context);
 /// Convenience function that starts recording a state change set for undo/redo purposes
 void start_state_change_set(idocument& Document, const char* const Context);
 /// Convenience function that cancels recording the current state change set

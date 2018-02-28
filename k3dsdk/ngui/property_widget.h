@@ -83,7 +83,7 @@ private:
 class control
 {
 public:
-	control(std::auto_ptr<idata_proxy> Data);
+	control(std::unique_ptr<idata_proxy> Data);
 	virtual ~control();
 
 	bool button_press_event(GdkEventButton* Event);
@@ -102,9 +102,9 @@ protected:
 	void disconnect(k3d::inode* Object);
 
 	/// Stores a reference to the underlying data object
-	std::auto_ptr<idata_proxy> m_data;
+	std::unique_ptr<idata_proxy> m_data;
 	/// Context menu displayed when the user clicks on the widget
-	std::auto_ptr<Gtk::Menu> m_menu;
+	std::unique_ptr<Gtk::Menu> m_menu;
 	/// Caches the "show connected" widget for tutorial playback
 	Gtk::MenuItem* m_show_connected;
 	/// Maps properties to widgets for tutorial playback
@@ -179,9 +179,9 @@ private:
 
 /// Convenience factory function for creating property_widget::idata_proxy objects
 template<typename data_t>
-std::auto_ptr<idata_proxy> proxy(document_state& DocumentState, data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = "")
+std::unique_ptr<idata_proxy> proxy(document_state& DocumentState, data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = "")
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(DocumentState, Data, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new data_proxy<data_t>(DocumentState, Data, StateRecorder, ChangeMessage));
 }
 
 } // namespace property_widget

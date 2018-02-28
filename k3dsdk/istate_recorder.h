@@ -42,13 +42,13 @@ class istate_recorder :
 {
 public:
 	/// Called by clients to register a change set for recording subsequent state changes (the recorder assumes responsibility for the lifetime of the changeset)
-	virtual void start_recording(std::auto_ptr<state_change_set> ChangeSet, const char* const DebugLabel) = 0;
+	virtual void start_recording(std::unique_ptr<state_change_set> ChangeSet, const char* const DebugLabel) = 0;
 	/// Returns the current change set being recorded (if any - could return NULL)
 	virtual state_change_set* current_change_set() = 0;
 	/// Called by clients to stop recording a set of state changes (the recorder relinquishes responsibility for the lifetime of the returned changeset)
-	virtual std::auto_ptr<state_change_set> stop_recording(const char* const DebugLabel) = 0;
+	virtual std::unique_ptr<state_change_set> stop_recording(const char* const DebugLabel) = 0;
 	/// Called by clients once a set of changes is complete, to make them a part of the undo/redo tree (the recorder assumes responsibility for the lifetime of the change set)
-	virtual void commit_change_set(std::auto_ptr<state_change_set> ChangeSet, const std::string& Label, const char* const DebugLabel) = 0;
+	virtual void commit_change_set(std::unique_ptr<state_change_set> ChangeSet, const std::string& Label, const char* const DebugLabel) = 0;
 
 	/// Defines a collection of "nodes" in the hierarchy of recorded state changes
 	struct node;

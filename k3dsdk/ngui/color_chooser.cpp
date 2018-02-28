@@ -58,8 +58,8 @@ class color_selection_dialog:
 	typedef application_window base;
 
 public:
-	color_selection_dialog(std::auto_ptr<idata_proxy> Data) :
-		m_data(Data)
+	color_selection_dialog(std::unique_ptr<idata_proxy> Data) :
+		m_data(std::move(Data))
 	{
 		Gtk::VBox* const vbox = new Gtk::VBox(false);
 		add(*manage(vbox));
@@ -117,7 +117,7 @@ private:
 
 	Gtk::ColorSelection m_color_selection;
 	sigc::connection m_color_changed_connection;
-	std::auto_ptr<idata_proxy> m_data;
+	std::unique_ptr<idata_proxy> m_data;
 };
 
 } // namespace detail
@@ -168,9 +168,9 @@ public:
 		return m_readable_data.property_changed_signal();
 	}
 
-	std::auto_ptr<idata_proxy> clone()
+	std::unique_ptr<idata_proxy> clone()
 	{
-		return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(m_readable_data, state_recorder, change_message));
+		return std::unique_ptr<idata_proxy>(new data_proxy<data_t>(m_readable_data, state_recorder, change_message));
 	}
 
 private:
@@ -181,17 +181,17 @@ private:
 	k3d::iwritable_property* const m_writable_data;
 };
 
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<k3d::iproperty>(Data, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new data_proxy<k3d::iproperty>(Data, StateRecorder, ChangeMessage));
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(std::auto_ptr<idata_proxy> Data) :
+control::control(std::unique_ptr<idata_proxy> Data) :
 	m_area(new Gtk::DrawingArea()),
-	m_data(Data)
+	m_data(std::move(Data))
 {
 	m_area->signal_expose_event().connect(sigc::hide(sigc::mem_fun(*this, &control::on_redraw)));
 	add(*manage(m_area));

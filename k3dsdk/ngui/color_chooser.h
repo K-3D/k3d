@@ -68,7 +68,7 @@ public:
 	const Glib::ustring change_message;
 
 	/// Virtual copy constructor idiom
-	virtual std::auto_ptr<idata_proxy> clone() = 0;
+	virtual std::unique_ptr<idata_proxy> clone() = 0;
 
 protected:
 	idata_proxy(k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage) :
@@ -92,7 +92,7 @@ class control :
 	typedef Gtk::Button base;
 
 public:
-	control(std::auto_ptr<idata_proxy> Data);
+	control(std::unique_ptr<idata_proxy> Data);
 	~control();
 
 private:
@@ -106,7 +106,7 @@ private:
 	/// Displays the currently color
 	Gtk::DrawingArea* const m_area;
 	/// Stores a reference to the underlying data object
-	std::auto_ptr<idata_proxy> m_data;
+	std::unique_ptr<idata_proxy> m_data;
 	/// Stores a signal that will be emitted when the control is destroyed
 	sigc::signal<void> m_deleted_signal;
 };
@@ -138,9 +138,9 @@ public:
 		return m_data.changed_signal();
 	}
 
-	std::auto_ptr<idata_proxy> clone()
+	std::unique_ptr<idata_proxy> clone()
 	{
-		return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(m_data, state_recorder, change_message));
+		return std::unique_ptr<idata_proxy>(new data_proxy<data_t>(m_data, state_recorder, change_message));
 	}
 
 private:
@@ -152,13 +152,13 @@ private:
 
 /// Convenience factory function for creating color_chooser::idata_proxy objects
 template<typename data_t>
-std::auto_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = "")
+std::unique_ptr<idata_proxy> proxy(data_t& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = "")
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new data_proxy<data_t>(Data, StateRecorder, ChangeMessage));
 }
 
 /// Convenience factory function for creating color_chooser::idata_proxy objects, specialized for k3d::iproperty
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = "");
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder = 0, const Glib::ustring& ChangeMessage = "");
 
 } // namespace color_chooser
 

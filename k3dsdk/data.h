@@ -1534,7 +1534,7 @@ private:
 	virtual void on_constrain(value_t& Value) = 0;
 
 	/// Storage for the (optional) next constraint to apply in the chain
-	const std::auto_ptr<iconstraint<value_t> > m_next_constraint;
+	const std::unique_ptr<iconstraint<value_t> > m_next_constraint;
 };
 
 namespace constraint
@@ -1650,7 +1650,7 @@ protected:
 
 private:
 	/// Stores the (mandatory) chain of constraint nodes to apply to incoming values
-	const std::auto_ptr<iconstraint<value_t> > m_constraint;
+	const std::unique_ptr<iconstraint<value_t> > m_constraint;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2058,7 +2058,7 @@ protected:
 
 private:
 	/// Storage for this policy's value
-	std::auto_ptr<non_pointer_t> m_value;
+	std::unique_ptr<non_pointer_t> m_value;
 	/// Set to true if this policy's value is stale and needs to be updated
 	bool m_update;
 	/// Stores a slot that will be executed to initialize this policy's value

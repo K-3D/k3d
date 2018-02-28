@@ -51,7 +51,7 @@ class control :
 	typedef property_widget::control base;
 
 public:
-	control(std::auto_ptr<property_widget::idata_proxy> Data);
+	control(std::unique_ptr<property_widget::idata_proxy> Data);
 
 private:
 	/// Called whenever the state of the underlying data has changed

@@ -137,21 +137,21 @@ private:
 	k3d::iwatched_path_property* const m_watched_data;
 };
 
-std::auto_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
+std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* const StateRecorder, const Glib::ustring& ChangeMessage)
 {
-	return std::auto_ptr<idata_proxy>(new data_proxy<k3d::iproperty>(Data, StateRecorder, ChangeMessage));
+	return std::unique_ptr<idata_proxy>(new data_proxy<k3d::iproperty>(Data, StateRecorder, ChangeMessage));
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // control
 
-control::control(std::auto_ptr<idata_proxy> Data) :
+control::control(std::unique_ptr<idata_proxy> Data) :
 	base(false, 0),
 	m_entry(new hotkey_entry),
 	m_button(new Gtk::Button("...")),
 	m_combo(new Gtk::ComboBox()),
 	m_toggle_button(0),
-	m_data(Data),
+	m_data(std::move(Data)),
 	m_disable_set_value(false)
 {
 	m_entry->signal_focus_out_event().connect(sigc::mem_fun(*this, &control::on_focus_out_event));

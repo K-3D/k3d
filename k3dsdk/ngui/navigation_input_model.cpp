@@ -638,7 +638,7 @@ struct navigation_input_model::implementation
 	double m_dolly_sensitivity;
 
 	/// Context menu
-	std::auto_ptr<Gtk::Menu> m_context_menu;
+	std::unique_ptr<Gtk::Menu> m_context_menu;
 
 	k3d::timer m_timer;
 };
