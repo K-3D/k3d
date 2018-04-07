@@ -97,7 +97,7 @@ public:
 
 private:
 	/// Called to refresh the drawing area that displays the current color
-	bool on_redraw();
+	bool on_redraw(const Cairo::RefPtr<Cairo::Context>& ctx);
 	/// Called when the user clicks on the control
 	void on_clicked();
 	/// Called whenever the underlying data changes

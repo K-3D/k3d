@@ -39,7 +39,7 @@
 #include <gtkmm/entry.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/togglebutton.h>
-#include <gtkmm/tooltips.h>
+#include <gtkmm/tooltip.h>
 
 namespace k3d
 {

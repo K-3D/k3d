@@ -67,9 +67,6 @@ public:
 	/// Attempts to safely close the application, saving unsaved documents and giving the user a chance to cancel.  Returns true iff the application will close.
 	bool safe_close(Gtk::Window& Parent);
 
-	/// Returns a gdkgl context node that can be used to share display lists between viewports
-	GdkGLContext* gdkgl_share_list();
-
 	/// Defines a signal that can be emitted to acknowledge of a document selection change
 	typedef sigc::signal<void> document_selection_change_signal_t;
 	/// Returns a signal that can be emitted to acknowledge of a document selection change

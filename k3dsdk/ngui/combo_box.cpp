@@ -88,14 +88,14 @@ std::unique_ptr<idata_proxy> proxy(k3d::iproperty& Data, k3d::istate_recorder* c
 // control
 
 control::control(std::unique_ptr<idata_proxy> Data) :
-	m_data(std::move(Data))
+	base(true), m_data(std::move(Data))
 {
 	if(m_data.get())
 		m_data->changed_signal().connect(sigc::mem_fun(*this, &control::data_changed));
 
 	m_model = Gtk::ListStore::create(m_columns);
 	set_model(m_model);
-	set_text_column(m_columns.value);
+	set_entry_text_column(m_columns.value);
 
 	Gtk::Entry* const entry = dynamic_cast<Gtk::Entry*>(get_child());
 

@@ -31,7 +31,7 @@
 #include <gtkmm/main.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/menuitem.h>
-#include <gtkmm/tooltips.h>
+#include <gtkmm/tooltip.h>
 
 #include <iostream>
 
@@ -101,19 +101,19 @@ public:
 		frame.set_label_widget(button);
 		frame.set_shadow_type(Gtk::SHADOW_NONE);
 
-		context_menu.items().push_back(*Gtk::manage(
+		context_menu.append(*Gtk::manage(
 			new Gtk::MenuItem(_("Expand")) <<
 			connect_menu_item(sigc::mem_fun(*this, &implementation::expand))));
 
-		context_menu.items().push_back(*Gtk::manage(
+		context_menu.append(*Gtk::manage(
 			new Gtk::MenuItem(_("Collapse")) <<
 			connect_menu_item(sigc::mem_fun(*this, &implementation::collapse))));
 
-		context_menu.items().push_back(*Gtk::manage(
+		context_menu.append(*Gtk::manage(
 			new Gtk::MenuItem(_("Expand All")) <<
 			connect_menu_item(expand_all_signal.make_slot())));
 
-		context_menu.items().push_back(*Gtk::manage(
+		context_menu.append(*Gtk::manage(
 			new Gtk::MenuItem(_("Collapse All")) <<
 			connect_menu_item(collapse_all_signal.make_slot())));
 	}

@@ -141,22 +141,24 @@ protected:
 	}
 
 	/// Stores a GC for drawing selections
-	Glib::RefPtr<Gdk::GC> m_selection_gc;
+	Cairo::RefPtr<Cairo::Context> m_selection_ctx;
 
 	/// Returns a GC for drawing selections
-	Glib::RefPtr<Gdk::GC> selection_gc(viewport::control& Viewport)
+	Cairo::RefPtr<Cairo::Context> selection_gc(viewport::control& Viewport)
 	{
-		if(!m_selection_gc)
+		if(!m_selection_ctx)
 		{
-			Gdk::Color selection_color = convert(k3d::color(0.2, 1.0, 1.0));
-			Viewport.get_default_colormap()->alloc_color(selection_color);
-			m_selection_gc = Gdk::GC::create(Viewport.get_window());
-			m_selection_gc->set_foreground(selection_color);
-			m_selection_gc->set_function(Gdk::XOR);
-			m_selection_gc->set_line_attributes(1, Gdk::LINE_ON_OFF_DASH, Gdk::CAP_BUTT, Gdk::JOIN_MITER);
+			const k3d::color selection_color(0.2, 1.0, 1.0);
+			m_selection_ctx = Viewport.get_window()->create_cairo_context();
+			m_selection_ctx->set_source_rgb(selection_color.red, selection_color.green, selection_color.blue);
+			m_selection_ctx->set_operator(Cairo::OPERATOR_XOR);
+			m_selection_ctx->set_line_width(1.0);
+			m_selection_ctx->set_dash(std::vector<double>({1.0}), 0.0);
+			m_selection_ctx->set_line_cap(Cairo::LINE_CAP_BUTT);
+			m_selection_ctx->set_line_join(Cairo::LINE_JOIN_MITER);
 		}
 
-		return m_selection_gc;
+		return m_selection_ctx;
 	}
 
 	/// Draws selection window

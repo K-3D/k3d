@@ -33,6 +33,8 @@
 
 #include <boost/format.hpp>
 
+#include <glibmm.h>
+
 #include <gtkmm/checkbutton.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/image.h>
@@ -127,25 +129,25 @@ file_chooser_dialog::~file_chooser_dialog()
 
 void file_chooser_dialog::add_pattern_filter(const Glib::ustring& Name, const Glib::ustring& Pattern)
 {
-	Gtk::FileFilter filter;
-	filter.set_name(Name);
-	filter.add_pattern(Pattern);
+	auto filter = Gtk::FileFilter::create();
+	filter->set_name(Name);
+	filter->add_pattern(Pattern);
 	add_filter(filter);
 }
 
 void file_chooser_dialog::add_mime_type_filter(const Glib::ustring& Name, const Glib::ustring& MimeType)
 {
-	Gtk::FileFilter filter;
-	filter.set_name(Name);
-	filter.add_mime_type(MimeType);
+	auto filter = Gtk::FileFilter::create();
+	filter->set_name(Name);
+	filter->add_mime_type(MimeType);
 	add_filter(filter);
 }
 
 void file_chooser_dialog::add_all_files_filter()
 {
-	Gtk::FileFilter filter;
-	filter.set_name(_("All Files"));
-	filter.add_pattern("*");
+	auto filter = Gtk::FileFilter::create();
+	filter->set_name(_("All Files"));
+	filter->add_pattern("*");
 	add_filter(filter);
 }
 
@@ -183,15 +185,15 @@ bool file_chooser_dialog::get_file_path(k3d::filesystem::path& Result, bool& Com
 	append_extension_widget.set_active(true);
 
 	Gtk::Button cancel_widget(Gtk::Stock::CANCEL);
-	cancel_widget.set_flags(cancel_widget.get_flags() | Gtk::CAN_DEFAULT);
+	cancel_widget.set_can_default();
 	cancel_widget.show();
 
 	Gtk::Button open_widget(Gtk::Stock::OPEN);
-	open_widget.set_flags(open_widget.get_flags() | Gtk::CAN_DEFAULT);
+	open_widget.set_can_default();
 	open_widget.show();
 
 	Gtk::Button save_widget(Gtk::Stock::SAVE);
-	save_widget.set_flags(save_widget.get_flags() | Gtk::CAN_DEFAULT);
+	save_widget.set_can_default();
 	save_widget.show();
 
 	// Add the K-3D share path as a shortcut ...
@@ -294,7 +296,7 @@ bool file_chooser_dialog::prompt_file_overwrite(const k3d::filesystem::path& Fil
 
 	Gtk::Button replace_button(_("Replace"));
 	replace_button.set_image(replace_icon);
-	replace_button.set_flags(replace_button.get_flags() | Gtk::CAN_DEFAULT);
+	replace_button.set_can_default();
 	replace_button.show();
 
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);

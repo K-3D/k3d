@@ -28,7 +28,7 @@
 #include <k3dsdk/iproperty.h>
 #include <k3dsdk/iwritable_property.h>
 
-#include <gtkmm/comboboxentry.h>
+#include <gtkmm/combobox.h>
 #include <gtkmm/liststore.h>
 
 #include <memory>
@@ -85,9 +85,9 @@ private:
 
 /// Provides a UI for manipulating enumerated quantities (i.e. the view and the controller from model-view-controller)
 class control :
-	public Gtk::ComboBoxEntry
+	public Gtk::ComboBox
 {
-	typedef Gtk::ComboBoxEntry base;
+	typedef Gtk::ComboBox base;
 
 public:
 	control(std::unique_ptr<idata_proxy> Data);

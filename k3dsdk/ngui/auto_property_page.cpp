@@ -175,7 +175,7 @@ public:
 			frame->add(*manage(table));
 
 			// Store entries for focus chain within table
-			std::list<Gtk::Widget*> entry_list;
+			std::vector<Gtk::Widget*> entry_list;
 
 			const unsigned long prop_delete_begin = 0;
 			const unsigned long prop_delete_end = 1;

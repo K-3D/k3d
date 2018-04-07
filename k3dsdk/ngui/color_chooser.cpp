@@ -193,7 +193,7 @@ control::control(std::unique_ptr<idata_proxy> Data) :
 	m_area(new Gtk::DrawingArea()),
 	m_data(std::move(Data))
 {
-	m_area->signal_expose_event().connect(sigc::hide(sigc::mem_fun(*this, &control::on_redraw)));
+	m_area->signal_draw().connect(sigc::mem_fun(*this, &control::on_redraw));
 	add(*manage(m_area));
 
 	data_changed(0);
@@ -207,16 +207,14 @@ control::~control()
 	m_deleted_signal.emit();
 }
 
-bool control::on_redraw()
+bool control::on_redraw(const Cairo::RefPtr<Cairo::Context>& ctx)
 {
 	return_val_if_fail(m_data.get(), false);
+	const auto& color = m_data->value();
 
-	Glib::RefPtr<Gdk::GC> gc = Gdk::GC::create(m_area->get_window());
-	Gdk::Color color = convert(m_data->value());
-	m_area->get_default_colormap()->alloc_color(color);
-	gc->set_foreground(color);
-
-	m_area->get_window()->draw_rectangle(gc, true, 0, 0, m_area->get_width(), m_area->get_height());
+	ctx->set_source_rgb(color.red, color.green, color.blue);
+	ctx->rectangle(0, 0, m_area->get_width(), m_area->get_height());
+	ctx->fill();
 
 	return true;
 }

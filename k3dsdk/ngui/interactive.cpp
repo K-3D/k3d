@@ -81,7 +81,7 @@ void warp_pointer(const k3d::point2& Offset)
 	return_if_fail(xdisplay);
 
 	// Get our X window ...
-	Window xwindow = GDK_WINDOW_XWINDOW(Gdk::Display::get_default()->get_default_screen()->get_root_window()->gobj());
+	Window xwindow = GDK_WINDOW_XID(Gdk::Display::get_default()->get_default_screen()->get_root_window()->gobj());
 	return_if_fail(xwindow);
 
 	// Move that pointer!
@@ -109,9 +109,13 @@ const k3d::point2 screen_coordinates(Gtk::Widget& Widget)
 
 	int left = 0;
 	int top = 0;
-	Widget.get_window()->get_origin(left, top);
+	auto win = Widget.get_window();
 
-	if(Widget.has_no_window())
+	if(win)
+	{
+		win->get_origin(left, top);
+	}
+	else
 	{
 		left += Widget.get_allocation().get_x();
 		top += Widget.get_allocation().get_y();

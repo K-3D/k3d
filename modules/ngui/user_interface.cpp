@@ -304,13 +304,6 @@ public:
 
 		m_main.reset(new Gtk::Main(argc, argv));
 
-		// Give gtkglext a chance at the startup arguments ...
-		if(!gtk_gl_init_check(&argc, &argv))
-		{
-			detail::handle_error("Could not initialize gtkglext", Quit, Error);
-			return arguments_t();
-		}
-
 		// We return any "unused" arguments ...
 		arguments_t unused;
 

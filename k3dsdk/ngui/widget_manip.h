@@ -29,7 +29,7 @@
 
 #include <gtkmm/accelgroup.h>
 #include <gtkmm/label.h>
-#include <gtkmm/tooltips.h>
+#include <gtkmm/tooltip.h>
 #include <glibmm/ustring.h>
 
 namespace Gtk { class ImageMenuItem; }

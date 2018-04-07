@@ -46,7 +46,7 @@ class control::implementation
 {
 public:
 	implementation() :
-		command_index(0), completion_key(GDK_VoidSymbol)
+		command_index(0), completion_key(GDK_KEY_VoidSymbol)
 	{
 		buffer = Gtk::TextBuffer::create();
 
@@ -69,7 +69,7 @@ public:
 
 	bool on_key_press_event(GdkEventKey* event)
 	{
-		if(event->keyval == GDK_Return)
+		if(event->keyval == GDK_KEY_Return)
 		{
 			const k3d::string_t input = buffer->get_text(buffer->get_iter_at_mark(begin_input), buffer->end()).raw();
 
@@ -92,11 +92,11 @@ public:
 
 			return true;
 		}
-		else if(event->keyval == GDK_Left)
+		else if(event->keyval == GDK_KEY_Left)
 		{
 			return buffer->get_iter_at_mark(buffer->get_insert()) <= buffer->get_iter_at_mark(begin_input);
 		}
-		else if(event->keyval == GDK_Up)
+		else if(event->keyval == GDK_KEY_Up)
 		{
 			if(command_index)
 			{
@@ -111,7 +111,7 @@ public:
 			buffer->place_cursor(buffer->end());
 			return true;
 		}
-		else if(event->keyval == GDK_Down)
+		else if(event->keyval == GDK_KEY_Down)
 		{
 			if(command_index < command_history.size())
 			{
@@ -126,12 +126,12 @@ public:
 			buffer->place_cursor(buffer->end());
 			return true;
 		}
-		else if(event->keyval == GDK_Home)
+		else if(event->keyval == GDK_KEY_Home)
 		{
 			buffer->place_cursor(buffer->get_iter_at_mark(begin_input));
 			return true;
 		}
-		else if(event->keyval == GDK_v && (event->state & GDK_CONTROL_MASK))
+		else if(event->keyval == GDK_KEY_v && (event->state & GDK_CONTROL_MASK))
 		{
 			const k3d::string_t input = Gtk::Clipboard::get()->wait_for_text();
 			
@@ -157,7 +157,7 @@ public:
 
 			return true;
 		}
-		else if(event->keyval != GDK_Control_L && event->keyval != GDK_Control_R)
+		else if(event->keyval != GDK_KEY_Control_L && event->keyval != GDK_KEY_Control_R)
 		{
 			return false;
 		}

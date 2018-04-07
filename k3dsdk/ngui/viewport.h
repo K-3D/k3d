@@ -58,7 +58,7 @@ namespace viewport
 // control
 
 class control :
-        public Gtk::DrawingArea,
+    public Gtk::DrawingArea,
 	public k3d::property_collection,
 	public k3d::irender_camera_frame,
 	public k3d::irender_camera_animation,

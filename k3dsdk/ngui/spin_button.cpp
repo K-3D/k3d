@@ -26,7 +26,7 @@
 #include <gtkmm/arrow.h>
 #include <gtkmm/button.h>
 #include <gtkmm/entry.h>
-#include <gtkmm/tooltips.h>
+#include <gtkmm/tooltip.h>
 #include <gtkmm/window.h>
 
 #include <k3dsdk/ngui/hotkey_entry.h>

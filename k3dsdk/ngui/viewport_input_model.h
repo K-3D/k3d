@@ -24,7 +24,7 @@
 		\author Tim Shead (tshead@k-3d.com)
 */
 
-#include <gdk/gdkevents.h>
+#include <gdk/gdk.h>
 
 namespace k3d
 {

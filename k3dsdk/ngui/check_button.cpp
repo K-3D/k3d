@@ -27,7 +27,7 @@
 #include <k3dsdk/istate_recorder.h>
 #include <k3dsdk/state_change_set.h>
 
-#include <gtkmm/tooltips.h>
+#include <gtkmm/tooltip.h>
 
 namespace k3d
 {

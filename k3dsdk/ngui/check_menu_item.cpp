@@ -28,7 +28,7 @@
 #include <k3dsdk/state_change_set.h>
 
 #include <gtkmm/menu.h>
-#include <gtkmm/tooltips.h>
+#include <gtkmm/tooltip.h>
 
 namespace k3d
 {

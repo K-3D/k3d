@@ -49,7 +49,7 @@ k3d::idocument& document_window::document()
 
 bool document_window::on_key_press_event(GdkEventKey* event)
 {
-	if(event->keyval == GDK_Escape)
+	if(event->keyval == GDK_KEY_Escape)
 	{
 		close();
 		return true;

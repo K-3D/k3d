@@ -39,7 +39,7 @@
 #include <k3dsdk/state_change_set.h>
 #include <k3dsdk/system.h>
 
-#include <gtkmm/tooltips.h>
+#include <gtkmm/tooltip.h>
 
 #include <boost/format.hpp>
 

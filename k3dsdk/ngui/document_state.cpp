@@ -25,7 +25,6 @@
 #include <gtkmm/menu.h>
 #include <gtkmm/window.h>
 
-#include <gtk/gtkgl.h>
 #include <gtk/gtkmain.h>
 
 #include <k3d-i18n-config.h>
@@ -110,7 +109,6 @@ class document_state::implementation :
 public:
 	implementation(k3d::idocument& Document) :
 		m_document(Document),
-		m_gdkgl_share_list(0),
 		m_last_selection_mode(selection::NODE),
 		m_active_tool(0),
 		m_selection_tool(0),
@@ -147,59 +145,6 @@ public:
 	{
 		return m_document;
 	}
-
-#if defined K3D_API_DARWIN || defined K3D_API_WIN32
-	/// Returns a "global" (to the document) gdkgl context that can be used to share display lists
-  GdkGLContext* gdkgl_share_list()
-  {
-    if(!m_gdkgl_share_list)
-    {
-      GdkGLConfig* const config = gdk_gl_config_new_by_mode(
-        static_cast<GdkGLConfigMode>(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
-      return_val_if_fail(config, 0);
-
-      Gtk::Window* const window = new Gtk::Window();
-      gtk_widget_set_gl_capability(GTK_WIDGET(window->gobj()), config, 0, true, GDK_GL_RGBA_TYPE);
-      window->show();
-      window->hide();
-
-      GdkGLContext* const context = gtk_widget_get_gl_context(GTK_WIDGET(window->gobj()));
-      return_val_if_fail(context, 0);
-
-      m_gdkgl_share_list = context;
-    }
-
-    return m_gdkgl_share_list;
-  }
-
-#else // K3D_API_WIN32
-
-	/// Returns a "global" (to the document) gdkgl context that can be used to share display lists
-	GdkGLContext* gdkgl_share_list()
-	{
-		if(!m_gdkgl_share_list)
-		{
-			GdkGLConfig* const config = gdk_gl_config_new_by_mode(
-				static_cast<GdkGLConfigMode>(GDK_GL_MODE_RGBA | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_DEPTH));
-			return_val_if_fail(config, 0);
-
-      GdkPixmap* const pixmap = gdk_pixmap_new(0, 8, 8, gdk_gl_config_get_depth(config));
-			return_val_if_fail(pixmap, 0);
-
-			GdkGLPixmap* const glpixmap = gdk_pixmap_set_gl_capability(pixmap, config, 0);
-			return_val_if_fail(glpixmap, 0);
-
-			GdkGLContext* const context = gdk_gl_context_new(
-				gdk_pixmap_get_gl_drawable(pixmap), 0, true, GDK_GL_RGBA_TYPE);
-			return_val_if_fail(context, 0);
-
-			m_gdkgl_share_list = context;
-		}
-
-		return m_gdkgl_share_list;
-	}
-
-#endif
 
 	/// Returns a signal that can be emitted to acknowledge of a document selection change
 	document_selection_change_signal_t& document_selection_change_signal()
@@ -280,10 +225,6 @@ assert_not_implemented();
 	/// Stores a reference to the owning document
 	k3d::idocument& m_document;
 	sigc::signal<bool, k3d::signal::cancelable> m_safe_to_close_signal;
-	/// Stores an unused off-screen pixmap so we can create a global gdkgl context for sharing display lists
-	Glib::RefPtr<Gdk::Pixmap> m_gdkgl_share_pixmap;
-	/// Stores a gdkgl context that can be used to share display lists for the entire document
-	GdkGLContext* m_gdkgl_share_list;
 	/// A signal that can be emitted to acknowledge of a document selection change
 	document_selection_change_signal_t m_document_selection_change_signal;
 	/// A signal that will be emitted whenever the active tool changes
@@ -459,11 +400,6 @@ bool document_state::safe_close(Gtk::Window& Parent)
 
 	k3d::application().close_document(document());
 	return true;
-}
-
-GdkGLContext* document_state::gdkgl_share_list()
-{
-	return m_implementation->gdkgl_share_list();
 }
 
 document_state::document_selection_change_signal_t& document_state::document_selection_change_signal()
