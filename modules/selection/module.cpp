@@ -57,6 +57,7 @@ extern k3d::iplugin_factory& select_n_sided_factory();
 extern k3d::iplugin_factory& select_nurbs_curve_by_number_factory();
 extern k3d::iplugin_factory& select_nurbs_patch_by_number_factory();
 extern k3d::iplugin_factory& select_point_by_number_factory();
+extern k3d::iplugin_factory &select_points_above_number_factory();
 
 } // namespace selection
 
@@ -90,5 +91,5 @@ K3D_MODULE_START(Registry)
 	Registry.register_factory(module::selection::select_nurbs_curve_by_number_factory());
 	Registry.register_factory(module::selection::select_nurbs_patch_by_number_factory());
 	Registry.register_factory(module::selection::select_point_by_number_factory());
+	Registry.register_factory(module::selection::select_points_above_number_factory());
 K3D_MODULE_END
-
