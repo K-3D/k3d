@@ -26,7 +26,7 @@
 #include <k3dsdk/document_plugin_factory.h>
 #include <k3dsdk/node.h>
 
-#include <boost/gil/extension/io/tiff_io.hpp>
+#include <boost/gil/extension/io/tiff.hpp>
 
 namespace module
 {
@@ -78,7 +78,7 @@ public:
 		try
 		{
 			k3d::log() << info << "Writing " << file.native_console_string() << " using " << get_factory().name() << std::endl;
-			boost::gil::tiff_write_view(file.native_filesystem_string(), boost::gil::color_converted_view<boost::gil::rgb8_pixel_t>(view(*bitmap), extract_rgb()));
+			boost::gil::write_view(file.native_filesystem_string(), boost::gil::color_converted_view<boost::gil::rgb8_pixel_t>(view(*bitmap), extract_rgb()), boost::gil::tiff_tag());
 		}
 		catch(std::exception& e)
 		{

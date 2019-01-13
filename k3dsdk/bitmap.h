@@ -41,6 +41,9 @@ namespace boost
 namespace gil
 {
 
+typedef boost::uint8_t  bits8;
+typedef float32_t bits32f;
+
 template<>
 struct channel_traits<half>
 {

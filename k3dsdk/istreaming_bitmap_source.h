@@ -24,6 +24,7 @@
 	\author Tim Shead (tshead@k-3d.com)
 */
 
+#include <k3dsdk/bitmap.h>
 #include <k3dsdk/iunknown.h>
 #include <k3dsdk/signal_system.h>
 

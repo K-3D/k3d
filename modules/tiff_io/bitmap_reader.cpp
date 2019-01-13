@@ -28,7 +28,7 @@
 #include <k3dsdk/options.h>
 #include <k3dsdk/path.h>
 
-#include <boost/gil/extension/io/tiff_io.hpp>
+#include <boost/gil/extension/io/tiff.hpp>
 
 namespace module
 {
@@ -66,7 +66,7 @@ public:
 		try
 		{
 			k3d::log() << info << "Reading " << file.native_console_string() << " using " << get_factory().name() << std::endl;
-			boost::gil::tiff_read_and_convert_image(file.native_filesystem_string(), Output);
+			boost::gil::read_and_convert_image(file.native_filesystem_string(), Output, boost::gil::tiff_tag());
 		}
 		catch(std::exception& e)
 		{

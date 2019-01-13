@@ -68,7 +68,7 @@ namespace detail {
         Sampler _sampler;
         resample_pixels_fn(const MapFn& dst_to_src, const Sampler& sampler) : _dst_to_src(dst_to_src), _sampler(sampler) {}
 
-        template <typename SrcView, typename DstView> GIL_FORCEINLINE void apply_compatible(const SrcView& src, const DstView& dst)  const { 
+        template <typename SrcView, typename DstView> BOOST_FORCEINLINE void apply_compatible(const SrcView& src, const DstView& dst)  const { 
             resample_pixels(src, dst, _dst_to_src, _sampler); 
         }
     };

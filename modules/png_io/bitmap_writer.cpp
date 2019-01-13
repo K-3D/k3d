@@ -29,7 +29,7 @@
 #define png_infopp_NULL (png_infopp)NULL
 #define int_p_NULL (int*)NULL
 
-#include <boost/gil/extension/io/png_io.hpp>
+#include <boost/gil/extension/io/png.hpp>
 
 namespace module
 {
@@ -76,7 +76,7 @@ public:
 				throw std::runtime_error("bitmap with zero height");
 
 			k3d::log() << info << "Writing " << file.native_console_string() << " using " << get_factory().name() << std::endl;
-			boost::gil::png_write_view(file.native_filesystem_string(), boost::gil::color_converted_view<boost::gil::rgba8_pixel_t>(view(*bitmap)));
+			boost::gil::write_view(file.native_filesystem_string(), boost::gil::color_converted_view<boost::gil::rgba8_pixel_t>(view(*bitmap)), boost::gil::png_tag());
 		}
 		catch(std::exception& e)
 		{

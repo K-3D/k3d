@@ -31,7 +31,7 @@
 #define png_infopp_NULL (png_infopp)NULL
 #define int_p_NULL (int*)NULL
 
-#include <boost/gil/extension/io/png_io.hpp>
+#include <boost/gil/extension/io/png.hpp>
 
 namespace module
 {
@@ -69,7 +69,7 @@ public:
 		try
 		{
 			k3d::log() << info << "Reading " << file.native_console_string() << " using " << get_factory().name() << std::endl;
-			boost::gil::png_read_and_convert_image(file.native_filesystem_string(), Output);
+			boost::gil::read_and_convert_image(file.native_filesystem_string(), Output, boost::gil::png_tag());
 		}
 		catch(std::exception& e)
 		{

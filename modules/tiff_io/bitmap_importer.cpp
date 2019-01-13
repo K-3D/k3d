@@ -28,7 +28,7 @@
 #include <k3dsdk/string_modifiers.h>
 
 #include <boost/assign/list_of.hpp>
-#include <boost/gil/extension/io/tiff_io.hpp>
+#include <boost/gil/extension/io/tiff.hpp>
 
 namespace module
 {
@@ -55,7 +55,7 @@ public:
 		try
 		{
 			k3d::log() << info << "Reading " << Path.native_console_string() << " using " << get_factory().name() << std::endl;
-			boost::gil::tiff_read_and_convert_image(Path.native_filesystem_string(), Bitmap);
+			boost::gil::read_and_convert_image(Path.native_filesystem_string(), Bitmap, boost::gil::tiff_tag());
 			return true;
 		}
 		catch(std::exception& e)
