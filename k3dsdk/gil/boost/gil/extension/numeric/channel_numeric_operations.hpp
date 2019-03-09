@@ -24,7 +24,12 @@
 */
 
 #include <functional>
+#include <boost/version.hpp>
+#if BOOST_VERSION < 106900
 #include <boost/gil/gil_config.hpp>
+#else
+#include <boost/gil.hpp>
+#endif
 #include <boost/gil/channel.hpp>
 
 namespace boost { namespace gil {

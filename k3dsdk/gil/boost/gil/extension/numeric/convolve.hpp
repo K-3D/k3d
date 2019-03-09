@@ -24,7 +24,12 @@
 #include <algorithm>
 #include <vector>
 #include <functional>
+#include <boost/version.hpp>
+#if BOOST_VERSION < 106900
 #include <boost/gil/gil_config.hpp>
+#else
+#include <boost/gil.hpp>
+#endif
 #include <boost/gil/image_view_factory.hpp>
 #include <boost/gil/algorithm.hpp>
 #include <boost/gil/metafunctions.hpp>

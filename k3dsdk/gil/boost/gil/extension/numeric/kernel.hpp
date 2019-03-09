@@ -22,8 +22,13 @@
 #include <algorithm>
 #include <vector>
 #include <memory>
-#include <boost/array.hpp>
+#include <boost/version.hpp>
+#if BOOST_VERSION < 106900
 #include <boost/gil/gil_config.hpp>
+#else
+#include <boost/gil.hpp>
+#endif
+#include <boost/array.hpp>
 #include <boost/gil/utilities.hpp>
 
 namespace boost { namespace gil {

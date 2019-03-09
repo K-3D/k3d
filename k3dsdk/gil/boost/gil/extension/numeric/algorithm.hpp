@@ -21,7 +21,12 @@
 #include <iterator>
 #include <algorithm>
 #include <numeric>
+#include <boost/version.hpp>
+#if BOOST_VERSION < 106900
 #include <boost/gil/gil_config.hpp>
+#else
+#include <boost/gil.hpp>
+#endif
 #include <boost/gil/pixel_iterator.hpp>
 #include <boost/gil/metafunctions.hpp>
 
