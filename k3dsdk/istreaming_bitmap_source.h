@@ -28,7 +28,12 @@
 #include <k3dsdk/iunknown.h>
 #include <k3dsdk/signal_system.h>
 
+#include <boost/version.hpp>
+#if BOOST_VERSION < 106900
 #include <boost/gil/gil_all.hpp>
+#else
+#include <boost/gil.hpp>
+#endif
 
 namespace k3d
 {
